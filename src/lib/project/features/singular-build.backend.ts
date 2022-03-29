@@ -1,4 +1,4 @@
-import { _ } from 'tnp-core';
+import { chokidar, _ } from 'tnp-core';
 import { glob } from 'tnp-core';
 import { path } from 'tnp-core'
 import { fse } from 'tnp-core'
@@ -19,7 +19,9 @@ export class SingularBuild extends FeatureForProject {
     return path.join(workspaceOrContainer.location, outFolder, workspaceOrContainer.name, client);
   }
 
-  async createSingluarTargeProjFor(parent: Project, client: Project, outFolder: Models.dev.BuildDir): Promise<Project> {
+  watchers: chokidar.FSWatcher[] = [];
+
+  async createSingluarTargeProjFor(parent: Project, client: Project, outFolder: Models.dev.BuildDir, watch = false): Promise<Project> {
 
     const children = this.project.children
       .filter(c => (c.typeIs('isomorphic-lib')) && c.frameworkVersionAtLeast('v3'))
@@ -82,7 +84,33 @@ export class SingularBuild extends FeatureForProject {
       const dest = path.join(destProjPath, config.folder.src, 'libs', c.name);
       const destAssets = path.join(destProjPath, config.folder.src, 'assets', 'assets-for', c.name);
       Helpers.createSymLink(source, dest);
-      Helpers.copy(sourceAssets, destAssets, { recursive: true, overwrite: true });
+
+      if (watch) {
+        // SYNCING FOLDERS
+        Helpers.copy(sourceAssets, destAssets, { recursive: true, overwrite: true });
+        const watcher = chokidar.watch(sourceAssets, {
+          ignoreInitial: true,
+          followSymlinks: false,
+          ignorePermissionErrors: true,
+        }).on('all', (event, f) => {
+          const dest = (path.join(destAssets, Helpers.removeSlashAtBegin(f.replace(`${sourceAssets}`, ''))))
+          if ((event === 'add') || (event === 'change')) {
+            Helpers.copyFile(f, dest);
+          }
+          if (event === 'addDir') {
+            Helpers.copy(f, dest, { recursive: true, overwrite: true });
+          }
+          if (event === 'unlink') {
+            Helpers.removeFileIfExists(dest);
+          }
+          if (event === 'unlinkDir') {
+            Helpers.remove(dest, true);
+          }
+        })
+        this.watchers.push(watcher);
+      } else {
+        Helpers.copy(sourceAssets, destAssets, { recursive: true, overwrite: true });
+      }
     });
 
 
@@ -186,7 +214,7 @@ export class SingularBuild extends FeatureForProject {
     }
 
     Helpers.log(`[singularbuildcontainer] children for build: \n\n${children.map(c => c.name)}\n\n`);
-    const singularWatchProj = await this.createSingluarTargeProjFor(this.project, client, outDir);
+    const singularWatchProj = await this.createSingluarTargeProjFor(this.project, client, outDir, watch);
 
     Helpers.log(`[singular build] init structure ${!!singularWatchProj}`);
 

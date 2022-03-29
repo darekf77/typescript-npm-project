@@ -418,16 +418,17 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     }
     if (this.project.frameworkVersionAtLeast('v3')) {
       // no modification of any code straight ng is being use
-      this.rawContent = this.rawContent.replace(
-        new RegExp(Helpers.escapeStringForRegEx(`/${this.project.name}/src/assets/`), 'g'),
-        `assets/assets-for/${this.project.name}/`
-      );
-
-      this.rawContent = this.rawContent.replace(
-        new RegExp(Helpers.escapeStringForRegEx(`${this.project.name}/src/assets/`), 'g'),
-        `assets/assets-for/${this.project.name}/`
-      );
-
+      if (this.project.isSmartContainerTarget) {
+        const parent = Project.From(this.project.smartContainerTargetParentContainerPath) as Project;
+        parent.children
+          .filter(f => f.typeIs('isomorphic-lib'))
+          .forEach(c => {
+            const from = `${c.name}/src/assets/`;
+            const to = `assets/assets-for/${c.name}/`;
+            this.rawContent = this.rawContent.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
+            this.rawContent = this.rawContent.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          });
+      }
     } else {
       this.rawContent = this.afterRegionsReplacement(this.rawContent);
     }
