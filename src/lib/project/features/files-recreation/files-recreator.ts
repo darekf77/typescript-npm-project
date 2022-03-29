@@ -459,6 +459,7 @@ ${this.project.isMonorepo ? [] : this.project.packageJson.linkedProjects.map(c =
 # =====================
 ${this.project.isCoreProject ? '!*.filetemplate' : '*.filetemplate'}
 ${this.project.isDocker ? '!Dockerfile.filetemplate' : ''}
+${this.project.isSmartContainer ? '/angular.json' : ''}
 ${coreFiles}
 
 `.trimRight() + '\n');
