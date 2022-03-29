@@ -314,27 +314,14 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     if (this.project.isSmartContainerChild) {
       parent = this.project.parent;
     }
-    const folderBefore = path.basename(path.dirname(path.dirname(this.project.location)));
-    if ([config.folder.dist, config.folder.bundle].includes(folderBefore)) {
-      const probablyParentPath = path.join(this.project.location, '../../..');
-      const probablyParent = Helpers.isFolder(probablyParentPath) && Project.From(probablyParentPath) as Project;
-      if (probablyParent?.isSmartContainer) {
-        parent = probablyParent;
-      }
+    if (this.project.isSmartContainerTarget) {
+      parent = Project.From(this.project.smartContainerTargetParentContainerPath);
     }
 
+    const additionalSmartPckages = (!parent ? [] : parent.children.map(c => `@${parent.name}/${c.name}`));
 
     const packages = packagesNames.concat([
-      this.project.name,
-      ...(!parent ? [] : parent.children.map(c => `@${parent.name}/${c.name}`)),
-      // ...(this.project.isSmartContainerChild
-      //   ? this.project.parent.children.map(c => `@${this.project.parent.name}/${c.name}`)
-      //   : []
-      // ),
-      // ...(this.project.isSmartContainer
-      //   ? `)
-      //   : []
-      // )
+      ...(parent ? additionalSmartPckages : [this.project.name]),
     ]);
 
 

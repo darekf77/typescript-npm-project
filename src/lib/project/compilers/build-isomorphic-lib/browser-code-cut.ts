@@ -10,6 +10,10 @@ import { ConfigModels } from 'tnp-config';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 
+const filesToDebug = [
+  'app.ts'
+]
+
 export class CodeCut {
 
   browserCodeCut: { new(any?): BrowserCodeCut }
@@ -173,12 +177,22 @@ export class BrowserCodeCut {
       },
 
       TSimportExport(rawImport, usage: ConfigModels.TsUsage) {
+        // const orgImport = rawImport;
         rawImport = rawImport.replace(new RegExp(`${usage}.+from\\s+`), '')
         rawImport = rawImport.replace(new RegExp(`(\'|\")`, 'g'), '').trim()
         if (rawImport.startsWith(`./`)) return void 0;
         if (rawImport.startsWith(`../`)) return void 0;
-        const fisrtName = rawImport.match(new RegExp(`\@?([a-zA-z]|\-)+\\/`))
-        let res: string = (_.isArray(fisrtName) && fisrtName.length > 0) ? fisrtName[0] : rawImport;
+
+        const workspacePackgeMatch = (rawImport.match(new RegExp(`^\\@([a-zA-z]|\\-)+\\/([a-zA-z]|\\-)+$`)) || [])
+          .filter(d => d.length > 1);
+        const worskpacePackageName = (_.isArray(workspacePackgeMatch) && workspacePackgeMatch.length === 1)
+          ? _.first(workspacePackgeMatch) : void 0;
+
+        // const normalPackageMatch = (rawImport.match(new RegExp(`^([a-zA-z]|\\-)+\\/`)) || []);
+        // const normalPackageName = (_.isArray(normalPackageMatch) && normalPackageMatch.length === 1)
+        //   ? _.first(normalPackageMatch) : '';
+
+        let res: string = worskpacePackageName ? worskpacePackageName : rawImport;
         if (res.endsWith('/') && res.length > 1) {
           res = res.substring(0, res.length - 1)
         }
@@ -188,8 +202,8 @@ export class BrowserCodeCut {
   }
 
   /**
-    * Check if package of isomorphic-lib type
-    * @param packageName
+   * LOOG HERE
+    * ./src/lib/project/compilers/build-isomorphic-lib/browser-code-cut-extended.backend.ts
     */
   protected getInlinePackage(packageName: string, packagesNames = BrowserCodeCut.IsomorphicLibs): Models.InlinePkg {
 
@@ -250,15 +264,22 @@ export class BrowserCodeCut {
   }
 
   REPLACERegionsFromTsImportExport(usage: ConfigModels.TsUsage) {
+    // const debug = filesToDebug.includes(path.basename(this.absoluteFilePath));
+    // if (debug) {
+    //   debugger
+    // }
     if (!this.absoluteFilePath.endsWith('.ts')) {
       return this;
     }
     if (!_.isString(this.rawContent)) return;
     const importRegex = new RegExp(`${usage}.+from\\s+(\\'|\\").+(\\'|\\")`, 'g')
     let imports = this.rawContent.match(importRegex)
+    // debug && console.log(imports)
     if (_.isArray(imports)) {
       imports.forEach(imp => {
+        // debug && console.log('imp: ' + imp)
         const pkgName = this.resolvePackageNameFrom.TSimportExport(imp, usage);
+        // debug && console.log('pkgName: ' + pkgName)
         if (pkgName) {
           this.replaceFromLine(pkgName, imp);
         }

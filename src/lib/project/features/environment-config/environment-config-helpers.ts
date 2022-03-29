@@ -393,9 +393,7 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
     workspaceConfig['pathesTsconfig'] = `${workspaceConfig['pathesTsconfig']},`;
   }
 
-  if (project.isSmartContainerTarget) {
-    workspaceConfig[customRootDir] = `"rootDir": "./src",`;
-  } else if (project.isSmartContainerChild) {
+  if (project.isSmartContainerChild) {
     workspaceConfig[customRootDir] = `"rootDir": "../",`;
   } else if (project.isSite) {
     workspaceConfig[customRootDir] = `"rootDir": "./tmp-src",`

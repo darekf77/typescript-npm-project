@@ -367,7 +367,7 @@ export class FilesRecreator extends FeatureForProject {
 
                     settings['files.exclude'][`${c.name}/src/index.ts`] = true;
                     settings['files.exclude'][`${c.name}/.vscode`] = true;
-                    settings['files.exclude'][`${c.name}/${config.file.package_json__tnp_json5}`] = true;
+                    // settings['files.exclude'][`${c.name}/${config.file.package_json__tnp_json5}`] = true;
                     // settings['files.exclude'][`${c.name}/src/lib`] = true;
                     settings['files.exclude'][`${c.name}/README.md`] = true;
                     settings['files.exclude'][`${c.name}/karma.conf.js*`] = true;

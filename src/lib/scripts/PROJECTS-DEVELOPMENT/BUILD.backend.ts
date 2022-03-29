@@ -14,9 +14,6 @@ import { chainBuild } from './chain-build.backend';
 
 //#region BUILD
 
-const $BUILD = async (args) => {
-  await chainBuild(args);
-};
 
 const BUILD_DIST = async (args) => {
   let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
@@ -26,9 +23,20 @@ const BUILD_DIST = async (args) => {
   await proj.buildProcess.startForLibFromArgs(false, false, 'dist', args);
 };
 
-const BUILD_DIST_WATCH = async (args) => (Project.Current as Project)
-  .buildProcess
-  .startForLibFromArgs(false, true, 'dist', args);
+const $BUILD = async (args) => {
+  let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  if (proj.isSmartContainerChild) {
+    await BUILD_DIST(args);
+  } else {
+    await chainBuild(args);
+  }
+};
+
+const BUILD_DIST_WATCH = async (args) => {
+  return (Project.Current as Project)
+    .buildProcess
+    .startForLibFromArgs(false, true, 'dist', args);
+}
 
 const $CLEAN_BUILD = async (args) => {
   args += ' --nocache';
@@ -37,8 +45,8 @@ const $CLEAN_BUILD = async (args) => {
 
 const $BUILD_WATCH = async (args) => {
   let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
-  if (proj.isSmartContainer) {
-    await chainBuild(args, true);
+  if (proj.isSmartContainerChild) {
+    await BUILD_DIST_WATCH(args);
   } else {
     if (proj.isStandaloneProject && proj.typeIsNot('vscode-ext')) {
       // TODO skipCopyToSelection no loger ipmortant
