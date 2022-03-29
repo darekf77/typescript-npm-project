@@ -410,14 +410,14 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     this.options = options;
     // console.log('options.replacements', options.replacements)
     const ext = path.extname(this.absoluteFilePath).replace('.', '') as ConfigModels.CutableFileExt;
-    console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
+    // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
     if (this.allowedToReplace.includes(ext)) {
 
       this.rawContent = this.project.sourceModifier.replaceBaslieneFromSiteBeforeBrowserCodeCut(this.rawContent);
       this.rawContent = RegionRemover.from(this.absoluteFilePath, this.rawContent, options.replacements, this.project).output;
     }
     if (this.project.frameworkVersionAtLeast('v3')) {
-      console.log(`isTarget fixing ? ${this.project.isSmartContainerTarget}`)
+      // console.log(`isTarget fixing ? ${this.project.isSmartContainerTarget}`)
       // no modification of any code straight ng is being use
       if (this.project.isSmartContainerTarget) {
         const parent = Project.From(this.project.smartContainerTargetParentContainerPath) as Project;
