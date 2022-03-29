@@ -71,7 +71,7 @@ ${'//#region'} @${'bro' + 'wser'}
       selector: 'app-${project.name}',
       template: 'hello from ${project.name}'
     })
-    export class $ { componentName } implements OnInit {
+    export class ${componentName} implements OnInit {
       constructor() { }
 
       ngOnInit() { }
@@ -83,7 +83,7 @@ ${'//#region'} @${'bro' + 'wser'}
       declarations: [${componentName}],
       providers: [],
     })
-    export class $ { moduleName } { }
+    export class ${moduleName} { }
     //#endregion
 
     //#region @backend

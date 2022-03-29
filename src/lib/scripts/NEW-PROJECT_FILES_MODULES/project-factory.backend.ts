@@ -420,7 +420,10 @@ export class ProjectFactory {
             + `&& git remote add origin ${projOrigin} ` +
             `&& git branch -M master `).sync();
         }
-        await newCreatedProject.parent.filesStructure.struct('');
+        if (!newCreatedProject?.isSmartContainerChild) {
+          await newCreatedProject.parent.filesStructure.struct('');
+        }
+
       }
     }
     if (firstContainer) {

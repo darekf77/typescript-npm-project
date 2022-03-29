@@ -365,7 +365,7 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
     const parentPath = project.isSmartContainerChild ? project.parent.location : path.join(project.location, '../../..')
     const parent = Project.From(parentPath);
     if (parent) {
-      workspaceConfig['pathesTsconfig'] = JSON.stringify((libs).reduce((a, b) => {
+      workspaceConfig['pathesTsconfig'] = `"paths": ` + JSON.stringify((libs).reduce((a, b) => {
         if (isSmartWorkspaceChild) {
           const pathRelative = path.join(path.basename(b), config.folder.src, 'lib');
           return _.merge(a, {
@@ -386,17 +386,21 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
     }
 
   } else {
-    workspaceConfig['pathesTsconfig'] = JSON.stringify({});
+    workspaceConfig['pathesTsconfig'] = `"paths": ` + JSON.stringify({});
+  }
+
+  if (!(workspaceConfig['pathesTsconfig'] as string)?.endsWith(',')) {
+    workspaceConfig['pathesTsconfig'] = `${workspaceConfig['pathesTsconfig']},`;
   }
 
   if (project.isSmartContainerTarget) {
-    workspaceConfig[customRootDir] = `"rootDir": "./src"`;
+    workspaceConfig[customRootDir] = `"rootDir": "./src",`;
   } else if (project.isSmartContainerChild) {
-    workspaceConfig[customRootDir] = `"rootDir": "../"`;
+    workspaceConfig[customRootDir] = `"rootDir": "../",`;
   } else if (project.isSite) {
-    workspaceConfig[customRootDir] = `"rootDir": "./tmp-src"`
+    workspaceConfig[customRootDir] = `"rootDir": "./tmp-src",`
   } else {
-    workspaceConfig[customRootDir] = `"rootDir": "./src"`
+    workspaceConfig[customRootDir] = `"rootDir": "./src",`
   }
 
   //#endregion
