@@ -369,12 +369,18 @@ export class FilesStructure extends FeatureForProject {
   }
 
   public async reset(options?: { recrusive: boolean; }) {
-    const { recrusive = false } = options || {};
+    let { recrusive = false } = options || {};
+    if (this.project.isSmartContainer) {
+      recrusive = true;
+    }
     await this.recrusiveOperation(this.project, recrusive, 'reset')
   }
 
   public async clear(options?: { recrusive: boolean; }) {
-    const { recrusive = false } = options || {};
+    let { recrusive = false } = options || {};
+    if (this.project.isSmartContainer) {
+      recrusive = true;
+    }
     await this.recrusiveOperation(this.project, recrusive, 'clear')
   }
 
