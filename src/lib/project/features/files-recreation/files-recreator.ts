@@ -352,6 +352,7 @@ export class FilesRecreator extends FeatureForProject {
 
                   if (self.project.isSmartContainer) {
                     settings['files.exclude'][`recent.json`] = true;
+                    settings['files.exclude'][`angular.json`] = true;
                     // settings['files.exclude'][`src/lib`] = true;
                   }
 

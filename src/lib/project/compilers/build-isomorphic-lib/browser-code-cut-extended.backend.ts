@@ -318,10 +318,10 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       parent = Project.From(this.project.smartContainerTargetParentContainerPath);
     }
 
-    const additionalSmartPckages = (!parent ? [] : parent.children.map(c => `@${parent.name}/${c.name}`));
+    // const additionalSmartPckages = (!parent ? [] : parent.children.map(c => `@${parent.name}/${c.name}`));
 
     const packages = packagesNames.concat([
-      ...(parent ? additionalSmartPckages : [this.project.name]),
+      ...(parent ? [] : [this.project.name]),
     ]);
 
 
@@ -426,7 +426,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
           .forEach(c => {
             const from = `${c.name}/src/assets/`;
             const to = `/assets/assets-for/${c.name}/`;
-            this.rawContent = this.rawContent.replace(new  RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
+            this.rawContent = this.rawContent.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
             this.rawContent = this.rawContent.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
           });
       }

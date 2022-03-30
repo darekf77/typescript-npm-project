@@ -11,7 +11,6 @@ import { BackendCompilation } from './compilation-backend';
 import { IncCompiler } from 'incremental-compiler';
 import { ConfigModels } from 'tnp-config';
 import { MorphiHelpers } from 'morphi';
-import { Project } from '../../abstract/project/project';
 
 @IncCompiler.Class({ className: 'BroswerCompilation' })
 export class BroswerCompilation extends BackendCompilation {
