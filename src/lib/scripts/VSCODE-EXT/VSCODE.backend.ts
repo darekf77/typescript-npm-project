@@ -187,6 +187,7 @@ function $VSCODE_GLOBAL() {
     'tslint.alwaysShowRuleFailuresAsWarnings': true,
     "workbench.editor.enablePreview": true,
     "security.workspace.trust.banner": "never",
+    "telemetry.enableTelemetry": false
   };
   const settingspathWindows = Helpers.resolve('~/AppData/Roaming/Code/User/settings.json');
   const settingspathLinux = Helpers.resolve('~/.config/Code/User/settings.json');
