@@ -23,6 +23,7 @@ export class ProjectIsomorphicLib
   extends Project
 //#endregion
 {
+  private npmRunNg = `npm-run ng`; // when there is not globl "ng" command -> npm-run ng.js works
 
   async initProcedure() {
     //#region @backend
@@ -263,7 +264,7 @@ export class ProjectIsomorphicLib
 
       if (watch) {
         if (outDir === 'dist') {
-          command = `${loadNvm} && npm-run ng serve ${portToServe} ${prod ? '--prod' : ''}`;
+          command = `${loadNvm} && ${this.npmRunNg} serve ${portToServe} ${prod ? '--prod' : ''}`;
         } else {
           command = ngBuildCmd;
         }
@@ -364,7 +365,7 @@ export class ProjectIsomorphicLib
     }
 
 
-    const angularCommand = `${loadNvm} && npm-run ng build ${this.name} ${watch ? '--watch' : ''}`;
+    const angularCommand = `${loadNvm} && ${this.npmRunNg} build ${this.name} ${watch ? '--watch' : ''}`;
 
     const showInfoAngular = () => {
       Helpers.info(`
