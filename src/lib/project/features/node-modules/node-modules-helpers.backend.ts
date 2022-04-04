@@ -53,7 +53,7 @@ export function dedupePackages(projectLocation: string, packagesNames?: string[]
     const current = Project.From<Project>(pathToCurrent);
 
     if (!current) {
-      warnings && Helpers.warn(`Project with name ${f} not founded`);
+      warnings && Helpers.log(`Project with name ${f} not founded`);
       return
     }
     Helpers.info(`Scanning for duplicates of current ${current.name}@${current.version} ....\n`)

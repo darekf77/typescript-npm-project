@@ -75,7 +75,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
     }
 
     if (this.project.isWorkspaceChildProject) {
-      await this.project.parent.npmPackages.installProcess(`workspace child: ${this.project.name} ${triggeredMsg} `, options)
+      this.project.parent.npmPackages.installProcess(`workspace child: ${this.project.name} ${triggeredMsg} `, options)
     }
 
     if (this.project.isStandaloneProject || this.project.isWorkspace || this.project.isUnknowNpmProject || this.project.isContainer) {

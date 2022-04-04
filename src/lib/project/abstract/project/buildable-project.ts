@@ -373,7 +373,7 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
       [copyto] Smart npm instalation for ${p.name}
 
       `);
-      await p.npmPackages.installFromArgs('');
+      p.npmPackages.installFromArgs('');
     }
 
     if (!this.isVscodeExtension) {

@@ -77,7 +77,7 @@ export async function $INSTALL(args, smooth = false, exit = true) {
       c.npmPackages.installFromArgs(args, smooth);
     }
   } else {
-    await proj.npmPackages.installFromArgs(args, smooth);
+    proj.npmPackages.installFromArgs(args, smooth);
   }
   if (exit) {
     process.exit(0);
@@ -94,11 +94,11 @@ export async function $UNINSTALL(args: string, exit = true) {
       if (args.trim() === '') {
         c.node_modules.remove(`container uninstall npm`);
       } else {
-        await c.npmPackages.uninstallFromArgs(args);
+        c.npmPackages.uninstallFromArgs(args);
       }
     }
   } else {
-    await proj.npmPackages.uninstallFromArgs(args);
+    proj.npmPackages.uninstallFromArgs(args);
   }
   if (exit) {
     process.exit(0);
@@ -534,7 +534,7 @@ EXIT /b
       const c = childrens[index];
       Helpers.log(`Processing ${c.genericName}`);
       if (!c.node_modules.exist) {
-        await c.npmPackages.installFromArgs('');
+        c.npmPackages.installFromArgs('');
       }
       const ownPackage = c.path(`${config.folder.node_modules}/${c.name}`).absolute.normal;
       Helpers.removeIfExists(ownPackage);
