@@ -218,40 +218,40 @@ async function addProcessesToModel(project: PROJECT) {
   }
 
   await assignProc(project, db, 'procStaticBuild', {
-    // cmd: 'tnp build:dist',
-    cmd: 'tnp staticbuild --env={env} --tnpShowProgress',
+    // cmd: '${config.frameworkName} build:dist',
+    cmd: `${config.frameworkName} staticbuild --env={env} --tnpShowProgress`,
     cwd: project.location,
     async: true,
     name: `Static Build of project ${project.name}`
   })
 
   await assignProc(project, db, 'procWatchBuild', {
-    // cmd: 'tnp build:dist:watch',
-    cmd: 'tnp show:loop:messages --max 6 --tnpShowProgress',
+    // cmd: '${config.frameworkName} build:dist:watch',
+    cmd: `${config.frameworkName} show:loop:messages --max 6 --tnpShowProgress`,
     cwd: project.location,
     async: true,
     name: `Watch build of project ${project.name}`
   });
 
   await assignProc(project, db, 'procServeStatic', {
-    cmd: 'tnp show:loop:messages --max 6 --tnpShowProgress',
-    // cmd: 'tnp start',
+    cmd: `${config.frameworkName} show:loop:messages --max 6 --tnpShowProgress`,
+    // cmd: '${config.frameworkName} start',
     cwd: project.location,
     async: true,
     name: `Server staticlyu project ${project.name}`
   })
 
   await assignProc(project, db, 'procInitEnv', {
-    cmd: 'tnp show:loop:messages --max 6 --tnpShowProgress',
-    // cmd: 'tnp init --env=%s',
+    cmd: `${config.frameworkName} show:loop:messages --max 6 --tnpShowProgress`,
+    // cmd: '${config.frameworkName} init --env=%s',
     cwd: project.location,
     async: false,
     name: `Init environment of project ${project.name}`
   });
 
   await assignProc(project, db, 'procClear', {
-    cmd: 'tnp show:loop:messages --max 6 --tnpShowProgress',
-    // cmd: 'tnp clear:%s',
+    cmd: `${config.frameworkName} show:loop:messages --max 6 --tnpShowProgress`,
+    // cmd: '${config.frameworkName} clear:%s',
     cwd: project.location,
     async: false,
     name: `Clear project ${project.name}`

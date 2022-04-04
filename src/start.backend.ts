@@ -299,7 +299,7 @@ export async function start(
         //   process.exit(1)
         // }
       } else {
-        Helpers.error(`\n${chalk.cyan('Please use help:')} ${chalk.bold('tnp run help')}\n`, false, true);
+        Helpers.error(`\n${chalk.cyan('Please use help:')} ${chalk.bold(`${config.frameworkName} run help`)}\n`, false, true);
       }
     }
   }

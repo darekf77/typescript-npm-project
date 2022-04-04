@@ -246,7 +246,7 @@ export abstract class LibProject {
       //   removeTagAndCommit(true);
       // }
 
-      // this.run(`tnp reset`).sync();
+      // this.run(`${config.frameworkName} reset`).sync();
 
       if (!this.node_modules.exist) {
         await this.npmPackages.installProcess(`release procedure`)
@@ -623,9 +623,9 @@ export abstract class LibProject {
       updateChildrenVersion(this, newVersion, this.name);
     } else {
       if (this.TnpProject.name === this.name) {
-        Helpers.info(`Ommiting version bump ${this.name} - for tnp itself`)
+        Helpers.info(`Ommiting version bump ${this.name} - for ${config.frameworkName} itself`)
       } else if (this.packageJson.hasDependency(this.TnpProject.name)) {
-        Helpers.info(`Ommiting version bump ${this.name} - has tnp as dependency`)
+        Helpers.info(`Ommiting version bump ${this.name} - has ${config.frameworkName} as dependency`)
       } else {
         this.TnpProject.packageJson.setDependencyAndSave({
           name: this.name,

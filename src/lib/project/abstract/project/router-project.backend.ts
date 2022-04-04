@@ -76,7 +76,7 @@ export abstract class RouterProject {
       const genWorkspace = Project.From<Project>(genLocationWOrkspace)
       if (!genWorkspace) {
         Helpers.error(`Workspace folder "${config.folder.bundle}" does not exists.`
-          + ` Please run: ${chalk.bold('tnp static:build')} in this workspace.
+          + ` Please run: ${chalk.bold(config.frameworkName + ' static:build')} in this workspace.
 Generated workspace should be here: ${genLocationWOrkspace}
         `)
       }

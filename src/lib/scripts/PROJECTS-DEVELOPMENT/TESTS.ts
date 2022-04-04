@@ -3,6 +3,7 @@ import { _, crossPlatformPath } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
 import { PROGRESS_DATA } from 'tnp-models';
+import { config } from 'tnp-config';
 
 
 function SHOW_LOOP(c = 0 as any, maximum = Infinity, errExit = false) {
@@ -81,7 +82,7 @@ const $READLAST = async (args) => {
 
 const TEST_ASYNC_PROC = async (args) => {
   global.tnpShowProgress = true;
-  let p = Helpers.run(`tnp show:loop ${args}`, { output: false, cwd: process.cwd() }).async()
+  let p = Helpers.run(`${config.frameworkName} show:loop ${args}`, { output: false, cwd: process.cwd() }).async()
   p.stdout.on('data', (chunk) => {
     console.log('prod:' + chunk)
   })
@@ -95,7 +96,7 @@ const TEST_ASYNC_PROC = async (args) => {
 const TEST_SYNC_PROC = async (args) => {
   global.tnpShowProgress = true;
   try {
-    let p = Helpers.run(`tnp show:loop ${args}`, { output: false, cwd: process.cwd() }).sync()
+    let p = Helpers.run(`${config.frameworkName} show:loop ${args}`, { output: false, cwd: process.cwd() }).sync()
     process.exit(0)
   } catch (err) {
     console.log('Erroroejk')

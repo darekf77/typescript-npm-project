@@ -398,7 +398,7 @@ const $FORK = async (args: string) => {
     Helpers.setValueToJSON(path.join(newProj.location, config.file.package_json), 'tnp.version', 'v2');
     Helpers.setValueToJSON(path.join(newProj.location, config.file.package_json), 'scripts', {});
     // const dependencies = Helpers.readValueFromJson(path.join(newProj.location, config.file.package_json), 'dependencies') as Object;
-    newProj.run(`tnp init`).sync();
+    newProj.run(`${config.frameworkName} init`).sync();
     newProj = Project.From(path.join(Project.Current.location, projectName)) as Project;
     newProj.removeFile('.browserslistrc');
   }

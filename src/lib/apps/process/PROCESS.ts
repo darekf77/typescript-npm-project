@@ -51,7 +51,7 @@ export type PROCESS_STATE =
   },
   defaultModelValues: {
     pid: void 0,
-    cmd: 'echo "Hello from tnp process"'
+    cmd: 'echo "Hello from process"'
   },
   additionalMapping: {},
   //#region @backend

@@ -9,7 +9,7 @@ import * as  psList from 'ps-list';
 import { _, crossPlatformPath } from 'tnp-core';
 import { path } from 'tnp-core';
 import { rimraf } from 'tnp-core';
-import { fse } from 'tnp-core';
+import { config } from 'tnp-config';
 //#endregion
 //#endregion
 
@@ -138,19 +138,19 @@ export class ProcessController extends Morphi.Base.Controller<PROCESS> {
     PROCESS.removeProcesesfolder();
     await PROCESS.db.bulkCreate([
       new PROCESS({
-        name: 'Test async', cmd: 'tnp test:async:proc --max 1 ',
+        name: 'Test async', cmd: `${config.frameworkName} test:async:proc --max 1 `,
         cwd: crossPlatformPath(process.cwd()), async: true
       }),
       new PROCESS({
-        name: 'Test sync error', cmd: 'tnp show:loop --max 2 --err',
+        name: 'Test sync error', cmd: `${config.frameworkName} show:loop --max 2 --err`,
         cwd: crossPlatformPath(process.cwd())
       }),
       new PROCESS({
-        name: 'Messages sync', cmd: 'tnp show:loop:messages --max 6',
+        name: 'Messages sync', cmd: `${config.frameworkName} show:loop:messages --max 6`,
         cwd: crossPlatformPath(process.cwd())
       }),
       new PROCESS({
-        name: 'Messages async', cmd: 'tnp show:loop:messages',
+        name: 'Messages async', cmd: `${config.frameworkName} show:loop:messages`,
         cwd: crossPlatformPath(process.cwd()), async: true
       }),
       new PROCESS({

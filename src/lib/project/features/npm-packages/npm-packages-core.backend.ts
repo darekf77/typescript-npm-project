@@ -25,7 +25,7 @@ export class NpmPackagesCore extends FeatureForProject {
     const oldContainer = Project.by('container', 'v1') as Project;
     if(!oldContainer.node_modules.exist) {
       Helpers.info('initing container v1 for global packages')
-      oldContainer.run(`tnp init`).sync();
+      oldContainer.run(`${config.frameworkName} init`).sync();
     }
     if (packageOnly) {
       return crossPlatformPath(path.join(oldContainer.node_modules.path, globalPackageName));

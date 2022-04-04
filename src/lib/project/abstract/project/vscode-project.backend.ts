@@ -149,7 +149,7 @@ export abstract class VscodeProject {
       const ngServeTask = {
         'label': 'Ng Serve',
         'type': 'shell',
-        'command': 'tnp build',
+        'command': config.frameworkName + ' build', // TODO how to decide when to user firedev
         'isBackground': true,
         'presentation': {
           'reveal': 'always'

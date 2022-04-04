@@ -218,7 +218,7 @@ function TEMPLATES_BUILDER() {
 
 const $INIT_EVERYWHERE = (args) => {
   Project.projects.forEach(p => {
-    p.run(`tnp init`).sync()
+    p.run(`${config.frameworkName} init`).sync()
   })
 }
 

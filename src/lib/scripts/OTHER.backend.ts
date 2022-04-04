@@ -49,7 +49,7 @@ async function version() {
     console.log(`I am secret project!!!`);
   }
   //#endregion
-  Helpers.log(`tnp location: ${Project.Tnp.location}`)
+  Helpers.log(`${config.frameworkName} location: ${Project.Tnp.location}`)
   // global.spinner.stop();
   // Helpers.info('waiting...');
   // Helpers.sleep(5);
@@ -215,10 +215,10 @@ async function $OUTPUT_TEST_ASCII() {
 
   // console.log(`"${Helpers.commnadOutputAsString('date')}"`);
   // console.log(`"${Helpers.commnadOutputAsString('date')}"`);
-  // console.log(`"${Helpers.commnadOutputAsString('tnp version')}"`);
-  // console.log(`version "${Helpers.commnadOutputAsString('tnp version')}"`);
+  // console.log(`"${Helpers.commnadOutputAsString('${config.frameworkName} version')}"`);
+  // console.log(`version "${Helpers.commnadOutputAsString('${config.frameworkName} version')}"`);
   // console.log(`version "${Helpers.commnadOutputAsString('navi version')}"`);
-  // console.log(`version "${await Helpers.run(`tnp version`, { output: true }).asyncAsPromise()}`)
+  // console.log(`version "${await Helpers.run(`${config.frameworkName} version`, { output: true }).asyncAsPromise()}`)
 
   process.exit(0)
 }

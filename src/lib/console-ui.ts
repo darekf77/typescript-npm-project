@@ -143,28 +143,28 @@
 //     switch (res.command) {
 
 //       case CHOICE.INIT:
-//         await this.db.transaction.setCommand(`tnp ${res.command}`)
+//         await this.db.transaction.setCommand(`${config.frameworkName} ${res.command}`)
 //         await (Project.Current as Project).filesStructure.init('');
 //         process.exit(0)
 //         break;
 
 //       case CHOICE.BUILD_APP_WATCH:
-//         await this.db.transaction.setCommand(`tnp ${res.command}`)
+//         await this.db.transaction.setCommand(`${config.frameworkName} ${res.command}`)
 //         await (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', '')
 //         break;
 
 //       case CHOICE.BUILD_DIST_WATCH:
-//         await this.db.transaction.setCommand(`tnp ${res.command}`)
+//         await this.db.transaction.setCommand(`${config.frameworkName} ${res.command}`)
 //         await (Project.Current as Project).buildProcess.startForLibFromArgs(false, true, 'dist', '')
 //         break;
 
 //       case CHOICE.BUILD_APP:
-//         await this.db.transaction.setCommand(`tnp ${res.command}`)
+//         await this.db.transaction.setCommand(`${config.frameworkName} ${res.command}`)
 //         await (Project.Current as Project).buildProcess.startForAppFromArgs(false, false, 'dist', '')
 //         break;
 
 //       case CHOICE.BUILD_DIST:
-//         await this.db.transaction.setCommand(`tnp ${res.command}`)
+//         await this.db.transaction.setCommand(`${config.frameworkName} ${res.command}`)
 //         await (Project.Current as Project).buildProcess.startForLibFromArgs(false, false, 'dist', '')
 //         break;
 
@@ -199,7 +199,7 @@
 //       // default:
 //       //   const fn = functions.find(f => f.name === res.command);
 //       //   if (_.isFunction(fn)) {
-//       //     this.db.commands.setCommand(crossPlatformPath(process.cwd()), `tnp ${simplifiedCmd(fn.name)}`)
+//       //     this.db.commands.setCommand(crossPlatformPath(process.cwd()), `${config.frameworkName} ${simplifiedCmd(fn.name)}`)
 //       //     await runSyncOrAsync(fn)
 //       //   } else {
 //       //     throw `Command not implemented: ${res.command}`

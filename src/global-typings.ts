@@ -6,7 +6,7 @@ declare global {
   namespace NodeJS {
     interface Global {
       /**
-       * Check whether am running tnp from:
+       * Check whether am running from:
        *  - system command line
        *  - I am calling Tnp from require/imports in some ts files
        */

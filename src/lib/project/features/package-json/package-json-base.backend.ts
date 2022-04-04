@@ -57,7 +57,7 @@ export class PackageJsonBase extends PackageJsonCore {
     if (!(this.data.husky && this.data.husky.hooks && _.isString(this.data.husky.hooks['pre-push']))) {
       this.data.husky = {
         hooks: {
-          'pre-push': 'tnp deps:show:if:standalone'
+          'pre-push': `${config.frameworkName} deps:show:if:standalone`
         }
       };
       this.save('Update hooks');

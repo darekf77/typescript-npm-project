@@ -9,7 +9,7 @@ import { config } from 'tnp-config';
 const generalHelp = `
 
 To use help run:
-tnp help <command name>
+${config.frameworkName} help <command name>
 
 `
 

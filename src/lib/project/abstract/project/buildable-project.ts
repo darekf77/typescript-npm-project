@@ -30,20 +30,20 @@ export abstract class BuildableProject {
   }
 
   get trustedAllPossible() {
-    const tnp = Project.Tnp as Project;
-    PackagesRecognitionExtended.From(tnp.location).start();
-    return tnp.availableIsomorphicPackagesInNodeModules;
+    const projTnp = Project.Tnp as Project;
+    PackagesRecognitionExtended.From(projTnp.location).start();
+    return projTnp.availableIsomorphicPackagesInNodeModules;
   }
 
   // @ts-ignore
   get trusted(this: Project) {
-    const tnp = Project.Tnp as Project;
-    PackagesRecognitionExtended.From(tnp.location).start();
-    tnp.availableIsomorphicPackagesInNodeModules;
+    const projTnp = Project.Tnp as Project;
+    PackagesRecognitionExtended.From(projTnp.location).start();
+    projTnp.availableIsomorphicPackagesInNodeModules;
     const currentProjVersion = this._frameworkVersion;
-    const value = tnp.packageJson.trusted[currentProjVersion];
+    const value = projTnp.packageJson.trusted[currentProjVersion];
     if (value === '*') {
-      return tnp.availableIsomorphicPackagesInNodeModules;
+      return projTnp.availableIsomorphicPackagesInNodeModules;
     }
     if (Array.isArray(value)) {
       return value;

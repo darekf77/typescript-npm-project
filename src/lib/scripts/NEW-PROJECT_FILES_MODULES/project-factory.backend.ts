@@ -46,7 +46,7 @@ export class ProjectFactory {
   private errorMsgCreateProject() {
     Helpers.log(chalk.green(`Good examples:`));
     config.projectTypes.forNpmLibs.forEach(t => {
-      Helpers.log(`\t${chalk.gray('tnp new')} ${chalk.black(t)} ${chalk.gray('mySuperLib')}`);
+      Helpers.log(`\t${chalk.gray(`${config.frameworkName} new`)} ${chalk.black(t)} ${chalk.gray('mySuperLib')}`);
     });
     Helpers.error(chalk.red(`Please use example above.`), false, true);
   }
