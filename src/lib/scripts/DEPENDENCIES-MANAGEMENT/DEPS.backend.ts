@@ -386,9 +386,9 @@ async function $LINK() {
   let project = (Project.Current as Project);
 
   if (project.isStandaloneProject) {
-    if (process.platform !== 'win32') {
-      await Helpers.isElevated();
-    }
+    // if (process.platform !== 'win32') {
+    //   await Helpers.isElevated();
+    // }
     //#region linking to global/local bin
     let glboalBinFolderPath = path.dirname(Helpers.run(`which ${config.frameworkName}`, { output: false }).sync().toString());
     if (process.platform === 'win32') {

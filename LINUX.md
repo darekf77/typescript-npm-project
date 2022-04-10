@@ -22,7 +22,7 @@ git clone git@github.com:darekf77/tsc-npm-project.git
 cd tsc-npm-project
 npm i && tsc && npm link
 # increase number of watchers
-echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+5
 # sudo sysctl fs.inotify.max_user_watches=16384 fix for https://github.com/sass/node-sass/issues/2534 no space left
 
 git config --global user.email "darekf77@gmail.com"
@@ -108,3 +108,9 @@ time tnp build ss-ui
 
 # copy script for dependencies
 rimraf ../tnp/node_modules/`basename \`pwd\`` && cp -R `pwd`/dist ../tnp/node_modules/`basename \`pwd\``
+
+# increase number of watchers in linux
+
+/etc/sysctl.conf -> append fs.inotify.max_user_watches=524288
+
+check command: cat /proc/sys/fs/inotify/max_user_watches

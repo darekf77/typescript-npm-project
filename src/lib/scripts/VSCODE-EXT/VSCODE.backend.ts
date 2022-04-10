@@ -93,9 +93,9 @@ function $FIX_WSL() {
 }
 
 function $VSCODE_GLOBAL() {
-  const keybindingPathLinxu = Helpers.resolve('~/.config/Code/User/keybindings.json');
-  const keybindingPath = Helpers.resolve(`~/Library/Application Support/Code/User/keybindings.json`);
-  const keys = [
+  const keybindingPathLinxu = path.join(crossPlatformPath(os.userInfo().homedir), '.config/Code/User/keybindings.json');
+  const keybindingPath = path.join(crossPlatformPath(os.userInfo().homedir), `Library/Application Support/Code/User/keybindings.json`);
+  const keysMac = [
     {
       'key': 'shift+cmd+s',
       'command': 'workbench.action.files.saveAll'
@@ -121,9 +121,50 @@ function $VSCODE_GLOBAL() {
       'command': 'default:redo'
     },
   ];
-  Helpers.writeFile(
-    process.platform === 'linux' ? keybindingPathLinxu : keybindingPath
-    , keys);
+
+  const keysLinux = [
+    {
+      "key": "shift+ctrl+s",
+      "command": "workbench.action.files.saveAll"
+    },
+    {
+      "key": "alt+ctrl+s",
+      "command": "-workbench.action.files.saveAll"
+    },
+    {
+      "key": "shift+ctrl+z",
+      "command": "default:redo"
+    },
+    {
+      "key": "ctrl+shift+z",
+      "command": "-extension.vscode-git-automator.addAndCommitCurrentFile"
+    },
+    {
+      "key": "shift+alt+f",
+      "command": "-filesExplorer.findInFolder",
+      "when": "explorerResourceIsFolder && explorerViewletVisible && filesExplorerFocus && !inputFocus"
+    },
+    {
+      "key": "shift+alt+f",
+      "command": "editor.action.formatDocument",
+      "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && !inCompositeEditor"
+    },
+    {
+      "key": "ctrl+shift+i",
+      "command": "-editor.action.formatDocument",
+      "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && !inCompositeEditor"
+    }
+  ];
+  
+  if (process.platform !== 'win32') {
+    if (process.platform === 'linux') {
+      Helpers.writeFile(keybindingPathLinxu, keysLinux);
+    }
+    if (process.platform === 'darwin') {
+      Helpers.writeFile(keybindingPath, keysMac);
+    }
+
+  }
 
   const windowsSettings = {
     'terminal.integrated.defaultProfile.windows': 'Git Bash',
@@ -189,9 +230,9 @@ function $VSCODE_GLOBAL() {
     "security.workspace.trust.banner": "never",
     "telemetry.enableTelemetry": false
   };
-  const settingspathWindows = Helpers.resolve('~/AppData/Roaming/Code/User/settings.json');
-  const settingspathLinux = Helpers.resolve('~/.config/Code/User/settings.json');
-  let settingspath = '~/Library/Application Support/Code/User/settings.json';
+  const settingspathWindows = path.join(crossPlatformPath(os.userInfo().homedir), 'AppData/Roaming/Code/User/settings.json');
+  const settingspathLinux = path.join(crossPlatformPath(os.userInfo().homedir), '.config/Code/User/settings.json');
+  let settingspath = path.join(crossPlatformPath(os.userInfo().homedir), 'Library/Application Support/Code/User/settings.json');
 
   if (process.platform === 'darwin') {
     settings = _.merge(settings, settingsMacOS);
@@ -204,7 +245,7 @@ function $VSCODE_GLOBAL() {
     settingspath = settingspathLinux;
   }
 
-  const dest = crossPlatformPath(path.join(os.userInfo().homedir, settingspath).replace('~', ''));
+  const dest = crossPlatformPath(settingspath);
   Helpers.writeFile(dest, settings);
   Helpers.info(`Vscode configured !`);
   process.exit(0);
