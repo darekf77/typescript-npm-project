@@ -92,23 +92,36 @@ export class QuickFixes extends FeatureForProject {
   }
 
   public missingAngularLibFiles() {
-    Helpers.log(`[quick fixes] missing angular lib fles start`)
-    if (this.project.typeIs('angular-lib')) {
-      const indexTs = path.join(this.project.location, config.folder.components, 'index.ts');
-      if (!fse.existsSync(indexTs)) {
-        Helpers.writeFile(indexTs, `
-        export * from './public_api';
-        `.trimLeft())
+    Helpers.log(`[quick fixes] missing angular lib fles start`);
+    if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
 
+      const indexTs = crossPlatformPath(path.join(this.project.location, config.folder.src, 'lib/index.ts'));
+      if (!Helpers.exists(indexTs)) {
+        Helpers.writeFile(indexTs, `
+        export function helloWorldFrom${_.upperFirst(_.camelCase(this.project.name))}() { }
+        `.trimLeft())
       }
 
-      const pubilcApiLoc = path.join(this.project.location, config.folder.components, config.file.publicApi_ts);
-      if (!fse.existsSync(pubilcApiLoc)) {
-        Helpers.writeFile(pubilcApiLoc, `
-        export function helloWorldFrom${_.startCase(this.project.name)}() { }
-        `.trimLeft())
+    } else {
+      if (this.project.typeIs('angular-lib')) {
+        const indexTs = path.join(this.project.location, config.folder.components, 'index.ts');
+        if (!Helpers.exists(indexTs)) {
+          Helpers.writeFile(indexTs, `
+          export * from './public_api';
+          `.trimLeft())
+
+        }
+
+        const pubilcApiLoc = path.join(this.project.location, config.folder.components, config.file.publicApi_ts);
+        if (!Helpers.exists(pubilcApiLoc)) {
+          Helpers.writeFile(pubilcApiLoc, `
+          export function helloWorldFrom${_.upperFirst(_.camelCase(this.project.name))}() { }
+          `.trimLeft())
+        }
       }
     }
+
+
     Helpers.log(`[quick fixes] missing angular lib fles end`)
   }
 

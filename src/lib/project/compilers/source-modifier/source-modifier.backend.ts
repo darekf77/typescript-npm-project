@@ -111,7 +111,7 @@ export class SourceModifier extends SourceModForSite {
       if (fse.lstatSync(f).isDirectory()) {
         this.reSaveAllFilesIn(f);
       } else {
-        Helpers.writeFile(f, Helpers.readFile(f), false);
+        Helpers.writeFile(f, Helpers.readFile(f), { overrideSameFile: true });
       }
     }
   }
