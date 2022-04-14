@@ -700,7 +700,7 @@ async function $CODE_DB() {
 }
 
 
-const $OPEN_DB = async () => await $SHOW_DB();
+const $DB = async () => await $SHOW_DB();
 const $DB_OPEN = async () => await $SHOW_DB();
 
 async function $SHOW_WORKER() {
@@ -787,10 +787,9 @@ export default {
   $SHOW_PROJECTS_NAVI: Helpers.CLIWRAP($SHOW_PROJECTS_NAVI, '$SHOW_PROJECTS_NAVI'),
   $DB_CODE: Helpers.CLIWRAP($DB_CODE, '$DB_CODE'),
   $CODE_DB: Helpers.CLIWRAP($CODE_DB, '$CODE_DB'),
-  $SHOW_DB: Helpers.CLIWRAP($SHOW_DB, '$SHOW_DB'),
-  $DB_SHOW: Helpers.CLIWRAP($DB_SHOW, '$DB_SHOW'),
-  $OPEN_DB: Helpers.CLIWRAP($OPEN_DB, '$OPEN_DB'),
-  $DB_OPEN: Helpers.CLIWRAP($DB_OPEN, '$DB_OPEN'),
+  // $SHOW_DB: Helpers.CLIWRAP($SHOW_DB, '$SHOW_DB'),
+  // $DB_SHOW: Helpers.CLIWRAP($DB_SHOW, '$DB_SHOW'),
+  $DB: Helpers.CLIWRAP($DB, '$DB'),
   $SHOW_WORKER: Helpers.CLIWRAP($SHOW_WORKER, '$SHOW_WORKER'),
   $SHOW_CORE_MODULES: Helpers.CLIWRAP($SHOW_CORE_MODULES, '$SHOW_CORE_MODULES'),
   DEPS_SHOW_IF_STANDALONE: Helpers.CLIWRAP(DEPS_SHOW_IF_STANDALONE, 'DEPS_SHOW_IF_STANDALONE'),
