@@ -355,7 +355,7 @@ const $RELEASE_OBSCURED = async (args) => {
 
 const $AUTO_RELEASE = async (args) => {
   const auto = `--automaticRelease`
-  await $RELEASE(args.replace(new RegExp(Helpers.escapeStringForRegEx(`--all`), 'g'), '') + ' ' + auto);
+  await $RELEASE(args + ' ' + auto);
 };
 
 export default {

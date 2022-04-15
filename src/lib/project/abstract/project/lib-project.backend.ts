@@ -327,6 +327,8 @@ export abstract class LibProject {
           })
         }, {})
       );
+    } else { ///
+      Helpers.setValueToJSON(path.join(this.location, config.folder.bundle, config.file.package_json), 'devDependencies', {});
     }
 
     if (!global.tnpNonInteractive) {

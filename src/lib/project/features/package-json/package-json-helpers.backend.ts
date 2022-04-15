@@ -710,7 +710,11 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     if (project.frameworkVersionAtLeast('v3')) {
       const saveTnpFiredevVer = `^${_.first(Project.Tnp.version.split('.'))}`;
       // project.packageJson.data.dependencies['tnp'] = saveTnpFiredevVer;
-      project.packageJson.data.dependencies['firedev'] = saveTnpFiredevVer;
+      if(project.isContainerCoreProject) {
+        project.packageJson.data.dependencies['firedev'] = saveTnpFiredevVer;
+      } else {
+        // project.packageJson.data.devDependencies['firedev'] = saveTnpFiredevVer;
+      }
     }
 
     //#endregion
@@ -719,8 +723,6 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   if (project.name === 'tnp') {
     delete project.packageJson.data.dependencies['tnp'];
     delete project.packageJson.data.dependencies['firedev'];
-
-
   }
 
   _.keys(project.packageJson.data.dependencies)
