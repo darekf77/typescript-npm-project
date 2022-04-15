@@ -16,6 +16,8 @@ const runtimeArgs = [
   "--nolazy",
   "-r",
   "ts-node/register",
+  "--preserve-symlinks",
+  "--preserve-symlinks-main",
   "--experimental-worker"
 ];
 
@@ -266,7 +268,7 @@ export abstract class VscodeProject {
       'skipFiles': [
         '<node_internals>/**'
       ],
-      "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+      // "outFiles": ["${workspaceFolder}/dist/**/*.js"] // not wokring for copy manager
     };
     //#endregion
 
@@ -279,7 +281,8 @@ export abstract class VscodeProject {
         'program': '${workspaceFolder}/run.js',
         'cwd': void 0,
         'args': [],
-        "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+        // "outFiles": ["${workspaceFolder}/dist/**/*.js"], becouse of this debugging inside node_moudles
+        // with compy manager created moduels does not work..
         runtimeArgs
       };
       if (serverChild.name !== clientProject.name) {
