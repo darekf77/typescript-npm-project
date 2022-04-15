@@ -12,6 +12,13 @@ import { Models } from 'tnp-models';
 import { config } from 'tnp-config';
 //#endregion
 
+const runtimeArgs = [
+  "--nolazy",
+  "-r",
+  "ts-node/register",
+  "--experimental-worker"
+];
+
 export abstract class VscodeProject {
 
   //#region getters
@@ -229,12 +236,7 @@ export abstract class VscodeProject {
         "outFiles": [
           "${workspaceFolder}" + `/dist/${container.name}/${c.name}/dist/**/*.js`
         ],
-        "runtimeArgs": [
-          "--nolazy",
-          "-r",
-          "ts-node/register",
-          "--experimental-worker"
-        ],
+        runtimeArgs,
         "presentation": {
           "group": "workspaceServers"
         }
@@ -278,10 +280,7 @@ export abstract class VscodeProject {
         'cwd': void 0,
         'args': [],
         "outFiles": ["${workspaceFolder}/dist/**/*.js"],
-        'runtimeArgs': [
-          '--nolazy', '-r', 'ts-node/register',
-          '--experimental-worker'
-        ]
+        runtimeArgs
       };
       if (serverChild.name !== clientProject.name) {
         let cwd = '${workspaceFolder}' + `/../${serverChild.name}`;
@@ -317,10 +316,7 @@ export abstract class VscodeProject {
         'sourceMaps': true,
         'console': 'internalConsole',
         'internalConsoleOptions': 'neverOpen',
-        'runtimeArgs': [
-          // "--nolazy", "-r", "ts-node/register",
-          '--experimental-worker'
-        ]
+        runtimeArgs
       };
       return result;
     }
