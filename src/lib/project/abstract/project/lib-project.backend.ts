@@ -328,7 +328,18 @@ export abstract class LibProject {
         }, {})
       );
     } else { ///
-      Helpers.setValueToJSON(path.join(this.location, config.folder.bundle, config.file.package_json), 'devDependencies', {});
+      const packageJsonInBundlePath = path.join(this.location, config.folder.bundle, config.file.package_json);
+      Helpers.setValueToJSON(packageJsonInBundlePath, 'devDependencies', {});
+      //#region QUICK FIX include only
+      const includeOnly = realCurrentProj.packageJson.data.tnp?.overrided?.includeOnly || [];
+      const dependencies = Helpers.readJson(packageJsonInBundlePath, {}).dependencies || {};
+      Object.keys(dependencies).forEach(packageName => {
+        if (!includeOnly.includes(packageName)) {
+          delete dependencies[packageName];
+        }
+      });
+      Helpers.setValueToJSON(packageJsonInBundlePath, 'dependencies', dependencies);
+      //#endregion
     }
 
     if (!global.tnpNonInteractive) {
