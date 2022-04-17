@@ -136,9 +136,18 @@ async function $OPEN_UNSTAGE() {
 //#region open / thing..
 function openThing(fileName: string) {
   const proj = Project.nearestTo(process.cwd()) as Project;
+
+  const openFn = (pathToTHing) => {
+    if (fileName.endsWith('.json')) {
+      Helpers.run(`code ${pathToTHing}`, { biggerBuffer: false }).sync();
+    } else {
+      Helpers.openFolderInFileExploer(pathToTHing);
+    }
+  };
+
   if (proj.isStandaloneProject && !proj.isSmartContainerChild) {
     const pathToDB = path.join(proj.location, fileName);
-    Helpers.openFolderInFileExploer(pathToDB);
+    openFn(pathToDB)
   }
 
   const smartContainerFn = (project: Project) => {
@@ -168,11 +177,7 @@ function openThing(fileName: string) {
     }
 
     const pathToTHing = path.join(lastFolder.folderPath, fileName);
-    if (fileName.endsWith('.json')) {
-      Helpers.run(`code ${pathToTHing}`, { biggerBuffer: false }).sync();
-    } else {
-      Helpers.openFolderInFileExploer(pathToTHing);
-    }
+    openFn(pathToTHing);
   };
 
   if (proj.isSmartContainer) {
