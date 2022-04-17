@@ -23,7 +23,7 @@ export class NpmPackagesCore extends FeatureForProject {
 
   global(globalPackageName: string, packageOnly = false) {
     const oldContainer = Project.by('container', 'v1') as Project;
-    if(!oldContainer.node_modules.exist) {
+    if (!oldContainer.node_modules.exist) {
       Helpers.info('initing container v1 for global packages')
       oldContainer.run(`${config.frameworkName} init`).sync();
     }
@@ -82,7 +82,7 @@ export class NpmPackagesCore extends FeatureForProject {
         if (pkg) {
           (Project.Tnp as Project).node_modules.copy(pkg).to(this.project);
         } else {
-          this.project.node_modules.copyFrom(Project.Tnp as Project, `Test mode instalaltion`);
+          this.project.node_modules.copyFrom(Project.Tnp as Project, { triggerMsg: `Test mode instalaltion` });
         }
       } else {
         if (smoothInstall) {

@@ -197,6 +197,10 @@ export abstract class BuildableProject {
       ) {
         Helpers.info(`UPDATING ALSO container core ${this._frameworkVersion}...`)
         projects.push(containerProj);
+        const tmpSmartNodeModulesProj = Project.From(path.dirname(containerProj.smartNodeModules.path)) as Project;
+        if (tmpSmartNodeModulesProj) {
+          projects.push(tmpSmartNodeModulesProj);
+        }
       }
 
       // @ts-ignore

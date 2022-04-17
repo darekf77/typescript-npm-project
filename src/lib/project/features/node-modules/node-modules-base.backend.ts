@@ -28,7 +28,8 @@ export class NodeModulesBase extends NodeModulesCore {
    * @param source project - source of node_modules
    * @param triggerMsg reason to copy packages
    */
-  public async copyFrom(source: Project, triggerMsg: string) {
+  public async copyFrom(source: Project, options: { triggerMsg: string; useDirectlySmartNodeModules?: boolean; }) {
+    const { triggerMsg, useDirectlySmartNodeModules } = options || {};
 
     Helpers.log(`[node_modules] Copy instalation of npm packages from ` +
       `${CLI.chalk.bold(source.genericName)} to ${CLI.chalk.bold(this.project.genericName)} ${triggerMsg}`);
@@ -37,8 +38,8 @@ export class NodeModulesBase extends NodeModulesCore {
       this.project.node_modules.remove();
       Helpers.mkdirp(this.project.node_modules.path);
       const packagesToLinkOrCopy = [
-        ...Helpers.foldersFrom(source.node_modules.path),
-        ...Helpers.linksToFoldersFrom(source.node_modules.path,
+        ...Helpers.foldersFrom(useDirectlySmartNodeModules ? source.smartNodeModules.path : source.node_modules.path),
+        ...Helpers.linksToFoldersFrom(useDirectlySmartNodeModules ? source.smartNodeModules.path : source.node_modules.path,
 
           // this.project.frameworkVersionAtLeast('v3') // TODO not needed for now
         ),

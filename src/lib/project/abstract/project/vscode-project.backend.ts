@@ -16,8 +16,8 @@ const runtimeArgs = [
   "--nolazy",
   "-r",
   "ts-node/register",
-  "--preserve-symlinks",
-  "--preserve-symlinks-main",
+  // "--preserve-symlinks", NOT WORKING
+  // "--preserve-symlinks-main",NOT WORKING
   "--experimental-worker"
 ];
 
