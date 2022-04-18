@@ -3,7 +3,6 @@ import { fse, crossPlatformPath } from 'tnp-core'
 import { path } from 'tnp-core'
 import { _ } from 'tnp-core';
 import { PackagesRecognitionExtended } from '../../features/packages-recognition-extended';
-import { config as configMorphi } from 'morphi';
 //#endregion
 import type { Project } from './project';
 import { Project as $Project } from 'tnp-helpers';
@@ -126,7 +125,7 @@ export abstract class TnpProject {
         PackagesRecognitionExtended.fromProject(this as any).start(void 0, '[tnp-projct][getter isomorphic pacakges ]');
       }
       const f = Helpers.readJson(p);
-      const arr = f[configMorphi.array.isomorphicPackages];
+      const arr = f[config.array.isomorphicPackages];
       if (_.isArray(arr)) {
         return isomorphicPackagesArr.concat(arr);
       } else {

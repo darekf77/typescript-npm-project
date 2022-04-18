@@ -6,9 +6,8 @@ import { Helpers } from 'tnp-helpers';
 import { Project } from '../../../abstract/project/project';
 import { InsideStruct } from '../inside-struct';
 import { BaseInsideStruct } from './base-inside-struct';
-import { config } from 'morphi';
-import * as cheerio from 'cheerio';
 import { recreateApp } from './inside-struct-helpers';
+import { config } from 'tnp-config';
 
 @CLASS.NAME('InsideStructAngular13App')
 export class InsideStructAngular13App extends BaseInsideStruct {

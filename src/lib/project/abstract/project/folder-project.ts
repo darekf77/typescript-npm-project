@@ -1,7 +1,6 @@
 //#region @backend
-import { fse, crossPlatformPath, glob } from 'tnp-core'
-import { path } from 'tnp-core'
-import { config as configMorphi } from 'morphi';
+import { fse, crossPlatformPath, glob } from 'tnp-core';
+import { path } from 'tnp-core';
 //#endregion
 import { _ } from 'tnp-core';
 import { config, ConfigModels } from 'tnp-config';
@@ -412,7 +411,7 @@ export abstract class FolderProject {
       const pj: Models.npm.IPackageJSON = fse.readJsonSync(pjPath, {
         encoding: 'utf8'
       });
-      pj[configMorphi.array.isomorphicPackages] = void 0;
+      pj[config.array.isomorphicPackages] = void 0;
       fse.writeJsonSync(pjPath, pj, {
         encoding: 'utf8',
         spaces: 2

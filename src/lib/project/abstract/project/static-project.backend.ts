@@ -5,8 +5,6 @@ import { _ } from 'tnp-core';
 import * as inquirer from 'inquirer';
 import * as json5 from 'json5';
 
-import { config as configMorphi } from 'morphi';
-
 import { config } from 'tnp-config';
 import { Project } from './project';
 import { Helpers } from 'tnp-helpers';
