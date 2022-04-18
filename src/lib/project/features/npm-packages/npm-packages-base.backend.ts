@@ -26,6 +26,12 @@ export class NpmPackagesBase extends NpmPackagesCore {
   }
 
   public async installProcess(triggeredMsg: string, options?: Models.npm.NpmInstallOptions) {
+
+    if (this.project.isContainer && !this.project.isSmartContainer && !this.project.isContainerCoreProject) {
+      Helpers.warn(`No need for package installation in normal containter`)
+      return;
+    }
+
     if (!global.globalSystemToolMode) {
       return;
     }

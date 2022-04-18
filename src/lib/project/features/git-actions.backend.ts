@@ -155,6 +155,9 @@ ${shouldBeProjectArr.map(p => `- ${p}`).join('\n')}
       commitMessage = 'update';
     }
     if (this.project.isContainer) {
+      if (!this.project.isSmartContainer) {
+        await this.project.filesStructure.init('');
+      }
       await this.project.recent.saveActiveProjects(false);
     }
     this.before();
@@ -202,6 +205,10 @@ ${shouldBeProjectArr.map(p => `- ${p}`).join('\n')}
       try {
         this.project.run(`git add --all . && git commit -m "${commitMessage}"`).sync();
       } catch (error) { }
+    }
+    if (!this.project.git.originURL && this.project.isContainerChild && !this.project.isSmartContainerChild) {
+      this.project.run(`git remote add origin ${this.project.parent.git
+        .originURL.replace(this.project.parent.name, this.project.name)}`).sync()
     }
 
     await this.repeatMenu('push', force, origin);
