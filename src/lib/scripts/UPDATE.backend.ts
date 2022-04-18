@@ -17,13 +17,20 @@ function $UPDATE_GLOBAL_DEPS_CACHE(args: string) {
 
 function $UPDATE(args: string) {
 
-  const morphiPathUserInUserDir = config.morphiPathUserInUserDir;
-  try {
-    Helpers.run(`git reset --hard && git pull origin master`,
-      { cwd: morphiPathUserInUserDir }).sync()
-  } catch (error) {
-    Helpers.error(`[config] Not pull origin of morphi: ${config.urlMorphi} in:    ${morphiPathUserInUserDir}`);
+  if (config.frameworkName === 'firedev') {
+    const morphiPathUserInUserDir = config.morphiPathUserInUserDir;
+    try {
+      Helpers.run(`git reset --hard && git pull origin master`,
+        { cwd: morphiPathUserInUserDir }).sync()
+    } catch (error) {
+      Helpers.error(`[config] Not pull origin of morphi: ${config.urlMorphi} in:    ${morphiPathUserInUserDir}`);
+    }
   }
+  if (config.frameworkName === 'tnp') {
+    Project.Tnp.run('npm i && tnp dedupe').sync();
+    Project.by('container', (Project.Tnp as Project)._frameworkVersion).run('tnp i ').sync();
+  }
+
 
   // const file = path.basename(args.trim());
   // function processing() {
