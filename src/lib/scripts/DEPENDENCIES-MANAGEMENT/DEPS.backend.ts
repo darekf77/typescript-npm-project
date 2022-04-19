@@ -759,7 +759,20 @@ async function $TREE(arg: string) {
   process.exit(0)
 }
 
+function $SHOW_REMOTES() {
+  const folders = Helpers.foldersFrom(process.cwd());
+
+  folders
+    .filter(c => !path.basename(c).startsWith('.'))
+    .forEach(cwd => {
+      Helpers.run(`git config --get remote.origin.url`, { cwd }).sync()
+    });
+  process.exit(0)
+}
+
+
 export default {
+  $SHOW_REMOTES: Helpers.CLIWRAP($SHOW_REMOTES, '$SHOW_REMOTES'),
   $TREE: Helpers.CLIWRAP($TREE, '$TREE'),
   $DEPS_TREE2: Helpers.CLIWRAP($DEPS_TREE2, '$DEPS_TREE2'),
   $DEPS_TREE: Helpers.CLIWRAP($DEPS_TREE, '$DEPS_TREE'),

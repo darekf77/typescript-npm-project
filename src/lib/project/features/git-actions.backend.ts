@@ -10,7 +10,7 @@ import { os } from 'tnp-core';
 import { FeatureForProject, Project } from '../abstract';
 //#endregion
 
-const USE_HTTPS_INSTEAD_SSH = !os.hostname().endsWith('.local'); // TODO
+// const USE_HTTPS_INSTEAD_SSH = !os.hostname().endsWith('.local'); // TODO
 
 export class GitActions extends FeatureForProject {
 
@@ -40,7 +40,7 @@ export class GitActions extends FeatureForProject {
         Helpers.pressKeyAndContinue(`press any key to continue or stop the process..`);
       }
     }
-    fixRemote(this.project);
+
     this.project.removeFolderByRelativePath('node_modules/husky');
     if (this.project.targetProjects.exists) {
       Helpers.warn(`
@@ -54,13 +54,15 @@ export class GitActions extends FeatureForProject {
 
   //#region get unexisted projects
   private async cloneUnexistedProjects() {
-    const shouldBeProjectArr = this.project.packageJson.linkedProjects.map(relativePath => {
-      const possibleProj = Project.From(path.join(this.project.location, relativePath));
-      // const possibleProj2 = Project.From(path.join(this.project.location, '--', relativePath));
-      if (!possibleProj) {
-        return relativePath;
-      }
-    }).filter(f => !!f);
+    const shouldBeProjectArr = this.project.packageJson.
+      linkedProjects.map(relativePath => {
+        const possibleProj = Project.From(path.join(this.project.location, relativePath));
+        // const possibleProj2 = Project.From(path.join(this.project.location, '--', relativePath));
+        if (!possibleProj) {
+          return relativePath;
+        }
+      }).filter(f => !!f);
+
     if (shouldBeProjectArr.length > 0) {
       Helpers.pressKeyAndContinue(`
 
@@ -82,6 +84,7 @@ ${shouldBeProjectArr.map(p => `- ${p}`).join('\n')}
           const githubGitUrl = this.project.isSmartContainer
             ? ADDRESS_GITHUB_SSH.replace(`${this.project.name}.git`, `${this.project.name}--${projectNameFromPackageJson}.git`)
             : ADDRESS_GITHUB_SSH.replace(`${this.project.name}.git`, `${projectNameFromPackageJson}.git`);
+
           await Helpers.actionWrapper(() => {
             this.project.git.clone(githubGitUrl + ` ${projectNameFromPackageJson}`);
           }, `Cloning unexisted project ${chalk.bold(projectNameFromPackageJson)}`);
@@ -114,10 +117,15 @@ ${shouldBeProjectArr.map(p => `- ${p}`).join('\n')}
   //#region repeat menu push,pull
   private async repeatMenu(action: keyof GitActions, force = false, origin = 'origin') {
     await Helpers.actionWrapper(async () => {
+      fixRemote(this.project,
+        (this.project.isContainerChild || this.project.isWorkspaceChildProject)
+          ? this.project.parent.sshOnly : this.project.sshOnly
+      )
       if (action === 'pull') {
         await this.project.git.pullCurrentBranch(true);
       }
       if (action === 'push') {
+        ;
         await this.project.git.pushCurrentBranch(force, origin);
       }
     }, `${action.toUpperCase()}ing project ${chalk.bold(this.project.name)}...`);
@@ -211,6 +219,7 @@ ${shouldBeProjectArr.map(p => `- ${p}`).join('\n')}
         .originURL.replace(this.project.parent.name, this.project.name)}`).sync()
     }
 
+
     await this.repeatMenu('push', force, origin);
   }
   //#endregion
@@ -232,8 +241,9 @@ ${shouldBeProjectArr.map(p => `- ${p}`).join('\n')}
 
 
       `);
+
       try {
-        this.project.run(`add --all .`).sync();
+        this.project.run(`git add --all .`).sync();
       } catch (error) { }
       try {
         this.project.run(`git stash`).sync();
@@ -271,9 +281,17 @@ ${shouldBeProjectArr.map(p => `- ${p}`).join('\n')}
 
 }
 
-function fixRemote(project: Project) {
+function fixRemote(project: Project, useSSh = false) {
   const originUrl = project.git.originURL;
-  if (originUrl.startsWith('git@github') && USE_HTTPS_INSTEAD_SSH) {
-    project.run(`git remote set-url origin ${originUrl.replace('git@github.com:', 'https://github.com/')}`).sync();
+  const provider = _.first(originUrl.match(/[a-z]+\.(com|org|pl|io)/));// TODO make it more universal
+  if (useSSh) {
+    if (originUrl.startsWith(`https://${provider}/`)) {
+      project.run(`git remote set-url origin ${originUrl.replace(`https://${provider}/`, `git@${provider}:`)}`).sync();
+    }
+  } else {
+    if (originUrl.startsWith(`git@${provider}`)) {
+      project.run(`git remote set-url origin ${originUrl.replace(`git@${provider}:`, `https://${provider}/`)}`).sync();
+    }
   }
+
 }

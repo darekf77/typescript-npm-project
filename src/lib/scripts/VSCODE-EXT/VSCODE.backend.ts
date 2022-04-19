@@ -155,7 +155,7 @@ function $VSCODE_GLOBAL() {
       "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && !inCompositeEditor"
     }
   ];
-  
+
   if (process.platform !== 'win32') {
     if (process.platform === 'linux') {
       Helpers.writeFile(keybindingPathLinxu, keysLinux);
@@ -228,7 +228,8 @@ function $VSCODE_GLOBAL() {
     'tslint.alwaysShowRuleFailuresAsWarnings': true,
     "workbench.editor.enablePreview": true,
     "security.workspace.trust.banner": "never",
-    "telemetry.enableTelemetry": false
+    "telemetry.enableTelemetry": false,
+    "security.workspace.trust.enabled": false
   };
   const settingspathWindows = path.join(crossPlatformPath(os.userInfo().homedir), 'AppData/Roaming/Code/User/settings.json');
   const settingspathLinux = path.join(crossPlatformPath(os.userInfo().homedir), '.config/Code/User/settings.json');

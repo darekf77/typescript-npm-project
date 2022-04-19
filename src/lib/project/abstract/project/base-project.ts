@@ -137,6 +137,11 @@ export abstract class BaseProject {
   }
 
   // @ts-ignore
+  get sshOnly(this: Project) {
+    return this.packageJson.sshOnly;
+  }
+
+  // @ts-ignore
   get isSmartContainerChild(this: Project) {
     return this.parent?.isSmartContainer;
   }

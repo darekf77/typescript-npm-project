@@ -85,6 +85,10 @@ export class PackageJsonCore {
     return !!this.data.tnp?.smart;
   }
 
+  get sshOnly(): boolean { // @ts-ignore
+    return !!this.data.tnp?.ssh;
+  }
+
   get isMonorepo(): boolean {
     return !!this.data.tnp?.monorepo;
   }
