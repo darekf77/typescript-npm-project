@@ -1,6 +1,6 @@
 {
   "name": "tnp",
-  "version": "13.0.68",
+  "version": "13.0.69",
   "bin": {
     "tnp": "bin/tnp",
     "tnp-debug": "bin/tnp-debug",
@@ -165,7 +165,7 @@
     "moment": "2.22.2",
     "morphi": "~13.0.29",
     "ng-packagr": "13.0.0",
-    "ng-talkback": "~13.0.10",
+    "ng-talkback": "13.0.10",
     "ng2-logger": "~13.0.11",
     "ng2-rest": "~13.0.14",
     "ng4-icons": "~13.0.12",
