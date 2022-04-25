@@ -28,6 +28,9 @@ export class RecentFilesForContainer extends FeatureForProject {
   //#endregion
 
   async saveActiveProjects(override = true) {
+    if (this.project.isSmartContainer) {
+      return;
+    }
     if (!this.project.isContainer) {
       Helpers.error(`[tnp-recent-files] Project is not container... `, false, true);
     }
@@ -90,6 +93,9 @@ export class RecentFilesForContainer extends FeatureForProject {
 
   //#region open local recent projects
   public openRecent() {
+    if (this.project.isSmartContainer) {
+      return;
+    }
     if (!this.project.isContainer) {
       Helpers.error(`[tnp-recent-files] Project is not container... `, false, true);
     }
@@ -100,6 +106,9 @@ export class RecentFilesForContainer extends FeatureForProject {
 
   //#region set local recent projects
   public setFrom(args: string, override = true) {
+    if (this.project.isSmartContainer) {
+      return;
+    }
     if (!this.project.isContainer) {
       Helpers.error(`[tnp-recent-files] Project is not container... `, false, true);
     }
