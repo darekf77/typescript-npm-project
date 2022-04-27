@@ -152,7 +152,7 @@ export class SmartNodeModules extends FeatureForProject {
           // console.log(`overrideFrom: ${overrideFrom}`)
           // console.log(`overrideDest: ${overrideDest}`)
           Helpers.removeIfExists(overrideDest);
-          Helpers.createSymLink(overrideFrom, overrideDest);
+          Helpers.createSymLink(overrideFrom, overrideDest); // TODO something is causing loop
 
           Helpers.foldersFrom(tempProj.node_modules.path)
             .filter(depName => path.basename(depName) !== packageName)

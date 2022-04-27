@@ -177,6 +177,7 @@
           'vpn-split',
           'magic-renamer',
           'node-cli-tester',
+          'static-columns',
 
 
           "typeorm",
@@ -408,7 +409,7 @@
           },
           essentials: {
             "element-resize-detector": "1.1.15",
-            "static-columns": '13.0.12',
+            "static-columns": '13.0.13',
             "bs4-breakpoint": '13.0.10',
             "ngx-breadcrumbs": "0.0.3",
             "ngx-editor": "^3.3.0",
