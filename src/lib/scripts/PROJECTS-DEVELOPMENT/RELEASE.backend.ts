@@ -39,6 +39,11 @@ const $RELEASE = async (args: string) => {
   // const autoRelease = !!argsObj.auto;
 
   const proj = Project.Current as Project;
+
+  if (proj.isSmartContainer || proj.isSmartContainerChild) {
+    Helpers.info(`Smart container not supported yet...`);
+    process.exit(0);
+  }
   /**
    * TODO this is not helpfull...
    */
@@ -100,7 +105,8 @@ const $RELEASE = async (args: string) => {
       const versionIsOk = !!specifiedVersion ? child.frameworkVersionAtLeast(specifiedVersion as any) : true;
 
       const shouldRelease = (
-        versionIsOk
+        (!child.isSmartContainer && !child.isSmartContainerChild)
+        && versionIsOk
         && !child.isPrivate
         && !child.targetProjects.exists
         && (!sameHashes || forceReleaseAll)
