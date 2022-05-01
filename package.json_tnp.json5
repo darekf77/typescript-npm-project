@@ -43,7 +43,7 @@
     ],
     includeAsDev: [],
     includeOnly: [
-      'tnp-ui',
+      'tnp-db',
       'ora',
       'progress',
       'open',

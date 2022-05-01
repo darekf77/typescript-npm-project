@@ -8,7 +8,7 @@ export class FiredevLogicUiModuleTemplate extends BaseFiredevFileTemplate {
   get entity() {
     return new FileTmpForSave(`
     ${this.baseImports}
-import { ${this.FramweorkName}, ModelDataConfig } from '${_.kebabCase(this.FramweorkName)}';
+import { ${this.FramweorkName} } from '${_.kebabCase(this.FramweorkName)}';
 import { I${this.ENTITYName} } from 'I${this.ENTITYName}';
 
 @${this.FramweorkName}.Entity<${this.ENTITYName}>({

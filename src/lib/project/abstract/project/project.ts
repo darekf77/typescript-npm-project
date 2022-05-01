@@ -12,7 +12,7 @@ import { config, ConfigModels } from 'tnp-config';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 
-import { Morphi, ModelDataConfig } from 'morphi';
+import { Morphi } from 'morphi';
 //#region @backend
 import { BaseProject } from './base-project';
 import { NpmProject } from './npm-project';
@@ -68,7 +68,7 @@ import { SingularBuild } from '../../features/singular-build.backend';
   },
   //#region @backend
   createTable: false,
-  browserTransformFn: (entity: Project, mdc: ModelDataConfig) => {
+  browserTransformFn: (entity: Project, mdc: any) => {
     // log('I AM TRANSFORMING ENTITY!!!', mdc)
     let exclude = [];
     if (!entity.browser) {
