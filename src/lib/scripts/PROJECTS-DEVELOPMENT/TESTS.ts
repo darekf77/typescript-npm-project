@@ -125,7 +125,16 @@ function $SHOW_LOOP_MESSAGES(args) {
   SHOW_LOOP_MESSAGES(args)
 }
 
+function $SHOW_RANDOM_HAMSTERS() {
+  while (true) {
+    const arr = ['Pluszla', 'Łapczuch', 'Misia', 'Chrupka']
+    console.log(arr[Helpers.numbers.randomInteger(0, 3)]);
+    Helpers.sleep(1);
+  }
+}
+
 export default {
+  $SHOW_RANDOM_HAMSTERS: Helpers.CLIWRAP($SHOW_RANDOM_HAMSTERS, '$SHOW_RANDOM_HAMSTERS'),
   $PROCESS_CWD: Helpers.CLIWRAP($PROCESS_CWD, '$PROCESS_CWD'),
   $TEST_WATCH: Helpers.CLIWRAP($TEST_WATCH, '$TEST_WATCH'),
   $TEST_WATCH_DEBUG: Helpers.CLIWRAP($TEST_WATCH_DEBUG, '$TEST_WATCH_DEBUG'),

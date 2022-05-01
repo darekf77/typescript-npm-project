@@ -44,6 +44,7 @@ function recreate() {
 }
 
 async function version() {
+  console.log(`Framework name: ${config.frameworkName}`)
   //#region @notForNpm
   if (ENV.notForNpm) {
     console.log(`I am secret project!!!`);

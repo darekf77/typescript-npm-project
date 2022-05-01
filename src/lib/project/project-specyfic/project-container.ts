@@ -37,7 +37,8 @@ export class ProjectContainer
         return proj;
       })
       .filter(f => !!f)
-      .filter(c => c.git.isGitRoot).map(c => c.name);
+      .filter(c => c.git.isGitRoot)
+      .map(c => c.name);
     let chagned = false;
 
     repoChilds.forEach(name => {

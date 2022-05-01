@@ -317,7 +317,7 @@ function createExampleConfigFor(proj: Project) {
   }
   `;
 
-  const configPathRequire = proj.isStandaloneProject ? '{ config: {} }' : `require('tnp/index.js').default`;
+  const configPathRequire = proj.isStandaloneProject ? '{ config: {} }' : `require('tnp').default`;
 
   return `
   const path = require('path')
