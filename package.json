@@ -235,7 +235,7 @@
     "watch": "1.0.2",
     "zone.js": "~0.11.4"
   },
-  "lastBuildTagHash": "cffbbcbf513b2f37dc71113a4f79cc2903fbd8bb",
+  "lastBuildTagHash": "7ba8bc7325a56fb5064283d4452f2c67fc6848b5",
   "scripts": {
     "activate": "npm i --force && firedev dedupe && npm-run tsc && sudo firedev link && tnp link:core && tnp bd && tnp env:install"
   },
