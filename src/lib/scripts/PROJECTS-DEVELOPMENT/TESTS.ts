@@ -107,8 +107,8 @@ const TEST_SYNC_PROC = async (args) => {
 
 function $SHOW_LOOP(args) {
   global.tnpShowProgress = true;
-  console.log('process pid', process.pid)
-  console.log('process ppid', process.ppid)
+  // console.log('process pid', process.pid)
+  // console.log('process ppid', process.ppid)
   // process.on('SIGTERM', () => {
   //   process.exit(0)
   // })
@@ -128,13 +128,30 @@ function $SHOW_LOOP_MESSAGES(args) {
 function $SHOW_RANDOM_HAMSTERS() {
   while (true) {
     const arr = ['Pluszla', 'Łapczuch', 'Misia', 'Chrupka']
-    console.log(arr[Helpers.numbers.randomInteger(0, 3)]);
+    console.log(arr[Helpers.numbers.randomInteger(0, arr.length - 1)]);
+    Helpers.sleep(1);
+  }
+}
+
+function $SHOW_RANDOM_HAMSTERS_TYPES() {
+  while (true) {
+    const arr = [
+      'djungarian',
+      'syrian golden',
+      'syrian teddy bear',
+      'dwarf roborowski',
+      'dwarf russian',
+      'dwarf winter white',
+      'chinese hamster'
+    ]
+    console.log(arr[Helpers.numbers.randomInteger(0, arr.length - 1)]);
     Helpers.sleep(1);
   }
 }
 
 export default {
   $SHOW_RANDOM_HAMSTERS: Helpers.CLIWRAP($SHOW_RANDOM_HAMSTERS, '$SHOW_RANDOM_HAMSTERS'),
+  $SHOW_RANDOM_HAMSTERS_TYPES: Helpers.CLIWRAP($SHOW_RANDOM_HAMSTERS_TYPES, '$SHOW_RANDOM_HAMSTERS_TYPES'),
   $PROCESS_CWD: Helpers.CLIWRAP($PROCESS_CWD, '$PROCESS_CWD'),
   $TEST_WATCH: Helpers.CLIWRAP($TEST_WATCH, '$TEST_WATCH'),
   $TEST_WATCH_DEBUG: Helpers.CLIWRAP($TEST_WATCH_DEBUG, '$TEST_WATCH_DEBUG'),
