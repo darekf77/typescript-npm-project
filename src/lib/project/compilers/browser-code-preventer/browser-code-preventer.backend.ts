@@ -142,14 +142,24 @@ export class BrowserCodePreventer extends FeatureCompilerForProject {
       if (content && !content.trimLeft().startsWith(FIXED)) {
         let raw = content;
 
-        let removeNext = false;
+        let removeNext = 0;
         raw = raw.split('\n').map((l, i) => {
-          if (removeNext) {
-            removeNext = false;
+          if (removeNext > 0) {
+            removeNext--;
             return Models.label.browserCode;
           }
+          if (l.search('@browser' + 'Import') !== -1) { // TODO QUCK_FIX regex for comment
+            removeNext = 2;
+            return Models.label.browserCode;
+          }
+
+          if (l.search('@browser' + 'Export') !== -1) { // TODO QUCK_FIX regex for comment
+            removeNext = 2;
+            return Models.label.browserCode;
+          }
+
           if (l.search('@browser' + 'Line') !== -1) { // TODO QUCK_FIX regex for comment
-            removeNext = true;
+            removeNext = 1;
             return Models.label.browserCode;
           }
           return l;
