@@ -70,7 +70,6 @@ export class BrowserCodePreventer extends FeatureCompilerForProject {
     const folder = `${path.join(this.project.location, folderPath)}/**/*.*`;
     const files = glob.sync(folder);
     // console.log('folder', files)
-    // console.log('KURWA', files)
     files.forEach(f => {
       this.fix(f);
     })

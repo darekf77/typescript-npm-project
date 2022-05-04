@@ -1,4 +1,3 @@
-
 //#region @backend
 // console.log('-- FIREDEV started... please wait. --')
 // require('cache-require-paths');
@@ -103,6 +102,10 @@ var startSpinner = spinnerIsDefault ?
 // TODO
 
 if (startSpinner && isNaN(process.ppid)) {
+  startSpinner = false;
+}
+
+if(process.platform === 'win32') {
   startSpinner = false;
 }
 

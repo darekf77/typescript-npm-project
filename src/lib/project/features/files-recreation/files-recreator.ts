@@ -474,8 +474,8 @@ ${coreFiles}
 
     const linkedFolder = this.project.linkedFolders;
     linkedFolder.forEach((c) => {
-      const from = path.resolve(path.join(this.project.location, c.from));
-      const to = path.resolve(path.join(this.project.location, c.to));
+      const from = crossPlatformPath(path.resolve(path.join(this.project.location, c.from)));
+      const to = crossPlatformPath( path.resolve(path.join(this.project.location, c.to)));
       if (Helpers.exists(from) && (to.search(this.project.location) !== -1)) {
         Helpers.removeIfExists(to);
         Helpers.createSymLink(from, to);
