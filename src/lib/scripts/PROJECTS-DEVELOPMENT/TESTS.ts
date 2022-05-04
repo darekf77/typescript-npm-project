@@ -24,22 +24,30 @@ function SHOW_LOOP(c = 0 as any, maximum = Infinity, errExit = false) {
   }, 1000)
 }
 
-function SHOW_LOOP_MESSAGES(c = 0 as any, maximum = Infinity, errExit = false) {
+function SHOW_LOOP_MESSAGES(c = 0 as any, maximum = Infinity, errExit = false, throwErr = false) {
   if (_.isString(c)) {
-    var { max = Infinity, err = false } = require('minimist')(c.split(' '));
+    const obj = require('minimist')(c.split(' '));
+    var { max = Infinity, err = false } = obj;
     maximum = _.isNumber(max) ? max : Infinity;
     errExit = err;
+    throwErr = obj.throw;
     // console.log('max',max)
     // console.log('err',err)
     c = 0
   }
   if (c === maximum) {
-    process.exit(errExit ? 1 : 0)
+    if (throwErr) {
+      new Error('Custom error!')
+    }
+    if (errExit) {
+      process.exit(1)
+    }
+    process.exit(0)
   }
   PROGRESS_DATA.log({ msg: `counter: ${c}`, value: c * 7 })
   setTimeout(() => {
-    SHOW_LOOP_MESSAGES(++c, maximum, errExit)
-  }, 3000)
+    SHOW_LOOP_MESSAGES(++c, maximum, errExit, throwErr)
+  }, 2000)
 }
 
 function $PROCESS_CWD() {
