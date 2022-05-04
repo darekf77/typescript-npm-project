@@ -22,10 +22,16 @@ async function KILL_DAEMON(args) {
 
 export async function DAEMON_LISTEN() {
   const db = await TnpDB.Instance();
-  // @ts-ignore
-  db.listenToChannel(Project.Current, 'tnp-copyto-add', () => { });
-  // @ts-ignore
-  db.listenToChannel(Project.Current, 'tnp-copyto-remove', () => { });
+  if (process.platform !== 'win32') { // TODO QUICK_FIX
+
+
+    // @ts-ignore
+    db.listenToChannel(Project.Current, 'tnp-copyto-add', () => { });
+    // @ts-ignore
+    db.listenToChannel(Project.Current, 'tnp-copyto-remove', () => { });
+
+
+  }
 }
 
 export async function DAEMON_TRIGGER_ADD() {

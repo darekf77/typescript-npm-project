@@ -57,12 +57,12 @@ export class CopyManager extends FeatureForProject {
           from: ${
             // @ts-ignore
             (this.buildOptions.copyto as Project[]).map(c => c.name).join(', ')
-          }
+            }
 
           to: ${
             // @ts-ignore
             (b.copyto as Project[]).map(c => c.name).join(', ')
-          }
+            }
 
       `)
           this.buildOptions.copyto = Helpers.arrays.uniqArray<Project>(b.copyto, 'location');
@@ -70,17 +70,20 @@ export class CopyManager extends FeatureForProject {
         }
       }
 
-      // @ts-ignore
-      db.listenToChannel(this.project, 'tnp-copyto-add', async () => {
-        Helpers.log(`[copytomanager] realtime update add`);
-        await updateFromDbLastCommand('tnp-copyto-add')();
-      });
+      if (process.platform !== 'win32') { // TODO QUICK_FIX
+        // @ts-ignore
+        db.listenToChannel(this.project, 'tnp-copyto-add', async () => {
+          Helpers.log(`[copytomanager] realtime update add`);
+          await updateFromDbLastCommand('tnp-copyto-add')();
+        });
 
-      // @ts-ignore
-      db.listenToChannel(this.project, 'tnp-copyto-remove', async () => {
-        Helpers.log(`[copytomanager] realtime update remove`);
-        await updateFromDbLastCommand('tnp-copyto-remove')();
-      });
+        // @ts-ignore
+        db.listenToChannel(this.project, 'tnp-copyto-remove', async () => {
+          Helpers.log(`[copytomanager] realtime update remove`);
+          await updateFromDbLastCommand('tnp-copyto-remove')();
+        });
+      }
+
 
     } else {
       await this.start();
