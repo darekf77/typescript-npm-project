@@ -160,7 +160,8 @@ export function prepareCommand(pkg: Models.npm.Package, remove: boolean, useYarn
       + ` ${argsForFasterInstall} `
       + ` ${(pkg && pkg.installType && pkg.installType === '--save-dev') ? '-dev' : ''} `;
   } else {
-    const argsForFasterInstall = `--force --ignore-engines --no-progress --no-audit `
+    // --no-progress
+    const argsForFasterInstall = `--force --ignore-engines --no-audit `
       + ` ${noPackageLock} `;
     command = `npm ${install} ${pkg ? pkg.name : ''} `
       + ` ${(pkg && pkg.installType) ? pkg.installType : ''} `
