@@ -225,13 +225,16 @@ ${shouldBeProjectArr.map(p => `- ${p}`).join('\n')}
   //#endregion
 
   //#region pull
-  public async pull() {
+  public async pull(clear = false) {
     if (this.project.typeIs('navi')) {
       await this.project.git.pullCurrentBranch(true);
       return;
     }
 
     this.before();
+    if (clear && this.project.npmPackages.useSmartInstall) {
+      this.project.node_modules.remove();
+    }
     let uncommitedChanges = this.project.git.thereAreSomeUncommitedChange;
     if (uncommitedChanges) {
       Helpers.warn(`
@@ -269,7 +272,7 @@ ${shouldBeProjectArr.map(p => `- ${p}`).join('\n')}
       const childrenToPull = await this.getLinkedPorjectsAndChildrens('pull');
       for (let index = 0; index < childrenToPull.length; index++) {
         const childProj = childrenToPull[index];
-        await childProj.gitActions.pull();
+        await childProj.gitActions.pull(clear);
       }
     }
 

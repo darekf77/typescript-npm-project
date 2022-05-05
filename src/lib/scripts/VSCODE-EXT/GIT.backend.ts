@@ -89,6 +89,11 @@ export async function $PULL(args: string, exit = true) {
   process.exit(0);
 }
 
+export async function $CLEAR_PULL(args: string, exit = true) {
+  await (Project.Current as Project).gitActions.pull(true);
+  process.exit(0);
+}
+
 
 export async function $CLONE(args: string, exit = true) {
   const argsss = args.split(' ');
@@ -237,6 +242,7 @@ export default {
   $FORCE_PUSH: Helpers.CLIWRAP($FORCE_PUSH, '$FORCE_PUSH'),
   $REPUSH: Helpers.CLIWRAP($REPUSH, '$REPUSH'),
   $PULL: Helpers.CLIWRAP($PULL, '$PULL'),
+  $CLEAR_PULL: Helpers.CLIWRAP($CLEAR_PULL, '$CLEAR_PULL'),
   $DIFF: Helpers.CLIWRAP($DIFF, '$DIFF'),
   $RECOMMIT: Helpers.CLIWRAP($RECOMMIT, '$RECOMMIT'),
   $CLONE: Helpers.CLIWRAP($CLONE, '$CLONE'),
