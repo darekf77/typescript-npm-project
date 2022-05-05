@@ -5,11 +5,12 @@ import {
   fse,
   rimraf,
   crossPlatformPath,
+  Helpers,
 } from 'tnp-core';
 import { CodeCut } from './browser-code-cut';
 import { BackendCompilation } from './compilation-backend';
 import { IncCompiler } from 'incremental-compiler';
-import { ConfigModels } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import { MorphiHelpers } from 'morphi';
 
 @IncCompiler.Class({ className: 'BroswerCompilation' })
@@ -39,7 +40,7 @@ export class BroswerCompilation extends BackendCompilation {
   }
 
   async syncAction(files: string[]) {
-    // console.log('[morphi] syncAction', files)
+    // console.log('[compilation browser] syncAction', files)
     if (fse.existsSync(this.compilationFolderPath)) {
       rimraf.sync(this.compilationFolderPath)
     }
@@ -86,15 +87,15 @@ export class BroswerCompilation extends BackendCompilation {
   async asyncAction(event: IncCompiler.Change) {
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
     // noting here for backend
-    // console.log('[asyncAction][morphi][cb] event.fileAbsolutePath', event.fileAbsolutePath)
+    // Helpers.log(`[compilation-browser][asyncAction][firedev][cb] event.fileAbsolutePath ${event.fileAbsolutePath}`)
     const relativeFilePath = absoluteFilePath.replace(crossPlatformPath(path.join(this.cwd, this.location)), '');
     // console.log('relativeFilePath', relativeFilePath)
     const destinationFilePath = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, relativeFilePath));
     // console.log('this.cwd', this.cwd)
     // console.log('this.sourceOutBrowser', this.sourceOutBrowser)
     // console.log('destinationFilePath', destinationFilePath)
-    // console.log('[asyncAction][morphi][cb] absoluteFilePath', absoluteFilePath)
-    // console.log('[asyncAction][morphi][cb] destinationFilePath', destinationFilePath)
+    // Helpers.log(`[asyncAction][${config.frameworkName}][cb] relativeFilePath: ${relativeFilePath}`)
+    // Helpers.log(`[asyncAction][${config.frameworkName}][cb] destinationFilePath: ${destinationFilePath}`)
     if (copyToBrowserSrcCodition(absoluteFilePath)) {
       if (event.eventName === 'unlink') {
         if (fse.existsSync(destinationFilePath)) {

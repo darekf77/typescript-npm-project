@@ -27,7 +27,7 @@ export class PackagesRecognition {
   }
 
   start(force?: boolean, reasonToSearch?: string) {
-    Helpers.log(`[morphi][force = ${force}] ${reasonToSearch}`);
+    Helpers.log(`[${config.frameworkName}][force = ${force}] ${reasonToSearch}`);
     const pjPath = crossPlatformPath(path.join(this.cwd, config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES));
     if (!Helpers.exists(pjPath)) {
       Helpers.writeJson(pjPath, {});
@@ -38,11 +38,11 @@ export class PackagesRecognition {
         if (_.isArray(pj[config.array.isomorphicPackages])) {
           this.recognizedPackages = pj[config.array.isomorphicPackages];
           BrowserCodeCut.IsomorphicLibs = _.cloneDeep(this.recognizedPackages);
-          Helpers.log(`[morphi] Recognized (${this.recognizedPackages}) in ${pjPath}`)
+          Helpers.log(`[${config.frameworkName}] Recognized (${this.recognizedPackages}) in ${pjPath}`)
           return;
         }
       } catch (error) {
-        Helpers.log(`[morphi] ERROR not recognized in`)
+        Helpers.log(`[${config.frameworkName}] ERROR not recognized in`)
       }
     }
     const node_modules = crossPlatformPath(path.join(this.cwd, config.folder.node_modules));
@@ -57,7 +57,7 @@ export class PackagesRecognition {
     folders = folders
       .map(f => path.basename(f))
       .filter(packageName => {
-        Helpers.log(`Checking package node_modules/${packageName}`, 2)
+        Helpers.log(`[${config.frameworkName}] Checking package node_modules/${packageName}`, 2)
         try {
           return this.checkIsomorphic(node_modules, packageName);
         } catch (error) {
@@ -69,7 +69,7 @@ export class PackagesRecognition {
   }
 
   protected updateCurrentPackageJson() {
-    Helpers.log('[morphi] updateCurrentPackageJson')
+    Helpers.log(`[${config.frameworkName}] updateCurrentPackageJson`)
     try {
       const pjPath = crossPlatformPath(path.join(this.cwd, config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES));
       if (!Helpers.exists(pjPath)) {
@@ -80,8 +80,8 @@ export class PackagesRecognition {
       Helpers.writeJson(pjPath, pj);
       BrowserCodeCut.IsomorphicLibs = _.cloneDeep(this.recognizedPackages);
     } catch (e) {
-      Helpers.log(`[morphi]`, e)
-      Helpers.log(`[morphi] Error during update ismorphic packages list cache`);
+      Helpers.log(`[${config.frameworkName}]`, e)
+      Helpers.log(`[${config.frameworkName}] Error during update ismorphic packages list cache`);
     }
   }
 

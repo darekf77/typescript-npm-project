@@ -67,7 +67,7 @@ export class PackageJSON
 
     const pkgJson = new PackageJSON({ data: pj.data, location, project });
     if (pj.saveAtLoad || (!pj_tnp5.exists && pkgJson.data.tnp.version === 'v3')) {
-      Helpers.log(`Saving fixed package.json structure in ${location}`);
+      Helpers.log(`Saving fixed package.json structure in ${location}`,1);
 
       pkgJson.writeToDisc();
 

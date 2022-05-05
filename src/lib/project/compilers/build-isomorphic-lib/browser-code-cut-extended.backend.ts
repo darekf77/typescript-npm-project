@@ -408,7 +408,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   REPLACERegionsForIsomorphicLib(options: Models.dev.ReplaceOptionsExtended) {
     options = _.clone(options);
     this.options = options;
-    // console.log('options.replacements', options.replacements)
+    // Helpers.log(`[REPLACERegionsForIsomorphicLib] options.replacements ${this.absoluteFilePath}`)
     const ext = path.extname(this.absoluteFilePath).replace('.', '') as ConfigModels.CutableFileExt;
     // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
     if (this.allowedToReplace.includes(ext)) {

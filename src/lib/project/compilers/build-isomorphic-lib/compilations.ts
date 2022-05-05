@@ -71,7 +71,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
   @IncCompiler.methods.AsyncAction()
   // @ts-ignore
   async asyncAction(event: IncCompiler.Change) {
-    // console.log('compilation', event.fileAbsolutePath)
+    console.log('[asyncAction] compilation', event.fileAbsolutePath)
     const triggerTsEventExts = ['css', 'scss', 'sass', 'html'].map(ext => `.${ext}`);
     if (triggerTsEventExts
       .includes(path.extname(event.fileAbsolutePath))) {

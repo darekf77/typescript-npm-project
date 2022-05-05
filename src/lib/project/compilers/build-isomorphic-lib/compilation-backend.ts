@@ -111,7 +111,7 @@ export class BackendCompilation extends IncCompiler.Base {
           stdio: [0, 1, 2]
         });
       } catch (e) {
-        Helpers.error(`[morphi] Compilation error (1): ${e}`, false, true);
+        Helpers.error(`[${config.frameworkName}] Compilation error (1): ${e}`, false, true);
       }
 
 
@@ -123,7 +123,7 @@ export class BackendCompilation extends IncCompiler.Base {
             stdio: [0, 1, 2]
           })
         } catch (e) {
-          Helpers.error(`[morphi] Compilation error (2): ${e}`, false, true);
+          Helpers.error(`[${config.frameworkName}] Compilation error (2): ${e}`, false, true);
         }
       }
     }

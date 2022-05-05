@@ -20,7 +20,7 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
 
   // @ts-ignore
   start(force: boolean, reasonToSearch: string) {
-    Helpers.log(`[morphi] ${reasonToSearch}`);
+    Helpers.log(`[${config.frameworkName}] ${reasonToSearch}`);
     if (typeof force !== 'boolean') {
       force = false;
     }
@@ -43,7 +43,7 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
       Helpers.log(`[${config.frameworkName}][checkIsomorphic] check project from ${pjPath}`, 1)
       const proj = Project.From<Project>(pjPath);
       if (proj) {
-        Helpers.log(`[${config.frameworkName}] Proj "${proj.genericName}" type ${proj._type}, standalone ${proj.isStandaloneProject}`)
+        Helpers.log(`[${config.frameworkName}] Proj "${proj.genericName}" type ${proj._type}, standalone ${proj.isStandaloneProject}`,1)
         if (proj.typeIs(...(config.projectTypes.forNpmLibs as ConfigModels.LibType[]))) {
           res = proj.isStandaloneProject;
         } else {

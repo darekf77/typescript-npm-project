@@ -87,9 +87,12 @@ export class IncrementalBuildProcess {
 
   // @ts-ignore
   async startAndWatch(taskName?: string, options?: IncCompiler.Models.StartAndWatchOptions) {
+
+    // console.log('[${config.frameworkName}][incremental-build-process] taskName' + taskName)
+
     const { watchOnly, afterInitCallBack } = options || {};
     if (this.compileOnce && watchOnly) {
-      console.error(`[morphi] Dont use "compileOnce" and "watchOnly" options together.`);
+      console.error(`[${config.frameworkName}] Dont use "compileOnce" and "watchOnly" options together.`);
       process.exit(0)
     }
     if (this.compileOnce) {
