@@ -1,6 +1,6 @@
 import { IncCompiler } from 'incremental-compiler';
 import { config } from 'tnp-config';
-import { glob, Helpers, path, _ } from 'tnp-core';
+import { crossPlatformPath, glob, Helpers, path, _ } from 'tnp-core';
 import { Models } from 'tnp-models';
 import { FeatureCompilerForProject } from '../../abstract/feature-compiler-for-project.backend';
 import type { Project } from '../../abstract/project/project';
@@ -76,9 +76,21 @@ export class BrowserCodePreventer extends FeatureCompilerForProject {
   }
 
   fix(fileAbsolutePath: string) {
+
+    fileAbsolutePath = crossPlatformPath(fileAbsolutePath);
     if (Helpers.isFolder(fileAbsolutePath)) {
       return;
     }
+
+    // if (path.basename(path.dirname(fileAbsolutePath)) === config.folder.node_modules) {
+    //   return;
+    // }
+    // if (path.basename(path.dirname(path.dirname(fileAbsolutePath))) === config.folder.node_modules) {
+    //   return;
+    // }
+    // if (path.basename(path.dirname(path.dirname(path.dirname(fileAbsolutePath)))) === config.folder.node_modules) {
+    //   return;
+    // }
 
     const isMapFile = (this.isSmartContainerTarget && fileAbsolutePath.endsWith('.js.map'));
 
@@ -86,27 +98,32 @@ export class BrowserCodePreventer extends FeatureCompilerForProject {
       return;
     }
 
+
     // console.log('checking', fileAbsolutePath)
 
     for (let index = 0; index < this.bases.length; index++) {
       const baseOutfolder = this.bases[index];
-      const base = path.join(baseOutfolder, config.folder.node_modules);
+      const base = crossPlatformPath(path.join(baseOutfolder, config.folder.node_modules));
       if (fileAbsolutePath.startsWith(base)) {
         return;
       }
     }
 
 
-    if (fileAbsolutePath.replace(path.join(this.project.location, config.folder.dist), '').startsWith(`/${config.folder.browser}/`)) {
+    if (fileAbsolutePath.replace(crossPlatformPath(path.join(this.project.location, config.folder.dist)), '')
+      .startsWith(`/${config.folder.browser}/`)) {
       return;
     }
-    if (fileAbsolutePath.replace(path.join(this.project.location, config.folder.dist), '').startsWith(`/${config.folder.client}/`)) {
+    if (fileAbsolutePath.replace(crossPlatformPath(path.join(this.project.location, config.folder.dist)), '')
+      .startsWith(`/${config.folder.client}/`)) {
       return;
     }
-    if (fileAbsolutePath.replace(path.join(this.project.location, config.folder.bundle), '').startsWith(`/${config.folder.browser}/`)) {
+    if (fileAbsolutePath.replace(crossPlatformPath(path.join(this.project.location, config.folder.bundle)), '')
+      .startsWith(`/${config.folder.browser}/`)) {
       return;
     }
-    if (fileAbsolutePath.replace(path.join(this.project.location, config.folder.bundle), '').startsWith(`/${config.folder.client}/`)) {
+    if (fileAbsolutePath.replace(crossPlatformPath(path.join(this.project.location, config.folder.bundle)), '')
+      .startsWith(`/${config.folder.client}/`)) {
       return;
     }
 
@@ -114,6 +131,8 @@ export class BrowserCodePreventer extends FeatureCompilerForProject {
     // if (realPath !== fileAbsolutePath) {
     //   return;
     // } sd
+
+    // console.log('fixing try: ', fileAbsolutePath)
 
     const content = Helpers.readFile(fileAbsolutePath);
 
@@ -139,7 +158,10 @@ export class BrowserCodePreventer extends FeatureCompilerForProject {
         // console.log(`FIXED MAP: ${fileAbsolutePath}`)
       }
     } else {
-      if (content && !content.trimLeft().startsWith(FIXED)) {
+      if (content
+        && !content.trimLeft().startsWith(FIXED)
+        && !content.trimLeft().startsWith('#') // do not fix bash files - windows issue
+      ) {
         let raw = content;
 
         let removeNext = 0;
@@ -165,6 +187,7 @@ export class BrowserCodePreventer extends FeatureCompilerForProject {
           return l;
         }).join('\n')
 
+        // console.log('fixing', fileAbsolutePath)
         // @ts-ignore
         raw = RegionRemover.from(fileAbsolutePath, raw, ['@browser'], this.project as Project).output;
         Helpers.writeFile(fileAbsolutePath, FIXED + raw)
