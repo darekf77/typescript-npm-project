@@ -437,8 +437,10 @@ export class ProjectIsomorphicLib
       if (this.frameworkVersionAtLeast('v3')) { // TOOD
         showInfoAngular()
         if (this.isSmartContainerTarget) {
-          const parent = Project.From(this.smartContainerTargetParentContainerPath) as Project;
-          parent.run(`${config.frameworkName} baw ${this.name}`).async();
+          if (process.platform !== 'win32') { // TODOD QUICK_FIX
+            const parent = Project.From(this.smartContainerTargetParentContainerPath) as Project;
+            parent.run(`${config.frameworkName} baw ${this.name}`).async();
+          }
         } else {
           await proxyProject.run(angularCommand).unitlOutputContains('Compilation complete. Watching for file changes')
         }
@@ -489,8 +491,10 @@ export class ProjectIsomorphicLib
         try {
           showInfoAngular()
           if (this.isSmartContainerTarget) {
-            const parent = Project.From(this.smartContainerTargetParentContainerPath) as Project;
-            parent.run(`${config.frameworkName} ba ${this.name}`).async();
+            if (process.platform !== 'win32') { // TODOD QUICK_FIX
+              const parent = Project.From(this.smartContainerTargetParentContainerPath) as Project;
+              parent.run(`${config.frameworkName} ba ${this.name}`).async();
+            }
           } else {
             await proxyProject.run(angularCommand).sync()
           }
