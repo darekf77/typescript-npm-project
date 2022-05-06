@@ -110,7 +110,20 @@ export class Project extends $Project<Project>
 
   //#region @backend
   public static linkCoreFolders() {
-   
+
+    if (config.frameworkName === 'tnp') {
+      const firedevProjects = crossPlatformPath( path.resolve(path.join(Project.Tnp.location, '../firedev-projects')));
+      console.log({
+        firedevProjects
+      })
+      if (!Helpers.exists(firedevProjects) || !Helpers.git.isGitRoot(firedevProjects)) {
+        Helpers.removeFolderIfExists(firedevProjects);
+        Helpers.run(`git clone https://github.com/darekf77/firedev-projects.git`, {
+          cwd: path.dirname(firedevProjects)
+        }).sync();
+      }
+    }
+
     config.coreProjectVersions.forEach(v => {
       const continer = Project.by('container', v as any) as Project;
       continer.recreate.handleProjectSpecyficFiles();

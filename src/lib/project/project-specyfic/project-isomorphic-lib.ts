@@ -13,6 +13,7 @@ import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
+import { CLI } from 'tnp-cli';
 const loadNvm = 'echo ' // 'export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" && [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh" && nvm use v14';
 
 //#region @backend
@@ -347,7 +348,7 @@ export class ProjectIsomorphicLib
 
   async buildLib() {
     //#region @backend
-    const { outDir, ngbuildonly, watch } = this.buildOptions;
+    const { outDir, ngbuildonly, watch, args } = this.buildOptions;
 
     this.fixBuildDirs(outDir);
 
@@ -437,10 +438,27 @@ export class ProjectIsomorphicLib
       if (this.frameworkVersionAtLeast('v3')) { // TOOD
         showInfoAngular()
         if (this.isSmartContainerTarget) {
-          if (process.platform !== 'win32') { // TODOD QUICK_FIX
-            const parent = Project.From(this.smartContainerTargetParentContainerPath) as Project;
-            parent.run(`${config.frameworkName} baw ${this.name}`).async();
-          }
+          const target = _.first(args.split(' '));
+          Helpers.info(`
+
+          LIB BUILD DONE...
+          (your target project is ${args})
+          please start in other terminal:
+
+          ${config.frameworkName} ` + CLI.chalk.bold(`build:app:watch ${target}`) + `
+          or
+          ${config.frameworkName} baw ${target}
+
+          (with port)
+          ${config.frameworkName} baw ${target} --port 4201 # or whatever port
+
+          to run angular ng serve.
+
+          `);
+          // if (process.platform !== 'win32') { // TODOD QUICK_FIX
+          //   const parent = Project.From(this.smartContainerTargetParentContainerPath) as Project;
+          //   parent.run(`${config.frameworkName} baw ${this.name}`).async();
+          // }
         } else {
           await proxyProject.run(angularCommand).unitlOutputContains('Compilation complete. Watching for file changes')
         }
@@ -491,10 +509,10 @@ export class ProjectIsomorphicLib
         try {
           showInfoAngular()
           if (this.isSmartContainerTarget) {
-            if (process.platform !== 'win32') { // TODOD QUICK_FIX
-              const parent = Project.From(this.smartContainerTargetParentContainerPath) as Project;
-              parent.run(`${config.frameworkName} ba ${this.name}`).async();
-            }
+            // if (process.platform !== 'win32') { // TODOD QUICK_FIX
+            const parent = Project.From(this.smartContainerTargetParentContainerPath) as Project;
+            parent.run(`${config.frameworkName} ba ${this.name}`).sync();
+            // }
           } else {
             await proxyProject.run(angularCommand).sync()
           }
