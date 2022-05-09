@@ -450,9 +450,6 @@ function travelObject(obj: Object, out: Object, parent: Object, updateFn?: (obj:
 //#region before save action
 function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveOptions) {
   const { newDeps, toOverride, action, reasonToHidePackages, reasonToShowPackages } = options;
-  const engines = (Project.Tnp as Project).packageJson.data.engines;
-  const license = project.isStandaloneProject ? 'MIT' : 'UNLICENSED';
-  const prv = (project.isStandaloneProject || project.isUnknowNpmProject) ? false : true;
 
   let recrateInPackageJson = (action === 'save' || action === 'show');
   if (project.isTnp) {
@@ -597,9 +594,6 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       });
     //#endregion
 
-    if (!project.isCoreProject && !project.isVscodeExtension) {
-      project.packageJson.data.engines = engines;
-    }
   } else {
     Helpers.log(`[package.json] save for clean - ${project._type} project: "${project.name}" , [${reasonToHidePackages}]`);
     project.packageJson.data.devDependencies = {};
@@ -610,10 +604,6 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   }
 
   Helpers.log(`Project: ${chalk.bold(project.genericName)}, framework verison: ${project._frameworkVersion}`);
-  project.packageJson.data.license = license;
-  if (_.isNil(project.packageJson.data.private)) {
-    project.packageJson.data.private = prv;
-  }
   if (project.isTnp) {
     Helpers.info(`Execute ${config.frameworkName} action`);
     const keysToDelete = [];
@@ -710,7 +700,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     if (project.frameworkVersionAtLeast('v3')) {
       const saveTnpFiredevVer = `^${_.first(Project.Tnp.version.split('.'))}`;
       // project.packageJson.data.dependencies['tnp'] = saveTnpFiredevVer;
-      if(project.isContainerCoreProject) {
+      if (project.isContainerCoreProject) {
         project.packageJson.data.dependencies['firedev'] = saveTnpFiredevVer;
       } else {
         // project.packageJson.data.devDependencies['firedev'] = saveTnpFiredevVer;

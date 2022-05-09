@@ -1,4 +1,4 @@
-import { _ } from 'tnp-core';
+import { os, _ } from 'tnp-core';
 import { crossPlatformPath } from 'tnp-core'
 import { Project } from '../project';
 import * as  psList from 'ps-list';
@@ -239,7 +239,35 @@ export function $PRINT_RELATIVES(folder) {
   process.exit(0)
 }
 
+//#region @notForNpm
+export function $MP3(args) {
+  Helpers.run('youtube-dl --extract-audio --audio-format mp3 ' + args,
+    {
+      output: true,
+      cwd: crossPlatformPath(path.join(os.userInfo().homedir, 'Downloads'))
+    }).sync();
+  process.exit(0)
+}
+
+export function $BREW(args) {
+  const isM1MacOS = os.cpus()[0].model.includes('Apple M1');
+  if (process.platform === 'darwin') {
+    if (isM1MacOS) {
+      Helpers.run(`arch -x86_64 brew install ${args}`).sync();
+    } else {
+      Helpers.run(`brew install ${args}`).sync();
+    }
+  }
+  process.exit(0);
+}
+//#endregion
+
+
 export default {
+  //#region @notForNpm
+  $BREW: Helpers.CLIWRAP($BREW, '$BREW'),
+  $MP3: Helpers.CLIWRAP($MP3, '$MP3'),
+  //#endregion
   $PRINT_RELATIVES: Helpers.CLIWRAP($PRINT_RELATIVES, '$PRINT_RELATIVES'),
   $OUTPUT_TEST_ASCII: Helpers.CLIWRAP($OUTPUT_TEST_ASCII, '$OUTPUT_TEST_ASCII'),
   $THROW_ERR: Helpers.CLIWRAP($THROW_ERR, '$THROW_ERR'),
