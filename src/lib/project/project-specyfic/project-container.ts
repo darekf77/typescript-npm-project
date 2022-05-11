@@ -10,6 +10,7 @@ import { Helpers } from 'tnp-helpers';
 import { CLASS } from 'typescript-class-helpers';
 import type { ProjectIsomorphicLib } from './project-isomorphic-lib';
 import { Models } from 'tnp-models';
+import { config } from 'tnp-config';
 
 //#region @backend
 @CLASS.NAME('ProjectContainer')
@@ -90,6 +91,20 @@ export class ProjectContainer
     const { outDir, args } = buildOptions;
 
     const proxy = this.proxyProjFor(_.first(args.split(' ')).trim(), outDir);
+    if (!proxy && this.isSmartContainer) {
+      const tmp = (c) => `${config.frameworkName} build:app:watch ${c} ${args}`;
+      Helpers.error(`
+
+      Please provide target for angular build:
+
+
+${this.children.filter(c => c.typeIs('isomorphic-lib')).map(c => {
+        return tmp(c.name);
+      }).join('\n')}
+
+
+      `, false, true);
+    }
     await proxy.buildSteps(buildOptions);
 
     //#endregion
