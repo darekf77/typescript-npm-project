@@ -124,8 +124,24 @@ export function copyMainProject(tmpProject: Project, project: Project, pkg: Mode
 }
 
 export function prepareTempProject(project: Project, pkg: Models.npm.Package): Project {
+  if (!pkg.version) {
+    try {
+      pkg.version = Helpers.commnadOutputAsString(`npm show ${pkg.name} version`);
+    } catch (error) {
+      console.log('pkg', pkg);
+      Helpers.error(`[${config.frameworkName}] `
+        + `not able to install package... try again with exact version or check package name.`, false, true);
+    }
+  }
+
+  Helpers.info(`
+
+      Packge ${pkg.name}@${pkg.version} will be installed..
+
+      `)
+
   const pathPart = `${config.folder.tmp}-${config.folder.node_modules}-installation-of`;
-  const tmpFolder = path.join(project.location, `${pathPart}-${pkg.name.replace('/', '-')}-${_.snakeCase(pkg.version ? pkg.version : '')}`);
+  const tmpFolder = path.join(project.location, `${pathPart}-${pkg.name.replace('/', '-')}-${_.snakeCase(pkg.version)}`);
 
   Helpers.remove(`${path.join(project.location, pathPart)}*`);
   Helpers.mkdirp(tmpFolder);
@@ -133,7 +149,10 @@ export function prepareTempProject(project: Project, pkg: Models.npm.Package): P
   const tmpProject = Project.From<Project>(tmpFolder);
   tmpProject.packageJson.setNamFromContainingFolder();
   tmpProject.packageJson.hideDeps(`smooth instalation`);
-  pkg.installType = '--save';
+  tmpProject.packageJson.data.dependencies = {
+    [pkg.name]: pkg.version
+  };
+  tmpProject.packageJson.save('smooth install')
   const command = prepareCommand(pkg, false, false, project);
   try {
     executeCommand(command, tmpProject);

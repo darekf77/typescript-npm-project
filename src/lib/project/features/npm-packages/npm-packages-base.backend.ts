@@ -12,6 +12,11 @@ import { PROGRESS_DATA } from 'tnp-models';
 export class NpmPackagesBase extends NpmPackagesCore {
 
   get useSmartInstall() {
+
+    if (this.project.isContainerCoreProject && this.project.frameworkVersionAtLeast('v2')) {
+      return true;
+    }
+
     if (this.project.isSmartContainer) {
       return true;
     }
@@ -100,8 +105,10 @@ export class NpmPackagesBase extends NpmPackagesCore {
       );
 
       if (installAllowed) {
-        if (this.useSmartInstall
-          || (this.project.isContainerCoreProject && this.project.frameworkVersionAtLeast('v2')) && !options.smartInstallPreparing) {
+        if (!smoothInstall
+          && this.useSmartInstall
+          && !options.smartInstallPreparing
+        ) {
           this.project.smartNodeModules.install(remove ? 'uninstall' : 'install', ...npmPackages);
         } else {
           if (fullInstall) {
