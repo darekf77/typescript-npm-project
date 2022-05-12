@@ -152,6 +152,7 @@ export function prepareTempProject(project: Project, pkg: Models.npm.Package): P
   tmpProject.packageJson.data.dependencies = {
     [pkg.name]: pkg.version
   };
+  tmpProject.packageJson.data.devDependencies = {};
   tmpProject.packageJson.save('smooth install')
   const command = prepareCommand(pkg, false, false, project);
   try {
