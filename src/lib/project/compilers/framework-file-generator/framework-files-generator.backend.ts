@@ -28,8 +28,10 @@ export class FrameworkFilesGenerator extends ControllersGenerator {
 
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
-    if (!this.notAllowedToWachFiles.includes(path.basename(event.fileAbsolutePath))) {
-      await this.syncAction()
+    if (event.eventName !== 'unlinkDir') {
+      if (!this.notAllowedToWachFiles.includes(path.basename(event.fileAbsolutePath))) {
+        await this.syncAction()
+      }
     }
   }
 

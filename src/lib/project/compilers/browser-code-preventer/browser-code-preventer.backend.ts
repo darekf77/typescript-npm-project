@@ -58,7 +58,9 @@ export class BrowserCodePreventer extends FeatureCompilerForProject {
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
     // Helpers.info(`async action for ${event.fileAbsolutePath}`)
-    this.fix(event.fileAbsolutePath)
+    if (event.eventName !== 'unlinkDir') {
+      this.fix(event.fileAbsolutePath);
+    }
   }
 
   bases = [

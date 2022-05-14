@@ -75,19 +75,10 @@ import { Project } from './lib/project';
 import { Helpers as TnpHelpers } from 'tnp-helpers';
 import { CLI_FUNCTIONS } from 'tnp-db';
 import { TnpDB } from 'tnp-db';
-import { Models } from 'tnp-models';
-import { IncCompiler } from 'incremental-compiler';
+
 import { CLASS } from 'typescript-class-helpers';
 //#endregion
 
-//#region init incremental compiler
-IncCompiler.init(async (asyncEvents) => { }, {
-  error: Helpers.error,
-  log: Helpers.log,
-  info: Helpers.info,
-  warn: Helpers.warn
-} as any);
-//#endregion
 
 //#region handle special args
 const SPECIAL_ARGS = [

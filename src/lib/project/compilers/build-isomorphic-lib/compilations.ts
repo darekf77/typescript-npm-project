@@ -71,33 +71,38 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
   @IncCompiler.methods.AsyncAction()
   // @ts-ignore
   async asyncAction(event: IncCompiler.Change) {
-    // console.log('[asyncAction] compilation', event.fileAbsolutePath)
-    const triggerTsEventExts = ['css', 'scss', 'sass', 'html'].map(ext => `.${ext}`);
-    if (triggerTsEventExts
-      .includes(path.extname(event.fileAbsolutePath))) {
+    const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
+    const relativeFilePath = crossPlatformPath(absoluteFilePath.replace(path.join(this.cwd, this.location), ''));
+    const destinationFilePath = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, relativeFilePath));
 
-      const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
-      const relativeFilePath = crossPlatformPath(absoluteFilePath.replace(path.join(this.cwd, this.location), ''));
-      const destinationFilePath = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, relativeFilePath));
-      if (event.eventName === 'unlink') {
-        Helpers.removeFileIfExists(destinationFilePath);
-        // console.log('FILE UNLINKED')
-      } else {
-        if (fse.existsSync(absoluteFilePath)) {
-          if (!fse.existsSync(path.dirname(destinationFilePath))) {
-            Helpers.mkdirp(path.dirname(destinationFilePath));
+    if (event.eventName === 'unlinkDir') {
+      // console.log('REMOVING DIR', destinationFilePath)
+      Helpers.removeFolderIfExists(destinationFilePath);
+    } else {
+      // console.log(`[compilation-browser][asyncAction][compilations.ts] ${event.eventName} ${event.fileAbsolutePath}`)
+      const triggerTsEventExts = Models.other.CutableFileExtArr.map(ext => `.${ext}`); // TODO FIX THIS @LAST
+      if (triggerTsEventExts
+        .includes(path.extname(event.fileAbsolutePath))) {
+        if (event.eventName === 'unlink') {
+          Helpers.removeFileIfExists(destinationFilePath);
+          // console.log('FILE UNLINKED')
+        } else {
+          if (fse.existsSync(absoluteFilePath)) {
+            if (!fse.existsSync(path.dirname(destinationFilePath))) {
+              Helpers.mkdirp(path.dirname(destinationFilePath));
+            }
+            if (fse.existsSync(destinationFilePath) && fse.lstatSync(destinationFilePath).isDirectory()) {
+              fse.removeSync(destinationFilePath);
+            }
+            Helpers.copyFile(absoluteFilePath, destinationFilePath);
           }
-          if (fse.existsSync(destinationFilePath) && fse.lstatSync(destinationFilePath).isDirectory()) {
-            fse.removeSync(destinationFilePath);
-          }
-          Helpers.copyFile(absoluteFilePath, destinationFilePath);
+          // console.log('FILE COPIED')
         }
-        // console.log('FILE COPIED')
+        // changeAbsoluteFilePathExt(event, 'ts'); // TODO
+        // console.log(`AFTER CHAGE: ${event.fileAbsolutePath}`)
       }
-      // changeAbsoluteFilePathExt(event, 'ts'); // TODO
-      // console.log(`AFTER CHAGE: ${event.fileAbsolutePath}`)
+      await super.asyncAction(event as any);
     }
-    await super.asyncAction(event as any);
   }
 
   constructor(

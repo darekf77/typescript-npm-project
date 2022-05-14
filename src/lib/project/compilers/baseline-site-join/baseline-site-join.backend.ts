@@ -60,13 +60,15 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
 
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
-    const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
-    const absolutePath = event.fileAbsolutePath;
-    const relativePath = this.resolveRelativePath(absolutePath);
-    if (!relativePath) {
-      return;
+    if (event.eventName === 'unlinkDir') {
+      const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
+      const absolutePath = event.fileAbsolutePath;
+      const relativePath = this.resolveRelativePath(absolutePath);
+      if (!relativePath) {
+        return;
+      }
+      this.merge(relativePath, modifiedFiles);
     }
-    this.merge(relativePath, modifiedFiles);
   }
 
   /**

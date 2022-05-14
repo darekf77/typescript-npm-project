@@ -118,22 +118,25 @@ export class SourceModifier extends SourceModForSite {
 
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change): Promise<Models.other.ModifiedFiles> {
+    if (event.eventName !== 'unlinkDir') {
 
-    const relativePathToProject = event.fileAbsolutePath
-      .replace(this.project.location, '')
-      .replace(/^\//, '');
 
-    const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
+      const relativePathToProject = event.fileAbsolutePath
+        .replace(this.project.location, '')
+        .replace(/^\//, '');
 
-    // Helpers.log(`Source modifer async action for ${relativePathToProject}`)
+      const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
 
-    this.processFile(relativePathToProject, modifiedFiles);
+      // Helpers.log(`Source modifer async action for ${relativePathToProject}`)
 
-    if (fse.existsSync(event.fileAbsolutePath)) {
-      this.replikatorAction(relativePathToProject, modifiedFiles)
+      this.processFile(relativePathToProject, modifiedFiles);
+
+      if (fse.existsSync(event.fileAbsolutePath)) {
+        this.replikatorAction(relativePathToProject, modifiedFiles)
+      }
+      return modifiedFiles;
     }
-    // console.log(modifiedFiles)
-    return modifiedFiles;
+    return { modifiedFiles: [] };
   }
 
   async syncAction(absoluteFilePathes: string[]): Promise<Models.other.ModifiedFiles> {

@@ -5,13 +5,13 @@ import {
   fse,
   rimraf,
   crossPlatformPath,
-  Helpers,
 } from 'tnp-core';
 import { CodeCut } from './browser-code-cut';
 import { BackendCompilation } from './compilation-backend';
 import { IncCompiler } from 'incremental-compiler';
 import { config, ConfigModels } from 'tnp-config';
 import { MorphiHelpers } from 'morphi';
+import { Helpers } from 'tnp-helpers';
 
 @IncCompiler.Class({ className: 'BroswerCompilation' })
 export class BroswerCompilation extends BackendCompilation {
@@ -85,43 +85,50 @@ export class BroswerCompilation extends BackendCompilation {
 
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
+    // console.log(`[compilation-browser][asyncAction] ${event.eventName} ${event.fileAbsolutePath}`)
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
-    // noting here for backend
-    // Helpers.log(`[compilation-browser][asyncAction][firedev][cb] event.fileAbsolutePath ${event.fileAbsolutePath}`)
     const relativeFilePath = absoluteFilePath.replace(crossPlatformPath(path.join(this.cwd, this.location)), '');
-    // console.log('relativeFilePath', relativeFilePath)
     const destinationFilePath = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, relativeFilePath));
-    // console.log('this.cwd', this.cwd)
-    // console.log('this.sourceOutBrowser', this.sourceOutBrowser)
-    // console.log('destinationFilePath', destinationFilePath)
-    // Helpers.log(`[asyncAction][${config.frameworkName}][cb] relativeFilePath: ${relativeFilePath}`)
-    // Helpers.log(`[asyncAction][${config.frameworkName}][cb] destinationFilePath: ${destinationFilePath}`)
-    if (copyToBrowserSrcCodition(absoluteFilePath)) {
-      if (event.eventName === 'unlink') {
-        if (fse.existsSync(destinationFilePath)) {
-          fse.unlinkSync(destinationFilePath)
-        }
-        // if (['module', 'component']
-        //   .map(c => `.${c}.ts`)
-        //   .filter(c => destinationFilePath.endsWith(c)).length > 0) {
-        //   const orgFil = `${destinationFilePath}.orginal`;
-        //   if (fse.existsSync(orgFil)) {
-        //     fse.unlinkSync(orgFil)
-        //   }
-        // }
-      } else {
-        if (fse.existsSync(absoluteFilePath)) {
-          if (!fse.existsSync(path.dirname(destinationFilePath))) {
-            fse.mkdirpSync(path.dirname(destinationFilePath));
+
+    if (event.eventName === 'unlinkDir') {
+      // console.log('REMOVING DIR', destinationFilePath)
+      Helpers.removeFolderIfExists(destinationFilePath);
+    } else {
+      // noting here for backend
+
+      // console.log('this.cwd', this.cwd)
+      // console.log('this.sourceOutBrowser', this.sourceOutBrowser)
+      // console.log('destinationFilePath', destinationFilePath)
+      // console.log(`[asyncAction][${config.frameworkName}][cb] relativeFilePath: ${relativeFilePath}`)
+      // console.log(`[asyncAction][${config.frameworkName}][cb] destinationFilePath: ${destinationFilePath}`);
+      if (copyToBrowserSrcCodition(absoluteFilePath)) {
+        if (event.eventName === 'unlink') {
+          if (fse.existsSync(destinationFilePath)) {
+            fse.unlinkSync(destinationFilePath)
           }
-          if (fse.existsSync(destinationFilePath) && fse.lstatSync(destinationFilePath).isDirectory()) {
-            fse.removeSync(destinationFilePath);
+          // if (['module', 'component']
+          //   .map(c => `.${c}.ts`)
+          //   .filter(c => destinationFilePath.endsWith(c)).length > 0) {
+          //   const orgFil = `${destinationFilePath}.orginal`;
+          //   if (fse.existsSync(orgFil)) {
+          //     fse.unlinkSync(orgFil)
+          //   }
+          // }
+        } else {
+          if (fse.existsSync(absoluteFilePath)) {
+            if (!fse.existsSync(path.dirname(destinationFilePath))) {
+              fse.mkdirpSync(path.dirname(destinationFilePath));
+            }
+            if (fse.existsSync(destinationFilePath) && fse.lstatSync(destinationFilePath).isDirectory()) {
+              fse.removeSync(destinationFilePath);
+            }
+            fse.copyFileSync(absoluteFilePath, destinationFilePath);
           }
-          fse.copyFileSync(absoluteFilePath, destinationFilePath);
         }
+        this.codecut.file(destinationFilePath);
       }
-      this.codecut.file(destinationFilePath);
     }
+
   }
 
   async compile(watch = false) {
