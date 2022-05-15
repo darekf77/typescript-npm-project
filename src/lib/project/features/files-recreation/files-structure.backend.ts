@@ -260,7 +260,7 @@ export class FilesStructure extends FeatureForProject {
 
     //#endregion
 
-    const client = Helpers.removeSlashAtEnd(args) as any;
+    const client = Helpers.removeSlashAtEnd(_.first((args || '').split(' '))) as any;
 
     this.handleSmartContainer(this.project, client);
 

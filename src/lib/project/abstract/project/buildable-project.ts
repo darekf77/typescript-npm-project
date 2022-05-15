@@ -384,9 +384,9 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
       PackagesRecognitionExtended.fromProject(this as any).start(void 0, '[buildable-project]');
     }
 
-    if (this.isSmartContainerChild) {
-      this.buildOptions.copyto = []
-    }
+    // if (this.isSmartContainerChild) {
+    //   this.buildOptions.copyto = []
+    // }
 
 
     const { skipBuild = false } = require('minimist')(this.buildOptions.args.split(' '));
@@ -398,7 +398,7 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
     }
     Helpers.info(`[buildable-project] Build steps ended... `);
     // console.log('after build steps')
-    if (this.isStandaloneProject) {
+    if (this.isStandaloneProject || this.isSmartContainer) {
       await this.copyManager.initCopyingOnBuildFinish(buildOptions);
     }
 

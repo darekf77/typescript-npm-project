@@ -40,18 +40,21 @@ export class ProjectContainer
       .filter(f => !!f)
       .filter(c => c.git.isGitRoot)
       .map(c => c.name);
-    let chagned = false;
 
-    repoChilds.forEach(name => {
-      if (_.isUndefined(this.packageJson.linkedProjects.find(p => p === name))
-        && Project.From<Project>(path.join(this.location, name))?.git.isGitRepo) {
-        chagned = true;
-        this.packageJson.linkedProjects.push(name);
-      }
-    });
-    if (chagned) {
-      this.packageJson.writeToDisc();
-    }
+
+    // TODO Too much things to check here
+    // let chagned = false;
+
+    // repoChilds.forEach(name => {
+    //   if (_.isUndefined(this.packageJson.linkedProjects.find(p => p === name))
+    //     && Project.From<Project>(path.join(this.location, name))?.git.isGitRepo) {
+    //     chagned = true;
+    //     this.packageJson.linkedProjects.push(name);
+    //   }
+    // });
+    // if (chagned) {
+    //   this.packageJson.writeToDisc();
+    // }
     //#endregion
   }
 

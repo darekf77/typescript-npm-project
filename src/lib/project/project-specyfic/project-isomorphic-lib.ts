@@ -1,5 +1,5 @@
 //#region @backend
-import { fse } from 'tnp-core'
+import { crossPlatformPath, fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import { glob } from 'tnp-core';
 import * as inquirer from 'inquirer';
@@ -438,14 +438,14 @@ export class ProjectIsomorphicLib
       if (this.frameworkVersionAtLeast('v3')) { // TOOD
         showInfoAngular()
         if (this.isSmartContainerTarget) {
-          const target = _.first(args.split(' '));
+          const target = (crossPlatformPath(_.first(args.split(' '))) || '').replace('/', '');
           Helpers.info(`
 
-          LIB BUILD DONE...
+          ${CLI.chalk.underline('LIB BUILD DONE...')}
           (your target project is ${args})
           please start in other terminal:
 
-          ${config.frameworkName} ` + CLI.chalk.bold(`build:app:watch ${target}`) + `
+          ${CLI.chalk.bold(config.frameworkName + ' build:app:watch ' + target)}
           or
           ${config.frameworkName} baw ${target}
 

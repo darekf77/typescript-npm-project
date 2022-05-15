@@ -62,6 +62,7 @@ if (typeof useWorker !== 'undefined') {
 global.hideLog = true;
 global.verboseLevel = 0;
 var verboseLevel = process.argv.find(a => a.startsWith('-verbose='));
+var childProc = process.argv.find(a => a.startsWith('-childproc'));
 if (typeof verboseLevel !== 'undefined') {
   global.hideLog = false;
   verboseLevel = Number(verboseLevel.replace('-verbose=', ''));
@@ -105,7 +106,7 @@ if (startSpinner && isNaN(process.ppid)) {
   startSpinner = false;
 }
 
-if(process.platform === 'win32') {
+if (process.platform === 'win32') {
   startSpinner = false;
 }
 
@@ -125,11 +126,9 @@ if (startSpinner) {
       process.send && process.send('stop-spinner')
     }
   }
-  process.on("SIGINT", function () {
-    process.exit(1);
-  });
 }
 process.argv = process.argv.filter(a => a !== '-spinner');
+process.argv = process.argv.filter(a => a !== '-childproc');
 process.argv = process.argv.filter(f => !!f);
 
 if (startSpinner) {
@@ -146,7 +145,7 @@ if (startSpinner) {
 
 
   const command = `${!!frameworkName ? frameworkName : 'tnp'}`;
-  const argsToCHildProc = `${orgArgv.slice(2).join(' ')} ${spinnerIsDefault ? '-spinner' : ''}`.split(' ');
+  const argsToCHildProc = `${orgArgv.slice(2).join(' ')} ${spinnerIsDefault ? '-spinner' : ''} -childproc`.split(' ');
   // !global.hideLog && console.log(`worker command: ${command} ${argsToCHildProc.join(' ')}`);
   const proc = spawn(command,
     argsToCHildProc
@@ -155,6 +154,18 @@ if (startSpinner) {
       stdio: [0, 1, 2, 'ipc'],
       cwd: process.cwd(),
     });
+
+
+  proc.on('exit', (code) => {
+    // console.info('-- clean exit ---')
+    process.exit(code)
+  });
+
+  // proc.on('disconnect', (code) => {
+  //   console.info('-- clean exit ---')
+  //   process.exit(code)
+  // });
+
   proc.on('message', message => {
     if (message === 'start-spinner') {
       spinner.start();
@@ -179,11 +190,11 @@ if (startSpinner) {
   // proc.stderr.on('error', (data) => {
   //   process.stderr.write(data);
   // })
-  proc.on('exit', (code) => {
-    // const end = new Date() - start
-    // console.info('Execution time: %dms', end)
-    process.exit(code);
-  })
+  // proc.on('exit', (code) => {
+  //   // const end = new Date() - start
+  //   // console.info('Execution time: %dms', end)
+  //   process.exit(code);
+  // })
   //#endregion
   // process.stdin.resume();
 } else {
@@ -271,6 +282,26 @@ if (startSpinner) {
     //#endregion
   }
   //#endregion
+
+  // function killProcesses() {
+  //   console.log("SENDING KILL")
+  //   var toKill = (global.firedevChildProcesses || []);
+  //   for (let index = 0; index < toKill.length; index++) {
+  //     const procFn = toKill[index];
+  //     if (typeof procFn === 'function') {
+  //       procFn();
+  //     }
+  //   }
+  // }
+
+  // process.on('SIGINT', () => {
+  //   killProcesses();
+  // })
+  // process.on('SIGTERM', () => {
+  //   killProcesses();
+  // })
+
+
   start(process.argv, 'tnp', mode, !!spinner ? spinner : void 0);
 }
 

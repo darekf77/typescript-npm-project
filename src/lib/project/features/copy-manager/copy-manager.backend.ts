@@ -20,6 +20,11 @@ export class CopyManager extends FeatureForProject {
   private buildOptions: BuildOptions;
   //#region init
   private modifyPackageFile: { fileRelativePath: string; modifyFn: (d: any) => any }[];
+
+  get target() {
+    const target = _.first((this.buildOptions.args || '').split(' ')).replace('/', '')
+    return target;
+  }
   private renameDestinationFolder?: string;
   public async initCopyingOnBuildFinish(buildOptions: BuildOptions,
     modifyPackageFile?: { fileRelativePath: string; modifyFn: (d: any) => any }[],
@@ -126,9 +131,11 @@ export class CopyManager extends FeatureForProject {
 
   //#region start and watch
   private startAndWatch() {
-    const monitorDir = path.join(this.project.location, this.buildOptions.outDir);
+    const monitorDir = this.project.isSmartContainer
+      ? path.join(this.project.location, 'dist', this.project.name, this.target, this.buildOptions.outDir)
+      : path.join(this.project.location, this.buildOptions.outDir);
 
-    // Helpers.log(`watching folder for as copy source!! ${ monitorDir } `)
+    // console.log(`watching folder for as copy source!! ${monitorDir} `)
 
     if (fse.existsSync(monitorDir)) {
       chokidar.watch(monitorDir, {
@@ -203,7 +210,10 @@ export class CopyManager extends FeatureForProject {
     const { override, showInfo, markAsGenerated } = options;
 
     const sourceLocation = this.project.location;
-    var packageJson: Models.npm.IPackageJSON = fse.readJsonSync(path.join(sourceLocation, config.file.package_json), {
+    var packageJson: Models.npm.IPackageJSON = fse.readJsonSync(path.join(
+      sourceLocation,
+      config.file.package_json
+    ), {
       encoding: 'utf8'
     });
     if (markAsGenerated && packageJson && packageJson.tnp) {
@@ -253,7 +263,7 @@ export class CopyManager extends FeatureForProject {
     if (showInfo) {
       let dir = path.basename(path.dirname(destinationLocation));
       if (fse.existsSync(path.dirname(path.dirname(destinationLocation)))) {
-        dir = `${path.basename(path.dirname(path.dirname(destinationLocation)))} / ${dir} `
+        dir = `${path.basename(path.dirname(path.dirname(destinationLocation)))}/${dir}`
       }
       Helpers.info(`Source of project "${this.project.genericName}" generated in ${dir} /(< here >) `)
     }
@@ -310,13 +320,22 @@ export class CopyManager extends FeatureForProject {
     const namePackageName = (
       (_.isString(this.renameDestinationFolder) && this.renameDestinationFolder !== '') ?
         this.renameDestinationFolder
-        : this.project.name
+        : (this.project.isSmartContainer
+          ? `@${this.project.name}`
+          : this.project.name)
     );
+
+    // console.log('namePackageName', namePackageName)
 
     const folderToLink = [
       `tmp-src-${outDir}`,
       this.project.sourceFolder,
-    ];
+    ].map(c => {
+      if (this.project.isSmartContainer) {
+        return path.join('dist', this.project.name, this.target, c);
+      }
+      return c;
+    })
 
     /**
      * 3 typese of sition
@@ -325,15 +344,17 @@ export class CopyManager extends FeatureForProject {
      * watch build with linked source
      */
     const isSourceMapsDistBuild = (outDir === 'dist' && (_.isUndefined(this.buildOptions) || this.buildOptions?.watch));
-    const allFolderLinksExists = !isSourceMapsDistBuild ? true : _.isUndefined(folderToLink.find(sourceFolder => {
-      const projectOudDirDest = path.join(destination.location,
-        config.folder.node_modules,
-        namePackageName,
-        sourceFolder
-      );
-      return !Helpers.exists(projectOudDirDest);
-    }));
-
+    const allFolderLinksExists = !isSourceMapsDistBuild
+      ? true
+      : _.isUndefined(folderToLink.find(sourceFolder => {
+        const projectOudDirDest = path.join(
+          destination.location,
+          config.folder.node_modules,
+          namePackageName,
+          sourceFolder
+        );
+        return !Helpers.exists(projectOudDirDest);
+      }));
 
     if (specyficFileRelativePath && allFolderLinksExists) {
       //#region handle single file
@@ -345,6 +366,7 @@ export class CopyManager extends FeatureForProject {
         namePackageName,
         specyficFileRelativePath));
 
+      // console.log({ destinationFile })
 
       specyficFileRelativePath = specyficFileRelativePath.replace(/^\//, '');
 
@@ -355,7 +377,7 @@ export class CopyManager extends FeatureForProject {
             `tmp-src-${outDir}`,
             this.project.sourceFolder,
           ];
-          let content = Helpers.readFile(sourceFile);
+          let content = (Helpers.readFile(sourceFile) || '');
           folderToLink.forEach(sourceFolder => {
             content = content.replace(`"../${sourceFolder}`, `"./${sourceFolder}`);
             content = content.replace(`../${sourceFolder}`, sourceFolder);
@@ -384,12 +406,17 @@ export class CopyManager extends FeatureForProject {
         namePackageName
       );
 
+      // console.log({ projectOudDirDest })
+
       if (!dontRemoveDestFolder) {
         Helpers.tryRemoveDir(projectOudDirDest, true)
       }
 
+
       // console.info('[copyto] NORMAL INTSTALL')
-      const monitoredOutDir: string = path.join(this.project.location, outDir)
+      const monitoredOutDir: string = (this.project.isSmartContainer)
+        ? path.join(this.project.location, 'dist', this.project.name, this.target, outDir, 'libs')
+        : path.join(this.project.location, outDir);
 
       Helpers.tryCopyFrom(monitoredOutDir, projectOudDirDest);
 
@@ -412,7 +439,8 @@ export class CopyManager extends FeatureForProject {
           config.file.index_d_ts,
         ), `export * from './${this.project.sourceFolder}';\n`);
 
-        glob.sync(`${path.join(destination.location, config.folder.node_modules, namePackageName)}/${config.folder.browser}/**/*.js.map`)
+        glob.sync(`${path.join(destination.location, config.folder.node_modules, namePackageName)}`
+          + `/${config.folder.browser}/**/*.js.map`)
           .forEach(f => {
             const sourceFolder = `tmp-src-${outDir}`;
             let content = Helpers.readFile(f);
@@ -421,7 +449,8 @@ export class CopyManager extends FeatureForProject {
           });
 
         if (this.project.typeIsNot('angular-lib')) {
-          glob.sync(`${path.join(destination.location, config.folder.node_modules, namePackageName)}/**/*.js.map`, { ignore: [`${config.folder.browser}/**/*.*`] })
+          glob.sync(`${path.join(destination.location, config.folder.node_modules, namePackageName)}/**/*.js.map`,
+            { ignore: [`${config.folder.browser}/**/*.*`] })
             .forEach(f => {
               const sourceFolder = this.project.sourceFolder;
               let content = Helpers.readFile(f);
