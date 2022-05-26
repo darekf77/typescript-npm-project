@@ -120,6 +120,26 @@ const $REINSTALL = async (args) => {
   process.exit(0);
 };
 
+
+const SMART_REINSTALL = async (args) => {
+  const proj = Project.Current as Project;
+
+  if (proj.isContainer) {
+    const children = proj.children.filter(c => c.frameworkVersionAtLeast('v3') && c.typeIs('isomorphic-lib') && c.npmPackages.useSmartInstall);
+    for (let index = 0; index < children.length; index++) {
+      const c = children[index];
+      Helpers.info(`Recreating node_module for ${c.genericName}`)
+      c.node_modules.remove();
+      c.smartNodeModules.remove();
+      await c.filesStructure.init('');
+    }
+  } else {
+    Helpers.error(`[${config.frameworkName}] This is not a container type project.`, false, true);
+  }
+
+  process.exit(0);
+};
+
 //#endregion
 
 //#region deps
@@ -772,6 +792,7 @@ function $SHOW_REMOTES() {
 
 
 export default {
+  SMART_REINSTALL: Helpers.CLIWRAP(SMART_REINSTALL, 'SMART_REINSTALL'),
   $SHOW_REMOTES: Helpers.CLIWRAP($SHOW_REMOTES, '$SHOW_REMOTES'),
   $TREE: Helpers.CLIWRAP($TREE, '$TREE'),
   $DEPS_TREE2: Helpers.CLIWRAP($DEPS_TREE2, '$DEPS_TREE2'),

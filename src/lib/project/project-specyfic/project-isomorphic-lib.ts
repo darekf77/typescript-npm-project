@@ -85,6 +85,7 @@ export class ProjectIsomorphicLib
 
     if (this.frameworkVersionAtLeast('v3')) {
       files = files.filter(f => !this.ignoreInV3.includes(f))
+      // files.push('webpack.backend-dist-build.js')
     }
 
     return files;
