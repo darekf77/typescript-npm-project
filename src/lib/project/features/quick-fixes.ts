@@ -129,6 +129,12 @@ export class QuickFixes extends FeatureForProject {
 
     if (this.project.frameworkVersionAtLeast('v2')) {
       [
+        '@types/prosemirror-view',
+        '@types/prosemirror-commands',
+        '@types/prosemirror-model',
+        '@types/prosemirror-keymap',
+        '@types/prosemirror-state',
+        '@types/prosemirror-transform',
         '@types/mocha',
         '@types/jasminewd2',
         '@types/jasmine',
