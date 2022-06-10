@@ -129,22 +129,16 @@ export class QuickFixes extends FeatureForProject {
 
     if (this.project.frameworkVersionAtLeast('v2')) {
       [
-        '@types/prosemirror-view',
-        '@types/prosemirror-commands',
-        '@types/prosemirror-model',
-        '@types/prosemirror-keymap',
-        '@types/prosemirror-state',
-        '@types/prosemirror-transform',
+        '@types/prosemirror-*',
         '@types/mocha',
-        '@types/jasminewd2',
-        '@types/jasmine',
+        '@types/jasmine*',
         '@types/puppeteer-core',
         '@types/puppeteer',
         '@types/oauth2orize',
         '@types/lowdb',
-        '@types/lowdb',
+        '@types/eslint',
       ].forEach(name => {
-        Helpers.removeFolderIfExists(path.join(this.project.node_modules.path, name));
+        Helpers.remove(path.join(this.project.node_modules.path, name));
       });
     }
     // if (this.project.isVscodeExtension) {
