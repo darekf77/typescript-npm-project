@@ -94,51 +94,58 @@ export class InsideStructures extends FeatureForProject {
         opt.replacement = replacement;
 
         //#region copying files
-        [
-          ...insideStruct.struct.relateivePathesFromContainer,
-        ].forEach(f => {
-          const orgPath = path.join(insideStruct.struct.coreContainer.location, f);
-          const destPath = path.join(
-            this.project.location,
-            replacement(f) || f,
-            // f.replace('app/', `${tmpProjects}/`)
-          );
-          if (orgPath !== destPath) {
-            if (Helpers.isFolder(orgPath)) {
-              Helpers.copy(orgPath, destPath);
+        if (insideStruct?.struct?.relateivePathesFromContainer) {
+          [
+            ...insideStruct.struct.relateivePathesFromContainer,
+          ].forEach(f => {
+            const orgPath = path.join(insideStruct.struct.coreContainer.location, f);
+            const destPath = path.join(
+              this.project.location,
+              replacement(f) || f,
+              // f.replace('app/', `${tmpProjects}/`)
+            );
+            if (orgPath !== destPath) {
+              if (Helpers.isFolder(orgPath)) {
+                Helpers.copy(orgPath, destPath);
+              } else {
+                Helpers.copyFile(orgPath, destPath);
+              }
             } else {
-              Helpers.copyFile(orgPath, destPath);
+              Helpers.warn(`${config.frameworkName} [initAngularAppStructure] trying to copy same thing:
+            ${orgPath}
+            `)
             }
-          } else {
-            Helpers.warn(`${config.frameworkName} [initAngularAppStructure] trying to copy same thing:
-          ${orgPath}
-          `)
-          }
-        });
+          });
+        }
+
         //#endregion
 
         //#region linking node_modules
-        for (let index = 0; index < insideStruct.struct.linkNodeModulesTo.length; index++) {
-          const f = insideStruct.struct.linkNodeModulesTo[index]
-          const destPath = path.join(client.location, replacement(f));
-          this.project.node_modules.linkTo(destPath);
+        if (insideStruct?.struct?.linkNodeModulesTo) {
+          for (let index = 0; index < insideStruct.struct.linkNodeModulesTo.length; index++) {
+            const f = insideStruct.struct.linkNodeModulesTo[index]
+            const destPath = path.join(client.location, replacement(f));
+            this.project.node_modules.linkTo(destPath);
+          }
         }
         //#endregion
 
         //#region linking files and folders
-        for (let index = 0; index < insideStruct.struct.linksFuncs.length; index++) {
-          const [fun1, fun2] = insideStruct.struct.linksFuncs[index]
-          let from = fun1(opt);
-          from = path.join(client.location, replacement(from));
+        if (insideStruct?.struct?.linksFuncs) {
+          for (let index = 0; index < insideStruct.struct.linksFuncs.length; index++) {
+            const [fun1, fun2] = insideStruct.struct.linksFuncs[index]
+            let from = fun1(opt);
+            from = path.join(client.location, replacement(from));
 
-          let to = fun2(opt);
-          to = path.join(client.location, replacement(to));
-          Helpers.remove(to);
-          Helpers.createSymLink(from, to, { continueWhenExistedFolderDoesntExists: true });
+            let to = fun2(opt);
+            to = path.join(client.location, replacement(to));
+            Helpers.remove(to);
+            Helpers.createSymLink(from, to, { continueWhenExistedFolderDoesntExists: true });
+          }
         }
         //#endregion
 
-        if (_.isFunction(insideStruct.struct.endAction)) {
+        if (_.isFunction(insideStruct?.struct?.endAction)) {
           await Helpers.runSyncOrAsync(insideStruct.struct.endAction, opt);
         }
       }
