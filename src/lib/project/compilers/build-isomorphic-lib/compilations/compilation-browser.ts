@@ -6,7 +6,7 @@ import {
   rimraf,
   crossPlatformPath,
 } from 'tnp-core';
-import { CodeCut } from './browser-code-cut';
+import { CodeCut } from '../code-cut/browser-code-cut';
 import { BackendCompilation } from './compilation-backend';
 import { IncCompiler } from 'incremental-compiler';
 import { config, ConfigModels } from 'tnp-config';

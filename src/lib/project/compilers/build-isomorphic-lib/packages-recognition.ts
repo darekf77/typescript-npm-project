@@ -6,7 +6,7 @@ import {
   crossPlatformPath,
   Helpers,
 } from 'tnp-core';
-import { BrowserCodeCut } from './browser-code-cut';
+import { BrowserCodeCut } from './code-cut';
 import { config } from 'tnp-config';
 
 export class PackagesRecognition {

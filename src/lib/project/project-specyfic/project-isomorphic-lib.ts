@@ -4,8 +4,8 @@ import { path } from 'tnp-core'
 import { glob } from 'tnp-core';
 import * as inquirer from 'inquirer';
 import { config, ConfigModels } from 'tnp-config';
-import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
-import { RegionRemover } from '../compilers/build-isomorphic-lib/region-remover.backend';
+import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build';
+import { RegionRemover } from '../compilers/build-isomorphic-lib/region-remove';
 //#endregion
 import { Project } from '../abstract/project/project';
 import { _ } from 'tnp-core';
@@ -380,6 +380,12 @@ export class ProjectIsomorphicLib
     };
 
     const webpackGlob = this.npmPackages.global('webpack');
+
+    Helpers.info(`
+
+    webpack path: ${webpackGlob}
+
+    `)
 
     const webpackCommandFn = (watchCommand: boolean) =>
       `node ${webpackGlob} --version && node ${webpackGlob} --config webpack.backend-bundle-build.js ${watchCommand ? '--watch -env=useUglify' : ''}`;

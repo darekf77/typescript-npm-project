@@ -5,10 +5,10 @@ import { fse } from 'tnp-core'
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';
-import { Project } from '../../abstract';
-import { BrowserCodeCutExtended } from './browser-code-cut-extended.backend';
+import { Project } from '../../../abstract';
+import { BrowserCodeCutExtended } from '../code-cut';
 import { BuildOptions } from 'tnp-db';
-import { CodeCut } from './browser-code-cut';
+import { CodeCut } from '../code-cut';
 
 export class ExtendedCodeCut extends CodeCut {
 

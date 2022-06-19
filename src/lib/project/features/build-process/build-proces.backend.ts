@@ -13,9 +13,6 @@ import { Helpers, Condition } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
 import { PROGRESS_DATA } from 'tnp-models';
 import { handleProjectsPorts } from '../environment-config/environment-config-helpers';
-import {
-  waitForAppBuildToBePossible, waitForRequiredDistsBuilds
-} from './waiting-for-builds-conditions-helpers.backend';
 import { selectClients } from '../../project-specyfic/select-clients.backend';
 import { EnvironmentConfig } from '../environment-config';
 

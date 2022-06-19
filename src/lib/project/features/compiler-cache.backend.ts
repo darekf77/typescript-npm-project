@@ -14,7 +14,7 @@ import { Helpers } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
 import { FeatureForProject } from '../abstract';
 import { CLASS } from 'typescript-class-helpers';
-import { IncrementalBuildProcess } from '../compilers/build-isomorphic-lib/incremental-build-process';
+import { IncrementalBuildProcess } from '../compilers/build-isomorphic-lib/incremental-build';
 
 const compierEntityKey = 'compilers';
 

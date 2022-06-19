@@ -8,8 +8,8 @@ import {
 } from 'tnp-core';
 import { CLI } from 'tnp-cli';
 import { config, ConfigModels } from 'tnp-config';
-import { BroswerCompilation } from './compilation-browser';
-import { BackendCompilation } from './compilation-backend';
+import { BroswerCompilation } from '../compilations';
+import { BackendCompilation } from '../compilations';
 import { IncCompiler } from 'incremental-compiler';
 import { MorphiHelpers } from 'morphi';
 

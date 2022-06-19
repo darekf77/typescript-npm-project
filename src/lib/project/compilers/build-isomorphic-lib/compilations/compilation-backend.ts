@@ -9,7 +9,7 @@ import {
 import { Helpers } from 'tnp-helpers'
 import { IncCompiler } from 'incremental-compiler';
 import { config, ConfigModels } from 'tnp-config';
-import { Project } from '../../abstract/project/project';
+import { Project } from '../../../abstract/project/project';
 import { Models } from 'tnp-models';
 
 export interface TscCompileOptions {

@@ -3,10 +3,10 @@ import { _ } from 'tnp-core';
 import { fse } from 'tnp-core'
 import chalk from 'chalk';
 
-import { BroswerForModuleCompilation, BackendCompilationExtended } from './compilations';
+import { BroswerForModuleCompilation, BackendCompilationExtended } from '../compilations';
 
 import { config } from 'tnp-config';
-import { Project } from '../../../project';
+import { Project } from '../../../../project';
 import { Helpers } from 'tnp-helpers';
 import { BuildOptions } from 'tnp-db';
 import { IncrementalBuildProcess } from './incremental-build-process';

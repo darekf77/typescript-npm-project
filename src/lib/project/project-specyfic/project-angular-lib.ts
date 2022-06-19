@@ -1,7 +1,7 @@
 //#region @backend
 import { fse, json5 } from 'tnp-core'
 import { path } from 'tnp-core'
-import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build-process.backend';
+import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib';
 import { Project } from '../abstract';
 //#endregion
 import { BuildOptions } from 'tnp-db';

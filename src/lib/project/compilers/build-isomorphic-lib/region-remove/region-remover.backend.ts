@@ -2,7 +2,7 @@ import { _, path } from 'tnp-core';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-core';
 import { Region } from './region.backend';
-import type { Project } from '../../abstract/project';
+import type { Project } from '../../../abstract/project';
 import { ConfigModels } from 'tnp-config';
 
 

@@ -4,14 +4,14 @@ import { path } from 'tnp-core';
 import { fse } from 'tnp-core';
 
 import { Models } from 'tnp-models';
-import { Project } from '../../abstract/project/project';
+import { Project } from '../../../abstract/project/project';
 import { Helpers } from 'tnp-helpers';
 import { BuildOptions } from 'tnp-db';
-import { ExtendedCodeCut } from './extended-code-cut.backend';
+import { ExtendedCodeCut } from '../code-cut';
 import { IncCompiler } from 'incremental-compiler';
 import { JSON10 } from 'json10';
 import { config, ConfigModels } from 'tnp-config';
-import { codeCuttFn } from './cutCodeFn.backend';
+import { codeCuttFn } from '../code-cut';
 import { BackendCompilation } from './compilation-backend';
 import { BroswerCompilation } from './compilation-browser';
 
@@ -80,7 +80,7 @@ export class BroswerForModuleCompilation extends BroswerCompilation {
       Helpers.removeFolderIfExists(destinationFilePath);
     } else {
       // console.log(`[compilation-browser][asyncAction][compilations.ts] ${event.eventName} ${event.fileAbsolutePath}`)
-      const triggerTsEventExts = Models.other.CutableFileExtArr.map(ext => `.${ext}`); // TODO FIX THIS @LAST
+      const triggerTsEventExts = Models.other.CutableFileExtArr.map(ext => `.${ext}`);
       if (triggerTsEventExts
         .includes(path.extname(event.fileAbsolutePath))) {
         if (event.eventName === 'unlink') {

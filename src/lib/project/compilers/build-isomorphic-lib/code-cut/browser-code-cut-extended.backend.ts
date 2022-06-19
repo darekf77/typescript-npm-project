@@ -8,11 +8,11 @@ import { BrowserCodeCut } from './browser-code-cut';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';
-import { Project } from '../../abstract';
+import { Project } from '../../../abstract';
 
 import { BuildOptions } from 'tnp-db';
 import { REGEX_REGION_HTML } from './browser-code-cut-helpers.backend';
-import { RegionRemover } from './region-remover.backend';
+import { RegionRemover } from '../region-remove';
 import { ConfigModels } from 'tnp-config';
 //#endregion
 

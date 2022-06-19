@@ -10,8 +10,8 @@ import { path } from 'tnp-core'
 import { config } from 'tnp-config';
 // import * as nodemailer from 'nodemailer';
 import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
-import { RegionRemover } from '../project/compilers/build-isomorphic-lib/region-remover.backend';
-import { codeCuttFn } from '../project/compilers/build-isomorphic-lib/cutCodeFn.backend';
+import { RegionRemover } from '../project/compilers/build-isomorphic-lib/region-remove';
+import { codeCuttFn } from '../project/compilers/build-isomorphic-lib/code-cut';
 import { CLI } from 'tnp-cli';
 declare const ENV: any;
 // console.log('hello')

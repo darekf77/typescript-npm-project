@@ -4,7 +4,7 @@ import { crossPlatformPath, glob, Helpers, path, _ } from 'tnp-core';
 import { Models } from 'tnp-models';
 import { FeatureCompilerForProject } from '../../abstract/feature-compiler-for-project.backend';
 import type { Project } from '../../abstract/project/project';
-import { RegionRemover } from '../build-isomorphic-lib/region-remover.backend';
+import { RegionRemover } from '../build-isomorphic-lib';
 const FIXED = '/* @fixed */ ';
 const MAP_VERSION = '{"version"';
 const MAP_FIXED = `{"fixed":true,"version"`;

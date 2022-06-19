@@ -129,7 +129,7 @@ export class RecentFilesForContainer extends FeatureForProject {
 
     const recentConfigPath = path.join(this.project.location, config.file.tmp_recent_json);
     Helpers.writeFile(recentConfigPath, {
-      recentOpenProjects
+      recentOpenProjects:  [] // TODO UNCOMMENT
     } as RecentFilesJson);
     Helpers.info('Done')
   }
