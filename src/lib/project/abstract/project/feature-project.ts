@@ -13,13 +13,13 @@ import {
 import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator, BrowserCodePreventer } from '../../compilers';
 import { CompilerCache } from '../../features/compiler-cache.backend';
 import { CopyManager } from '../../features/copy-manager';
-import { IncrementalBuildProcessExtended } from '../../compilers';
+import { IncrementalBuildProcessExtended } from '../../compilers/build-isomorphic-lib/compilations/incremental-build-process-extended.backend';
 import { PackageJSON, EnvironmentConfig } from '../../features';
 import { InsideStructures } from '../../features/inside-structures/inside-structures';
 import { SingularBuild } from '../../features/singular-build.backend';
+import { WebpackBackendCompilation } from '../../features/webpack-backend-compilation.backend';
 //#endregion
 import { _ } from 'tnp-core';
-
 
 export abstract class FeatureProject {
 
@@ -92,7 +92,7 @@ export abstract class FeatureProject {
   //#endregion
 
   //#region @backend
-  public browserCodePreventer: BrowserCodePreventer;
+  // public browserCodePreventer: BrowserCodePreventer;
   //#endregion
 
   //#region @backend
@@ -127,5 +127,8 @@ export abstract class FeatureProject {
   public singluarBuild: SingularBuild;
   //#endregion
 
+  //#region @backend
+  public webpackBackendBuild: WebpackBackendCompilation;
+  //#endregion
 
 }

@@ -1,15 +1,12 @@
 import { path, crossPlatformPath } from 'tnp-core'
 import { _ } from 'tnp-core';
-import { fse } from 'tnp-core'
-import chalk from 'chalk';
-
-import { BroswerForModuleCompilation, BackendCompilationExtended } from '../compilations';
 
 import { config } from 'tnp-config';
 import { Project } from '../../../../project';
 import { Helpers } from 'tnp-helpers';
 import { BuildOptions } from 'tnp-db';
 import { IncrementalBuildProcess } from './incremental-build-process';
+import { BackendCompilationExtended, BroswerForModuleCompilation } from './compilations-extended';
 
 export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
 
@@ -69,14 +66,11 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
     //#region int backend compilation
     if (project.typeIs('isomorphic-lib')) {
       if (project.isSiteInStrictMode) {
-        // @ts-ignore
         this.backendCompilation = new BackendCompilationExtended(outFolder as any, config.folder.tempSrc, cwd);
       } else {
-        // @ts-ignore
         this.backendCompilation = new BackendCompilationExtended(outFolder as any, location, cwd);
       }
     } else {
-      // @ts-ignore
       this.backendCompilation = new BackendCompilationExtended(outFolder as any, location, cwd);
     }
     Helpers.log(`[incremental-build-process] this.backendCompilation exists: ${!!this.backendCompilation}`);

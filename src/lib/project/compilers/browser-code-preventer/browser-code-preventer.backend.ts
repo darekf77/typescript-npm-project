@@ -4,7 +4,7 @@ import { crossPlatformPath, glob, Helpers, path, _ } from 'tnp-core';
 import { Models } from 'tnp-models';
 import { FeatureCompilerForProject } from '../../abstract/feature-compiler-for-project.backend';
 import type { Project } from '../../abstract/project/project';
-import { RegionRemover } from '../build-isomorphic-lib';
+import { RegionRemover } from 'isomorphic-region-loader';
 const FIXED = '/* @fixed */ ';
 const MAP_VERSION = '{"version"';
 const MAP_FIXED = `{"fixed":true,"version"`;
@@ -41,12 +41,14 @@ export function options(project: Project): IncCompiler.Models.BaseClientCompiler
   return options;
 }
 
+
 /**
+ * @deprecated
  * Thanks to this I can easly
  * remove code that belong only to backend
  * from dist or bundle
  */
-@IncCompiler.Class({ className: 'BrowserCodePreventer' })
+@IncCompiler.Class({ className: 'BrowserCodePreventer' }) // @deprecated
 export class BrowserCodePreventer extends FeatureCompilerForProject {
 
   readonly isSmartContainerTarget: boolean = false;

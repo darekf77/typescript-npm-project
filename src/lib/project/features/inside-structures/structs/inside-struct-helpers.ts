@@ -8,6 +8,7 @@ import {
 } from 'tnp-core';
 
 import { Helpers } from 'tnp-helpers';
+import { EXPORT_TEMPLATE } from '../../../../templates';
 import { Project } from '../../../abstract/project/project';
 
 export function recreateIndex(project: Project) {
@@ -33,8 +34,7 @@ ${exportsContainer}
 
     } else {
       if (!Helpers.exists(indexInSrcFile)) {
-        Helpers.writeFile(indexInSrcFile, `export * from './lib';
-        `);
+        Helpers.writeFile(indexInSrcFile, EXPORT_TEMPLATE('lib'));
       }
     }
 

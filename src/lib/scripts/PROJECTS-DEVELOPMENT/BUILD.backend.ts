@@ -38,6 +38,13 @@ const BUILD_DIST_WATCH = async (args) => {
     .startForLibFromArgs(false, true, 'dist', args);
 }
 
+const DEV = async (args) => {
+  args = `${args} --skipCopyToSelection`;
+  return (Project.Current as Project)
+    .buildProcess
+    .startForLibFromArgs(false, true, 'dist', args);
+}
+
 const $CLEAN_BUILD = async (args) => {
   args += ' --nocache';
   await BUILD_DIST(args);
@@ -415,6 +422,7 @@ async function $DB_BUILDS_UPDATE() {
 
 export default {
   //#region export default
+  DEV: Helpers.CLIWRAP(DEV, 'DEV'),
   BUILD_NG: Helpers.CLIWRAP(BUILD_NG, 'BUILD_NG'),
   BUILD_NG_WATCH: Helpers.CLIWRAP(BUILD_NG_WATCH, 'BUILD_NG_WATCH'),
   $RECREATE: Helpers.CLIWRAP($RECREATE, '$RECREATE'),

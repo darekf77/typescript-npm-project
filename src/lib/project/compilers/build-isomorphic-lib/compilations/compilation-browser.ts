@@ -7,11 +7,11 @@ import {
   crossPlatformPath,
 } from 'tnp-core';
 import { CodeCut } from '../code-cut/browser-code-cut';
-import { BackendCompilation } from './compilation-backend';
 import { IncCompiler } from 'incremental-compiler';
 import { config, ConfigModels } from 'tnp-config';
 import { MorphiHelpers } from 'morphi';
 import { Helpers } from 'tnp-helpers';
+import { BackendCompilation } from './compilation-backend';
 
 @IncCompiler.Class({ className: 'BroswerCompilation' })
 export class BroswerCompilation extends BackendCompilation {

@@ -9,8 +9,7 @@ import chalk from 'chalk';
 import { path } from 'tnp-core'
 import { config } from 'tnp-config';
 // import * as nodemailer from 'nodemailer';
-import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
-import { RegionRemover } from '../project/compilers/build-isomorphic-lib/region-remove';
+import { RegionRemover } from 'isomorphic-region-loader';
 import { codeCuttFn } from '../project/compilers/build-isomorphic-lib/code-cut';
 import { CLI } from 'tnp-cli';
 declare const ENV: any;
@@ -51,13 +50,13 @@ async function version() {
   }
   //#endregion
   Helpers.log(`${config.frameworkName} location: ${Project.Tnp.location}`)
-  // global.spinner.stop();
+  // global.spinner?.stop();
   // Helpers.info('waiting...');
   // Helpers.sleep(5);
-  // global.spinner.start();
+  // global.spinner?.start();
   // Helpers.info('waiting next time!!. ..');
   // Helpers.sleep(5);
-  // global.spinner.stop();
+  // global.spinner?.stop();
   Helpers.info((Project.Tnp as Project).version);
   process.exit(0)
 }

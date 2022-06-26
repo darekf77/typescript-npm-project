@@ -10,7 +10,6 @@ import { Helpers } from 'tnp-helpers'
 import { IncCompiler } from 'incremental-compiler';
 import { config, ConfigModels } from 'tnp-config';
 import { Project } from '../../../abstract/project/project';
-import { Models } from 'tnp-models';
 
 export interface TscCompileOptions {
   cwd: string;
@@ -78,12 +77,28 @@ export class BackendCompilation extends IncCompiler.Base {
     const project = Project.nearestTo(cwd) as Project;
     Helpers.log(`Project form ${cwd}: ${project?.location}`)
 
-    if (project.frameworkVersionAtLeast('v3') && isBrowserBuild) {
-      // nothing here for for now
+    if (isBrowserBuild) {
+      if (project.frameworkVersionAtLeast('v3')) {
+        // nothing here for for now
+      } else {
+        await this.buildStandardLibVer({
+          watch, commandJsAndMaps, commandDts, generateDeclarations, cwd
+        });
+      }
     } else {
-      await this.buildStandardLibVer({
-        watch, commandJsAndMaps, commandDts, generateDeclarations, cwd
-      })
+
+      if (global['useWebpackBackendBuild']) {
+        project.webpackBackendBuild.run({
+          buildType: 'lib',
+          outDir: _.last(outDir.split('/')) as any,
+          watch,
+          // uglify,
+        })
+      } else {
+        await this.buildStandardLibVer({
+          watch, commandJsAndMaps, commandDts, generateDeclarations, cwd
+        });
+      }
     }
 
   }

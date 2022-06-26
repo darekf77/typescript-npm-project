@@ -12,7 +12,7 @@ import { Project } from '../../../abstract';
 
 import { BuildOptions } from 'tnp-db';
 import { REGEX_REGION_HTML } from './browser-code-cut-helpers.backend';
-import { RegionRemover } from '../region-remove';
+import { RegionRemover } from 'isomorphic-region-loader';
 import { ConfigModels } from 'tnp-config';
 //#endregion
 

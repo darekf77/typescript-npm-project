@@ -4,8 +4,8 @@ import { path } from 'tnp-core'
 import { glob } from 'tnp-core';
 import * as inquirer from 'inquirer';
 import { config, ConfigModels } from 'tnp-config';
-import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/incremental-build';
-import { RegionRemover } from '../compilers/build-isomorphic-lib/region-remove';
+import { RegionRemover } from 'isomorphic-region-loader';
+import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/compilations/incremental-build-process-extended.backend';
 //#endregion
 import { Project } from '../abstract/project/project';
 import { _ } from 'tnp-core';
@@ -14,6 +14,7 @@ import { Models } from 'tnp-models';
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
 import { CLI } from 'tnp-cli';
+
 const loadNvm = 'echo ' // 'export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" && [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh" && nvm use v14';
 
 //#region @backend
@@ -85,7 +86,7 @@ export class ProjectIsomorphicLib
 
     if (this.frameworkVersionAtLeast('v3')) {
       files = files.filter(f => !this.ignoreInV3.includes(f))
-      // files.push('webpack.backend-dist-build.js')
+      files.push('webpack.backend-dist-build.js')
     }
 
     return files;
@@ -349,6 +350,10 @@ export class ProjectIsomorphicLib
 
   async buildLib() {
     //#region @backend
+
+    //#region preparing variables
+
+    //#region preparing variables & fixing things
     const { outDir, ngbuildonly, watch, args } = this.buildOptions;
 
     this.fixBuildDirs(outDir);
@@ -366,7 +371,12 @@ export class ProjectIsomorphicLib
       this.quickFixes.overritenBadNpmPackages();
     }
 
+    if (!this.buildOptions.watch && (uglify || obscure || nodts) && outDir === 'bundle') {
+      this.buildOptions.genOnlyClientCode = true;
+    }
+    //#endregion
 
+    //#region preparing variables / angular
     const angularCommand = `${loadNvm} && ${this.npmRunNg} build ${this.name} ${watch ? '--watch' : ''}`;
 
     const showInfoAngular = () => {
@@ -378,7 +388,9 @@ export class ProjectIsomorphicLib
 
       Helpers.log(` command: ${angularCommand}`);
     };
+    //#endregion
 
+    //#region preparing variables / webpack
     const webpackGlob = this.npmPackages.global('webpack');
 
     Helpers.info(`
@@ -401,11 +413,9 @@ export class ProjectIsomorphicLib
       `);
       Helpers.info(` command: ${webpackCommand}`);
     };
+    //#endregion
 
-
-    if (!this.buildOptions.watch && (uglify || obscure || nodts) && outDir === 'bundle') {
-      this.buildOptions.genOnlyClientCode = true;
-    }
+    //#region preparing variables / incremental build
     this.incrementalBuildProcess = new IncrementalBuildProcessExtended(this, this.buildOptions);
 
     const proxyProject = this.proxyNgProj(this, this.buildOptions, 'lib');
@@ -421,6 +431,10 @@ export class ProjectIsomorphicLib
     // const fileWEbpack = path.join(this.location, 'webpack.backend-bundle-build.js')
     // const fileContent = Helpers.readFile(fileWEbpack).replace(webPack1, webPack2);
     // Helpers.writeFile(fileWEbpack, fileContent);
+    //#endregion
+
+    //#endregion
+
 
     if (this.buildOptions.watch) {
       //#region watch build
@@ -475,13 +489,14 @@ export class ProjectIsomorphicLib
     } else {
       //#region non watch build
       if (outDir === 'bundle' && (obscure || uglify || nodts)) {
+        //#region advanced backend compilation
         try {
           showInfoWebpack()
           this.run(webpackCommand).sync();
         } catch (er) {
           Helpers.error(`BUNDLE (single file compilation) build failed`, false, true);
         }
-        await this.browserCodePreventer.start('browser code preventer');
+        // await this.browserCodePreventer.start('browser code preventer');
 
         try {
           if (obscure || uglify) {
@@ -511,7 +526,9 @@ export class ProjectIsomorphicLib
 
           Not able to build project: ${this.genericName}`, false, true)
         }
+        //#endregion
       } else {
+        //#region normal backend compilation
         await this.incrementalBuildProcess.start('isomorphic compilation');
         try {
           showInfoAngular()
@@ -530,14 +547,18 @@ export class ProjectIsomorphicLib
 
           Not able to build project: ${this.genericName}`, false, true)
         }
-        await this.browserCodePreventer.start('browser code preventer');
+        // await this.browserCodePreventer.start('browser code preventer');
+        //#endregion
       }
       //#endregion
     }
+
+    //#region QUICK_FIX code preventer
     if (this.frameworkVersionAtLeast('v3') && this.isSmartContainerTarget) {
-      this.browserCodePreventer.runForFolder(outDir); // TODO QUICK_FIX for backend source maps
+      // this.browserCodePreventer.runForFolder(outDir); // TODO QUICK_FIX for backend source maps
     }
-    // console.log('EEEEE')
+    //#endregion
+
     //#endregion
   }
 

@@ -4,8 +4,6 @@ import { path } from 'tnp-core'
 import { glob } from 'tnp-core';
 import chalk from 'chalk';
 import { os } from 'tnp-core';
-
-
 import { config } from 'tnp-config';
 import { Project } from '../abstract';
 import { FeatureCompilerForProject } from '../abstract';
@@ -14,7 +12,8 @@ import { Helpers } from 'tnp-helpers';
 import { TnpDB } from 'tnp-db';
 import { FeatureForProject } from '../abstract';
 import { CLASS } from 'typescript-class-helpers';
-import { IncrementalBuildProcess } from '../compilers/build-isomorphic-lib/incremental-build';
+import { IncrementalBuildProcess } from '../compilers/build-isomorphic-lib/compilations/incremental-build-process';
+
 
 const compierEntityKey = 'compilers';
 

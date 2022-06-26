@@ -552,7 +552,9 @@ export function stuberizeFrontendPackages(project: Project, packages?: string[])
     "use strict";
     Object.defineProperty(exports, '__esModule', { value: true });
     var tslib_1 = require('tslib');
+    var index_1 = require("./index");
     tslib_1.__exportStar(require('./dist'), exports);
+    exports.default = index_1.default;
             `.trim()));
 
     Helpers.removeFolderIfExists(path.join(proj.location, config.folder.dist));

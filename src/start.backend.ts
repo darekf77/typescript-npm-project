@@ -195,7 +195,7 @@ export async function start(
   //   const localPath = path.join(config.pathes.bin_in_node_modules, localLib)
   //   const commadnToRun = `${localPath} ${argsv.slice(3).join(' ')}`
   //   try {
-  //     spinner && spinner.stop()
+  //     spinner && spinner?.stop()
   //     runCommand(commadnToRun).sync()
   //   } catch (error) {
   //     Helpers.log(`Command ${localLib} ERROR...`);
@@ -248,11 +248,11 @@ export async function start(
               const check = TnpHelpers.cliTool.match(vFnName, argsv);
               if (check.isMatch) {
                 recognized = true;
-                // spinner && spinner.stop()
+                // spinner && spinner?.stop()
                 // Helpers.log('FNNAME',vFn.name)
                 // process.exit(0)
                 Helpers.log('--- recognized command ---' + CLASS.getName(vFn))
-                global.spinner.stop();
+                global?.spinner?.stop();
                 vFn.apply(null, [globalArgumentsParser(check.restOfArgs)]);
                 breakLoop = true;
                 break;
@@ -267,7 +267,7 @@ export async function start(
     }
   }
   // Helpers.log(' loop eneded ')
-  // spinner && spinner.stop()
+  // spinner && spinner?.stop()
   if (recognized) {
     // Helpers.log("RECOGNIZED !!")
     process.stdin.resume();

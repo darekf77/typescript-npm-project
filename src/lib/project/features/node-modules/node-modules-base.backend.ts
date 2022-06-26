@@ -106,7 +106,7 @@ export class NodeModulesBase extends NodeModulesCore {
     source.packageJson.save(`instalation of packages from ${this.project.genericName} ${triggerMsg} `);
 
 
-    // global.spinner.start()
+    // global.spinner?.start()
 
     for (let index = 0; index < Models.npm.ArrNpmDependencyType.length; index++) {
       const depName = Models.npm.ArrNpmDependencyType[index];
@@ -119,7 +119,7 @@ export class NodeModulesBase extends NodeModulesCore {
     }
 
     source.node_modules.copyBin.to(this.project);
-    // global.spinner.start()
+    // global.spinner?.start()
 
     // const overridedDeps = this.project.getDepsAsPackage('tnp_overrided_dependencies');
     // for (let indexOverridedDeps = 0; indexOverridedDeps < overridedDeps.length; indexOverridedDeps++) {

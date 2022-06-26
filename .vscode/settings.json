@@ -42,6 +42,7 @@
     ".vscode/launch.json.filetemplate": true,
     ".vscode/tasks.json.filetemplate": true,
     "tsconfig.json.filetemplate": true,
+    "webpack.backend-dist-build.js": true,
     "projects/tmp*": true,
     ".gitignore": true,
     ".npmignore": true,

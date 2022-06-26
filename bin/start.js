@@ -59,6 +59,22 @@ if (typeof useWorker !== 'undefined') {
   }
 }
 
+
+global.useWebpackBackendBuild = false;
+var useWebpackBackendBuild = process.argv.find(a => a.startsWith('-webpack'));
+if (typeof useWebpackBackendBuild !== 'undefined') {
+  var useWebpackBackendBuildArr = useWebpackBackendBuild.split('=');
+  if (useWebpackBackendBuildArr.length === 2) {
+    if (useWebpackBackendBuildArr[1] === 'false') {
+      global.useWebpackBackendBuild = false;
+    } else {
+      global.useWebpackBackendBuild = true;
+    }
+  } else {
+    global.useWebpackBackendBuild = true;
+  }
+}
+
 global.hideLog = true;
 global.verboseLevel = 0;
 var verboseLevel = process.argv.find(a => a.startsWith('-verbose='));

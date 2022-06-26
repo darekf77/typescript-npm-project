@@ -33,6 +33,7 @@ import {
   FilesTemplatesBuilder, TestRunner, EnvironmentConfig,
   ProxyRouter, FilesStructure, BuildProcess, TargetProject,
   GitActions,
+  WebpackBackendCompilation,
 } from '../../features';
 import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin, BrowserCodePreventer } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
@@ -112,7 +113,9 @@ export class Project extends $Project<Project>
   public static linkCoreFolders() {
 
     if (config.frameworkName === 'tnp') {
-      const firedevProjects = crossPlatformPath( path.resolve(path.join(Project.Tnp.location, '../firedev-projects')));
+      const firedevProjects = crossPlatformPath(
+        path.resolve(path.join(Project.Tnp.location, '../firedev-projects'))
+      );
       console.log({
         firedevProjects
       })
@@ -180,7 +183,7 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('filesFactory', FilesFactory);
       this.defineProperty<Project>('sourceModifier', SourceModifier);
       this.defineProperty<Project>('frameworkFileGenerator', FrameworkFilesGenerator);
-      this.defineProperty<Project>('browserCodePreventer', BrowserCodePreventer);
+      // this.defineProperty<Project>('browserCodePreventer', BrowserCodePreventer);
       this.defineProperty<Project>('filesTemplatesBuilder', FilesTemplatesBuilder);
       this.defineProperty<Project>('join', BaselineSiteJoin);
       this.defineProperty<Project>('tests', TestRunner);
@@ -198,6 +201,7 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('workerApps', GlobalWorkerApps);
       this.defineProperty<Project>('insideStructure', InsideStructures);
       this.defineProperty<Project>('singluarBuild', SingularBuild);
+      this.defineProperty<Project>('webpackBackendBuild', WebpackBackendCompilation);
 
     }
 
