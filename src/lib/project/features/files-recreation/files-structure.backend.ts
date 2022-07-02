@@ -314,15 +314,18 @@ export class FilesStructure extends FeatureForProject {
               await this.project.compilerCache.setUpdatoDate.sourceModifier();
             }
           });
-
-          // await this.project.browserCodePreventer.startAndWatch(this.taskNames.browserCodePreventer);
+          if (!global['useWebpackBackendBuild']) {
+            await this.project.browserCodePreventer.startAndWatch(this.taskNames.browserCodePreventer);
+          }
         } else {
           await this.project.frameworkFileGenerator.start(this.taskNames.frameworkFileGenerator);
           // if (!this.project) {
           //   console.trace('HERE')
           // }
           await this.project.sourceModifier.start(this.taskNames.sourceModifir);
-          // await this.project.browserCodePreventer.start(this.taskNames.browserCodePreventer);
+          if (!global['useWebpackBackendBuild']) {
+            await this.project.browserCodePreventer.start(this.taskNames.browserCodePreventer);
+          }
         }
         // process.exit(0)
       }

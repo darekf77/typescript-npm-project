@@ -92,7 +92,7 @@ export abstract class FeatureProject {
   //#endregion
 
   //#region @backend
-  // public browserCodePreventer: BrowserCodePreventer;
+  public browserCodePreventer: BrowserCodePreventer;
   //#endregion
 
   //#region @backend

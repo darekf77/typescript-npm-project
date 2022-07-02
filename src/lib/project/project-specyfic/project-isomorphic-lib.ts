@@ -496,7 +496,9 @@ export class ProjectIsomorphicLib
         } catch (er) {
           Helpers.error(`BUNDLE (single file compilation) build failed`, false, true);
         }
-        // await this.browserCodePreventer.start('browser code preventer');
+        if (!global['useWebpackBackendBuild']) {
+          await this.browserCodePreventer.start('browser code preventer');
+        }
 
         try {
           if (obscure || uglify) {
@@ -547,7 +549,9 @@ export class ProjectIsomorphicLib
 
           Not able to build project: ${this.genericName}`, false, true)
         }
-        // await this.browserCodePreventer.start('browser code preventer');
+        if (!global['useWebpackBackendBuild']) {
+          await this.browserCodePreventer.start('browser code preventer');
+        }
         //#endregion
       }
       //#endregion
@@ -555,7 +559,9 @@ export class ProjectIsomorphicLib
 
     //#region QUICK_FIX code preventer
     if (this.frameworkVersionAtLeast('v3') && this.isSmartContainerTarget) {
-      // this.browserCodePreventer.runForFolder(outDir); // TODO QUICK_FIX for backend source maps
+      if (!global['useWebpackBackendBuild']) {
+        this.browserCodePreventer.runForFolder(outDir); // TODO QUICK_FIX for backend source maps
+      }
     }
     //#endregion
 
