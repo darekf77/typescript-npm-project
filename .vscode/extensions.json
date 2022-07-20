@@ -37,6 +37,7 @@
         "abumalick.vscode-nvm",
         "esbenp.prettier-vscode",
         "mariusalchimavicius.json-to-ts",
-        "marclipovsky.string-manipulation"
+        "marclipovsky.string-manipulation",
+        "eg2.tslint",
     ]
 }

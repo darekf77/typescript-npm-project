@@ -20,12 +20,14 @@ import HELP from './HELP.backend';
 import DAEMON from './DAEMON.backend';
 import BASH_CONFIG from './BASH-CONFIG.backend';
 import UPDATE from './UPDATE.backend';
+import JAVA from './JAVA.backend';
 
 export default [
   BENCHMARKS,
   COMPILERS,
   DB,
   DEPS,
+  JAVA,
   NEW,
   CLOUD,
   BUILD,
