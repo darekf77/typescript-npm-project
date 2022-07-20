@@ -99,6 +99,8 @@ export class ProjectIsomorphicLib
     //#region @backendFunc
     let files = [
       'tsconfig.json.filetemplate',
+      'tsconfig.backend.dist.json.filetemplate',
+      'tsconfig.backend.bundle.json.filetemplate',
     ];
 
     if (this.frameworkVersionAtLeast('v2')) {
@@ -496,9 +498,6 @@ export class ProjectIsomorphicLib
         } catch (er) {
           Helpers.error(`BUNDLE (single file compilation) build failed`, false, true);
         }
-        if (!global['useWebpackBackendBuild']) {
-          await this.browserCodePreventer.start('browser code preventer');
-        }
 
         try {
           if (obscure || uglify) {
@@ -549,21 +548,10 @@ export class ProjectIsomorphicLib
 
           Not able to build project: ${this.genericName}`, false, true)
         }
-        if (!global['useWebpackBackendBuild']) {
-          await this.browserCodePreventer.start('browser code preventer');
-        }
         //#endregion
       }
       //#endregion
     }
-
-    //#region QUICK_FIX code preventer
-    if (this.frameworkVersionAtLeast('v3') && this.isSmartContainerTarget) {
-      if (!global['useWebpackBackendBuild']) {
-        this.browserCodePreventer.runForFolder(outDir); // TODO QUICK_FIX for backend source maps
-      }
-    }
-    //#endregion
 
     //#endregion
   }

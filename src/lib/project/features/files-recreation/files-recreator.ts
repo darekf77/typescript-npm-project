@@ -443,6 +443,8 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+tsconfig.backend.dist.json
+tsconfig.backend.bundle.json
 ${this.project.isStandaloneProject ? `/${config.folder.testsEnvironments}` : ''}
 
 # System Files

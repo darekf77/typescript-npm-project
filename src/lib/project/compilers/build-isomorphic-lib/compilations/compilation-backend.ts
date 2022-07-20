@@ -56,6 +56,9 @@ export class BackendCompilation extends IncCompiler.Base {
       generateDeclarations = false;
     }
 
+    const project = Project.nearestTo(cwd) as Project;
+    Helpers.log(`Project form ${cwd}: ${project?.location}`)
+
     const params = [
       watch ? ' -w ' : '',
       outDir ? ` --outDir ${outDir} ` : '',
@@ -66,16 +69,25 @@ export class BackendCompilation extends IncCompiler.Base {
       // hideErrors ? ' --skipLibCheck true --noEmit true ' : '',
     ];
 
-    const commandJsAndMaps = `${tsExe} -d false  ${params.join(' ')}`
-    const commandDts = `${tsExe}  ${params.join(' ')}`
+    let commandJsAndMaps, commandDts;
+    if (isBrowserBuild) {
+      commandJsAndMaps = `${tsExe} -d false  ${params.join(' ')}`
+      commandDts = `${tsExe} ${params.join(' ')}`
+    } else {
+      const tsconfigBackendPath = crossPlatformPath(
+        project.path(`tsconfig.backend.${_.last(outDir.split('/'))}.json`).absolute.normal
+      );
+      commandJsAndMaps = `${tsExe} -d false  ${params.join(' ')}   --project ${tsconfigBackendPath}`
+      commandDts = `${tsExe} ${params.join(' ')}   --project ${tsconfigBackendPath}`
+    }
+
 
     Helpers.log(`(${this.compilerName}) Execute first command :
 
     ${commandJsAndMaps}
 
     # inside: ${cwd}`)
-    const project = Project.nearestTo(cwd) as Project;
-    Helpers.log(`Project form ${cwd}: ${project?.location}`)
+
 
     if (isBrowserBuild) {
       if (project.frameworkVersionAtLeast('v3')) {

@@ -66,12 +66,11 @@ export function recreateApp(project: Project) {
 
 ${'//#reg' + 'ion'} ${'@not' + 'ForNpm'}
 
-// ${'@bro' + 'wser'}Line
+${'//#reg' + 'ion'} @${'bro' + 'wser'}
     import { NgModule } from '@angular/core';
-// ${'@bro' + 'wser'}Line
     import { Component, OnInit } from '@angular/core';
 
-${'//#reg' + 'ion'} @${'bro' + 'wser'}
+
     @Component({
       selector: 'app-${project.name}',
       template: 'hello from ${project.name}'

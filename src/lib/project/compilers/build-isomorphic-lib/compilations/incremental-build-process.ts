@@ -69,17 +69,17 @@ export class IncrementalBuildProcess {
       this.compileOnce = true;
     }
 
-    if (this.backendCompilation) {
-      await this.backendCompilation.start(this.backendTaskName(taskName))
-    }
-
-
     for (let index = 0; index < this.browserCompilations.length; index++) {
       const browserCompilation = this.browserCompilations[index];
       await browserCompilation.start(this.browserTaksName(taskName, browserCompilation), () => {
         this.recreateBrowserLinks(browserCompilation)
       })
     }
+
+    if (this.backendCompilation) {
+      await this.backendCompilation.start(this.backendTaskName(taskName))
+    }
+
     if (_.isFunction(afterInitCallBack)) {
       await Helpers.runSyncOrAsync(afterInitCallBack);
     }
@@ -110,12 +110,6 @@ export class IncrementalBuildProcess {
       // await this.start(taskName, afterInitCallBack);
     }
 
-    if (this.backendCompilation) {
-      // @ts-ignore
-      await this.backendCompilation.startAndWatch(this.backendTaskName(taskName), { watchOnly })
-    }
-
-
     for (let index = 0; index < this.browserCompilations.length; index++) {
       const browserCompilation = this.browserCompilations[index];
       await browserCompilation.startAndWatch(
@@ -127,6 +121,12 @@ export class IncrementalBuildProcess {
         watchOnly
       });
     }
+
+    if (this.backendCompilation) {
+      // @ts-ignore
+      await this.backendCompilation.startAndWatch(this.backendTaskName(taskName), { watchOnly })
+    }
+
     if (_.isFunction(afterInitCallBack)) {
       await Helpers.runSyncOrAsync(afterInitCallBack);
     }

@@ -55,7 +55,6 @@ export class FilesStructure extends FeatureForProject {
       frameworkFileGenerator: `[filestructure] (${chalk.bold(this.project.genericName)
         }) Files generator: entites.ts, controllers.ts`,
       joinMerge: `[filestructure] Join project ${this.project.genericName}`,
-      browserCodePreventer: `[filestructure] Browser Code preventer for project ${this.project.genericName}`
     };
   }
 
@@ -314,18 +313,12 @@ export class FilesStructure extends FeatureForProject {
               await this.project.compilerCache.setUpdatoDate.sourceModifier();
             }
           });
-          if (!global['useWebpackBackendBuild']) {
-            await this.project.browserCodePreventer.startAndWatch(this.taskNames.browserCodePreventer);
-          }
         } else {
           await this.project.frameworkFileGenerator.start(this.taskNames.frameworkFileGenerator);
           // if (!this.project) {
           //   console.trace('HERE')
           // }
           await this.project.sourceModifier.start(this.taskNames.sourceModifir);
-          if (!global['useWebpackBackendBuild']) {
-            await this.project.browserCodePreventer.start(this.taskNames.browserCodePreventer);
-          }
         }
         // process.exit(0)
       }

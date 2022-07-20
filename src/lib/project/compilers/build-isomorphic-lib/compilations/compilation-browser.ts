@@ -89,10 +89,16 @@ export class BroswerCompilation extends BackendCompilation {
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
     const relativeFilePath = absoluteFilePath.replace(crossPlatformPath(path.join(this.cwd, this.location)), '');
     const destinationFilePath = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, relativeFilePath));
+    const destinationFileBackendPath = crossPlatformPath(path.join(
+      this.cwd,
+      this.sourceOutBrowser,
+      relativeFilePath.replace('tmp-src', 'tmp-source')
+    ));
 
     if (event.eventName === 'unlinkDir') {
       // console.log('REMOVING DIR', destinationFilePath)
       Helpers.removeFolderIfExists(destinationFilePath);
+      Helpers.removeFolderIfExists(destinationFileBackendPath);
     } else {
       // noting here for backend
 
@@ -106,6 +112,9 @@ export class BroswerCompilation extends BackendCompilation {
           if (fse.existsSync(destinationFilePath)) {
             fse.unlinkSync(destinationFilePath)
           }
+          if (fse.existsSync(destinationFileBackendPath)) {
+            fse.unlinkSync(destinationFileBackendPath)
+          }
           // if (['module', 'component']
           //   .map(c => `.${c}.ts`)
           //   .filter(c => destinationFilePath.endsWith(c)).length > 0) {
@@ -116,12 +125,21 @@ export class BroswerCompilation extends BackendCompilation {
           // }
         } else {
           if (fse.existsSync(absoluteFilePath)) {
+
             if (!fse.existsSync(path.dirname(destinationFilePath))) {
               fse.mkdirpSync(path.dirname(destinationFilePath));
             }
+            if (!fse.existsSync(path.dirname(destinationFileBackendPath))) {
+              fse.mkdirpSync(path.dirname(destinationFileBackendPath));
+            }
+
             if (fse.existsSync(destinationFilePath) && fse.lstatSync(destinationFilePath).isDirectory()) {
               fse.removeSync(destinationFilePath);
             }
+            if (fse.existsSync(destinationFileBackendPath) && fse.lstatSync(destinationFileBackendPath).isDirectory()) {
+              fse.removeSync(destinationFileBackendPath);
+            }
+
             fse.copyFileSync(absoluteFilePath, destinationFilePath);
           }
         }
@@ -147,7 +165,8 @@ export class BroswerCompilation extends BackendCompilation {
 }
 
 function copyToBrowserSrcCodition(absoluteFilePath: string) {
-  return !absoluteFilePath.endsWith('.backend.ts') && !absoluteFilePath.endsWith('.spec.ts')
+  return !absoluteFilePath.endsWith('.spec.ts')
+  // && !absoluteFilePath.endsWith('.backend.ts');
 }
 
 //#endregion

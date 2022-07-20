@@ -35,7 +35,7 @@ import {
   GitActions,
   WebpackBackendCompilation,
 } from '../../features';
-import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin, BrowserCodePreventer } from '../../compilers';
+import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
 import { DbProcessProject } from './db-process-project.backend';
 import { DependencyProject } from './dependency-project.backend';
@@ -183,7 +183,6 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('filesFactory', FilesFactory);
       this.defineProperty<Project>('sourceModifier', SourceModifier);
       this.defineProperty<Project>('frameworkFileGenerator', FrameworkFilesGenerator);
-      this.defineProperty<Project>('browserCodePreventer', BrowserCodePreventer);
       this.defineProperty<Project>('filesTemplatesBuilder', FilesTemplatesBuilder);
       this.defineProperty<Project>('join', BaselineSiteJoin);
       this.defineProperty<Project>('tests', TestRunner);

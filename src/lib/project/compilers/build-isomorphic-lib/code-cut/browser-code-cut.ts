@@ -61,12 +61,19 @@ export class BrowserCodeCut {
   protected isDebuggingFile = false;
 
   protected rawContent: string;
+  public rawContentBackend: string;
 
-  get isEmpty() {
+  get isEmptyBrowserFile() {
     return this.rawContent.replace(/\s/g, '').trim() === '';
   }
 
-  constructor(protected absoluteFilePath: string) {
+  get isEmptyBackendFile() {
+    return this.rawContent.replace(/\s/g, '').trim() === '';
+  }
+
+  constructor(
+    protected absoluteFilePath: string
+  ) {
     this.rawContent = fse.existsSync(absoluteFilePath) ?
       fse.readFileSync(absoluteFilePath, 'utf8').toString()
       : '';
@@ -323,19 +330,20 @@ export class BrowserCodeCut {
   }
 
   saveOrDelete() {
+    Helpers.error('SHOULD NOW ACCESS THIS METHOD!!', true, true)
     // console.log('saving ismoprhic file', this.absoluteFilePath)
-    if (this.isEmpty && ['.ts', '.js'].includes(path.extname(this.absoluteFilePath))) {
-      if (fse.existsSync(this.absoluteFilePath)) {
-        fse.unlinkSync(this.absoluteFilePath)
-      }
-      // console.log(`Delete empty: ${deletePath}`)
-    } else {
-      // console.log(`Not empty: ${this.absoluteFilePath}`)
-      if (!fse.existsSync(path.dirname(this.absoluteFilePath))) {
-        fse.mkdirpSync(path.dirname(this.absoluteFilePath));
-      }
-      fse.writeFileSync(this.absoluteFilePath, this.rawContent, 'utf8');
-    }
+    // if (this.isEmptyBrowserFile && ['.ts', '.js'].includes(path.extname(this.absoluteFilePath))) {
+    //   if (fse.existsSync(this.absoluteFilePath)) {
+    //     fse.unlinkSync(this.absoluteFilePath)
+    //   }
+    //   // console.log(`Delete empty: ${deletePath}`)
+    // } else {
+    //   // console.log(`Not empty: ${this.absoluteFilePath}`)
+    //   if (!fse.existsSync(path.dirname(this.absoluteFilePath))) {
+    //     fse.mkdirpSync(path.dirname(this.absoluteFilePath));
+    //   }
+    //   fse.writeFileSync(this.absoluteFilePath, this.rawContent, 'utf8');
+    // }
     // }
   }
 

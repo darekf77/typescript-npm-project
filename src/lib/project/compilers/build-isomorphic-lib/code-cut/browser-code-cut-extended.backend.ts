@@ -60,7 +60,12 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   }
   //#endregion
 
+  //#region DEPRECATED api
+
   //#region after regions replacement
+  /**
+   * @deprecated
+   */
   afterRegionsReplacement(content: string) {
     const contentFromMorphi = content;
     let absoluteFilePath = this.absoluteFilePath.replace(/\/$/, '');
@@ -137,6 +142,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   //#endregion
 
   //#region replace html
+  /**
+   * @deprecated
+   */
   private replaceHtmlTemplateInComponent(dir, base, content, orginalFileExists: boolean = true) {
     const htmlTemplatePath = crossPlatformPath(path.join(dir, `${base}.component.html`));
     let replacement = ` <!-- File ${base}.component.html  does not exist -->`
@@ -166,6 +174,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   //#endregion
 
   //#region replace css
+  /**
+   * @deprecated
+   */
   private replaceCssInComponent(dir, base, content, orginalFileExists: boolean = true) {
     const cssFilePath = crossPlatformPath(path.join(dir, `${base}.component.css`));
     // console.log('cssFilePath', cssFilePath)
@@ -201,6 +212,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   //#endregion
 
   //#region replace scss
+  /**
+   * @deprecated
+   */
   private replaceSCSSInComponent(dir, base, content, ext: 'scss' | 'sass', absoluteFilePath,
     orginalFileExists: boolean = true) {
 
@@ -254,6 +268,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   //#endregion
 
   //#region find replecaments
+  /**
+   * @deprecated
+   */
   private findReplacements(
     stringContent: string,
     pattern: string,
@@ -305,6 +322,10 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   }
   //#endregion
 
+
+  //#endregion
+
+  //#region get inline package
   protected getInlinePackage(packageName: string, packagesNames = BrowserCodeCut.IsomorphicLibs): Models.InlinePkg {
 
     let parent: Project;
@@ -327,6 +348,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
     return super.getInlinePackage(packageName, packages);
   }
+  //#endregion
 
   //#region remove from line pkg
   replaceFromLine(pkgName: string, imp: string) {
@@ -412,9 +434,13 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
     const ext = path.extname(this.absoluteFilePath).replace('.', '') as ConfigModels.CutableFileExt;
     // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
     if (this.allowedToReplace.includes(ext)) {
-
       this.rawContent = this.project.sourceModifier.replaceBaslieneFromSiteBeforeBrowserCodeCut(this.rawContent);
-      this.rawContent = RegionRemover.from(this.absoluteFilePath, this.rawContent, options.replacements, this.project).output;
+
+      const orgContent = this.rawContent;
+      this.rawContent = RegionRemover.from(this.absoluteFilePath, orgContent, options.replacements, this.project).output;
+      if (this.project.isStandaloneProject || this.project.isSmartContainer) {
+        this.rawContentBackend = RegionRemover.from(this.absoluteFilePath, orgContent, ['@bro' + 'wser'], this.project).output;
+      }
     }
     if (this.project.frameworkVersionAtLeast('v3')) {
       // console.log(`isTarget fixing ? ${this.project.isSmartContainerTarget}`)
@@ -473,8 +499,12 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   //#region save or delete
   saveOrDelete() {
     const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
+    const relativePath = this.absoluteFilePath
+      .replace(`${this.compilationProject.location}/`, '')
+      .replace(/^\//, '')
+
     Helpers.log(`saving ismoprhic file: ${this.absoluteFilePath}`, 1)
-    if (this.isEmpty && ['.ts', '.js'].includes(path.extname(this.absoluteFilePath))) {
+    if (this.isEmptyBrowserFile && ['.ts', '.js'].includes(path.extname(this.absoluteFilePath))) {
       if (fse.existsSync(this.absoluteFilePath)) {
         fse.unlinkSync(this.absoluteFilePath)
       }
@@ -486,9 +516,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       }
       fse.writeFileSync(this.absoluteFilePath, this.rawContent, 'utf8');
 
-      const relativePath = this.absoluteFilePath
-        .replace(`${this.compilationProject.location}/`, '')
-        .replace(/^\//, '')
+
       // if (path.isAbsolute(relativePath)) {
       //   console.log(`is ABsolute !`, relativePath)
       //   // process.exit(0)
@@ -496,6 +524,19 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
       Helpers.log(`Written file: ${relativePath}`, 1)
       this.compilationProject.sourceModifier.processFile(relativePath, modifiedFiles, 'tmp-src-for')
+    }
+    if (!this.isEmptyBackendFile) {
+      const absoluteBackendFilePath = path.join(
+        this.compilationProject.location,
+        relativePath.replace('tmp-src', 'tmp-source')
+      );
+
+      if (!fse.existsSync(path.dirname(absoluteBackendFilePath))) {
+        fse.mkdirpSync(path.dirname(absoluteBackendFilePath));
+      }
+      fse.writeFileSync(absoluteBackendFilePath, this.rawContentBackend, 'utf8');
+
+
     }
     // }
   }
