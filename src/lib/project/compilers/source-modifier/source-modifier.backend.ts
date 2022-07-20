@@ -14,6 +14,8 @@ import { IncCompiler } from 'incremental-compiler';
 import { SourceModForSite } from './source-mod-for-site.backend';
 //#endregion
 
+const IS_ENABLE = false; // TODO UNCOMMENT
+
 export function optionsSourceModifier(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
   // console.log('PROJECT', project.name)
   let folderPath: string | string[] = void 0;
@@ -45,6 +47,9 @@ export function optionsSourceModifier(project: Project): IncCompiler.Models.Base
 export class SourceModifier extends SourceModForSite {
 
   async preAsyncAction() {
+    if (!IS_ENABLE) {
+      return;
+    }
     if (!(this.project.isWorkspaceChildProject || this.project.isStandaloneProject)) {
       return;
     }
@@ -118,6 +123,9 @@ export class SourceModifier extends SourceModForSite {
 
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change): Promise<Models.other.ModifiedFiles> {
+    if (!IS_ENABLE) {
+      return;
+    }
     if (event.eventName !== 'unlinkDir') {
 
 
@@ -212,6 +220,9 @@ export class SourceModifier extends SourceModForSite {
   }
 
   async start(taskName?: string, afterInitCallBack?: () => void) {
+    if (!IS_ENABLE) {
+      return;
+    }
     if (this.project.isSite) {
       // if(!this.project || !this.project.baseline) {
       //   console.trace('HERE')
@@ -222,6 +233,9 @@ export class SourceModifier extends SourceModForSite {
   }
 
   async startAndWatch(taskName?: string, options?: IncCompiler.Models.StartAndWatchOptions) {
+    if (!IS_ENABLE) {
+      return;
+    }
     const { watchOnly } = options || {};
     Helpers.log(`Start source modifer for ${this.project.genericName}`)
     if (this.project.isSite) {

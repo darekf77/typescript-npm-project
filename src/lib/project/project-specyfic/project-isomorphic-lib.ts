@@ -395,18 +395,17 @@ export class ProjectIsomorphicLib
     //#region preparing variables / webpack
     const webpackGlob = this.npmPackages.global('webpack');
 
-    Helpers.info(`
-
-    webpack path: ${webpackGlob}
-
-    `)
-
     const webpackCommandFn = (watchCommand: boolean) =>
       `node ${webpackGlob} --version && node ${webpackGlob} --config webpack.backend-bundle-build.js ${watchCommand ? '--watch -env=useUglify' : ''}`;
 
     const webpackCommand = webpackCommandFn(this.buildOptions.watch);
 
     const showInfoWebpack = () => {
+      Helpers.log(`
+
+    webpack path: ${webpackGlob}
+
+    `)
       Helpers.info(`
 
       WEBPACK ${this.buildOptions.watch ? 'WATCH ' : ''

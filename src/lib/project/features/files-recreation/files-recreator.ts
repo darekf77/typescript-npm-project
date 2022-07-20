@@ -156,6 +156,10 @@ export class FilesRecreator extends FeatureForProject {
           ] : [])
           .concat((!self.project.isStandaloneProject && !self.project.isCoreProject) ? self.project.projectSpecyficIgnoredFiles() : [])
           .concat(self.project.isTnp ? ['projects/tmp*'] : [])
+          .concat([
+            'tsconfig.backend.dist.json',
+            'tsconfig.backend.bundle.json',
+          ])
         // .concat(self.project.isContainer ? [
         //   ...(self.project.children.filter(c => c.git.isGitRepo).map(c => c.name))
         // ] : []);
@@ -443,8 +447,6 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
-tsconfig.backend.dist.json
-tsconfig.backend.bundle.json
 ${this.project.isStandaloneProject ? `/${config.folder.testsEnvironments}` : ''}
 
 # System Files
@@ -477,7 +479,7 @@ ${coreFiles}
     const linkedFolder = this.project.linkedFolders;
     linkedFolder.forEach((c) => {
       const from = crossPlatformPath(path.resolve(path.join(this.project.location, c.from)));
-      const to = crossPlatformPath( path.resolve(path.join(this.project.location, c.to)));
+      const to = crossPlatformPath(path.resolve(path.join(this.project.location, c.to)));
       if (Helpers.exists(from) && (to.search(this.project.location) !== -1)) {
         Helpers.removeIfExists(to);
         Helpers.createSymLink(from, to);
