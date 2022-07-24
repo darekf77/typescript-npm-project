@@ -591,8 +591,8 @@ function templateBin(debug = false) {
   return `#!/usr/bin/env node ${debug ? '--inspect' : ''}
 var { fse, crossPlatformPath, path } = require('tnp-core');
 var path = {
-  dist: path.join(crossPlatformPath(__dirname), '../dist/start.backend.js'),
-  bundle: path.join(crossPlatformPath(__dirname), '../start.backend.js')
+  dist: path.join(crossPlatformPath(__dirname), '../dist/index.js'),
+  bundle: path.join(crossPlatformPath(__dirname), '../index.js')
 }
 var p = fse.existsSync(path.dist) ? path.dist : path.bundle;
 global.globalSystemToolMode = true;
@@ -605,11 +605,14 @@ function templateStartBackedn() {
   return `import { Helpers } from 'tnp-helpers';
 
 export async function run(args: string[]) {
-    const command = args.shift() as any;
-    if (command === 'test') {
-      Helpers.clearConsole();
-    }
+  console.log('Hello from', require('path').basename(process.argv[1]))
+  const command = args.shift() as any;
+  if (command === 'test') {
+    Helpers.clearConsole();
+    console.log('waiting for nothing...')
     process.stdin.resume();
+  }
+  process.exit(0);
   }`
 }
 //#endregion

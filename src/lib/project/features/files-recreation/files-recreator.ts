@@ -319,7 +319,7 @@ export class FilesRecreator extends FeatureForProject {
                   s['files.exclude']["*.sh"] = true;
                   s['files.exclude']["*.xlsx"] = true;
                   s['files.exclude']["scripts"] = true;
-                  s['files.exclude']["bin"] = true;
+                  // s['files.exclude']["bin"] = true;
                 }
                 project.projectLinkedFiles().forEach(({ relativePath }) => {
                   s['files.exclude'][relativePath] = true;

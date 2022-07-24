@@ -420,7 +420,9 @@ export class ProjectFactory {
         if (newCreatedProject.parent.git.isGitRepo && newCreatedProject.parent.git.isGitRoot) {
           if (!newCreatedProject.parent.isMonorepo) {
             const parentOrigin = newCreatedProject.parent.git.originURL;
-            const projOrigin = newCreatedProject.isWorkspace ?
+            const projOrigin = (newCreatedProject.isWorkspace
+              || (newCreatedProject.isContainerChild && !newCreatedProject.isSmartContainerChild)
+            ) ?
               parentOrigin.replace(path.basename(parentOrigin), newCreatedProject.name + '.git')
               : parentOrigin.replace(path.basename(parentOrigin), (newCreatedProject.parent.name + '--' + newCreatedProject.name + '.git'));
             Helpers.info(`Adding git origin: ${projOrigin}
