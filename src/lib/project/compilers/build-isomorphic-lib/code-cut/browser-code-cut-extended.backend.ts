@@ -25,9 +25,14 @@ const depbugFiles = [
 export class BrowserCodeCutExtended extends BrowserCodeCut {
 
   //#region fields & getters
-  get allowedToReplace() {
-    return Models.other.CutableFileExtArr;
-  }
+  readonly allowedToReplace = Models.other.CutableFileExtArr;
+
+
+  readonly allowedToReplaceDotPref = Models.other.CutableFileExtArr
+    .concat(['js'])
+    .map(ext => `.${ext}`);
+
+
   //#endregion
 
   //#region handle tick in code
@@ -497,20 +502,23 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
   //#endregion
 
   //#region save or delete
+
   saveOrDelete() {
     const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
     const relativePath = this.absoluteFilePath
       .replace(`${this.compilationProject.location}/`, '')
       .replace(/^\//, '')
 
-    Helpers.log(`saving ismoprhic file: ${this.absoluteFilePath}`, 1)
-    if (this.isEmptyBrowserFile && ['.ts', '.js'].includes(path.extname(this.absoluteFilePath))) {
+    // Helpers.log(`saving ismoprhic file: ${this.absoluteFilePath}`, 1)
+    if (this.isEmptyBrowserFile && this.allowedToReplaceDotPref
+      .includes(path.extname(this.absoluteFilePath))
+    ) {
       if (fse.existsSync(this.absoluteFilePath)) {
         fse.unlinkSync(this.absoluteFilePath)
       }
-      Helpers.log(`Delete empty: ${this.absoluteFilePath}`, 1);
+      // Helpers.log(`Delete empty: ${this.absoluteFilePath}`, 1);
     } else {
-      Helpers.log(`Not empty: ${this.absoluteFilePath}`, 1)
+      // Helpers.log(`Not empty: ${this.absoluteFilePath}`, 1)
       if (!fse.existsSync(path.dirname(this.absoluteFilePath))) {
         fse.mkdirpSync(path.dirname(this.absoluteFilePath));
       }
@@ -522,10 +530,12 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       //   // process.exit(0)
       // }
 
-      Helpers.log(`Written file: ${relativePath}`, 1)
+      // Helpers.log(`Written file: ${relativePath}`, 1)
       this.compilationProject.sourceModifier.processFile(relativePath, modifiedFiles, 'tmp-src-for')
     }
-    if (!this.isEmptyBackendFile) {
+    if (!this.isEmptyBackendFile && this.allowedToReplaceDotPref
+      .includes(path.extname(this.absoluteFilePath))
+    ) {
       const absoluteBackendFilePath = path.join(
         this.compilationProject.location,
         relativePath.replace('tmp-src', 'tmp-source')
@@ -534,9 +544,8 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       if (!fse.existsSync(path.dirname(absoluteBackendFilePath))) {
         fse.mkdirpSync(path.dirname(absoluteBackendFilePath));
       }
+
       fse.writeFileSync(absoluteBackendFilePath, this.rawContentBackend, 'utf8');
-
-
     }
     // }
   }

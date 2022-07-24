@@ -1,6 +1,6 @@
 {
   "name": "tnp",
-  "version": "13.0.82",
+  "version": "13.0.91",
   "bin": {
     "tnp": "bin/tnp",
     "tnp-debug": "bin/tnp-debug",
@@ -24,6 +24,7 @@
     "@angular/pwa": "~13.2.5",
     "@angular/router": "~13.2.0",
     "@angular/service-worker": "~13.2.0",
+    "@babel/cli": "7.18.6",
     "@mdi/js": "6.5.95",
     "@ngrx/component-store": "~13.0.2",
     "@ngrx/data": "~13.0.2",
@@ -74,10 +75,6 @@
     "@types/watch": "1.0.0",
     "accepts": "1.3.4",
     "axios": "0.17.1",
-    "babel-cli": "6.26.0",
-    "babel-core": "6.25.0",
-    "babel-preset-env": "1.7.0",
-    "babel-preset-es2015": "6.24.1",
     "background-worker-process": "~13.0.20",
     "bcryptjs": "2.4.3",
     "better-sqlite3": "7.5.1",

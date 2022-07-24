@@ -51,13 +51,28 @@ export class BackendCompilation extends IncCompiler.Base {
       Helpers.log(`Compilation disabled for ${_.startCase(BackendCompilation.name)}`)
       return;
     }
+
+    console.log(`
+
+
+
+
+
+    STARTING BUILD TYPE: ${isBrowserBuild ? 'browser' : 'backend'}
+
+
+
+
+
+    `)
+
     if (hideErrors) {
       diagnostics = false;
       generateDeclarations = false;
     }
-
+    // console.log(`starting search for project in: ${cwd}`)
     const project = Project.nearestTo(cwd) as Project;
-    Helpers.log(`Project form ${cwd}: ${project?.location}`)
+    // console.log(`Project form ${cwd}: ${project?.location}`)
 
     const params = [
       watch ? ' -w ' : '',
@@ -77,6 +92,11 @@ export class BackendCompilation extends IncCompiler.Base {
       const tsconfigBackendPath = crossPlatformPath(
         project.path(`tsconfig.backend.${_.last(outDir.split('/'))}.json`).absolute.normal
       );
+      // console.log(`
+      // tsconfigBackendPath: ${tsconfigBackendPath}
+
+      // `)
+
       commandJsAndMaps = `${tsExe} -d false  ${params.join(' ')}   --project ${tsconfigBackendPath}`
       commandDts = `${tsExe} ${params.join(' ')}   --project ${tsconfigBackendPath}`
     }

@@ -68,7 +68,7 @@ export class BrowserCodeCut {
   }
 
   get isEmptyBackendFile() {
-    return this.rawContent.replace(/\s/g, '').trim() === '';
+    return !this.rawContentBackend || (this.rawContentBackend.replace(/\s/g, '').trim() === '');
   }
 
   constructor(

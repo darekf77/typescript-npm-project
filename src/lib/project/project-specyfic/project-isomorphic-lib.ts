@@ -439,6 +439,15 @@ export class ProjectIsomorphicLib
 
     if (this.buildOptions.watch) {
       //#region watch build
+
+
+      await this.incrementalBuildProcess.startAndWatch('isomorphic compilation (watch mode)',
+        {
+          watchOnly: this.buildOptions.watchOnly,
+          afterInitCallBack: async () => {
+            await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
+          }
+        });
       if (outDir === 'bundle') {
         // Helpers.error(`Watch build not available for bundle build`, false, true);
         Helpers.info(`Starting watch bundle build for fast cli..`);
@@ -450,13 +459,7 @@ export class ProjectIsomorphicLib
           Helpers.error(`WATCH BUNDLE build failed`, false, true);
         }
       }
-      await this.incrementalBuildProcess.startAndWatch('isomorphic compilation (watch mode)',
-        {
-          watchOnly: this.buildOptions.watchOnly,
-          afterInitCallBack: async () => {
-            await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
-          }
-        });
+
       if (this.frameworkVersionAtLeast('v3')) { // TOOD
         showInfoAngular()
         if (this.isSmartContainerTarget) {
@@ -490,6 +493,9 @@ export class ProjectIsomorphicLib
     } else {
       //#region non watch build
       if (outDir === 'bundle' && (obscure || uglify || nodts)) {
+        // console.log('k1')
+        await this.incrementalBuildProcess.start('isomorphic compilation (only browser) ');
+        // console.log("AFTER COMPILATION")
         //#region advanced backend compilation
         try {
           showInfoWebpack()
@@ -515,7 +521,7 @@ export class ProjectIsomorphicLib
         } catch (er) {
           Helpers.error(`BUNDLE (obscure || uglify || nodts) process failed`, false, true);
         }
-        await this.incrementalBuildProcess.start('isomorphic compilation (only browser) ');
+
         try {
           showInfoAngular()
           await proxyProject.run(angularCommand).sync()
@@ -529,7 +535,9 @@ export class ProjectIsomorphicLib
         //#endregion
       } else {
         //#region normal backend compilation
+        // console.log('k2')
         await this.incrementalBuildProcess.start('isomorphic compilation');
+        // console.log("AFTER COMPILATION")
         try {
           showInfoAngular()
           if (this.isSmartContainerTarget) {
