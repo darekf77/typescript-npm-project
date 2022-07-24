@@ -35,6 +35,7 @@ export class BackendCompilation extends IncCompiler.Base {
   }
   public isEnableCompilation = true;
 
+  static counter = 1;
   async libCompilation({
     cwd,
     watch = false,
@@ -51,27 +52,17 @@ export class BackendCompilation extends IncCompiler.Base {
       Helpers.log(`Compilation disabled for ${_.startCase(BackendCompilation.name)}`)
       return;
     }
-
-    console.log(`
-
-
+    // let id = BackendCompilation.counter++;
+    const project = Project.nearestTo(cwd) as Project;
 
 
-
-    STARTING BUILD TYPE: ${isBrowserBuild ? 'browser' : 'backend'}
-
-
-
-
-
-    `)
 
     if (hideErrors) {
       diagnostics = false;
       generateDeclarations = false;
     }
     // console.log(`starting search for project in: ${cwd}`)
-    const project = Project.nearestTo(cwd) as Project;
+
     // console.log(`Project form ${cwd}: ${project?.location}`)
 
     const params = [
@@ -100,6 +91,22 @@ export class BackendCompilation extends IncCompiler.Base {
       commandJsAndMaps = `${tsExe} -d false  ${params.join(' ')}   --project ${tsconfigBackendPath}`
       commandDts = `${tsExe} ${params.join(' ')}   --project ${tsconfigBackendPath}`
     }
+
+    // console.log(`
+
+    // STARTING BUILD TYPE (${id}): ${isBrowserBuild ? 'browser' : 'backend'}
+
+    // `,{
+    //   cwd,
+    //   watch,
+    //   outDir,
+    //   project: project.location,
+    //   locationOfMainProject,
+    //   buildType,
+    //   generateDeclarations,
+    //   commandDts,
+    //   commandJsAndMaps
+    // })
 
 
     Helpers.log(`(${this.compilerName}) Execute first command :
@@ -132,6 +139,12 @@ export class BackendCompilation extends IncCompiler.Base {
         });
       }
     }
+
+    // console.log(`
+
+    // DONE BUILD TYPE (${id}): ${isBrowserBuild ? 'browser' : 'backend'}
+
+    // `)
 
   }
 

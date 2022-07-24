@@ -365,7 +365,7 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
     const parentPath = project.isSmartContainerChild ? project.parent.location : path.join(project.location, '../../..')
     const parent = Project.From(parentPath);
     if (parent) {
-      workspaceConfig['pathesTsconfig'] = `"paths": ` + JSON.stringify((libs).reduce((a, b) => {
+      const generatedPathes = `"paths": ` + JSON.stringify((libs).reduce((a, b) => {
         if (isSmartWorkspaceChild) {
           const pathRelative = path.join(path.basename(b), config.folder.src, 'lib');
           return _.merge(a, {
@@ -380,6 +380,10 @@ export function saveConfigWorkspca(project: Project, workspaceConfig: Models.env
           })
         }
       }, {}));
+      workspaceConfig['pathesTsconfig'] = generatedPathes;
+      workspaceConfig['pathesTsconfigSourceDist'] = generatedPathes.replace(/\/src/g, '/tmp-source-dist')
+      workspaceConfig['pathesTsconfigSourceBundle'] = generatedPathes.replace(/\/src/g, '/tmp-source-bundle')
+
       // workspaceConfig['exclusion'] = `exclude:[]`;
     } else {
       Helpers.warn(`[env config] parent not found by path ${parentPath}`);
