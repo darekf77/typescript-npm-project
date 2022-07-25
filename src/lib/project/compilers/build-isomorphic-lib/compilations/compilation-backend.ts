@@ -54,8 +54,7 @@ export class BackendCompilation extends IncCompiler.Base {
     }
     // let id = BackendCompilation.counter++;
     const project = Project.nearestTo(cwd) as Project;
-
-
+    const buildOutDir = _.last(outDir.split('/')) as 'bundle' | 'dist';
 
     if (hideErrors) {
       diagnostics = false;
@@ -75,22 +74,38 @@ export class BackendCompilation extends IncCompiler.Base {
       // hideErrors ? ' --skipLibCheck true --noEmit true ' : '',
     ];
 
-    let commandJsAndMaps, commandDts;
+    let cmd = (specificTsconfig?: string) => {
+      let commandJs, commandMaps, commandDts;
+      const nocutsrc = `${project.location}/${buildOutDir}-nocutsrc`;
+      // commandJs = `${tsExe} -d false  --mapRoot ${nocutsrc} ${params.join(' ')} `
+      //   + (specificTsconfig ? `--project ${specificTsconfig}` : '');
+
+      commandJs = `${tsExe} --mapRoot ${nocutsrc} ${params.join(' ')} `
+        + (specificTsconfig ? `--project ${specificTsconfig}` : '');
+
+      // commandDts = `${tsExe} --emitDeclarationOnly  ${params.join(' ')}`;
+      params[1] = ` --outDir ${nocutsrc}`;
+      commandMaps = `${tsExe} -d false  ${params.join(' ')} `;
+      return {
+        commandJs, commandMaps,
+        // commandDts
+      }
+    };
+
+    let tscCommands = {} as { commandJs: string; commandMaps: string;
+      // commandDts: string;
+    };
+
     if (isBrowserBuild) {
-      commandJsAndMaps = `${tsExe} -d false  ${params.join(' ')}`
-      commandDts = `${tsExe} ${params.join(' ')}`
+      tscCommands = cmd() // DEPRACATED
     } else {
       const tsconfigBackendPath = crossPlatformPath(
-        project.path(`tsconfig.backend.${_.last(outDir.split('/'))}.json`).absolute.normal
+        project.path(`tsconfig.backend.${buildOutDir}.json`).absolute.normal
       );
-      // console.log(`
-      // tsconfigBackendPath: ${tsconfigBackendPath}
-
-      // `)
-
-      commandJsAndMaps = `${tsExe} -d false  ${params.join(' ')}   --project ${tsconfigBackendPath}`
-      commandDts = `${tsExe} ${params.join(' ')}   --project ${tsconfigBackendPath}`
+      tscCommands = cmd(tsconfigBackendPath)
     }
+
+    console.log(tscCommands)
 
     // console.log(`
 
@@ -109,11 +124,11 @@ export class BackendCompilation extends IncCompiler.Base {
     // })
 
 
-    Helpers.log(`(${this.compilerName}) Execute first command :
+    // Helpers.log(`(${this.compilerName}) Execute first command :
 
-    ${commandJsAndMaps}
+    // ${commandJsAndMaps}
 
-    # inside: ${cwd}`)
+    // # inside: ${cwd}`)
 
 
     if (isBrowserBuild) {
@@ -121,7 +136,7 @@ export class BackendCompilation extends IncCompiler.Base {
         // nothing here for for now
       } else {
         await this.buildStandardLibVer({
-          watch, commandJsAndMaps, commandDts, generateDeclarations, cwd
+          watch, ...tscCommands, generateDeclarations, cwd
         });
       }
     } else {
@@ -129,13 +144,13 @@ export class BackendCompilation extends IncCompiler.Base {
       if (global['useWebpackBackendBuild']) {
         project.webpackBackendBuild.run({
           buildType: 'lib',
-          outDir: _.last(outDir.split('/')) as any,
+          outDir: buildOutDir as any,
           watch,
           // uglify,
         })
       } else {
         await this.buildStandardLibVer({
-          watch, commandJsAndMaps, commandDts, generateDeclarations, cwd
+          watch, ...tscCommands, generateDeclarations, cwd
         });
       }
     }
@@ -150,23 +165,27 @@ export class BackendCompilation extends IncCompiler.Base {
 
   protected async buildStandardLibVer(options: {
     watch: boolean;
-    commandJsAndMaps: string;
-    commandDts: string,
+    commandJs: string;
+    commandMaps: string;
+    // commandDts: string,
     generateDeclarations: boolean,
     cwd: string;
   }) {
 
-    const { watch, generateDeclarations, commandDts, commandJsAndMaps, cwd } = options;
+    const { watch, generateDeclarations,
+      //  commandDts,
+        commandJs, commandMaps, cwd } = options;
     //#region normal js build
     if (watch) {
-      await Helpers.logProc2(child_process.exec(commandJsAndMaps, { cwd }), ['Watching for file changes.']);
-      if (generateDeclarations) {
-        Helpers.log(`(${this.compilerName}) Execute second command : ${commandDts}    # inside: ${cwd}`)
-        await Helpers.logProc2(child_process.exec(commandDts, { cwd }), ['Watching for file changes.']);
-      }
+      await Helpers.logProc2(child_process.exec(commandJs, { cwd }), ['Watching for file changes.']);
+      await Helpers.logProc2(child_process.exec(commandMaps, { cwd }), ['Watching for file changes.']);
+      // if (generateDeclarations) {
+      //   Helpers.log(`(${this.compilerName}) Execute second command : ${commandDts}    # inside: ${cwd}`)
+      //   await Helpers.logProc2(child_process.exec(commandDts, { cwd }), ['Watching for file changes.']);
+      // }
     } else {
       try {
-        child_process.execSync(commandJsAndMaps, {
+        child_process.execSync(commandJs, {
           cwd,
           stdio: [0, 1, 2]
         });
@@ -174,18 +193,26 @@ export class BackendCompilation extends IncCompiler.Base {
         Helpers.error(`[${config.frameworkName}] Compilation error (1): ${e}`, false, true);
       }
 
-
-      if (generateDeclarations) {
-        Helpers.log(`(${this.compilerName}) Execute second command : ${commandDts}    # inside: ${cwd}`)
-        try {
-          child_process.execSync(commandDts, {
-            cwd,
-            stdio: [0, 1, 2]
-          })
-        } catch (e) {
-          Helpers.error(`[${config.frameworkName}] Compilation error (2): ${e}`, false, true);
-        }
+      try {
+        child_process.execSync(commandMaps, {
+          cwd,
+          stdio: [0, 1, 2]
+        });
+      } catch (e) {
+        Helpers.error(`[${config.frameworkName}] Compilation error (1): ${e}`, false, true);
       }
+
+      // if (generateDeclarations) {
+      //   Helpers.log(`(${this.compilerName}) Execute second command : ${commandDts}    # inside: ${cwd}`)
+      //   try {
+      //     child_process.execSync(commandDts, {
+      //       cwd,
+      //       stdio: [0, 1, 2]
+      //     })
+      //   } catch (e) {
+      //     Helpers.error(`[${config.frameworkName}] Compilation error (2): ${e}`, false, true);
+      //   }
+      // }
     }
     //#endregion
   }

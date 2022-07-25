@@ -217,7 +217,7 @@ if (startSpinner) {
   //#region mode
   var mode;
   var distOnly = (process.argv.includes('-dist'));
-  var bundleOnly = (process.argv.includes('-bundle'));
+  // var bundleOnly = (process.argv.includes('-bundle'));
   var npmOnly = (process.argv.includes('-npm'));
   if (distOnly) {
     mode = 'dist';
@@ -230,18 +230,20 @@ if (startSpinner) {
     var start = require(pathToDistRun.replace(/\.js$/g, '')).start;
 
     // =======================================================================
-  } else if (bundleOnly) {
-    mode = 'bundle';
-    !global.hideLog && console.log('- bundle only -');
-    // =========================== only dist ============================
-    process.argv = process.argv.filter(a => a !== '-bundle');
-    process.argv = process.argv.filter(f => !!f);
-    var path = require('path');
-    var pathToDistRun = path.join(__dirname, '../bundle/index.js');
-    var start = require(pathToDistRun.replace(/\.js$/g, '')).start;
+  }
+  // else if (bundleOnly) {
+  //   mode = 'bundle';
+  //   !global.hideLog && console.log('- bundle only -');
+  //   // =========================== only dist ============================
+  //   process.argv = process.argv.filter(a => a !== '-bundle');
+  //   process.argv = process.argv.filter(f => !!f);
+  //   var path = require('path');
+  //   var pathToDistRun = path.join(__dirname, '../bundle/index.js');
+  //   var start = require(pathToDistRun.replace(/\.js$/g, '')).start;
 
-    // =======================================================================
-  } else if (npmOnly) {
+  //   // =======================================================================
+  // }
+  else if (npmOnly) {
     mode = 'npm';
     !global.hideLog && console.log('- npm global only -');
     // =========================== only dist ============================
@@ -260,40 +262,42 @@ if (startSpinner) {
     // var pathToBundleFolder = path.join(__dirname, '../bundle');
 
     var pathToDistRun = path.join(__dirname, '../dist/index.js');
-    var pathToBundletRun = path.join(__dirname, '../bundle/index.js');
+    // var pathToBundletRun = path.join(__dirname, '../bundle/index.js');
     var pathToIndexRun = path.join(__dirname, '../index.js');
 
     var distExist = fs.existsSync(pathToDistRun);
-    var bundleExist = fs.existsSync(pathToBundletRun);
+    // var bundleExist = fs.existsSync(pathToBundletRun);
 
     var start;
 
-    if (bundleExist && distExist) {
-      // if (fs.lstatSync(pathToDistFolder).mtimeMs > fs.lstatSync(pathToBundleFolder).mtimeMs) {
-      //   mode = 'dist';
-      //   !global.hideLog && console.log('- firedev dist -> becouse is newer -');
-      //   start = require(pathToDistRun.replace(/\.js$/g, '')).start;
-      // } else {
-      mode = 'bundle'; // bundle is default
-      !global.hideLog && console.log('- firedev bundle -> becouse is newer -');
-      start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
-      // }
-    } else {
-      if (distExist) {
-        mode = 'dist';
-        !global.hideLog && console.log('- firedev dist -');
-        // TOOOO MUCH TIME !!!!!!
-        start = require(pathToDistRun.replace(/\.js$/g, '')).start;
-      } else if (bundleExist) {
-        mode = 'bundle';
-        !global.hideLog && console.log('- firedev bundle -');
-        start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
-      } else {
-        mode = 'npm';
-        !global.hideLog && console.log('- npm mode -');
-        start = require(pathToIndexRun.replace(/\.js$/g, '')).start;
-      }
+    // if (bundleExist && distExist) {
+    //   // if (fs.lstatSync(pathToDistFolder).mtimeMs > fs.lstatSync(pathToBundleFolder).mtimeMs) {
+    //   //   mode = 'dist';
+    //   //   !global.hideLog && console.log('- firedev dist -> becouse is newer -');
+    //   //   start = require(pathToDistRun.replace(/\.js$/g, '')).start;
+    //   // } else {
+    //   mode = 'bundle'; // bundle is default
+    //   !global.hideLog && console.log('- firedev bundle -> becouse is newer -');
+    //   start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
+    //   // }
+    // } else {
+    if (distExist) {
+      mode = 'dist';
+      !global.hideLog && console.log('- firedev dist -');
+      // TOOOO MUCH TIME !!!!!!
+      start = require(pathToDistRun.replace(/\.js$/g, '')).start;
     }
+    // else if (bundleExist) {
+    //   mode = 'bundle';
+    //   !global.hideLog && console.log('- firedev bundle -');
+    //   start = require(pathToBundletRun.replace(/\.js$/g, '')).start;
+    // }
+     else {
+      mode = 'npm';
+      !global.hideLog && console.log('- npm mode -');
+      start = require(pathToIndexRun.replace(/\.js$/g, '')).start;
+    }
+    // }
 
     //#endregion
   }

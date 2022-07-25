@@ -304,6 +304,12 @@ export class FilesRecreator extends FeatureForProject {
               const getSettingsFor = (project: Project, s = {}) => {
 
                 s['files.exclude'] = {};
+
+                s['files.exclude']['tsconfig.backend.dist.json'] = true;
+                s['files.exclude']['tsconfig.backend.bundle.json'] = true;
+                s['files.exclude']['tsconfig.backend.dist.json.filetemplate'] = true;
+                s['files.exclude']['tsconfig.backend.bundle.json.filetemplate'] = true;
+
                 if (project.isVscodeExtension) {
                   s['files.exclude']["out"] = true;
                   s['files.exclude']["update-proj.js"] = true;
@@ -384,6 +390,9 @@ export class FilesRecreator extends FeatureForProject {
                     });
                   })
                 }
+
+
+
               }
               // settings['files.exclude'][config.folder.tmpTestsEnvironments] = false;
 
