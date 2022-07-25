@@ -150,6 +150,12 @@ ${shouldBeProjectArr.map(p => `- ${p}`).join('\n')}
         });
     } catch (error) { }
 
+    Helpers.info(`
+Remotes for repo:
+${remotes.map((r, i) => `${i + 1}. ${r.origin} ${r.url}`).join('\n')}
+
+    `)
+
     for (let index = 0; index < remotes.length; index++) {
       const { origin, url } = remotes[index];
       await this.push(commitMessage, force, origin);
@@ -172,7 +178,7 @@ ${shouldBeProjectArr.map(p => `- ${p}`).join('\n')}
     const childrenToPush = await this.getLinkedPorjectsAndChildrens('push');
     for (let index = 0; index < childrenToPush.length; index++) {
       const childProj = childrenToPush[index];
-      await childProj.gitActions.push(commitMessage, force);
+      await childProj.gitActions.push(commitMessage, force, origin);
     }
 
 
@@ -215,7 +221,7 @@ ${shouldBeProjectArr.map(p => `- ${p}`).join('\n')}
       } catch (error) { }
     }
     if (!this.project.git.originURL && this.project.isContainerChild && !this.project.isSmartContainerChild) {
-      this.project.run(`git remote add origin ${this.project.parent.git
+      this.project.run(`git remote add ${origin} ${this.project.parent.git
         .originURL.replace(this.project.parent.name, this.project.name)}`).sync()
     }
 
