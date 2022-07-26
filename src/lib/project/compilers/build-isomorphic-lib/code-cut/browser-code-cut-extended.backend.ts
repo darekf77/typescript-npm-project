@@ -545,7 +545,13 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
         fse.mkdirpSync(path.dirname(absoluteBackendFilePath));
       }
 
-      fse.writeFileSync(absoluteBackendFilePath, this.rawContentBackend, 'utf8');
+      if (
+        !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist/tests/`) &&
+        !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist/tests/`)
+      ) {
+        // console.log(relativePath)
+        fse.writeFileSync(absoluteBackendFilePath, this.rawContentBackend, 'utf8');
+      }
     }
     // }
   }
