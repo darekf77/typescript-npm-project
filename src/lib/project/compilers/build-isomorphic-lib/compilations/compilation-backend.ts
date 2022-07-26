@@ -105,7 +105,7 @@ export class BackendCompilation extends IncCompiler.Base {
       tscCommands = cmd(tsconfigBackendPath)
     }
 
-    console.log(tscCommands)
+    // console.log(tscCommands)
 
     // console.log(`
 

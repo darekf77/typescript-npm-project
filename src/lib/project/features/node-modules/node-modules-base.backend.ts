@@ -58,7 +58,16 @@ export class NodeModulesBase extends NodeModulesCore {
 
       filtered.forEach(f => {
         const dest = path.join(this.project.node_modules.path, path.basename(f));
-        if (['.bin', '.install-date'].includes(path.basename(f))) {
+        const realPath = fse.realpathSync(f);
+        // console.log('realPath', realPath)
+        if (['background-worker-process'].includes(path.basename(f))) { // TODO QUCIK_FIX
+          // console.log('HEELOOEOOEO')
+          // const filter = (src) => {
+          //   console.log(src)
+          //   return !/.*node_modules.*/g.test(src);
+          // };
+          Helpers.copy(realPath, dest, { overwrite: true, recursive: true });
+        } else if (['.bin', '.install-date'].includes(path.basename(f))) {
           //#region handle specyfick folders and files
           const linkFromBin = fse.realpathSync(f);
           if (Helpers.exists(linkFromBin)) {
