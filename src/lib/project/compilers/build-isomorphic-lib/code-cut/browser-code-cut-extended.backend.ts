@@ -547,7 +547,7 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
       if (
         !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist/tests/`) &&
-        !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist/tests/`)
+        !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle/tests/`)
       ) {
         // console.log(relativePath)
         fse.writeFileSync(absoluteBackendFilePath, this.rawContentBackend, 'utf8');
