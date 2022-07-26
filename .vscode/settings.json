@@ -1,5 +1,9 @@
 {
   "files.exclude": {
+    "tsconfig.backend.dist.json": true,
+    "tsconfig.backend.bundle.json": true,
+    "tsconfig.backend.dist.json.filetemplate": true,
+    "tsconfig.backend.bundle.json.filetemplate": true,
     "json5-writer": true,
     "lowdb": true,
     "misc-utils-of-mine-generic": true,
@@ -28,8 +32,6 @@
     ".vscode/launch.json": true,
     ".vscode/tasks.json": true,
     "tsconfig.json": true,
-    "tsconfig.backend.dist.json": true,
-    "tsconfig.backend.bundle.json": true,
     ".npmrc": true,
     "tslint.json": true,
     ".editorconfig": true,
@@ -43,8 +45,6 @@
     ".vscode/launch.json.filetemplate": true,
     ".vscode/tasks.json.filetemplate": true,
     "tsconfig.json.filetemplate": true,
-    "tsconfig.backend.dist.json.filetemplate": true,
-    "tsconfig.backend.bundle.json.filetemplate": true,
     "webpack.backend-dist-build.js": true,
     "projects/tmp*": true,
     ".gitignore": true,
