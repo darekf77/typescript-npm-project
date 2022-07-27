@@ -274,11 +274,13 @@ ${remotes.map((r, i) => `${i + 1}. ${r.origin} ${r.url}`).join('\n')}
     Project.unload(this.project);
     this.project = Project.From(location) as Project;
 
-    if (this.project.isContainerOrWorkspaceWithLinkedProjects) {
-      const childrenToPull = await this.getLinkedPorjectsAndChildrens('pull');
-      for (let index = 0; index < childrenToPull.length; index++) {
-        const childProj = childrenToPull[index];
-        await childProj.gitActions.pull(clear);
+    if(this.project) {
+      if (this.project.isContainerOrWorkspaceWithLinkedProjects) {
+        const childrenToPull = await this.getLinkedPorjectsAndChildrens('pull');
+        for (let index = 0; index < childrenToPull.length; index++) {
+          const childProj = childrenToPull[index];
+          await childProj.gitActions.pull(clear);
+        }
       }
     }
 
