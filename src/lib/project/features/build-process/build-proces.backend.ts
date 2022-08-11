@@ -274,7 +274,7 @@ inside generated projects...
 
     //#region handle end of building
     const msg = (buildOptions.watch ? `
-      Waching files.. started.. please wait...
+      Waching files started..
     `: `
       End of Building ${this.project.genericName}
 

@@ -511,6 +511,14 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
 
     // Helpers.log(`saving ismoprhic file: ${this.absoluteFilePath}`, 1)
     if (this.isEmptyBrowserFile && this.allowedToReplaceDotPref
+      .filter(f => ![
+        '.html', // fix for angular
+        '.scss',
+        '.css',
+        '.sass',
+        '.less',
+        '.json',
+      ].includes(f))
       .includes(path.extname(this.absoluteFilePath))
     ) {
       if (fse.existsSync(this.absoluteFilePath)) {
@@ -533,7 +541,9 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       // Helpers.log(`Written file: ${relativePath}`, 1)
       this.compilationProject.sourceModifier.processFile(relativePath, modifiedFiles, 'tmp-src-for')
     }
-    if (!this.isEmptyBackendFile && this.allowedToReplaceDotPref
+
+    const isEmptyModuleBackendFile = this.isEmptyModuleBackendFile
+    if ((!this.isEmptyBackendFile || isEmptyModuleBackendFile) && this.allowedToReplaceDotPref
       .includes(path.extname(this.absoluteFilePath))
     ) {
       const absoluteBackendFilePath = path.join(
@@ -550,7 +560,10 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
         !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle/tests/`)
       ) {
         // console.log(relativePath)
-        fse.writeFileSync(absoluteBackendFilePath, this.rawContentBackend, 'utf8');
+        fse.writeFileSync(absoluteBackendFilePath,
+          isEmptyModuleBackendFile ? `export function dummy${(new Date()).getTime()}() { }`
+            : this.rawContentBackend,
+          'utf8');
       }
     }
     // }

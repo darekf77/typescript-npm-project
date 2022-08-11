@@ -298,7 +298,35 @@ export class ProjectIsomorphicLib
 
       `)
 
-    const isStandalone = !this.isWorkspace;
+    const isStandalone = (this.isStandaloneProject
+      && !this.isWorkspaceChildProject
+      && !this.isSmartContainerTarget
+    );
+    // console.log({ isStandalone, 'this.name': this.name });
+
+    const buildOutDir = this.buildOptions.outDir;
+    const parent = (!isStandalone ? (
+      this.isSmartContainerTarget ? Project.From(this.smartContainerTargetParentContainerPath)
+        : this.parent)
+      : void 0);
+    const additionalReplace = (line: string) => {
+      const beforeModule2 = crossPlatformPath(path.join(
+        buildOutDir,
+        parent.name,
+        this.name,
+        `tmp-apps-for-${buildOutDir}/${this.name}`
+      ));
+
+      // console.log({ beforeModule2 })
+
+      if (line.search(beforeModule2) !== -1) {
+        line = line.replace(beforeModule2 + '/', '')
+      }
+
+      return line
+    }
+
+
     await proj.execute(command, {
       exitOnError: true,
       exitOnErrorCallback: async (code) => {
@@ -306,13 +334,36 @@ export class ProjectIsomorphicLib
           , false, true);
       },
       outputLineReplace: (line: string) => {
-          if (isStandalone) {
-            return line.replace(
-              `src/app/${this.name}/`,
-              `./src/`
-            );
+        if (isStandalone) {
+          return line.replace(
+            `src/app/${this.name}/`,
+            `./src/`
+          );
+        } else {
+          line = line.trim();
+
+          if (line.search('src/app/') !== -1) {
+            line = line.replace('src/app/', './src/app/');
+            line = line.replace('././src/app/', './src/app/');
           }
-        return line;
+
+          if (line.search(`src/app/${this.name}/libs/`) !== -1) {
+            const [__, ___, ____, _____, ______, moduleName] = line.split('/');
+            return additionalReplace(line.replace(
+              `src/app/${this.name}/libs/${moduleName}/`,
+              `${moduleName}/src/lib/`,
+            ));
+          }
+
+          if (line.search(`src/app/`) !== -1) {
+            const [__, ___, ____, moduleName] = line.split('/');
+            return additionalReplace(line.replace(
+              `src/app/${moduleName}/`,
+              `${moduleName}/src/`,
+            ));
+          }
+          return additionalReplace(line);
+        }
       },
     });
     //#endregion

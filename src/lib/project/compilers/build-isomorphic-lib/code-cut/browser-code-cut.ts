@@ -71,6 +71,10 @@ export class BrowserCodeCut {
     return !this.rawContentBackend || (this.rawContentBackend.replace(/\s/g, '').trim() === '');
   }
 
+  get isEmptyModuleBackendFile() {
+    return (this.rawContentBackend || '').replace(/\/\*\ \*\//g, '').trim().length === 0;
+  }
+
   constructor(
     protected absoluteFilePath: string
   ) {

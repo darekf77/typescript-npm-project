@@ -185,25 +185,88 @@ export class BackendCompilation extends IncCompiler.Base {
       buildOutDir
     } = options;
 
-    const isStandalone = project.isStandaloneProject;
+    const isStandalone = (!project.isSmartContainerTarget && !project.isWorkspace && !project.isSmartContainerChild);
+    const parent = !isStandalone ? (project.parent || Project.From(project.smartContainerTargetParentContainerPath)) : void 0;
 
+    Helpers.info(`
+
+Starting backend typescirpt build....
+
+    `)
+    const additionalReplace = (line: string) => {
+
+      const beforeModule = crossPlatformPath(path.join(
+        parent.location,
+        buildOutDir,
+        parent.name,
+        project.name,
+        `tmp-source-${buildOutDir}/libs`
+      ));
+
+      if (line.search(beforeModule)) {
+        const [__, filepath] = line.split(`'`);
+        // console.log({
+        //   filepath
+        // })
+        if (filepath) {
+          const moduleName = _.first(filepath.replace(beforeModule + '/', '').split('/'));
+          if (moduleName) {
+            return line.replace(
+              crossPlatformPath(path.join(beforeModule, moduleName)),
+              `./${path.join(moduleName, 'src/lib')}`
+            )
+          }
+        }
+      }
+
+
+
+      return line;
+    }
+    // console.log({ isStandalone, buildOutDir })
     //#region normal js build
     // if (watch) {
     await Helpers.execute(child_process.exec(commandJs, { cwd }),
       {
         exitOnError: true,
         exitOnErrorCallback: async (code) => {
-          Helpers.error(`[${config.frameworkName}] Typescript compilation error (code=${code})`
+          Helpers.error(`[${config.frameworkName}] Typescript compilation (backend) error (code=${code})`
             , false, true);
         },
         outputLineReplace: (line: string) => {
           if (isStandalone) {
-            return line.replace(
+            return additionalReplace(line.replace(
               `../tmp-source-${buildOutDir}/`,
               `./src/`
-            );
+            ));
+          } else {
+            line = line.trimLeft();
+            // console.log({ line })
+            if (line.startsWith('./src/libs/')) {
+              const [__, ___, moduleName] = line.split('/');
+              return additionalReplace(line.replace(
+                `./src/libs/${moduleName}/`,
+                `./${moduleName}/src/lib/`,
+              ));
+            } else if (line.startsWith(`../tmp-source-${buildOutDir}/libs/`)) {
+              const [__, ___, ____, moduleName] = line.split('/');
+              return additionalReplace(line.replace(
+                `../tmp-source-${buildOutDir}/libs/${moduleName}/`,
+                `./${moduleName}/src/lib/`,
+              ));
+            } else if (line.startsWith(`../tmp-source-${buildOutDir}/`)) {
+              return additionalReplace(line.replace(
+                `../tmp-source-${buildOutDir}/`,
+                `./${project.name}/src/`,
+              ));
+
+            } else {
+              return additionalReplace(line.replace(
+                `./src/`,
+                `./${project.name}/src/lib/`
+              ));
+            }
           }
-          return line;
         },
         resolvePromiseMsg: {
           stdout: ['Watching for file changes.']
