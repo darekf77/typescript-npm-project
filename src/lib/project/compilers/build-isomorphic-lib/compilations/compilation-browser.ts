@@ -88,15 +88,21 @@ export class BroswerCompilation extends BackendCompilation {
     // console.log(`[compilation-browser][asyncAction] ${event.eventName} ${event.fileAbsolutePath}`)
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
     const relativeFilePath = absoluteFilePath.replace(crossPlatformPath(path.join(this.cwd, this.location)), '');
-    const destinationFilePath = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, relativeFilePath));
-    const destinationFileBackendPath = crossPlatformPath(path.join(
+    const destinationFilePath = crossPlatformPath(path.join(
       this.cwd,
       this.sourceOutBrowser,
-      relativeFilePath.replace('tmp-src', 'tmp-source')
+      relativeFilePath,
     ));
+    const destinationFileBackendPath = crossPlatformPath(path.join(
+      this.cwd,
+      this.sourceOutBrowser.replace('tmp-src', 'tmp-source'),
+      relativeFilePath
+    ));
+
 
     if (event.eventName === 'unlinkDir') {
       // console.log('REMOVING DIR', destinationFilePath)
+      // console.log('REMOVING DIR BACKEND', destinationFileBackendPath)
       Helpers.removeFolderIfExists(destinationFilePath);
       Helpers.removeFolderIfExists(destinationFileBackendPath);
     } else {
@@ -115,6 +121,10 @@ export class BroswerCompilation extends BackendCompilation {
           if (fse.existsSync(destinationFileBackendPath)) {
             fse.unlinkSync(destinationFileBackendPath)
           }
+
+          // console.log('unlink browser', destinationFilePath);
+          // console.log('unlink backend', destinationFileBackendPath);
+
           // if (['module', 'component']
           //   .map(c => `.${c}.ts`)
           //   .filter(c => destinationFilePath.endsWith(c)).length > 0) {

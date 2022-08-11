@@ -92,7 +92,8 @@ export class BackendCompilation extends IncCompiler.Base {
       }
     };
 
-    let tscCommands = {} as { commandJs: string; commandMaps: string;
+    let tscCommands = {} as {
+      commandJs: string; commandMaps: string;
       // commandDts: string;
     };
 
@@ -136,7 +137,7 @@ export class BackendCompilation extends IncCompiler.Base {
         // nothing here for for now
       } else {
         await this.buildStandardLibVer({
-          watch, ...tscCommands, generateDeclarations, cwd
+          watch, ...tscCommands, generateDeclarations, cwd, project, buildOutDir
         });
       }
     } else {
@@ -150,7 +151,7 @@ export class BackendCompilation extends IncCompiler.Base {
         })
       } else {
         await this.buildStandardLibVer({
-          watch, ...tscCommands, generateDeclarations, cwd
+          watch, ...tscCommands, generateDeclarations, cwd, project, buildOutDir
         });
       }
     }
@@ -170,50 +171,90 @@ export class BackendCompilation extends IncCompiler.Base {
     // commandDts: string,
     generateDeclarations: boolean,
     cwd: string;
+    project: Project;
+    buildOutDir: 'dist' | 'bundle',
   }) {
+
 
     const { watch, generateDeclarations,
       //  commandDts,
-        commandJs, commandMaps, cwd } = options;
+      commandJs,
+      commandMaps,
+      cwd,
+      project,
+      buildOutDir
+    } = options;
+
+    const isStandalone = project.isStandaloneProject;
+
     //#region normal js build
-    if (watch) {
-      await Helpers.logProc2(child_process.exec(commandJs, { cwd }), ['Watching for file changes.']);
-      await Helpers.logProc2(child_process.exec(commandMaps, { cwd }), ['Watching for file changes.']);
-      // if (generateDeclarations) {
-      //   Helpers.log(`(${this.compilerName}) Execute second command : ${commandDts}    # inside: ${cwd}`)
-      //   await Helpers.logProc2(child_process.exec(commandDts, { cwd }), ['Watching for file changes.']);
-      // }
-    } else {
-      try {
-        child_process.execSync(commandJs, {
-          cwd,
-          stdio: [0, 1, 2]
-        });
-      } catch (e) {
-        Helpers.error(`[${config.frameworkName}] Compilation error (1): ${e}`, false, true);
-      }
+    // if (watch) {
+    await Helpers.execute(child_process.exec(commandJs, { cwd }),
+      {
+        exitOnError: true,
+        exitOnErrorCallback: async (code) => {
+          Helpers.error(`[${config.frameworkName}] Typescript compilation error (code=${code})`
+            , false, true);
+        },
+        outputLineReplace: (line: string) => {
+          if (isStandalone) {
+            return line.replace(
+              `../tmp-source-${buildOutDir}/`,
+              `./src/`
+            );
+          }
+          return line;
+        },
+        resolvePromiseMsg: {
+          stdout: ['Watching for file changes.']
+        }
+      });
 
-      try {
-        child_process.execSync(commandMaps, {
-          cwd,
-          stdio: [0, 1, 2]
-        });
-      } catch (e) {
-        Helpers.error(`[${config.frameworkName}] Compilation error (1): ${e}`, false, true);
-      }
+    await Helpers.execute(child_process.exec(commandMaps, { cwd }),
+      {
+        hideOutput: {
+          stderr: true,
+          stdout: true,
+        },
+        resolvePromiseMsg: {
+          stdout: ['Watching for file changes.']
+        }
+      });
+    // if (generateDeclarations) {
+    //   Helpers.log(`(${this.compilerName}) Execute second command : ${commandDts}    # inside: ${cwd}`)
+    //   await Helpers.logProc2(child_process.exec(commandDts, { cwd }), ['Watching for file changes.']);
+    // }
+    // } else {
+    //   try {
+    //     child_process.execSync(commandJs, {
+    //       cwd,
+    //       stdio: [0, 1, 2]
+    //     });
+    //   } catch (e) {
+    //     Helpers.error(`[${config.frameworkName}] Compilation error (1): ${e}`, false, true);
+    //   }
 
-      // if (generateDeclarations) {
-      //   Helpers.log(`(${this.compilerName}) Execute second command : ${commandDts}    # inside: ${cwd}`)
-      //   try {
-      //     child_process.execSync(commandDts, {
-      //       cwd,
-      //       stdio: [0, 1, 2]
-      //     })
-      //   } catch (e) {
-      //     Helpers.error(`[${config.frameworkName}] Compilation error (2): ${e}`, false, true);
-      //   }
-      // }
-    }
+    //   try {
+    //     child_process.execSync(commandMaps, {
+    //       cwd,
+    //       stdio: [0, 1, 2]
+    //     });
+    //   } catch (e) {
+    //     Helpers.error(`[${config.frameworkName}] Compilation error (1): ${e}`, false, true);
+    //   }
+
+    // if (generateDeclarations) {
+    //   Helpers.log(`(${this.compilerName}) Execute second command : ${commandDts}    # inside: ${cwd}`)
+    //   try {
+    //     child_process.execSync(commandDts, {
+    //       cwd,
+    //       stdio: [0, 1, 2]
+    //     })
+    //   } catch (e) {
+    //     Helpers.error(`[${config.frameworkName}] Compilation error (2): ${e}`, false, true);
+    //   }
+    // }
+    // }
     //#endregion
   }
 

@@ -1,5 +1,5 @@
 //#region @backend
-import { crossPlatformPath, fse } from 'tnp-core'
+import { crossPlatformPath, ExecuteOptions, fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import { glob } from 'tnp-core';
 import * as inquirer from 'inquirer';
@@ -298,8 +298,23 @@ export class ProjectIsomorphicLib
 
       `)
 
-    proj.run(command).sync();
-
+    const isStandalone = !this.isWorkspace;
+    await proj.execute(command, {
+      exitOnError: true,
+      exitOnErrorCallback: async (code) => {
+        Helpers.error(`[${config.frameworkName}] Typescript compilation error (code=${code})`
+          , false, true);
+      },
+      outputLineReplace: (line: string) => {
+          if (isStandalone) {
+            return line.replace(
+              `src/app/${this.name}/`,
+              `./src/`
+            );
+          }
+        return line;
+      },
+    });
     //#endregion
   }
 
@@ -436,6 +451,26 @@ export class ProjectIsomorphicLib
 
     //#endregion
 
+    const isStandalone = (!this.isWorkspace || !this.isSmartContainer);
+
+    const sharedOptions = () => {
+      return {
+        exitOnError: true,
+        exitOnErrorCallback: async (code) => {
+          Helpers.error(`[${config.frameworkName}] Typescript compilation lib error (code=${code})`
+            , false, true);
+        },
+        outputLineReplace: (line: string) => {
+          if (isStandalone) {
+            return line.replace(
+              `projects/${this.name}/src/`,
+              `./src/`
+            );
+          }
+          return line;
+        },
+      } as ExecuteOptions;
+    }
 
     if (this.buildOptions.watch) {
       //#region watch build
@@ -459,6 +494,8 @@ export class ProjectIsomorphicLib
           Helpers.error(`WATCH BUNDLE build failed`, false, true);
         }
       }
+
+
 
       if (this.frameworkVersionAtLeast('v3')) { // TOOD
         showInfoAngular()
@@ -485,7 +522,12 @@ export class ProjectIsomorphicLib
           //   parent.run(`${config.frameworkName} baw ${this.name}`).async();
           // }
         } else {
-          await proxyProject.run(angularCommand).unitlOutputContains('Compilation complete. Watching for file changes')
+          await proxyProject.execute(angularCommand, {
+            resolvePromiseMsg: {
+              stdout: 'Compilation complete. Watching for file changes'
+            },
+            ...sharedOptions(),
+          });
         }
       }
       // console.log('HEHEHHE')
@@ -524,7 +566,9 @@ export class ProjectIsomorphicLib
 
         try {
           showInfoAngular()
-          await proxyProject.run(angularCommand).sync()
+          await proxyProject.execute(angularCommand, {
+            ...sharedOptions()
+          })
         } catch (e) {
           Helpers.log(e)
           Helpers.error(`
@@ -546,7 +590,9 @@ export class ProjectIsomorphicLib
             parent.run(`${config.frameworkName} ba ${this.name}`).sync();
             // }
           } else {
-            await proxyProject.run(angularCommand).sync()
+            await proxyProject.execute(angularCommand, {
+              ...sharedOptions(),
+            })
           }
         } catch (e) {
           Helpers.log(e)
