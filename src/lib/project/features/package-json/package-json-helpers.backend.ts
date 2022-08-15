@@ -752,6 +752,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     project.packageJson.data.dependencies['webpack'] = '4.46'
     project.packageJson.data.dependencies['ts-loader'] = '9.3.1'
     project.packageJson.data.dependencies['on-build-webpack'] = '0.1.0';
+    project.packageJson.data.dependencies['yargs'] = '6.0.0';
     project.packageJson.data.devDependencies = {}
   }
 
