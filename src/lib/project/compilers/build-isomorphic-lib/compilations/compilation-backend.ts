@@ -195,6 +195,9 @@ Starting backend typescirpt build....
     `)
     const additionalReplace = (line: string) => {
 
+      if (!parent) {
+        return line;
+      }
       const beforeModule = crossPlatformPath(path.join(
         parent.location,
         buildOutDir,

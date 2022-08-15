@@ -56,11 +56,16 @@ export class NodeModulesBase extends NodeModulesCore {
       const filtered = packagesToLinkOrCopy
         .filter(f => path.basename(f) !== this.project.name && fse.existsSync(f));
 
+      const ONLY_COPY_ALLOWED =[
+        'background-worker-process',
+        'better-sqlite3',
+      ];
+
       filtered.forEach(f => {
         const dest = path.join(this.project.node_modules.path, path.basename(f));
         const realPath = fse.realpathSync(f);
         // console.log('realPath', realPath)
-        if (['background-worker-process'].includes(path.basename(f))) { // TODO QUCIK_FIX
+        if (ONLY_COPY_ALLOWED.includes(path.basename(f))) { // TODO QUCIK_FIX
           // console.log('HEELOOEOOEO')
           // const filter = (src) => {
           //   console.log(src)
