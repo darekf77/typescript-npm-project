@@ -561,7 +561,7 @@
   },
 
   scripts: {
-    activate: "npm i --force && firedev dedupe && npm-run tsc && sudo firedev link && tnp link:core && tnp bd && tnp env:install",
+    activate: "npm i --force && firedev dedupe && npx tsc && firedev link && tnp bd",
   },
 
   license: "MIT",
