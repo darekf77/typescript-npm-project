@@ -17,6 +17,8 @@ import { IncrementalBuildProcess } from '../compilers/build-isomorphic-lib/compi
 
 const compierEntityKey = 'compilers';
 
+const COMPILER_CACHE_ENABLE = false
+
 export class CompilerCache extends FeatureForProject {
 
 
@@ -48,6 +50,9 @@ export class CompilerCache extends FeatureForProject {
 
   // tslint:disable-next-line: member-ordering
   public static async checkIfPojectHasUpToDateCompiledData(project: Project) {
+    if (!COMPILER_CACHE_ENABLE) {
+      return;
+    }
     const projectLocation = project.location;
     const db = await TnpDB.Instance();
     let data = await db.rawGet(compierEntityKey) as any[];
@@ -83,6 +88,9 @@ export class CompilerCache extends FeatureForProject {
   // tslint:disable-next-line: member-ordering
   public static async setProjectHasUpToDateCompiledData(project: Project,
     compilerObject: FeatureCompilerForProject | IncrementalBuildProcess) {
+    if (!COMPILER_CACHE_ENABLE) {
+      return;
+    }
     const compilerName = CLASS.getNameFromObject(compilerObject);
     const projectLocation = project.location;
     Helpers.log(`
@@ -118,10 +126,16 @@ export class CompilerCache extends FeatureForProject {
     await db.rawSet(compierEntityKey, data);
   }
   public static async unsetAllProjectsCompiledData() {
+    if (!COMPILER_CACHE_ENABLE) {
+      return;
+    }
     const db = await TnpDB.Instance();
     await db.rawSet(compierEntityKey, []);
   }
   public static async unsetProjectHasUpToDateCompiledData(project: Project) {
+    if (!COMPILER_CACHE_ENABLE) {
+      return;
+    }
     const projectLocation = project.location;
     Helpers.log(`
 
