@@ -448,11 +448,14 @@ export class ProjectIsomorphicLib
     const angularCommand = `${loadNvm} && ${this.npmRunNg} build ${this.name} ${watch ? '--watch' : ''}`;
 
     const showInfoAngular = () => {
-      Helpers.info(`
+      Helpers.info(`Starting browser typescirpt build....`);
+      Helpers.log(`
 
       ANGULAR 13+ ${this.buildOptions.watch ? 'WATCH ' : ''} LIB BUILD STARTED...
 
       `);
+
+
 
       Helpers.log(` command: ${angularCommand}`);
     };

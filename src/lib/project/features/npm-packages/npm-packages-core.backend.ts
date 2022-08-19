@@ -69,7 +69,7 @@ export class NpmPackagesCore extends FeatureForProject {
     const yarnLockPath = path.join(this.project.location, config.file.yarn_lock);
     const yarnLockExisits = fse.existsSync(yarnLockPath);
     const command: string = prepareCommand(pkg, remove, useYarn, this.project);
-    Helpers.info(`
+    Helpers.log(`
 
     [actualNpmProcess][${smoothInstall ? 'smooth' : 'normal'}] npm instalation...
 

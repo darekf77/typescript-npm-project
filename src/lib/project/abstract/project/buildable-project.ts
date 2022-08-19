@@ -396,7 +396,7 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
       // console.log('before build steps')
       await this.buildSteps(buildOptions);
     }
-    Helpers.info(`[buildable-project] Build steps ended... `);
+    Helpers.log(`[buildable-project] Build steps ended... `);
     // console.log('after build steps')
     if (this.isStandaloneProject || this.isSmartContainer) {
       await this.copyManager.initCopyingOnBuildFinish(buildOptions);

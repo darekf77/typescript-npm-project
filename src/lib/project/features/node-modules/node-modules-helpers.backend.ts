@@ -56,7 +56,7 @@ export function dedupePackages(projectLocation: string, packagesNames?: string[]
       warnings && Helpers.log(`Project with name ${f} not founded`);
       return
     }
-    Helpers.info(`Scanning for duplicates of current ${current.name}@${current.version} ....\n`)
+    Helpers.log(`Scanning for duplicates of current ${current.name}@${current.version} ....\n`)
     const nodeMod = path.join(projectLocation, config.folder.node_modules);
     if (!fse.existsSync(nodeMod)) {
       Helpers.mkdirp(nodeMod);

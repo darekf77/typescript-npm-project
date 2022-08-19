@@ -17,7 +17,17 @@ import { CopyMangerHelpers } from './copy-manager-helpers.backend';
 
 export class CopyManager extends FeatureForProject {
 
+  //#region fields & getters
   private buildOptions: BuildOptions;
+  get projectToCopyTo() {
+    if (Array.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
+      // @ts-ignore
+      return this.buildOptions.copyto as Project[];
+    }
+    return [];
+  }
+  //#endregion
+
   //#region init
   private modifyPackageFile: { fileRelativePath: string; modifyFn: (d: any) => any }[];
 
@@ -40,7 +50,7 @@ export class CopyManager extends FeatureForProject {
     }
 
     if (this.buildOptions.copyto.length === 0) {
-      Helpers.info(`No need to copying on build finsh... `)
+      Helpers.log(`No need to --copyto on build finsh... `)
       return;
     }
     if (watch) {
@@ -98,13 +108,6 @@ export class CopyManager extends FeatureForProject {
   //#endregion
 
   //#region start
-  get projectToCopyTo() {
-    if (Array.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
-      // @ts-ignore
-      return this.buildOptions.copyto as Project[];
-    }
-    return [];
-  }
   private async start(
     event?: ConfigModels.FileEvent,
     specyficFileRelativePath?: string,
@@ -161,7 +164,7 @@ export class CopyManager extends FeatureForProject {
       })
 
     } else {
-      console.log(`Waiting for outdir: ${this.buildOptions.outDir}, monitor Dir: ${monitorDir} `);
+      Helpers.log(`Waiting for outdir: ${this.buildOptions.outDir}, monitor Dir: ${monitorDir} `);
       setTimeout(() => {
         this.startAndWatch();
       }, 1000);
@@ -420,7 +423,7 @@ export class CopyManager extends FeatureForProject {
 
       Helpers.tryCopyFrom(monitoredOutDir, projectOudDirDest);
 
-      if (isSourceMapsDistBuild) {
+      if (isSourceMapsDistBuild) { // @LAST
 
         folderToLink.forEach(sourceFolder => {
           const srcOrComponents = path.join(this.project.location, sourceFolder);
