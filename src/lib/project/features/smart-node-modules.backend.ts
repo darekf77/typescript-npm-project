@@ -157,26 +157,29 @@ export class SmartNodeModules extends FeatureForProject {
           // console.log(`overrideFrom: ${overrideFrom}`)
           // console.log(`overrideDest: ${overrideDest}`)
           Helpers.removeIfExists(overrideDest);
-          Helpers.createSymLink(overrideFrom, overrideDest); // TODO something is causing loop
+          if (Helpers.exists(overrideFrom)) { // TODO quick fix
+            Helpers.createSymLink(overrideFrom, overrideDest); // TODO something is causing loop
 
-          Helpers.foldersFrom(tempProj.node_modules.path)
-            .filter(depName => path.basename(depName) !== packageName)
-            .forEach(depName => {
-              depName = path.basename(depName);
-              const verrr = tempProj.npmPackages.package(depName).version;
-              const fromProj = tempProj.npmPackages.package(depName);
-              const destProj = this.project.npmPackages.package(depName);
-              if (Helpers.exists(destProj.location)) {
-                if (fromProj.isNotSatisfyBy(destProj.version)) {
-                  Helpers.warn(`[override package][link "${packageName}"] ${chalk.bold(depName)}@${verrr} won't be satisfy`
-                    + ` in this repository by version "${destProj.version}"`);
+            Helpers.foldersFrom(tempProj.node_modules.path)
+              .filter(depName => path.basename(depName) !== packageName)
+              .forEach(depName => {
+                depName = path.basename(depName);
+                const verrr = tempProj.npmPackages.package(depName).version;
+                const fromProj = tempProj.npmPackages.package(depName);
+                const destProj = this.project.npmPackages.package(depName);
+                if (Helpers.exists(destProj.location)) {
+                  if (fromProj.isNotSatisfyBy(destProj.version)) {
+                    Helpers.warn(`[override package][link "${packageName}"] ${chalk.bold(depName)}@${verrr} won't be satisfy`
+                      + ` in this repository by version "${destProj.version}"`);
+                  } else {
+                    Helpers.log(`[override package][link "${packageName}"] copying new package ${chalk.bold(depName)} to main node_modules`)
+                  }
                 } else {
-                  Helpers.log(`[override package][link "${packageName}"] copying new package ${chalk.bold(depName)} to main node_modules`)
+                  Helpers.createSymLink(fromProj.location, destProj.location);
                 }
-              } else {
-                Helpers.createSymLink(fromProj.location, destProj.location);
-              }
-            });
+              });
+          }
+
           //#endregion
         }
       }

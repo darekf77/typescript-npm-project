@@ -70,10 +70,15 @@ export class NpmPackagesBase extends NpmPackagesCore {
       } else {
         Helpers.log(`Package [${npmPackages.map(p => p.name + (p.version ? `@${p.version}` : ''))
           .join(',')
-          }] instalation for ${chalk.bold(this.project.genericName)} ${triggeredMsg} `)
-        npmPackages.forEach(p => {
+          }] instalation for ${chalk.bold(this.project.genericName)} ${triggeredMsg} `);
+
+        for (let index = 0; index < npmPackages.length; index++) {
+          const p = npmPackages[index];
+          if (!p.version) {
+            p.version = 'latest';
+          }
           this.project.packageJson.setDependencyAndSave(p, `package ${p && p.name} instalation`);
-        });
+        }
       }
     }
 
