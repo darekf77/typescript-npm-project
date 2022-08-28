@@ -56,7 +56,7 @@ export function dedupePackages(projectLocation: string, packagesNames?: string[]
       warnings && Helpers.log(`Project with name ${f} not founded`);
       return
     }
-    Helpers.log(`Scanning for duplicates of current ${current.name}@${current.version} ....\n`)
+    Helpers.info(`Scanning for duplicates of current ${current.name}@${current.version} ....\n`)
     const nodeMod = path.join(projectLocation, config.folder.node_modules);
     if (!fse.existsSync(nodeMod)) {
       Helpers.mkdirp(nodeMod);
@@ -81,11 +81,11 @@ export function dedupePackages(projectLocation: string, packagesNames?: string[]
           // Helpers.warn(`Not able to identyfy project in ${p}`)
         } else {
           p = p.replace(path.join(projectLocation, config.folder.node_modules), '');
-          Helpers.log(`${i + 1}. Duplicate "${nproj.name}@${nproj.version}" in:\n\t ${CLI.chalk.bold(p)}\n`);
+          Helpers.info(`${i + 1}. Duplicate "${nproj.name}@${nproj.version}" in:\n\t ${CLI.chalk.bold(p)}\n`);
         }
       });
       if (duplicates.length === 0) {
-        Helpers.log(`No dupicate of ${current.name} fouded.`);
+        Helpers.info(`No dupicate of ${current.name} fouded.`);
       }
     } else {
       duplicates.forEach(duplicateRelativePath => {

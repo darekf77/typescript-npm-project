@@ -19,6 +19,14 @@ export class CopyManager extends FeatureForProject {
 
   //#region fields & getters
   private buildOptions: BuildOptions;
+
+  private modifyPackageFile: { fileRelativePath: string; modifyFn: (d: any) => any }[];
+
+  get target() {
+    const target = _.first((this.buildOptions.args || '').split(' ')).replace('/', '')
+    return target;
+  }
+
   get projectToCopyTo() {
     if (Array.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
       // @ts-ignore
@@ -26,15 +34,16 @@ export class CopyManager extends FeatureForProject {
     }
     return [];
   }
+
+  get isOrganizationPackageBuild() {
+    const isOrganizationPackageBuild = this.project.isSmartContainer;
+    return isOrganizationPackageBuild;
+  }
+
   //#endregion
 
   //#region init
-  private modifyPackageFile: { fileRelativePath: string; modifyFn: (d: any) => any }[];
 
-  get target() {
-    const target = _.first((this.buildOptions.args || '').split(' ')).replace('/', '')
-    return target;
-  }
   private renameDestinationFolder?: string;
   public async initCopyingOnBuildFinish(buildOptions: BuildOptions,
     modifyPackageFile?: { fileRelativePath: string; modifyFn: (d: any) => any }[],
@@ -54,50 +63,52 @@ export class CopyManager extends FeatureForProject {
       return;
     }
     if (watch) {
-      await this.start(void 0, void 0, watch);
-      await this.startAndWatch();
-      const db = await TnpDB.Instance();
+      await this.start();
+      await this.watch();
 
-      const updateFromDbLastCommand = (channel: string) => async () => {
-        Helpers.log(`Trigger of updateFromDbLastCommand`);
-        const db = await TnpDB.Instance();
-        const cmd = (await db.getCommands()).find(c => c.isBuildCommand && c.location === Project.Current.location);
-        if (cmd) {
-          // @ts-ignore
-          const b = await BuildOptions.from(cmd.command, Project.Current);
-          Helpers.info(`
+      // TODO update this when expressjs server for each build
+      // const db = await TnpDB.Instance();
 
-          COPYTO UPDATED: "${channel}"
+      // const updateFromDbLastCommand = (channel: string) => async () => {
+      //   Helpers.log(`Trigger of updateFromDbLastCommand`);
+      //   const db = await TnpDB.Instance();
+      //   const cmd = (await db.getCommands()).find(c => c.isBuildCommand && c.location === Project.Current.location);
+      //   if (cmd) {
+      //     // @ts-ignore
+      //     const b = await BuildOptions.from(cmd.command, Project.Current);
+      //     Helpers.info(`
 
-          from: ${
-            // @ts-ignore
-            (this.buildOptions.copyto as Project[]).map(c => c.name).join(', ')
-            }
+      //     COPYTO UPDATED: "${channel}"
 
-          to: ${
-            // @ts-ignore
-            (b.copyto as Project[]).map(c => c.name).join(', ')
-            }
+      //     from: ${
+      //       // @ts-ignore
+      //       (this.buildOptions.copyto as Project[]).map(c => c.name).join(', ')
+      //       }
 
-      `)
-          this.buildOptions.copyto = Helpers.arrays.uniqArray<Project>(b.copyto, 'location');
-          await db.updateCommandBuildOptions(cmd.location, this.buildOptions);
-        }
-      }
+      //     to: ${
+      //       // @ts-ignore
+      //       (b.copyto as Project[]).map(c => c.name).join(', ')
+      //       }
 
-      if (process.platform !== 'win32') { // TODO QUICK_FIX
-        // @ts-ignore
-        db.listenToChannel(this.project, 'tnp-copyto-add', async () => {
-          Helpers.log(`[copytomanager] realtime update add`);
-          await updateFromDbLastCommand('tnp-copyto-add')();
-        });
+      // `)
+      //     this.buildOptions.copyto = Helpers.arrays.uniqArray<Project>(b.copyto, 'location');
+      //     await db.updateCommandBuildOptions(cmd.location, this.buildOptions);
+      //   }
+      // }
 
-        // @ts-ignore
-        db.listenToChannel(this.project, 'tnp-copyto-remove', async () => {
-          Helpers.log(`[copytomanager] realtime update remove`);
-          await updateFromDbLastCommand('tnp-copyto-remove')();
-        });
-      }
+      // if (process.platform !== 'win32') { // TODO QUICK_FIX
+      //   // @ts-ignore
+      //   db.listenToChannel(this.project, 'tnp-copyto-add', async () => {
+      //     Helpers.log(`[copytomanager] realtime update add`);
+      //     await updateFromDbLastCommand('tnp-copyto-add')();
+      //   });
+
+      //   // @ts-ignore
+      //   db.listenToChannel(this.project, 'tnp-copyto-remove', async () => {
+      //     Helpers.log(`[copytomanager] realtime update remove`);
+      //     await updateFromDbLastCommand('tnp-copyto-remove')();
+      //   });
+      // }
 
 
     } else {
@@ -110,11 +121,9 @@ export class CopyManager extends FeatureForProject {
   //#region start
   private async start(
     event?: ConfigModels.FileEvent,
-    specyficFileRelativePath?: string,
-    dontRemoveDestFolder = false
+    specyficFileRelativePath?: string
   ) {
     const outDir = this.buildOptions.outDir;
-
 
     const projectToCopyTo = this.projectToCopyTo;
 
@@ -124,8 +133,7 @@ export class CopyManager extends FeatureForProject {
         {
           specyficFileRelativePath: event && specyficFileRelativePath,
           outDir: outDir as any
-        },
-        dontRemoveDestFolder
+        }
       );
     }
 
@@ -133,12 +141,19 @@ export class CopyManager extends FeatureForProject {
   //#endregion
 
   //#region start and watch
-  private startAndWatch() {
-    const monitorDir = this.project.isSmartContainer
-      ? path.join(this.project.location, 'dist', this.project.name, this.target, this.buildOptions.outDir)
-      : path.join(this.project.location, this.buildOptions.outDir);
 
-    // console.log(`watching folder for as copy source!! ${monitorDir} `)
+  // TODO make it getter
+
+  private monitoredOutDir(outDir: 'dist' | 'bundle' | 'docs') {
+    const monitorDir: string = (this.project.isSmartContainer)
+      ? path.join(this.project.location, 'dist', this.project.name, this.target, outDir, 'libs')
+      : path.join(this.project.location, outDir);
+    return monitorDir;
+  }
+  private watch() {
+    const monitorDir = this.monitoredOutDir(this.buildOptions.outDir);
+
+    Helpers.log(`[copytomanger] watching folder for as copy source!! ${monitorDir} `)
 
     if (fse.existsSync(monitorDir)) {
       chokidar.watch(monitorDir, {
@@ -166,7 +181,7 @@ export class CopyManager extends FeatureForProject {
     } else {
       Helpers.log(`Waiting for outdir: ${this.buildOptions.outDir}, monitor Dir: ${monitorDir} `);
       setTimeout(() => {
-        this.startAndWatch();
+        this.watch();
       }, 1000);
     }
   }
@@ -304,184 +319,164 @@ export class CopyManager extends FeatureForProject {
     return this._copyBuildedDistributionTo(destination);
   }
 
+  /**
+  * There are 3 typese of --copyto build
+  * 1. dist build (wihout source maps buit without links)
+  * 2. dist build (with source maps and links) - when no buildOptions
+  * 3. same as 2 buit with watch
+  */
   private _copyBuildedDistributionTo(
     destination: Project,
     options?: {
       specyficFileRelativePath?: string,
       outDir?: 'dist'
-    },
-    dontRemoveDestFolder = false
+    }
   ) {
-
-    let { specyficFileRelativePath = void 0, outDir = 'dist' } = options || {};
+    const { specyficFileRelativePath = void 0, outDir = 'dist' } = options || {};
 
     if (!specyficFileRelativePath && (!destination || !destination.location)) {
       Helpers.warn(`Invalid project: ${destination.name}`)
       return;
     }
 
-    const namePackageName = (
-      (_.isString(this.renameDestinationFolder) && this.renameDestinationFolder !== '') ?
-        this.renameDestinationFolder
-        : (this.project.isSmartContainer
-          ? `@${this.project.name}`
-          : this.project.name)
+    const isOrganizationPackageBuild = this.isOrganizationPackageBuild;
+    const children = this.project.children;
+
+    const rootPackageName = ((_.isString(this.renameDestinationFolder) && this.renameDestinationFolder !== '') ?
+      this.renameDestinationFolder
+      : (this.isOrganizationPackageBuild ? `@${this.project.name}` : this.project.name)
     );
 
-    // console.log('namePackageName', namePackageName)
+    const folderToLinkFromRootLocation = [
+      config.folder.src,
+    ];
 
-    const folderToLink = [
-      `tmp-src-${outDir}`,
-      this.project.sourceFolder,
-    ].map(c => {
-      if (this.project.isSmartContainer) {
-        return path.join('dist', this.project.name, this.target, c);
-      }
-      return c;
-    })
-
-    /**
-     * 3 typese of sition
-     * dist build
-     * dist build but link sourcea - when no buildOptions
-     * watch build with linked source
-     */
     const isSourceMapsDistBuild = (outDir === 'dist' && (_.isUndefined(this.buildOptions) || this.buildOptions?.watch));
-    const allFolderLinksExists = !isSourceMapsDistBuild
-      ? true
-      : _.isUndefined(folderToLink.find(sourceFolder => {
-        const projectOudDirDest = path.join(
-          destination.location,
-          config.folder.node_modules,
-          namePackageName,
-          sourceFolder
-        );
-        return !Helpers.exists(projectOudDirDest);
-      }));
+
+    this.initalFix({
+      isOrganizationPackageBuild,
+      destination,
+      rootPackageName,
+      children,
+    });
+
+    const allFolderLinksExists = !isSourceMapsDistBuild ? true : this.handleLinksToSourceInCopiedPackage({
+      mode: 'check-dest-packge-source-link-ok',
+      isOrganizationPackageBuild,
+      destination,
+      rootPackageName: rootPackageName,
+      folderToLinkFromRootLocation,
+      children,
+      outDir,
+    });
+
 
     if (specyficFileRelativePath && allFolderLinksExists) {
       //#region handle single file
-      const sourceFile = path.normalize(path.join(this.project.location,
-        outDir, specyficFileRelativePath));
+      // const sourceFile = path.normalize(path.join(this.project.location,
+      //   outDir, specyficFileRelativePath));
 
-      const destinationFile = path.normalize(path.join(destination.location,
-        config.folder.node_modules,
-        namePackageName,
-        specyficFileRelativePath));
+      // const destinationFile = path.normalize(path.join(destination.location,
+      //   config.folder.node_modules,
+      //   rootPackageName,
+      //   specyficFileRelativePath
+      // ));
 
-      // console.log({ destinationFile })
 
-      specyficFileRelativePath = specyficFileRelativePath.replace(/^\//, '');
+      // const relativePath = specyficFileRelativePath.replace(/^\//, '');
 
-      if (isSourceMapsDistBuild) {
-        //#region handle dist copyto with source maps
-        if (destinationFile.endsWith('.js.map')) {
-          const folderToLink = [
-            `tmp-src-${outDir}`,
-            this.project.sourceFolder,
-          ];
-          let content = (Helpers.readFile(sourceFile) || '');
-          folderToLink.forEach(sourceFolder => {
-            content = content.replace(`"../${sourceFolder}`, `"./${sourceFolder}`);
-            content = content.replace(`../${sourceFolder}`, sourceFolder);
-          });
-          Helpers.writeFile(destinationFile, content);
-        } else if (specyficFileRelativePath !== config.file.index_d_ts) { // don't override index.d.ts
-          Helpers.copyFile(sourceFile, destinationFile);
-        }
-        //#endregion
-      } else {
-        Helpers.copyFile(sourceFile, destinationFile);
-      }
+      // const notAllowedFiles = [
+      //   '.DS_Store',
+      //   config.file.index_d_ts,
+      // ]
 
-      //#region copy package json to browser folder
-      if (specyficFileRelativePath === config.file.package_json) {
-        // TODO this is VSCODE/typescirpt new fucking issue
-        // Helpers.copyFile(sourceFile, path.join(path.dirname(destinationFile), config.folder.browser, path.basename(destinationFile)));
-      }
-      //#endregion
+      // if (isSourceMapsDistBuild) {
+
+      //   const isBackendMapsFile = destinationFile.endsWith('.js.map');
+      //   const isBrowserMapsFile = destinationFile.endsWith('.mjs.map');
+
+      //   if (isBackendMapsFile || isBrowserMapsFile) {
+
+      //     let content = (Helpers.readFile(sourceFile) || '');
+
+      //     if (isBackendMapsFile) {
+      //       content = this.transformMapFile(content, outDir, isOrganizationPackageBuild, false);
+      //     }
+      //     if (isBrowserMapsFile) {
+      //       content = this.transformMapFile(content, outDir, isOrganizationPackageBuild, true);
+      //     }
+
+      //     Helpers.writeFile(destinationFile, content);
+      //   } else if (!notAllowedFiles.includes(relativePath)) { // don't override index.d.ts
+      //     Helpers.copyFile(sourceFile, destinationFile);
+      //   }
+
+      // } else {
+      //   Helpers.copyFile(sourceFile, destinationFile);
+      // }
+
+
+      // if (relativePath === config.file.package_json) {
+      //   // TODO this is VSCODE/typescirpt new fucking issue
+      //   // Helpers.copyFile(sourceFile, path.join(path.dirname(destinationFile), config.folder.browser, path.basename(destinationFile)));
+      // }
+
 
       //#endregion
     } else {
-      //#region handle whole folder at begin
-      const projectOudDirDest = path.join(destination.location,
-        config.folder.node_modules,
-        namePackageName
-      );
 
-      // console.log({ projectOudDirDest })
+      this.handleLinksToSourceInCopiedPackage({
+        mode: 'copy-compiled-source-and-declarations',
+        destination,
+        folderToLinkFromRootLocation,
+        isOrganizationPackageBuild,
+        rootPackageName,
+        children,
+        outDir,
+      });
 
-      if (!dontRemoveDestFolder) {
-        Helpers.tryRemoveDir(projectOudDirDest, true)
-      }
+      if (isSourceMapsDistBuild) {
 
-
-      // console.info('[copyto] NORMAL INTSTALL')
-      const monitoredOutDir: string = (this.project.isSmartContainer)
-        ? path.join(this.project.location, 'dist', this.project.name, this.target, outDir, 'libs')
-        : path.join(this.project.location, outDir);
-
-      Helpers.tryCopyFrom(monitoredOutDir, projectOudDirDest);
-
-      if (isSourceMapsDistBuild) { // @LAST
-
-        folderToLink.forEach(sourceFolder => {
-          const srcOrComponents = path.join(this.project.location, sourceFolder);
-          const projectOudDirDest = path.join(destination.location,
-            config.folder.node_modules,
-            namePackageName,
-            sourceFolder
-          );
-          Helpers.removeIfExists(projectOudDirDest);
-          Helpers.createSymLink(srcOrComponents, projectOudDirDest);
+        this.handleLinksToSourceInCopiedPackage({
+          mode: 'add-links',
+          destination,
+          folderToLinkFromRootLocation,
+          isOrganizationPackageBuild,
+          rootPackageName,
+          children,
+          outDir,
         });
 
-        Helpers.writeFile(path.join(destination.location,
-          config.folder.node_modules,
-          namePackageName,
-          config.file.index_d_ts,
-        ), `export * from './${this.project.sourceFolder}';\n`);
-
-        glob.sync(`${path.join(destination.location, config.folder.node_modules, namePackageName)}`
-          + `/${config.folder.browser}/**/*.js.map`)
-          .forEach(f => {
-            const sourceFolder = `tmp-src-${outDir}`;
-            let content = Helpers.readFile(f);
-            content = content.replace(`../${sourceFolder}`, sourceFolder);
-            Helpers.writeFile(f, content);
-          });
-
-        if (this.project.typeIsNot('angular-lib')) {
-          glob.sync(`${path.join(destination.location, config.folder.node_modules, namePackageName)}/**/*.js.map`,
-            { ignore: [`${config.folder.browser}/**/*.*`] })
-            .forEach(f => {
-              const sourceFolder = this.project.sourceFolder;
-              let content = Helpers.readFile(f);
-              content = content.replace(`"../${sourceFolder}`, `"./${sourceFolder}`);
-              content = content.replace(`../${sourceFolder}`, sourceFolder);
-              Helpers.writeFile(f, content);
-            });
-        }
+        this.handleLinksToSourceInCopiedPackage({
+          mode: 'copy-source-maps',
+          destination,
+          folderToLinkFromRootLocation,
+          isOrganizationPackageBuild,
+          rootPackageName,
+          children,
+          outDir,
+        });
 
       } else {
-        folderToLink.forEach(sourceFolder => {
-          const projectOudDirDest = path.join(destination.location,
-            config.folder.node_modules,
-            namePackageName,
-            sourceFolder
-          );
-          Helpers.removeIfExists(projectOudDirDest);
+        this.handleLinksToSourceInCopiedPackage({
+          mode: 'remove-links',
+          destination,
+          folderToLinkFromRootLocation,
+          isOrganizationPackageBuild,
+          rootPackageName,
+          children,
+          outDir,
         });
       }
       // TODO not working werid tsc issue with browser/index
       // {const projectOudBorwserSrc = path.join(destination.location,
       //   config.folder.node_modules,
-      //   namePackageName,
+      //   rootPackageName,
       //   config.file.package_json
       // );
       // const projectOudBorwserDest = path.join(destination.location,
       //   config.folder.node_modules,
-      //   namePackageName,
+      //   rootPackageName,
       //   config.folder.browser,
       //   config.file.package_json
       // );
@@ -492,4 +487,299 @@ export class CopyManager extends FeatureForProject {
   }
   //#endregion
 
+  //#region private methods
+
+  //#region private methods / initial fix
+  private initalFix(options: {
+    isOrganizationPackageBuild: boolean;
+    destination: Project,
+    rootPackageName: string,
+    children: Project[],
+  }) {
+    const {
+      isOrganizationPackageBuild,
+      destination,
+      rootPackageName,
+      children,
+    } = options;
+    const destPackageInNodeModules = path.join(destination.location, config.folder.node_modules, rootPackageName);
+    const destPackageInNodeModulesBrowser = path.join(destPackageInNodeModules, config.folder.browser);
+    if (Helpers.isSymlinkFileExitedOrUnexisted(destPackageInNodeModules)) {
+      Helpers.removeFileIfExists(destPackageInNodeModules);
+    }
+    if (!Helpers.exists(destPackageInNodeModules)) {
+      Helpers.mkdirp(destPackageInNodeModules);
+    }
+    if (Helpers.isSymlinkFileExitedOrUnexisted(destPackageInNodeModulesBrowser)) {
+      Helpers.removeFileIfExists(destPackageInNodeModulesBrowser);
+    }
+    if (!Helpers.exists(destPackageInNodeModulesBrowser)) {
+      Helpers.mkdirp(destPackageInNodeModulesBrowser);
+    }
+    if (isOrganizationPackageBuild) {
+      for (let index = 0; index < children.length; index++) {
+        const c = children[index];
+        const childDestPackageInNodeModules = path.join(destPackageInNodeModules, childPureName(c))
+        const childDestPackageInNodeModulesBrowser = path.join(destPackageInNodeModules, childPureName(c), config.folder.browser);
+        if (Helpers.isSymlinkFileExitedOrUnexisted(childDestPackageInNodeModules)) {
+          Helpers.removeFileIfExists(childDestPackageInNodeModules);
+        }
+        if (!Helpers.exists(childDestPackageInNodeModules)) {
+          Helpers.mkdirp(childDestPackageInNodeModules);
+        }
+        if (Helpers.isSymlinkFileExitedOrUnexisted(childDestPackageInNodeModulesBrowser)) {
+          Helpers.removeFileIfExists(childDestPackageInNodeModulesBrowser);
+        }
+        if (!Helpers.exists(childDestPackageInNodeModulesBrowser)) {
+          Helpers.mkdirp(childDestPackageInNodeModulesBrowser);
+        }
+      }
+    }
+  }
+  //#endregion
+
+  //#region private methods / transfor map file
+  private transformMapFile(options: {
+    content: string;
+    outDir: 'dist' | 'bundle' | 'docs';
+    isOrganizationPackageBuild: boolean;
+    isBrowser: boolean;
+    children: Project[];
+  }) {
+    const {
+      isOrganizationPackageBuild,
+      isBrowser,
+      outDir,
+      children,
+    } = options;
+    let { content } = options;
+    if (isOrganizationPackageBuild) {
+      let toReplaceString2 = isBrowser
+        ? `../tmp-libs-for-${outDir}/${this.project.name}/projects/${this.project.name}/${config.folder.src}`
+        : `../../../tmp-source-${outDir}`;
+
+      let toReplaceString1 = `"${toReplaceString2}`;
+      const addon = `/libs/(${children.map(c => Helpers.escapeStringForRegEx(childPureName(c))).join('|')})`;
+      const regex1 = new RegExp(Helpers.escapeStringForRegEx(toReplaceString1) + addon, 'g');
+      const regex2 = new RegExp(Helpers.escapeStringForRegEx(toReplaceString2) + addon, 'g');
+
+      if (isBrowser) { // TODO replace browser doesnt make sense ?? - for now yes
+        // content = content.replace(regex1, `"./${config.folder.src}`);
+        // content = content.replace(regex2, config.folder.src);
+      } else {
+        content = content.replace(regex1, `"./${config.folder.src}`);
+        content = content.replace(regex2, config.folder.src);
+      }
+
+    } else {
+      let toReplaceString2 = isBrowser
+        ? `../tmp-libs-for-${outDir}/${this.project.name}/projects/${this.project.name}/${config.folder.src}`
+        : `../tmp-source-${outDir}`;
+
+      let toReplaceString1 = `"${toReplaceString2}`;
+      const regex1 = new RegExp(Helpers.escapeStringForRegEx(toReplaceString1), 'g');
+      const regex2 = new RegExp(Helpers.escapeStringForRegEx(toReplaceString2), 'g');
+
+      if (isBrowser) { // TODO replace browser doesnt make sense ?? - for now yes
+        // content = content.replace(regex1, `"./${config.folder.src}`);
+        // content = content.replace(regex2, config.folder.src);
+      } else {
+        content = content.replace(regex1, `"./${config.folder.src}`);
+        content = content.replace(regex2, config.folder.src);
+      }
+    }
+
+    return content;
+  }
+  //#endregion
+
+  //#region private methods / remove links to source in copied packages
+  private handleLinksToSourceInCopiedPackage(options: {
+    isOrganizationPackageBuild: boolean;
+    destination: Project;
+    folderToLinkFromRootLocation: string[];
+    rootPackageName: string;
+    children: Project[],
+    mode: 'remove-links'
+    | 'add-links'
+    | 'check-dest-packge-source-link-ok'
+    | 'copy-source-maps'
+    | 'copy-compiled-source-and-declarations',
+    outDir: 'dist' | 'bundle' | 'docs'
+  }) {
+    const {
+      isOrganizationPackageBuild,
+      destination,
+      folderToLinkFromRootLocation,
+      rootPackageName,
+      mode,
+      children,
+      outDir
+    } = options;
+
+    //#region action
+    const action = (options: {
+      sourceFolder: string;
+      sourceToLink: string;
+      destPackageLinkSourceLocation: string;
+    }, parent?: Project) => {
+      const {
+        sourceFolder,
+        sourceToLink,
+        destPackageLinkSourceLocation,
+      } = options;
+      const destPackageLocation = path.dirname(destPackageLinkSourceLocation);
+
+      if (mode === 'remove-links') {
+        //#region remove links to sources in destination packages
+        Helpers.removeIfExists(destPackageLinkSourceLocation);
+        //#endregion
+      }
+      if (mode === 'add-links') {
+        //#region add links to source in destination packges
+        Helpers.removeIfExists(destPackageLinkSourceLocation);
+        Helpers.createSymLink(sourceToLink, destPackageLinkSourceLocation);
+        //#endregion
+      }
+      if (mode == 'check-dest-packge-source-link-ok') {
+        //#region check if destination pacakage has proper links to sources
+        return Helpers.exists(destPackageLinkSourceLocation)
+        //#endregion
+      }
+      if (mode === 'copy-source-maps') {
+        //#region copy source maps
+
+        glob.sync(`${destPackageLocation}/${config.folder.browser}/**/*.mjs.map`)
+          .forEach(f => {
+            let content = Helpers.readFile(f);
+            content = this.transformMapFile({
+              content, outDir, isOrganizationPackageBuild, isBrowser: true, children
+            });
+            Helpers.writeFile(f, content);
+          });
+
+        glob.sync(`${destPackageLocation}/**/*.js.map`,
+          { ignore: [`${config.folder.browser}/**/*.*`] })
+          .forEach(f => {
+            let content = Helpers.readFile(f);
+            content = this.transformMapFile({
+              content, outDir, isOrganizationPackageBuild, isBrowser: false, children
+            });
+            Helpers.writeFile(f, content);
+          });
+        //#endregion
+      }
+      if (mode === 'copy-compiled-source-and-declarations') {
+
+        Helpers.writeFile(path.join(
+          destPackageLocation,
+          config.file.index_d_ts,
+        ), `export * from './${this.project.sourceFolder}';\n`);
+
+        const monitorDir = this.monitoredOutDir(outDir);
+        const worksapcePackageName = path.basename(destPackageLocation);
+
+        if (isOrganizationPackageBuild) {
+          Helpers.copy(path.join(monitorDir, worksapcePackageName), destPackageLocation, {
+            recursive: true,
+            overwrite: true,
+            omitFolders: [config.folder.browser, config.folder.node_modules]
+          });
+          const sourceBrowser = path.join(path.dirname(monitorDir), config.folder.browser);
+          const browserDest = path.join(destPackageLocation, config.folder.browser);
+
+          Helpers.copy(sourceBrowser, browserDest, {
+            recursive: true,
+            overwrite: true,
+          });
+
+          const browserDestPackageJson = path.join(
+            destPackageLocation,
+            config.folder.browser,
+            config.file.package_json,
+          );
+          const packageJsonBrowserDest = Helpers.readJson(browserDestPackageJson, {});
+          packageJsonBrowserDest.name = worksapcePackageName;
+          Helpers.writeJson(browserDestPackageJson, packageJsonBrowserDest);
+
+          const browserDestPublicApiDest = path.join(
+            destPackageLocation,
+            config.folder.browser,
+            'public-api.d.ts',
+          );
+          Helpers.writeFile(browserDestPublicApiDest,
+            (worksapcePackageName === this.target) ? `
+export * from './lib';\n
+`.trimLeft(): `
+export * from './libs/${worksapcePackageName}';\n
+`.trimLeft()
+            );
+
+            // TODO @LAST extract child specyfic things from browser build
+
+        } else {
+          Helpers.tryCopyFrom(monitorDir, destPackageLocation);
+        }
+
+      }
+    };
+    //#endregion
+
+    if (isOrganizationPackageBuild && (mode === 'copy-compiled-source-and-declarations')) {
+      Helpers.writeFile(path.join(destination.location,
+        config.folder.node_modules,
+        rootPackageName,
+        config.file.index_d_ts,
+      ),
+        `// Plase use: import { < anything > } from '@${this.project.name}/<${children.map(c => c.name).join('|')}>';\n`
+      );
+    }
+
+    for (let index = 0; index < folderToLinkFromRootLocation.length; index++) {
+      const sourceFolder = folderToLinkFromRootLocation[index];
+      if (isOrganizationPackageBuild) {
+        children.forEach(c => {
+          const childName = childPureName(c);
+          const sourceToLink = path.join(c.location, sourceFolder);
+          const destPackageLinkSourceLocation = path.join(destination.location,
+            config.folder.node_modules,
+            rootPackageName,
+            childName,
+            sourceFolder
+          );
+
+          const res = action({
+            sourceFolder, sourceToLink, destPackageLinkSourceLocation
+          }, this.project);
+          if ((mode === 'check-dest-packge-source-link-ok') && !res) {
+            return false;
+          }
+
+        })
+      } else {
+        const sourceToLink = path.join(this.project.location, sourceFolder);
+        const destPackageLinkSourceLocation = path.join(destination.location,
+          config.folder.node_modules,
+          rootPackageName,
+          sourceFolder
+        );
+        const res = action({
+          sourceFolder, sourceToLink, destPackageLinkSourceLocation
+        });
+        if ((mode === 'check-dest-packge-source-link-ok') && !res) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  //#endregion
+
+  //#endregion
+
+}
+
+
+function childPureName(child: Project) {
+  return child.name.startsWith('@') ? child.name.split('/')[1] : child.name; // pure name
 }

@@ -31,31 +31,48 @@ export class PackagesRecognitionExtended extends PackagesRecognition {
     in ${this.cwd}
     `);
     Helpers.mesureExectionInMsSync(`Searching isomorphic packages...`, () => {
-      super.start(true, reasonToSearch); // TODO QUICK_FIX
+      let local = [];
+      if (this.project.isSmartContainer || this.project.isSmartContainerTarget) {
+        const parent = this.project.isSmartContainer ? this.project
+          : Project.From(this.project.smartContainerTargetParentContainerPath);
+
+        local = [
+          ...parent.children.map(c => {
+            return `@${parent.name}/${c.name}`
+          })
+        ]
+      }
+      super.start(true, reasonToSearch, local); // TODO QUICK_FIX
+
     });
     Helpers.info(`[${config.frameworkName}] [package-recognition] Founded ${this.count} isomorphic packages`);
   }
 
-  checkIsomorphic(node_modules: string, packageName: string) {
-    const pjPath = crossPlatformPath(fse.realpathSync(path.join(node_modules, packageName)));
-    let res = false;
-    try {
-      Helpers.log(`[${config.frameworkName}][checkIsomorphic] check project from ${pjPath}`, 1)
-      const proj = Project.From<Project>(pjPath);
-      if (proj) {
-        Helpers.log(`[${config.frameworkName}] Proj "${proj.genericName}" type ${proj._type}, standalone ${proj.isStandaloneProject}`,1)
-        if (proj.typeIs(...(config.projectTypes.forNpmLibs as ConfigModels.LibType[]))) {
-          res = proj.isStandaloneProject;
-        } else {
-          res = super.checkIsomorphic(node_modules, packageName);
-        }
-      }
-    } catch (error) {
-      Helpers.log(`[${config.frameworkName}][pacakge-recognition] Not able to check ${pjPath}`)
-    }
-    // console.log(`checkIsomorphic: "${packageName}"`, res)
-    return res;
-  }
+  // checkIsomorphic(node_modules: string, packageName: string) {
+  //   const packageInNodeModulesPath = crossPlatformPath(fse.realpathSync(path.join(node_modules, packageName)));
+  //   let res = false;
+  //   try {
+  //     Helpers.log(`[${config.frameworkName}][checkIsomorphic] check project from ${packageInNodeModulesPath}`, 1);
+  //     // if(Helpers.isSymlinkFileExitedOrUnexisted(packageInNodeModulesPath)) {
+
+  //     // } else {
+
+  //     // }
+  //     const proj = Project.From<Project>(packageInNodeModulesPath);
+  //     if (proj) {
+  //       Helpers.log(`[${config.frameworkName}] Proj "${proj.genericName}" type ${proj._type}, standalone ${proj.isStandaloneProject}`, 1)
+  //       if (proj.typeIs('isomorphic-lib')) {
+  //         res = proj.isStandaloneProject;
+  //       } else {
+  //         res = super.checkIsomorphic(node_modules, packageName);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     Helpers.log(`[${config.frameworkName}][pacakge-recognition] Not able to check ${packageInNodeModulesPath}`)
+  //   }
+  //   // console.log(`checkIsomorphic: "${packageName}"`, res)
+  //   return res;
+  // }
 
 }
 

@@ -6,6 +6,7 @@ import * as inquirer from 'inquirer';
 import { config, ConfigModels } from 'tnp-config';
 import { RegionRemover } from 'isomorphic-region-loader';
 import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/compilations/incremental-build-process-extended.backend';
+import { PackagesRecognitionExtended } from '../features/packages-recognition-extended';
 //#endregion
 import { Project } from '../abstract/project/project';
 import { _ } from 'tnp-core';
@@ -14,6 +15,7 @@ import { Models } from 'tnp-models';
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
 import { CLI } from 'tnp-cli';
+
 
 const loadNvm = 'echo ' // 'export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" && [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh" && nvm use v14';
 
@@ -553,6 +555,21 @@ export class ProjectIsomorphicLib
 
       if (this.frameworkVersionAtLeast('v3')) { // TOOD
         showInfoAngular()
+
+        if (isStandalone
+          || (this.isSmartContainerTarget && this.buildOptions.copyto?.length > 0)
+        ) {
+          if (this.isSmartContainerTarget) { // TODO QUICK_FIX this should be in init/struct
+            PackagesRecognitionExtended.fromProject(this).start(true, 'before startling lib proxy project');
+          }
+          await proxyProject.execute(angularCommand, {
+            resolvePromiseMsg: {
+              stdout: 'Compilation complete. Watching for file changes'
+            },
+            ...sharedOptions(),
+          });
+        }
+
         if (this.isSmartContainerTarget) {
           const target = (crossPlatformPath(_.first(args.split(' '))) || '').replace('/', '');
           Helpers.info(`
@@ -571,18 +588,23 @@ export class ProjectIsomorphicLib
           to run angular ng serve.
 
           `);
+          // if (this.buildOptions.copyto.length > 0) { // is 0 -> it is handled by app
+
+          //   await proxyProject.execute(angularCommand, {
+          //     resolvePromiseMsg: {
+          //       stdout: 'Compilation complete. Watching for file changes'
+          //     },
+          //     ...sharedOptions(),
+          //   });
+
+          // }
+
           // if (process.platform !== 'win32') { // TODOD QUICK_FIX
           //   const parent = Project.From(this.smartContainerTargetParentContainerPath) as Project;
           //   parent.run(`${config.frameworkName} baw ${this.name}`).async();
           // }
-        } else {
-          await proxyProject.execute(angularCommand, {
-            resolvePromiseMsg: {
-              stdout: 'Compilation complete. Watching for file changes'
-            },
-            ...sharedOptions(),
-          });
         }
+
       }
       // console.log('HEHEHHE')
       //#endregion

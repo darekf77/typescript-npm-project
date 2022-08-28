@@ -26,7 +26,7 @@ export class PackagesRecognition {
     return _.isArray(this.recognizedPackages) ? this.recognizedPackages.length : 0;
   }
 
-  start(force?: boolean, reasonToSearch?: string) {
+  start(force?: boolean, reasonToSearch?: string, local: string[] = []) {
     Helpers.log(`[${config.frameworkName}][force = ${force}] ${reasonToSearch}`);
     const pjPath = crossPlatformPath(path.join(this.cwd, config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES));
     if (!Helpers.exists(pjPath)) {
@@ -50,12 +50,33 @@ export class PackagesRecognition {
     const linksToFolders = Helpers.linksToFolderFrom(node_modules);
 
     let folders = [
-      ...Helpers.foldersFrom(node_modules),
+      ...Helpers.foldersFrom(node_modules).reduce((a, b) => {
+        if (path.basename(b).startsWith('@')) {
+          const foldersFromB = Helpers.foldersFrom(b)
+            .filter(f => ![config.folder.browser].includes(path.basename(f)))
+            .map(f => {
+              return `${path.basename(b)}/${path.basename(f)}`;
+            });
+          return [
+            ...a,
+            ...foldersFromB,
+          ]
+        }
+        return [
+          ...a,
+          b
+        ]
+      }, []),
       ...linksToFolders,
-    ];
+    ] as string[];
 
     folders = folders
-      .map(f => path.basename(f))
+      .map(f => {
+        if (f.startsWith('@')) {
+          return f;
+        }
+        return path.basename(f);
+      })
       .filter(packageName => {
         Helpers.log(`[${config.frameworkName}] Checking package node_modules/${packageName}`, 2)
         try {
@@ -64,7 +85,10 @@ export class PackagesRecognition {
           return false;
         }
       });
-    this.recognizedPackages = folders;
+    this.recognizedPackages = [
+      ...folders,
+      ...local,
+    ];
     this.updateCurrentPackageJson()
   }
 
@@ -86,8 +110,9 @@ export class PackagesRecognition {
   }
 
   protected checkIsomorphic(node_modules: string, packageName: string) {
-    const browser = crossPlatformPath(path.join(crossPlatformPath(node_modules), packageName, config.folder.browser));
-    return Helpers.exists(browser)
+    const packageInNodeModulesPath = crossPlatformPath(fse.realpathSync(path.join(node_modules, packageName)));
+    const browser = crossPlatformPath(path.join(packageInNodeModulesPath, config.folder.browser));
+    return Helpers.exists(browser);
   }
 
 }

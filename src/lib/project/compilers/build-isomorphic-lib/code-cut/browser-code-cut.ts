@@ -14,6 +14,9 @@ const filesToDebug = [
   // 'app.ts'
 ]
 
+const regexAsyncImport = /\ import\((\`|\'|\")([a-zA-Z|\-|\@|\/|\.]+)(\`|\'|\")\)/;
+const regexAsyncImportG = /\ import\((\`|\'|\")([a-zA-Z|\-|\@|\/|\.]+)(\`|\'|\")\)/g;
+
 export class CodeCut {
 
   browserCodeCut: { new(any?): BrowserCodeCut }
@@ -186,9 +189,18 @@ export class BrowserCodeCut {
         }
         return res;
       },
-
-      TSimportExport(rawImport, usage: ConfigModels.TsUsage) {
+      TSimportExport(rawImport: string, usage: ConfigModels.TsUsage) {
         // const orgImport = rawImport;
+        if (usage === 'import') {
+          const matches = rawImport.match(regexAsyncImport);
+          if (Array.isArray(matches) && matches.length > 0) {
+            const first = _.first(matches);
+            rawImport = first;
+            rawImport = rawImport.replace(/\ import\((\`|\'|\")/, '');
+            rawImport = rawImport.replace(/(\`|\'|\")\)/, '');
+          }
+        }
+
         rawImport = rawImport.replace(new RegExp(`${usage}.+from\\s+`), '')
         rawImport = rawImport.replace(new RegExp(`(\'|\")`, 'g'), '').trim()
         if (rawImport.startsWith(`./`)) return void 0;
@@ -207,6 +219,7 @@ export class BrowserCodeCut {
         if (res.endsWith('/') && res.length > 1) {
           res = res.substring(0, res.length - 1)
         }
+
         return res;
       }
     };
@@ -279,12 +292,22 @@ export class BrowserCodeCut {
     // if (debug) {
     //   debugger
     // }
-    if (!this.absoluteFilePath.endsWith('.ts')) {
+    if (!this.absoluteFilePath.endsWith('.ts')
+      // && !this.absoluteFilePath.endsWith('.tsx')
+    ) {
       return this;
     }
     if (!_.isString(this.rawContent)) return;
-    const importRegex = new RegExp(`${usage}.+from\\s+(\\'|\\").+(\\'|\\")`, 'g')
-    let imports = this.rawContent.match(importRegex)
+    const importRegex = new RegExp(`${usage}.+from\\s+(\\'|\\").+(\\'|\\")`, 'g');
+
+    const asynMatches = (usage === 'import') ? this.rawContent.match(regexAsyncImportG) : [];
+    const normalMatches = this.rawContent.match(importRegex);
+
+    const asyncImports = (Array.isArray(asynMatches) ? asynMatches : []);
+    let imports = [
+      ...(Array.isArray(normalMatches) ? normalMatches : []),
+      ...asyncImports,
+    ]
     // debug && console.log(imports)
     if (_.isArray(imports)) {
       imports.forEach(imp => {
@@ -300,7 +323,9 @@ export class BrowserCodeCut {
   }
 
   REPLACERegionsFromJSrequire() {
-    if (!this.absoluteFilePath.endsWith('.ts')) {
+    if (!this.absoluteFilePath.endsWith('.ts')
+      // && !this.absoluteFilePath.endsWith('.tsx')
+    ) {
       return this;
     }
     if (!_.isString(this.rawContent)) return;

@@ -333,8 +333,8 @@ ${appModuleFile}
                 .replace('src/', `src/app/${project.name}/`)
                 ;
               return _.merge(a, {
-                [`@${parent.name}/${path.basename(b)}`]: [`./${pathRelative}`],
-                [`@${parent.name}/${path.basename(b)}/*`]: [`./${pathRelative}/*`],
+                [`@${parent.name}/${path.basename(b)}/browser`]: [`./${pathRelative}`],
+                [`@${parent.name}/${path.basename(b)}/browser/*`]: [`./${pathRelative}/*`],
               })
             }, {}));
             Helpers.writeJson(tsconfigJSONpath, content);

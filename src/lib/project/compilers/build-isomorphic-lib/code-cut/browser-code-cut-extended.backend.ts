@@ -344,10 +344,11 @@ export class BrowserCodeCutExtended extends BrowserCodeCut {
       parent = Project.From(this.project.smartContainerTargetParentContainerPath);
     }
 
-    // const additionalSmartPckages = (!parent ? [] : parent.children.map(c => `@${parent.name}/${c.name}`));
+    const additionalSmartPckages = (!parent ? [] : parent.children.map(c => `@${parent.name}/${c.name}`));
 
     const packages = packagesNames.concat([
       ...(parent ? [] : [this.project.name]),
+      ...additionalSmartPckages,
     ]);
 
 

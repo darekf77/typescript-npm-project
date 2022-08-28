@@ -25,6 +25,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
     }
     const tmpProjectsStandalone = `tmp-libs-for-{{{outFolder}}}/${project.name}`;
     const tmpProjects = `tmp-libs-for-{{{outFolder}}}/${project.name}--for--{{{client}}}`;
+    const tmpSource = `tmp-src-{{{outFolder}}}`;
     const result = InsideStruct.from({
 
       relateivePathesFromContainer: [
@@ -141,6 +142,104 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
           );
           Helpers.remove(dest);
           Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
+
+          const sourcePublicApi = path.join(
+            projectLocation,
+            this.project.isStandaloneProject
+              ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
+            `projects/${projectName}/src/public-api.ts`,
+          );
+
+          let publicApiFile = Helpers.readFile(sourcePublicApi);
+
+
+          const sourceTsconfig = path.join(
+            projectLocation,
+            this.project.isStandaloneProject
+            ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
+            `tsconfig.json`,
+          );
+
+          let tsconfigJson = Helpers.readJson(sourceTsconfig, void 0, true);
+
+          if (tsconfigJson) {
+            tsconfigJson.compilerOptions ? tsconfigJson.compilerOptions : {};
+          }
+
+          if (this.project.isSmartContainerTarget) {
+            const parent = Project.From(this.project.smartContainerTargetParentContainerPath) as Project;
+            const otherChildren = parent.children.filter(c => c.name !== this.project.name);
+            const base = this.project.name;
+            if (tsconfigJson) {
+              tsconfigJson.compilerOptions.paths = otherChildren.reduce((a, b) => {
+                return _.merge(a, {
+                  [`@${parent.name}/${b.name}/browser`]: [
+                    `./projects/${base}/src/libs/${b.name}`
+                  ],
+                  [`@${parent.name}/${b.name}/browser/*`]: [
+                    `./projects/${base}/src/libs/${b.name}/*`
+                  ],
+                })
+              }, {});
+
+              tsconfigJson.compilerOptions.paths[`@${parent.name}/${this.project.name}/browser`] = [
+                `./projects/${base}/src/lib`
+              ];
+              tsconfigJson.compilerOptions.paths[`@${parent.name}/${this.project.name}/browser/*`] = [
+                `./projects/${base}/src/lib/*`
+              ];
+
+
+            }
+
+            if (otherChildren.length > 0) {
+              publicApiFile = `
+export * from './lib';
+${otherChildren.map(c => {
+                return `export * from './libs/${c.name}';`
+              }).join('\n')}
+`.trimLeft();
+            } else {
+              publicApiFile = `
+export * from './lib';
+`.trimLeft();
+            }
+
+            for (let index = 0; index < otherChildren.length; index++) {
+              const child = otherChildren[index];
+              const sourceChild = path.join(
+                projectLocation,
+                `tmp-src-${outFolder}`,
+                'libs',
+                child.name,
+              );
+
+              const destChild = path.join(
+                projectLocation,
+                this.project.isStandaloneProject
+                  ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
+                `projects/${projectName}/src/libs/${child.name}`
+              );
+
+              Helpers.remove(destChild);
+              Helpers.createSymLink(sourceChild, destChild, { continueWhenExistedFolderDoesntExists: true });
+            }
+          } else {
+            if (tsconfigJson) {
+              tsconfigJson.compilerOptions.paths = void 0;
+
+            }
+            publicApiFile = `
+export * from './lib';
+`.trimLeft();
+          }
+
+          if (tsconfigJson) {
+            Helpers.writeJson(sourceTsconfig, tsconfigJson);
+          }
+
+          Helpers.writeFile(sourcePublicApi, publicApiFile);
+
         })();
 
 
