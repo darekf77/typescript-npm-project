@@ -170,7 +170,7 @@ export class CopyManager extends FeatureForProject {
           // console.log(f)
         }
         this.start('created', f as any);
-      }).on('unlink', f => {
+      }).on('unlink', f => { // TODO @LAST better handle UNLIN
         if (_.isString(f)) {
           f = f.replace(monitorDir, '') as any
           // console.log(f)
@@ -373,54 +373,64 @@ export class CopyManager extends FeatureForProject {
 
     if (specyficFileRelativePath && allFolderLinksExists) {
       //#region handle single file
-      // const sourceFile = path.normalize(path.join(this.project.location,
-      //   outDir, specyficFileRelativePath));
+      if (isOrganizationPackageBuild) {
+        // @LAST TODO
+      } else {
 
-      // const destinationFile = path.normalize(path.join(destination.location,
-      //   config.folder.node_modules,
-      //   rootPackageName,
-      //   specyficFileRelativePath
-      // ));
+        const sourceFile = path.normalize(path.join(this.project.location,
+          outDir, specyficFileRelativePath));
 
-
-      // const relativePath = specyficFileRelativePath.replace(/^\//, '');
-
-      // const notAllowedFiles = [
-      //   '.DS_Store',
-      //   config.file.index_d_ts,
-      // ]
-
-      // if (isSourceMapsDistBuild) {
-
-      //   const isBackendMapsFile = destinationFile.endsWith('.js.map');
-      //   const isBrowserMapsFile = destinationFile.endsWith('.mjs.map');
-
-      //   if (isBackendMapsFile || isBrowserMapsFile) {
-
-      //     let content = (Helpers.readFile(sourceFile) || '');
-
-      //     if (isBackendMapsFile) {
-      //       content = this.transformMapFile(content, outDir, isOrganizationPackageBuild, false);
-      //     }
-      //     if (isBrowserMapsFile) {
-      //       content = this.transformMapFile(content, outDir, isOrganizationPackageBuild, true);
-      //     }
-
-      //     Helpers.writeFile(destinationFile, content);
-      //   } else if (!notAllowedFiles.includes(relativePath)) { // don't override index.d.ts
-      //     Helpers.copyFile(sourceFile, destinationFile);
-      //   }
-
-      // } else {
-      //   Helpers.copyFile(sourceFile, destinationFile);
-      // }
+        const destinationFile = path.normalize(path.join(destination.location,
+          config.folder.node_modules,
+          rootPackageName,
+          specyficFileRelativePath
+        ));
 
 
-      // if (relativePath === config.file.package_json) {
-      //   // TODO this is VSCODE/typescirpt new fucking issue
-      //   // Helpers.copyFile(sourceFile, path.join(path.dirname(destinationFile), config.folder.browser, path.basename(destinationFile)));
-      // }
+        const relativePath = specyficFileRelativePath.replace(/^\//, '');
 
+        const notAllowedFiles = [
+          '.DS_Store',
+          config.file.index_d_ts,
+        ]
+
+        if (isSourceMapsDistBuild) {
+
+          const isBackendMapsFile = destinationFile.endsWith('.js.map');
+          const isBrowserMapsFile = destinationFile.endsWith('.mjs.map');
+
+          if (isBackendMapsFile || isBrowserMapsFile) {
+
+            let content = (Helpers.readFile(sourceFile) || '');
+
+            if (isBackendMapsFile) {
+              content = this.transformMapFile({
+                children, content, outDir, isOrganizationPackageBuild, isBrowser: false
+              });
+            }
+            if (isBrowserMapsFile) {
+              content = this.transformMapFile({
+                children, content, outDir, isOrganizationPackageBuild, isBrowser: true
+              });
+            }
+
+            Helpers.writeFile(destinationFile, content);
+          } else if (!notAllowedFiles.includes(relativePath)) { // don't override index.d.ts
+            Helpers.copyFile(sourceFile, destinationFile);
+          }
+
+        } else {
+          Helpers.copyFile(sourceFile, destinationFile);
+        }
+
+
+        if (relativePath === config.file.package_json) {
+          // TODO this is VSCODE/typescirpt new fucking issue
+          // Helpers.copyFile(sourceFile, path.join(path.dirname(destinationFile), config.folder.browser, path.basename(destinationFile)));
+        }
+
+
+      }
 
       //#endregion
     } else {
@@ -710,12 +720,12 @@ export class CopyManager extends FeatureForProject {
           Helpers.writeFile(browserDestPublicApiDest,
             (worksapcePackageName === this.target) ? `
 export * from './lib';\n
-`.trimLeft(): `
+`.trimLeft() : `
 export * from './libs/${worksapcePackageName}';\n
 `.trimLeft()
-            );
+          );
 
-            // TODO @LAST extract child specyfic things from browser build
+          // TODO @LAST extract child specyfic things from browser build
 
         } else {
           Helpers.tryCopyFrom(monitorDir, destPackageLocation);
