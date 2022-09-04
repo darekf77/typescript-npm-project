@@ -372,66 +372,65 @@ export class CopyManager extends FeatureForProject {
 
 
     if (specyficFileRelativePath && allFolderLinksExists) {
+
       //#region handle single file
-      if (isOrganizationPackageBuild) {
-        // @LAST TODO
-      } else {
+      const notAllowedFiles = [
+        '.DS_Store',
+        config.file.index_d_ts,
+      ]
 
-        const sourceFile = path.normalize(path.join(this.project.location,
-          outDir, specyficFileRelativePath));
+      let destinationFile = path.normalize(path.join(destination.location,
+        config.folder.node_modules,
+        rootPackageName,
+        specyficFileRelativePath
+      ));
 
-        const destinationFile = path.normalize(path.join(destination.location,
-          config.folder.node_modules,
-          rootPackageName,
+      const relativePath = specyficFileRelativePath.replace(/^\//, '');
+      const isBackendMapsFile = destinationFile.endsWith('.js.map');
+      const isBrowserMapsFile = destinationFile.endsWith('.mjs.map');
+
+      const sourceFile = isOrganizationPackageBuild
+        ? path.normalize(path.join(// ORGANIZATION
+          this.monitoredOutDir(outDir),
+          specyficFileRelativePath
+        )
+        ) : path.normalize(path.join(
+          this.project.location,
+          outDir,
           specyficFileRelativePath
         ));
 
+      if (isSourceMapsDistBuild) {
 
-        const relativePath = specyficFileRelativePath.replace(/^\//, '');
+        if (isBackendMapsFile || isBrowserMapsFile) {
 
-        const notAllowedFiles = [
-          '.DS_Store',
-          config.file.index_d_ts,
-        ]
+          let content = (Helpers.readFile(sourceFile) || '');
 
-        if (isSourceMapsDistBuild) {
-
-          const isBackendMapsFile = destinationFile.endsWith('.js.map');
-          const isBrowserMapsFile = destinationFile.endsWith('.mjs.map');
-
-          if (isBackendMapsFile || isBrowserMapsFile) {
-
-            let content = (Helpers.readFile(sourceFile) || '');
-
-            if (isBackendMapsFile) {
-              content = this.transformMapFile({
-                children, content, outDir, isOrganizationPackageBuild, isBrowser: false
-              });
-            }
-            if (isBrowserMapsFile) {
-              content = this.transformMapFile({
-                children, content, outDir, isOrganizationPackageBuild, isBrowser: true
-              });
-            }
-
-            Helpers.writeFile(destinationFile, content);
-          } else if (!notAllowedFiles.includes(relativePath)) { // don't override index.d.ts
-            Helpers.copyFile(sourceFile, destinationFile);
+          if (isBackendMapsFile) {
+            content = this.transformMapFile({
+              children, content, outDir, isOrganizationPackageBuild, isBrowser: false
+            });
+          }
+          if (isBrowserMapsFile) {
+            content = this.transformMapFile({
+              children, content, outDir, isOrganizationPackageBuild, isBrowser: true
+            });
           }
 
-        } else {
+          Helpers.writeFile(destinationFile, content);
+        } else if (!notAllowedFiles.includes(relativePath)) { // don't override index.d.ts
           Helpers.copyFile(sourceFile, destinationFile);
         }
 
-
-        if (relativePath === config.file.package_json) {
-          // TODO this is VSCODE/typescirpt new fucking issue
-          // Helpers.copyFile(sourceFile, path.join(path.dirname(destinationFile), config.folder.browser, path.basename(destinationFile)));
-        }
-
-
+      } else {
+        Helpers.copyFile(sourceFile, destinationFile);
       }
 
+
+      if (relativePath === config.file.package_json) {
+        // TODO this is VSCODE/typescirpt new fucking issue
+        // Helpers.copyFile(sourceFile, path.join(path.dirname(destinationFile), config.folder.browser, path.basename(destinationFile)));
+      }
       //#endregion
     } else {
 
@@ -514,18 +513,23 @@ export class CopyManager extends FeatureForProject {
     } = options;
     const destPackageInNodeModules = path.join(destination.location, config.folder.node_modules, rootPackageName);
     const destPackageInNodeModulesBrowser = path.join(destPackageInNodeModules, config.folder.browser);
-    if (Helpers.isSymlinkFileExitedOrUnexisted(destPackageInNodeModules)) {
-      Helpers.removeFileIfExists(destPackageInNodeModules);
+    if (isOrganizationPackageBuild) {
+      Helpers.remove(destPackageInNodeModulesBrowser);
+    } else {
+      if (Helpers.isSymlinkFileExitedOrUnexisted(destPackageInNodeModules)) {
+        Helpers.removeFileIfExists(destPackageInNodeModules);
+      }
+      if (!Helpers.exists(destPackageInNodeModules)) {
+        Helpers.mkdirp(destPackageInNodeModules);
+      }
+      if (Helpers.isSymlinkFileExitedOrUnexisted(destPackageInNodeModulesBrowser)) {
+        Helpers.removeFileIfExists(destPackageInNodeModulesBrowser);
+      }
+      if (!Helpers.exists(destPackageInNodeModulesBrowser)) {
+        Helpers.mkdirp(destPackageInNodeModulesBrowser);
+      }
     }
-    if (!Helpers.exists(destPackageInNodeModules)) {
-      Helpers.mkdirp(destPackageInNodeModules);
-    }
-    if (Helpers.isSymlinkFileExitedOrUnexisted(destPackageInNodeModulesBrowser)) {
-      Helpers.removeFileIfExists(destPackageInNodeModulesBrowser);
-    }
-    if (!Helpers.exists(destPackageInNodeModulesBrowser)) {
-      Helpers.mkdirp(destPackageInNodeModulesBrowser);
-    }
+
     if (isOrganizationPackageBuild) {
       for (let index = 0; index < children.length; index++) {
         const c = children[index];
