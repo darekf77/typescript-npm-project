@@ -281,13 +281,6 @@ export class BrowserCodeCut {
     return this.replaceRegionsWith(stringContent, words);
   }
 
-  // protected replaceFromLine(pkgName: string, imp: string) {
-  //   const p = this.getInlinePackage(pkgName)
-  //   if (p.isIsomorphic) {
-  //     const replacedImp = imp.replace(p.realName, `${p.realName}/${this.browserString}`);
-  //     this.rawContent = this.rawContent.replace(imp, replacedImp);
-  //   }
-  // }
   replaceFromLine(pkgName: string, imp: string) {
     // console.log(`Check package: "${pkgName}"`)
     // console.log(`imp: "${imp}"`)
@@ -360,8 +353,6 @@ export class BrowserCodeCut {
 
   }
 
-
-
   REPLACERegionsFromTsImportExport(usage: ConfigModels.TsUsage) {
     // const debug = filesToDebug.includes(path.basename(this.absoluteFilePath));
     // if (debug) {
@@ -419,16 +410,6 @@ export class BrowserCodeCut {
     return this;
   }
 
-  // REPLACERegionsForIsomorphicLib(options: Models.dev.ReplaceOptionsExtended) {
-
-  //   // console.log('options.replacements', options.replacements)
-  //   if (this.absoluteFilePath.endsWith('.ts')) {
-  //     this.rawContent = this.replaceRegionsWith(this.rawContent, options.replacements)
-  //   }
-  //   this.rawContent = this.afterRegionsReplacement(this.rawContent)
-  //   return this;
-  // }
-
   REPLACERegionsForIsomorphicLib(options: Models.dev.ReplaceOptionsExtended) {
     options = _.clone(options);
     this.options = options;
@@ -444,28 +425,22 @@ export class BrowserCodeCut {
         this.rawContentBackend = RegionRemover.from(this.absoluteFilePath, orgContent, ['@bro' + 'wser'], this.project).output;
       }
     }
-    if (this.project.frameworkVersionAtLeast('v3')) {
-      // console.log(`isTarget fixing ? ${this.project.isSmartContainerTarget}`)
-      // no modification of any code straight ng is being use
-      if (this.project.isSmartContainerTarget) {
-        const parent = this.project.smartContainerTargetParentContainer;
-        parent.children
-          .filter(f => f.typeIs('isomorphic-lib'))
-          .forEach(c => {
-            const from = `${c.name}/src/assets/`;
-            const to = `/assets/assets-for/${c.name}/`;
-            this.rawContent = this.rawContent.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
-            this.rawContent = this.rawContent.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
-          });
-      }
-    } else {
-      this.rawContent = this.afterRegionsReplacement(this.rawContent);
-    }
-    return this;
-  }
 
-  protected afterRegionsReplacement(content: string) {
-    return content;
+    // console.log(`isTarget fixing ? ${this.project.isSmartContainerTarget}`)
+    // no modification of any code straight ng is being use
+    if (this.project.isSmartContainerTarget) {
+      const parent = this.project.smartContainerTargetParentContainer;
+      parent.children
+        .filter(f => f.typeIs('isomorphic-lib'))
+        .forEach(c => {
+          const from = `${c.name}/src/assets/`;
+          const to = `/assets/assets-for/${c.name}/`;
+          this.rawContent = this.rawContent.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
+          this.rawContent = this.rawContent.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+        });
+    }
+
+    return this;
   }
 
   handleTickInCode(replacement: string): string {

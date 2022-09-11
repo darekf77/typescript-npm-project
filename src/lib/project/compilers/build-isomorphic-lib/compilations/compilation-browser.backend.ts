@@ -44,20 +44,6 @@ export class BroswerCompilation extends BackendCompilation {
   //#endregion
 
   //#region constructor
-  // constructor(
-  //   /**
-  //    * Relative path for browser temporary src
-  //    * Ex.   tmp-src-dist-browser
-  //    */
-  //   public sourceOutBrowser: string,
-  //   outFolder: ConfigModels.OutFolder,
-  //   location: string,
-  //   cwd: string,
-  //   public backendOutFolder: string,
-  //   private customCompiler?: string
-  // ) {
-  //   super(outFolder, location, cwd)
-  // }
   constructor(
     public compilationProject: Project,
     public moduleName: string,
@@ -267,23 +253,6 @@ export class BroswerCompilation extends BackendCompilation {
     }
   }
 
-
-
-
-  //   initCodeCut(filesPathes: string[]) {
-  //     filesPathes = filesPathes.map(f => {
-  //       f = crossPlatformPath(f);
-  //       return f.replace(crossPlatformPath(path.join(this.cwd, this.location)), '').replace(/^\//, '');
-  //     })
-  //     this.codecut = new CodeCut(this.compilationFolderPath, filesPathes, {
-  //       replacements: [
-  //         ["@backendFunc",
-  //           `return undefined;
-  // `],
-  //         "@backend"
-  //       ]
-  //     })
-  //   }
   initCodeCut(filesPathes: string[]) {
     Helpers.log(`[initCodeCut] filesPathes:
 
