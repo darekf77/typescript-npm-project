@@ -12,16 +12,7 @@ export class CodeCut {
   readonly browserCodeCut: BrowserCodeCut;
   //#endregion
 
-
   //#region constructor
-
-  // constructor(
-  //   protected cwd: string,
-  //   protected filesPathes: string[],
-  //   protected options: Models.dev.ReplaceOptionsExtended) {
-  //   // console.log('init code cut ', this.options)
-  //   this.browserCodeCut = BrowserCodeCut;
-  // }
   constructor(
     protected cwd: string,
     protected filesPathes: string[],

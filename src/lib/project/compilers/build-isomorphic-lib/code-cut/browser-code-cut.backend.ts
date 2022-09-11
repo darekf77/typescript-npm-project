@@ -60,14 +60,6 @@ export class BrowserCodeCut {
   //#endregion
 
   //#region constructor
-  // constructor(
-  //   protected absoluteFilePath: string
-  // ) {
-  //   this.rawContent = fse.existsSync(absoluteFilePath) ?
-  //     fse.readFileSync(absoluteFilePath, 'utf8').toString()
-  //     : '';
-  // }
-  // //#endregion
   constructor(
     protected absoluteFilePath: string,
     private project?: Project,
