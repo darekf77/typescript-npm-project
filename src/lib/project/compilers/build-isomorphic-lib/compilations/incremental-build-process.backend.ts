@@ -1,19 +1,28 @@
+//#region imports
 import { path, crossPlatformPath } from 'tnp-core'
 import { _ } from 'tnp-core';
 
 import { config } from 'tnp-config';
-import { Project } from '../../../../project';
+import type { Project } from '../../../../project/abstract/project/project';
 import { Helpers } from 'tnp-helpers';
 import { BuildOptions } from 'tnp-db';
-import { IncrementalBuildProcess } from './incremental-build-process';
-import { BackendCompilationExtended, BroswerForModuleCompilation } from './compilations-extended';
+import { MorphiHelpers } from 'morphi';
+import { BackendCompilation } from './compilation-backend.backend';
+import { BroswerCompilation } from './compilation-browser.backend';
+import { IncCompiler } from 'incremental-compiler';
+import { CLI } from 'tnp-cli';
+//#endregion
 
-export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
+export class IncrementalBuildProcess {
 
-  // @ts-ignore
-  protected browserCompilations: BroswerForModuleCompilation[];
+  //#region fields & getters
+  protected compileOnce = false;
+  protected backendCompilation: BackendCompilation;
+  protected browserCompilations: BroswerCompilation[];
 
-  //#region resolve modules from Location
+  /**
+   * resolve modules from Location
+   */
   private get resolveModulesLocations(): string[] {
     if (this.project.isWorkspaceChildProject || (this.project.isStandaloneProject && this.project.isGenerated)) {
 
@@ -30,15 +39,11 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
   }
   //#endregion
 
-  constructor(private project: Project, private buildOptions: BuildOptions) {
-
-    super(
-      buildOptions?.outDir as any,
-      config?.folder.src,
-      project?.location,
-      false,
-    );
-
+  //#region constructor
+  constructor(
+    private project: Project,
+    private buildOptions: BuildOptions,
+  ) {
     Helpers.log(`[incremental-build-process] for project: ${project.genericName}`)
 
     //#region init variables
@@ -66,12 +71,12 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
     //#region int backend compilation
     if (project.typeIs('isomorphic-lib')) {
       if (project.isSiteInStrictMode) {
-        this.backendCompilation = new BackendCompilationExtended(outFolder as any, config.folder.tempSrc, cwd);
+        this.backendCompilation = new BackendCompilation(outFolder as any, config.folder.tempSrc, cwd);
       } else {
-        this.backendCompilation = new BackendCompilationExtended(outFolder as any, location, cwd);
+        this.backendCompilation = new BackendCompilation(outFolder as any, location, cwd);
       }
     } else {
-      this.backendCompilation = new BackendCompilationExtended(outFolder as any, location, cwd);
+      this.backendCompilation = new BackendCompilation(outFolder as any, location, cwd);
     }
     Helpers.log(`[incremental-build-process] this.backendCompilation exists: ${!!this.backendCompilation}`);
 
@@ -108,7 +113,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
           browserOutFolder = crossPlatformPath(path.join(outFolder, browserOutFolder));
         }
         this.browserCompilations = [
-          new BroswerForModuleCompilation(
+          new BroswerCompilation(
             this.project,
             moduleName,
             envConfig,
@@ -135,7 +140,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
             }
 
             this.browserCompilations.push(
-              new BroswerForModuleCompilation(
+              new BroswerCompilation(
                 this.project,
                 moduleName,
                 envConfig,
@@ -157,7 +162,7 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
       } else {
         let browserOutFolder = Helpers.getBrowserVerPath();
         this.browserCompilations = [
-          new BroswerForModuleCompilation(
+          new BroswerCompilation(
             this.project,
             void 0,
             void 0,
@@ -180,6 +185,94 @@ export class IncrementalBuildProcessExtended extends IncrementalBuildProcess {
       + `\n\n` + compilationsInfo + `\n\n`);
 
   }
+  //#endregion
 
+  //#region  methods
+  protected browserTaksName(taskName: string, bc: BroswerCompilation) {
+    return `browser ${taskName} in ${path.basename(bc.compilationFolderPath)}`
+  }
+
+  protected backendTaskName(taskName) {
+    return `${taskName} in ${path.basename(this.backendCompilation.compilationFolderPath)}`
+  }
+
+  private recreateBrowserLinks(bc: BroswerCompilation) {
+    const outDistPath = crossPlatformPath(path.join(bc.cwd, bc.outFolder));
+    Helpers.log(`recreateBrowserLinks: outDistPath: ${outDistPath}`)
+    MorphiHelpers.System.Operations.tryRemoveDir(outDistPath)
+    const targetOut = crossPlatformPath(path.join(bc.cwd, bc.backendOutFolder, bc.outFolder))
+    Helpers.log(`recreateBrowserLinks: targetOut: ${targetOut}`)
+    Helpers.createSymLink(targetOut, outDistPath, { continueWhenExistedFolderDoesntExists: true });
+  }
+
+  async start(taskName?: string, afterInitCallBack?: () => void) {
+    if (!this.compileOnce) {
+      this.compileOnce = true;
+    }
+
+    for (let index = 0; index < this.browserCompilations.length; index++) {
+      const browserCompilation = this.browserCompilations[index];
+      await browserCompilation.start(this.browserTaksName(taskName, browserCompilation), () => {
+        this.recreateBrowserLinks(browserCompilation)
+      })
+    }
+
+    if (this.backendCompilation) {
+      await this.backendCompilation.start(this.backendTaskName(taskName))
+    }
+
+    if (_.isFunction(afterInitCallBack)) {
+      await Helpers.runSyncOrAsync(afterInitCallBack);
+    }
+  }
+
+  // @ts-ignore
+  async startAndWatch(taskName?: string, options?: IncCompiler.Models.StartAndWatchOptions) {
+
+    // console.log('[${config.frameworkName}][incremental-build-process] taskName' + taskName)
+
+    const { watchOnly, afterInitCallBack } = options || {};
+    if (this.compileOnce && watchOnly) {
+      console.error(`[${config.frameworkName}] Dont use "compileOnce" and "watchOnly" options together.`);
+      process.exit(0)
+    }
+    if (this.compileOnce) {
+      console.log('Watch compilation single run')
+      await this.start(taskName, afterInitCallBack);
+      process.exit(0);
+    }
+    if (watchOnly) {
+      console.log(CLI.chalk.gray(
+        `Watch mode only for "${taskName}"` +
+        ` -- morphi only starts starAndWatch anyway --`
+      ));
+    } else {
+      // THIS IS NOT APPLIED FOR TSC
+      // await this.start(taskName, afterInitCallBack);
+    }
+
+    for (let index = 0; index < this.browserCompilations.length; index++) {
+      const browserCompilation = this.browserCompilations[index];
+      await browserCompilation.startAndWatch(
+        this.browserTaksName(taskName, browserCompilation), {
+        // @ts-ignore
+        afterInitCallBack: () => {
+          this.recreateBrowserLinks(browserCompilation)
+        },
+        watchOnly
+      });
+    }
+
+    if (this.backendCompilation) {
+      // @ts-ignore
+      await this.backendCompilation.startAndWatch(this.backendTaskName(taskName), { watchOnly })
+    }
+
+    if (_.isFunction(afterInitCallBack)) {
+      await Helpers.runSyncOrAsync(afterInitCallBack);
+    }
+  }
+
+  //#endregion
 
 }

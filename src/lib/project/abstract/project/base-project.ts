@@ -119,12 +119,12 @@ export abstract class BaseProject {
   get isSmartContainerTarget(this: Project) {
     const folderBefore = path.basename(path.dirname(path.dirname(this.location)));
     return [config.folder.dist, config.folder.bundle].includes(folderBefore)
-      && Project.From(this.smartContainerTargetParentContainerPath)?.isSmartContainer;
+      && this.smartContainerTargetParentContainer.isSmartContainer;
   }
 
   // @ts-ignore
-  get smartContainerTargetParentContainerPath(this: Project) {
-    return path.dirname(path.dirname(path.dirname(this.location)));
+  get smartContainerTargetParentContainer(this: Project) {
+    return Project.From(path.dirname(path.dirname(path.dirname(this.location)))) as Project;
   }
 
   // @ts-ignore

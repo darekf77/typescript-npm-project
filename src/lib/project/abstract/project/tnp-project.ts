@@ -2,7 +2,7 @@
 import { fse, crossPlatformPath } from 'tnp-core'
 import { path } from 'tnp-core'
 import { _ } from 'tnp-core';
-import { PackagesRecognitionExtended } from '../../features/packages-recognition-extended';
+import { PackagesRecognition } from '../../features/package-recognition/packages-recognition';
 //#endregion
 import type { Project } from './project';
 import { Project as $Project } from 'tnp-helpers';
@@ -122,7 +122,7 @@ export abstract class TnpProject {
 
       var p = crossPlatformPath(path.join(location, config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES))
       if (!fse.existsSync(p)) {
-        PackagesRecognitionExtended.fromProject(this as any).start(void 0, '[tnp-projct][getter isomorphic pacakges ]');
+        PackagesRecognition.fromProject(this as any).start(void 0, '[tnp-projct][getter isomorphic pacakges ]');
       }
       const f = Helpers.readJson(p);
       const arr = f[config.array.isomorphicPackages];

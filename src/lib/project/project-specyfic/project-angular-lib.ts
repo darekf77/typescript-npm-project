@@ -1,8 +1,8 @@
 //#region @backend
 import { fse, json5 } from 'tnp-core'
 import { path } from 'tnp-core'
-import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/compilations/incremental-build-process-extended.backend';
-import { Project } from '../abstract';
+import { IncrementalBuildProcess } from '../compilers/build-isomorphic-lib/compilations/incremental-build-process.backend';
+import { Project } from '../abstract/project/project';
 //#endregion
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
@@ -190,7 +190,7 @@ export class ProjectAngularLib
     if (ngbuildonly) {
       // await this.buildAngulazrVer(watch);
     } else {
-      this.incrementalBuildProcess = new IncrementalBuildProcessExtended(this, this.buildOptions);
+      this.incrementalBuildProcess = new IncrementalBuildProcess(this, this.buildOptions);
 
       if (this.buildOptions.watch) {
         await this.incrementalBuildProcess.startAndWatch(`isomorphic ${this._type} compilation (watch mode)`,

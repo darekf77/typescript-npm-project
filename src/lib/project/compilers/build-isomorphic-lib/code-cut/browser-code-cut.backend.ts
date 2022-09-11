@@ -1,70 +1,50 @@
-//#region @backend
+//#region imports
 import {
   _,
   path,
   fse,
-  crossPlatformPath,
 } from 'tnp-core';
 
-import { ConfigModels } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
+import type { Project } from '../../../abstract/project/project';
+import { BuildOptions } from 'tnp-db';
+import { RegionRemover } from 'isomorphic-region-loader';
+//#endregion
 
+//#region consts
 const filesToDebug = [
   // 'app.ts'
 ]
 
 const regexAsyncImport = /\ import\((\`|\'|\")([a-zA-Z|\-|\@|\/|\.]+)(\`|\'|\")\)/;
 const regexAsyncImportG = /\ import\((\`|\'|\")([a-zA-Z|\-|\@|\/|\.]+)(\`|\'|\")\)/g;
-
-export class CodeCut {
-
-  browserCodeCut: { new(any?): BrowserCodeCut }
-  constructor(
-    protected cwd: string,
-    protected filesPathes: string[],
-    protected options: Models.dev.ReplaceOptionsExtended) {
-    // console.log('init code cut ', this.options)
-    this.browserCodeCut = BrowserCodeCut;
-  }
-
-  files() {
-    // console.log('options in fiels', this.options)
-    this.filesPathes.forEach((relativePathToFile) => {
-      const absolutePathToFile = crossPlatformPath(path.join(this.cwd, relativePathToFile))
-      // console.log('process', absolutePathToFile)
-      this.file(absolutePathToFile);
-    })
-  }
-
-  file(absolutePathToFile) {
-    // console.log('options here ', options)
-    // return new (this.browserCodeCut)(absolutePathToFile)
-    //   // .FLATTypescriptImportExport('import')
-    //   // .FLATTypescriptImportExport('export')
-    //   .REPLACERegionsForIsomorphicLib(_.cloneDeep(this.options))
-    //   .REPLACERegionsFromTsImportExport('import')
-    //   .REPLACERegionsFromTsImportExport('export')
-    //   .REPLACERegionsFromJSrequire()
-    //   .saveOrDelete()
-  }
-}
-
+//#endregion
 
 export class BrowserCodeCut {
 
+  //#region static
   public static IsomorphicLibs = [];
   public static resolveAndAddIsomorphicLibs(libsNames: string[]) {
     this.IsomorphicLibs = this.IsomorphicLibs.concat(libsNames);
   }
+  //#endregion
 
-
+  //#region fields & getters
+  private options: Models.dev.ReplaceOptionsExtended;
   protected browserString = 'browser';
 
   protected isDebuggingFile = false;
 
   protected rawContent: string;
   public rawContentBackend: string;
+  readonly allowedToReplace = Models.other.CutableFileExtArr;
+
+
+  readonly allowedToReplaceDotPref = Models.other.CutableFileExtArr
+    .concat(['js'])
+    .map(ext => `.${ext}`);
 
   get isEmptyBrowserFile() {
     return this.rawContent.replace(/\s/g, '').trim() === '';
@@ -77,16 +57,31 @@ export class BrowserCodeCut {
   get isEmptyModuleBackendFile() {
     return (this.rawContentBackend || '').replace(/\/\*\ \*\//g, '').trim().length === 0;
   }
+  //#endregion
 
+  //#region constructor
+  // constructor(
+  //   protected absoluteFilePath: string
+  // ) {
+  //   this.rawContent = fse.existsSync(absoluteFilePath) ?
+  //     fse.readFileSync(absoluteFilePath, 'utf8').toString()
+  //     : '';
+  // }
+  // //#endregion
   constructor(
-    protected absoluteFilePath: string
+    protected absoluteFilePath: string,
+    private project?: Project,
+    private compilationProject?: Project,
+    private buildOptions?: BuildOptions,
+    private sourceOutBrowser?: string,
   ) {
     this.rawContent = fse.existsSync(absoluteFilePath) ?
       fse.readFileSync(absoluteFilePath, 'utf8').toString()
       : '';
   }
+  //#endregion
 
-
+  //#region methods
   debug(fileName: string) {
     // console.log('path.basename(this.absoluteFilePath)',path.basename(this.absoluteFilePath))
     this.isDebuggingFile = (path.basename(this.absoluteFilePath) === fileName);
@@ -225,11 +220,26 @@ export class BrowserCodeCut {
     };
   }
 
-  /**
-   * LOOG HERE
-    * ./src/lib/project/compilers/build-isomorphic-lib/browser-code-cut-extended.backend.ts
-    */
   protected getInlinePackage(packageName: string, packagesNames = BrowserCodeCut.IsomorphicLibs): Models.InlinePkg {
+
+    let parent: Project;
+    if (this.project.isSmartContainer) {
+      parent = this.project;
+    }
+    if (this.project.isSmartContainerChild) {
+      parent = this.project.parent;
+    }
+    if (this.project.isSmartContainerTarget) {
+      parent = this.project.smartContainerTargetParentContainer;
+    }
+
+    const additionalSmartPckages = (!parent ? [] : parent.children.map(c => `@${parent.name}/${c.name}`));
+
+    const packages = packagesNames.concat([
+      ...(parent ? [] : [this.project.name]),
+      ...additionalSmartPckages,
+    ]);
+
 
     // console.log('MORPHI this.isomorphicLibs', this.isomorphicLibs)
     let realName = packageName;
@@ -279,13 +289,86 @@ export class BrowserCodeCut {
     return this.replaceRegionsWith(stringContent, words);
   }
 
-  protected replaceFromLine(pkgName: string, imp: string) {
-    const p = this.getInlinePackage(pkgName)
-    if (p.isIsomorphic) {
-      const replacedImp = imp.replace(p.realName, `${p.realName}/${this.browserString}`);
+  // protected replaceFromLine(pkgName: string, imp: string) {
+  //   const p = this.getInlinePackage(pkgName)
+  //   if (p.isIsomorphic) {
+  //     const replacedImp = imp.replace(p.realName, `${p.realName}/${this.browserString}`);
+  //     this.rawContent = this.rawContent.replace(imp, replacedImp);
+  //   }
+  // }
+  replaceFromLine(pkgName: string, imp: string) {
+    // console.log(`Check package: "${pkgName}"`)
+    // console.log(`imp: "${imp}"`)
+    const inlinePkg = this.getInlinePackage(pkgName)
+
+    if (inlinePkg.isIsomorphic) {
+      // console.log('inlinePkg ', inlinePkg.realName)
+      const replacedImp = imp.replace(inlinePkg.realName, `${inlinePkg.realName}/${this.browserString}`);
       this.rawContent = this.rawContent.replace(imp, replacedImp);
+      return;
     }
+    if (this.compilationProject.isWorkspaceChildProject && this.absoluteFilePath) {
+      // console.log(`check child: ${pkgName}`)
+      const parent = (this.compilationProject.isGenerated && !this.compilationProject.isWorkspaceChildProject
+      ) ? this.compilationProject.grandpa : this.compilationProject.parent;
+      const child = parent.child(pkgName, false);
+      if (child && this.buildOptions && !this.buildOptions.appBuild) {
+        // console.log(`child founded: ${pkgName}`)
+        const orgImp = imp;
+        let proceed = true;
+        if (child.typeIs('isomorphic-lib')) {
+          const sourceRegex = `${pkgName}\/(${config.moduleNameIsomorphicLib.join('|')})(?!\-)`;
+          const regex = new RegExp(sourceRegex);
+          // console.log(`[isomorphic-lib] Regex source: "${sourceRegex}"`)
+          if (regex.test(imp)) {
+            // console.log(`[isom] MATCH: ${imp}`)
+            imp = imp.replace(regex, pkgName);
+          } else {
+
+            const regexAlreadyIs = new RegExp(`${pkgName}\/${Helpers.getBrowserVerPath(this.project && this.project.name)}`);
+            if (regexAlreadyIs.test(imp)) {
+              imp = imp.replace(regexAlreadyIs, pkgName);
+            } else {
+              proceed = false;
+            }
+
+            // console.log(`[isom] NOTMATCH: ${imp}`)
+          }
+          // console.log(`[isomorphic-lib] Regex replaced: "${imp}"`)
+        } else {
+          const sourceRegex = `${pkgName}\/(${config.moduleNameAngularLib.join('|')})(?!\-)`;
+          const regex = new RegExp(sourceRegex);
+          // console.log(`[angular-lib] Regex source: "${sourceRegex}"`)
+          if (regex.test(imp)) {
+            // console.log(`[angul] MATCH: ${imp}`)
+            imp = imp.replace(regex, pkgName);
+          } else {
+
+            const regexAlreadyIs = new RegExp(`${pkgName}\/${Helpers.getBrowserVerPath(this.project && this.project.name)}`);
+            if (regexAlreadyIs.test(imp)) {
+              imp = imp.replace(regexAlreadyIs, pkgName);
+            } else {
+              proceed = false;
+            }
+
+            // console.log(`[angul] NOTMATCH: ${imp}`)
+          }
+          // console.log(`[angular-lib] Regex replaced: "${imp}"`)
+        }
+        if (proceed) {
+
+        }
+        const replacedImp = imp.replace(pkgName,
+          `${pkgName}/${Helpers.getBrowserVerPath(this.project && this.project.name)}`);
+        this.rawContent = this.rawContent.replace(orgImp, replacedImp);
+        return;
+
+      }
+    }
+
   }
+
+
 
   REPLACERegionsFromTsImportExport(usage: ConfigModels.TsUsage) {
     // const debug = filesToDebug.includes(path.basename(this.absoluteFilePath));
@@ -344,13 +427,48 @@ export class BrowserCodeCut {
     return this;
   }
 
-  REPLACERegionsForIsomorphicLib(options: Models.dev.ReplaceOptionsExtended) {
+  // REPLACERegionsForIsomorphicLib(options: Models.dev.ReplaceOptionsExtended) {
 
-    // console.log('options.replacements', options.replacements)
-    if (this.absoluteFilePath.endsWith('.ts')) {
-      this.rawContent = this.replaceRegionsWith(this.rawContent, options.replacements)
+  //   // console.log('options.replacements', options.replacements)
+  //   if (this.absoluteFilePath.endsWith('.ts')) {
+  //     this.rawContent = this.replaceRegionsWith(this.rawContent, options.replacements)
+  //   }
+  //   this.rawContent = this.afterRegionsReplacement(this.rawContent)
+  //   return this;
+  // }
+
+  REPLACERegionsForIsomorphicLib(options: Models.dev.ReplaceOptionsExtended) {
+    options = _.clone(options);
+    this.options = options;
+    // Helpers.log(`[REPLACERegionsForIsomorphicLib] options.replacements ${this.absoluteFilePath}`)
+    const ext = path.extname(this.absoluteFilePath).replace('.', '') as ConfigModels.CutableFileExt;
+    // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
+    if (this.allowedToReplace.includes(ext)) {
+      this.rawContent = this.project.sourceModifier.replaceBaslieneFromSiteBeforeBrowserCodeCut(this.rawContent);
+
+      const orgContent = this.rawContent;
+      this.rawContent = RegionRemover.from(this.absoluteFilePath, orgContent, options.replacements, this.project).output;
+      if (this.project.isStandaloneProject || this.project.isSmartContainer) {
+        this.rawContentBackend = RegionRemover.from(this.absoluteFilePath, orgContent, ['@bro' + 'wser'], this.project).output;
+      }
     }
-    this.rawContent = this.afterRegionsReplacement(this.rawContent)
+    if (this.project.frameworkVersionAtLeast('v3')) {
+      // console.log(`isTarget fixing ? ${this.project.isSmartContainerTarget}`)
+      // no modification of any code straight ng is being use
+      if (this.project.isSmartContainerTarget) {
+        const parent = this.project.smartContainerTargetParentContainer;
+        parent.children
+          .filter(f => f.typeIs('isomorphic-lib'))
+          .forEach(c => {
+            const from = `${c.name}/src/assets/`;
+            const to = `/assets/assets-for/${c.name}/`;
+            this.rawContent = this.rawContent.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
+            this.rawContent = this.rawContent.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          });
+      }
+    } else {
+      this.rawContent = this.afterRegionsReplacement(this.rawContent);
+    }
     return this;
   }
 
@@ -358,26 +476,89 @@ export class BrowserCodeCut {
     return content;
   }
 
+  handleTickInCode(replacement: string): string {
+    if (replacement.search('`') !== -1) {
+      Helpers.warn(`[browsercodecut] Please dont use tick \` ... in ${path.basename(this.absoluteFilePath)}`)
+      replacement = replacement.replace(/\`/g, '\\`');
+    }
+    return replacement;
+  }
+
+  handleOutput(replacement: string, ext: ConfigModels.CutableFileExt): string {
+    replacement = this.handleTickInCode(replacement);
+
+    return replacement;
+  }
+
   saveOrDelete() {
-    Helpers.error('SHOULD NOW ACCESS THIS METHOD!!', true, true)
-    // console.log('saving ismoprhic file', this.absoluteFilePath)
-    // if (this.isEmptyBrowserFile && ['.ts', '.js'].includes(path.extname(this.absoluteFilePath))) {
-    //   if (fse.existsSync(this.absoluteFilePath)) {
-    //     fse.unlinkSync(this.absoluteFilePath)
-    //   }
-    //   // console.log(`Delete empty: ${deletePath}`)
-    // } else {
-    //   // console.log(`Not empty: ${this.absoluteFilePath}`)
-    //   if (!fse.existsSync(path.dirname(this.absoluteFilePath))) {
-    //     fse.mkdirpSync(path.dirname(this.absoluteFilePath));
-    //   }
-    //   fse.writeFileSync(this.absoluteFilePath, this.rawContent, 'utf8');
-    // }
+    const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
+    const relativePath = this.absoluteFilePath
+      .replace(`${this.compilationProject.location}/`, '')
+      .replace(/^\//, '')
+
+    // Helpers.log(`saving ismoprhic file: ${this.absoluteFilePath}`, 1)
+    if (this.isEmptyBrowserFile && this.allowedToReplaceDotPref
+      .filter(f => ![
+        '.html', // fix for angular
+        '.scss',
+        '.css',
+        '.sass',
+        '.less',
+        '.json',
+      ].includes(f))
+      .includes(path.extname(this.absoluteFilePath))
+    ) {
+      if (fse.existsSync(this.absoluteFilePath)) {
+        fse.unlinkSync(this.absoluteFilePath)
+      }
+      // Helpers.log(`Delete empty: ${this.absoluteFilePath}`, 1);
+    } else {
+      // Helpers.log(`Not empty: ${this.absoluteFilePath}`, 1)
+      if (!fse.existsSync(path.dirname(this.absoluteFilePath))) {
+        fse.mkdirpSync(path.dirname(this.absoluteFilePath));
+      }
+      fse.writeFileSync(this.absoluteFilePath, this.rawContent, 'utf8');
+
+
+      // if (path.isAbsolute(relativePath)) {
+      //   console.log(`is ABsolute !`, relativePath)
+      //   // process.exit(0)
+      // }
+
+      // Helpers.log(`Written file: ${relativePath}`, 1)
+      this.compilationProject.sourceModifier.processFile(relativePath, modifiedFiles, 'tmp-src-for')
+    }
+
+    const isEmptyModuleBackendFile = this.isEmptyModuleBackendFile
+    if ((!this.isEmptyBackendFile || isEmptyModuleBackendFile) && this.allowedToReplaceDotPref
+      .includes(path.extname(this.absoluteFilePath))
+    ) {
+      const absoluteBackendFilePath = path.join(
+        this.compilationProject.location,
+        relativePath.replace('tmp-src', 'tmp-source')
+      );
+
+      if (!fse.existsSync(path.dirname(absoluteBackendFilePath))) {
+        fse.mkdirpSync(path.dirname(absoluteBackendFilePath));
+      }
+
+      if (
+        !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist/tests/`) &&
+        !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle/tests/`)
+      ) {
+        // console.log(relativePath)
+        fse.writeFileSync(absoluteBackendFilePath,
+          isEmptyModuleBackendFile ? `export function dummy${(new Date()).getTime()}() { }`
+            : this.rawContentBackend,
+          'utf8');
+      }
+    }
     // }
   }
 
 
+
+
+  //#endregion
+
 }
-
-
-//#endregion

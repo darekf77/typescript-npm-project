@@ -167,7 +167,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
           }
 
           if (this.project.isSmartContainerTarget) {
-            const parent = Project.From(this.project.smartContainerTargetParentContainerPath) as Project;
+            const parent = this.project.smartContainerTargetParentContainer;
             const otherChildren = parent.children.filter(c => c.name !== this.project.name);
             const base = this.project.name;
             if (tsconfigJson) {

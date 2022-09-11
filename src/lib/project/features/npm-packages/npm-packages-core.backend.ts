@@ -1,28 +1,28 @@
 //#region imports
-import chalk from 'chalk';
 import { crossPlatformPath, moment, path } from 'tnp-core'
 import { fse } from 'tnp-core'
-import { glob } from 'tnp-core';
 import { _ } from 'tnp-core';
 
-import { Project } from '../../abstract';
+import type { Project } from '../../abstract';
 import { Helpers } from 'tnp-helpers';
 import { FeatureForProject } from '../../abstract';
 import { Models } from 'tnp-models';
 import { config } from 'tnp-config';
 import * as semver from 'semver';
-import { PackagesRecognitionExtended } from '../packages-recognition-extended';
+import { PackagesRecognition } from '../package-recognition/packages-recognition';
 import {
   executeCommand, fixOptions, prepareCommand, prepareTempProject,
   copyMainProject, copyMainProjectDependencies
 } from './npm-packages-helpers.backend';
+import { CLASS } from 'typescript-class-helpers';
 //#endregion
 
 export class NpmPackagesCore extends FeatureForProject {
 
 
   global(globalPackageName: string, packageOnly = false) {
-    const oldContainer = Project.by('container', 'v1') as Project;
+    const ProjectClass = CLASS.getBy('Project') as typeof Project;
+    const oldContainer = ProjectClass.by('container', 'v1') as Project;
     if (!oldContainer.node_modules.exist) {
       Helpers.info('initing container v1 for global packages')
       oldContainer.run(`${config.frameworkName} init`).sync();
@@ -38,7 +38,8 @@ export class NpmPackagesCore extends FeatureForProject {
   }
 
   package(pacakgeName: string) {
-    const p = Project.From(this.project.node_modules.pathFor(pacakgeName));
+    const ProjectClass = CLASS.getBy('Project') as typeof Project;
+    const p = ProjectClass.From(this.project.node_modules.pathFor(pacakgeName));
     const ver = p?.version;
     const that = this;
     return {
@@ -64,6 +65,7 @@ export class NpmPackagesCore extends FeatureForProject {
     if (this.project.isDocker) {
       return;
     }
+    const ProjectClass = CLASS.getBy('Project') as typeof Project;
 
     const { generatLockFiles, useYarn, pkg, reason, remove, smoothInstall } = fixOptions(options);
     const yarnLockPath = path.join(this.project.location, config.file.yarn_lock);
@@ -80,9 +82,9 @@ export class NpmPackagesCore extends FeatureForProject {
       if (global.testMode) {
         Helpers.log(`Test mode: normal instalation`)
         if (pkg) {
-          (Project.Tnp as Project).node_modules.copy(pkg).to(this.project);
+          (ProjectClass.Tnp as Project).node_modules.copy(pkg).to(this.project);
         } else {
-          this.project.node_modules.copyFrom(Project.Tnp as Project, { triggerMsg: `Test mode instalaltion` });
+          this.project.node_modules.copyFrom(ProjectClass.Tnp as Project, { triggerMsg: `Test mode instalaltion` });
         }
       } else {
         if (smoothInstall) {
@@ -97,7 +99,7 @@ export class NpmPackagesCore extends FeatureForProject {
               Press any key to continue.. `);
             }
             Helpers.removeFolderIfExists(this.project.node_modules.path);
-            const workspaceForVersion = (Project.by(this.project._type, this.project._frameworkVersion) as Project).parent;
+            const workspaceForVersion = (ProjectClass.by(this.project._type, this.project._frameworkVersion) as Project).parent;
             if (!workspaceForVersion.node_modules.exist) {
               workspaceForVersion.run(`${config.frameworkName} init`).sync();
             }
@@ -118,7 +120,7 @@ export class NpmPackagesCore extends FeatureForProject {
     }
 
     this.project.quickFixes.nodeModulesPackagesZipReplacement();
-    PackagesRecognitionExtended.fromProject(this.project).start(true, '[actualNpmProcess] after npm i');
+    PackagesRecognition.fromProject(this.project).start(true, '[actualNpmProcess] after npm i');
 
     if (!generatLockFiles) {
       if (useYarn) {

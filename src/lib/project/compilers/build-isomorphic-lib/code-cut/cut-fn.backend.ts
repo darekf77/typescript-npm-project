@@ -1,4 +1,3 @@
-import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-core';
 
 export function codeCuttFn(cutIftrue: boolean) {

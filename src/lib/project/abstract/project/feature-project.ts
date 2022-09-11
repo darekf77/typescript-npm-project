@@ -13,7 +13,7 @@ import {
 import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator } from '../../compilers';
 import { CompilerCache } from '../../features/compiler-cache.backend';
 import { CopyManager } from '../../features/copy-manager';
-import { IncrementalBuildProcessExtended } from '../../compilers/build-isomorphic-lib/compilations/incremental-build-process-extended.backend';
+import { IncrementalBuildProcess } from '../../compilers/build-isomorphic-lib/compilations/incremental-build-process.backend';
 import { PackageJSON, EnvironmentConfig } from '../../features';
 import { InsideStructures } from '../../features/inside-structures/inside-structures';
 import { SingularBuild } from '../../features/singular-build.backend';
@@ -112,7 +112,7 @@ export abstract class FeatureProject {
   //#endregion
 
   //#region @backend
-  public incrementalBuildProcess: IncrementalBuildProcessExtended;
+  public incrementalBuildProcess: IncrementalBuildProcess;
   //#endregion
 
   //#region @backend

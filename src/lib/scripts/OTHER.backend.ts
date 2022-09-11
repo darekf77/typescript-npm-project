@@ -10,8 +10,8 @@ import { path } from 'tnp-core'
 import { config } from 'tnp-config';
 // import * as nodemailer from 'nodemailer';
 import { RegionRemover } from 'isomorphic-region-loader';
-import { codeCuttFn } from '../project/compilers/build-isomorphic-lib/code-cut';
 import { CLI } from 'tnp-cli';
+import { codeCuttFn } from '../project/compilers/build-isomorphic-lib/code-cut/cut-fn.backend';
 declare const ENV: any;
 // console.log('hello')
 

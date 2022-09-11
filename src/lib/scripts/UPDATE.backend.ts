@@ -1,11 +1,12 @@
 import { path } from 'tnp-core'
 import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';
-import { PackagesRecognitionExtended } from '../project/features/packages-recognition-extended';
+
 import { Project } from '../project/abstract/project';
+import { PackagesRecognition } from '../project/features/package-recognition/packages-recognition';
 
 function $UPDATE_ISOMORPHIC() {
-  PackagesRecognitionExtended.fromProject((Project.Current as Project)).start(true, '[update process]');
+  PackagesRecognition.fromProject((Project.Current as Project)).start(true, '[update process]');
   process.exit(0)
 }
 
@@ -39,7 +40,7 @@ function $UPDATE(args: string) {
   // switch (file) {
   //   case config.file.tmpIsomorphicPackagesJson:
   //     processing();
-  //     PackagesRecognitionExtended.fromProject((Project.Current as Project)).start(true, '[update process]');
+  //     PackagesRecognition.fromProject((Project.Current as Project)).start(true, '[update process]');
   //     break;
   //   default:
   //     Helpers.error(`Not recognized file for update`, false, true);

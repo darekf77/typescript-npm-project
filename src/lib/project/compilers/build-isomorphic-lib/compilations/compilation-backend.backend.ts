@@ -1,41 +1,100 @@
-//#region @backend
-import {
-  _,
-  path,
-  fse,
-  child_process,
-  crossPlatformPath,
-} from 'tnp-core';
-import { Helpers } from 'tnp-helpers'
-import { IncCompiler } from 'incremental-compiler';
-import { config, ConfigModels } from 'tnp-config';
-import { Project } from '../../../abstract/project/project';
-
-export interface TscCompileOptions {
-  cwd: string;
-  watch?: boolean;
-  outDir?: string;
-  generateDeclarations?: boolean;
-  tsExe?: string;
-  diagnostics?: boolean;
-  hideErrors?: boolean;
-  debug?: boolean;
-  locationOfMainProject: string;
-  isBrowserBuild?: boolean;
-  buildType: 'dist' | 'bundle';
-}
+//#region imports
+import { IncCompiler } from "incremental-compiler";
+import { config, ConfigModels } from "tnp-config";
+import { child_process, crossPlatformPath, fse, path, _ } from "tnp-core";
+import { Helpers } from "tnp-helpers";
+import { Models } from "tnp-models";
+import { CLASS } from "typescript-class-helpers";
+import type { Project } from "../../../abstract/project";
+//#endregion
 
 @IncCompiler.Class({ className: 'BackendCompilation' })
 export class BackendCompilation extends IncCompiler.Base {
 
+  //#region static
+  static counter = 1;
+  //#endregion
+
+  //#region fields & getters
+  CompilationWrapper = Helpers.compilationWrapper as any;
+  public isEnableCompilation = true;
+  protected compilerName = 'Backend Compiler';
+  get tsConfigName() {
+    return 'tsconfig.json'
+  }
+  get tsConfigBrowserName() {
+    return 'tsconfig.browser.json'
+  }
   public get compilationFolderPath() {
     if (_.isString(this.location) && _.isString(this.cwd)) {
       return crossPlatformPath(path.join(this.cwd, this.location));
     }
   }
-  public isEnableCompilation = true;
+  //#endregion
 
-  static counter = 1;
+  //#region constructor
+  constructor(
+    /**
+     * Output folder
+     * Ex. dist
+     */
+    public outFolder: ConfigModels.OutFolder,
+    /**
+     * Source location
+     * Ex. src | components
+     */
+    public location: string,
+    /**
+     * Current cwd same for browser and backend
+     * but browser project has own compilation folder
+     * Ex. /home/username/project/myproject
+     */
+    public cwd?: string
+  ) {
+    super({
+      folderPath: [path.join(cwd, location)],
+      notifyOnFileUnlink: true,
+    });
+  }
+  //#endregion
+
+  //#region methods
+  async compile(watch = false) {
+
+    const ProjectClass = CLASS.getBy('Project') as typeof Project;
+    // QUICK_FIX for backend in ${config.frameworkName} projects
+    const currentProject = ProjectClass.From<Project>(this.cwd);
+    const generatedDeclarations = !currentProject.isWorkspaceChildProject;
+
+    const hideErrorsForBackend = currentProject.typeIs('angular-lib')
+      && this.compilationFolderPath.endsWith(config.folder.components);
+
+    await this.libCompilation
+      ({
+        cwd: this.compilationFolderPath,
+        watch,
+        outDir: (`../${this.outFolder}` as any),
+        generateDeclarations: generatedDeclarations,
+        hideErrors: hideErrorsForBackend,
+        locationOfMainProject: this.location,
+        buildType: this.outFolder as any
+      });
+  }
+
+
+  async syncAction(filesPathes: string[]) {
+    const outDistPath = crossPlatformPath(path.join(this.cwd, this.outFolder));
+    // Helpers.System.Operations.tryRemoveDir(outDistPath)
+    if (!fse.existsSync(outDistPath)) {
+      fse.mkdirpSync(outDistPath);
+    }
+    await this.compile();
+  }
+
+  async preAsyncAction() {
+    await this.compile(true)
+  }
+
   async libCompilation({
     cwd,
     watch = false,
@@ -44,16 +103,15 @@ export class BackendCompilation extends IncCompiler.Base {
     tsExe = 'npm-run tsc',
     diagnostics = false,
     hideErrors = false,
-    locationOfMainProject,
     isBrowserBuild,
-    buildType = 'dist'
-  }: TscCompileOptions) {
+  }: Models.dev.TscCompileOptions) {
     if (!this.isEnableCompilation) {
       Helpers.log(`Compilation disabled for ${_.startCase(BackendCompilation.name)}`)
       return;
     }
     // let id = BackendCompilation.counter++;
-    const project = Project.nearestTo(cwd) as Project;
+    const ProjectClass = CLASS.getBy('Project') as typeof Project;
+    const project = ProjectClass.nearestTo(cwd) as Project;
     const buildOutDir = _.last(outDir.split('/')) as 'bundle' | 'dist';
 
     if (hideErrors) {
@@ -186,7 +244,7 @@ export class BackendCompilation extends IncCompiler.Base {
     } = options;
 
     const isStandalone = (!project.isSmartContainerTarget && !project.isWorkspace && !project.isSmartContainerChild);
-    const parent = !isStandalone ? (project.parent || Project.From(project.smartContainerTargetParentContainerPath)) : void 0;
+    const parent = !isStandalone ? (project.parent || project.smartContainerTargetParentContainer) : void 0;
 
     Helpers.info(`
 
@@ -323,66 +381,6 @@ Starting backend typescirpt build....
     // }
     //#endregion
   }
-
-  protected compilerName = 'Backend Compiler';
-  async compile(watch = false) {
-    await this.libCompilation({
-      cwd: this.compilationFolderPath,
-      watch,
-      outDir: (`../${this.outFolder}` as any),
-      generateDeclarations: true,
-      locationOfMainProject: this.location,
-      buildType: this.outFolder as any
-    });
-  }
-
-  async syncAction(filesPathes: string[]) {
-    const outDistPath = crossPlatformPath(path.join(this.cwd, this.outFolder));
-    // Helpers.System.Operations.tryRemoveDir(outDistPath)
-    if (!fse.existsSync(outDistPath)) {
-      fse.mkdirpSync(outDistPath);
-    }
-    await this.compile();
-  }
-
-  async preAsyncAction() {
-    await this.compile(true)
-  }
-
-  get tsConfigName() {
-    return 'tsconfig.json'
-  }
-  get tsConfigBrowserName() {
-    return 'tsconfig.browser.json'
-  }
-
-  constructor(
-    /**
-     * Output folder
-     * Ex. dist
-     */
-    public outFolder: ConfigModels.OutFolder,
-    /**
-     * Source location
-     * Ex. src | components
-     */
-    public location: string,
-    /**
-     * Current cwd same for browser and backend
-     * but browser project has own compilation folder
-     * Ex. /home/username/project/myproject
-     */
-    public cwd?: string
-  ) {
-    super({
-      folderPath: [path.join(cwd, location)],
-      notifyOnFileUnlink: true,
-    });
-  }
-
+  //#endregion
 
 }
-
-
-
-//#endregion

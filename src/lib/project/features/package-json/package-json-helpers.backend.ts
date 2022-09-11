@@ -1,14 +1,13 @@
 //#region imports
 import { _ } from 'tnp-core';
 import * as JSON5 from 'json5';
-import { JSON10 } from 'json10';
 import chalk from 'chalk';
 import * as semver from 'semver';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config, ConfigModels } from 'tnp-config';
-import { PackagesRecognitionExtended } from '../packages-recognition-extended';
+
 //#endregion
 
 //#region clean ignored

@@ -20,7 +20,7 @@ export function recreateIndex(project: Project) {
     ));
 
     if (project.isSmartContainerTarget) {
-      const container = Project.From(project.smartContainerTargetParentContainerPath) as Project;
+      const container = project.smartContainerTargetParentContainer;
       if (!Helpers.exists(indexInSrcFile)) {
         const exportsContainer = container.children
           .filter(c => c.typeIs('isomorphic-lib') && c.frameworkVersionAtLeast('v3'))

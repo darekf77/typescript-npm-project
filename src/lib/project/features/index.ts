@@ -3,7 +3,6 @@ export * from './build-process';
 export * from './files-recreation';
 export * from './node-modules';
 export * from './npm-packages';
-export * from './packages-recognition-extended';
 export * from './proxy-router';
 export * from './quick-fixes';
 export * from './test-runner';

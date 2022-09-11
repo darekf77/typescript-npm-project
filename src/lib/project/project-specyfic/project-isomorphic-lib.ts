@@ -5,8 +5,8 @@ import { glob } from 'tnp-core';
 import * as inquirer from 'inquirer';
 import { config, ConfigModels } from 'tnp-config';
 import { RegionRemover } from 'isomorphic-region-loader';
-import { IncrementalBuildProcessExtended } from '../compilers/build-isomorphic-lib/compilations/incremental-build-process-extended.backend';
-import { PackagesRecognitionExtended } from '../features/packages-recognition-extended';
+import { IncrementalBuildProcess } from '../compilers/build-isomorphic-lib/compilations/incremental-build-process.backend';
+import { PackagesRecognition } from '../features/package-recognition/packages-recognition';
 //#endregion
 import { Project } from '../abstract/project/project';
 import { _ } from 'tnp-core';
@@ -307,10 +307,10 @@ export class ProjectIsomorphicLib
     // console.log({ isStandalone, 'this.name': this.name });
 
     const buildOutDir = this.buildOptions.outDir;
-    const parent = (!isStandalone ? (
-      this.isSmartContainerTarget ? Project.From(this.smartContainerTargetParentContainerPath)
-        : this.parent)
-      : void 0);
+    const parent = (!isStandalone
+      ? (this.isSmartContainerTarget ? this.smartContainerTargetParentContainer : this.parent)
+      : void 0
+    );
     const additionalReplace = (line: string) => {
       const beforeModule2 = crossPlatformPath(path.join(
         buildOutDir,
@@ -488,7 +488,7 @@ export class ProjectIsomorphicLib
     //#endregion
 
     //#region preparing variables / incremental build
-    this.incrementalBuildProcess = new IncrementalBuildProcessExtended(this, this.buildOptions);
+    this.incrementalBuildProcess = new IncrementalBuildProcess(this, this.buildOptions);
 
     const proxyProject = this.proxyNgProj(this, this.buildOptions, 'lib');
 
@@ -560,7 +560,7 @@ export class ProjectIsomorphicLib
           || (this.isSmartContainerTarget && this.buildOptions.copyto?.length > 0)
         ) {
           if (this.isSmartContainerTarget) { // TODO QUICK_FIX this should be in init/struct
-            PackagesRecognitionExtended.fromProject(this).start(true, 'before startling lib proxy project');
+            PackagesRecognition.fromProject(this).start(true, 'before startling lib proxy project');
           }
           await proxyProject.execute(angularCommand, {
             resolvePromiseMsg: {
@@ -662,7 +662,7 @@ export class ProjectIsomorphicLib
           showInfoAngular()
           if (this.isSmartContainerTarget) {
             // if (process.platform !== 'win32') { // TODOD QUICK_FIX
-            const parent = Project.From(this.smartContainerTargetParentContainerPath) as Project;
+            const parent = this.smartContainerTargetParentContainer;
             parent.run(`${config.frameworkName} ba ${this.name}`).sync();
             // }
           } else {

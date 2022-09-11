@@ -1,5 +1,5 @@
 //#region @backend
-import { PackagesRecognitionExtended } from '../../features';
+import { PackagesRecognition } from '../../features/package-recognition/packages-recognition';
 import { BuildOptions } from 'tnp-db';
 import * as inquirer from 'inquirer';
 import { path } from 'tnp-core';
@@ -11,7 +11,6 @@ import { config } from 'tnp-config';
 import { Project } from './project';
 import { Helpers, Project as $Project } from 'tnp-helpers';
 
-
 export abstract class BuildableProject {
 
 
@@ -20,7 +19,7 @@ export abstract class BuildableProject {
 
   // @ts-ignore
   get availableIsomorphicPackagesInNodeModules(this: Project): string[] {
-    const jsonPath = path.join(this.location, PackagesRecognitionExtended.FILE_NAME_ISOMORPHIC_PACKAGES);
+    const jsonPath = path.join(this.location, PackagesRecognition.FILE_NAME_ISOMORPHIC_PACKAGES);
     try {
       const json = Helpers.readJson(jsonPath) as { isomorphicPackages: string[]; };
       return (json && _.isArray(json.isomorphicPackages)) ? json.isomorphicPackages : [];
@@ -31,14 +30,14 @@ export abstract class BuildableProject {
 
   get trustedAllPossible() {
     const projTnp = Project.Tnp as Project;
-    PackagesRecognitionExtended.From(projTnp.location).start();
+    PackagesRecognition.fromProject(projTnp).start();
     return projTnp.availableIsomorphicPackagesInNodeModules;
   }
 
   // @ts-ignore
   get trusted(this: Project) {
     const projTnp = Project.Tnp as Project;
-    PackagesRecognitionExtended.From(projTnp.location).start();
+    PackagesRecognition.fromProject(projTnp).start();
     projTnp.availableIsomorphicPackagesInNodeModules;
     const currentProjVersion = this._frameworkVersion;
     const value = projTnp.packageJson.trusted[currentProjVersion];
@@ -381,7 +380,7 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
     }
 
     if (!this.isVscodeExtension) {
-      PackagesRecognitionExtended.fromProject(this as any).start(void 0, '[buildable-project]');
+      PackagesRecognition.fromProject(this as any).start(void 0, '[buildable-project]');
     }
 
     // if (this.isSmartContainerChild) {
