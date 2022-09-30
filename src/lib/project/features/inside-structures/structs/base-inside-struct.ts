@@ -3,7 +3,7 @@ import { InsideStruct } from '../inside-struct';
 
 export class BaseInsideStruct {
   public readonly struct: InsideStruct;
-  constructor(public readonly project: Project) {
+  constructor(public readonly project: Project, public readonly websql: boolean) {
 
   }
 }

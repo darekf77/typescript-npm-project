@@ -13,6 +13,7 @@ import { optionsSourceModifier } from './source-modifier.backend';
 export class SourceModForStandaloneProjects
   extends FeatureCompilerForProject<Models.other.ModifiedFiles, Models.other.ModifiedFiles> {
 
+  protected websql: boolean = false;
   constructor(public project: Project) {
     super(project, optionsSourceModifier(project));
   }
@@ -44,8 +45,9 @@ export class SourceModForStandaloneProjects
     return input;
   }
 
-  public processFile(relativePath: string, files: Models.other.ModifiedFiles, source?: 'tmp-src-for'): boolean {
+  public processFile(relativePath: string, files: Models.other.ModifiedFiles, source?: 'tmp-src-for', websql = false): boolean {
     //#region process file
+    this.websql = websql;
     const absoluteFilePath = path.join(this.project.location, relativePath);
 
     if (!fse.existsSync(absoluteFilePath)) {
@@ -146,24 +148,24 @@ export class SourceModForStandaloneProjects
 
       if (modType === 'tmp-src-for') {
         input = impReplace({
-          name: `${libName} -> ${libName}/${config.folder.browser}`,
+          name: `${libName} -> ${libName}/${this.websql ? config.folder.websql : config.folder.browser}`,
           project: this.project,
           input,
           modType,
           urlParts: [libName],
-          notAllowedAfterSlash: [config.folder.browser],
-          partsReplacements: [libName, config.folder.browser],
+          notAllowedAfterSlash: [this.websql ? config.folder.websql : config.folder.browser],
+          partsReplacements: [libName, this.websql ? config.folder.websql : config.folder.browser],
           relativePath,
           method
         });
 
         input = impReplace({
-          name: `${libName}/(${folders.join('|\n')}) -> ${libName}/${config.folder.browser}`,
+          name: `${libName}/(${folders.join('|\n')}) -> ${libName}/${this.websql ? config.folder.websql : config.folder.browser}`,
           project: this.project,
           input,
           modType,
           urlParts: [libName, folders],
-          partsReplacements: [libName, config.folder.browser],
+          partsReplacements: [libName, this.websql ? config.folder.websql : config.folder.browser],
           relativePath,
           method
         });
@@ -171,24 +173,24 @@ export class SourceModForStandaloneProjects
 
       if (modType === 'tmp-src' && this.project.typeIsNot('isomorphic-lib')) {
         input = impReplace({
-          name: `${libName} -> ${libName}/${config.folder.browser}`,
+          name: `${libName} -> ${libName}/${this.websql ? config.folder.websql : config.folder.browser}`,
           project: this.project,
           input,
           modType,
           urlParts: [libName],
-          notAllowedAfterSlash: [config.folder.browser],
-          partsReplacements: [libName, config.folder.browser],
+          notAllowedAfterSlash: [this.websql ? config.folder.websql : config.folder.browser],
+          partsReplacements: [libName, this.websql ? config.folder.websql : config.folder.browser],
           relativePath,
           method
         });
 
         input = impReplace({
-          name: `${libName}/(${folders.join('|\n')}) -> ${libName}/${config.folder.browser}`,
+          name: `${libName}/(${folders.join('|\n')}) -> ${libName}/${this.websql ? config.folder.websql : config.folder.browser}`,
           project: this.project,
           input,
           modType,
           urlParts: [libName, folders],
-          partsReplacements: [libName, config.folder.browser],
+          partsReplacements: [libName, this.websql ? config.folder.websql : config.folder.browser],
           relativePath,
           method
         });

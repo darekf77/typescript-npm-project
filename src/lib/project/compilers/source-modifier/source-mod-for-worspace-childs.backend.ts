@@ -47,7 +47,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
         process(folders);
         if (!this.project.isStandaloneProject) {
           folders = this.project.parent.childrenThatAreClients.map(client => {
-            return Helpers.getBrowserVerPath(client.name);
+            return Helpers.getBrowserVerPath(client.name, this.websql);
           });
           process(folders);
         }
@@ -58,7 +58,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
         //#region fix for tmp-src-for when refering to browser-for-wrong-client-name
         let clientName = relativePath.split('/')[0]
         clientName = clientName.replace(`tmp-src-dist-browser-for-`, '');
-        const browserForCurrentClient = Helpers.getBrowserVerPath(clientName);
+        const browserForCurrentClient = Helpers.getBrowserVerPath(clientName, this.websql);
         const process = (compiled: any[]) => {
           // console.log(`${libName}/${compiled.join('|\n')} -> ${libName}/${browserForCurrentClient}`)
           input = impReplace({
@@ -91,7 +91,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
               method
             });
           } else {
-            const browserForCurrentClient = Helpers.getBrowserVerPath(this.project.name);
+            const browserForCurrentClient = Helpers.getBrowserVerPath(this.project.name, this.websql);
             input = impReplace({
               name: `${libName}/${compiled.join('|\n')} -> ${libName}/${browserForCurrentClient}`,
               project: this.project,
@@ -112,7 +112,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
         folders = this.project.isStandaloneProject ? [] : this.project.parent.childrenThatAreClients
           .filter(f => f.name !== this.project.name)
           .map(client => {
-            return Helpers.getBrowserVerPath(client.name)
+            return Helpers.getBrowserVerPath(client.name, this.websql)
           });
         process(folders);
         //#endregion
@@ -160,7 +160,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
         const libNamEscaped = Helpers.escapeStringForRegEx(libName);
         const regexSourceForLib = `(\\"|\\')${Helpers.escapeStringForRegEx(baselineName)}\\/${libNamEscaped}\\/${sourceFolders}`;
         const regexForLib = new RegExp(regexSourceForLib, 'g');
-        const browserForClientName = Helpers.getBrowserVerPath(this.project.name);
+        const browserForClientName = Helpers.getBrowserVerPath(this.project.name, this.websql);
         input = Helpers.tsCodeModifier.replace(input, regexForLib, `'${baselineName}/${libName}/${browserForClientName}`);
       });
     }

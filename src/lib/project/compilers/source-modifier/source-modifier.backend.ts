@@ -2,14 +2,12 @@
 import { _ } from 'tnp-core';
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
-import { glob } from 'tnp-core';
 import { chokidar } from 'tnp-core';
 
 import { config } from 'tnp-config';
-import { FeatureCompilerForProject, Project } from '../../abstract';
+import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
-import { SourceModForWorkspaceChilds } from './source-mod-for-worspace-childs.backend';
 import { IncCompiler } from 'incremental-compiler';
 import { SourceModForSite } from './source-mod-for-site.backend';
 //#endregion
@@ -137,7 +135,7 @@ export class SourceModifier extends SourceModForSite {
 
       // Helpers.log(`Source modifer async action for ${relativePathToProject}`)
 
-      this.processFile(relativePathToProject, modifiedFiles);
+      this.processFile(relativePathToProject, modifiedFiles, void 0, this.websql);
 
       if (fse.existsSync(event.fileAbsolutePath)) {
         this.replikatorAction(relativePathToProject, modifiedFiles)
@@ -162,7 +160,7 @@ export class SourceModifier extends SourceModForSite {
 
     relativePathesToProject.forEach(relativePathToProject => {
       Helpers.log(`[sourceModifier][syn] ${relativePathToProject}`, 1)
-      this.processFile(relativePathToProject, modifiedFiles);
+      this.processFile(relativePathToProject, modifiedFiles, void 0, this.websql);
     });
 
     // console.log(relativePathesToProject)
@@ -190,7 +188,7 @@ export class SourceModifier extends SourceModForSite {
         // console.log('process tmp file', destinationPath)
         if (fse.existsSync(destinationPath)) {
 
-          this.processFile(relativePathToTempSrc, modifiedFiles);
+          this.processFile(relativePathToTempSrc, modifiedFiles, void 0, this.websql);
         }
       } else {
         // console.log('WRONG process tmp file', destinationPath)

@@ -33,7 +33,6 @@ export class BrowserCodeCut {
 
   //#region fields & getters
   private options: Models.dev.ReplaceOptionsExtended;
-  protected browserString = 'browser';
 
   protected isDebuggingFile = false;
 
@@ -288,7 +287,11 @@ export class BrowserCodeCut {
 
     if (inlinePkg.isIsomorphic) {
       // console.log('inlinePkg ', inlinePkg.realName)
-      const replacedImp = imp.replace(inlinePkg.realName, `${inlinePkg.realName}/${this.browserString}`);
+      const replacedImp = imp.replace(
+        inlinePkg.realName,
+        `${inlinePkg.realName}/${this.buildOptions.websql ? config.folder.websql : config.folder.browser}`
+      );
+
       this.rawContent = this.rawContent.replace(imp, replacedImp);
       return;
     }
@@ -310,7 +313,7 @@ export class BrowserCodeCut {
             imp = imp.replace(regex, pkgName);
           } else {
 
-            const regexAlreadyIs = new RegExp(`${pkgName}\/${Helpers.getBrowserVerPath(this.project && this.project.name)}`);
+            const regexAlreadyIs = new RegExp(`${pkgName}\/${Helpers.getBrowserVerPath(this.project && this.project.name, this.buildOptions.websql)}`);
             if (regexAlreadyIs.test(imp)) {
               imp = imp.replace(regexAlreadyIs, pkgName);
             } else {
@@ -329,7 +332,7 @@ export class BrowserCodeCut {
             imp = imp.replace(regex, pkgName);
           } else {
 
-            const regexAlreadyIs = new RegExp(`${pkgName}\/${Helpers.getBrowserVerPath(this.project && this.project.name)}`);
+            const regexAlreadyIs = new RegExp(`${pkgName}\/${Helpers.getBrowserVerPath(this.project && this.project.name, this.buildOptions.websql)}`);
             if (regexAlreadyIs.test(imp)) {
               imp = imp.replace(regexAlreadyIs, pkgName);
             } else {
@@ -344,7 +347,7 @@ export class BrowserCodeCut {
 
         }
         const replacedImp = imp.replace(pkgName,
-          `${pkgName}/${Helpers.getBrowserVerPath(this.project && this.project.name)}`);
+          `${pkgName}/${Helpers.getBrowserVerPath(this.project && this.project.name, this.buildOptions.websql)}`);
         this.rawContent = this.rawContent.replace(orgImp, replacedImp);
         return;
 
@@ -422,7 +425,14 @@ export class BrowserCodeCut {
       const orgContent = this.rawContent;
       this.rawContent = RegionRemover.from(this.absoluteFilePath, orgContent, options.replacements, this.project).output;
       if (this.project.isStandaloneProject || this.project.isSmartContainer) {
-        this.rawContentBackend = RegionRemover.from(this.absoluteFilePath, orgContent, ['@bro' + 'wser'], this.project).output;
+        const regionsToRemove = ['@bro' + 'wser', '@web' + 'sqlOnly'];
+
+        this.rawContentBackend = RegionRemover.from(
+          this.absoluteFilePath,
+          orgContent,
+          regionsToRemove,
+          this.project
+        ).output;
       }
     }
 
@@ -493,7 +503,12 @@ export class BrowserCodeCut {
       // }
 
       // Helpers.log(`Written file: ${relativePath}`, 1)
-      this.compilationProject.sourceModifier.processFile(relativePath, modifiedFiles, 'tmp-src-for')
+      this.compilationProject.sourceModifier.processFile(
+        relativePath,
+        modifiedFiles,
+        'tmp-src-for',
+        this.buildOptions.websql,
+      );
     }
 
     const isEmptyModuleBackendFile = this.isEmptyModuleBackendFile
@@ -502,7 +517,7 @@ export class BrowserCodeCut {
     ) {
       const absoluteBackendFilePath = path.join(
         this.compilationProject.location,
-        relativePath.replace('tmp-src', 'tmp-source')
+        relativePath.replace('tmp-src', 'tmp-source').replace('-websql', '') // backend is ONE
       );
 
       if (!fse.existsSync(path.dirname(absoluteBackendFilePath))) {

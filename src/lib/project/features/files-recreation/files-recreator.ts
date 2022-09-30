@@ -102,6 +102,8 @@ export class FilesRecreator extends FeatureForProject {
           'bundle*',
           'browser',
           'browser*',
+          'websql',
+          'websql*',
           'module*',
           'backup',
           'module',

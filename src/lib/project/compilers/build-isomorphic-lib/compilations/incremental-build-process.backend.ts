@@ -71,12 +71,27 @@ export class IncrementalBuildProcess {
     //#region int backend compilation
     if (project.typeIs('isomorphic-lib')) {
       if (project.isSiteInStrictMode) {
-        this.backendCompilation = new BackendCompilation(outFolder as any, config.folder.tempSrc, cwd);
+        this.backendCompilation = new BackendCompilation(
+          outFolder as any,
+          config.folder.tempSrc,
+          cwd,
+          this.buildOptions.websql
+        );
       } else {
-        this.backendCompilation = new BackendCompilation(outFolder as any, location, cwd);
+        this.backendCompilation = new BackendCompilation(
+          outFolder as any,
+          location,
+          cwd,
+          this.buildOptions.websql,
+        );
       }
     } else {
-      this.backendCompilation = new BackendCompilation(outFolder as any, location, cwd);
+      this.backendCompilation = new BackendCompilation(
+        outFolder as any,
+        location,
+        cwd,
+        this.buildOptions.websql,
+      );
     }
     Helpers.log(`[incremental-build-process] this.backendCompilation exists: ${!!this.backendCompilation}`);
 
@@ -108,7 +123,8 @@ export class IncrementalBuildProcess {
       if (parentProj.isContainer) {
         const moduleName = '';
         const envConfig = {} as any;
-        let browserOutFolder = Helpers.getBrowserVerPath(moduleName);
+        let browserOutFolder = Helpers.getBrowserVerPath(moduleName, this.buildOptions.websql);
+
         if (outFolder === 'bundle') {
           browserOutFolder = crossPlatformPath(path.join(outFolder, browserOutFolder));
         }
@@ -128,7 +144,7 @@ export class IncrementalBuildProcess {
       } else {
         this.resolveModulesLocations
           .forEach(moduleName => {
-            let browserOutFolder = Helpers.getBrowserVerPath(moduleName);
+            let browserOutFolder = Helpers.getBrowserVerPath(moduleName, this.buildOptions.websql);
             if (outFolder === 'bundle') {
               browserOutFolder = crossPlatformPath(path.join(outFolder, browserOutFolder));
             }
@@ -160,13 +176,13 @@ export class IncrementalBuildProcess {
       if (project.isGenerated) {
         modularBuild();
       } else {
-        let browserOutFolder = Helpers.getBrowserVerPath();
+        let browserOutFolder = Helpers.getBrowserVerPath(void 0, this.buildOptions.websql);
         this.browserCompilations = [
           new BroswerCompilation(
             this.project,
             void 0,
             void 0,
-            `tmp-src-${outFolder}`,
+            `tmp-src-${outFolder}${this.buildOptions.websql ? '-websql' : ''}`,
             browserOutFolder as any,
             location,
             cwd,

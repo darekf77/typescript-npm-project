@@ -22,6 +22,7 @@ export class InsideStructures extends FeatureForProject {
 
   //#region field & getters
   readonly structures = {} as { [name in keyof typeof structs]: BaseInsideStruct; }
+  readonly structuresWebsql = {} as { [name in keyof typeof structs]: BaseInsideStruct; }
   protected recreatedOnce = false;
   private _gitIgnoreFiles = [];
   private _npmIgnoreFiles = [];
@@ -49,7 +50,12 @@ export class InsideStructures extends FeatureForProject {
 
     Object.keys(structs).forEach(s => {
       const structFn = structs[s] as typeof BaseInsideStruct;
-      this.structures[CLASS.getName(structFn)] = new structFn(project);
+      this.structures[CLASS.getName(structFn)] = new structFn(project, false);
+    });
+
+    Object.keys(structs).forEach(s => {
+      const structFn = structs[s] as typeof BaseInsideStruct;
+      this.structuresWebsql[CLASS.getName(structFn)] = new structFn(project, true);
     });
 
     //#endregion
@@ -65,7 +71,10 @@ export class InsideStructures extends FeatureForProject {
       ? this.project.parent.childrenThatAreLibs : [];
 
     const action = async (client: Project) => {
-      const structs = Object.values(this.structures);
+      const structs = [
+        ...Object.values(this.structures),
+        ...Object.values(this.structuresWebsql)
+      ];
 
       for (let index = 0; index < structs.length; index++) {
         const insideStruct = structs[index];

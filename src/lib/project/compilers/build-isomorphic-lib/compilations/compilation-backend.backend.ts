@@ -49,7 +49,8 @@ export class BackendCompilation extends IncCompiler.Base {
      * but browser project has own compilation folder
      * Ex. /home/username/project/myproject
      */
-    public cwd?: string
+    public cwd?: string,
+    public websql: boolean = false,
   ) {
     super({
       folderPath: [path.join(cwd, location)],
@@ -72,6 +73,7 @@ export class BackendCompilation extends IncCompiler.Base {
     await this.libCompilation
       ({
         cwd: this.compilationFolderPath,
+        websql: this.websql,
         watch,
         outDir: (`../${this.outFolder}` as any),
         generateDeclarations: generatedDeclarations,
@@ -97,6 +99,7 @@ export class BackendCompilation extends IncCompiler.Base {
 
   async libCompilation({
     cwd,
+    websql = false, // TODO ? hmmm this is not needed here
     watch = false,
     outDir,
     generateDeclarations = false,
@@ -112,7 +115,7 @@ export class BackendCompilation extends IncCompiler.Base {
     // let id = BackendCompilation.counter++;
     const ProjectClass = CLASS.getBy('Project') as typeof Project;
     const project = ProjectClass.nearestTo(cwd) as Project;
-    const buildOutDir = _.last(outDir.split('/')) as 'bundle' | 'dist';
+    const buildOutDir = _.last(outDir.split('/')) as 'bundle' | 'dist' | 'browser';
 
     if (hideErrors) {
       diagnostics = false;
@@ -189,7 +192,6 @@ export class BackendCompilation extends IncCompiler.Base {
 
     // # inside: ${cwd}`)
 
-
     if (isBrowserBuild) {
       if (project.frameworkVersionAtLeast('v3')) {
         // nothing here for for now
@@ -230,7 +232,7 @@ export class BackendCompilation extends IncCompiler.Base {
     generateDeclarations: boolean,
     cwd: string;
     project: Project;
-    buildOutDir: 'dist' | 'bundle',
+    buildOutDir: 'dist' | 'bundle' | 'browser',
   }) {
 
 

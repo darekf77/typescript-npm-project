@@ -1,3 +1,4 @@
+//#region imports
 //#region @backend
 import { PackagesRecognition } from '../../features/package-recognition/packages-recognition';
 import { BuildOptions } from 'tnp-db';
@@ -10,6 +11,7 @@ import { _ } from 'tnp-core';
 import { config } from 'tnp-config';
 import { Project } from './project';
 import { Helpers, Project as $Project } from 'tnp-helpers';
+//#endregion
 
 export abstract class BuildableProject {
 
@@ -30,14 +32,14 @@ export abstract class BuildableProject {
 
   get trustedAllPossible() {
     const projTnp = Project.Tnp as Project;
-    PackagesRecognition.fromProject(projTnp).start();
+    PackagesRecognition.fromProject(projTnp, true).start();
     return projTnp.availableIsomorphicPackagesInNodeModules;
   }
 
   // @ts-ignore
   get trusted(this: Project) {
     const projTnp = Project.Tnp as Project;
-    PackagesRecognition.fromProject(projTnp).start();
+    PackagesRecognition.fromProject(projTnp, true).start();
     projTnp.availableIsomorphicPackagesInNodeModules;
     const currentProjVersion = this._frameworkVersion;
     const value = projTnp.packageJson.trusted[currentProjVersion];
@@ -113,8 +115,6 @@ export abstract class BuildableProject {
     return (result as Project[]).map(p => (p as Project).location);
   }
   //#endregion
-
-
 
   //#region @backend
 
@@ -229,10 +229,11 @@ export abstract class BuildableProject {
     // Helpers.log(`BUILD OPTIONS: ${JSON10.stringify(buildOptions)}`)
 
     //#region TODO refactor this part
-    const { obscure, uglify, nodts }: {
+    const { obscure, uglify, nodts, websql }: {
       obscure: boolean,
       nodts: boolean,
-      uglify: boolean
+      uglify: boolean,
+      websql: boolean,
     } = require('minimist')(buildOptions.args.split(' '));
 
     if (_.isUndefined(buildOptions.obscure) && obscure) {
@@ -243,6 +244,9 @@ export abstract class BuildableProject {
     }
     if (_.isUndefined(buildOptions.uglify) && uglify) {
       buildOptions.uglify = true;
+    }
+    if (_.isUndefined(buildOptions.uglify) && websql) {
+      buildOptions.websql = true;
     }
     //#endregion
 

@@ -53,7 +53,7 @@ export class SourceModForSite extends SourceModForWorkspaceChilds {
         process(folders);
 
         folders = this.project.isStandaloneProject ? [] : this.project.parent.childrenThatAreClients.map(client => {
-          return Helpers.getBrowserVerPath(client.name);
+          return Helpers.getBrowserVerPath(client.name, this.websql);
         });
         process(folders);
         //#endregion
@@ -112,7 +112,7 @@ export class SourceModForSite extends SourceModForWorkspaceChilds {
               method
             });
           } else {
-            const browserForCurrentClient = Helpers.getBrowserVerPath(this.project.name);
+            const browserForCurrentClient = Helpers.getBrowserVerPath(this.project.name, this.websql);
             input = impReplace({
               name: `${baselineName}/${libName}/(${compiled.join('|\n')}) -> ${libName}/${browserForCurrentClient}`,
               project: this.project,
@@ -133,7 +133,7 @@ export class SourceModForSite extends SourceModForWorkspaceChilds {
         process(folders);
         folders = this.project.isStandaloneProject ? [] : this.project.parent.childrenThatAreClients
           .map(client => {
-            return Helpers.getBrowserVerPath(client.name);
+            return Helpers.getBrowserVerPath(client.name, this.websql);
           });
         process(folders);
         //#endregion
@@ -145,7 +145,7 @@ export class SourceModForSite extends SourceModForWorkspaceChilds {
           if (child.typeIs('angular-lib')) {
             compiled = compiled.filter(f => f !== config.folder.src);
           };
-          const browserForCurrentClient = Helpers.getBrowserVerPath(this.project.name);
+          const browserForCurrentClient = Helpers.getBrowserVerPath(this.project.name, this.websql);
           input = impReplace({
             name: `${baselineName}/${libName}/(${compiled.join('|\n')}) -> ${baselineName}/${libName}/${browserForCurrentClient}`,
             project: this.project,
@@ -164,7 +164,7 @@ export class SourceModForSite extends SourceModForWorkspaceChilds {
         process(folders);
         folders = this.project.isStandaloneProject ? [] : this.project.parent.childrenThatAreClients
           .map(client => {
-            return Helpers.getBrowserVerPath(client.name);
+            return Helpers.getBrowserVerPath(client.name, this.websql);
           });
         process(folders);
       }

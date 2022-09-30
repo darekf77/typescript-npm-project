@@ -512,7 +512,9 @@ export class CopyManager extends FeatureForProject {
       children,
     } = options;
     const destPackageInNodeModules = path.join(destination.location, config.folder.node_modules, rootPackageName);
-    const destPackageInNodeModulesBrowser = path.join(destPackageInNodeModules, config.folder.browser);
+    const destPackageInNodeModulesBrowser = path.join(destPackageInNodeModules,
+      this.buildOptions.websql ? config.folder.websql : config.folder.browser);
+
     if (isOrganizationPackageBuild) {
       Helpers.remove(destPackageInNodeModulesBrowser);
     } else {
@@ -534,7 +536,12 @@ export class CopyManager extends FeatureForProject {
       for (let index = 0; index < children.length; index++) {
         const c = children[index];
         const childDestPackageInNodeModules = path.join(destPackageInNodeModules, childPureName(c))
-        const childDestPackageInNodeModulesBrowser = path.join(destPackageInNodeModules, childPureName(c), config.folder.browser);
+        const childDestPackageInNodeModulesBrowser = path.join(
+          destPackageInNodeModules,
+          childPureName(c),
+          this.buildOptions.websql ? config.folder.websql : config.folder.browser
+        );
+
         if (Helpers.isSymlinkFileExitedOrUnexisted(childDestPackageInNodeModules)) {
           Helpers.removeFileIfExists(childDestPackageInNodeModules);
         }
@@ -663,7 +670,9 @@ export class CopyManager extends FeatureForProject {
       if (mode === 'copy-source-maps') {
         //#region copy source maps
 
-        glob.sync(`${destPackageLocation}/${config.folder.browser}/**/*.mjs.map`)
+        glob.sync(`${destPackageLocation}/`
+          + `${this.buildOptions.websql ? config.folder.websql : config.folder.browser}`
+          + `/**/*.mjs.map`)
           .forEach(f => {
             let content = Helpers.readFile(f);
             content = this.transformMapFile({
@@ -673,7 +682,7 @@ export class CopyManager extends FeatureForProject {
           });
 
         glob.sync(`${destPackageLocation}/**/*.js.map`,
-          { ignore: [`${config.folder.browser}/**/*.*`] })
+          { ignore: [`${config.folder.browser}/**/*.*`, `${config.folder.websql}/**/*.*`] })
           .forEach(f => {
             let content = Helpers.readFile(f);
             content = this.transformMapFile({
@@ -685,11 +694,6 @@ export class CopyManager extends FeatureForProject {
       }
       if (mode === 'copy-compiled-source-and-declarations') {
 
-        Helpers.writeFile(path.join(
-          destPackageLocation,
-          config.file.index_d_ts,
-        ), `export * from './${this.project.sourceFolder}';\n`);
-
         const monitorDir = this.monitoredOutDir(outDir);
         const worksapcePackageName = path.basename(destPackageLocation);
 
@@ -697,10 +701,17 @@ export class CopyManager extends FeatureForProject {
           Helpers.copy(path.join(monitorDir, worksapcePackageName), destPackageLocation, {
             recursive: true,
             overwrite: true,
-            omitFolders: [config.folder.browser, config.folder.node_modules]
+            omitFolders: [config.folder.browser, config.folder.websql, config.folder.node_modules]
           });
-          const sourceBrowser = path.join(path.dirname(monitorDir), config.folder.browser);
-          const browserDest = path.join(destPackageLocation, config.folder.browser);
+          const sourceBrowser = path.join(
+            path.dirname(monitorDir),
+            this.buildOptions.websql ? config.folder.websql : config.folder.browser
+          );
+
+          const browserDest = path.join(
+            destPackageLocation,
+            this.buildOptions.websql ? config.folder.websql : config.folder.browser
+          );
 
           Helpers.copy(sourceBrowser, browserDest, {
             recursive: true,
@@ -709,7 +720,7 @@ export class CopyManager extends FeatureForProject {
 
           const browserDestPackageJson = path.join(
             destPackageLocation,
-            config.folder.browser,
+            this.buildOptions.websql ? config.folder.websql : config.folder.browser,
             config.file.package_json,
           );
           const packageJsonBrowserDest = Helpers.readJson(browserDestPackageJson, {});
@@ -718,7 +729,7 @@ export class CopyManager extends FeatureForProject {
 
           const browserDestPublicApiDest = path.join(
             destPackageLocation,
-            config.folder.browser,
+            this.buildOptions.websql ? config.folder.websql : config.folder.browser,
             'public-api.d.ts',
           );
           Helpers.writeFile(browserDestPublicApiDest,
@@ -734,6 +745,12 @@ export * from './libs/${worksapcePackageName}';\n
         } else {
           Helpers.tryCopyFrom(monitorDir, destPackageLocation);
         }
+
+        Helpers.writeFile(path.join( // override dts to easly debugging
+          destPackageLocation,
+          config.file.index_d_ts,
+        ), `export * from './${this.project.sourceFolder}';\n`);
+
 
       }
     };

@@ -151,12 +151,13 @@ export class ProjectIsomorphicLib
     project: Project,
     outFolder?: ConfigModels.OutFolder,
     client?: string,
+    websql?: boolean,
     type: 'app' | 'lib' = 'app'
   ) {
     const pref = ((type === 'app') ? 'apps' : 'libs')
 
-    const tmpProjectsStandalone = `tmp-${pref}-for-{{{outFolder}}}/${project.name}`;
-    const tmpProjects = `tmp-${pref}-for-{{{outFolder}}}/${project.name}--for--{{{client}}}`;
+    const tmpProjectsStandalone = `tmp-${pref}-for-{{{outFolder}}}${websql ? '-websql' : ''}/${project.name}`;
+    const tmpProjects = `tmp-${pref}-for-{{{outFolder}}}${websql ? '-websql' : ''}/${project.name}--for--{{{client}}}`;
     if (project.isStandaloneProject) {
       if (outFolder) {
         return tmpProjectsStandalone.replace('{{{outFolder}}}', outFolder);
@@ -176,6 +177,7 @@ export class ProjectIsomorphicLib
       project,
       buildOptions.outDir as any,
       void 0, // TODO
+      this.buildOptions.websql,
       type
     ));
     const proj = Project.From(projepath);

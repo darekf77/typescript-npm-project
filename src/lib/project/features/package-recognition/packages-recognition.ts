@@ -14,12 +14,22 @@ export class PackagesRecognition {
 
   static FILE_NAME_ISOMORPHIC_PACKAGES = config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES;
 
-  public static fromProject(project: Project) {
+  private static cached: { [location: string]: PackagesRecognition; } = {} as any;
+
+  public static fromProject(project: Project, cached = false) {
+    if (cached && !!project?.location && !this.cached[project?.location]) {
+      this.cached[project?.location] = new PackagesRecognition(project.location, project);
+    }
+    if (cached && !!project?.location) {
+      const instance = this.cached[project?.location] as PackagesRecognition;
+
+      return instance;
+    }
     return new PackagesRecognition(project.location, project);
   }
 
   protected recognizedPackages: string[];
-
+  private processAlreadyDone = false;
   constructor(protected cwd: string, protected project?: Project) {
 
   }
@@ -30,6 +40,12 @@ export class PackagesRecognition {
 
   // @ts-ignore
   start(force?: boolean, reasonToSearch?: string) {
+    if (this.processAlreadyDone) {
+      this.updateCurrentIsomorphicJsonSearchResults();
+      Helpers.info(`[package-recognition] Searching isomorphic packages for ${this.project.genericName}...`
+        + ` ommiting, updating from cache`);
+      return;
+    }
     Helpers.log(`[${config.frameworkName}] ${reasonToSearch}`);
     if (typeof force !== 'boolean') {
       force = false;
@@ -37,10 +53,11 @@ export class PackagesRecognition {
     if (!global.globalSystemToolMode) {
       return;
     }
-    Helpers.info(`[package-recognition] Searching isomorphic packages... force=${force}
+
+    Helpers.info(`[package-recognition] Searching isomorphic packages for ${this.project.genericName}... force=${force}
     in ${this.cwd}
     `);
-    Helpers.mesureExectionInMsSync(`Searching isomorphic packages...`, () => {
+    Helpers.mesureExectionInMsSync(`Searching isomorphic packages for ${this.project.genericName}...`, () => {
       let local = [];
       if (this.project.isSmartContainer || this.project.isSmartContainerTarget) {
         const parent = this.project.isSmartContainer ? this.project
@@ -56,6 +73,7 @@ export class PackagesRecognition {
 
     });
     Helpers.info(`[${config.frameworkName}] [package-recognition] Founded ${this.count} isomorphic packages`);
+    this.processAlreadyDone = true;
   }
 
   // checkIsomorphic(node_modules: string, packageName: string) {
@@ -138,20 +156,20 @@ export class PackagesRecognition {
       })
       .filter(packageName => {
         Helpers.log(`[${config.frameworkName}] Checking package node_modules/${packageName}`, 2)
-        try {
-          return this.checkIsomorphic(node_modules, packageName);
-        } catch (error) {
-          return false;
-        }
+        // try {
+        return this.checkIsomorphic(node_modules, packageName);
+        // } catch (error) {
+        //   return false;
+        // }
       });
     this.recognizedPackages = [
       ...folders,
       ...local,
     ];
-    this.updateCurrentPackageJson()
+    this.updateCurrentIsomorphicJsonSearchResults()
   }
 
-  protected updateCurrentPackageJson() {
+  protected updateCurrentIsomorphicJsonSearchResults() {
     Helpers.log(`[${config.frameworkName}] updateCurrentPackageJson`)
     try {
       const pjPath = crossPlatformPath(path.join(this.cwd, config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES));
@@ -169,9 +187,16 @@ export class PackagesRecognition {
   }
 
   protected checkIsomorphic(node_modules: string, packageName: string) {
+    let isIsomorphic = false;
     const packageInNodeModulesPath = crossPlatformPath(fse.realpathSync(path.join(node_modules, packageName)));
     const browser = crossPlatformPath(path.join(packageInNodeModulesPath, config.folder.browser));
-    return Helpers.exists(browser);
+    const websql = crossPlatformPath(path.join(packageInNodeModulesPath, config.folder.websql));
+    isIsomorphic = Helpers.exists(browser);
+    if (isIsomorphic && !Helpers.exists(websql)) {
+      Helpers.removeIfExists(websql);
+      Helpers.createSymLink(browser, websql);
+    }
+    return isIsomorphic;
   }
 
 }

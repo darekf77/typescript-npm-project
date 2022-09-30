@@ -12,14 +12,14 @@ import { config } from 'tnp-config';
 @CLASS.NAME('InsideStructAngular13App')
 export class InsideStructAngular13App extends BaseInsideStruct {
 
-  private constructor(project: Project) {
-    super(project);
+  private constructor(project: Project, websql: boolean) {
+    super(project, websql);
     //#region @backend
     if (!project.frameworkVersionAtLeast('v3') || project.typeIsNot('isomorphic-lib')) {
       return
     }
-    const tmpProjectsStandalone = `tmp-apps-for-{{{outFolder}}}/${project.name}`;
-    const tmpProjects = `tmp-apps-for-{{{outFolder}}}/${project.name}--for--{{{client}}}`;
+    const tmpProjectsStandalone = `tmp-apps-for-{{{outFolder}}}${this.websql ? '-websql' : ''}/${project.name}`;
+    const tmpProjects = `tmp-apps-for-{{{outFolder}}}${this.websql ? '-websql' : ''}/${project.name}--for--{{{client}}}`;
     const result = InsideStruct.from({
 
       relateivePathesFromContainer: [
@@ -71,9 +71,9 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         [
           ({ outFolder, client }) => {
             if (project.isStandaloneProject) {
-              return `tmp-src-${outFolder}`;
+              return `tmp-src-${outFolder}${this.websql ? '-websql' : ''}`;
             }
-            return `tmp-src-${outFolder}-browser-for-{{{client}}}`;
+            return `tmp-src-${outFolder}${this.websql ? '-websql' : ''}-browser-for-{{{client}}}`;
           },
           ({ projectName }) => `app/src/app/${projectName}`,
         ],
@@ -333,8 +333,8 @@ ${appModuleFile}
                 .replace('src/', `src/app/${project.name}/`)
                 ;
               return _.merge(a, {
-                [`@${parent.name}/${path.basename(b)}/browser`]: [`./${pathRelative}`],
-                [`@${parent.name}/${path.basename(b)}/browser/*`]: [`./${pathRelative}/*`],
+                [`@${parent.name}/${path.basename(b)}/${this.websql ? config.folder.websql : config.folder.browser}`]: [`./${pathRelative}`],
+                [`@${parent.name}/${path.basename(b)}/${this.websql ? config.folder.websql : config.folder.browser}/*`]: [`./${pathRelative}/*`],
               })
             }, {}));
             Helpers.writeJson(tsconfigJSONpath, content);

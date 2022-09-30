@@ -61,7 +61,7 @@ export class BroswerCompilation extends BackendCompilation {
     public backendOutFolder: string,
     public buildOptions: BuildOptions
   ) {
-    super(outFolder, location, cwd);
+    super(outFolder, location, cwd, buildOptions.websql);
     this.compilerName = this.customCompilerName;
 
     Helpers.log(`[BroswerCompilation][constructor]
@@ -88,6 +88,8 @@ export class BroswerCompilation extends BackendCompilation {
   //#endregion
 
   //#region methods
+
+  //#region methods / sync action
   async syncAction(files: string[]) {
     // console.log('[compilation browser] syncAction', files)
     if (fse.existsSync(this.compilationFolderPath)) {
@@ -115,8 +117,9 @@ export class BroswerCompilation extends BackendCompilation {
     this.codecut.files();
     await this.compile();
   }
+  //#endregion
 
-
+  //#region methods / async action
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
@@ -227,12 +230,13 @@ export class BroswerCompilation extends BackendCompilation {
     }
 
   }
+  //#endregion
 
-
-
+  //#region methods / compile
   async compile(watch: boolean = false) {
     try {
       await this.libCompilation({
+        websql: this.websql,
         cwd: this.compilationFolderPath,
         watch,
         outDir: (`../${this.backendOutFolder}/${this.outFolder}` as any),
@@ -252,7 +256,9 @@ export class BroswerCompilation extends BackendCompilation {
       Helpers.error(`Browser compilation fail: ${e}`, false, true);
     }
   }
+  //#endregion
 
+  //#region methods / init code cut
   initCodeCut(filesPathes: string[]) {
     Helpers.log(`[initCodeCut] filesPathes:
 
@@ -292,16 +298,25 @@ export class BroswerCompilation extends BackendCompilation {
 
     `, 1);
 
+    const replacements = [];
+
+    replacements.push(['@backe' + 'ndFunc', `return (void 0);`]);
+    replacements.push('@bac' + 'kend' as any);
+
+    if (!this.buildOptions.websql) {
+      replacements.push('@web' + 'sqlOnly' as any,);
+      replacements.push(['@websq' + 'lFunc', `return (void 0);`]);
+      replacements.push('@we' + 'bsql' as any,);
+    }
+
+    replacements.push(['@cutCode' + 'IfTrue', codeCuttFn(true)]);
+    replacements.push(['@cutCod' + 'eIfFalse', codeCuttFn(false)]);
+
     this.codecut = new CodeCut(
       this.compilationFolderPath,
       filesPathes,
       {
-        replacements: [
-          ['@backendFunc', `return (void 0);`],
-          '@backend' as any,
-          ['@cutCodeIfTrue', codeCuttFn(true)],
-          ['@cutCodeIfFalse', codeCuttFn(false)]
-        ].filter(f => !!f),
+        replacements: replacements.filter(f => !!f),
         env
       },
       project,
@@ -310,8 +325,7 @@ export class BroswerCompilation extends BackendCompilation {
       this.sourceOutBrowser
     );
   }
-
-
+  //#endregion
 
   //#endregion
 

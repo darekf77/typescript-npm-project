@@ -17,15 +17,15 @@ import { recreateApp, recreateIndex } from './inside-struct-helpers';
 @CLASS.NAME('InsideStructAngular13Lib')
 export class InsideStructAngular13Lib extends BaseInsideStruct {
 
-  private constructor(project: Project) {
-    super(project);
+  private constructor(project: Project, websql: boolean) {
+    super(project, websql);
     //#region @backend
     if (!project.frameworkVersionAtLeast('v3') || project.typeIsNot('isomorphic-lib')) {
       return
     }
-    const tmpProjectsStandalone = `tmp-libs-for-{{{outFolder}}}/${project.name}`;
-    const tmpProjects = `tmp-libs-for-{{{outFolder}}}/${project.name}--for--{{{client}}}`;
-    const tmpSource = `tmp-src-{{{outFolder}}}`;
+    const tmpProjectsStandalone = `tmp-libs-for-{{{outFolder}}}${this.websql ? '-websql' : ''}/${project.name}`;
+    const tmpProjects = `tmp-libs-for-{{{outFolder}}}${this.websql ? '-websql' : ''}/${project.name}--for--{{{client}}}`;
+    const tmpSource = `tmp-src-{{{outFolder}}}${this.websql ? '-websql' : ''}`;
     const result = InsideStruct.from({
 
       relateivePathesFromContainer: [
@@ -130,7 +130,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
         (() => {
           const source = path.join(
             projectLocation,
-            `tmp-src-${outFolder}`,
+            `tmp-src-${outFolder}${this.websql ? '-websql' : ''}`,
             'lib'
           );
 
@@ -156,7 +156,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
           const sourceTsconfig = path.join(
             projectLocation,
             this.project.isStandaloneProject
-            ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
+              ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
             `tsconfig.json`,
           );
 
@@ -209,7 +209,7 @@ export * from './lib';
               const child = otherChildren[index];
               const sourceChild = path.join(
                 projectLocation,
-                `tmp-src-${outFolder}`,
+                `tmp-src-${outFolder}${this.websql ? '-websql' : ''}`,
                 'libs',
                 child.name,
               );
@@ -287,7 +287,9 @@ export * from './lib';
               ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
             `projects/${projectName}/ng-package.json`);
           const json = Helpers.readJson(ngPath);
-          json.dest = json.dest.replace(`/dist/${projectName}`, `/../../${outFolder}/browser`)
+          json.dest = json.dest.replace(`/dist/${projectName}`, `/../../${outFolder}/`
+            + `${this.websql ? config.folder.websql : config.folder.browser}`);
+
           Helpers.writeJson(ngPath, json);
         })();
 
