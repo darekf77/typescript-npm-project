@@ -526,7 +526,9 @@ export class BrowserCodeCut {
 
       if (
         !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist/tests/`) &&
-        !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle/tests/`)
+        !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle/tests/`) &&
+        !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist-websql/tests/`) &&
+        !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle-websql/tests/`)
       ) {
         // console.log(relativePath)
         fse.writeFileSync(absoluteBackendFilePath,

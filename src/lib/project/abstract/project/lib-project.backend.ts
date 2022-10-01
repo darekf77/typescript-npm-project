@@ -733,7 +733,7 @@ export abstract class LibProject {
     const vsixPackageName = this.extensionVsixName;
     try {
       await Helpers.actionWrapper(() => {
-        this.run(`npm-run vsce package --yarn`).sync();
+        this.run(`vsce package`).sync();
       }, `Building vsix package ` + chalk.bold(vsixPackageName) + `... `);
       if (showInfo) {
         const commandInstall = chalk.bold(`${config.frameworkName} install:locally`);

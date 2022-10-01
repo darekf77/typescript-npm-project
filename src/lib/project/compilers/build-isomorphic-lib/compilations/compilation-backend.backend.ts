@@ -336,6 +336,8 @@ Starting backend typescirpt build....
         }
       });
 
+    Helpers.info(`* Typescirpt compilation first part done.`)
+
     await Helpers.execute(child_process.exec(commandMaps, { cwd }),
       {
         hideOutput: {
@@ -346,6 +348,7 @@ Starting backend typescirpt build....
           stdout: ['Watching for file changes.']
         }
       });
+    Helpers.info(`* Typescirpt compilation second part done.`)
     // if (generateDeclarations) {
     //   Helpers.log(`(${this.compilerName}) Execute second command : ${commandDts}    # inside: ${cwd}`)
     //   await Helpers.logProc2(child_process.exec(commandDts, { cwd }), ['Watching for file changes.']);
