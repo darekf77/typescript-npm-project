@@ -236,7 +236,7 @@
     "watch": "1.0.2",
     "zone.js": "~0.11.4"
   },
-  "lastBuildTagHash": "be08d68acc7d5639324c8004ab8053e116b84a25",
+  "lastBuildTagHash": "52c408aff10449ad9b21b012221089f31dcbf6b3",
   "scripts": {
     "activate": "npm i --force && firedev dedupe && npx tsc && firedev link && tnp bd"
   },
