@@ -15,7 +15,7 @@ import { RegionRemover } from 'isomorphic-region-loader';
 
 //#region consts
 const filesToDebug = [
-  // 'app.ts'
+
 ]
 
 const regexAsyncImport = /\ import\((\`|\'|\")([a-zA-Z|\-|\@|\/|\.]+)(\`|\'|\")\)/;

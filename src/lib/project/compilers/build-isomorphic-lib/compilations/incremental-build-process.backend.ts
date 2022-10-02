@@ -6,7 +6,6 @@ import { config } from 'tnp-config';
 import type { Project } from '../../../../project/abstract/project/project';
 import { Helpers } from 'tnp-helpers';
 import { BuildOptions } from 'tnp-db';
-import { MorphiHelpers } from 'morphi';
 import { BackendCompilation } from './compilation-backend.backend';
 import { BroswerCompilation } from './compilation-browser.backend';
 import { IncCompiler } from 'incremental-compiler';
@@ -215,7 +214,7 @@ export class IncrementalBuildProcess {
   private recreateBrowserLinks(bc: BroswerCompilation) {
     const outDistPath = crossPlatformPath(path.join(bc.cwd, bc.outFolder));
     Helpers.log(`recreateBrowserLinks: outDistPath: ${outDistPath}`)
-    MorphiHelpers.System.Operations.tryRemoveDir(outDistPath)
+    Helpers.tryRemoveDir(outDistPath)
     const targetOut = crossPlatformPath(path.join(bc.cwd, bc.backendOutFolder, bc.outFolder))
     Helpers.log(`recreateBrowserLinks: targetOut: ${targetOut}`)
     Helpers.createSymLink(targetOut, outDistPath, { continueWhenExistedFolderDoesntExists: true });

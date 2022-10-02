@@ -9,7 +9,6 @@ import {
 } from 'tnp-core';
 import { IncCompiler } from 'incremental-compiler';
 import { ConfigModels } from 'tnp-config';
-import { MorphiHelpers } from 'morphi';
 import { Helpers } from 'tnp-helpers';
 import { BackendCompilation } from './compilation-backend.backend';
 import { BuildOptions } from 'tnp-db';
@@ -100,7 +99,7 @@ export class BroswerCompilation extends BackendCompilation {
     // console.log(`copying ${path.join(this.cwd, this.location)}/ to  ${this.compilationFolderPath} dereference: ${dereference},`)
 
     // TODO_NOT_IMPORTANT this may be replaced by filesPathes
-    MorphiHelpers.System.Operations.tryCopyFrom(`${crossPlatformPath(path.join(this.cwd, this.location))}/`, this.compilationFolderPath, {
+    Helpers.copy(`${crossPlatformPath(path.join(this.cwd, this.location))}/`, this.compilationFolderPath, {
       dereference,
       filter: (src: string, dest: string) => {
         return copyToBrowserSrcCodition(src);

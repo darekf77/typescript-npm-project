@@ -457,8 +457,14 @@ async function $TARGET_PROJ_UPDATE() {
   process.exit(0)
 }
 
+function $WATCHERS() {
+  Helpers.run(`find /proc/*/fd -user "$USER" -lname anon_inode:inotify -printf '%hinfo/%f\n' 2>/dev/null | xargs cat | grep -c '^inotify'`).sync();
+  process.exit(0)
+}
+
 export default {
   //#region export default
+  $WATCHERS: Helpers.CLIWRAP($WATCHERS, '$WATCHERS'),
   $TARGET_PROJ_UPDATE: Helpers.CLIWRAP($TARGET_PROJ_UPDATE, '$TARGET_PROJ_UPDATE'),
   $INFO: Helpers.CLIWRAP($INFO, '$INFO'),
   $CHECK: Helpers.CLIWRAP($CHECK, '$CHECK'),

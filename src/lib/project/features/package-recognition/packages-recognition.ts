@@ -191,7 +191,7 @@ export class PackagesRecognition {
     const packageInNodeModulesPath = crossPlatformPath(fse.realpathSync(path.join(node_modules, packageName)));
     const browser = crossPlatformPath(path.join(packageInNodeModulesPath, config.folder.browser));
     const websql = crossPlatformPath(path.join(packageInNodeModulesPath, config.folder.websql));
-    isIsomorphic = Helpers.exists(browser);
+    isIsomorphic = (Helpers.exists(browser) || Helpers.exists(websql));
     if (isIsomorphic && !Helpers.exists(websql)) {
       Helpers.removeIfExists(websql);
       Helpers.createSymLink(browser, websql);
