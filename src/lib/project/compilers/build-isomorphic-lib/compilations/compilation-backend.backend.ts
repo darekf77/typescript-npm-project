@@ -197,7 +197,7 @@ export class BackendCompilation extends IncCompiler.Base {
         // nothing here for for now
       } else {
         await this.buildStandardLibVer({
-          watch, ...tscCommands, generateDeclarations, cwd, project, buildOutDir
+          watch, ...tscCommands, generateDeclarations, cwd, project, buildOutDir, websql
         });
       }
     } else {
@@ -211,7 +211,7 @@ export class BackendCompilation extends IncCompiler.Base {
         })
       } else {
         await this.buildStandardLibVer({
-          watch, ...tscCommands, generateDeclarations, cwd, project, buildOutDir
+          watch, ...tscCommands, generateDeclarations, cwd, project, buildOutDir, websql
         });
       }
     }
@@ -228,6 +228,7 @@ export class BackendCompilation extends IncCompiler.Base {
     watch: boolean;
     commandJs: string;
     commandMaps: string;
+    websql: boolean;
     // commandDts: string,
     generateDeclarations: boolean,
     cwd: string;
@@ -242,7 +243,8 @@ export class BackendCompilation extends IncCompiler.Base {
       commandMaps,
       cwd,
       project,
-      buildOutDir
+      buildOutDir,
+      websql
     } = options;
 
     const isStandalone = (!project.isSmartContainerTarget && !project.isWorkspace && !project.isSmartContainerChild);
@@ -336,7 +338,7 @@ Starting backend typescirpt build....
         }
       });
 
-    Helpers.info(`* Typescirpt compilation first part done.`)
+    Helpers.info(`* Typescirpt compilation first part done. ${websql ? '[WEBSQL]' : ''} `)
 
     await Helpers.execute(child_process.exec(commandMaps, { cwd }),
       {
@@ -348,7 +350,7 @@ Starting backend typescirpt build....
           stdout: ['Watching for file changes.']
         }
       });
-    Helpers.info(`* Typescirpt compilation second part done.`)
+    Helpers.info(`* Typescirpt compilation second part done. ${websql ? '[WEBSQL]' : ''} `)
     // if (generateDeclarations) {
     //   Helpers.log(`(${this.compilerName}) Execute second command : ${commandDts}    # inside: ${cwd}`)
     //   await Helpers.logProc2(child_process.exec(commandDts, { cwd }), ['Watching for file changes.']);

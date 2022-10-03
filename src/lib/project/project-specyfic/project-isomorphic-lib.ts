@@ -452,7 +452,7 @@ export class ProjectIsomorphicLib
     const angularCommand = `${loadNvm} && ${this.npmRunNg} build ${this.name} ${watch ? '--watch' : ''}`;
 
     const showInfoAngular = () => {
-      Helpers.info(`Starting browser typescirpt build....`);
+      Helpers.info(`Starting browser typescirpt build.... ${this.buildOptions.websql ? '[WEBSQL]' : ''}`);
       Helpers.log(`
 
       ANGULAR 13+ ${this.buildOptions.watch ? 'WATCH ' : ''} LIB BUILD STARTED...
@@ -543,7 +543,7 @@ export class ProjectIsomorphicLib
         });
       if (outDir === 'bundle') {
         // Helpers.error(`Watch build not available for bundle build`, false, true);
-        Helpers.info(`Starting watch bundle build for fast cli..`);
+        Helpers.info(`Starting watch bundle build for fast cli.. ${this.buildOptions.websql ? '[WEBSQL]' : ''}`);
 
         try {
           showInfoWebpack()

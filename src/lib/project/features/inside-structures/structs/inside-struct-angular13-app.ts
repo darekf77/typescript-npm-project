@@ -125,7 +125,7 @@ ${appModuleFile}
 
           appHtmlFile = appHtmlFile.replace(
             '<!-- <<<TO_REPLACE_COMPONENT_TAG>>> -->',
-            `${tagName}, `
+            `${tagName} `
           );
           Helpers.writeFile(appModuleFilePath, appHtmlFile);
         })();

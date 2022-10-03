@@ -81,7 +81,7 @@ export class FilesStructure extends FeatureForProject {
       options.initiator = this.project;
     }
     const { alreadyInitedPorjects, watch, watchOnly } = options;
-    let { skipNodeModules, recrusive, env, struct }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
+    let { skipNodeModules, websql, recrusive, env, struct }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
 
     // THIS IS SLOW... BUT I CAN AFORD IT HERE
     if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {
@@ -148,7 +148,7 @@ export class FilesStructure extends FeatureForProject {
     }
 
     if (this.project.isWorkspace || this.project.isStandaloneProject) {
-      Helpers.info(`Initing project: ${chalk.bold(this.project.genericName)}`);
+      Helpers.info(`Initing project: ${chalk.bold(this.project.genericName)}  ${websql ? '[WEBSQL]' : ''}`);
     }
 
     alreadyInitedPorjects.push(this.project)
