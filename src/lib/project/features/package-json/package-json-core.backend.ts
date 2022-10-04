@@ -333,7 +333,7 @@ export class PackageJsonCore {
       const recreateJson5 = (resultFileName === config.file.package_json__tnp_json5)
         && !Helpers.exists(splitPath)
         && (data.tnp?.type === 'isomorphic-lib' || ((data.tnp?.type === 'container') && (data.tnp?.smart)))
-        && Number(data.tnp?.version.replace('v', '')) >= 3;
+        && Number(data.tnp?.version?.replace('v', '')) >= 3;
 
       if (recreateJson5) {
         Helpers.writeJson(splitPath, data.tnp);
