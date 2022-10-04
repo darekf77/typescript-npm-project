@@ -175,7 +175,12 @@ ${remotes.map((r, i) => `${i + 1}. ${r.origin} ${r.url}`).join('\n')}
       await this.project.recent.saveActiveProjects(false);
     }
     this.before();
-    const childrenToPush = await this.getLinkedPorjectsAndChildrens('push');
+    const linedChildren = await this.getLinkedPorjectsAndChildrens('push')
+    const childrenToPush = [
+      ...linedChildren,
+      ...this.project.linkedRepos.all,
+    ];
+
     for (let index = 0; index < childrenToPush.length; index++) {
       const childProj = childrenToPush[index];
       await childProj.gitActions.push(commitMessage, force, origin);
@@ -274,7 +279,7 @@ ${remotes.map((r, i) => `${i + 1}. ${r.origin} ${r.url}`).join('\n')}
     Project.unload(this.project);
     this.project = Project.From(location) as Project;
 
-    if(this.project) {
+    if (this.project) {
       if (this.project.isContainerOrWorkspaceWithLinkedProjects) {
         const childrenToPull = await this.getLinkedPorjectsAndChildrens('pull');
         for (let index = 0; index < childrenToPull.length; index++) {

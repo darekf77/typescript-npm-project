@@ -107,6 +107,8 @@ export class FilesStructure extends FeatureForProject {
     await this.project.__initProcedure();
     Helpers.log(`[init] __initProcedure end for  ${this.project.genericName} `)
 
+    await this.project.linkedRepos.update(struct);
+
     if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
       if (env) {
         Helpers.log(`ENVIRONMENT: ${chalk.bold(env)} inited for ${this.project.genericName}`)

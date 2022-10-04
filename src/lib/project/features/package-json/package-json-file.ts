@@ -296,6 +296,32 @@ function consistencyFixes(
     content[tnpProperty].linkedProjects = [];
     additionalSaveRequired = true;
   }
+
+  if (_.isUndefined(content[tnpProperty].linkedRepos)) {
+    content[tnpProperty].linkedRepos = [];
+    additionalSaveRequired = true;
+  }
+
+  for (let index = 0; index < content[tnpProperty].linkedRepos.length; index++) {
+    const linkedRepo = content[tnpProperty].linkedRepos[index];
+    if (!_.isArray(linkedRepo.relativeFoldersLinks)
+      || (linkedRepo.relativeFoldersLinks.length === 0)
+    ) {
+      linkedRepo.relativeFoldersLinks = [{
+        from: '',
+        to: ''
+      }];
+    }
+
+    if (_.isUndefined(linkedRepo.relativeFoldersLinks.find(f => (f.from === '') && (f.from === f.to)))) {
+      linkedRepo.relativeFoldersLinks.push({
+        from: '',
+        to: ''
+      })
+    }
+
+  }
+
   if (_.isUndefined(content[tnpProperty].libReleaseOptions)) {
     content[tnpProperty].libReleaseOptions = {
       nodts: false,

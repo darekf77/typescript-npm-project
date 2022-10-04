@@ -46,6 +46,14 @@ export class PackageJsonCore {
     return [];
   }
 
+  get linkedRepos(): Models.npm.LinkedRepo[] {
+    const res = this.data.tnp ? this.data.tnp.linkedRepos : undefined;
+    if (_.isArray(res)) {
+      return res;
+    }
+    return [];
+  }
+
   get linkedFolders() {
     const res = this.data?.tnp?.overrided?.linkedFolders;
     if (_.isArray(res)) {

@@ -7,7 +7,7 @@ import {
   FilesStructure, FilesTemplatesBuilder, BuildProcess,
   WorkspaceSymlinks, NodeModules, FilesRecreator, FilesFactory,
   QuickFixes, NpmPackages, ProxyRouter, TargetProject, GitActions,
-  SmartNodeModules, RecentFilesForContainer
+  SmartNodeModules, RecentFilesForContainer,LinkedRepos
 } from '../../features';
 
 import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator } from '../../compilers';
@@ -125,6 +125,10 @@ export abstract class FeatureProject {
 
   //#region @backend
   public webpackBackendBuild: WebpackBackendCompilation;
+  //#endregion
+
+  //#region @backend
+  public linkedRepos: LinkedRepos;
   //#endregion
 
 }
