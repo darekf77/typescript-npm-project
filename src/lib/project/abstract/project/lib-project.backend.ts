@@ -185,7 +185,10 @@ export abstract class LibProject {
           useTempLocation: true, // TODO not needed
           markAsGenerated: false, // TODO not needed
           forceCopyPackageJSON: true, // TODO not needed
+          // @ts-ignore
+          dereference: true,
         });
+
         this.packageJson.linkTo(absolutePathReleaseProject, true);
 
         const generatedProject = Project.From(absolutePathReleaseProject) as Project;
@@ -201,6 +204,7 @@ export abstract class LibProject {
           }
         })
 
+        // this.linkedRepos.linkToProject(generatedProject as Project)
         this.node_modules.linkToProject(generatedProject as Project);
         releaseOptions.useTempFolder = false;
         const vscodeFolder = path.join(generatedProject.location, config.folder._vscode);

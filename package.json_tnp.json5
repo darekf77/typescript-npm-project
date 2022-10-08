@@ -166,6 +166,7 @@
 
           'isomorphic-region-loader',
           "typeorm",
+          "firedev-typeorm",
         ],
       },
       "dedupe-for-testing": [

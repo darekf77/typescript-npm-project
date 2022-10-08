@@ -1,19 +1,29 @@
 import { config } from "tnp-config";
 import { path } from "tnp-core";
-import { Helpers } from "tnp-helpers";
+import { Helpers, PREFIXES } from "tnp-helpers";
 import { Models } from "tnp-models";
 import { FeatureForProject } from "../abstract/feature-for-project";
 import { Project } from "../abstract/project";
 
 
 export class LinkedRepos extends FeatureForProject {
+  prefixes = {
+    DELETED: PREFIXES.DELETED,
+    ORIGINAL: PREFIXES.ORIGINAL
+  }
+  labels = {
+    LINKED_REPOS: 'linked-repos'
+  }
+  get pathLinkedRepos() {
+    return path.join(this.project.location, this.labels.LINKED_REPOS);
+  }
 
   get all() {
     const linkedRepos = this.project.packageJson.linkedRepos
       .map(repo => {
-        const { dest } = this.destFor(repo);
-        if (this.isDestOk(dest)) {
-          return Project.From(dest);
+        const { destLinkedRepos } = this.destFor(repo);
+        if (this.isDestOk(destLinkedRepos)) {
+          return Project.From(destLinkedRepos);
         }
       })
       .filter(f => !!f);
@@ -23,41 +33,39 @@ export class LinkedRepos extends FeatureForProject {
   get git() {
     return {
       ignored: () => {
-        return `/linked-repos
-${this.project.packageJson.linkedRepos
-            .map(r => r.relativeFoldersLinks?.map(c => c.to))
-            .reduce((a, b) => a.concat(b), [])
-            .filter(f => !!f)
-            .map(a => `/${a}`).join('\n')
-          }`
+        return `/${this.labels.LINKED_REPOS}`.trimRight() + '\n';
       }
     }
   }
 
-
   async update(struct = false) {
+
     if (this.project.packageJson.linkedRepos.length > 0 && !struct) {
       const toClone = this.project.packageJson.linkedRepos;
       for (let index = 0; index < toClone.length; index++) {
         const repo = toClone[index];
         if (repo?.origin) {
-          const { dest, nameRepo } = this.destFor(repo);
-          if (!Helpers.exists(path.dirname(dest))) {
-            Helpers.mkdirp(path.dirname(dest));
+          const { destLinkedRepos, nameRepo } = this.destFor(repo);
+
+          if (!Helpers.exists(path.dirname(destLinkedRepos))) {
+            Helpers.mkdirp(path.dirname(destLinkedRepos));
+          }
+          if (this.project.packageJson.isLink) { // link means temp folder in release
+            return;
           }
           try {
-            if (this.isDestOk(dest)) {
-              if (Helpers.git.checkIfthereAreSomeUncommitedChange(dest)) {
+            if (this.isDestOk(destLinkedRepos)) {
+              if (Helpers.git.checkIfthereAreSomeUncommitedChange(destLinkedRepos)) {
                 Helpers.warn(`Ommiting update of linked repo linked-repos/${nameRepo}`.toUpperCase());
                 // if (await Helpers.questionYesNo(`Do you want to force reset linked repo linked-repos/${nameRepo}`)) {
                 //   Helpers.run('git reset --hard HEAD~5', { cwd: dest }).sync();
                 // }
               } else {
-                Helpers.git.pullCurrentBranch(dest, true);
+                Helpers.git.pullCurrentBranch(destLinkedRepos, true);
               }
             } else {
               Helpers.git.clone({
-                cwd: path.dirname(dest),
+                cwd: path.dirname(destLinkedRepos),
                 url: repo.origin,
                 override: true
               })
@@ -65,32 +73,84 @@ ${this.project.packageJson.linkedRepos
           } catch (error) {
             Helpers.error(`Not able to clone/update repo from ${repo.origin}...
 
-            Check your ${config.file.package_json__tnp_json5}:
-            ...
-            ${JSON.stringify(repo, null, 4)}
-            ...
+              Check your ${config.file.package_json__tnp_json5}:
+              ...
+              ${JSON.stringify(repo, null, 4)}
+              ...
 
-            `, false, true)
+              `, false, true)
           }
+
           const toLink = repo.relativeFoldersLinks.filter(f => !(f.from === f.to && f.from === '' && f.from === ''));
+
           for (let index = 0; index < toLink.length; index++) {
             const element = toLink[index];
             if (element.from && element.to) {
-              try {
-                Helpers.createSymLink(
-                  path.join(dest, element.from),
-                  path.join(this.project.location, element.to),
-                )
-              } catch (error) {
-                Helpers.error(`Not able to link folder for repo from ${repo.origin}...
+              const fileBasePath = {
+                from: path.join(destLinkedRepos, element.from),
+                to: path.join(this.project.location, element.to),
+              };
 
-                Check your ${config.file.package_json__tnp_json5}:
-                ...
-                ${JSON.stringify(element, null, 4)}
-                ...
+              const filter = (filterFile) => {
+                return path.basename(filterFile).search(this.prefixes.ORIGINAL) === -1
+                  && path.basename(filterFile).search(this.prefixes.DELETED) === -1
+              };
 
-                `, false, true)
-              }
+              const fileBases = {
+                from: Helpers.getRecrusiveFilesFrom(fileBasePath.from).filter(filter),
+                to: Helpers.getRecrusiveFilesFrom(fileBasePath.to).filter(filter),
+              };
+
+              //#region handl ___ORIGINAL___ files
+              // sync from to to new location - create _______UPDATE______.file if new file or ______DELETE______ is file is GONE
+              fileBases.from.forEach(sourceFilePath => {
+                const destFilePath = sourceFilePath.replace(fileBasePath.from, fileBasePath.to);
+                const foundedExistedDestPath = fileBases
+                  .to
+                  .find(f1 => f1 === destFilePath);
+
+
+                if (foundedExistedDestPath) {
+                  const contentNew = Helpers.readFile(sourceFilePath);
+                  const contentExisted = Helpers.readFile(foundedExistedDestPath);
+                  const originalFilePath = path.join(
+                    path.dirname(foundedExistedDestPath),
+                    `${path.basename(foundedExistedDestPath).replace(path.extname(foundedExistedDestPath), '')}`
+                    + `${this.prefixes.ORIGINAL}${path.extname(foundedExistedDestPath)}`
+                  );
+                  if (contentNew !== contentExisted) {
+                    Helpers.writeFile(originalFilePath, contentNew)
+                  } else {
+                    Helpers.removeFileIfExists(originalFilePath);
+                  }
+                } else {
+                  Helpers.copy(sourceFilePath, destFilePath);
+                }
+              });
+              //#endregion
+
+              //#region handle ___DELETED___ files
+              fileBases.to.forEach(sourceFilePath => {
+
+                const destFilePath = sourceFilePath.replace(fileBasePath.to, fileBasePath.from);
+                const foundedExistedDestPath = fileBases
+                  .from
+                  .find(f1 => f1 === destFilePath);
+
+                const deletedFilePath = path.join(
+                  path.dirname(sourceFilePath),
+                  `${path.basename(sourceFilePath).replace(path.extname(sourceFilePath), '')}`
+                  + `${this.prefixes.DELETED}${path.extname(sourceFilePath)}`
+                );
+
+
+                if (foundedExistedDestPath) {
+                  Helpers.removeFileIfExists(deletedFilePath);
+                } else {
+                  Helpers.writeFile(deletedFilePath, '// FILE HAS BEEN DELETED FROM LINKED REPO')
+                }
+              });
+              //#endregion
 
             }
           }
@@ -101,18 +161,13 @@ ${this.project.packageJson.linkedRepos
 
   private destFor(repo: Models.npm.LinkedRepo) {
     const nameRepo = path.basename(repo.origin.replace('.git', ''));
-    const destTMP = path.join(this.project.location, 'tmp-linked-repos', nameRepo);
-    const dest = path.join(this.project.location, 'linked-repos', nameRepo);
-    const destTMPdirname = path.dirname(destTMP);
-    const destDirname = path.dirname(dest);
-    if (!Helpers.exists(destTMPdirname) || !Helpers.isFolder(destTMPdirname)) {
-      Helpers.removeIfExists(destTMPdirname);
-      Helpers.mkdirp(destTMPdirname);
+    const destLinkedRepos = path.join(this.pathLinkedRepos, nameRepo);
+
+    if (!Helpers.exists(path.dirname(destLinkedRepos))) {
+      Helpers.mkdirp(path.dirname(destLinkedRepos));
     }
-    Helpers.remove(destDirname);
-    Helpers.createSymLink(destTMPdirname, destDirname);
     return {
-      dest,
+      destLinkedRepos,
       nameRepo
     }
   }

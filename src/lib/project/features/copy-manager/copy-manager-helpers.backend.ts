@@ -95,10 +95,10 @@ export namespace CopyMangerHelpers {
     const filter = override ? CopyMangerHelpers.filterOnlyCopy(sourceFolders, project)
       : CopyMangerHelpers.filterDontCopy(foldersToSkip, project);
 
-    Helpers.copy(`${sourceLocation}/`, tempDestination, { filter });
+    Helpers.copy(`${sourceLocation}/`, tempDestination, { filter, dereference: options.dereference });
 
     if (useTempLocation) {
-      Helpers.copy(`${tempDestination}/`, destinationLocation);
+      Helpers.copy(`${tempDestination}/`, destinationLocation, { dereference: options.dereference });
       Helpers.remove(tempDestination);
     }
 

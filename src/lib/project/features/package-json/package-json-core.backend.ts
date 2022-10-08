@@ -192,6 +192,10 @@ export class PackageJsonCore {
     return path.join(this.cwd, config.file.package_json);
   }
 
+  get isLink() {
+    return Helpers.isSymlinkFileExitedOrUnexisted(this.path);
+  }
+
   get pathToBaseline(): string {
     if (this.data && this.data.tnp &&
       (_.isString(this.data.tnp.basedOn) || _.isArray(this.data.tnp.dependsOn))
