@@ -1,3 +1,4 @@
+//#region imports
 //#region @backend
 import { crossPlatformPath, ExecuteOptions, fse } from 'tnp-core'
 import { path } from 'tnp-core'
@@ -15,47 +16,50 @@ import { Models } from 'tnp-models';
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
 import { CLI } from 'tnp-cli';
-
-
-const loadNvm = 'echo ' // 'export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" && [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh" && nvm use v14';
-
-//#region @backend
-@CLASS.NAME('ProjectIsomorphicLib')
 //#endregion
+
+//#region consts
+const loadNvm = 'echo ' // 'export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" && [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh" && nvm use v14';
+//#endregion
+@CLASS.NAME('ProjectIsomorphicLib')
 export class ProjectIsomorphicLib
   //#region @backend
   extends Project
 //#endregion
 {
+  //#region static
+
+  //#region static / get angular project proxy path
+  //#region @backend
+  public static angularProjProxyPath(
+    project: Project,
+    outFolder?: ConfigModels.OutFolder,
+    client?: string,
+    websql?: boolean,
+    type: 'app' | 'lib' = 'app'
+  ) {
+    const pref = ((type === 'app') ? 'apps' : 'libs')
+
+    const tmpProjectsStandalone = `tmp-${pref}-for-{{{outFolder}}}${websql ? '-websql' : ''}/${project.name}`;
+    const tmpProjects = `tmp-${pref}-for-{{{outFolder}}}${websql ? '-websql' : ''}/${project.name}--for--{{{client}}}`;
+    if (project.isStandaloneProject) {
+      if (outFolder) {
+        return tmpProjectsStandalone.replace('{{{outFolder}}}', outFolder);
+      }
+      return tmpProjectsStandalone;
+    }
+    if (outFolder && client) {
+      return tmpProjects.replace('{{{outFolder}}}', outFolder).replace('{{{client}}}', client);
+    }
+    return tmpProjects;
+  }
+  //#endregion
+  //#endregion
+
+  //#endregion
+
+  //#region fields / getters
   private npmRunNg = `npm-run ng`; // when there is not globl "ng" command -> npm-run ng.js works
-
-  async initProcedure() {
-    //#region @backend
-    if (this.isCoreProject && this.frameworkVersionAtLeast('v2')) {
-
-    }
-    //#endregion
-  }
-
-  startOnCommand(args: string) {
-    //#region @backendFunc
-    const command = `ts-node run.js ${args}`;
-    return command;
-    //#endregion
-  }
-
-  sourceFilesToIgnore() {
-    //#region @backendFunc
-    let toIgnore = [
-      `src/${config.file.entities_ts}`,
-      `src/${config.file.controllers_ts}`,
-    ];
-    if (this.isSiteInStrictMode) {
-      toIgnore = toIgnore.concat(toIgnore.map(f => `${config.folder.custom}/${f}`))
-    }
-    return toIgnore;
-    //#endregion
-  }
 
   get ignoreInV3() {
     const files = [
@@ -68,6 +72,26 @@ export class ProjectIsomorphicLib
     ]
   }
 
+  //#endregion
+
+  //#region methods
+
+  //#region methods / source files to ignore
+  sourceFilesToIgnore() {
+    //#region @backendFunc
+    let toIgnore = [
+      `src/${config.file.entities_ts}`,
+      `src/${config.file.controllers_ts}`,
+    ];
+    if (this.isSiteInStrictMode) {
+      toIgnore = toIgnore.concat(toIgnore.map(f => `${config.folder.custom}/${f}`))
+    }
+    return toIgnore;
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / project specyfic files
   projectSpecyficFiles(): string[] {
     //#region @backendFunc
     let files = super.projectSpecyficFiles()
@@ -94,9 +118,9 @@ export class ProjectIsomorphicLib
     return files;
     //#endregion
   }
+  //#endregion
 
-
-
+  //#region methods / files templates
   filesTemplates() {
     //#region @backendFunc
     let files = [
@@ -121,7 +145,9 @@ export class ProjectIsomorphicLib
     return files;
     //#endregion
   }
+  //#endregion
 
+  //#region methods / project linked files
   projectLinkedFiles() {
     //#region @backendFunc
     const files = super.projectLinkedFiles();
@@ -136,7 +162,9 @@ export class ProjectIsomorphicLib
     return files;
     //#endregion
   }
+  //#endregion
 
+  //#region methods / project specyfic ignored files
   projectSpecyficIgnoredFiles() {
     //#region @backendFunc
     return [
@@ -145,48 +173,53 @@ export class ProjectIsomorphicLib
     ].concat(this.projectSpecyficFiles());
     //#endregion
   }
+  //#endregion
 
-  //#region @backend
-  public static angularProjProxyPath(
-    project: Project,
-    outFolder?: ConfigModels.OutFolder,
-    client?: string,
-    websql?: boolean,
-    type: 'app' | 'lib' = 'app'
-  ) {
-    const pref = ((type === 'app') ? 'apps' : 'libs')
+  //#region methods / build steps
+  async buildSteps(buildOptions?: BuildOptions) {
+    //#region @backendFunc
+    this.buildOptions = buildOptions;
+    const { prod, watch, outDir, onlyWatchNoBuild, appBuild, args, forClient = [], baseHref } = buildOptions;
 
-    const tmpProjectsStandalone = `tmp-${pref}-for-{{{outFolder}}}${websql ? '-websql' : ''}/${project.name}`;
-    const tmpProjects = `tmp-${pref}-for-{{{outFolder}}}${websql ? '-websql' : ''}/${project.name}--for--{{{client}}}`;
-    if (project.isStandaloneProject) {
-      if (outFolder) {
-        return tmpProjectsStandalone.replace('{{{outFolder}}}', outFolder);
+    if (!onlyWatchNoBuild) {
+      if (appBuild) {
+        await this.buildApp(outDir, watch, forClient as any, buildOptions.args, baseHref, prod);
+      } else {
+        await this.buildLib();
       }
-      return tmpProjectsStandalone;
     }
-    if (outFolder && client) {
-      return tmpProjects.replace('{{{outFolder}}}', outFolder).replace('{{{client}}}', client);
-    }
-    return tmpProjects;
+
+    //#endregion
   }
   //#endregion
 
-  private proxyNgProj(project: Project, buildOptions: BuildOptions, type: 'app' | 'lib' = 'app') {
-    //#region @backendFunc
-    const projepath = path.join(this.location, ProjectIsomorphicLib.angularProjProxyPath(
-      project,
-      buildOptions.outDir as any,
-      void 0, // TODO
-      this.buildOptions.websql,
-      type
-    ));
-    const proj = Project.From(projepath);
-    return proj as Project;
+  //#endregion
+
+  //#region api
+
+  //#region api / init procedure
+  async initProcedure() {
+    //#region @backend
+    if (this.isCoreProject && this.frameworkVersionAtLeast('v2')) {
+
+    }
     //#endregion
   }
+  //#endregion
 
+  //#region api / start on command
 
-  private async buildApp(
+  startOnCommand(args: string) {
+    //#region @backendFunc
+    const command = `ts-node run.js ${args}`;
+    return command;
+    //#endregion
+  }
+  //#endregion
+
+  //#region api / build app
+  async buildApp(
+    //#region options
     //#region @backend
     outDir: Models.dev.BuildDir,
     watch: boolean,
@@ -195,10 +228,13 @@ export class ProjectIsomorphicLib
     baseHref: string,
     prod: boolean,
     //#endregion
+    //#endregion
   ) {
     //#region @backend
 
-    //#region prepare baseHref
+    //#region prepare variables
+
+    //#region prepare variables / baseHref
     if (baseHref) {
       baseHref = `${baseHref}/`;
       baseHref = baseHref.replace(/\/\//g, '/')
@@ -207,6 +243,7 @@ export class ProjectIsomorphicLib
     baseHref = `--${baseHref}`;
     //#endregion
 
+    //#region prepare variables / webpack params
     let webpackEnvParams = `--env.outFolder=${outDir}`;
     webpackEnvParams = webpackEnvParams + (watch ? ' --env.watch=true' : '');
 
@@ -217,6 +254,9 @@ export class ProjectIsomorphicLib
     let { flags } = require('minimist')(args.split(' '));
     flags = (_.isString(flags) ? [flags] : []);
     flags = (!_.isArray(flags) ? [] : flags);
+    //#endregion
+
+    //#region prepare variables / general variables
 
     // TODO ?
     // const statsCommand = (!this.isStandaloneProject ? (
@@ -224,7 +264,83 @@ export class ProjectIsomorphicLib
     // ) : '');
 
     let client = _.first(forClient as Project[]);
+    let port: number;
+    if (client) {
+      port = client.getDefaultPort();
+      webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name}`;
+    }
 
+    const argsAdditionalParams: { port: number; } = Helpers.cliTool.argsFrom(args) || {} as any;
+    if (_.isNumber(argsAdditionalParams.port)) {
+      port = argsAdditionalParams.port;
+    }
+    if (_.isNumber(port)) {
+      await Helpers.killProcessByPort(port);
+    }
+
+    const isStandalone = (this.isStandaloneProject
+      && !this.isWorkspaceChildProject
+      && !this.isSmartContainerTarget
+    );
+    // console.log({ isStandalone, 'this.name': this.name });
+
+    const buildOutDir = this.buildOptions.outDir;
+    const parent = (!isStandalone
+      ? (this.isSmartContainerTarget ? this.smartContainerTargetParentContainer : this.parent)
+      : void 0
+    );
+
+    const additionalReplace = (line: string) => {
+      const beforeModule2 = crossPlatformPath(path.join(
+        buildOutDir,
+        parent.name,
+        this.name,
+        `tmp-apps-for-${buildOutDir}/${this.name}`
+      ));
+
+      // console.log({ beforeModule2 })
+
+      if (line.search(beforeModule2) !== -1) {
+        line = line.replace(beforeModule2 + '/', '')
+      }
+
+      return line
+    };
+    //#endregion
+
+    //#region prepare variables / command
+    let command: string;
+    if (this.frameworkVersionAtLeast('v3')) {
+      //#region prepare angular variables for new v3 inside structure build
+      const portToServe = _.isNumber(port) ? `--port=${port}` : '';
+      const aot = flags.includes('aot');
+      const ngBuildCmd = `${loadNvm} && npm-run ng build `
+        + `${aot ? '--aot=true' : ''} `
+        + `${prod ? '--prod' : ''} `
+        + `${watch ? '--watch' : ''}`
+        + `${outPutPathCommand} `
+
+      if (watch) {
+        if (outDir === 'dist') {
+          command = `${loadNvm} && ${this.npmRunNg} serve ${portToServe} ${prod ? '--prod' : ''}`;
+        } else {
+          command = ngBuildCmd;
+        }
+      } else {
+        command = ngBuildCmd;
+      }
+      //#endregion
+    } else {
+      //#region @deprecated prepare webpack variables
+      if (_.isNumber(port)) {
+        webpackEnvParams = `${webpackEnvParams} --env.port=${port}`;
+      }
+      command = `npm-run webpack-dev-server ${webpackEnvParams}`;
+      //#endregion
+    }
+    //#endregion
+
+    //#region prepare variables / @depracated  workspace simulated app
     if (!global.tnpNonInteractive) {
       if (!this.isStandaloneProject && forClient.length === 0) {
         const answer: { project: string } = await inquirer
@@ -245,99 +361,42 @@ export class ProjectIsomorphicLib
         client = Project.From<Project>(path.join(this.location, '..', answer.project));
       }
     }
+    //#endregion
 
-    let port: number;
-    if (client) {
-      port = client.getDefaultPort();
-      webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name}`;
-    }
-
-    const argsAdditionalParams: { port: number; } = Helpers.cliTool.argsFrom(args) || {} as any;
-    if (_.isNumber(argsAdditionalParams.port)) {
-      port = argsAdditionalParams.port;
-    }
-    if (_.isNumber(port)) {
-      await Helpers.killProcessByPort(port);
-    }
-
-    let command: string;
-
-    if (this.frameworkVersionAtLeast('v3')) {
-      const portToServe = _.isNumber(port) ? `--port=${port}` : '';
-      const aot = flags.includes('aot');
-      const ngBuildCmd = `${loadNvm} && npm-run ng build `
-        + `${aot ? '--aot=true' : ''} `
-        + `${prod ? '--prod' : ''} `
-        + `${watch ? '--watch' : ''}`
-        + `${outPutPathCommand} `
-
-      if (watch) {
-        if (outDir === 'dist') {
-          command = `${loadNvm} && ${this.npmRunNg} serve ${portToServe} ${prod ? '--prod' : ''}`;
-        } else {
-          command = ngBuildCmd;
-        }
-      } else {
-        command = ngBuildCmd;
-      }
-    } else {
-      if (_.isNumber(port)) {
-        webpackEnvParams = `${webpackEnvParams} --env.port=${port}`;
-      }
-      command = `npm-run webpack-dev-server ${webpackEnvParams}`;
-    }
-
+    //#region prepare variables / proper project variable
     let proj: Project;
     if (this.frameworkVersionAtLeast('v3')) {
       proj = this.proxyNgProj(this, this.buildOptions);
     } else {
       proj = this;
     }
+    //#endregion
 
-    Helpers.info(`
+    //#region prepare variables / angular info
+    const showInfoAngular = () => {
+      Helpers.info(`
 
-      ANGULAR COMMAND: ${command}
+  ANGULAR BUILD APP COMMAND: ${command}
 
-      inside: ${proj.location}
+  inside: ${proj.location}
 
-      `)
+  `);
+    };
+    //#endregion
 
-    const isStandalone = (this.isStandaloneProject
-      && !this.isWorkspaceChildProject
-      && !this.isSmartContainerTarget
-    );
-    // console.log({ isStandalone, 'this.name': this.name });
+    //#endregion
 
-    const buildOutDir = this.buildOptions.outDir;
-    const parent = (!isStandalone
-      ? (this.isSmartContainerTarget ? this.smartContainerTargetParentContainer : this.parent)
-      : void 0
-    );
-    const additionalReplace = (line: string) => {
-      const beforeModule2 = crossPlatformPath(path.join(
-        buildOutDir,
-        parent.name,
-        this.name,
-        `tmp-apps-for-${buildOutDir}/${this.name}`
-      ));
-
-      // console.log({ beforeModule2 })
-
-      if (line.search(beforeModule2) !== -1) {
-        line = line.replace(beforeModule2 + '/', '')
-      }
-
-      return line
-    }
-
+    showInfoAngular();
 
     await proj.execute(command, {
+      //#region command execute params
       exitOnError: true,
       exitOnErrorCallback: async (code) => {
         Helpers.error(`[${config.frameworkName}] Typescript compilation error (code=${code})`
           , false, true);
       },
       outputLineReplace: (line: string) => {
+        //#region replace outut line for better debugging
         if (isStandalone) {
           return line.replace(
             `src/app/${this.name}/`,
@@ -368,58 +427,15 @@ export class ProjectIsomorphicLib
           }
           return additionalReplace(line);
         }
+        //#endregion
       },
+      //#endregion
     });
     //#endregion
   }
-
-
-  async buildSteps(buildOptions?: BuildOptions) {
-    //#region @backendFunc
-    this.buildOptions = buildOptions;
-    const { prod, watch, outDir, onlyWatchNoBuild, appBuild, args, forClient = [], baseHref } = buildOptions;
-
-    if (!onlyWatchNoBuild) {
-      if (appBuild) {
-        await this.buildApp(outDir, watch, forClient as any, buildOptions.args, baseHref, prod);
-      } else {
-        await this.buildLib();
-      }
-    }
-
-    //#endregion
-  }
-
-  //#region @backend
-  cutReleaseCode() {
-    if (!(path.basename(path.dirname(path.dirname(this.location))) === config.folder.bundle &&
-      path.basename(path.dirname(this.location)) === config.folder.project)) {
-      Helpers.warn(`Npm code cut available only for command: ${config.frameworkName} release`);
-      return;
-    }
-
-    const releaseSrcLocation = path.join(this.location, config.folder.src);
-    const filesForModyficaiton = glob.sync(`${releaseSrcLocation}/**/*`);
-    filesForModyficaiton
-      .filter(absolutePath => !Helpers.isFolder(absolutePath))
-      .forEach(absolutePath => {
-        let rawContent = Helpers.readFile(absolutePath);
-        rawContent = RegionRemover.from(absolutePath, rawContent, ['@notForNpm'], this.project).output;
-        // rawContent = this.replaceRegionsWith(rawContent, ['@notForNpm']);
-        Helpers.writeFile(absolutePath, rawContent);
-      });
-  }
-
   //#endregion
 
-  fixBuildDirs(outDir: Models.dev.BuildDir) {
-    const p = path.join(this.location, outDir);
-    if (!Helpers.isFolder(p)) {
-      Helpers.remove(p);
-      Helpers.mkdirp(p);
-    }
-  }
-
+  //#region api / build lib
   async buildLib() {
     //#region @backend
 
@@ -446,23 +462,6 @@ export class ProjectIsomorphicLib
     if (!this.buildOptions.watch && (uglify || obscure || nodts) && outDir === 'bundle') {
       this.buildOptions.genOnlyClientCode = true;
     }
-    //#endregion
-
-    //#region preparing variables / angular
-    const angularCommand = `${loadNvm} && ${this.npmRunNg} build ${this.name} ${watch ? '--watch' : ''}`;
-
-    const showInfoAngular = () => {
-      Helpers.info(`Starting browser typescirpt build.... ${this.buildOptions.websql ? '[WEBSQL]' : ''}`);
-      Helpers.log(`
-
-      ANGULAR 13+ ${this.buildOptions.watch ? 'WATCH ' : ''} LIB BUILD STARTED...
-
-      `);
-
-
-
-      Helpers.log(` command: ${angularCommand}`);
-    };
     //#endregion
 
     //#region preparing variables / webpack
@@ -507,8 +506,7 @@ export class ProjectIsomorphicLib
     // Helpers.writeFile(fileWEbpack, fileContent);
     //#endregion
 
-    //#endregion
-
+    //#region preparing variables / general
     const isStandalone = (!this.isWorkspace || !this.isSmartContainer);
 
     const sharedOptions = () => {
@@ -528,20 +526,44 @@ export class ProjectIsomorphicLib
           return line;
         },
       } as ExecuteOptions;
-    }
+    };
+    //#endregion
+
+    //#region prepare variables / command
+    const command = `${loadNvm} && ${this.npmRunNg} build ${this.name} ${watch ? '--watch' : ''}`;
+    //#endregion
+
+     //#region prepare variables / angular info
+     const showInfoAngular = () => {
+      Helpers.info(`Starting browser typescirpt build.... ${this.buildOptions.websql ? '[WEBSQL]' : ''}`);
+      Helpers.log(`
+
+      ANGULAR 13+ ${this.buildOptions.watch ? 'WATCH ' : ''} LIB BUILD STARTED...
+
+      `);
+
+      Helpers.log(` command: ${command}`);
+    };
+    //#endregion
+
+    //#endregion
 
     if (this.buildOptions.watch) {
       //#region watch build
-
-
       await this.incrementalBuildProcess.startAndWatch('isomorphic compilation (watch mode)',
+        //#region options
         {
           watchOnly: this.buildOptions.watchOnly,
           afterInitCallBack: async () => {
             await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
           }
-        });
+        }
+        //#endregion
+      );
+
+      //#region @depracated bunlde simulte webpack build
       if (outDir === 'bundle') {
+
         // Helpers.error(`Watch build not available for bundle build`, false, true);
         Helpers.info(`Starting watch bundle build for fast cli.. ${this.buildOptions.websql ? '[WEBSQL]' : ''}`);
 
@@ -552,71 +574,34 @@ export class ProjectIsomorphicLib
           Helpers.error(`WATCH BUNDLE build failed`, false, true);
         }
       }
-
-
+      //#endregion
 
       if (this.frameworkVersionAtLeast('v3')) { // TOOD
         showInfoAngular()
 
-        if (isStandalone
-          || (this.isSmartContainerTarget && this.buildOptions.copyto?.length > 0)
-        ) {
+        if (isStandalone || (this.isSmartContainerTarget && this.buildOptions.copyto?.length > 0)) {
           if (this.isSmartContainerTarget) { // TODO QUICK_FIX this should be in init/struct
             PackagesRecognition.fromProject(this).start(true, 'before startling lib proxy project');
           }
-          await proxyProject.execute(angularCommand, {
+          await proxyProject.execute(command, {
             resolvePromiseMsg: {
               stdout: 'Compilation complete. Watching for file changes'
             },
             ...sharedOptions(),
           });
         }
-
-        if (this.isSmartContainerTarget) {
-          const target = (crossPlatformPath(_.first(args.split(' '))) || '').replace('/', '');
-          Helpers.info(`
-
-          ${CLI.chalk.underline('LIB BUILD DONE...')}
-          (your target project is ${args})
-          please start in other terminal:
-
-          ${CLI.chalk.bold(config.frameworkName + ' build:app:watch ' + target)}
-          or
-          ${config.frameworkName} baw ${target}
-
-          (with port)
-          ${config.frameworkName} baw ${target} --port 4201 # or whatever port
-
-          to run angular ng serve.
-
-          `);
-          // if (this.buildOptions.copyto.length > 0) { // is 0 -> it is handled by app
-
-          //   await proxyProject.execute(angularCommand, {
-          //     resolvePromiseMsg: {
-          //       stdout: 'Compilation complete. Watching for file changes'
-          //     },
-          //     ...sharedOptions(),
-          //   });
-
-          // }
-
-          // if (process.platform !== 'win32') { // TODOD QUICK_FIX
-          //   const parent = Project.From(this.smartContainerTargetParentContainerPath) as Project;
-          //   parent.run(`${config.frameworkName} baw ${this.name}`).async();
-          // }
-        }
-
+        this.showMesageWhenBuildLibDoneForSmartContainer(args, watch);
       }
       // console.log('HEHEHHE')
       //#endregion
     } else {
       //#region non watch build
       if (outDir === 'bundle' && (obscure || uglify || nodts)) {
+        //#region release production backend build for firedev/tnp specyfic
         // console.log('k1')
         await this.incrementalBuildProcess.start('isomorphic compilation (only browser) ');
         // console.log("AFTER COMPILATION")
-        //#region advanced backend compilation
+
         try {
           showInfoWebpack()
           this.run(webpackCommand).sync();
@@ -644,38 +629,32 @@ export class ProjectIsomorphicLib
 
         try {
           showInfoAngular()
-          await proxyProject.execute(angularCommand, {
+          await proxyProject.execute(command, {
             ...sharedOptions()
           })
         } catch (e) {
           Helpers.log(e)
           Helpers.error(`
-          Command failed: ${angularCommand}
+          Command failed: ${command}
 
           Not able to build project: ${this.genericName}`, false, true)
         }
         //#endregion
       } else {
         //#region normal backend compilation
-        // console.log('k2')
+
         await this.incrementalBuildProcess.start('isomorphic compilation');
-        // console.log("AFTER COMPILATION")
+
         try {
-          showInfoAngular()
-          if (this.isSmartContainerTarget) {
-            // if (process.platform !== 'win32') { // TODOD QUICK_FIX
-            const parent = this.smartContainerTargetParentContainer;
-            parent.run(`${config.frameworkName} ba ${this.name}`).sync();
-            // }
-          } else {
-            await proxyProject.execute(angularCommand, {
-              ...sharedOptions(),
-            })
-          }
+          showInfoAngular();
+          await proxyProject.execute(command, {
+            ...sharedOptions(),
+          });
+          this.showMesageWhenBuildLibDoneForSmartContainer(args, watch);
         } catch (e) {
           Helpers.log(e)
           Helpers.error(`
-          Command failed: ${angularCommand}
+          Command failed: ${command}
 
           Not able to build project: ${this.genericName}`, false, true)
         }
@@ -686,15 +665,97 @@ export class ProjectIsomorphicLib
 
     //#endregion
   }
+  //#endregion
 
-  backendCompilerDeclarationFiles() {
+  //#endregion
+
+  //#region private methods
+
+  //#region private methods / show message when build lib done for smart container
+  private showMesageWhenBuildLibDoneForSmartContainer(args: string, watch: boolean) {
+    const buildLibDone = 'LIB BUILD DONE';
+    const ifapp = 'is you want to start app build -> please run in other terminal:';
+    const ngserve = `--port 4201 # or whatever port to run angular ${watch ? 'ng serve' : 'ng build (for application - not lib)'}.`;
+    const bawOrba = watch ? 'baw' : 'ba';
+    const bawOrbaLong = watch ? ' build:app:watch ' : ' build:app ';
+    const withPort = '(with port)';
+
+    if (this.isSmartContainerTarget) {
+      const parent = this.smartContainerTargetParentContainer;
+      const target = (crossPlatformPath(_.first(args.split(' '))) || '').replace('/', '');
+      Helpers.info(`
+
+      ${CLI.chalk.underline(`${buildLibDone}... for target project "${parent ? (parent.name + '/') : ''}${target}"`)}
+
+      ${ifapp}
+
+      ${CLI.chalk.bold(config.frameworkName + bawOrbaLong + target)}
+      or
+      ${config.frameworkName} ${bawOrba} ${target}
+
+      ${withPort}
+      ${config.frameworkName} ${bawOrba} ${target} ${ngserve}
+
+            `);
+    } else if (this.isStandaloneProject) {
+      Helpers.info(`
+
+      ${CLI.chalk.underline(`${buildLibDone}...`)}
+
+      ${ifapp}
+
+      ${CLI.chalk.bold(config.frameworkName + bawOrbaLong)}
+      or
+      ${config.frameworkName} ${bawOrba}
+
+      ${withPort}
+      ${config.frameworkName} ${bawOrba} ${ngserve}
+
+      `);
+    }
+
+  }
+  //#endregion
+
+  //#region private methods / fix build dirs
+  private fixBuildDirs(outDir: Models.dev.BuildDir) {
+    //#region @backend
+    const p = path.join(this.location, outDir);
+    if (!Helpers.isFolder(p)) {
+      Helpers.remove(p);
+      Helpers.mkdirp(p);
+    }
+    //#endregion
+  }
+  //#endregion
+
+  //#region private methods / get proxy ng projects
+  private proxyNgProj(project: Project, buildOptions: BuildOptions, type: 'app' | 'lib' = 'app') {
+    //#region @backendFunc
+    const projepath = path.join(this.location, ProjectIsomorphicLib.angularProjProxyPath(
+      project,
+      buildOptions.outDir as any,
+      void 0, // TODO
+      this.buildOptions.websql,
+      type
+    ));
+    const proj = Project.From(projepath);
+    return proj as Project;
+    //#endregion
+  }
+  //#endregion
+
+  //#region private methods / compile backend declaration files
+  private backendCompilerDeclarationFiles() {
     //#region @backend
     this.run(`npm-run tsc --emitDeclarationOnly --declarationDir ${config.folder.bundle}`).sync();
     //#endregion
   }
+  //#endregion
 
-  //#region @backend
-  backendCompileToEs5() {
+  //#region private methods / compile backend es5
+  private backendCompileToEs5() {
+    //#region @backend
     if (!Helpers.exists(path.join(this.location, config.folder.bundle, 'index.js'))) {
       Helpers.warn(`[compileToEs5] Nothing to compile to es5... no index.js in bundle`)
       return;
@@ -708,10 +769,12 @@ export class ProjectIsomorphicLib
     );
     Helpers.removeFileIfExists(path.join(this.location, config.folder.bundle, indexEs5js));
     Helpers.removeFileIfExists(path.join(this.location, config.folder.bundle, config.file._babelrc));
+    //#endregion
   }
   //#endregion
 
-  backendUglifyCode(reservedNames: string[]) {
+  //#region private methods / compile/uglify backend code
+  private backendUglifyCode(reservedNames: string[]) {
     //#region @backendFunc
     if (!Helpers.exists(path.join(this.location, config.folder.bundle, 'index.js'))) {
       Helpers.warn(`[uglifyCode] Nothing to uglify... no index.js in bundle`)
@@ -731,8 +794,10 @@ export class ProjectIsomorphicLib
     this.run(command).sync();
     //#endregion
   }
+  //#endregion
 
-  backendObscureCode(reservedNames: string[]) {
+  //#region private methods / compile/obscure backend code
+  private backendObscureCode(reservedNames: string[]) {
     //#region @backendFunc
     if (!Helpers.exists(path.join(this.location, config.folder.bundle, 'index.js'))) {
       Helpers.warn(`[obscureCode] Nothing to obscure... no index.js in bundle`)
@@ -757,7 +822,32 @@ export class ProjectIsomorphicLib
     this.run(commnad).sync();
     //#endregion
   }
+  //#endregion
 
+  //#region private methods / cut release code
+  private cutReleaseCode() {
+    //#region @backend
+    if (!(path.basename(path.dirname(path.dirname(this.location))) === config.folder.bundle &&
+      path.basename(path.dirname(this.location)) === config.folder.project)) {
+      Helpers.warn(`Npm code cut available only for command: ${config.frameworkName} release`);
+      return;
+    }
+
+    const releaseSrcLocation = path.join(this.location, config.folder.src);
+    const filesForModyficaiton = glob.sync(`${releaseSrcLocation}/**/*`);
+    filesForModyficaiton
+      .filter(absolutePath => !Helpers.isFolder(absolutePath))
+      .forEach(absolutePath => {
+        let rawContent = Helpers.readFile(absolutePath);
+        rawContent = RegionRemover.from(absolutePath, rawContent, ['@notForNpm'], this.project).output;
+        // rawContent = this.replaceRegionsWith(rawContent, ['@notForNpm']);
+        Helpers.writeFile(absolutePath, rawContent);
+      });
+    //#endregion
+  }
+  //#endregion
+
+  //#endregion
 }
 
 //#region @backend

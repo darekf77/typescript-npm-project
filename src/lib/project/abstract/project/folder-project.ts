@@ -119,7 +119,7 @@ export abstract class FolderProject {
     if (excludeUnknowProjects) {
       res = res.filter(c => {
         const isNot = c.typeIsNot('unknow');
-      
+
         return isNot;
       })
     }
@@ -199,7 +199,7 @@ export abstract class FolderProject {
       '^\.vscode$', '^node\_modules$',
       ...Helpers.values(config.tempFolders).map(v => `^${v}$`),
       '^e2e$', '^tmp.*', '^dist.*', '^tests$', '^module$', '^browser', 'bundle*',
-      '^components$', '\.git', '^bin$', '^custom$'
+      '^components$', '\.git', '^bin$', '^custom$', '^linked\-repos$',
     ].map(s => new RegExp(s))
 
     const isDirectory = source => fse.lstatSync(source).isDirectory()
@@ -426,6 +426,13 @@ export abstract class FolderProject {
 
     ]
   }
+  //#endregion
+
+  //#region @backend
+  writeFile(this: Project, relativePath: string, content: string) {
+    Helpers.writeFile([this.location, relativePath], content);
+  }
+
   //#endregion
 
 }

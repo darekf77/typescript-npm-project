@@ -60,7 +60,7 @@ export class LinkedRepos extends FeatureForProject {
                 // if (await Helpers.questionYesNo(`Do you want to force reset linked repo linked-repos/${nameRepo}`)) {
                 //   Helpers.run('git reset --hard HEAD~5', { cwd: dest }).sync();
                 // }
-              } else {
+              } else { // TODO
                 Helpers.git.pullCurrentBranch(destLinkedRepos, true);
               }
             } else {

@@ -47,6 +47,7 @@ import { CloudProject } from './cloud-project';
 import { GlobalWorkerApps } from '../../features/global-worker-apps';
 import { InsideStructures } from '../../features/inside-structures/inside-structures';
 import { SingularBuild } from '../../features/singular-build.backend';
+import { CLASS } from 'typescript-class-helpers';
 //#endregion
 
 @Morphi.Entity<Project>({
@@ -172,7 +173,8 @@ export class Project extends $Project<Project>
     if (!global.codePurposeBrowser) { // TODO when on weird on node 12
       this.defineProperty('compilerCache', CompilerCache);
       this.cache = {};
-      this.packageJson = PackageJSON.fromProject(this);
+      const PackageJSONClass = CLASS.getBy('PackageJSON') as typeof PackageJSON;
+      this.packageJson = PackageJSONClass.fromProject(this);
       this.setType(this.packageJson ? this.packageJson.type : 'unknow');
 
       this.defineProperty<Project>('quickFixes', QuickFixes);

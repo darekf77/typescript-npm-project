@@ -142,6 +142,36 @@ export class NpmProject {
       for (let index = 1; index < ver.length; index++) {
         ver[index] = '0';
       }
+    } else {
+      Helpers.warn(`[npm-project] something went wrong with bumping major version`)
+    }
+    return ver.join('.');
+  }
+
+  // @ts-ignore
+  get versionMinorPlusWithZeros(this: Project) {
+    if (this.typeIs('unknow')) {
+      return '';
+    }
+    if (!this.version) {
+
+      if (!global[CoreConfig.message.globalSystemToolMode]) {
+        return;
+      }
+
+      Helpers.error(`Please define ${chalk.bold('version')} property in your package.json:
+      location: ${path.join(this.location, config.file.package_json)}
+
+      `, true, true);
+    }
+    const ver = this.version.split('.');
+    if (ver.length > 1) {
+      ver[1] = (parseInt(ver[1]) + 1).toString();
+      for (let index = 2; index < ver.length; index++) {
+        ver[index] = '0';
+      }
+    } else {
+      Helpers.warn(`[npm-project] something went wrong with bumping minor version`)
     }
     return ver.join('.');
   }

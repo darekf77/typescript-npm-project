@@ -7,7 +7,7 @@ import { JSON10 } from 'json10';
 import { config, ConfigModels } from 'tnp-config';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
-import { Project } from '../../project';
+import { Project } from '../../project/abstract/project/project';
 
 //#region site option
 export type NewSiteOptions = {

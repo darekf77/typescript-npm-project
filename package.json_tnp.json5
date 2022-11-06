@@ -2,7 +2,9 @@
   resources: [],
 
   overrided: {
-    dependencies: {},
+    dependencies: {
+      'firedev-typeorm': '0.0.16',
+    },
     ignoreDepsPattern: [
       "bs4-breakpoint",
       "base-model-wrap",
@@ -211,22 +213,22 @@
       ],
       common: {
         // all isomorphic application config
-        "tnp-config": '13.0.31',
-        "tnp-models": '13.0.26',
-        "tnp-helpers": '13.0.37',
+        "tnp-config": '13.0.35',
+        "tnp-models": '13.0.27',
+        "tnp-helpers": '13.0.38',
         "tnp-db": '13.0.31',
         'firedev-crud': '13.0.30',
         'firedev-ports': '13.0.24',
         'firedev-crud-deamon': '13.0.21',
         "tnp-ui": '13.0.20',
-        "tnp-core": '13.0.67',
+        "tnp-core": '13.1.2',
         "tnp-cli": '13.0.25',
         "tnp-tools": '0.0.58',
         'any-project-cli': '0.0.11',
         "@types/node": "10.12.30",
         morphi: '13.0.48',
         gulp: "^3.9.1",
-        "ng2-logger": '13.0.25',
+        "ng2-logger": '13.0.26',
         "ng2-rest": '13.0.34',
         "record-replay-req-res-scenario": '13.0.16',
         randomcolor: "^0.5.3",
@@ -301,7 +303,7 @@
           "jscodeshift": "^0.6.3",
           "@types/fs-extra": "^7.0.0",
           "@types/rimraf": "^2.0.2",
-          "incremental-compiler": '13.0.27',
+          "incremental-compiler": '13.1.1',
           open: "7.2.1",
           // "sharp": "0.23.3", - > proble with dependncies
           "@types/sharp": "0.23.1",
@@ -322,7 +324,7 @@
           "node-cli-test": "0.0.2",
           "reflect-metadata": "^0.1.10",
           "ts-loader": "^2.3.1",
-          "typescript-class-helpers": '13.0.26',
+          "typescript-class-helpers": '13.1.1',
           tslib: "2.2.0",
           "ts-node": "^7.0.1",
           typescript: "4.1.5",

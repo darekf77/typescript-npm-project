@@ -63,6 +63,12 @@ const $RELEASE = async (args: string) => {
     const newVersion = proj.versionMajorPlusWithZeros;
     proj.packageJson.data.version = newVersion;
     proj.packageJson.save(`Major version up`);
+  } else if (argsObj.releaseType === 'minor') {
+    const newVersion = proj.versionMinorPlusWithZeros;
+    proj.packageJson.data.version = newVersion;
+    proj.packageJson.save(`Minor version up`);
+  } else {
+   // TODO path release !
   }
 
   proj.packageJson.showDeps('Release');
@@ -324,9 +330,20 @@ const $RELEASE_MAJOR = async (args: string) => {
   return await $RELEASE(args);
 }
 
+const $RELEASE_MINOR = async (args: string) => {
+  args = (args || '') + ' --releaseType=minor';
+  return await $RELEASE(args);
+}
+
 const $MAJOR_RELEASE = async (args: string) => {
   return await $RELEASE_MAJOR(args);
 };
+
+const $MINOR_RELEASE = async (args: string) => {
+  return await $RELEASE_MINOR(args);
+};
+
+
 
 function handleStandalone(proj: Project, argsObj: any) {
   if (proj.packageJson.libReleaseOptions.obscure) {
@@ -369,6 +386,8 @@ export default {
   $RELEASE: Helpers.CLIWRAP($RELEASE, '$RELEASE'),
   $RELEASE_MAJOR: Helpers.CLIWRAP($RELEASE_MAJOR, '$RELEASE_MAJOR'),
   $MAJOR_RELEASE: Helpers.CLIWRAP($MAJOR_RELEASE, '$MAJOR_RELEASE'),
+  $RELEASE_MINOR: Helpers.CLIWRAP($RELEASE_MINOR, '$RELEASE_MINOR'),
+  $MINOR_RELEASE: Helpers.CLIWRAP($MINOR_RELEASE, '$MINOR_RELEASE'),
   $RELEASE_ALL: Helpers.CLIWRAP($RELEASE_ALL, '$RELEASE_ALL'),
   $RELEASE_OBSCURED: Helpers.CLIWRAP($RELEASE_OBSCURED, '$RELEASE_OBSCURED'),
 }

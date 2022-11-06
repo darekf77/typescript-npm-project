@@ -1,11 +1,9 @@
-//#region @backend
-export * from './project-specyfic/project-isomorphic-lib';
-//#endregion
 export * from './features/package-json';
 export * from './abstract';
 
 //#region @backend
 export * from './compilers/baseline-site-join';
+export * from './project-specyfic/project-isomorphic-lib';
 export * from './project-specyfic/project-angular-client';
 export * from './project-specyfic/project-angular-lib';
 export * from './project-specyfic/project-electron-client';

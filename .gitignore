@@ -11,6 +11,8 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+/linked-repos
+
 /tests-environments
 
 # System Files
@@ -24,6 +26,8 @@ Thumbs.db
 /bundle*
 /browser
 /browser*
+/websql
+/websql*
 /module*
 /backup
 /module
@@ -39,6 +43,8 @@ Thumbs.db
 /.vscode/launch.json
 /.vscode/tasks.json
 /tsconfig.json
+/tsconfig.backend.dist.json
+/tsconfig.backend.bundle.json
 /.npmrc
 /tslint.json
 /.editorconfig
@@ -53,9 +59,15 @@ Thumbs.db
 /.vscode/launch.json.filetemplate
 /.vscode/tasks.json.filetemplate
 /tsconfig.json.filetemplate
+/tsconfig.backend.dist.json.filetemplate
+/tsconfig.backend.bundle.json.filetemplate
+/webpack.backend-dist-build.js
+/projects/tmp*
+/tsconfig.backend.dist.json
+/tsconfig.backend.bundle.json
 
-
-
+!tsconfig*
+webpack.*
 
 # =====================
 *.filetemplate

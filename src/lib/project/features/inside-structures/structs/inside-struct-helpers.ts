@@ -16,7 +16,7 @@ export function recreateIndex(project: Project) {
     const indexInSrcFile = crossPlatformPath(path.join(
       project.location,
       config.folder.src,
-      'index.ts'
+      config.file.index_ts,
     ));
 
     if (project.isSmartContainerTarget) {

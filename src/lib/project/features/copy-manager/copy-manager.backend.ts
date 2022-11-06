@@ -1,199 +1,178 @@
 //#region imports
-import { _ } from 'tnp-core';
+import { crossPlatformPath, _ } from 'tnp-core';
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import { glob } from 'tnp-core';
-import chalk from 'chalk';
-import { os } from 'tnp-core';
 import { chokidar } from 'tnp-core';
 import { config, ConfigModels } from 'tnp-config';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';;
 import { BuildOptions, TnpDB } from 'tnp-db';
-import { FeatureForProject } from '../../abstract';
+import { FeatureForProject, FeatureCompilerForProject } from '../../abstract';
 import { CopyMangerHelpers } from './copy-manager-helpers.backend';
+import { IncCompiler } from 'incremental-compiler';
 //#endregion
 
-export class CopyManager extends FeatureForProject {
+export class CopyManager extends FeatureCompilerForProject {
 
-  //#region fields & getters
+  //#region fields
+  // TODO remove this
+  private readonly isomorphicPackages = [] as string[];
+  private readonly projectChildren = [] as Project[];
+  private renameDestinationFolder?: string;
   private buildOptions: BuildOptions;
+  //#endregion
 
-  private modifyPackageFile: { fileRelativePath: string; modifyFn: (d: any) => any }[];
+  //#region getters
 
-  get target() {
+  //#region getters / target
+  get targetProjNameForOrgBuild() {
     const target = _.first((this.buildOptions.args || '').split(' ')).replace('/', '')
     return target;
   }
+  //#endregion
 
-  get projectToCopyTo() {
+  //#region getters / project copyto
+  projectToCopyTo(outdir: Models.dev.BuildDir) {
     if (Array.isArray(this.buildOptions.copyto) && this.buildOptions.copyto.length > 0) {
       // @ts-ignore
-      return this.buildOptions.copyto as Project[];
+      return [
+        this.localTempProj(outdir),
+        ...this.buildOptions.copyto,
+      ] as Project[];
     }
-    return [];
+    return [this.localTempProj(outdir)];
   }
+  //#endregion
 
+  //#region getters / is origanization package build
   get isOrganizationPackageBuild() {
     const isOrganizationPackageBuild = this.project.isSmartContainer;
     return isOrganizationPackageBuild;
   }
+  //#endregion
 
   //#endregion
 
-  //#region init
+  //#region api
 
-  private renameDestinationFolder?: string;
-  public async initCopyingOnBuildFinish(buildOptions: BuildOptions,
-    modifyPackageFile?: { fileRelativePath: string; modifyFn: (d: any) => any }[],
+  //#region api / sync action
+  @IncCompiler.methods.AsyncAction()
+  async asyncAction(event: IncCompiler.Change) {
+    const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
+
+    const outDir = this.buildOptions.outDir;
+    const specyficFileRelativePath = absoluteFilePath.replace(this.monitoredOutDir(outDir) + '/', '');
+
+    Helpers.log(`ASYNC ACTION
+    absoluteFilePath: ${absoluteFilePath}
+    specyficFileRelativePath: ${specyficFileRelativePath}
+    `);
+    const projectToCopyTo = this.projectToCopyTo(outDir)
+
+    for (let index = 0; index < projectToCopyTo.length; index++) {
+      const projectToCopy = projectToCopyTo[index];
+      this._copyBuildedDistributionTo(projectToCopy,
+        {
+          specyficFileRelativePath: event && specyficFileRelativePath,
+          outDir: outDir as any,
+          event
+        }
+      );
+    }
+  }
+  //#endregion
+
+  //#region api / sync action
+  async syncAction(files: string[]) {
+    Helpers.log('SYNC ACTION');
+
+    const outDir = this.buildOptions.outDir;
+
+    const projectToCopyTo = this.projectToCopyTo(outDir);
+
+    for (let index = 0; index < projectToCopyTo.length; index++) {
+      const projectToCopy = projectToCopyTo[index];
+      this._copyBuildedDistributionTo(projectToCopy,
+        {
+          outDir: outDir as any,
+          files
+        }
+      );
+    }
+  }
+  //#endregion
+
+  //#region api / init
+  public init(buildOptions: BuildOptions,
     renameDestinationFolder?: string,
   ) {
-    this.modifyPackageFile = modifyPackageFile;
     this.renameDestinationFolder = renameDestinationFolder;
     this.buildOptions = buildOptions;
-    const { watch } = buildOptions;
 
     if (!Array.isArray(this.buildOptions.copyto)) {
       this.buildOptions.copyto = [];
     }
 
     if (this.buildOptions.copyto.length === 0) {
-      Helpers.log(`No need to --copyto on build finsh... `)
-      return;
-    }
-    if (watch) {
-      await this.start();
-      await this.watch();
-
-      // TODO update this when expressjs server for each build
-      // const db = await TnpDB.Instance();
-
-      // const updateFromDbLastCommand = (channel: string) => async () => {
-      //   Helpers.log(`Trigger of updateFromDbLastCommand`);
-      //   const db = await TnpDB.Instance();
-      //   const cmd = (await db.getCommands()).find(c => c.isBuildCommand && c.location === Project.Current.location);
-      //   if (cmd) {
-      //     // @ts-ignore
-      //     const b = await BuildOptions.from(cmd.command, Project.Current);
-      //     Helpers.info(`
-
-      //     COPYTO UPDATED: "${channel}"
-
-      //     from: ${
-      //       // @ts-ignore
-      //       (this.buildOptions.copyto as Project[]).map(c => c.name).join(', ')
-      //       }
-
-      //     to: ${
-      //       // @ts-ignore
-      //       (b.copyto as Project[]).map(c => c.name).join(', ')
-      //       }
-
-      // `)
-      //     this.buildOptions.copyto = Helpers.arrays.uniqArray<Project>(b.copyto, 'location');
-      //     await db.updateCommandBuildOptions(cmd.location, this.buildOptions);
-      //   }
-      // }
-
-      // if (process.platform !== 'win32') { // TODO QUICK_FIX
-      //   // @ts-ignore
-      //   db.listenToChannel(this.project, 'tnp-copyto-add', async () => {
-      //     Helpers.log(`[copytomanager] realtime update add`);
-      //     await updateFromDbLastCommand('tnp-copyto-add')();
-      //   });
-
-      //   // @ts-ignore
-      //   db.listenToChannel(this.project, 'tnp-copyto-remove', async () => {
-      //     Helpers.log(`[copytomanager] realtime update remove`);
-      //     await updateFromDbLastCommand('tnp-copyto-remove')();
-      //   });
-      // }
-
-
-    } else {
-      await this.start();
+      Helpers.log(`No need to --copyto on build finsh...(only copy to local temp proj) `);
     }
 
-  }
-  //#endregion
+    // @ts-ignore
+    this.projectChildren = this.project.children;
 
-  //#region start
-  private async start(
-    event?: ConfigModels.FileEvent,
-    specyficFileRelativePath?: string
-  ) {
-    const outDir = this.buildOptions.outDir;
+    // @ts-ignore
+    this.isomorphicPackages = this.project.availableIsomorphicPackagesInNodeModules;
+    Helpers.log(`Opearating on ${this.isomorphicPackages.length} isomorphic pacakges...`);
 
-    const projectToCopyTo = this.projectToCopyTo;
 
-    for (let index = 0; index < projectToCopyTo.length; index++) {
-      const p = projectToCopyTo[index];
-      this._copyBuildedDistributionTo(p,
-        {
-          specyficFileRelativePath: event && specyficFileRelativePath,
-          outDir: outDir as any
-        }
-      );
-    }
 
-  }
-  //#endregion
+    Helpers.remove(this.localTempProjPath(this.buildOptions.outDir));
+    Helpers.writeFile(this.localTempProjPathes(this.buildOptions.outDir).packageJson, {
+      name: path.basename(this.localTempProjPath(this.buildOptions.outDir)),
+      version: '0.0.0'
+    });
+    Helpers.mkdirp(this.localTempProjPathes(this.buildOptions.outDir).nodeModules);
 
-  //#region start and watch
-
-  // TODO make it getter
-
-  private monitoredOutDir(outDir: 'dist' | 'bundle' | 'docs') {
-    const monitorDir: string = (this.project.isSmartContainer)
-      ? path.join(this.project.location, 'dist', this.project.name, this.target, outDir, 'libs')
-      : path.join(this.project.location, outDir);
-    return monitorDir;
-  }
-  private watch() {
-    const monitorDir = this.monitoredOutDir(this.buildOptions.outDir);
-
-    Helpers.log(`[copytomanger] watching folder for as copy source!! ${monitorDir} `)
-
-    if (fse.existsSync(monitorDir)) {
-      chokidar.watch(monitorDir, {
-        followSymlinks: false
-      }).on('change', (f) => {
-        if (_.isString(f)) {
-          f = f.replace(monitorDir, '') as any
-          // console.log(f)
-        }
-        this.start('changed', f as any);
-      }).on('add', f => {
-        if (_.isString(f)) {
-          f = f.replace(monitorDir, '') as any
-          // console.log(f)
-        }
-        this.start('created', f as any);
-      }).on('unlink', f => { // TODO @LAST better handle UNLIN
-        if (_.isString(f)) {
-          f = f.replace(monitorDir, '') as any
-          // console.log(f)
-        }
-        this.start('removed', f as any);
+    const monitorDir = this.monitoredOutDir(buildOptions.outDir);
+    const currentBrowserFolder = this.buildOptions.websql ? config.folder.websql : config.folder.browser;
+    if (this.project.isStandaloneProject) {
+      this.initOptions({
+        folderPath: [
+          path.join(monitorDir, config.file.package_json),
+          path.join(monitorDir, config.file.index_d_ts),
+          path.join(monitorDir, config.file.index_js),
+          path.join(monitorDir, config.file.index_js_map),
+          path.join(monitorDir, config.folder.lib),
+          path.join(monitorDir, currentBrowserFolder),
+        ],
+        folderPathContentCheck: [
+          path.join(monitorDir, config.folder.lib),
+          path.join(monitorDir, currentBrowserFolder)
+        ]
       })
-
-    } else {
-      Helpers.log(`Waiting for outdir: ${this.buildOptions.outDir}, monitor Dir: ${monitorDir} `);
-      setTimeout(() => {
-        this.watch();
-      }, 1000);
     }
+    if(this.project.isSmartContainer) {
+      // console.log({ monitorDir })
+      this.initOptions({
+        folderPath: [
+          monitorDir,
+        ],
+        folderPathContentCheck: [
+          monitorDir
+        ]
+      })
+    }
+
   }
   //#endregion
 
-  //#region generate source copy in
+  //#region api / generate source copy in
   public generateSourceCopyIn(destinationLocation: string,
     options?: Models.other.GenerateProjectCopyOpt): boolean {
-    // if (this.project.isWorkspace) {
-    //   console.log('GENERATING WORKSPACE')
-    // }
 
+    //#region fix options
     if (_.isUndefined(options)) {
       options = {} as any;
     }
@@ -224,10 +203,12 @@ export class CopyManager extends FeatureForProject {
     if (_.isUndefined(options.regenerateOnlyCoreProjects)) {
       options.regenerateOnlyCoreProjects = true;
     }
+    //#endregion
 
     const { override, showInfo, markAsGenerated } = options;
 
     const sourceLocation = this.project.location;
+    //#region modify package.json for generated
     var packageJson: Models.npm.IPackageJSON = fse.readJsonSync(path.join(
       sourceLocation,
       config.file.package_json
@@ -242,7 +223,9 @@ export class CopyManager extends FeatureForProject {
         packageJson.tnp.isCoreProject = false;
       }
     }
+    //#endregion
 
+    //#region execute copy
     if (fse.existsSync(destinationLocation)) {
       if (override) {
         Helpers.tryRemoveDir(destinationLocation);
@@ -255,7 +238,9 @@ export class CopyManager extends FeatureForProject {
     }
 
     CopyMangerHelpers.executeCopy(sourceLocation, destinationLocation, options, this.project);
+    //#endregion
 
+    //#region handle additional package.json markings
     if (this.project.isContainerWorkspaceRelated || this.project.isVscodeExtension || options.forceCopyPackageJSON) {
       const packageJsonLocation = path.join(destinationLocation, config.file.package_json);
       // console.log(`packageJsonLocation: ${ packageJsonLocation } `)
@@ -269,24 +254,27 @@ export class CopyManager extends FeatureForProject {
     if (this.project.isWorkspace) {
       if (options.markAsGenerated) {
         Helpers.writeFile(path.resolve(path.join(destinationLocation, '../info.txt')), `
-      This workspace is generated.
-      `);
+    This workspace is generated.
+    `);
       } else {
         Helpers.writeFile(path.resolve(path.join(destinationLocation, '../info.txt')), `
-      This is container for workspaces.
-      `);
+    This is container for workspaces.
+    `);
       }
     }
+    //#endregion
 
     if (showInfo) {
+      //#region show info about generation
       let dir = path.basename(path.dirname(destinationLocation));
       if (fse.existsSync(path.dirname(path.dirname(destinationLocation)))) {
         dir = `${path.basename(path.dirname(path.dirname(destinationLocation)))}/${dir}`
       }
-      Helpers.info(`Source of project "${this.project.genericName}" generated in ${dir} /(< here >) `)
+      Helpers.info(`Source of project "${this.project.genericName}" generated in ${dir} /(< here >) `);
+      //#endregion
     }
 
-
+    //#region recrusive execution for childrens
     if (options.regenerateProjectChilds && this.project.isContainerWorkspaceRelated) {
       let childs = this.project.children.filter(f => !['lib', 'app'].includes(path.basename(f.location)));
 
@@ -309,12 +297,17 @@ export class CopyManager extends FeatureForProject {
         c.copyManager.generateSourceCopyIn(path.join(destinationLocation, c.name), options);
       });
     }
+    //#endregion
 
     return true;
   }
   //#endregion
 
-  //#region copy build distribution to
+  //#endregion
+
+  //#region private methods
+
+  //#region private methods / copy build distribution to
   public copyBuildedDistributionTo(destination: Project) {
     return this._copyBuildedDistributionTo(destination);
   }
@@ -329,152 +322,111 @@ export class CopyManager extends FeatureForProject {
     destination: Project,
     options?: {
       specyficFileRelativePath?: string,
-      outDir?: 'dist'
+      outDir?: 'dist',
+      event?: any,
+      /**
+       * sync action
+       * all files - abs pathes
+       */
+      files?: string[]
     }
   ) {
-    const { specyficFileRelativePath = void 0, outDir = 'dist' } = options || {};
 
-    if (!specyficFileRelativePath && (!destination || !destination.location)) {
-      Helpers.warn(`Invalid project: ${destination.name}`)
+    //#region init & prepare parameters
+    const { specyficFileRelativePath = void 0, outDir = 'dist', event, files } = options || {};
+
+    // if (!specyficFileRelativePath) {
+    //   debugger
+    //   Helpers.warn(`Invalid project: ${destination?.name}`)
+    //   return;
+    // }
+    if (!destination || !destination?.location) {
+      Helpers.warn(`Invalid project: ${destination?.name}`)
       return;
     }
 
     const isOrganizationPackageBuild = this.isOrganizationPackageBuild;
-    const children = this.project.children;
+    const children = isOrganizationPackageBuild ? this.projectChildren : [];
 
     const rootPackageName = ((_.isString(this.renameDestinationFolder) && this.renameDestinationFolder !== '') ?
       this.renameDestinationFolder
       : (this.isOrganizationPackageBuild ? `@${this.project.name}` : this.project.name)
     );
 
+    const isomorphicPackages = [
+      ...this.isomorphicPackages,
+      rootPackageName,
+    ]
+
     const folderToLinkFromRootLocation = [
       config.folder.src,
     ];
 
     const isSourceMapsDistBuild = (outDir === 'dist' && (_.isUndefined(this.buildOptions) || this.buildOptions?.watch));
+    const isTempLocalProj = (destination.location === this.localTempProjPath(outDir));
 
-    this.initalFix({
+    const scope = {
+      isomorphicPackages,
       isOrganizationPackageBuild,
       destination,
       rootPackageName,
-      children,
-    });
-
-    const allFolderLinksExists = !isSourceMapsDistBuild ? true : this.handleLinksToSourceInCopiedPackage({
-      mode: 'check-dest-packge-source-link-ok',
-      isOrganizationPackageBuild,
-      destination,
-      rootPackageName: rootPackageName,
       folderToLinkFromRootLocation,
       children,
       outDir,
+      files,
+      specyficFileRelativePath,
+      isSourceMapsDistBuild,
+      isTempLocalProj,
+    };
+
+
+    if (!specyficFileRelativePath) {
+      this.initalFixForDestinationPackage({
+        ...scope
+      });
+    }
+
+
+    const allFolderLinksExists = !isSourceMapsDistBuild ? true : this.handleAllFilesActions({
+      mode: 'check-dest-packge-source-link-ok',
+      ...scope
     });
 
 
+    // if(specyficFileRelativePath) {
+    //   Helpers.log(`[${destination?.name}] Specyfic file change (allFolderLinksExists=${allFolderLinksExists}) (event:${event})`
+    //   + ` ${outDir}${specyficFileRelativePath}`);
+    // }
+    //#endregion
+
     if (specyficFileRelativePath && allFolderLinksExists) {
-
       //#region handle single file
-      const notAllowedFiles = [
-        '.DS_Store',
-        config.file.index_d_ts,
-      ]
-
-      let destinationFile = path.normalize(path.join(destination.location,
-        config.folder.node_modules,
-        rootPackageName,
-        specyficFileRelativePath
-      ));
-
-      const relativePath = specyficFileRelativePath.replace(/^\//, '');
-      const isBackendMapsFile = destinationFile.endsWith('.js.map');
-      const isBrowserMapsFile = destinationFile.endsWith('.mjs.map');
-
-      const sourceFile = isOrganizationPackageBuild
-        ? path.normalize(path.join(// ORGANIZATION
-          this.monitoredOutDir(outDir),
-          specyficFileRelativePath
-        )
-        ) : path.normalize(path.join(
-          this.project.location,
-          outDir,
-          specyficFileRelativePath
-        ));
-
-      if (isSourceMapsDistBuild) {
-
-        if (isBackendMapsFile || isBrowserMapsFile) {
-
-          let content = (Helpers.readFile(sourceFile) || '');
-
-          if (isBackendMapsFile) {
-            content = this.transformMapFile({
-              children, content, outDir, isOrganizationPackageBuild, isBrowser: false
-            });
-          }
-          if (isBrowserMapsFile) {
-            content = this.transformMapFile({
-              children, content, outDir, isOrganizationPackageBuild, isBrowser: true
-            });
-          }
-
-          Helpers.writeFile(destinationFile, content);
-        } else if (!notAllowedFiles.includes(relativePath)) { // don't override index.d.ts
-          Helpers.copyFile(sourceFile, destinationFile);
-        }
-
-      } else {
-        Helpers.copyFile(sourceFile, destinationFile);
-      }
-
-
-      if (relativePath === config.file.package_json) {
-        // TODO this is VSCODE/typescirpt new fucking issue
-        // Helpers.copyFile(sourceFile, path.join(path.dirname(destinationFile), config.folder.browser, path.basename(destinationFile)));
-      }
+      this.handleCopyOfSingleFile({
+        ...scope
+      });
       //#endregion
     } else {
-
-      this.handleLinksToSourceInCopiedPackage({
-        mode: 'copy-compiled-source-and-declarations',
-        destination,
-        folderToLinkFromRootLocation,
-        isOrganizationPackageBuild,
-        rootPackageName,
-        children,
-        outDir,
+      //#region handle all files
+      this.handleAllFilesActions({
+        mode: '1__copy-compiled-source-and-declarations',
+        ...scope
       });
 
       if (isSourceMapsDistBuild) {
-
-        this.handleLinksToSourceInCopiedPackage({
+        this.handleAllFilesActions({
           mode: 'add-links',
-          destination,
-          folderToLinkFromRootLocation,
-          isOrganizationPackageBuild,
-          rootPackageName,
-          children,
-          outDir,
+          ...scope,
         });
 
-        this.handleLinksToSourceInCopiedPackage({
-          mode: 'copy-source-maps',
-          destination,
-          folderToLinkFromRootLocation,
-          isOrganizationPackageBuild,
-          rootPackageName,
-          children,
-          outDir,
+        this.handleAllFilesActions({
+          mode: '2__copy-source-maps',
+          ...scope,
         });
 
       } else {
-        this.handleLinksToSourceInCopiedPackage({
+        this.handleAllFilesActions({
           mode: 'remove-links',
-          destination,
-          folderToLinkFromRootLocation,
-          isOrganizationPackageBuild,
-          rootPackageName,
-          children,
-          outDir,
+          ...scope,
         });
       }
       // TODO not working werid tsc issue with browser/index
@@ -496,10 +448,117 @@ export class CopyManager extends FeatureForProject {
   }
   //#endregion
 
-  //#region private methods
+  //#region private methods / handle copy of single file
+  private handleCopyOfSingleFile(options: {
+    isOrganizationPackageBuild: boolean;
+    destination: Project;
+    folderToLinkFromRootLocation: string[];
+    rootPackageName: string;
+    children: Project[];
+    isomorphicPackages: string[];
+    outDir: Models.dev.BuildDir;
+    specyficFileRelativePath: string;
+    isSourceMapsDistBuild: boolean;
+    isTempLocalProj: boolean;
+  }) {
+    //#region handle single file
 
-  //#region private methods / initial fix
-  private initalFix(options: {
+    const notAllowedFiles = [
+      '.DS_Store',
+      config.file.index_d_ts,
+    ];
+
+    const {
+      destination,
+      rootPackageName,
+      specyficFileRelativePath,
+      isOrganizationPackageBuild,
+      outDir,
+      children,
+      isSourceMapsDistBuild,
+      isomorphicPackages,
+      isTempLocalProj,
+    } = options;
+
+    let destinationFile = path.normalize(path.join(destination.location,
+      config.folder.node_modules,
+      rootPackageName,
+      specyficFileRelativePath
+    ));
+
+    const relativePath = specyficFileRelativePath.replace(/^\//, '');
+
+    if (notAllowedFiles.includes(relativePath)) {
+      return;
+    }
+
+    const sourceFileInLocalTempFolder = path.join(
+      this.localTempProjPathes(this.buildOptions.outDir).package(rootPackageName),
+      specyficFileRelativePath
+    );
+
+    if (!isTempLocalProj) {
+      // Helpers.log(`Eqal content with temp proj: ${}`)
+      Helpers.copyFile(sourceFileInLocalTempFolder, destinationFile);
+      return;
+    }
+
+    const sourceFile = isOrganizationPackageBuild
+      ? path.normalize(path.join(// ORGANIZATION
+        this.monitoredOutDir(outDir),
+        specyficFileRelativePath
+      )
+      ) : path.normalize(path.join(
+        this.project.location,
+        outDir,
+        specyficFileRelativePath
+      ));
+
+    let contentToWriteInDestination = (Helpers.readFile(sourceFile));
+
+    contentToWriteInDestination = contentToWriteInDestination ? contentToWriteInDestination : '';
+
+    if (path.basename(sourceFile).endsWith('.d.ts')) {
+      const currentBrowserFolder = this.buildOptions.websql ? config.folder.websql : config.folder.browser;
+      const fixedContent = fixDtsImport(contentToWriteInDestination, sourceFile, currentBrowserFolder, isomorphicPackages);
+      // if (content.trim() !== fixedContent.trim()) {
+      contentToWriteInDestination = fixedContent;
+      //   Helpers.writeFile(sourceFile, content);
+      // }
+    }
+
+    if (isSourceMapsDistBuild) {
+      const isBackendMapsFile = destinationFile.endsWith('.js.map');
+      const isBrowserMapsFile = destinationFile.endsWith('.mjs.map');
+
+      if (isBackendMapsFile || isBrowserMapsFile) {
+        if (isBackendMapsFile) {
+          contentToWriteInDestination = this.transformMapFile({
+            children, content: contentToWriteInDestination, outDir, isOrganizationPackageBuild, isBrowser: false
+          });
+        }
+        if (isBrowserMapsFile) {
+          contentToWriteInDestination = this.transformMapFile({
+            children, content: contentToWriteInDestination, outDir, isOrganizationPackageBuild, isBrowser: true
+          });
+        }
+      }
+    }
+
+    Helpers.writeFile(destinationFile, contentToWriteInDestination);
+
+    // TODO check this
+    if (relativePath === config.file.package_json) {
+      // TODO this is VSCODE/typescirpt new fucking issue
+      // Helpers.copyFile(sourceFile, path.join(path.dirname(destinationFile), config.folder.browser, path.basename(destinationFile)));
+    }
+    //#endregion
+  }
+
+  //#endregion
+
+  //#region private methods / initial fix for destination
+  private initalFixForDestinationPackage(options: {
     isOrganizationPackageBuild: boolean;
     destination: Project,
     rootPackageName: string,
@@ -559,14 +618,302 @@ export class CopyManager extends FeatureForProject {
   }
   //#endregion
 
+  //#region private methods / all files action
+  private handleAllFilesActions(options: {
+    isOrganizationPackageBuild: boolean;
+    destination: Project;
+    folderToLinkFromRootLocation: string[];
+    rootPackageName: string;
+    children: Project[];
+    isomorphicPackages: string[];
+    isTempLocalProj: boolean;
+    mode: 'remove-links'
+    | 'add-links'
+    | 'check-dest-packge-source-link-ok'
+    | '2__copy-source-maps'
+    | '1__copy-compiled-source-and-declarations'
+    ;
+    outDir: Models.dev.BuildDir;
+    files: string[],
+  }) {
+    const {
+      isOrganizationPackageBuild,
+      destination,
+      folderToLinkFromRootLocation,
+      rootPackageName,
+      mode,
+      isomorphicPackages,
+      children,
+      outDir,
+      files,
+      isTempLocalProj,
+    } = options;
+
+    //#region action
+    const action = (options: {
+      sourceFolder: string;
+      sourceToLink: string;
+      destPackageLinkSourceLocation: string;
+    }, parent?: Project) => {
+      const {
+        sourceFolder,
+        sourceToLink,
+        destPackageLinkSourceLocation,
+      } = options;
+      const destPackageLocation = path.dirname(destPackageLinkSourceLocation);
+
+      if (mode === 'remove-links') {
+        //#region remove links to sources in destination packages
+        Helpers.removeIfExists(destPackageLinkSourceLocation);
+        //#endregion
+      }
+      if (mode === 'add-links') {
+        //#region add links to source in destination packges
+        Helpers.removeIfExists(destPackageLinkSourceLocation);
+        Helpers.createSymLink(sourceToLink, destPackageLinkSourceLocation);
+        //#endregion
+      }
+      if (mode == 'check-dest-packge-source-link-ok') {
+        //#region check if destination pacakage has proper links to sources
+        return Helpers.exists(destPackageLinkSourceLocation)
+        //#endregion
+      }
+
+      if (mode === '1__copy-compiled-source-and-declarations') {
+        //#region copy compiled source and declarations
+        const monitorDir = isTempLocalProj
+          ? this.monitoredOutDir(outDir)
+          : this.localTempProjPathes(outDir).package(rootPackageName);
+
+        const worksapcePackageName = path.basename(destPackageLocation);
+
+        const sourceBrowser = isTempLocalProj ? path.join(
+          path.dirname(monitorDir),
+          this.buildOptions.websql ? config.folder.websql : config.folder.browser
+        ) : path.join(
+          this.localTempProjPath(outDir),
+          config.folder.node_modules,
+          rootPackageName,
+          this.buildOptions.websql ? config.folder.websql : config.folder.browser
+        );
+
+        //#region fix d.ts files in angular build - problem with require() in d.ts with wrong name
+        if (destPackageLocation === this.localTempProjPathes(outDir).package(rootPackageName)) {
+          // debugger
+          Helpers.log('Fixing .d.ts. files start...')
+          const browserDtsFiles = Helpers.filesFrom(sourceBrowser, true).filter(f => f.endsWith('.d.ts'));
+          for (let index = 0; index < browserDtsFiles.length; index++) {
+            const dtsFileAbsolutePath = browserDtsFiles[index];
+            const dtsFileContent = Helpers.readFile(dtsFileAbsolutePath);
+            const dtsFixedContent = fixDtsImport(
+              dtsFileContent,
+              dtsFileAbsolutePath,
+              this.buildOptions.websql ? config.folder.websql : config.folder.browser,
+              isomorphicPackages
+            );
+            if (dtsFileAbsolutePath.trim() !== dtsFileContent.trim()) {
+              Helpers.writeFile(dtsFileAbsolutePath, dtsFixedContent);
+            }
+            // Helpers.log(`[] Fixing files: ${}`)
+          }
+          Helpers.log('Fixing .d.ts. files done.')
+        }
+        //#endregion
+
+        if (isOrganizationPackageBuild) {
+          //#region organizaiton package copy
+          Helpers.writeFile(path.join(destination.location,
+            config.folder.node_modules,
+            rootPackageName,
+            config.file.index_d_ts,
+          ),
+            `// Plase use: import { < anything > } from '@${this.project.name}/<${children.map(c => c.name).join('|')}>';\n`
+          );
+
+          Helpers.copy(path.join(monitorDir, worksapcePackageName), destPackageLocation, {
+            recursive: true,
+            overwrite: true,
+            omitFolders: [config.folder.browser, config.folder.websql, config.folder.node_modules]
+          });
+
+          const browserDest = path.join(
+            destPackageLocation,
+            this.buildOptions.websql ? config.folder.websql : config.folder.browser
+          );
+
+          Helpers.copy(sourceBrowser, browserDest, {
+            recursive: true,
+            overwrite: true,
+          });
+
+          const browserDestPackageJson = path.join(
+            destPackageLocation,
+            this.buildOptions.websql ? config.folder.websql : config.folder.browser,
+            config.file.package_json,
+          );
+          const packageJsonBrowserDest = Helpers.readJson(browserDestPackageJson, {});
+          packageJsonBrowserDest.name = worksapcePackageName;
+          Helpers.writeJson(browserDestPackageJson, packageJsonBrowserDest);
+
+          const browserDestPublicApiDest = path.join(
+            destPackageLocation,
+            this.buildOptions.websql ? config.folder.websql : config.folder.browser,
+            'public-api.d.ts',
+          );
+          Helpers.writeFile(browserDestPublicApiDest,
+            (worksapcePackageName === this.targetProjNameForOrgBuild) ? `
+export * from './lib';\n
+`.trimLeft() : `
+export * from './libs/${worksapcePackageName}';\n
+`.trimLeft()
+          );
+
+          // TODO extract child specyfic things from browser build if it is possible
+          //#endregion
+        } else {
+          Helpers.tryCopyFrom(monitorDir, destPackageLocation);
+        }
+
+        Helpers.writeFile(path.join( // override dts to easly debugging
+          destPackageLocation,
+          config.file.index_d_ts,
+        ), `export * from './${this.project.sourceFolder}';\n`);
+
+        //#endregion
+      }
+
+      if (mode === '2__copy-source-maps') {
+        //#region copy source maps
+
+        if (isTempLocalProj) {
+          //#region fix files in local temp project
+          const mjsBrowserFilesPattern = `${destPackageLocation}/`
+            + `${this.buildOptions.websql ? config.folder.websql : config.folder.browser}`
+            + `/**/*.mjs.map`;
+
+          const mjsBrwoserFiles = glob.sync(mjsBrowserFilesPattern);
+
+          const mapBackendFilesPattern = `${destPackageLocation}/**/*.js.map`;
+          const mpaBackendFiles = glob.sync(mapBackendFilesPattern,
+            { ignore: [`${config.folder.browser}/**/*.*`, `${config.folder.websql}/**/*.*`] })
+
+
+          mjsBrwoserFiles.forEach(f => {
+            let content = Helpers.readFile(f);
+            content = this.transformMapFile({
+              content, outDir, isOrganizationPackageBuild, isBrowser: true, children
+            });
+            Helpers.writeFile(f, content);
+          });
+
+          mpaBackendFiles.forEach(f => {
+            let content = Helpers.readFile(f);
+            content = this.transformMapFile({
+              content, outDir, isOrganizationPackageBuild, isBrowser: false, children
+            });
+            Helpers.writeFile(f, content);
+          });
+          //#endregion
+        } else {
+          //#region for other project thatn local temp -> copy files from local tmep
+          const localTempProjOutFolder = this.localTempProjPathes(outDir).package(rootPackageName);
+
+          const mjsBrowserFilesPattern = `${localTempProjOutFolder}/`
+            + `${this.buildOptions.websql ? config.folder.websql : config.folder.browser}`
+            + `/**/*.mjs.map`;
+
+          const mjsBrwoserFiles = glob.sync(mjsBrowserFilesPattern);
+
+          const mapBackendFilesPattern = `${localTempProjOutFolder}/**/*.js.map`;
+          const mapBackendFiles = glob.sync(mapBackendFilesPattern,
+            { ignore: [`${config.folder.browser}/**/*.*`, `${config.folder.websql}/**/*.*`] })
+
+
+          const toCopy = [
+            ...mjsBrwoserFiles,
+            ...mapBackendFiles,
+          ];
+
+          for (let index = 0; index < toCopy.length; index++) {
+            const fileAbsPath = toCopy[index];
+            const fileRelativePath = fileAbsPath.replace(`${localTempProjOutFolder}/`, '');
+            const destAbs = path.join(
+              destination.location,
+              config.folder.node_modules,
+              rootPackageName,
+              fileRelativePath,
+            );
+            Helpers.copyFile(fileAbsPath, destAbs, { dontCopySameContent: false });
+          }
+          //#endregion
+        }
+        //#endregion
+      }
+
+    };
+    //#endregion
+
+    for (let index = 0; index < folderToLinkFromRootLocation.length; index++) {
+      const sourceFolder = folderToLinkFromRootLocation[index];
+      if (isOrganizationPackageBuild) {
+        //#region execture action for children when organization
+
+        for (let index = 0; index < children.length; index++) {
+          const c = children[index];
+          const childName = childPureName(c);
+          const sourceToLink = path.join(c.location, sourceFolder);
+          const destPackageLinkSourceLocation = path.join(
+            destination.location,
+            config.folder.node_modules,
+            rootPackageName,
+            childName,
+            sourceFolder
+          );
+
+          const res = action({
+            sourceFolder,
+            sourceToLink,
+            destPackageLinkSourceLocation
+          }, this.project);
+          if ((mode === 'check-dest-packge-source-link-ok') && !res) {
+            return false;
+          }
+        }
+
+        //#endregion
+      } else {
+        //#region execture action for standalone project
+        const sourceToLink = path.join(this.project.location, sourceFolder);
+        const destPackageLinkSourceLocation = path.join(
+          destination.location,
+          config.folder.node_modules,
+          rootPackageName,
+          sourceFolder
+        );
+        const res = action({
+          sourceFolder,
+          sourceToLink,
+          destPackageLinkSourceLocation,
+        });
+        if ((mode === 'check-dest-packge-source-link-ok') && !res) {
+          return false;
+        }
+        //#endregion
+      }
+    }
+    return true;
+  }
+  //#endregion
+
   //#region private methods / transfor map file
   private transformMapFile(options: {
     content: string;
-    outDir: 'dist' | 'bundle' | 'docs';
+    outDir: Models.dev.BuildDir;
     isOrganizationPackageBuild: boolean;
     isBrowser: boolean;
     children: Project[];
   }) {
+
     const {
       isOrganizationPackageBuild,
       isBrowser,
@@ -574,6 +921,7 @@ export class CopyManager extends FeatureForProject {
       children,
     } = options;
     let { content } = options;
+
     if (isOrganizationPackageBuild) {
       let toReplaceString2 = isBrowser
         ? `../tmp-libs-for-${outDir}/${this.project.name}/projects/${this.project.name}/${config.folder.src}`
@@ -614,203 +962,71 @@ export class CopyManager extends FeatureForProject {
   }
   //#endregion
 
-  //#region private methods / remove links to source in copied packages
-  private handleLinksToSourceInCopiedPackage(options: {
-    isOrganizationPackageBuild: boolean;
-    destination: Project;
-    folderToLinkFromRootLocation: string[];
-    rootPackageName: string;
-    children: Project[],
-    mode: 'remove-links'
-    | 'add-links'
-    | 'check-dest-packge-source-link-ok'
-    | 'copy-source-maps'
-    | 'copy-compiled-source-and-declarations',
-    outDir: 'dist' | 'bundle' | 'docs'
-  }) {
-    const {
-      isOrganizationPackageBuild,
-      destination,
-      folderToLinkFromRootLocation,
-      rootPackageName,
-      mode,
-      children,
-      outDir
-    } = options;
-
-    //#region action
-    const action = (options: {
-      sourceFolder: string;
-      sourceToLink: string;
-      destPackageLinkSourceLocation: string;
-    }, parent?: Project) => {
-      const {
-        sourceFolder,
-        sourceToLink,
-        destPackageLinkSourceLocation,
-      } = options;
-      const destPackageLocation = path.dirname(destPackageLinkSourceLocation);
-
-      if (mode === 'remove-links') {
-        //#region remove links to sources in destination packages
-        Helpers.removeIfExists(destPackageLinkSourceLocation);
-        //#endregion
-      }
-      if (mode === 'add-links') {
-        //#region add links to source in destination packges
-        Helpers.removeIfExists(destPackageLinkSourceLocation);
-        Helpers.createSymLink(sourceToLink, destPackageLinkSourceLocation);
-        //#endregion
-      }
-      if (mode == 'check-dest-packge-source-link-ok') {
-        //#region check if destination pacakage has proper links to sources
-        return Helpers.exists(destPackageLinkSourceLocation)
-        //#endregion
-      }
-      if (mode === 'copy-source-maps') {
-        //#region copy source maps
-
-        glob.sync(`${destPackageLocation}/`
-          + `${this.buildOptions.websql ? config.folder.websql : config.folder.browser}`
-          + `/**/*.mjs.map`)
-          .forEach(f => {
-            let content = Helpers.readFile(f);
-            content = this.transformMapFile({
-              content, outDir, isOrganizationPackageBuild, isBrowser: true, children
-            });
-            Helpers.writeFile(f, content);
-          });
-
-        glob.sync(`${destPackageLocation}/**/*.js.map`,
-          { ignore: [`${config.folder.browser}/**/*.*`, `${config.folder.websql}/**/*.*`] })
-          .forEach(f => {
-            let content = Helpers.readFile(f);
-            content = this.transformMapFile({
-              content, outDir, isOrganizationPackageBuild, isBrowser: false, children
-            });
-            Helpers.writeFile(f, content);
-          });
-        //#endregion
-      }
-      if (mode === 'copy-compiled-source-and-declarations') {
-
-        const monitorDir = this.monitoredOutDir(outDir);
-        const worksapcePackageName = path.basename(destPackageLocation);
-
-        if (isOrganizationPackageBuild) {
-          Helpers.copy(path.join(monitorDir, worksapcePackageName), destPackageLocation, {
-            recursive: true,
-            overwrite: true,
-            omitFolders: [config.folder.browser, config.folder.websql, config.folder.node_modules]
-          });
-          const sourceBrowser = path.join(
-            path.dirname(monitorDir),
-            this.buildOptions.websql ? config.folder.websql : config.folder.browser
-          );
-
-          const browserDest = path.join(
-            destPackageLocation,
-            this.buildOptions.websql ? config.folder.websql : config.folder.browser
-          );
-
-          Helpers.copy(sourceBrowser, browserDest, {
-            recursive: true,
-            overwrite: true,
-          });
-
-          const browserDestPackageJson = path.join(
-            destPackageLocation,
-            this.buildOptions.websql ? config.folder.websql : config.folder.browser,
-            config.file.package_json,
-          );
-          const packageJsonBrowserDest = Helpers.readJson(browserDestPackageJson, {});
-          packageJsonBrowserDest.name = worksapcePackageName;
-          Helpers.writeJson(browserDestPackageJson, packageJsonBrowserDest);
-
-          const browserDestPublicApiDest = path.join(
-            destPackageLocation,
-            this.buildOptions.websql ? config.folder.websql : config.folder.browser,
-            'public-api.d.ts',
-          );
-          Helpers.writeFile(browserDestPublicApiDest,
-            (worksapcePackageName === this.target) ? `
-export * from './lib';\n
-`.trimLeft() : `
-export * from './libs/${worksapcePackageName}';\n
-`.trimLeft()
-          );
-
-          // TODO @LAST extract child specyfic things from browser build
-
-        } else {
-          Helpers.tryCopyFrom(monitorDir, destPackageLocation);
-        }
-
-        Helpers.writeFile(path.join( // override dts to easly debugging
-          destPackageLocation,
-          config.file.index_d_ts,
-        ), `export * from './${this.project.sourceFolder}';\n`);
-
-
-      }
-    };
-    //#endregion
-
-    if (isOrganizationPackageBuild && (mode === 'copy-compiled-source-and-declarations')) {
-      Helpers.writeFile(path.join(destination.location,
-        config.folder.node_modules,
-        rootPackageName,
-        config.file.index_d_ts,
-      ),
-        `// Plase use: import { < anything > } from '@${this.project.name}/<${children.map(c => c.name).join('|')}>';\n`
-      );
-    }
-
-    for (let index = 0; index < folderToLinkFromRootLocation.length; index++) {
-      const sourceFolder = folderToLinkFromRootLocation[index];
-      if (isOrganizationPackageBuild) {
-        children.forEach(c => {
-          const childName = childPureName(c);
-          const sourceToLink = path.join(c.location, sourceFolder);
-          const destPackageLinkSourceLocation = path.join(destination.location,
-            config.folder.node_modules,
-            rootPackageName,
-            childName,
-            sourceFolder
-          );
-
-          const res = action({
-            sourceFolder, sourceToLink, destPackageLinkSourceLocation
-          }, this.project);
-          if ((mode === 'check-dest-packge-source-link-ok') && !res) {
-            return false;
-          }
-
-        })
-      } else {
-        const sourceToLink = path.join(this.project.location, sourceFolder);
-        const destPackageLinkSourceLocation = path.join(destination.location,
-          config.folder.node_modules,
-          rootPackageName,
-          sourceFolder
-        );
-        const res = action({
-          sourceFolder, sourceToLink, destPackageLinkSourceLocation
-        });
-        if ((mode === 'check-dest-packge-source-link-ok') && !res) {
-          return false;
-        }
-      }
-    }
-    return true;
+  //#region private methods / monitored out dir
+  private monitoredOutDir(outDir: Models.dev.BuildDir, project?: Project) {
+    const proj = project ? project : this.project;
+    const monitorDir: string = (proj.isSmartContainer)
+      ? path.join(proj.location, 'dist', proj.name, this.targetProjNameForOrgBuild, outDir, 'libs')
+      : path.join(proj.location, outDir);
+    return monitorDir;
   }
   //#endregion
+
+  //#region private methods / local temp proj path
+  localTempProjPath(outdir: Models.dev.BuildDir) {
+    return path.join(this.project.location, `tmp-local-copyto-proj-${outdir}`);
+  }
+  //#endregion
+
+  //#region private methods / local temp proj pathes
+  localTempProjPathes(outdir: Models.dev.BuildDir) {
+    const self = this;
+    return {
+      get packageJson() {
+        return path.join(self.localTempProjPath(outdir), config.file.package_json);
+      },
+      get nodeModules() {
+        return path.join(self.localTempProjPath(outdir), config.folder.node_modules);
+      },
+      package(rootPackageName: string) {
+        return path.join(self.localTempProjPath(outdir), config.folder.node_modules, rootPackageName);
+      }
+    }
+  }
+  //#endregion
+
+  //#region private methods / local temp proj
+  private localTempProj(outdir: Models.dev.BuildDir) {
+    let localProj = Project.From(this.localTempProjPath(outdir)) as Project;
+    return localProj;
+  }
+  //#endregion
+
 
   //#endregion
 
 }
 
+//#region helpers
+
+function fixDtsImport(content: string, filepath: string, browserFolder: string, isomorphicPackages: string[]) {
+  content = content ? content : '';
+
+  // if(path.basename(filepath) === 'framework-context.d.ts') {
+  //   debugger
+  // }
+
+  for (let index = 0; index < isomorphicPackages.length; index++) {
+    const isomorphicPackageName = isomorphicPackages[index];
+    content = (content || '').replace(
+      new RegExp(Helpers.escapeStringForRegEx(`import("${isomorphicPackageName}"`), 'g'),
+      `import("${isomorphicPackageName}/${browserFolder}"`);
+  }
+
+  return content;
+}
 
 function childPureName(child: Project) {
   return child.name.startsWith('@') ? child.name.split('/')[1] : child.name; // pure name
 }
+//#endregion

@@ -111,6 +111,35 @@ ${appModuleFile}
         })();
         //#endregion
 
+
+
+        //#region replace app.component.ts websql things
+        (() => {
+          const appModuleFilePath = path.join(
+            project.location,
+            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+            `/src/app/app.component.ts`
+          );
+
+
+          let appModuleFile = Helpers.readFile(appModuleFilePath);
+
+
+          if (!this.websql) {
+            appModuleFile = appModuleFile.replace(
+              `require('sql.js');`,
+              `(arg: any) => {
+                console.error('This should not be available in non-sql mode');
+                return void 0;
+              };`
+            );
+          }
+
+
+          Helpers.writeFile(appModuleFilePath, appModuleFile);
+        })();
+        //#endregion
+
         //#region replace app.component.html
         (() => {
           const appModuleFilePath = path.join(

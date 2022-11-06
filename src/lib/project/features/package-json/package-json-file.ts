@@ -22,7 +22,7 @@ export class PackageJsonFile {
   //#endregion
 
   //#region fields & getters
-  public get exists() {
+  public get exists() { // @ts-ignore
     return Helpers.exists(this.fullPath);
   }
 

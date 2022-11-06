@@ -547,33 +547,34 @@ EXIT /b
 
     process.exit(0);
     //#endregion
-  } else if (project.isContainer) {
-    const childrens = project.children.filter(p => p.frameworkVersionAtLeast('v2'));
-    Helpers.info(`Installing pacakge / Removing own pacakge..`);
-    for (let index = 0; index < childrens.length; index++) {
-      const c = childrens[index];
-      Helpers.log(`Processing ${c.genericName}`);
-      if (!c.node_modules.exist) {
-        c.npmPackages.installFromArgs('');
-      }
-      const ownPackage = c.path(`${config.folder.node_modules}/${c.name}`).absolute.normal;
-      Helpers.removeIfExists(ownPackage);
-    }
-    Helpers.info(`Removing own pacakge..done`);
-    Helpers.info(`Linking pacakges...`);
-    for (let index = 0; index < childrens.length; index++) {
-      const c = childrens[index];
-      const childGenericName = c.genericName;
-      const copyToChildrens = childrens.filter(ic => c.name !== ic.name);
-      const copyToChildrensNames = copyToChildrens.map(ic => ic.name);
-      Helpers.log(`Linking ${childGenericName} for every package in container... `);
-      // @ts-ignore
-      const opt = await BuildOptions.from(`${config.frameworkName} bd`, c, { copyto: copyToChildrens });
-      await c.copyManager.initCopyingOnBuildFinish(opt);
-      Helpers.log(`Linking ${childGenericName} for every package in container... DONE`);
-    }
-    Helpers.info(`Linking pacakges...DONE`);
-    process.exit(0)
+  } else if (project.isContainer) { // TODO
+    // const childrens = project.children.filter(p => p.frameworkVersionAtLeast('v2'));
+    // Helpers.info(`Installing pacakge / Removing own pacakge..`);
+    // for (let index = 0; index < childrens.length; index++) {
+    //   const c = childrens[index];
+    //   Helpers.log(`Processing ${c.genericName}`);
+    //   if (!c.node_modules.exist) {
+    //     c.npmPackages.installFromArgs('');
+    //   }
+    //   const ownPackage = c.path(`${config.folder.node_modules}/${c.name}`).absolute.normal;
+    //   Helpers.removeIfExists(ownPackage);
+    // }
+    // Helpers.info(`Removing own pacakge..done`);
+    // Helpers.info(`Linking pacakges...`);
+    // for (let index = 0; index < childrens.length; index++) {
+    //   const c = childrens[index];
+    //   const childGenericName = c.genericName;
+    //   const copyToChildrens = childrens.filter(ic => c.name !== ic.name);
+    //   const copyToChildrensNames = copyToChildrens.map(ic => ic.name);
+    //   Helpers.log(`Linking ${childGenericName} for every package in container... `);
+    //   // @ts-ignore
+    //   const opt = await BuildOptions.from(`${config.frameworkName} bd`, c, { copyto: copyToChildrens });
+    //   c.copyManager.init(opt);
+    //   await c.copyManager.startAndWatch() // TODO not sure why would I do this
+    //   Helpers.log(`Linking ${childGenericName} for every package in container... DONE`);
+    // }
+    // Helpers.info(`Linking pacakges...DONE`);
+    // process.exit(0)
   } else {
     if (project.isWorkspaceChildProject) {
       project = project.parent;

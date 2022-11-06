@@ -11,6 +11,7 @@ import { _ } from 'tnp-core';
 import { config } from 'tnp-config';
 import { Project } from './project';
 import { Helpers, Project as $Project } from 'tnp-helpers';
+import { CopyManager } from '../../features/copy-manager';
 //#endregion
 
 export abstract class BuildableProject {
@@ -400,11 +401,20 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
       await this.buildSteps(buildOptions);
     }
     Helpers.log(`[buildable-project] Build steps ended... `);
-    // console.log('after build steps')
-    if (this.isStandaloneProject || this.isSmartContainer) {
-      await this.copyManager.initCopyingOnBuildFinish(buildOptions);
+    if (buildOptions.copyto.length > 0) {
+      Helpers.info(`[buildable-project] copying build data to ${buildOptions.copyto.length} projects... `);
     }
-
+    // console.log('after build steps')
+    this.copyManager = new CopyManager(this);
+    if (this.isStandaloneProject || this.isSmartContainer) {
+      this.copyManager.init(buildOptions);
+      const taskName = 'copyto manger';
+      if (buildOptions.watch) {
+        await this.copyManager.startAndWatch(taskName)
+      } else {
+        await this.copyManager.start(taskName)
+      }
+    }
   }
   //#endregion
 }

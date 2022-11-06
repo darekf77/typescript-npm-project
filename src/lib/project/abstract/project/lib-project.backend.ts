@@ -102,7 +102,7 @@ export abstract class LibProject {
   //#endregion
 
   //#region api / build lib
-  async buildLib() {
+  protected async buildLib() {
     Helpers.log(`[buildLib] callend buildLib not implemented`)
   }
   //#endregion

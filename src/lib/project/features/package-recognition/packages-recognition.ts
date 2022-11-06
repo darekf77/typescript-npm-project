@@ -42,11 +42,11 @@ export class PackagesRecognition {
   start(force?: boolean, reasonToSearch?: string) {
     if (this.processAlreadyDone) {
       this.updateCurrentIsomorphicJsonSearchResults();
-      Helpers.info(`[package-recognition] Searching isomorphic packages for ${this.project.genericName}...`
+      Helpers.log(`[package-recognition] Searching isomorphic packages for ${this.project.genericName}...`
         + ` ommiting, updating from cache`);
       return;
     }
-    Helpers.log(`[${config.frameworkName}] ${reasonToSearch}`);
+    Helpers.log(`[${config.frameworkName}] reason to search ${reasonToSearch}`);
     if (typeof force !== 'boolean') {
       force = false;
     }
@@ -54,7 +54,7 @@ export class PackagesRecognition {
       return;
     }
 
-    Helpers.info(`[package-recognition] Searching isomorphic packages for ${this.project.genericName}... force=${force}
+    Helpers.log(`[package-recognition] Searching isomorphic packages for ${this.project.genericName}... force=${force}
     in ${this.cwd}
     `);
     Helpers.mesureExectionInMsSync(`Searching isomorphic packages for ${this.project.genericName}...`, () => {

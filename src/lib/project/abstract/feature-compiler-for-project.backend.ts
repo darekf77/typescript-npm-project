@@ -20,7 +20,7 @@ export abstract class FeatureCompilerForProject<RES_ASYNC = any, RES_SYNC = any,
 {
 
   //#region @backend
-  constructor(public project: Project, options: IncCompiler.Models.BaseClientCompilerOptions,
+  constructor(public project: Project, options?: IncCompiler.Models.BaseClientCompilerOptions,
     allowFolderOutSideProject = false) {
     super(checkFolderCompiler(project, options, allowFolderOutSideProject));
   }
@@ -42,6 +42,9 @@ export abstract class FeatureCompilerForProject<RES_ASYNC = any, RES_SYNC = any,
 //#region helpers
 //#region @backend
 function checkFolderCompiler(project: Project, options: IncCompiler.Models.BaseClientCompilerOptions, dontCheck = false) {
+  if (_.isUndefined(options)) {
+    return options;
+  }
   if (_.isUndefined(options.folderPath)) {
     options.folderPath = [];
   }

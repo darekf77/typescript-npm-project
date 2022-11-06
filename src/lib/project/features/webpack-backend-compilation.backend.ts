@@ -1,4 +1,5 @@
 import { CLI } from "tnp-cli";
+import { config } from "tnp-config";
 import { path } from "tnp-core";
 import { BuildOptions } from "tnp-db";
 import { Helpers } from "tnp-helpers";
@@ -36,7 +37,7 @@ export class WebpackBackendCompilation extends FeatureForProject {
     };
 
     // TODO QUICK_FIX
-    Helpers.writeFile(path.join(this.project.location, outDir, 'index.d.ts'), EXPORT_TEMPLATE('dist'));
+    Helpers.writeFile(path.join(this.project.location, outDir, config.file.index_d_ts), EXPORT_TEMPLATE('dist'));
 
     try {
       showInfoWebpack()

@@ -35,9 +35,6 @@ export class BuildProcess extends FeatureForProject {
     if (_.isUndefined(options.watch)) {
       options.watch = false;
     }
-    if (_.isUndefined(options.watch)) {
-      options.watch = false;
-    }
     if (_.isUndefined(options.staticBuildAllowed)) {
       options.staticBuildAllowed = false;
     }
@@ -273,6 +270,12 @@ inside generated projects...
     await this.project.build(buildOptions);
 
     //#region handle end of building
+    if (buildOptions.copyto.length > 0) {
+      const porjectINfo = buildOptions.copyto.length === 1
+        ? `project "${(_.first(buildOptions.copyto as any) as Project).name}"`
+        : `all ${buildOptions.copyto.length} projects`;
+      Helpers.info(`From now... ${porjectINfo} will be updated after every change...`)
+    }
     const msg = (buildOptions.watch ? `
       Waching files started.. ${buildOptions.websql ? '[WEBSQL]' : ''}
     `: `
