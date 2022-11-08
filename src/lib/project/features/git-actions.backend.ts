@@ -299,7 +299,7 @@ ${remotes.map((r, i) => `${i + 1}. ${r.origin} ${r.url}`).join('\n')}
 
 function fixRemote(project: Project, useSSh = false) {
   const originUrl = project.git.originURL;
-  const provider = _.first(originUrl.match(/[a-z]+\.(com|org|pl|io)/));// TODO make it more universal
+  const provider = _.first(originUrl.match(/([a-z0-9]+\.)+(com|org|pl|io)/));// TODO make it more universal
   if (useSSh) {
     if (originUrl.startsWith(`https://${provider}/`)) {
       project.run(`git remote set-url origin ${originUrl.replace(`https://${provider}/`, `git@${provider}:`)}`).sync();

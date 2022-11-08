@@ -153,7 +153,7 @@ export class CopyManager extends FeatureCompilerForProject {
         ]
       })
     }
-    if(this.project.isSmartContainer) {
+    if (this.project.isSmartContainer) {
       // console.log({ monitorDir })
       this.initOptions({
         folderPath: [
@@ -171,7 +171,7 @@ export class CopyManager extends FeatureCompilerForProject {
   //#region api / generate source copy in
   public generateSourceCopyIn(destinationLocation: string,
     options?: Models.other.GenerateProjectCopyOpt): boolean {
-
+    destinationLocation = crossPlatformPath(destinationLocation);
     //#region fix options
     if (_.isUndefined(options)) {
       options = {} as any;
@@ -480,11 +480,11 @@ export class CopyManager extends FeatureCompilerForProject {
       isTempLocalProj,
     } = options;
 
-    let destinationFile = path.normalize(path.join(destination.location,
+    let destinationFile = crossPlatformPath(path.normalize(path.join(destination.location,
       config.folder.node_modules,
       rootPackageName,
       specyficFileRelativePath
-    ));
+    )));
 
     const relativePath = specyficFileRelativePath.replace(/^\//, '');
 
@@ -492,10 +492,10 @@ export class CopyManager extends FeatureCompilerForProject {
       return;
     }
 
-    const sourceFileInLocalTempFolder = path.join(
+    const sourceFileInLocalTempFolder = crossPlatformPath(path.join(
       this.localTempProjPathes(this.buildOptions.outDir).package(rootPackageName),
       specyficFileRelativePath
-    );
+    ));
 
     if (!isTempLocalProj) {
       // Helpers.log(`Eqal content with temp proj: ${}`)
@@ -503,7 +503,7 @@ export class CopyManager extends FeatureCompilerForProject {
       return;
     }
 
-    const sourceFile = isOrganizationPackageBuild
+    const sourceFile = crossPlatformPath(isOrganizationPackageBuild
       ? path.normalize(path.join(// ORGANIZATION
         this.monitoredOutDir(outDir),
         specyficFileRelativePath
@@ -512,7 +512,7 @@ export class CopyManager extends FeatureCompilerForProject {
         this.project.location,
         outDir,
         specyficFileRelativePath
-      ));
+      )));
 
     let contentToWriteInDestination = (Helpers.readFile(sourceFile));
 
@@ -687,7 +687,7 @@ export class CopyManager extends FeatureCompilerForProject {
 
         const worksapcePackageName = path.basename(destPackageLocation);
 
-        const sourceBrowser = isTempLocalProj ? path.join(
+        const sourceBrowser = crossPlatformPath(isTempLocalProj ? path.join(
           path.dirname(monitorDir),
           this.buildOptions.websql ? config.folder.websql : config.folder.browser
         ) : path.join(
@@ -695,7 +695,7 @@ export class CopyManager extends FeatureCompilerForProject {
           config.folder.node_modules,
           rootPackageName,
           this.buildOptions.websql ? config.folder.websql : config.folder.browser
-        );
+        ));
 
         //#region fix d.ts files in angular build - problem with require() in d.ts with wrong name
         if (destPackageLocation === this.localTempProjPathes(outDir).package(rootPackageName)) {
@@ -837,12 +837,12 @@ export * from './libs/${worksapcePackageName}';\n
           for (let index = 0; index < toCopy.length; index++) {
             const fileAbsPath = toCopy[index];
             const fileRelativePath = fileAbsPath.replace(`${localTempProjOutFolder}/`, '');
-            const destAbs = path.join(
+            const destAbs = crossPlatformPath(path.join(
               destination.location,
               config.folder.node_modules,
               rootPackageName,
               fileRelativePath,
-            );
+            ));
             Helpers.copyFile(fileAbsPath, destAbs, { dontCopySameContent: false });
           }
           //#endregion
@@ -861,14 +861,14 @@ export * from './libs/${worksapcePackageName}';\n
         for (let index = 0; index < children.length; index++) {
           const c = children[index];
           const childName = childPureName(c);
-          const sourceToLink = path.join(c.location, sourceFolder);
-          const destPackageLinkSourceLocation = path.join(
+          const sourceToLink = crossPlatformPath(path.join(c.location, sourceFolder));
+          const destPackageLinkSourceLocation = crossPlatformPath(path.join(
             destination.location,
             config.folder.node_modules,
             rootPackageName,
             childName,
             sourceFolder
-          );
+          ));
 
           const res = action({
             sourceFolder,
@@ -883,13 +883,13 @@ export * from './libs/${worksapcePackageName}';\n
         //#endregion
       } else {
         //#region execture action for standalone project
-        const sourceToLink = path.join(this.project.location, sourceFolder);
-        const destPackageLinkSourceLocation = path.join(
+        const sourceToLink = crossPlatformPath(path.join(this.project.location, sourceFolder));
+        const destPackageLinkSourceLocation = crossPlatformPath(path.join(
           destination.location,
           config.folder.node_modules,
           rootPackageName,
           sourceFolder
-        );
+        ));
         const res = action({
           sourceFolder,
           sourceToLink,
@@ -965,16 +965,18 @@ export * from './libs/${worksapcePackageName}';\n
   //#region private methods / monitored out dir
   private monitoredOutDir(outDir: Models.dev.BuildDir, project?: Project) {
     const proj = project ? project : this.project;
-    const monitorDir: string = (proj.isSmartContainer)
-      ? path.join(proj.location, 'dist', proj.name, this.targetProjNameForOrgBuild, outDir, 'libs')
-      : path.join(proj.location, outDir);
+    const monitorDir: string = crossPlatformPath(
+      proj.isSmartContainer
+        ? path.join(proj.location, 'dist', proj.name, this.targetProjNameForOrgBuild, outDir, 'libs')
+        : path.join(proj.location, outDir)
+    );
     return monitorDir;
   }
   //#endregion
 
   //#region private methods / local temp proj path
   localTempProjPath(outdir: Models.dev.BuildDir) {
-    return path.join(this.project.location, `tmp-local-copyto-proj-${outdir}`);
+    return crossPlatformPath(path.join(this.project.location, `tmp-local-copyto-proj-${outdir}`));
   }
   //#endregion
 
@@ -983,13 +985,13 @@ export * from './libs/${worksapcePackageName}';\n
     const self = this;
     return {
       get packageJson() {
-        return path.join(self.localTempProjPath(outdir), config.file.package_json);
+        return crossPlatformPath(path.join(self.localTempProjPath(outdir), config.file.package_json));
       },
       get nodeModules() {
-        return path.join(self.localTempProjPath(outdir), config.folder.node_modules);
+        return crossPlatformPath(path.join(self.localTempProjPath(outdir), config.folder.node_modules));
       },
       package(rootPackageName: string) {
-        return path.join(self.localTempProjPath(outdir), config.folder.node_modules, rootPackageName);
+        return crossPlatformPath(path.join(self.localTempProjPath(outdir), config.folder.node_modules, rootPackageName));
       }
     }
   }
