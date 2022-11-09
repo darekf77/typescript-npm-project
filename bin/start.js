@@ -146,6 +146,10 @@ if (startSpinner) {
       setText((message.slice(6)), true);
     } else if (message.startsWith('success::')) {
       setText((message.slice(9)));
+    } else if (message.startsWith('taskstart::')) {
+      setText((message.slice(12)));
+    } else if (message.startsWith('taskdone::')) {
+      setText((message.slice(10)));
     } else if (message.startsWith('error::')) {
       setText((message.slice(7)));
     } else if (message.startsWith('log::')) {
