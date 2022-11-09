@@ -262,7 +262,7 @@ inside generated projects...
     //#endregion
 
     //#region report start building message
-    Helpers.success(`\n\n\t${chalk.bold('[build-process] Start of Building')} ${this.project.genericName} `
+    Helpers.taskStarted(`\n\n\t${chalk.bold('[build-process] Start of Building')} ${this.project.genericName} `
       + `(${buildOptions.appBuild ? 'app' : 'lib'})\n\n`);
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({ msg: `[build-process] Start of building ${this.project.genericName}` })

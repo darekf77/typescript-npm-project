@@ -446,7 +446,7 @@ export class ProjectIsomorphicLib
 
     this.fixBuildDirs(outDir);
 
-    Helpers.log(`[buildLib] start of building`);
+    Helpers.info(`[buildLib] start of building`);
     this.beforeLibBuild(outDir);
 
 
@@ -675,17 +675,20 @@ export class ProjectIsomorphicLib
   private showMesageWhenBuildLibDoneForSmartContainer(args: string, watch: boolean) {
     const buildLibDone = 'LIB BUILD DONE';
     const ifapp = 'is you want to start app build -> please run in other terminal:';
-    const ngserve = `${watch ? '--port 4201 # or whatever port':'#'} to run angular ${watch ? 'ng serve' : 'ng build (for application - not lib)'}.`;
+    const ngserve = `${watch ? '--port 4201 # or whatever port' : '#'} to run angular ${watch ? 'ng serve' : 'ng build (for application - not lib)'}.`;
     const bawOrba = watch ? 'baw' : 'ba';
     const bawOrbaLong = watch ? ' build:app:watch ' : ' build:app ';
     const withPort = '(with port)';
 
+
+
     if (this.isSmartContainerTarget) {
       const parent = this.smartContainerTargetParentContainer;
       const target = (crossPlatformPath(_.first(args.split(' '))) || '').replace('/', '');
-      Helpers.success(`
+      Helpers.taskDone(`${CLI.chalk.underline(`${buildLibDone}... for target project "`
+        + `${parent ? (parent.name + '/') : ''}${target}"`)}`)
 
-      ${CLI.chalk.underline(`${buildLibDone}... for target project "${parent ? (parent.name + '/') : ''}${target}"`)}
+      Helpers.success(`
 
       ${ifapp}
 
@@ -698,9 +701,8 @@ export class ProjectIsomorphicLib
 
             `);
     } else if (this.isStandaloneProject) {
+      Helpers.taskDone(`${CLI.chalk.underline(`${buildLibDone}...`)}`)
       Helpers.success(`
-
-      ${CLI.chalk.underline(`${buildLibDone}...`)}
 
       ${ifapp}
 

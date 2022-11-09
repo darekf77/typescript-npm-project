@@ -291,7 +291,7 @@ processing...
       await proj.git.pushCurrentBranch();
       Project.Tnp.git.commit(`Update after release`);
       await Project.Tnp.git.pushCurrentBranch();
-      Helpers.info(`
+      Helpers.success(`
 
 
       R E L E A S E   O F   C O N T I A I N E R  ${chalk.bold(proj.genericName)}  D O N E
@@ -299,7 +299,7 @@ processing...
 
       `);
     } else {
-      Helpers.info(`
+      Helpers.success(`
 
 
       P A R T I A L  R E L E A S E   O F   C O N T I A I N E R  ${chalk.bold(proj.genericName)}  D O N E
