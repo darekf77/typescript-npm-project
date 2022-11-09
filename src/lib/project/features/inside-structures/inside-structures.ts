@@ -66,7 +66,7 @@ export class InsideStructures extends FeatureForProject {
 
   //#region api / recreate
   public async recrate(outFolder: ConfigModels.OutFolder, watchBuild = true) {
-
+    // console.log('recreate start')
     const clients: Project[] = this.project.isWorkspaceChildProject
       ? this.project.parent.childrenThatAreLibs : [];
 
@@ -170,6 +170,7 @@ export class InsideStructures extends FeatureForProject {
     }
 
     this.recreatedOnce = true;
+    // console.log('recreate sdone')
   }
   //#endregion
 

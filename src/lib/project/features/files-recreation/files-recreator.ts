@@ -37,6 +37,7 @@ function getVscodeSettingsFrom(project: Project) {
 export class FilesRecreator extends FeatureForProject {
 
   public async init() {
+    Helpers.log('recreation init')
     if (this.project.typeIs('container')) {
       this.gitignore();
       this.handleProjectSpecyficFiles();
@@ -55,7 +56,7 @@ export class FilesRecreator extends FeatureForProject {
     this.gitignore();
     this.npmignore();
     this.customFolder();
-
+    Helpers.log('recreation end')
 
   }
 
@@ -192,7 +193,8 @@ export class FilesRecreator extends FeatureForProject {
 
 
   private modifyVscode(modifyFN: (settings: VSCodeSettings, project?: Project) => VSCodeSettings) {
-    const pathSettingsVScode = path.join(this.project.location, '.vscode', 'settings.json')
+    const pathSettingsVScode = path.join(this.project.location, '.vscode', 'settings.json');
+    Helpers.log('[modifyVscode] setting things...')
     if (this.project.isSite) {
       if (!fse.existsSync(pathSettingsVScode)) {
         Helpers.mkdirp(path.dirname(pathSettingsVScode));
@@ -204,6 +206,7 @@ export class FilesRecreator extends FeatureForProject {
     }
     if (Helpers.exists(pathSettingsVScode)) {
       try {
+        Helpers.log('parsing 1 ...')
         let settings: VSCodeSettings = JSON5.parse(Helpers.readFile(pathSettingsVScode))
         settings = modifyFN(settings, this.project);
         Helpers.writeFile(pathSettingsVScode, settings);
@@ -212,6 +215,7 @@ export class FilesRecreator extends FeatureForProject {
       }
     } else {
       try {
+        Helpers.log('parsing 2...')
         const settingFromCore = path.join(Project.by<Project>(this.project._type).location, '.vscode', 'settings.json');
         Helpers.mkdirp(path.dirname(pathSettingsVScode));
         if (Helpers.exists(settingFromCore)) {
@@ -601,7 +605,7 @@ ${coreFiles}
       this.project.name,
     );
     const notInRightPlace = glob.sync(`${folderAA}/**/*.*`);
-    console.log('notInRightPlace', notInRightPlace)
+    Helpers.log('notInRightPlace' + notInRightPlace)
     if (notInRightPlace.length > 0) {
       notInRightPlace
         .map(f => {
@@ -610,8 +614,8 @@ ${coreFiles}
         .forEach(rp => {
           const sour = path.join(folderAA, rp);
           const dest = path.join(folderForProject, rp);
-          console.log('SOUR', sour)
-          console.log('DEST', dest)
+          Helpers.log('SOUR' + sour)
+          Helpers.log('DEST'+ dest)
           if (!fse.lstatSync(sour).isDirectory()) {
             Helpers.copyFile(sour, dest);
           }

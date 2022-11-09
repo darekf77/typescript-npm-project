@@ -140,7 +140,7 @@ export class NpmPackagesCore extends FeatureForProject {
 
 
   private smoothInstallPrepare(pkg: Models.npm.Package) {
-    console.log(pkg)
+    Helpers.log(pkg)
 
     const tmpProject = prepareTempProject(this.project, pkg);
     const { mainProjectExisted, mainProjectInTemp } = copyMainProject(tmpProject, this.project, pkg);

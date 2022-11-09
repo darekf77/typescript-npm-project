@@ -533,8 +533,8 @@ export class ProjectIsomorphicLib
     const command = `${loadNvm} && ${this.npmRunNg} build ${this.name} ${watch ? '--watch' : ''}`;
     //#endregion
 
-     //#region prepare variables / angular info
-     const showInfoAngular = () => {
+    //#region prepare variables / angular info
+    const showInfoAngular = () => {
       Helpers.info(`Starting browser typescirpt build.... ${this.buildOptions.websql ? '[WEBSQL]' : ''}`);
       Helpers.log(`
 
@@ -675,7 +675,7 @@ export class ProjectIsomorphicLib
   private showMesageWhenBuildLibDoneForSmartContainer(args: string, watch: boolean) {
     const buildLibDone = 'LIB BUILD DONE';
     const ifapp = 'is you want to start app build -> please run in other terminal:';
-    const ngserve = `--port 4201 # or whatever port to run angular ${watch ? 'ng serve' : 'ng build (for application - not lib)'}.`;
+    const ngserve = `${watch ? '--port 4201 # or whatever port':'#'} to run angular ${watch ? 'ng serve' : 'ng build (for application - not lib)'}.`;
     const bawOrba = watch ? 'baw' : 'ba';
     const bawOrbaLong = watch ? ' build:app:watch ' : ' build:app ';
     const withPort = '(with port)';
@@ -683,7 +683,7 @@ export class ProjectIsomorphicLib
     if (this.isSmartContainerTarget) {
       const parent = this.smartContainerTargetParentContainer;
       const target = (crossPlatformPath(_.first(args.split(' '))) || '').replace('/', '');
-      Helpers.info(`
+      Helpers.success(`
 
       ${CLI.chalk.underline(`${buildLibDone}... for target project "${parent ? (parent.name + '/') : ''}${target}"`)}
 
@@ -698,7 +698,7 @@ export class ProjectIsomorphicLib
 
             `);
     } else if (this.isStandaloneProject) {
-      Helpers.info(`
+      Helpers.success(`
 
       ${CLI.chalk.underline(`${buildLibDone}...`)}
 

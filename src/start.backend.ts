@@ -77,6 +77,7 @@ import { CLI_FUNCTIONS } from 'tnp-db';
 import { TnpDB } from 'tnp-db';
 
 import { CLASS } from 'typescript-class-helpers';
+import { Ora } from 'ora';
 //#endregion
 
 
@@ -146,7 +147,11 @@ export async function start(
   frameworkName: 'tnp' | 'firedev' = 'tnp',
   mode: 'dist' | 'bundle' | 'npm' = 'dist'
 ) {
-  Helpers.log(`in start, mode: "${mode}"`);
+
+  // // const proc = require('process');
+  // global?.spinner?.start()
+
+  Helpers.info(`in start, mode: "${mode}"`);
   config.frameworkName = frameworkName;
 
 

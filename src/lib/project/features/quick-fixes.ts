@@ -137,6 +137,7 @@ export class QuickFixes extends FeatureForProject {
         '@types/oauth2orize',
         '@types/lowdb',
         '@types/eslint',
+        '@types/eslint-scope',
       ].forEach(name => {
         Helpers.remove(path.join(this.project.node_modules.path, name));
       });

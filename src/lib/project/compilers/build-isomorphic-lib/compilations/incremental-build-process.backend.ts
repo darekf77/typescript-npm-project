@@ -252,12 +252,12 @@ export class IncrementalBuildProcess {
       process.exit(0)
     }
     if (this.compileOnce) {
-      console.log('Watch compilation single run')
+      Helpers.log('Watch compilation single run')
       await this.start(taskName, afterInitCallBack);
       process.exit(0);
     }
     if (watchOnly) {
-      console.log(CLI.chalk.gray(
+      Helpers.log(CLI.chalk.gray(
         `Watch mode only for "${taskName}"` +
         ` -- morphi only starts starAndWatch anyway --`
       ));

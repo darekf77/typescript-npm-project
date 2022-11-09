@@ -128,7 +128,7 @@ export function prepareTempProject(project: Project, pkg: Models.npm.Package): P
     try {
       pkg.version = Helpers.commnadOutputAsString(`npm show ${pkg.name} version`);
     } catch (error) {
-      console.log('pkg', pkg);
+      Helpers.log('pkg'+ JSON.stringify(pkg));
       Helpers.error(`[${config.frameworkName}] `
         + `not able to install package... try again with exact version or check package name.`, false, true);
     }

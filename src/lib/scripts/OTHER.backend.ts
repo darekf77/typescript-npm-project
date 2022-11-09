@@ -43,27 +43,36 @@ function recreate() {
 }
 
 async function version() {
-  console.log(`Framework name: ${config.frameworkName}`)
+  Helpers.log(`Framework name: ${config.frameworkName}`)
   //#region @notForNpm
   if (ENV.notForNpm) {
-    console.log(`I am secret project!!!`);
+    Helpers.success(`I am secret project!!!`);
   }
   //#endregion
-  Helpers.log(`${config.frameworkName} location: ${Project.Tnp.location}`)
-  // global.spinner?.stop();
+  global.spinner?.start();
+  Helpers.sleep(1);
+  Helpers.info(`${config.frameworkName} location: ${Project.Tnp.location}`)
+  Helpers.sleep(1);
+  Helpers.info(`${config.frameworkName} location: ${Project.Tnp.location}`)
+  Helpers.sleep(1);
+  Helpers.info(`${config.frameworkName} location: ${Project.Tnp.location}`)
+  Helpers.sleep(1);
+  Helpers.info(`${config.frameworkName} location: ${Project.Tnp.location}`)
+  Helpers.sleep(1);
+  Helpers.info(`${config.frameworkName} location: ${Project.Tnp.location}`)
   // Helpers.info('waiting...');
-  // Helpers.sleep(5);
+
   // global.spinner?.start();
   // Helpers.info('waiting next time!!. ..');
   // Helpers.sleep(5);
-  // global.spinner?.stop();
-  Helpers.info((Project.Tnp as Project).version);
+  global.spinner?.stop();
+  Helpers.success((Project.Tnp as Project).version);
   process.exit(0)
 }
 
 async function RUN_PROCESS() {
-  console.log(`RUNNING ON PID: ${chalk.bold(process.pid.toString())}`)
-  console.log(`----------PPID: ${process.ppid}`)
+  Helpers.log(`RUNNING ON PID: ${chalk.bold(process.pid.toString())}`)
+  Helpers.log(`----------PPID: ${process.ppid}`)
   process.env['teststttt'] = '12';
   process.env['hello'] = 'world';
 }
@@ -230,7 +239,7 @@ export function $PRINT_RELATIVES(folder) {
     .getRecrusiveFilesFrom(folder)
     .map(f => f.replace(folder, base));
 
-  console.log(`
+    console.log(`
 
   ${files.map(f => `'${f}'`).join(',\n')}
 

@@ -54,6 +54,7 @@ export class EnvironmentConfig
       if (!configEn && this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
         Helpers.error(`Please build library first: ${config.frameworkName} build:dist`,)
       }
+      // console.log('upppp')
       configEn.build = {
         number: this.project.git.countComits(),
         date: this.project.git.lastCommitDate(),
@@ -62,7 +63,8 @@ export class EnvironmentConfig
           isWatchBuild: this.project.buildOptions.watch,
           outDir: this.project.buildOptions.outDir,
         }
-      }
+      };
+      // console.log('upppp done')
     }
     saveEnvironmentConfig(this.project, configEn);
   }

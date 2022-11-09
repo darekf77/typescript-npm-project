@@ -3,6 +3,7 @@ import { Project } from '../abstract';
 //#endregion
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
+import { Helpers } from 'tnp-core';
 
 //#region @backend
 @CLASS.NAME('ProjectElectronClient')
@@ -37,7 +38,7 @@ export class ProjectElectronClient
 
   async buildSteps(buildOptions?: BuildOptions) {
     //#region @backend
-    console.log('hello from building steps');
+    Helpers.log('hello from building steps');
     process.exit(0)
     //#endregion
   }

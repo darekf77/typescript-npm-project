@@ -6,7 +6,7 @@ import { TnpDB } from 'tnp-db';
 export async function DAEMON_TEST(args, exit = true) {
   const db = await TnpDB.Instance();
   const projs = await db.getProjects();
-  console.log(projs.map(c => c.project.name));
+  Helpers.success(projs.map(c => c.project.name));
   process.exit(0);
 }
 

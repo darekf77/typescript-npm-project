@@ -21,14 +21,14 @@ export function getHelpFor(command: string, warnings = false) {
       let groupHelp: { title: string, content: string }[] = [];
       let commandNameFit = false;
       const result = !!(_.isObject(exportetFunctions) && Object.keys(exportetFunctions).find(k => {
-        console.log('k', k)
+        Helpers.log('k: ' + k)
         const v = exportetFunctions[k];
         if (typeof v === 'string') {
           groupHelp.push({ title: k, content: v });
         }
         if (warnings && typeof v === 'function') {
           const tsFile = file.replace(path.basename(file), path.basename(file).replace('.js', '.ts'));
-          console.log(`WARN: No documentation for: ${v.name}  in ${tsFile.replace('dist', 'src')} `)
+          Helpers.warn(`No documentation for: ${v.name}  in ${tsFile.replace('dist', 'src')} `)
         }
         if (Helpers.cliTool.simplifiedCmd(k) === Helpers.cliTool.simplifiedCmd(command)) {
           commandNameFit = true;
@@ -56,7 +56,7 @@ export function getHelpFor(command: string, warnings = false) {
 
 function help(argsString: string) {
   const args = argsString.trim().split(' ').filter(f => !!f);
-  console.log(args)
+  Helpers.log(args)
   if (args.length === 0) {
     getHelpFor(undefined, true)
   } else if (args.length >= 2 && args[1] === '!') {
@@ -66,8 +66,8 @@ function help(argsString: string) {
     const docs = getHelpFor(command);
     if (docs) {
       Helpers.clearConsole()
-      console.log(`\nHelp for command "${CLI.chalk.green(command)}":\n`)
-      console.log(docs)
+      Helpers.log(`\nHelp for command "${CLI.chalk.green(command)}":\n`)
+      Helpers.log(docs)
     } else {
       Helpers.error(`No documentation for ${CLI.chalk.bold(command)}`)
     }

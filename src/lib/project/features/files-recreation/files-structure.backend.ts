@@ -162,10 +162,12 @@ export class FilesStructure extends FeatureForProject {
 
       if (!this.project.isContainerOrWorkspaceWithLinkedProjects) {
         const containerChildren = this.project.children.filter(c => {
+          Helpers.log('checking if git repo')
           if (c.git.isGitRepo) {
             Helpers.log(`[init] not initing recrusively, it is git repo ${c.name}`)
             return false;
           }
+          Helpers.log('checking if git repo - done')
           return true;
         })
         for (let index = 0; index < containerChildren.length; index++) {
@@ -217,7 +219,6 @@ export class FilesStructure extends FeatureForProject {
       PROGRESS_DATA.log({ msg: `Initing project:  "${this.project.genericName}" started` });
     }
     //#endregion
-
 
     if (this.project.isWorkspaceChildProject) {
       const isInNodeMOdules = path.join(this.project.parent.location, config.folder.node_modules, this.project.name);

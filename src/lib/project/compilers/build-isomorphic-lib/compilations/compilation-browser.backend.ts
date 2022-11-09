@@ -122,8 +122,16 @@ export class BroswerCompilation extends BackendCompilation {
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
-    const relativeFilePath = crossPlatformPath(absoluteFilePath.replace(path.join(this.cwd, this.location), ''));
+    const relativeFilePath = crossPlatformPath(absoluteFilePath.replace(crossPlatformPath(path.join(this.cwd, this.location)), ''));
     const destinationFilePath = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, relativeFilePath));
+
+    // console.log({
+    //   absoluteFilePath,
+    //   relativeFilePath,
+    //   destinationFilePath,
+    //   cwd: this.cwd,
+    //   location: this.location,
+    // })
 
     if (event.eventName === 'unlinkDir') {
       // console.log('REMOVING DIR', destinationFilePath)
@@ -158,7 +166,7 @@ export class BroswerCompilation extends BackendCompilation {
   async superAsyncAction(event: IncCompiler.Change) {
     // console.log(`[compilation-browser][asyncAction] ${event.eventName} ${event.fileAbsolutePath}`)
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
-    const relativeFilePath = absoluteFilePath.replace(crossPlatformPath(path.join(this.cwd, this.location)), '');
+    const relativeFilePath = absoluteFilePath.replace(crossPlatformPath(crossPlatformPath(path.join(this.cwd, this.location))), '');
     const destinationFilePath = crossPlatformPath(path.join(
       this.cwd,
       this.sourceOutBrowser,
@@ -170,6 +178,14 @@ export class BroswerCompilation extends BackendCompilation {
       relativeFilePath
     ));
 
+    // console.log({
+    //   absoluteFilePath,
+    //   relativeFilePath,
+    //   destinationFilePath,
+    //   destinationFileBackendPath,
+    //   cwd: this.cwd,
+    //   location: this.location,
+    // })
 
     if (event.eventName === 'unlinkDir') {
       // console.log('REMOVING DIR', destinationFilePath)

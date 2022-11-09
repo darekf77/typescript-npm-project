@@ -203,6 +203,7 @@ inside generated projects...
 
     } else {
       if (buildOptions.watch) {
+        Helpers.log('is lib build watch')
         if (this.project.isWorkspace) {
           Helpers.log(`Removing on purpose tmp-environment.json from wokspace, before init`);
           Helpers.remove(path.join(this.project.location, config.file.tnpEnvironment_json));
@@ -212,6 +213,7 @@ inside generated projects...
         await this.project.filesStructure.init(buildOptions.args);
       }
     }
+    Helpers.log('before file templates')
 
     //#region update environment data for "childs"
     if (this.project.isStandaloneProject || this.project.isWorkspaceChildProject) {
@@ -260,14 +262,16 @@ inside generated projects...
     //#endregion
 
     //#region report start building message
-    Helpers.info(`\n\n\t${chalk.bold('[build-process] Start of Building')} ${this.project.genericName} `
+    Helpers.success(`\n\n\t${chalk.bold('[build-process] Start of Building')} ${this.project.genericName} `
       + `(${buildOptions.appBuild ? 'app' : 'lib'})\n\n`);
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({ msg: `[build-process] Start of building ${this.project.genericName}` })
     }
+
     //#endregion
 
     await this.project.build(buildOptions);
+
 
     //#region handle end of building
     if (buildOptions.copyto.length > 0) {
@@ -277,17 +281,18 @@ inside generated projects...
       Helpers.info(`From now... ${porjectINfo} will be updated after every change...`)
     }
     const msg = (buildOptions.watch ? `
-      Waching files started.. ${buildOptions.websql ? '[WEBSQL]' : ''}
+      Files watcher started.. ${buildOptions.websql ? '[WEBSQL]' : ''}
     `: `
       End of Building ${this.project.genericName}
 
     ` )
 
-    if (global.tnpNonInteractive) {
-      PROGRESS_DATA.log({ msg });
-    } else {
-      Helpers.info(msg);
-    }
+    // if (global.tnpNonInteractive) {
+    //   PROGRESS_DATA.log({ msg });
+    // } else {
+    Helpers.info(msg);
+    // global?.spinner?.start();
+    // }
 
     if (exit && !buildOptions.watch) {
       Helpers.log('Build process exit')

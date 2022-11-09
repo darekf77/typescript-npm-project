@@ -55,14 +55,14 @@ export class TestRunner
           env: { ...process.env, FORCE_COLOR: '1' },
           cwd: this.project.location
         } as any);
-        console.log(result.toString());
+        Helpers.log(result.toString());
       } else {
         console.info(`Start of testing...`);
         this.project.run(command, { output: true }).sync()
         console.info(`End of testing...`);
       }
     } catch (err) {
-      console.log(err)
+      Helpers.log(err)
       let errorMessage = err?.output[2]?.toString();
       let errorMessage2 = err?.output[1]?.toString();
       // Helpers.error(errorMessage, true, false);
