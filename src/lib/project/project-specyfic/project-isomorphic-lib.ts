@@ -674,7 +674,7 @@ export class ProjectIsomorphicLib
   //#region private methods / show message when build lib done for smart container
   private showMesageWhenBuildLibDoneForSmartContainer(args: string, watch: boolean) {
     const buildLibDone = 'LIB BUILD DONE';
-    const ifapp = 'is you want to start app build -> please run in other terminal:';
+    const ifapp = 'if you want to start app build -> please run in other terminal command:';
     const ngserve = `${watch ? '--port 4201 # or whatever port' : '#'} to run angular ${watch ? 'ng serve' : 'ng build (for application - not lib)'}.`;
     const bawOrba = watch ? 'baw' : 'ba';
     const bawOrbaLong = watch ? ' build:app:watch ' : ' build:app ';

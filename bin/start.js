@@ -143,19 +143,19 @@ if (startSpinner) {
     } else if (message === 'stop-spinner') {
       spinner.stop();
     } else if (message.startsWith('info::')) {
-      setText((message.slice(6)), true);
+      setText((message), true);
     } else if (message.startsWith('success::')) {
-      setText((message.slice(9)));
+      setText((message));
     } else if (message.startsWith('taskstart::')) {
-      setText((message.slice(12)));
+      setText((message));
     } else if (message.startsWith('taskdone::')) {
-      setText((message.slice(10)));
+      setText((message));
     } else if (message.startsWith('error::')) {
-      setText((message.slice(7)));
+      setText((message));
     } else if (message.startsWith('log::')) {
-      setText((message.slice(5)), true);
+      setText((message), true);
     } else if (message.startsWith('warn::')) {
-      setText((message.slice(6)));
+      setText((message));
     }
   });
 
@@ -221,19 +221,27 @@ function crossPlatofrmPath(p) {
 
 function setText(text, toSpiner = false) {
   const spinner = global.spinner;
-  if (toSpiner) {
-    spinner.text = text.replace(/(?:\r\n|\r|\n)/g, ' ');
-  } else {
-    const wasSpinning = spinner.isSpinning;
-    if (wasSpinning) {
-      spinner.stop();
-      spinner.clear();
-    }
-    console.log(text);
-    if (wasSpinning) {
-      spinner.start()
-    }
+  if(text) {
+    text = text.split('::').slice(1).join('::');
   }
+  if (spinner) {
+    if (toSpiner) {
+      spinner.text = text.replace(/(?:\r\n|\r|\n)/g, ' ');
+    } else {
+      const wasSpinning = spinner.isSpinning;
+      if (wasSpinning) {
+        spinner.stop();
+        spinner.clear();
+      }
+      console.log(text);
+      if (wasSpinning) {
+        spinner.start()
+      }
+    }
+  } else {
+    console.log(text);
+  }
+
 }
 
 //#endregion

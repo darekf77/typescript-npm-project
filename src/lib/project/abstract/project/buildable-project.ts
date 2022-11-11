@@ -400,21 +400,25 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
       // console.log('before build steps')
       await this.buildSteps(buildOptions);
     }
-    Helpers.log(`[buildable-project] Build steps ended... `);
-    if (buildOptions.copyto.length > 0) {
-      Helpers.info(`[buildable-project] copying build data to ${buildOptions.copyto.length} projects... `);
-    }
-    // console.log('after build steps')
-    this.copyManager = new CopyManager(this);
-    if (this.isStandaloneProject || this.isSmartContainer) {
-      this.copyManager.init(buildOptions);
-      const taskName = 'copyto manger';
-      if (buildOptions.watch) {
-        await this.copyManager.startAndWatch(taskName)
-      } else {
-        await this.copyManager.start(taskName)
+    if ((this.isStandaloneProject && this.typeIs('isomorphic-lib') || this.isSmartContainerTarget || this.isSmartContainer)) {
+      Helpers.log(`[buildable-project] Build steps ended... `);
+      if (buildOptions.copyto.length > 0) {
+        Helpers.info(`[buildable-project] copying build data to ${buildOptions.copyto.length} projects... `);
+      }
+      // console.log('after build steps')
+      this.copyManager = new CopyManager(this);
+      if (this.isStandaloneProject || this.isSmartContainer) {
+        this.copyManager.init(buildOptions);
+        const taskName = 'copyto manger';
+        if (buildOptions.watch) {
+          await this.copyManager.startAndWatch(taskName)
+        } else {
+          await this.copyManager.start(taskName)
+        }
       }
     }
+
+
   }
   //#endregion
 }
