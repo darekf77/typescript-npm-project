@@ -12,6 +12,10 @@ import { config } from 'tnp-config';
 import { RegionRemover } from 'isomorphic-region-loader';
 import { CLI } from 'tnp-cli';
 import { codeCuttFn } from '../project/compilers/build-isomorphic-lib/code-cut/cut-fn.backend';
+import { Log } from 'ng2-logger';
+
+const log = Log.create(path.basename(__filename))
+
 declare const ENV: any;
 // console.log('hello')
 
@@ -49,23 +53,24 @@ async function version() {
     Helpers.success(`I am secret project!!!`);
   }
   //#endregion
-  global.spinner?.start();
-  Helpers.sleep(1);
-  Helpers.info(`${config.frameworkName} location: ${Project.Tnp.location}`)
-  Helpers.sleep(1);
-  Helpers.info(`${config.frameworkName} location: ${Project.Tnp.location}`)
-  Helpers.sleep(1);
-  Helpers.info(`${config.frameworkName} location: ${Project.Tnp.location}`)
-  Helpers.sleep(1);
-  Helpers.info(`${config.frameworkName} location: ${Project.Tnp.location}`)
-  Helpers.sleep(1);
-  Helpers.info(`${config.frameworkName} location: ${Project.Tnp.location}`)
+  // global.spinner?.start();
+  // Helpers.sleep(1);
+  // Helpers.info(`${config.frameworkName} location: ${Project.Tnp.location}`)
+  // Helpers.sleep(1);
+  // Helpers.info(`${config.frameworkName} location: ${Project.Tnp.location}`)
+  // Helpers.sleep(1);
+  // Helpers.info(`${config.frameworkName} location: ${Project.Tnp.location}`)
+  // Helpers.sleep(1);
+  // Helpers.info(`${config.frameworkName} location: ${Project.Tnp.location}`)
+  // Helpers.sleep(1);
+  // Helpers.info(`${config.frameworkName} location: ${Project.Tnp.location}`)
   // Helpers.info('waiting...');
 
   // global.spinner?.start();
   // Helpers.info('waiting next time!!. ..');
   // Helpers.sleep(5);
-  global.spinner?.stop();
+  // global.spinner?.stop();
+  log.data('Hellleoeoeo')
   Helpers.success((Project.Tnp as Project).version);
   process.exit(0)
 }

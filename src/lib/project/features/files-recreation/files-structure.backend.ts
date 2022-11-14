@@ -232,7 +232,7 @@ export class FilesStructure extends FeatureForProject {
 
     if (this.project.isStandaloneProject) {
       if (_.isNil(this.project.buildOptions)) { // TODO QUICK_FIX
-        this.project.buildOptions = {};
+        this.project.buildOptions = {} as any;
       }
       await (this.project.env as any as EnvironmentConfig).init(args);
       this.project.filesTemplatesBuilder.rebuild();

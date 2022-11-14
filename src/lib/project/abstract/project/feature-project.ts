@@ -112,10 +112,6 @@ export abstract class FeatureProject {
   //#endregion
 
   //#region @backend
-  public incrementalBuildProcess: IncrementalBuildProcess;
-  //#endregion
-
-  //#region @backend
   public insideStructure: InsideStructures;
   //#endregion
 

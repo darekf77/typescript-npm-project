@@ -119,9 +119,9 @@ export abstract class BuildableProject {
 
   //#region @backend
 
-  get buildOptions() {
+  get buildOptions(): BuildOptions {
     if (!this._buildOptions) {
-      return {};
+      return {} as any;
     }
     return this._buildOptions;
   }
@@ -230,12 +230,14 @@ export abstract class BuildableProject {
     // Helpers.log(`BUILD OPTIONS: ${JSON10.stringify(buildOptions)}`)
 
     //#region TODO refactor this part
+    const options = require('minimist')(buildOptions.args.split(' '));
+    // console.log({ options })
     const { obscure, uglify, nodts, websql }: {
       obscure: boolean,
       nodts: boolean,
       uglify: boolean,
       websql: boolean,
-    } = require('minimist')(buildOptions.args.split(' '));
+    } = options
 
     if (_.isUndefined(buildOptions.obscure) && obscure) {
       buildOptions.obscure = true;
@@ -246,7 +248,7 @@ export abstract class BuildableProject {
     if (_.isUndefined(buildOptions.uglify) && uglify) {
       buildOptions.uglify = true;
     }
-    if (_.isUndefined(buildOptions.uglify) && websql) {
+    if (_.isUndefined(buildOptions.websql) && websql) {
       buildOptions.websql = true;
     }
     //#endregion
@@ -325,7 +327,7 @@ export abstract class BuildableProject {
           const projectCurrent = this;
           const projectName = projectCurrent.name;
           const what = path.normalize(`${project.location}/${config.folder.node_modules}/${projectName}`);
-          Helpers.log(`\n\n${chalk.bold('+ After each build finish')} ${Helpers.formatPath(what)} will be update.`);
+          Helpers.info(`\n\n${chalk.bold('+ After each build finish')} ${Helpers.formatPath(what)} will be update.`);
         });
       }
 
@@ -392,6 +394,7 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
     //   this.buildOptions.copyto = []
     // }
 
+    Helpers.info(`[info] Copy compiled project to ${buildOptions.copyto.length} projects... `);
 
     const { skipBuild = false } = require('minimist')(this.buildOptions.args.split(' '));
     if (skipBuild) {
@@ -400,8 +403,9 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
       // console.log('before build steps')
       await this.buildSteps(buildOptions);
     }
+
     if ((this.isStandaloneProject && this.typeIs('isomorphic-lib') || this.isSmartContainerTarget || this.isSmartContainer)) {
-      Helpers.log(`[buildable-project] Build steps ended... `);
+      Helpers.info(`[buildable-project] Build steps ended... `);
       if (buildOptions.copyto.length > 0) {
         Helpers.info(`[buildable-project] copying build data to ${buildOptions.copyto.length} projects... `);
       }

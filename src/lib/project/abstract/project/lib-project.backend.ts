@@ -1,19 +1,17 @@
 //#region imports
-//#region @backend
 import { BuildOptions, BuildProcess } from '../../features';
-import { fse } from 'tnp-core'
+import { crossPlatformPath, fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import { glob } from 'tnp-core';
 import * as getDependents from 'npm-get-dependents';
 import chalk from 'chalk';
-import * as semver from 'semver';
-//#endregion
 import { Project } from './project';
 import { _ } from 'tnp-core';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';
-import { CLASS } from 'typescript-class-helpers';
+import { Log } from 'ng2-logger';
+const log = Log.create(path.basename(__filename))
 //#endregion
 
 /**
@@ -130,15 +128,13 @@ export abstract class LibProject {
   //#endregion
 
   //#region api / release
-
-
   public async release(this: Project, releaseOptions?: Models.dev.ReleaseOptions, automaticRelease = false) {
     //#region @backend
 
     //#region handle realeas temp folder
     // @ts-ignore
-    Helpers.log(`LIB: automaticRelease=${automaticRelease}`);
-    Helpers.log(`LIB: global.tnpNonInteractive=${global.tnpNonInteractive}`);
+    log.data(`automaticRelease=${automaticRelease}`);
+    log.data(`global.tnpNonInteractive=${global.tnpNonInteractive}`);
     if (_.isUndefined(releaseOptions.useTempFolder)) {
       if (!this.checkIfReadyForNpm(true)) {
         Helpers.warn(`Project "${this.name}" is not ready for npm release`)
@@ -279,7 +275,7 @@ export abstract class LibProject {
         uglify,
         outDir: config.folder.bundle as 'bundle',
         args: releaseOptions.args
-      }, this));
+      }, this) as any);
 
       Helpers.info(`
 
@@ -302,7 +298,7 @@ export abstract class LibProject {
         uglify,
         outDir: config.folder.bundle as 'bundle',
         args: releaseOptions.args
-      }, this));
+      }, this) as any);
       // Helpers.move(browserBundle, websqlBundleTemp);
       // Helpers.move(browserBundleTemp, browserBundle);
 
@@ -387,8 +383,8 @@ export abstract class LibProject {
         const names = this.packageJson.additionalNpmNames;
         for (let index = 0; index < names.length; index++) {
           const c = names[index];
-          const existedBundle = path.join(this.location, 'bundle');
-          const additionBase = path.resolve(path.join(this.location, `../../../additional-bundle-${c}`));
+          const existedBundle = crossPlatformPath(path.join(this.location, 'bundle'));
+          const additionBase = crossPlatformPath(path.resolve(path.join(this.location, `../../../additional-bundle-${c}`)));
           Helpers.mkdirp(additionBase);
           Helpers.copy(existedBundle, additionBase, {
             copySymlinksAsFiles: true,

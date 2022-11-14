@@ -71,14 +71,16 @@ export class IncrementalBuildProcess {
     if (project.typeIs('isomorphic-lib')) {
       if (project.isSiteInStrictMode) {
         this.backendCompilation = new BackendCompilation(
-          outFolder as any,
+          buildOptions.watch,
+          outFolder,
           config.folder.tempSrc,
           cwd,
           this.buildOptions.websql
         );
       } else {
         this.backendCompilation = new BackendCompilation(
-          outFolder as any,
+          buildOptions.watch,
+          outFolder,
           location,
           cwd,
           this.buildOptions.websql,
@@ -86,7 +88,8 @@ export class IncrementalBuildProcess {
       }
     } else {
       this.backendCompilation = new BackendCompilation(
-        outFolder as any,
+        buildOptions.watch,
+        outFolder,
         location,
         cwd,
         this.buildOptions.websql,
@@ -129,6 +132,7 @@ export class IncrementalBuildProcess {
         }
         this.browserCompilations = [
           new BroswerCompilation(
+            buildOptions.watch,
             this.project,
             moduleName,
             envConfig,
@@ -156,6 +160,7 @@ export class IncrementalBuildProcess {
 
             this.browserCompilations.push(
               new BroswerCompilation(
+                buildOptions.watch,
                 this.project,
                 moduleName,
                 envConfig,
@@ -178,6 +183,7 @@ export class IncrementalBuildProcess {
         let browserOutFolder = Helpers.getBrowserVerPath(void 0, this.buildOptions.websql);
         this.browserCompilations = [
           new BroswerCompilation(
+            buildOptions.watch,
             this.project,
             void 0,
             void 0,

@@ -34,6 +34,7 @@ export class BackendCompilation extends IncCompiler.Base {
 
   //#region constructor
   constructor(
+    public isWatchBuild: boolean,
     /**
      * Output folder
      * Ex. dist
@@ -50,7 +51,8 @@ export class BackendCompilation extends IncCompiler.Base {
      * Ex. /home/username/project/myproject
      */
     public cwd?: string,
-    public websql: boolean = false,
+    public websql: boolean = false
+
   ) {
     super({
       folderPath: [path.join(cwd, location)],
@@ -90,11 +92,7 @@ export class BackendCompilation extends IncCompiler.Base {
     if (!fse.existsSync(outDistPath)) {
       fse.mkdirpSync(outDistPath);
     }
-    await this.compile();
-  }
-
-  async preAsyncAction() {
-    await this.compile(true)
+    await this.compile(this.isWatchBuild);
   }
 
   async libCompilation({

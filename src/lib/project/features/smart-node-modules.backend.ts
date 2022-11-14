@@ -118,6 +118,19 @@ export class SmartNodeModules extends FeatureForProject {
       // TODO put this into QUICK_FIX
       if (packageName === 'tnp' && this.project.name === 'firedev' && !!Project.From(locationLocalTnp)) {
         const tnpProj = Project.From(locationLocalTnp) as Project;
+        tnpProj.copyManager.init({ // TODO INCLUDE WEBSQL
+          watch: false,
+          args: '',
+          outDir: 'dist',
+          websql: false,
+        } as any)
+        tnpProj.copyManager.copyBuildedDistributionTo(this.project);
+        tnpProj.copyManager.init({ // TODO INCLUDE WEBSQL
+          watch: false,
+          args: '',
+          outDir: 'dist',
+          websql: true,
+        } as any)
         tnpProj.copyManager.copyBuildedDistributionTo(this.project);
         Helpers.info(`[${config.frameworkName}] tnp was update from local version in ${locationLocalTnp}`);
       } else {

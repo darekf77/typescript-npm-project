@@ -190,10 +190,10 @@ export class ProjectAngularLib
     if (ngbuildonly) {
       // await this.buildAngulazrVer(watch);
     } else {
-      this.incrementalBuildProcess = new IncrementalBuildProcess(this, this.buildOptions);
+      const incrementalBuildProcess = new IncrementalBuildProcess(this, this.buildOptions);
 
       if (this.buildOptions.watch) {
-        await this.incrementalBuildProcess.startAndWatch(`isomorphic ${this._type} compilation (watch mode)`,
+        await incrementalBuildProcess.startAndWatch(`isomorphic ${this._type} compilation (watch mode)`,
           {
             watchOnly: this.buildOptions.watchOnly,
             afterInitCallBack: async () => {
@@ -201,7 +201,7 @@ export class ProjectAngularLib
             }
           });
       } else {
-        await this.incrementalBuildProcess.start(`isomorphic ${this._type} compilation`);
+        await incrementalBuildProcess.start(`isomorphic ${this._type} compilation`);
         // if (outDir === 'bundle') {
 
         //   this.buildAngularVer();

@@ -43,7 +43,8 @@ export class CompilerCache extends FeatureForProject {
         await CompilerCache.setProjectHasUpToDateCompiledData(this.project, this.project.join);
       },
       incrementalBuildProcess: async () => {
-        await CompilerCache.setProjectHasUpToDateCompiledData(this.project, this.project.incrementalBuildProcess as any);
+        // TODO
+        // await CompilerCache.setProjectHasUpToDateCompiledData(this.project, this.project.incrementalBuildProcess as any);
       },
     }
   }

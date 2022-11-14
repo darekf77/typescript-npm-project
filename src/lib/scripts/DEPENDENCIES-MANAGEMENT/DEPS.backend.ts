@@ -479,6 +479,10 @@ async function $LINK() {
         const destinationGlobalLink = path.join(glboalBinFolderPath, globalName);
         Helpers.removeIfExists(destinationGlobalLink);
 
+        const inspect = globalName.endsWith('debug') || globalName.endsWith('inspect');
+        const inspectBrk = globalName.endsWith('debug-brk') || globalName.endsWith('inspect-brk');
+        const attachDebugParam = inspect ? '--inspect' : (inspectBrk ? '--inspect-brk' : '')
+
         if (process.platform === 'win32') {
           Helpers.writeFile(destinationGlobalLink, `
 #!/bin/sh
@@ -489,10 +493,10 @@ case \`uname\` in
 esac
 
 if [ -x "$basedir/node" ]; then
-  "$basedir/node"  "$basedir/node_modules/${path.basename(project.location)}/bin/${globalName}" "$@"
+  "$basedir/node" ${attachDebugParam} "$basedir/node_modules/${path.basename(project.location)}/bin/${globalName}" "$@"
   ret=$?
 else
-  node  "$basedir/node_modules/${path.basename(project.location)}/bin/${globalName}" "$@"
+  node ${attachDebugParam} "$basedir/node_modules/${path.basename(project.location)}/bin/${globalName}" "$@"
   ret=$?
 fi
 exit $ret

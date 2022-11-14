@@ -15,7 +15,9 @@ import { PROGRESS_DATA } from 'tnp-models';
 import { handleProjectsPorts } from '../environment-config/environment-config-helpers';
 import { selectClients } from '../../project-specyfic/select-clients.backend';
 import { EnvironmentConfig } from '../environment-config';
+import { Log } from 'ng2-logger';
 
+const log = Log.create(__filename)
 
 //#endregion
 
@@ -39,7 +41,7 @@ export class BuildProcess extends FeatureForProject {
       options.staticBuildAllowed = false;
     }
     if (project.isGenerated && !options.staticBuildAllowed) {
-      Helpers.error(`Please use command:
+      log.error(`Please use command:
 $ ${config.frameworkName} static:build
 inside generated projects...
 `, false, true);
@@ -82,7 +84,7 @@ inside generated projects...
   //#region mereg npm project
   private mergeNpmPorject() {
     // console.log(this.project.parent.getAllChildren({ unknowIncluded: true }))
-    Helpers.log(`[mergeNpmPorject] started.. for ${this.project.genericName}`)
+    log.data(`[mergeNpmPorject] started.. for ${this.project.genericName}`)
     if (this.project.isWorkspaceChildProject) {
 
       this.project.parent.getFolders()
@@ -109,20 +111,20 @@ inside generated projects...
         });
 
     }
-    Helpers.log(`[mergeNpmPorject] finish..`)
+    log.data(`[mergeNpmPorject] finish..`)
   }
   //#endregion
 
   private async build(buildOptions: BuildOptions, allowedLibs: ConfigModels.LibType[], exit = true) {
 
-    Helpers.log(`
+    log.data(`
 
     BUILD PID: ${process.pid}
     BUILD PPID: ${process.ppid}
 
     `)
 
-    Helpers.log(`[build] in build of ${this.project.genericName}, type: ${this.project._type}`);
+    log.data(`[build] in build of ${this.project.genericName}, type: ${this.project._type}`);
     this.project.buildOptions = buildOptions;
 
     if (this.project.isGenerated && buildOptions.watch && !this.project.isStandaloneProject) {
@@ -142,11 +144,11 @@ inside generated projects...
     }
     //#endregion
 
-    Helpers.log(`[db] chekcking started... `);
+    log.data(`[db] chekcking started... `);
     const db = await TnpDB.Instance();
 
     if (buildOptions.appBuild) {
-      Helpers.log('FIST check if build allowed')
+      log.data('FIST check if build allowed')
       await db.checkBuildIfAllowed(
         this.project as any,
         buildOptions,
@@ -154,16 +156,16 @@ inside generated projects...
         process.ppid,
         true
       );
-      Helpers.log(`[db]] finish `);
+      log.data(`[db]] finish `);
     } else {
-      Helpers.log(`[db] no needed for dist`);
+      log.data(`[db] no needed for dist`);
     }
 
 
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
 
       if (this.project.node_modules.exist) {
-        Helpers.log(`NODE MODULE EXISTS`)
+        log.data(`NODE MODULE EXISTS`)
       } else {
         await this.project.filesStructure.init(buildOptions.args);
       }
@@ -203,9 +205,9 @@ inside generated projects...
 
     } else {
       if (buildOptions.watch) {
-        Helpers.log('is lib build watch')
+        log.data('is lib build watch')
         if (this.project.isWorkspace) {
-          Helpers.log(`Removing on purpose tmp-environment.json from wokspace, before init`);
+          log.data(`Removing on purpose tmp-environment.json from wokspace, before init`);
           Helpers.remove(path.join(this.project.location, config.file.tnpEnvironment_json));
         }
         await this.project.filesStructure.init(buildOptions.args, { watch: true, watchOnly: buildOptions.watchOnly });
@@ -213,7 +215,7 @@ inside generated projects...
         await this.project.filesStructure.init(buildOptions.args);
       }
     }
-    Helpers.log('before file templates')
+    log.data('before file templates')
 
     //#region update environment data for "childs"
     if (this.project.isStandaloneProject || this.project.isWorkspaceChildProject) {
@@ -230,7 +232,7 @@ inside generated projects...
     }
     //#endregion
     if (buildOptions.appBuild) {
-      Helpers.log('Second check if build allowed')
+      log.data('Second check if build allowed')
       await db.checkBuildIfAllowed(
         this.project as any,
         buildOptions,
@@ -242,7 +244,7 @@ inside generated projects...
 
     //#region handle build clients projects
 
-    Helpers.log(`
+    log.data(`
 
     projec: ${this.project.genericName}
     type: ${this.project._type}
@@ -262,10 +264,12 @@ inside generated projects...
     //#endregion
 
     //#region report start building message
-    Helpers.taskStarted(`\n\n\t${chalk.bold('[build-process] Start of Building')} ${this.project.genericName} `
-      + `(${buildOptions.appBuild ? 'app' : 'lib'})\n\n`);
+    // console.log('WEBSQL', buildOptions.websql)
+
+    log.taskStarted(`\n\n\t${chalk.bold('[build-process] Start of Building')} ${this.project.genericName} `
+      + `(${buildOptions.appBuild ? 'app' : 'lib'}) ${buildOptions.websql ? '[WEBSQL]' : ''}\n\n`);
     if (global.tnpNonInteractive) {
-      PROGRESS_DATA.log({ msg: `[build-process] Start of building ${this.project.genericName}` })
+      PROGRESS_DATA.log({ msg: `[build-process] Start of building ${this.project.genericName} ${buildOptions.websql ? '[WEBSQL]' : ''}` })
     }
 
     //#endregion
@@ -278,24 +282,24 @@ inside generated projects...
       const porjectINfo = buildOptions.copyto.length === 1
         ? `project "${(_.first(buildOptions.copyto as any) as Project).name}"`
         : `all ${buildOptions.copyto.length} projects`;
-      Helpers.info(`From now... ${porjectINfo} will be updated after every change...`)
+      log.info(`From now... ${porjectINfo} will be updated after every change...`)
     }
     const msg = (buildOptions.watch ? `
       Files watcher started.. ${buildOptions.websql ? '[WEBSQL]' : ''}
     `: `
-      End of Building ${this.project.genericName}
+      End of Building ${this.project.genericName} ${buildOptions.websql ? '[WEBSQL]' : ''}
 
     ` )
 
     // if (global.tnpNonInteractive) {
     //   PROGRESS_DATA.log({ msg });
     // } else {
-    Helpers.info(msg);
+    log.info(msg);
     // global?.spinner?.start();
     // }
 
     if (exit && !buildOptions.watch) {
-      Helpers.log('Build process exit')
+      log.data('Build process exit')
       process.exit(0);
     }
     //#endregion

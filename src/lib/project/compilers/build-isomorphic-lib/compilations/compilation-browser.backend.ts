@@ -44,6 +44,7 @@ export class BroswerCompilation extends BackendCompilation {
 
   //#region constructor
   constructor(
+    isWatchBuild: boolean,
     public compilationProject: Project,
     public moduleName: string,
     public ENV: Models.env.EnvConfig,
@@ -60,7 +61,7 @@ export class BroswerCompilation extends BackendCompilation {
     public backendOutFolder: string,
     public buildOptions: BuildOptions
   ) {
-    super(outFolder, location, cwd, buildOptions.websql);
+    super(isWatchBuild, outFolder, location, cwd, buildOptions.websql);
     this.compilerName = this.customCompilerName;
 
     Helpers.log(`[BroswerCompilation][constructor]
@@ -91,16 +92,14 @@ export class BroswerCompilation extends BackendCompilation {
   //#region methods / sync action
   async syncAction(files: string[]) {
     // console.log('[compilation browser] syncAction', files)
-    if (fse.existsSync(this.compilationFolderPath)) {
-      rimraf.sync(this.compilationFolderPath)
-    }
-    fse.mkdirpSync(this.compilationFolderPath)
+    Helpers.removeFileIfExists(this.compilationFolderPath)
+    Helpers.mkdirp(this.compilationFolderPath)
     const dereference = true; // Copy symlinks as normal files
     // console.log(`copying ${path.join(this.cwd, this.location)}/ to  ${this.compilationFolderPath} dereference: ${dereference},`)
 
     // TODO_NOT_IMPORTANT this may be replaced by filesPathes
     Helpers.copy(`${crossPlatformPath(path.join(this.cwd, this.location))}/`, this.compilationFolderPath, {
-      dereference,
+      dereference: false,
       filter: (src: string, dest: string) => {
         return copyToBrowserSrcCodition(src);
       }
@@ -261,13 +260,14 @@ export class BroswerCompilation extends BackendCompilation {
         buildType: this.backendOutFolder as any
       });
     } catch (e) {
-      console.log(require('callsite-record')({
-        forError: e
-      }).renderSync({
-        // stackFilter(frame) {
-        //   return !frame.getFileName().includes('node_modules');
-        // }
-      }))
+      Helpers.log(e);
+      // console.log(require('callsite-record')({
+      //   forError: e
+      // }).renderSync({
+      //   // stackFilter(frame) {
+      //   //   return !frame.getFileName().includes('node_modules');
+      //   // }
+      // }))
       Helpers.error(`Browser compilation fail: ${e}`, false, true);
     }
   }

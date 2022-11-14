@@ -16,15 +16,13 @@ export interface WebpackBackendCompilationOpt {
 
 export class WebpackBackendCompilation extends FeatureForProject {
 
-  run(options: WebpackBackendCompilationOpt) {
+  async run(options: WebpackBackendCompilationOpt) {
     const { outDir, watch, uglify, buildType, buildTitle } = options;
     const webpackGlob = this.project.npmPackages.global('webpack');
 
-
-
     const webpackCommand = `node ${webpackGlob} --version && node ${webpackGlob} `
       + `--config webpack.backend-${outDir}-build.js ${watch ? '--watch' : ''
-      } ${uglify ? '-env=useUglify' : ''}`;
+      } ${uglify ? '--env=useUglify' : ''}`;
 
     const showInfoWebpack = () => {
       Helpers.info(`
@@ -37,14 +35,21 @@ export class WebpackBackendCompilation extends FeatureForProject {
     };
 
     // TODO QUICK_FIX
-    Helpers.writeFile(path.join(this.project.location, outDir, config.file.index_d_ts), EXPORT_TEMPLATE('dist'));
+    Helpers.writeFile(path.join(this.project.location, outDir, config.file.index_d_ts), EXPORT_TEMPLATE(outDir));
 
     try {
       showInfoWebpack()
       if (watch) {
-        this.project.run(webpackCommand).async();
+        await this.project.execute(webpackCommand, {
+          biggerBuffer: true,
+          resolvePromiseMsg: {
+            stdout: ['hidden modules']
+          }
+        })
       } else {
-        this.project.run(webpackCommand).sync();
+        this.project.run(webpackCommand, {
+          biggerBuffer: true
+        }).sync();
       }
     } catch (er) {
       Helpers.error(`

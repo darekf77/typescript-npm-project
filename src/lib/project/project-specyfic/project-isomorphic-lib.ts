@@ -19,7 +19,7 @@ import { CLI } from 'tnp-cli';
 //#endregion
 
 //#region consts
-const loadNvm = 'echo ' // 'export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" && [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh" && nvm use v14';
+// const loadNvm = ''// 'echo ' // 'export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" && [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh" && nvm use v14';
 //#endregion
 @CLASS.NAME('ProjectIsomorphicLib')
 export class ProjectIsomorphicLib
@@ -314,7 +314,8 @@ export class ProjectIsomorphicLib
       //#region prepare angular variables for new v3 inside structure build
       const portToServe = _.isNumber(port) ? `--port=${port}` : '';
       const aot = flags.includes('aot');
-      const ngBuildCmd = `${loadNvm} && npm-run ng build `
+      // const ngBuildCmd = `${loadNvm} && npm-run ng build `
+      const ngBuildCmd = `npm-run ng build `
         + `${aot ? '--aot=true' : ''} `
         + `${prod ? '--prod' : ''} `
         + `${watch ? '--watch' : ''}`
@@ -322,7 +323,8 @@ export class ProjectIsomorphicLib
 
       if (watch) {
         if (outDir === 'dist') {
-          command = `${loadNvm} && ${this.npmRunNg} serve ${portToServe} ${prod ? '--prod' : ''}`;
+          // command = `${loadNvm} && ${this.npmRunNg} serve ${portToServe} ${prod ? '--prod' : ''}`;
+          command = `${this.npmRunNg} serve ${portToServe} ${prod ? '--prod' : ''}`;
         } else {
           command = ngBuildCmd;
         }
@@ -446,11 +448,14 @@ export class ProjectIsomorphicLib
 
     this.fixBuildDirs(outDir);
 
-    Helpers.info(`[buildLib] start of building`);
+    // Helpers.info(`[buildLib] start of building ${websql ? '[WEBSQL]' : ''}`);
+    Helpers.info(`[buildLib] start of building...`);
     this.beforeLibBuild(outDir);
 
 
     const { obscure, uglify, nodts } = this.buildOptions;
+    const isWebpackBundleProductionBuild = ((outDir === 'bundle') && (obscure || uglify || nodts))
+
     if (outDir === 'bundle') {
       this.cutReleaseCode();
     }
@@ -459,45 +464,37 @@ export class ProjectIsomorphicLib
       this.quickFixes.overritenBadNpmPackages();
     }
 
-    if (!this.buildOptions.watch && (uglify || obscure || nodts) && outDir === 'bundle') {
+    if (isWebpackBundleProductionBuild) {
       this.buildOptions.genOnlyClientCode = true;
     }
     //#endregion
 
-    //#region preparing variables / webpack
-    const webpackGlob = this.npmPackages.global('webpack');
-
-    const webpackCommandFn = (watchCommand: boolean) =>
-      `node ${webpackGlob} --version && node ${webpackGlob} --config webpack.backend-bundle-build.js ${watchCommand ? '--watch -env=useUglify' : ''}`;
-
-    const webpackCommand = webpackCommandFn(this.buildOptions.watch);
-
-    const showInfoWebpack = () => {
-      Helpers.log(`
-
-    webpack path: ${webpackGlob}
-
-    `)
-      Helpers.info(`
-
-      WEBPACK ${this.buildOptions.watch ? 'WATCH ' : ''
-        } BACKEND BUILD started...
-
-      `);
-      Helpers.info(` command: ${webpackCommand}`);
-    };
-    //#endregion
-
     //#region preparing variables / incremental build
-    this.incrementalBuildProcess = new IncrementalBuildProcess(this, this.buildOptions);
+    const incrementalBuildProcess = new IncrementalBuildProcess(this, this.buildOptions.clone({
+      websql: false
+    }));
 
-    const proxyProject = this.proxyNgProj(this, this.buildOptions, 'lib');
+    const incrementalBuildProcessWebsql = new IncrementalBuildProcess(this, this.buildOptions.clone({
+      websql: true,
+      genOnlyClientCode: true,
+    }));
+
+    const proxyProject = this.proxyNgProj(this, this.buildOptions.clone({
+      websql: false,
+    }), 'lib');
+
+    const proxyProjectWebsql = this.proxyNgProj(this, this.buildOptions.clone({
+      websql: true
+    }), 'lib');
 
     Helpers.log(`
 
     proxy Proj = ${proxyProject?.location}
+    proxy Proj websql = ${proxyProjectWebsql?.location}
 
     `);
+
+
 
     // const webPack1 = `require('webpack')`;
     // const webPack2 = `require('${this.npmPackages.global('webpack', true)}')`;
@@ -530,15 +527,16 @@ export class ProjectIsomorphicLib
     //#endregion
 
     //#region prepare variables / command
-    const command = `${loadNvm} && ${this.npmRunNg} build ${this.name} ${watch ? '--watch' : ''}`;
+    // const command = `${loadNvm} && ${this.npmRunNg} build ${this.name} ${watch ? '--watch' : ''}`;
+    const command = `${this.npmRunNg} build ${this.name} ${watch ? '--watch' : ''}`;
     //#endregion
 
     //#region prepare variables / angular info
     const showInfoAngular = () => {
-      Helpers.info(`Starting browser typescirpt build.... ${this.buildOptions.websql ? '[WEBSQL]' : ''}`);
+      Helpers.info(`Starting browser Angular/TypeScirpt build.... ${this.buildOptions.websql ? '[WEBSQL]' : ''}`);
       Helpers.log(`
 
-      ANGULAR 13+ ${this.buildOptions.watch ? 'WATCH ' : ''} LIB BUILD STARTED...
+      ANGULAR 13+ ${this.buildOptions.watch ? 'WATCH ' : ''} LIB BUILD STARTED... ${this.buildOptions.websql ? '[WEBSQL]' : ''}
 
       `);
 
@@ -549,8 +547,39 @@ export class ProjectIsomorphicLib
     //#endregion
 
     if (this.buildOptions.watch) {
-      //#region watch build
-      await this.incrementalBuildProcess.startAndWatch('isomorphic compilation (watch mode)',
+      if (isWebpackBundleProductionBuild) {
+        //#region webpack bundle build
+        await incrementalBuildProcess.startAndWatch(`isomorphic compilation (only browser) `);
+        await incrementalBuildProcessWebsql.startAndWatch(`isomorphic compilation (only browser) [WEBSQL]`);
+        // Helpers.error(`Watch build not available for bundle build`, false, true);
+        // Helpers.info(`Starting watch bundle build for fast cli.. ${this.buildOptions.websql ? '[WEBSQL]' : ''}`);
+        Helpers.info(`Starting watch bundle build for fast cli.. `);
+
+        try {
+          await this.webpackBackendBuild.run({
+            buildType: 'lib',
+            outDir,
+            watch,
+            uglify
+          });
+        } catch (er) {
+          Helpers.error(`WATCH BUNDLE build failed`, false, true);
+        }
+        //#endregion
+      } else {
+        //#region watch backend compilation
+        await incrementalBuildProcess.startAndWatch('isomorphic compilation (watch mode)',
+          //#region options
+          {
+            watchOnly: this.buildOptions.watchOnly,
+            afterInitCallBack: async () => {
+              await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
+            }
+          }
+          //#endregion
+        );
+
+        await incrementalBuildProcessWebsql.startAndWatch('isomorphic compilation (watch mode) [WEBSQL]',
         //#region options
         {
           watchOnly: this.buildOptions.watchOnly,
@@ -561,50 +590,45 @@ export class ProjectIsomorphicLib
         //#endregion
       );
 
-      //#region @depracated bunlde simulte webpack build
-      if (outDir === 'bundle') {
+        if (this.frameworkVersionAtLeast('v3')) { // TOOD
+          showInfoAngular()
 
-        // Helpers.error(`Watch build not available for bundle build`, false, true);
-        Helpers.info(`Starting watch bundle build for fast cli.. ${this.buildOptions.websql ? '[WEBSQL]' : ''}`);
-
-        try {
-          showInfoWebpack()
-          this.run(webpackCommand).async();
-        } catch (er) {
-          Helpers.error(`WATCH BUNDLE build failed`, false, true);
-        }
-      }
-      //#endregion
-
-      if (this.frameworkVersionAtLeast('v3')) { // TOOD
-        showInfoAngular()
-
-        if (isStandalone || (this.isSmartContainerTarget && this.buildOptions.copyto?.length > 0)) {
-          if (this.isSmartContainerTarget) { // TODO QUICK_FIX this should be in init/struct
-            PackagesRecognition.fromProject(this).start(true, 'before startling lib proxy project');
+          if (isStandalone || (this.isSmartContainerTarget && this.buildOptions.copyto?.length > 0)) {
+            if (this.isSmartContainerTarget) { // TODO QUICK_FIX this should be in init/struct
+              PackagesRecognition.fromProject(this).start(true, 'before startling lib proxy project');
+            }
+            await proxyProject.execute(command, {
+              resolvePromiseMsg: {
+                stdout: 'Compilation complete. Watching for file changes'
+              },
+              ...sharedOptions(),
+            });
+            await proxyProjectWebsql.execute(command, {
+              resolvePromiseMsg: {
+                stdout: 'Compilation complete. Watching for file changes'
+              },
+              ...sharedOptions(),
+            });
           }
-          await proxyProject.execute(command, {
-            resolvePromiseMsg: {
-              stdout: 'Compilation complete. Watching for file changes'
-            },
-            ...sharedOptions(),
-          });
+          this.showMesageWhenBuildLibDoneForSmartContainer(args, watch);
         }
-        this.showMesageWhenBuildLibDoneForSmartContainer(args, watch);
+        //#endregion
       }
-      // console.log('HEHEHHE')
-      //#endregion
     } else {
       //#region non watch build
-      if (outDir === 'bundle' && (obscure || uglify || nodts)) {
+      if (isWebpackBundleProductionBuild) {
         //#region release production backend build for firedev/tnp specyfic
         // console.log('k1')
-        await this.incrementalBuildProcess.start('isomorphic compilation (only browser) ');
-        // console.log("AFTER COMPILATION")
+        await incrementalBuildProcess.start('isomorphic compilation (only browser) ');
+        await incrementalBuildProcessWebsql.start('isomorphic compilation (only browser) [WEBSQL] ');
 
         try {
-          showInfoWebpack()
-          this.run(webpackCommand).sync();
+          await this.webpackBackendBuild.run({
+            buildType: 'lib',
+            outDir,
+            watch,
+            uglify
+          });
         } catch (er) {
           Helpers.error(`BUNDLE (single file compilation) build failed`, false, true);
         }
@@ -632,6 +656,9 @@ export class ProjectIsomorphicLib
           await proxyProject.execute(command, {
             ...sharedOptions()
           })
+          await proxyProjectWebsql.execute(command, {
+            ...sharedOptions()
+          })
         } catch (e) {
           Helpers.log(e)
           Helpers.error(`
@@ -643,11 +670,15 @@ export class ProjectIsomorphicLib
       } else {
         //#region normal backend compilation
 
-        await this.incrementalBuildProcess.start('isomorphic compilation');
+        await incrementalBuildProcess.start('isomorphic compilation');
+        await incrementalBuildProcessWebsql.start('isomorphic compilation');
 
         try {
           showInfoAngular();
           await proxyProject.execute(command, {
+            ...sharedOptions(),
+          });
+          await proxyProjectWebsql.execute(command, {
             ...sharedOptions(),
           });
           this.showMesageWhenBuildLibDoneForSmartContainer(args, watch);
@@ -673,7 +704,7 @@ export class ProjectIsomorphicLib
 
   //#region private methods / show message when build lib done for smart container
   private showMesageWhenBuildLibDoneForSmartContainer(args: string, watch: boolean) {
-    const buildLibDone = 'LIB BUILD DONE';
+    const buildLibDone = `LIB BUILD DONE.. `;
     const ifapp = 'if you want to start app build -> please run in other terminal command:';
     const ngserve = `${watch ? '--port 4201 # or whatever port' : '#'} to run angular ${watch ? 'ng serve' : 'ng build (for application - not lib)'}.`;
     const bawOrba = watch ? 'baw' : 'ba';
@@ -738,7 +769,7 @@ export class ProjectIsomorphicLib
       project,
       buildOptions.outDir as any,
       void 0, // TODO
-      this.buildOptions.websql,
+      buildOptions.websql,
       type
     ));
     const proj = Project.From(projepath);

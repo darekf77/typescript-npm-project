@@ -11,36 +11,6 @@ import { Helpers } from 'tnp-helpers';;
 
 export namespace CopyMangerHelpers {
 
-
-  export function filterDontCopy(basePathFoldersTosSkip: string[], project: Project) {
-
-    return (src: string, dest: string) => {
-      // console.log('src',src)
-      const baseFolder = _.first(src.replace(project.location, '')
-        .replace(/^\//, '').split('/'));
-      if (!baseFolder || baseFolder.trim() === '') {
-        return true;
-      }
-      const isAllowed = _.isUndefined(basePathFoldersTosSkip.find(f => baseFolder.startsWith(f)));
-      return isAllowed;
-    };
-
-  }
-
-  export function filterOnlyCopy(basePathFoldersOnlyToInclude: string[], project: Project) {
-
-    return (src: string, dest: string) => {
-      const baseFolder = _.first(src.replace(project.location, '')
-        .replace(/^\//, '').split('/'));
-      if (!baseFolder || baseFolder.trim() === '') {
-        return true;
-      }
-      const isAllowed = !_.isUndefined(basePathFoldersOnlyToInclude.find(f => baseFolder.startsWith(f)));
-      return isAllowed;
-    };
-
-  }
-
   export function executeCopy(
     sourceLocation: string,
     destinationLocation: string,
@@ -86,8 +56,8 @@ export namespace CopyMangerHelpers {
 
     // console.log(foldersToSkip)
 
-    const filter = override ? CopyMangerHelpers.filterOnlyCopy(sourceFolders, project)
-      : CopyMangerHelpers.filterDontCopy(foldersToSkip, project);
+    const filter = override ? Helpers.filterOnlyCopy(sourceFolders, project)
+      : Helpers.filterDontCopy(foldersToSkip, project);
 
     Helpers.copy(`${sourceLocation}/`, tempDestination, { filter, dereference: options.dereference });
 

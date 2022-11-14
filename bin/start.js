@@ -65,11 +65,16 @@ if (procType === 'child-of-root' || debugMode) {
   startSpinner = false;
 }
 
-if (startSpinner) {
-  const inspector = require('inspector');
-  isNodeDebuggerEnabled = (inspector.url() !== undefined);
-  startSpinner = !isNodeDebuggerEnabled;
+// if (startSpinner) {
+//   const inspector = require('inspector');
+//   isNodeDebuggerEnabled = (inspector.url() !== undefined);
+//   startSpinner = !isNodeDebuggerEnabled;
+// }
+
+if (frameworkName === 'tnp') {
+  startSpinner = false;
 }
+
 //#endregion
 
 const path = require('path');
@@ -206,7 +211,7 @@ if (startSpinner) {
     //#endregion
   }
 
-  global.start = start;
+  // global.start = start;
   process.argv = process.argv.filter(f => !!f);
   start(process.argv, global.frameworkName, mode);
   //#endregion
@@ -221,7 +226,7 @@ function crossPlatofrmPath(p) {
 
 function setText(text, toSpiner = false) {
   const spinner = global.spinner;
-  if(text) {
+  if (text) {
     text = text.split('::').slice(1).join('::');
   }
   if (spinner) {

@@ -221,7 +221,7 @@
         'firedev-ports': '13.0.24',
         'firedev-crud-deamon': '13.0.21',
         "tnp-ui": '13.0.20',
-        "tnp-core": '13.1.3',
+        "tnp-core": '13.1.17',
         "tnp-cli": '13.0.25',
         "tnp-tools": '0.0.58',
         'any-project-cli': '0.0.11',
