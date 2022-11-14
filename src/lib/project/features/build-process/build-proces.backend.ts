@@ -24,7 +24,7 @@ const log = Log.create(__filename)
 export class BuildProcess extends FeatureForProject {
 
   //#region prepare build options
-  public static prepareOptionsBuildProcess(options: Models.dev.StartForOptions, project: Project) {
+  public static prepareOptionsBuildProcess(options: Models.dev.StartForOptions, project: Project): BuildOptions {
     if (_.isUndefined(options)) {
       options = {} as any;
     }
@@ -50,7 +50,7 @@ inside generated projects...
     if (!_.isString(options.args)) {
       options.args = ''
     }
-    return options;
+    return BuildOptions.fromJson(options);
   }
   //#endregion
 

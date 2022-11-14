@@ -277,28 +277,7 @@ export abstract class LibProject {
         args: releaseOptions.args
       }, this) as any);
 
-      Helpers.info(`
 
-      BUILDING WEBSQL VERSION
-
-      `);
-
-      // TODO QUICK_FIX websql should actuall create its own project/dist/websql folder with compiled files
-      // also plus additionaly all folder tmp-src-dist-websql etc.
-      // const browserBundle = path.join(this.location, config.folder.bundle, config.folder.browser);
-      // const browserBundleTemp = path.join(this.location, config.folder.bundle, config.folder.browser + '-temp');
-      // const websqlBundleTemp = path.join(this.location, config.folder.bundle, config.folder.websql);
-      // Helpers.move(browserBundle, browserBundleTemp);
-
-      await this.build(BuildProcess.prepareOptionsBuildProcess({
-        websql: true,
-        prod,
-        obscure,
-        nodts,
-        uglify,
-        outDir: config.folder.bundle as 'bundle',
-        args: releaseOptions.args
-      }, this) as any);
       // Helpers.move(browserBundle, websqlBundleTemp);
       // Helpers.move(browserBundleTemp, browserBundle);
 
