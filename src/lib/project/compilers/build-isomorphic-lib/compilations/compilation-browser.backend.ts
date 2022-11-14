@@ -92,9 +92,9 @@ export class BroswerCompilation extends BackendCompilation {
   //#region methods / sync action
   async syncAction(files: string[]) {
     // console.log('[compilation browser] syncAction', files)
-    Helpers.removeFileIfExists(this.compilationFolderPath)
+    Helpers.removeFolderIfExists(this.compilationFolderPath)
     Helpers.mkdirp(this.compilationFolderPath)
-    const dereference = true; // Copy symlinks as normal files
+    // const dereference = true; // Copy symlinks as normal files
     // console.log(`copying ${path.join(this.cwd, this.location)}/ to  ${this.compilationFolderPath} dereference: ${dereference},`)
 
     // TODO_NOT_IMPORTANT this may be replaced by filesPathes
