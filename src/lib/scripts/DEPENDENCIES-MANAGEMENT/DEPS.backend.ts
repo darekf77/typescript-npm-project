@@ -136,14 +136,22 @@ const $REINSTALL = async (args) => {
   const proj = Project.Current as Project;
 
   if (proj.isContainer) {
-    const children = proj.children.filter(c => c.frameworkVersionAtLeast('v3') && c.typeIs('isomorphic-lib') && c.npmPackages.useSmartInstall);
-    for (let index = 0; index < children.length; index++) {
-      const c = children[index];
-      Helpers.info(`Recreating node_module for ${c.genericName}`)
-      c.node_modules.remove();
-      c.smartNodeModules.remove();
-      await c.filesStructure.init('');
+    if (proj.isContainerCoreProject) {
+      proj.node_modules.remove();
+      proj.smartNodeModules.remove();
+      proj.run(`${config.frameworkName} install`).sync();
+      Helpers.info(`Reinstal done for core container`);
+    } else {
+      const children = proj.children.filter(c => c.frameworkVersionAtLeast('v3') && c.typeIs('isomorphic-lib') && c.npmPackages.useSmartInstall);
+      for (let index = 0; index < children.length; index++) {
+        const c = children[index];
+        Helpers.info(`Recreating node_module for ${c.genericName}`)
+        c.node_modules.remove();
+        c.smartNodeModules.remove();
+        await c.filesStructure.init('');
+      }
     }
+
   } else {
     Helpers.error(`[${config.frameworkName}] This is not a container type project.`, false, true);
   }

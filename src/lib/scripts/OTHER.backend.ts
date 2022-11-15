@@ -136,6 +136,18 @@ function $isbundlemode(args) {
 
 const $ASSETS = () => recreate();
 const $VERSION = () => version();
+
+async function  $VERSIONS() {
+  const children = Project.Current.children;
+
+  for (let index = 0; index < children.length; index++) {
+    const child = children[index] as Project;
+    Helpers.info(`v${child.packageJson.data.version}\t - ${child.genericName}`);
+  }
+
+  process.exit(0)
+}
+
 const PATH = () => {
   console.log((Project.Tnp as Project).location);
   process.exit(0)
@@ -301,6 +313,7 @@ export default {
   $isbundlemode: Helpers.CLIWRAP($isbundlemode, '$isbundlemode'),
   $ASSETS: Helpers.CLIWRAP($ASSETS, '$ASSETS'),
   $VERSION: Helpers.CLIWRAP($VERSION, '$VERSION'),
+  $VERSIONS: Helpers.CLIWRAP($VERSIONS, '$VERSIONS'),
   PATH: Helpers.CLIWRAP(PATH, 'PATH'),
   COPY_RESOURCES: Helpers.CLIWRAP(COPY_RESOURCES, 'COPY_RESOURCES'),
   $CHECK_ENV: Helpers.CLIWRAP($CHECK_ENV, '$CHECK_ENV'),

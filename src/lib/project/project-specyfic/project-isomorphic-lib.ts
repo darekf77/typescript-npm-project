@@ -709,14 +709,18 @@ export class ProjectIsomorphicLib
     const ngserve = `${watch ? '--port 4201 # or whatever port' : '#'} to run angular ${watch ? 'ng serve' : 'ng build (for application - not lib)'}.`;
     const bawOrba = watch ? 'baw' : 'ba';
     const bawOrbaLong = watch ? ' build:app:watch ' : ' build:app ';
+    const bawOrbaLongWebsql = watch ? 'build:app:watch --websql' : 'build:app --websql';
     const withPort = '(with port)';
+    const orIfWebsql = `or if you wannt try websql mode:`;
 
 
 
     if (this.isSmartContainerTarget) {
       const parent = this.smartContainerTargetParentContainer;
       const target = (crossPlatformPath(_.first(args.split(' '))) || '').replace('/', '');
-      Helpers.taskDone(`${CLI.chalk.underline(`${buildLibDone}... for target project "`
+      Helpers.taskDone(`${CLI.chalk.underline(`
+
+      ${buildLibDone}... for target project "`
         + `${parent ? (parent.name + '/') : ''}${target}"`)}`)
 
       Helpers.success(`
@@ -729,6 +733,9 @@ export class ProjectIsomorphicLib
 
       ${withPort}
       ${config.frameworkName} ${bawOrba} ${target} ${ngserve}
+
+      ${orIfWebsql}
+      ${bawOrbaLongWebsql}
 
             `);
     } else if (this.isStandaloneProject) {
@@ -743,6 +750,9 @@ export class ProjectIsomorphicLib
 
       ${withPort}
       ${config.frameworkName} ${bawOrba} ${ngserve}
+
+      ${orIfWebsql}
+      ${bawOrbaLongWebsql}
 
       `);
     }

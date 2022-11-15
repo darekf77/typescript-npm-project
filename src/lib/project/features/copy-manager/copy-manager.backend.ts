@@ -864,11 +864,16 @@ export * from './libs/${worksapcePackageName}';\n
           const sourceFolders = [
             config.folder.src,
             config.folder.node_modules,
+            config.folder.tempSrcDist,
+            config.file.package_json,
           ];
           const filter = Helpers.filterDontCopy(sourceFolders, monitorDir);
 
           sourceFolders.forEach(sourceFolder => {
-            Helpers.removeFileIfExists(crossPlatformPath(path.join(destPackageLocation, sourceFolder)))
+            const toRemoveLink = crossPlatformPath(path.join(destPackageLocation, sourceFolder));
+            if(Helpers.isSymlinkFileExitedOrUnexisted(toRemoveLink)) {
+              Helpers.removeFileIfExists(crossPlatformPath(path.join(destPackageLocation, sourceFolder)));
+            }
           })
 
           Helpers.copy(monitorDir, destPackageLocation, {

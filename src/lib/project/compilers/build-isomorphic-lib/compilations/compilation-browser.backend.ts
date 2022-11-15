@@ -23,6 +23,8 @@ import { CLASS } from 'typescript-class-helpers';
 @IncCompiler.Class({ className: 'BroswerCompilation' })
 export class BroswerCompilation extends BackendCompilation {
 
+  private static instances = {} as { [websql: string]: BroswerCompilation; }
+
   //#region fields & getters
   compilerName = 'Browser standard compiler'
   public codecut: CodeCut;
@@ -62,6 +64,7 @@ export class BroswerCompilation extends BackendCompilation {
     public buildOptions: BuildOptions
   ) {
     super(isWatchBuild, outFolder, location, cwd, buildOptions.websql);
+    BroswerCompilation.instances[String(!!buildOptions.websql)] = this;
     this.compilerName = this.customCompilerName;
 
     Helpers.log(`[BroswerCompilation][constructor]
@@ -120,6 +123,12 @@ export class BroswerCompilation extends BackendCompilation {
   //#region methods / async action
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
+
+    if (!this.buildOptions.websql) { // TODO QUICK_FIX QUICK_DIRTY_FIX
+      const websqlInstance = BroswerCompilation.instances[String(!this.buildOptions.websql)];
+      await websqlInstance.asyncAction(event);
+    }
+
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
     const relativeFilePath = crossPlatformPath(absoluteFilePath.replace(crossPlatformPath(path.join(this.cwd, this.location)), ''));
     const destinationFilePath = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, relativeFilePath));
