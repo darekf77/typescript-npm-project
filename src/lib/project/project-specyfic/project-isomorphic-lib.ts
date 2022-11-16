@@ -711,7 +711,7 @@ export class ProjectIsomorphicLib
     const bawOrbaLong = watch ? ' build:app:watch ' : ' build:app ';
     const bawOrbaLongWebsql = watch ? 'build:app:watch --websql' : 'build:app --websql';
     const withPort = '(with port)';
-    const orIfWebsql = `or if you wannt try websql mode:`;
+    const orIfWebsql = `or if you want to try websql mode:`;
 
 
 

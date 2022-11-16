@@ -135,6 +135,11 @@ ${appModuleFile}
             );
           }
 
+          appModuleFile = appModuleFile.replace(
+            `import { Helpers } from 'tnp-core';`,
+            `import { Helpers } from 'tnp-core/${this.websql ? config.folder.websql : config.folder.browser}';`,
+          )
+
 
           Helpers.writeFile(appModuleFilePath, appModuleFile);
         })();
