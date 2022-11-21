@@ -300,13 +300,14 @@ processing...
         }
 
         depForPush.git.commit(`release push`);
-        await depForPush.git.pullCurrentBranch()
+        await depForPush.gitActions.push()
       }
 
       proj.git.commit(`Up4date after release`);
-      await proj.git.pushCurrentBranch();
-      Project.Tnp.git.commit(`Update after release`);
-      await Project.Tnp.git.pushCurrentBranch();
+      await proj.gitActions.push();
+      const tnpProj = (Project.Tnp as Project);
+      tnpProj.git.commit(`Update after release`);
+      await tnpProj.gitActions.push();
       Helpers.success(`
 
 
