@@ -10,8 +10,13 @@ const $RELEASE_ALL = async (args: string) => {
 };
 
 const $RELEASE_TRUSTED = async (args: string) => {
-  const all = `--trusted`
-  await $RELEASE(args.replace(new RegExp(Helpers.escapeStringForRegEx(`--trusted`), 'g'), '') + ' ' + all);
+  const trusted = `--trusted`;  ;
+  const all = `--all`;
+  await $RELEASE(
+    args
+      .replace(new RegExp(Helpers.escapeStringForRegEx(`--trusted`), 'g'), '')
+      .replace(new RegExp(Helpers.escapeStringForRegEx(`--all`), 'g'), '')
+    + ' ' + trusted + ' ' + all);
 };
 
 //#region RELEASE / NORMAL
@@ -108,7 +113,7 @@ const $RELEASE = async (args: string) => {
 
     const depsOnlyToPush = [];
 
-    const all = (Project.Current as Project).trustedAllPossible;
+    const allTrusted = (Project.Current as Project).trustedAllPossible;
 
     //#region filter children
     for (let index = 0; index < deps.length; index++) {
@@ -122,7 +127,7 @@ const $RELEASE = async (args: string) => {
 
       const shouldRelease = (
         (!child.isSmartContainer && !child.isSmartContainerChild)
-        && (argsObj.trusted ? all.includes(child.name) : true)
+        && (argsObj.trusted ? allTrusted.includes(child.name) : true)
         && versionIsOk
         && !child.isPrivate
         && !child.targetProjects.exists
@@ -443,6 +448,7 @@ export default {
   SET_MAJOR_VER: Helpers.CLIWRAP(SET_MAJOR_VER, 'SET_MAJOR_VER'),
   $AUTO_RELEASE: Helpers.CLIWRAP($AUTO_RELEASE, '$AUTO_RELEASE'),
   $RELEASE: Helpers.CLIWRAP($RELEASE, '$RELEASE'),
+  $RELEASE_TRUSTED: Helpers.CLIWRAP($RELEASE_TRUSTED, '$RELEASE_TRUSTED'),
   $RELEASE_MAJOR: Helpers.CLIWRAP($RELEASE_MAJOR, '$RELEASE_MAJOR'),
   $MAJOR_RELEASE: Helpers.CLIWRAP($MAJOR_RELEASE, '$MAJOR_RELEASE'),
   $RELEASE_MINOR: Helpers.CLIWRAP($RELEASE_MINOR, '$RELEASE_MINOR'),
