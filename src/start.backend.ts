@@ -151,7 +151,7 @@ export async function start(
   // // const proc = require('process');
   // global?.spinner?.start()
 
-  Helpers.info(`in start, mode: "${mode}"`);
+  Helpers.log(`in start, mode: "${mode}"`);
   config.frameworkName = frameworkName;
 
 

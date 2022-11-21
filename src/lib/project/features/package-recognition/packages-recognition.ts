@@ -165,6 +165,7 @@ export class PackagesRecognition {
     this.recognizedPackages = [
       ...folders,
       ...local,
+      ...Object.values(config.frameworkNames),
     ];
     this.updateCurrentIsomorphicJsonSearchResults()
   }

@@ -54,6 +54,15 @@ process.argv = process.argv.filter(a => a !== '-npm');
 process.argv = process.argv.filter(a => !a.startsWith('-verbose'));
 //#endregion
 
+//#region fix argument
+process.argv = process.argv.map(a => {
+  if (a === '-websql') {
+    return '--websql'
+  }
+  return a;
+})
+//#endregion
+
 //#region variables
 let mode;
 let start;

@@ -9,6 +9,11 @@ const $RELEASE_ALL = async (args: string) => {
   await $RELEASE(args.replace(new RegExp(Helpers.escapeStringForRegEx(`--all`), 'g'), '') + ' ' + all);
 };
 
+const $RELEASE_TRUSTED = async (args: string) => {
+  const all = `--trusted`
+  await $RELEASE(args.replace(new RegExp(Helpers.escapeStringForRegEx(`--trusted`), 'g'), '') + ' ' + all);
+};
+
 //#region RELEASE / NORMAL
 const $RELEASE = async (args: string) => {
 
@@ -18,6 +23,10 @@ const $RELEASE = async (args: string) => {
   argsObj.args = args;
   if (!argsObj.releaseType) {
     argsObj.releaseType = 'patch';
+  }
+
+  if (!argsObj.trusted) {
+    argsObj.trusted = false;
   }
 
   const specifiedVersion = argsObj.args
@@ -68,7 +77,7 @@ const $RELEASE = async (args: string) => {
     proj.packageJson.data.version = newVersion;
     proj.packageJson.save(`Minor version up`);
   } else {
-   // TODO path release !
+    // TODO path release !
   }
 
   proj.packageJson.showDeps('Release');
@@ -99,6 +108,7 @@ const $RELEASE = async (args: string) => {
 
     const depsOnlyToPush = [];
 
+    const all = (Project.Current as Project).trustedAllPossible;
 
     //#region filter children
     for (let index = 0; index < deps.length; index++) {
@@ -112,6 +122,7 @@ const $RELEASE = async (args: string) => {
 
       const shouldRelease = (
         (!child.isSmartContainer && !child.isSmartContainerChild)
+        && (argsObj.trusted ? all.includes(child.name) : true)
         && versionIsOk
         && !child.isPrivate
         && !child.targetProjects.exists
@@ -344,6 +355,52 @@ const $MINOR_RELEASE = async (args: string) => {
 };
 
 
+const SET_MINOR_VER = async (args: string) => {
+  const argsObj: { trusted } = require('minimist')(args.split(' '));
+  let children = (Project.Current.children as Project[]);
+
+  // if (argsObj.trusted) {
+  args = args.replace('--trusted', '')
+  args = args.replace('true', '')
+  const all = (Project.Current as Project).trustedAllPossible;
+  // console.log({
+  //   all
+  // })
+  children = children.filter(c => all.includes(c.name));
+  // }
+
+  for (let index = 0; index < children.length; index++) {
+    const child = children[index] as Project;
+    Helpers.taskStarted(`Updating version for ${child.name}@${child.packageJson.data.version} ... `);
+    await child.setMinorVersion(Number(args.trim()));
+    Helpers.taskDone();
+  }
+  process.exit(0)
+}
+
+const SET_MAJOR_VER = async (args: string) => {
+  const argsObj: { trusted } = require('minimist')(args.split(' '));
+  let children = (Project.Current.children as Project[]);
+
+  // if (argsObj.trusted) {
+  args = args.replace('--trusted', '')
+  args = args.replace('true', '')
+  const all = (Project.Current as Project).trustedAllPossible;
+  // console.log({
+  //   all
+  // })
+  children = children.filter(c => all.includes(c.name));
+  // }
+
+  for (let index = 0; index < children.length; index++) {
+    const child = children[index] as Project;
+    Helpers.taskStarted(`Updating version for ${child.name}@${child.packageJson.data.version} ... `);
+    await child.setMajorVersion(Number(args.trim()));
+    Helpers.taskDone();
+  }
+  process.exit(0)
+}
+
 
 function handleStandalone(proj: Project, argsObj: any) {
   if (proj.packageJson.libReleaseOptions.obscure) {
@@ -382,6 +439,8 @@ const $AUTO_RELEASE = async (args) => {
 };
 
 export default {
+  SET_MINOR_VER: Helpers.CLIWRAP(SET_MINOR_VER, 'SET_MINOR_VER'),
+  SET_MAJOR_VER: Helpers.CLIWRAP(SET_MAJOR_VER, 'SET_MAJOR_VER'),
   $AUTO_RELEASE: Helpers.CLIWRAP($AUTO_RELEASE, '$AUTO_RELEASE'),
   $RELEASE: Helpers.CLIWRAP($RELEASE, '$RELEASE'),
   $RELEASE_MAJOR: Helpers.CLIWRAP($RELEASE_MAJOR, '$RELEASE_MAJOR'),

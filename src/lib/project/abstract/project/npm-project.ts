@@ -36,6 +36,100 @@ export class NpmProject {
     //#endregion
   }
 
+  /**
+   * {
+   *  version: "<major>.<minor>.<path>"
+   * }
+   *
+   * This function is setting minor version
+   * example
+   * {
+   *  version:"3.1.4"
+   * }
+   * with @param minorVersionToSet equals 4
+   * will result in
+   * {
+   *  version:"3.4.4"
+   * }
+   */
+  async setMinorVersion(this: Project, minorVersionToSet: number) {
+    if (this.typeIs('unknow')) {
+      return '';
+    }
+
+    minorVersionToSet = Number(minorVersionToSet);
+    if (isNaN(minorVersionToSet) || !Number.isInteger(minorVersionToSet)) {
+      Helpers.error(`Wrong minor version to set: ${minorVersionToSet}`, false, true);
+    }
+
+    const ver = this.version.split('.');
+    if (ver.length !== 3) {
+      Helpers.error(`Wrong version in project: ${this.project}`, false, true);
+    }
+
+    const currentMinorVersion = Number(ver[1]);
+    const newVer = [ver[0], minorVersionToSet, ver[2]].join('.');
+
+    if (minorVersionToSet <= currentMinorVersion) {
+      Helpers.warn(`Ommiting... Trying to set same or lower minor version for project: ${this.genericName}
+        ${this.version} => v${newVer}
+      `)
+    } else {
+      await this.setNewVersion(newVer);
+    }
+  }
+
+
+  /**
+   * {
+   *  version: "<major>.<minor>.<path>"
+   * }
+   *
+   * This function is setting minor version
+   * example
+   * {
+   *  version:"3.1.4"
+   * }
+   * with @param minorVersionToSet equals 15
+   * will result in
+   * {
+   *  version:"15.1.4"
+   * }
+   */
+  async setMajorVersion(this: Project, majorVersionToSet: number) {
+    if (this.typeIs('unknow')) {
+      return '';
+    }
+
+    majorVersionToSet = Number(majorVersionToSet);
+    if (isNaN(majorVersionToSet) || !Number.isInteger(majorVersionToSet)) {
+      Helpers.error(`Wrong major version to set: ${majorVersionToSet}`, false, true);
+    }
+
+    const ver = this.version.split('.');
+    if (ver.length !== 3) {
+      Helpers.error(`Wrong version in project: ${this.project}`, false, true);
+    }
+
+    const currentMajorVersion = Number(ver[0]);
+    const newMajorVer = [majorVersionToSet, ver[1], ver[2]].join('.');
+
+    if (majorVersionToSet <= currentMajorVersion) {
+      Helpers.warn(`Ommiting... Trying to set same or lower minor version for project: ${this.genericName}
+        ${this.version} => v${newMajorVer}
+      `)
+    } else {
+      await this.setNewVersion(newMajorVer);
+    }
+  }
+
+  async setNewVersion(this: Project, version: string) {
+    Helpers.info(`Setting version to project  ${this.genericName}: v${version}`);
+    this.packageJson.data.version = version;
+    this.packageJson.save('updating version')
+  }
+
+
   // @ts-ignore
   get isPrivate(this: Project) {
     if (Helpers.isBrowser) {

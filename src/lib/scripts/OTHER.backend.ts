@@ -137,12 +137,27 @@ function $isbundlemode(args) {
 const $ASSETS = () => recreate();
 const $VERSION = () => version();
 
-async function  $VERSIONS() {
+async function $VERSIONS() {
   const children = Project.Current.children;
 
   for (let index = 0; index < children.length; index++) {
     const child = children[index] as Project;
     Helpers.info(`v${child.packageJson.data.version}\t - ${child.genericName}`);
+  }
+
+  process.exit(0)
+}
+
+
+async function $VERSIONS_TRUSED() {
+  let children = (Project.Current.children as Project[]);
+
+  const all = (Project.Current as Project).trustedAllPossible;
+  children = children.filter(c => all.includes(c.name));
+
+  for (let index = 0; index < children.length; index++) {
+    const child = children[index] as Project;
+    Helpers.info(`${index + 1}. ${child.name}@${child.packageJson.data.version}`);
   }
 
   process.exit(0)
@@ -256,7 +271,7 @@ export function $PRINT_RELATIVES(folder) {
     .getRecrusiveFilesFrom(folder)
     .map(f => f.replace(folder, base));
 
-    console.log(`
+  console.log(`
 
   ${files.map(f => `'${f}'`).join(',\n')}
 
@@ -314,6 +329,7 @@ export default {
   $ASSETS: Helpers.CLIWRAP($ASSETS, '$ASSETS'),
   $VERSION: Helpers.CLIWRAP($VERSION, '$VERSION'),
   $VERSIONS: Helpers.CLIWRAP($VERSIONS, '$VERSIONS'),
+  $VERSIONS_TRUSTED: Helpers.CLIWRAP($VERSIONS_TRUSED, '$VERSIONS_TRUSTED'),
   PATH: Helpers.CLIWRAP(PATH, 'PATH'),
   COPY_RESOURCES: Helpers.CLIWRAP(COPY_RESOURCES, 'COPY_RESOURCES'),
   $CHECK_ENV: Helpers.CLIWRAP($CHECK_ENV, '$CHECK_ENV'),

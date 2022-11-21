@@ -20,6 +20,10 @@ async function KILL_DAEMON(args) {
   await DAEMON_KILL(args);
 }
 
+async function KILL_WORKER(args) {
+  await DAEMON_KILL(args);
+}
+
 export async function DAEMON_LISTEN() {
   const db = await TnpDB.Instance();
   if (process.platform !== 'win32') { // TODO QUICK_FIX
@@ -53,6 +57,7 @@ export default {
   DAEMON_TEST: Helpers.CLIWRAP(DAEMON_TEST, 'DAEMON_TEST'),
   DAEMON_KILL: Helpers.CLIWRAP(DAEMON_KILL, 'DAEMON_KILL'),
   KILL_DAEMON: Helpers.CLIWRAP(KILL_DAEMON, 'KILL_DAEMON'),
+  KILL_WORKER: Helpers.CLIWRAP(KILL_WORKER, 'KILL_WORKER'),
   DAEMON_LISTEN: Helpers.CLIWRAP(DAEMON_LISTEN, 'DAEMON_LISTEN'),
   // DAEMON_TRIGGER: Helpers.CLIWRAP(DAEMON_TRIGGER, 'DAEMON_TRIGGER'),
   DAEMON_TRIGGER_ADD: Helpers.CLIWRAP(DAEMON_TRIGGER_ADD, 'DAEMON_TRIGGER_ADD'),
