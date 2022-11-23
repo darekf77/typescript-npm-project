@@ -152,6 +152,10 @@ const $REINSTALL = async (args) => {
       }
     }
 
+  } if (proj.isStandaloneProject && proj.npmPackages.useSmartInstall) {
+    proj.node_modules.remove();
+    proj.smartNodeModules.remove();proj.run(`${config.frameworkName} install`).sync();
+    Helpers.info(`Reinstal done for core standalone project`);
   } else {
     Helpers.error(`[${config.frameworkName}] This is not a container type project.`, false, true);
   }
