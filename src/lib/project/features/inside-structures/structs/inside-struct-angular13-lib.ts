@@ -173,19 +173,19 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
             if (tsconfigJson) {
               tsconfigJson.compilerOptions.paths = otherChildren.reduce((a, b) => {
                 return _.merge(a, {
-                  [`@${parent.name}/${b.name}/browser`]: [
+                  [`@${parent.name}/${b.name}/${this.websql ? config.folder.websql : config.folder.browser}`]: [
                     `./projects/${base}/src/libs/${b.name}`
                   ],
-                  [`@${parent.name}/${b.name}/browser/*`]: [
+                  [`@${parent.name}/${b.name}/${this.websql ? config.folder.websql : config.folder.browser}/*`]: [
                     `./projects/${base}/src/libs/${b.name}/*`
                   ],
                 })
               }, {});
 
-              tsconfigJson.compilerOptions.paths[`@${parent.name}/${this.project.name}/browser`] = [
+              tsconfigJson.compilerOptions.paths[`@${parent.name}/${this.project.name}/${this.websql ? config.folder.websql : config.folder.browser}`] = [
                 `./projects/${base}/src/lib`
               ];
-              tsconfigJson.compilerOptions.paths[`@${parent.name}/${this.project.name}/browser/*`] = [
+              tsconfigJson.compilerOptions.paths[`@${parent.name}/${this.project.name}/${this.websql ? config.folder.websql : config.folder.browser}/*`] = [
                 `./projects/${base}/src/lib/*`
               ];
 
@@ -274,7 +274,7 @@ export * from './lib';
           if (path.basename(f) === 'tsconfig.json') {
             content = content.replace(
               new RegExp(Helpers.escapeStringForRegEx(`"dist/${projectName}`), 'g'),
-              `"../../${outFolder}/browser/${projectName}`);
+              `"../../${outFolder}/${this.websql ? config.folder.websql : config.folder.browser}/${projectName}`);
           }
 
           Helpers.writeFile(f, content);

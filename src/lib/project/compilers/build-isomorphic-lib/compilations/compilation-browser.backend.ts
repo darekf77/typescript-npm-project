@@ -102,7 +102,7 @@ export class BroswerCompilation extends BackendCompilation {
 
     // TODO_NOT_IMPORTANT this may be replaced by filesPathes
     Helpers.copy(`${crossPlatformPath(path.join(this.cwd, this.location))}/`, this.compilationFolderPath, {
-      dereference: false,
+      copySymlinksAsFiles: true,
       filter: (src: string, dest: string) => {
         return copyToBrowserSrcCodition(src);
       }

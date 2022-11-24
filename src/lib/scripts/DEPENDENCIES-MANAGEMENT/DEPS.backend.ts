@@ -142,6 +142,7 @@ const $REINSTALL = async (args) => {
       proj.run(`${config.frameworkName} install`).sync();
       Helpers.info(`Reinstal done for core container`);
     } else {
+      // smart container or normal container
       const children = proj.children.filter(c => c.frameworkVersionAtLeast('v3') && c.typeIs('isomorphic-lib') && c.npmPackages.useSmartInstall);
       for (let index = 0; index < children.length; index++) {
         const c = children[index];
@@ -151,13 +152,14 @@ const $REINSTALL = async (args) => {
         await c.filesStructure.init('');
       }
     }
-
-  } if (proj.isStandaloneProject && proj.npmPackages.useSmartInstall) {
+  } else if (proj.isStandaloneProject && proj.npmPackages.useSmartInstall) {
     proj.node_modules.remove();
-    proj.smartNodeModules.remove();proj.run(`${config.frameworkName} install`).sync();
+    proj.smartNodeModules.remove(); proj.run(`${config.frameworkName} install`).sync();
     Helpers.info(`Reinstal done for core standalone project`);
   } else {
-    Helpers.error(`[${config.frameworkName}] This is not a container type project.`, false, true);
+    Helpers.error(`[${config.frameworkName}] This project does not support reinsall.
+    location: ${proj?.location}
+    `, false, false);
   }
 
   process.exit(0);
