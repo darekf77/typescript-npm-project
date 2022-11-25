@@ -5,6 +5,7 @@ import { FeatureForProject } from '../abstract';
 import { chokidar } from 'tnp-core';
 import { child_process } from 'tnp-core';
 //#endregion
+global.hideLog = true;
 
 import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
@@ -39,7 +40,7 @@ export class TestRunner
       Helpers.error(`Tests not impolemented for ${this.project._type}`, false, true)
     }
 
-
+    Helpers.info(`command: ${command}`)
 
     try {
       if (watchMode) {
@@ -57,9 +58,9 @@ export class TestRunner
         } as any);
         Helpers.log(result.toString());
       } else {
-        console.info(`Start of testing...`);
+        Helpers.info(`Start of testing...`);
         this.project.run(command, { output: true }).sync()
-        console.info(`End of testing...`);
+        Helpers.info(`End of testing...`);
       }
     } catch (err) {
       Helpers.log(err)

@@ -394,7 +394,9 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
     //   this.buildOptions.copyto = []
     // }
 
-    Helpers.info(`[info] Copy compiled project to ${buildOptions.copyto.length} projects... `);
+    if (!buildOptions.appBuild) {
+      Helpers.info(`[info] Copy compiled project to ${buildOptions.copyto.length} projects... `);
+    }
 
     const { skipBuild = false } = require('minimist')(this.buildOptions.args.split(' '));
     if (skipBuild) {
@@ -404,20 +406,27 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
       await this.buildSteps(buildOptions);
     }
 
-    if ((this.isStandaloneProject && this.typeIs('isomorphic-lib') || this.isSmartContainerTarget || this.isSmartContainer)) {
-      Helpers.info(`[buildable-project] Build steps ended... `);
-      if (buildOptions.copyto.length > 0) {
-        Helpers.info(`[buildable-project] copying build data to ${buildOptions.copyto.length} projects... `);
-      }
-      // console.log('after build steps')
-      this.copyManager = new CopyManager(this);
-      if (this.isStandaloneProject || this.isSmartContainer) {
-        this.copyManager.init(buildOptions);
-        const taskName = 'copyto manger';
-        if (buildOptions.watch) {
-          await this.copyManager.startAndWatch(taskName)
-        } else {
-          await this.copyManager.start(taskName)
+    Helpers.info(`[buildable-project] Build steps ended (project type: ${this._type}) ... `);
+
+    if (!buildOptions.appBuild) {
+      if (
+        (this.isStandaloneProject && this.typeIs('isomorphic-lib'))
+        // && !this.isSmartContainerTarget // TODO @LAST @UNCOMMENT
+        || this.isSmartContainerTarget // @LAST fixing tmp local project for containeri target
+      ) {
+        if (buildOptions.copyto.length > 0) {
+          Helpers.info(`[buildable-project] copying build data to ${buildOptions.copyto.length} projects... `);
+        }
+        // console.log('after build steps')
+        this.copyManager = new CopyManager(this);
+        if (this.isStandaloneProject || this.isSmartContainer) {
+          this.copyManager.init(buildOptions);
+          const taskName = 'copyto manger';
+          if (buildOptions.watch) {
+            await this.copyManager.startAndWatch(taskName)
+          } else {
+            await this.copyManager.start(taskName)
+          }
         }
       }
     }

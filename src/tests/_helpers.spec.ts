@@ -51,7 +51,6 @@ export class SpecWrap {
     return testsDescribtion;
   }
 
-
   async it(testName: string, callback: FuncTest, options?: ItOptions) {
     options = options || {} as any;
     if (_.isUndefined(options.removeTestFolder)) {

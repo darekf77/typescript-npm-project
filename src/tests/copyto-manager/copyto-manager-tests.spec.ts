@@ -1,3 +1,4 @@
+//#region imports
 import { describe } from 'mocha';
 import { expect, use } from 'chai';
 import { fse } from 'tnp-core'
@@ -16,12 +17,13 @@ import { PackageJSON } from '../../lib/project/features/package-json/package-jso
 import { dummyfiles } from './copyto-manager-dummy-files';
 import { ProjectUnknowNpm } from '../../lib/project/project-specyfic/project-unknow-npm';
 import { ProjectWorkspace } from '../../lib/project/project-specyfic/project-workspace';
-
+//#endregion
 
 const wrap = SpecWrap.create();
 
 describe(wrap.describe(`${config.frameworkName} / copyto manager`), async () => {
 
+  // THIS IS REQUIRE BECAUSE OF CIRCURAL DEPS ISSUES
   ({ Project, ProjectIsomorphicLib, ProjectContainer, PackageJSON, ProjectUnknowNpm, ProjectWorkspace })
 
   //#region test / it should copy files to another project at first run
@@ -53,12 +55,12 @@ describe(wrap.describe(`${config.frameworkName} / copyto manager`), async () => 
 
         const outDir = 'dist';
 
-        dummy1.copyManager.init({
+        dummy1.copyManager.init(BuildOptions.fromJson({
           copyto: [mainProject],
           args: '',
           watch: false,
           outDir
-        });
+        }));
 
         const localCopyToProjPath = dummy1.copyManager.localTempProjPath(outDir)
         await dummy1.copyManager.syncAction([]);
@@ -104,12 +106,12 @@ describe(wrap.describe(`${config.frameworkName} / copyto manager`), async () => 
         // dummy1.run(`${config.frameworkName} bd --copyto ../${mainProjName}`).sync();
         // dummy1.run(`${config.frameworkName} bd`).sync();
 
-        dummy1.copyManager.init({
+        dummy1.copyManager.init(BuildOptions.fromJson({
           copyto: [mainProject],
           args: '',
           watch: true,
           outDir
-        });
+        }));
 
         await dummy1.copyManager.syncAction([]);
 
@@ -135,7 +137,6 @@ describe(wrap.describe(`${config.frameworkName} / copyto manager`), async () => 
 
     });
   //#endregion
-
 
   //#region test / container it should copy files to another project at first run
   await wrap.it(`should container build copy files to another project ${config.folder.node_modules}`,
@@ -172,8 +173,8 @@ describe(wrap.describe(`${config.frameworkName} / copyto manager`), async () => 
         expect(mainProject).to.be.not.be.undefined;
 
         // TODO mock this
-        await dummyContainer.execute(`${config.frameworkName} bd ${containerFirstLibProjName}`,{
-          hideOutput:  {
+        await dummyContainer.execute(`${config.frameworkName} bd ${containerFirstLibProjName}`, {
+          hideOutput: {
             stdout: true
           }
         })
@@ -182,12 +183,12 @@ describe(wrap.describe(`${config.frameworkName} / copyto manager`), async () => 
 
         const outDir = 'dist';
 
-        dummyContainer.copyManager.init({
+        dummyContainer.copyManager.init(BuildOptions.fromJson({
           copyto: [mainProject],
           args: '',
           watch: false,
           outDir
-        });
+        }));
 
         const localCopyToProjPath = dummyContainer.copyManager.localTempProjPath(outDir)
         await dummyContainer.copyManager.syncAction([]);
@@ -202,9 +203,6 @@ describe(wrap.describe(`${config.frameworkName} / copyto manager`), async () => 
 
     });
   //#endregion
-
-
-
 
 });
 
