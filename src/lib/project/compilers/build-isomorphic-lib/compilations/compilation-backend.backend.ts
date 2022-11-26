@@ -113,7 +113,7 @@ export class BackendCompilation extends IncCompiler.Base {
     // let id = BackendCompilation.counter++;
     const ProjectClass = CLASS.getBy('Project') as typeof Project;
     const project = ProjectClass.nearestTo(cwd) as Project;
-    const buildOutDir = _.last(outDir.split('/')) as 'bundle' | 'dist' | 'browser';
+    const buildOutDir = _.last(outDir.split('/')) as Models.dev.BuildDir;
 
     if (hideErrors) {
       diagnostics = false;
@@ -231,7 +231,7 @@ export class BackendCompilation extends IncCompiler.Base {
     generateDeclarations: boolean,
     cwd: string;
     project: Project;
-    buildOutDir: 'dist' | 'bundle' | 'browser',
+    buildOutDir: Models.dev.BuildDir | 'browser',
   }) {
 
 

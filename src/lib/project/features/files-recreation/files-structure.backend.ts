@@ -271,6 +271,7 @@ export class FilesStructure extends FeatureForProject {
       //#region handle smart container
       Helpers.writeFile([this.project.location, 'angular.json'], this.angularJsonContainer);
       await this.project.singluarBuild.init(watch, false, 'dist', client);
+      await this.project.singluarBuild.init(watch, false, 'bundle', client);
       //#endregion
     }
 

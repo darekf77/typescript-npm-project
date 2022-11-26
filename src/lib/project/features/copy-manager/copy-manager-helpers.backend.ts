@@ -11,6 +11,13 @@ import { Helpers } from 'tnp-helpers';;
 
 export namespace CopyMangerHelpers {
 
+  //#region
+  export const browserwebsqlFolders = [
+    config.folder.browser,
+    config.folder.websql,
+  ] as Models.dev.BuildDirBrowser[];
+
+  //#region helpers / excute copy
   export function executeCopy(
     sourceLocation: string,
     destinationLocation: string,
@@ -86,5 +93,38 @@ export namespace CopyMangerHelpers {
     }
 
   }
+  //#endregion
+
+  //#region helpers / fix dts import
+
+  export function fixDtsImport(
+    content: string,
+    filepath: string,
+    browserFolder: Models.dev.BuildDirBrowser,
+    isomorphicPackages: string[],
+  ) {
+
+    content = content ? content : '';
+
+    // if(path.basename(filepath) === 'framework-context.d.ts') {
+    //   debugger
+    // }
+
+    for (let index = 0; index < isomorphicPackages.length; index++) {
+      const isomorphicPackageName = isomorphicPackages[index];
+      content = (content || '').replace(
+        new RegExp(Helpers.escapeStringForRegEx(`import("${isomorphicPackageName}"`), 'g'),
+        `import("${isomorphicPackageName}/${browserFolder}"`);
+    }
+
+    return content;
+  }
+
+
+  export function childPureName(child: Project) {
+    return child.name.startsWith('@') ? child.name.split('/')[1] : child.name; // pure name
+  }
+  //#endregion
+
 
 }
