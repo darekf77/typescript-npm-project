@@ -16,7 +16,46 @@ export class CopyManagerStandalone extends CopyManager {
     buildOptions: BuildOptions,
     renameDestinationFolder?: string,
   ) {
-    super.init(buildOptions, renameDestinationFolder);
+    // @ts-ignore
+    this.renameDestinationFolder = renameDestinationFolder;
+
+    // @ts-ignore
+    this.outDir = buildOptions.outDir;
+    // @ts-ignore
+    this.copyto = buildOptions.copyto;
+    // @ts-ignore
+    this.args = buildOptions.args;
+    // @ts-ignore
+    this.watch = !!buildOptions.watch;
+
+    if (!Array.isArray(this.copyto)) {
+      // @ts-ignore
+      this.copyto = [];
+    }
+
+    if (this.copyto.length === 0) {
+      Helpers.log(`No need to --copyto on build finsh...(only copy to local temp proj) `);
+    }
+
+    // @ts-ignore
+    this.projectChildren = this.project.children;
+
+    // @ts-ignore
+    this._isomorphicPackages = this.project.availableIsomorphicPackagesInNodeModules;
+    Helpers.log(`Opearating on ${this.isomorphicPackages.length} isomorphic pacakges...`);
+
+    Helpers.remove(this.localTempProjPath);
+    Helpers.writeFile([this.localTempProjPath, config.file.package_json], {
+      name: path.basename(this.localTempProjPath),
+      version: '0.0.0'
+    });
+    Helpers.mkdirp([this.localTempProjPath, config.folder.node_modules]);
+    this.initWatching();
+  }
+  //#endregion
+
+  //#region init watching
+  initWatching() {
     const monitoredOutDir = this.monitoredOutDir;
 
     const toMonitorBrowser = CopyMangerHelpers.browserwebsqlFolders
@@ -69,12 +108,6 @@ export class CopyManagerStandalone extends CopyManager {
   }
   //#endregion
 
-  //#region get children
-  getChildren(): Project[] {
-    return [];
-  }
-  //#endregion
-
   //#region initial fix for destination pacakge
   initalFixForDestination(destination: Project): void {
 
@@ -109,7 +142,8 @@ export class CopyManagerStandalone extends CopyManager {
   changedJsMapFilesInternalPathesForDebug(
     content: string,
     isBrowser: boolean,
-    isForCliDebuggerToWork?: boolean,
+    isForCliDebuggerToWork: boolean,
+    filePath: string,
   ): string {
 
     let toReplaceString2 = isBrowser
@@ -146,7 +180,7 @@ export class CopyManagerStandalone extends CopyManager {
       : this.localTempProj.node_modules.pathFor(this.rootPackageName);
 
     if (isTempLocalProj) {
-      this.fixingDtsImports(monitorDir);
+      CopyMangerHelpers.fixingDtsImports(monitorDir, this.isomorphicPackages);
     }
 
     //#region final copy from dist|bundle to node_moules/rootpackagename
@@ -181,6 +215,15 @@ export class CopyManagerStandalone extends CopyManager {
   //#endregion
 
   //#region fix backend and browser js (m)js.map files (for proper debugging)
+  /**
+  *  fix backend and browser js (m)js.map files (for proper debugging)
+  * destination package here is temp project
+  *
+  * Fix for 2 things:
+  * - debugging when in cli mode (fix in actual (dist|bundle)/(browser/websql)  )
+  * - debugging when in node_modules of other project (fixing only tmp-local-project)
+  * @param destinationPackageLocation desitnation/node_modues/< rootPackageName >
+  */
   fixBackendAndBrowserJsMapFilesIn() {
     Helpers.log('fixing maps started...')
     const destinationPackageLocation = this.localTempProj.node_modules.pathFor(this.rootPackageName);
@@ -227,6 +270,11 @@ export class CopyManagerStandalone extends CopyManager {
   //#endregion
 
   //#region copy backend and browser jsM (m)js.map files to destination location
+  /**
+   * Copy fixed maps from tmp-local-project to other projects
+   *
+   * @param destination any project other than tmp-local-proj
+   */
   copyBackendAndBrowserJsMapFilesFromLocalProjTo(destination: Project) {
     const destinationPackageLocation = this.localTempProj.node_modules.pathFor(this.rootPackageName);
 
@@ -264,11 +312,65 @@ export class CopyManagerStandalone extends CopyManager {
   }
   //#endregion
 
+  //#region prevent not fixing files in dist|bundle when source map hasn't been changed
+  /**
+   * if I am changing just thing in single line - maps are not being triggered asynch (it is good)
+   * BUT typescript/angular compiler changes maps files inside dist|bundle or dist|bundle/browser|websql
+   *
+   *
+   */
+  preventWeakDetectionOfchanges(specyficFileRelativePath: string, destination: Project, isTempLocalProj: boolean) {
+    const specyficFileRelativePathBackendMap = specyficFileRelativePath.replace('.js', '.js.map');
+    const possibleBackendMapFile = crossPlatformPath(path.normalize(path.join(
+      this.monitoredOutDir,
+      specyficFileRelativePathBackendMap,
+    )));
+
+    if (Helpers.exists(possibleBackendMapFile)) {
+      this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePathBackendMap);
+    }
+
+    for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
+      const browserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
+      const specyficFileRelativePathBrowserMap = specyficFileRelativePath.replace('.mjs', '.mjs.map');
+      const possibleBrowserMapFile = crossPlatformPath(path.normalize(path.join(
+        this.monitoredOutDir,
+        browserFolder,
+        specyficFileRelativePathBrowserMap,
+      )));
+      if (Helpers.exists(possibleBrowserMapFile)) {
+        this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePathBrowserMap);
+      }
+    }
+  }
+  //#endregion
+
+  //#region fix d.ts import with wrong package names
+  fixDtsImportsWithWronPackageName(absOrgFilePathInDistOrBundle: string, destinationFilePath: string) {
+    if (path.basename(absOrgFilePathInDistOrBundle).endsWith('.d.ts')) {
+      const contentToWriteInDestination = (Helpers.readFile(absOrgFilePathInDistOrBundle) || '');
+      for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
+        const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
+        const newContent = CopyMangerHelpers.fixDtsImport(
+          contentToWriteInDestination,
+          // sourceFile,
+          currentBrowserFolder,
+          this.isomorphicPackages,
+        );
+        if (newContent !== contentToWriteInDestination) {
+          Helpers.writeFile(destinationFilePath, newContent);
+        }
+      }
+    }
+  }
+  //#endregion
+
   //#region handle copy of single file
   handleCopyOfSingleFile(destination: Project, isTempLocalProj: boolean, specyficFileRelativePath: string): void {
-    //#region handle single file
 
     specyficFileRelativePath = specyficFileRelativePath.replace(/^\//, '');
+
+    Helpers.log(`Handle single file: ${specyficFileRelativePath} for ${destination.location}`)
 
     const notAllowedFiles = [
       '.DS_Store',
@@ -278,6 +380,8 @@ export class CopyManagerStandalone extends CopyManager {
     if (notAllowedFiles.includes(specyficFileRelativePath)) {
       return;
     }
+
+    this.preventWeakDetectionOfchanges(specyficFileRelativePath, destination, isTempLocalProj);
 
     const destinationFilePath = crossPlatformPath(path.normalize(path.join(
       destination.node_modules.pathFor(this.rootPackageName),
@@ -294,27 +398,14 @@ export class CopyManagerStandalone extends CopyManager {
       return;
     }
 
-    const absFilePathInDistOrBundle = crossPlatformPath(path.normalize(path.join(
+    const absOrgFilePathInDistOrBundle = crossPlatformPath(path.normalize(path.join(
       this.project.location,
       this.outDir,
       specyficFileRelativePath
     )));
 
-    let contentToWriteInDestination = (Helpers.readFile(absFilePathInDistOrBundle));
+    this.fixDtsImportsWithWronPackageName(absOrgFilePathInDistOrBundle, destinationFilePath)
 
-    contentToWriteInDestination = contentToWriteInDestination ? contentToWriteInDestination : '';
-
-    if (path.basename(absFilePathInDistOrBundle).endsWith('.d.ts')) {
-      for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
-        const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
-        contentToWriteInDestination = CopyMangerHelpers.fixDtsImport(
-          contentToWriteInDestination,
-          // sourceFile,
-          currentBrowserFolder,
-          this.isomorphicPackages,
-        );
-      }
-    }
 
     const isBackendMapsFile = destinationFilePath.endsWith('.js.map');
     const isBrowserMapsFile = destinationFilePath.endsWith('.mjs.map');
@@ -328,7 +419,6 @@ export class CopyManagerStandalone extends CopyManager {
           false,
           specyficFileRelativePath,
           destination.node_modules.pathFor(this.rootPackageName),
-          contentToWriteInDestination,
         )
       }
       if (isBrowserMapsFile) {
@@ -336,11 +426,10 @@ export class CopyManagerStandalone extends CopyManager {
           true,
           specyficFileRelativePath,
           destination.node_modules.pathFor(this.rootPackageName),
-          contentToWriteInDestination,
         )
       }
     } else {
-      Helpers.writeFile(destinationFilePath, contentToWriteInDestination)
+      Helpers.writeFile(destinationFilePath, (Helpers.readFile(absOrgFilePathInDistOrBundle) || ''));
     }
 
 
@@ -350,7 +439,74 @@ export class CopyManagerStandalone extends CopyManager {
       // TODO this is VSCODE/typescirpt new fucking issue
       // Helpers.copyFile(sourceFile, path.join(path.dirname(destinationFile), config.folder.browser, path.basename(destinationFile)));
     }
+  }
+  //#endregion
+
+  //#region write fixed map files
+  /**
+   *
+   * @param isForBrowser
+   * @param specyficFileRelativePath
+   * @param destinationPackageLocation should be ONLY temp project
+   */
+  protected writeFixedMapFile(
+    isForBrowser: boolean,
+    specyficFileRelativePath: string,
+    destinationPackageLocation: string,
+  ) {
+
+    //#region map fix for node_moules/pacakge
+    const absMapFilePathInLocalProjNodeModulesPackage = crossPlatformPath(path.join(
+      destinationPackageLocation,
+      specyficFileRelativePath,
+    ));
+
+    const fixedContentNonCLI = this.changedJsMapFilesInternalPathesForDebug(
+      Helpers.readFile(absMapFilePathInLocalProjNodeModulesPackage),
+      isForBrowser,
+      false,
+      absMapFilePathInLocalProjNodeModulesPackage
+    );
+
+    Helpers.writeFile(
+      absMapFilePathInLocalProjNodeModulesPackage,
+      fixedContentNonCLI,
+    );
     //#endregion
+
+    //#region mpa fix for CLI
+    const monitoredOutDirFileToReplaceBack = path.join(
+      this.monitoredOutDir,
+      specyficFileRelativePath,
+    );
+
+    const fixedContentCLIDebug = this.changedJsMapFilesInternalPathesForDebug(
+      Helpers.readFile(monitoredOutDirFileToReplaceBack),
+      isForBrowser,
+      true,
+      monitoredOutDirFileToReplaceBack,
+    );
+
+    Helpers.writeFile(
+      monitoredOutDirFileToReplaceBack,
+      fixedContentCLIDebug,
+    );
+    //#endregion
+  }
+  //#endregion
+
+  //#region copy source maps
+  /**
+   *
+   * @param destination that already has node_modues/rootPackagename copied
+   * @param isTempLocalProj
+   */
+  copySourceMaps(destination: Project, isTempLocalProj: boolean) {
+    if (isTempLocalProj) { // destination === tmp-local-proj
+      this.fixBackendAndBrowserJsMapFilesIn();
+    } else {
+      this.copyBackendAndBrowserJsMapFilesFromLocalProjTo(destination);
+    }
   }
   //#endregion
 

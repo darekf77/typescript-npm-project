@@ -23,7 +23,6 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   protected readonly outDir: Models.dev.BuildDir;
   protected readonly watch: boolean;
   protected readonly renameDestinationFolder?: string;
-  protected readonly children: Project[] = this.getChildren();
   //#endregion
 
   //#region getters
@@ -379,7 +378,8 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   abstract changedJsMapFilesInternalPathesForDebug(
     content: string,
     isBrowser: boolean,
-    isForCliDebuggerToWork?: boolean,
+    isForCliDebuggerToWork: boolean,
+    filePath: string,
   ): string
 
   abstract initalFixForDestination(destination: Project): void;
@@ -393,7 +393,6 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
    */
   abstract copyCompiledSourcesAndDeclarations(destination: Project, isTempLocalProj: boolean);
 
-  abstract getChildren(): Project[];
   //#endregion
 
 }

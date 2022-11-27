@@ -118,12 +118,46 @@ export namespace CopyMangerHelpers {
 
     return content;
   }
+  //#endregion
 
-
+  //#region helpers / pure child name
   export function childPureName(child: Project) {
     return child.name.startsWith('@') ? child.name.split('/')[1] : child.name; // pure name
   }
   //#endregion
 
+  //#region helpers / fix d.ts import files in folder
+  /**
+   *  fixing d.ts for (dist|bundle)/(browser|websql) when destination local project
+   * @param distOrBuneleOrPkgFolder usually dist
+   * @param isTempLocalProj
+   */
+  export function fixingDtsImports(distOrBuneleOrPkgFolder: string, isomorphicPackages: string[]) {
+
+    for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
+
+      const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
+      Helpers.log('Fixing .d.ts. files start...');
+      const sourceBrowser = path.join(distOrBuneleOrPkgFolder, currentBrowserFolder);
+      const browserDtsFiles = Helpers.filesFrom(sourceBrowser, true)
+        .filter(f => f.endsWith('.d.ts'));
+
+      for (let index = 0; index < browserDtsFiles.length; index++) {
+        const dtsFileAbsolutePath = browserDtsFiles[index];
+        const dtsFileContent = Helpers.readFile(dtsFileAbsolutePath);
+        const dtsFixedContent = CopyMangerHelpers.fixDtsImport(
+          dtsFileContent,
+          // dtsFileAbsolutePath,
+          currentBrowserFolder,
+          isomorphicPackages
+        );
+        if (dtsFileAbsolutePath.trim() !== dtsFileContent.trim()) {
+          Helpers.writeFile(dtsFileAbsolutePath, dtsFixedContent);
+        }
+      }
+      Helpers.log('Fixing .d.ts. files done.');
+    }
+  }
+  //#endregion
 
 }
