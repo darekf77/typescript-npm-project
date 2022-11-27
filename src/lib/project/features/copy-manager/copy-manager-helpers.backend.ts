@@ -8,14 +8,14 @@ import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';;
 //#endregion
-
 export namespace CopyMangerHelpers {
 
-  //#region
+  //#region helpers / browser websql folders
   export const browserwebsqlFolders = [
     config.folder.browser,
     config.folder.websql,
   ] as Models.dev.BuildDirBrowser[];
+  //#endregion
 
   //#region helpers / excute copy
   export function executeCopy(

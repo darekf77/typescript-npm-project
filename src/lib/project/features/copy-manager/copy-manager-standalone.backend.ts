@@ -17,23 +17,23 @@ export class CopyManagerStandalone extends CopyManager {
     renameDestinationFolder?: string,
   ) {
     super.init(buildOptions, renameDestinationFolder);
-    const monitorDir = this.monitoredOutDir(this.project);
+    const monitoredOutDir = this.monitoredOutDir;
 
     const toMonitorBrowser = CopyMangerHelpers.browserwebsqlFolders
-      .map(currentBrowserFolder => path.join(monitorDir, currentBrowserFolder));
+      .map(currentBrowserFolder => path.join(monitoredOutDir, currentBrowserFolder));
 
     this.initOptions({
       folderPath: [
-        path.join(monitorDir, config.file.package_json),
-        path.join(monitorDir, config.file.index_d_ts),
-        path.join(monitorDir, config.file.index_js),
-        path.join(monitorDir, config.file.index_js_map),
-        path.join(monitorDir, config.folder.lib),
+        path.join(monitoredOutDir, config.file.package_json),
+        path.join(monitoredOutDir, config.file.index_d_ts),
+        path.join(monitoredOutDir, config.file.index_js),
+        path.join(monitoredOutDir, config.file.index_js_map),
+        path.join(monitoredOutDir, config.folder.lib),
 
         ...toMonitorBrowser,
       ],
       folderPathContentCheck: [
-        path.join(monitorDir, config.folder.lib),
+        path.join(monitoredOutDir, config.folder.lib),
         ...toMonitorBrowser,
       ]
     });
@@ -45,6 +45,53 @@ export class CopyManagerStandalone extends CopyManager {
     const localProjPath = crossPlatformPath(path.join(this.project.location, this.tempProjName));
     return localProjPath;
   }
+  //#endregion
+
+  //#region root package name
+  /**
+   * first folder in node_modules for packge
+   * example:
+   * project/node_modules/<rootPackageName> # like 'ng2-rest' or '@angular'
+   */
+  get rootPackageName() {
+    const rootPackageName = ((_.isString(this.renameDestinationFolder) && this.renameDestinationFolder !== '')
+      ? this.renameDestinationFolder
+      : (this.project.name)
+    );
+    return rootPackageName;
+  }
+  //#endregion
+
+  //#region monitored out dir
+  get monitoredOutDir(): string {
+    const monitorDir: string = crossPlatformPath(path.join(this.project.location, this.outDir));
+    return monitorDir;
+  }
+  //#endregion
+
+  //#region get children
+  getChildren(): Project[] {
+    return [];
+  }
+  //#endregion
+
+  //#region get source folder
+  getSourceFolder(
+    monitorDir: string,
+    currentBrowserFolder: Models.dev.BuildDirBrowser,
+    isTempLocalProj: boolean
+  ) {
+    const sourceBrowser = crossPlatformPath(
+      isTempLocalProj
+        ? path.join(path.dirname(monitorDir), currentBrowserFolder)
+        : path.join(
+          this.localTempProjPath,
+          config.folder.node_modules,
+          this.rootPackageName,
+          currentBrowserFolder,
+        ));
+    return sourceBrowser;
+  };
   //#endregion
 
   //#region initial fix for destination pacakge
@@ -110,20 +157,12 @@ export class CopyManagerStandalone extends CopyManager {
   }
   //#endregion
 
-  //#region monitored out dir
-  monitoredOutDir(project: Project): string {
-    const proj = project;
-    const monitorDir: string = crossPlatformPath(path.join(proj.location, this.outDir));
-    return monitorDir;
-  }
-  //#endregion
-
   //#region copy compiled sources and declarations
   copyCompiledSourcesAndDeclarations(destination: Project, isTempLocalProj: boolean) {
 
     const monitorDir = isTempLocalProj
-      ? this.monitoredOutDir(this.project)
-      : this.localTempProjPathes.package(this.rootPackageName);
+      ? this.monitoredOutDir
+      : this.localTempProjectPathes.package(this.rootPackageName);
 
     for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
 
@@ -197,8 +236,8 @@ export class CopyManagerStandalone extends CopyManager {
           Helpers.writeFile(f, this.transformMapFile(orgContent, true));
 
           const monitoredOutDirFileToReplaceBack = path.join(
-            this.monitoredOutDir(this.project),
-            crossPlatformPath(f).replace(this.localTempProjPathes.package(this.rootPackageName), ''),
+            this.monitoredOutDir,
+            crossPlatformPath(f).replace(this.localTempProjectPathes.package(this.rootPackageName), ''),
           );
 
           Helpers.writeFile(
@@ -219,8 +258,8 @@ export class CopyManagerStandalone extends CopyManager {
         Helpers.writeFile(f, this.transformMapFile(orgContent, false));
 
         const monitoredOutDirFileToReplaceBack = path.join(
-          this.monitoredOutDir(this.project),
-          crossPlatformPath(f).replace(this.localTempProjPathes.package(this.rootPackageName), ''),
+          this.monitoredOutDir,
+          crossPlatformPath(f).replace(this.localTempProjectPathes.package(this.rootPackageName), ''),
         );
 
         Helpers.writeFile(
@@ -233,7 +272,7 @@ export class CopyManagerStandalone extends CopyManager {
 
     } else {
 
-      const localTempProjOutFolder = this.localTempProjPathes.package(this.rootPackageName);
+      const localTempProjOutFolder = this.localTempProjectPathes.package(this.rootPackageName);
 
       const allMjsBrowserFiles = CopyMangerHelpers.browserwebsqlFolders.map(currentBrowserFolder => {
         const mjsBrowserFilesPattern = `${localTempProjOutFolder}/`
@@ -296,7 +335,7 @@ export class CopyManagerStandalone extends CopyManager {
     }
 
     const sourceFileInLocalTempFolder = crossPlatformPath(path.join(
-      this.localTempProjPathes.package(this.rootPackageName),
+      this.localTempProjectPathes.package(this.rootPackageName),
       specyficFileRelativePath
     ));
 
@@ -340,8 +379,8 @@ export class CopyManagerStandalone extends CopyManager {
 
           if (isTempLocalProj) {
             const monitoredOutDirFileToReplaceBack = crossPlatformPath(path.join(
-              this.monitoredOutDir(this.project),
-              crossPlatformPath(sourceFile).replace(this.monitoredOutDir(this.project), ''),
+              this.monitoredOutDir,
+              crossPlatformPath(sourceFile).replace(this.monitoredOutDir, ''),
             ));
 
 
@@ -358,8 +397,8 @@ export class CopyManagerStandalone extends CopyManager {
 
           if (isTempLocalProj) {
             const monitoredOutDirFileToReplaceBack = crossPlatformPath(path.join(
-              this.monitoredOutDir(this.project),
-              crossPlatformPath(sourceFile).replace(this.monitoredOutDir(this.project), ''),
+              this.monitoredOutDir,
+              crossPlatformPath(sourceFile).replace(this.monitoredOutDir, ''),
             ));
 
             Helpers.writeFile(monitoredOutDirFileToReplaceBack, this.transformMapFile(
@@ -380,27 +419,6 @@ export class CopyManagerStandalone extends CopyManager {
       // Helpers.copyFile(sourceFile, path.join(path.dirname(destinationFile), config.folder.browser, path.basename(destinationFile)));
     }
     //#endregion
-  }
-  //#endregion
-
-  //#region get children
-  getChildren(): Project[] {
-    return [];
-  }
-  //#endregion
-
-  //#region root package name
-  /**
-   * first folder in node_modules for packge
-   * example:
-   * project/node_modules/<rootPackageName> # like 'ng2-rest' or '@angular'
-   */
-  get rootPackageName() {
-    const rootPackageName = ((_.isString(this.renameDestinationFolder) && this.renameDestinationFolder !== '')
-      ? this.renameDestinationFolder
-      : (this.project.name)
-    );
-    return rootPackageName;
   }
   //#endregion
 

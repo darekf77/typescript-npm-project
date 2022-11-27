@@ -2,14 +2,11 @@
 import { crossPlatformPath, _ } from 'tnp-core';
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
-import { glob } from 'tnp-core';
-import { chokidar } from 'tnp-core';
-import { config, ConfigModels } from 'tnp-config';
+import { config } from 'tnp-config';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';;
-import { BuildOptions, TnpDB } from 'tnp-db';
-import { FeatureForProject, FeatureCompilerForProject } from '../../abstract';
+import { FeatureCompilerForProject } from '../../abstract';
 import { CopyMangerHelpers } from './copy-manager-helpers.backend';
 import { IncCompiler } from 'incremental-compiler';
 import { Log } from 'ng2-logger';
@@ -21,6 +18,7 @@ const log = Log.create(_.startCase(path.basename(__filename)));
 
 export abstract class BaseCopyManger extends FeatureCompilerForProject {
 
+  //#region fields
   private readonly _isomorphicPackages = [] as string[];
   protected readonly copyto: Project[] = [];
   protected readonly args: string;
@@ -28,19 +26,27 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   protected readonly watch: boolean;
   protected readonly renameDestinationFolder?: string;
   protected readonly children: Project[] = this.getChildren();
+  //#endregion
 
-  abstract get rootPackageName(): string;
-  abstract get localTempProjPath(): string;
-  get sourceToLink() {
+  //#region getters
+
+  //#region getters / source path to link
+
+  get sourcePathToLink() {
     const sourceToLink = crossPlatformPath(path.join(this.project.location, config.folder.src));
     return sourceToLink;
   }
+  //#endregion
 
+  //#region getters / temp project name
   get tempProjName() {
     const tempProjName = `tmp-local-copyto-proj-${this.outDir}`;
     return tempProjName;
   }
-  get localTempProjPathes() {
+  //#endregion
+
+  //#region local temp proj pathes
+  get localTempProjectPathes() {
     const self = this;
     return {
       get packageJson() {
@@ -54,13 +60,16 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       }
     }
   }
+  //#endregion
 
+  //#region getters / local temp proj path
   get localTempProj() {
     let localProj = Project.From(this.localTempProjPath) as Project;
     return localProj;
   }
+  //#endregion
 
-
+  //#region getters / project to copy to
   get projectToCopyTo() {
     if (Array.isArray(this.copyto) && this.copyto.length > 0) {
       // @ts-ignore
@@ -71,7 +80,9 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     }
     return [this.localTempProj];
   }
+  //#endregion
 
+  //#region getters / isomorphic pacakges
   get isomorphicPackages() {
     const isomorphicPackages = [
       ...this._isomorphicPackages,
@@ -79,7 +90,10 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     ];
     return isomorphicPackages;
   }
+  //#endregion
+  //#endregion
 
+  //#region generate source copy in
   public generateSourceCopyIn(destinationLocation: string,
     options?: Models.other.GenerateProjectCopyOpt): boolean {
     destinationLocation = crossPlatformPath(destinationLocation);
@@ -212,13 +226,15 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
 
     return true;
   }
+  //#endregion
 
+  //#region async action
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
 
     const outDir = this.outDir;
-    const specyficFileRelativePath = absoluteFilePath.replace(this.monitoredOutDir(this.project) + '/', '');
+    const specyficFileRelativePath = absoluteFilePath.replace(this.monitoredOutDir + '/', '');
 
     Helpers.log(`ASYNC ACTION
     absoluteFilePath: ${absoluteFilePath}
@@ -237,7 +253,9 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       );
     }
   }
+  //#endregion
 
+  //#region sync action
   async syncAction(files: string[]) {
     Helpers.log('SYNC ACTION');
 
@@ -257,29 +275,12 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       log.data('copy done...')
     }
   }
+  //#endregion
 
+  //#region copy builded distribution to
   public copyBuildedDistributionTo(destination: Project) {
     return this._copyBuildedDistributionTo(destination);
   }
-
-  protected getSourceFolder(
-    monitorDir: string,
-    currentBrowserFolder: Models.dev.BuildDirBrowser,
-    isTempLocalProj: boolean
-  ) {
-    const sourceBrowser = crossPlatformPath(isTempLocalProj ?
-      path.join(
-        path.dirname(monitorDir),
-        currentBrowserFolder,
-      ) : path.join(
-        this.localTempProjPath,
-        config.folder.node_modules,
-        this.rootPackageName,
-        currentBrowserFolder,
-      ));
-    return sourceBrowser;
-  };
-
   /**
   * There are 3 typese of --copyto build
   * 1. dist build (wihout source maps buit without links)
@@ -349,7 +350,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       if (this.watch || isTempLocalProj) {
         log.data('addiing links')
         Helpers.removeIfExists(destPackageLinkSourceLocation);
-        Helpers.createSymLink(this.sourceToLink, destPackageLinkSourceLocation);
+        Helpers.createSymLink(this.sourcePathToLink, destPackageLinkSourceLocation);
 
       } else {
         log.data('removing links');
@@ -376,15 +377,18 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     }
 
   }
+  //#endregion
+
+  //#region abstract
+  abstract get rootPackageName(): string;
+  abstract get localTempProjPath(): string;
+  abstract get monitoredOutDir(): string;
 
   abstract transformMapFile(
     content: string,
     isBrowser: boolean,
     isForCliDebuggerToWork?: boolean,
   ): string
-
-
-  abstract monitoredOutDir(project: Project): string;
 
   abstract initalFixForDestination(destination: Project): void;
 
@@ -398,7 +402,6 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   abstract copyCompiledSourcesAndDeclarations(destination: Project, isTempLocalProj: boolean);
 
   abstract getChildren(): Project[];
-
-
+  //#endregion
 
 }

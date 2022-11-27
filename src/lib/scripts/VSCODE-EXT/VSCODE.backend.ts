@@ -221,6 +221,7 @@ function $VSCODE_GLOBAL() {
     'workbench.colorTheme': 'Default Light+',
     'update.mode': 'none',
     'debug.onTaskErrors': 'abort',
+    "editor.wordBasedSuggestions": false,
     'typescript.tsdk': 'node_modules/typescript/lib',
     'terminal.integrated.tabs.enabled': false,
     'tslint.autoFixOnSave': false, // TODO

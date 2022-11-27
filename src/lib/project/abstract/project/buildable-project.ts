@@ -12,6 +12,8 @@ import { config } from 'tnp-config';
 import { Project } from './project';
 import { Helpers, Project as $Project } from 'tnp-helpers';
 import { CopyManager } from '../../features/copy-manager';
+import { CopyManagerStandalone } from '../../features/copy-manager/copy-manager-standalone.backend';
+import { CopyManagerOrganization } from '../../features/copy-manager/copy-manager-organization.backend';
 //#endregion
 
 export abstract class BuildableProject {
@@ -414,6 +416,11 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
           Helpers.info(`[buildable-project] copying build data to ${buildOptions.copyto.length} projects... `);
         }
         // console.log('after build steps')
+        (() => {
+          {
+            return { CopyManagerOrganization, CopyManagerStandalone }
+          }
+        });
         this.copyManager = CopyManager.for(this);
         this.copyManager.init(buildOptions);
         const taskName = 'copyto manger';

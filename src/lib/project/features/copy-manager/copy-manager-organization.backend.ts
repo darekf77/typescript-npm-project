@@ -24,14 +24,14 @@ export class CopyManagerOrganization extends CopyManager {
     renameDestinationFolder?: string,
   ) {
     super.init(buildOptions, renameDestinationFolder);
-    const monitorDir = this.monitoredOutDir(this.project);
+    const monitoredOutDir = this.monitoredOutDir;
 
     this.initOptions({
       folderPath: [
-        monitorDir,
+        monitoredOutDir,
       ],
       folderPathContentCheck: [
-        monitorDir
+        monitoredOutDir
       ]
     })
 
@@ -49,6 +49,60 @@ export class CopyManagerOrganization extends CopyManager {
     );
     return crossPlatformPath(targetProjPath)
   }
+  //#endregion
+
+  //#region root package name
+  get rootPackageName() {
+    const rootPackageName = ((
+      _.isString(this.renameDestinationFolder) && this.renameDestinationFolder !== '')
+      ? this.renameDestinationFolder
+      : `@${this.project.name}`
+    );
+    return rootPackageName
+  }
+  //#endregion
+
+  //#region monitored out dir
+  get monitoredOutDir(): string {
+    const monitorDir: string = crossPlatformPath(path.join(
+      this.project.location,
+      this.outDir,
+      this.project.name,
+      this.targetProjNameForOrgBuild,
+      this.outDir,
+      'libs',
+    ));
+    return monitorDir;
+  }
+  //#endregion
+
+  //#region get chhildren
+  getChildren(): Project[] {
+    return [
+      this.project.children.find(c => c.name === this.targetProjNameForOrgBuild),
+      ...this.project.children.filter(c => c.name !== this.targetProjNameForOrgBuild),
+    ];
+  }
+  //#endregion
+
+  //#region get source folder
+  getSourceFolder(
+    monitorDir: string,
+    currentBrowserFolder: Models.dev.BuildDirBrowser,
+    isTempLocalProj: boolean
+  ) {
+    const sourceBrowser = crossPlatformPath(isTempLocalProj ?
+      path.join(
+        path.dirname(monitorDir),
+        currentBrowserFolder,
+      ) : path.join(
+        this.localTempProjPath,
+        config.folder.node_modules,
+        this.rootPackageName,
+        currentBrowserFolder,
+      ));
+    return sourceBrowser;
+  };
   //#endregion
 
   //#region initial fix for destination pacakge
@@ -128,21 +182,6 @@ export class CopyManagerOrganization extends CopyManager {
   }
   //#endregion
 
-  //#region monitored out dir
-  monitoredOutDir(project: Project): string {
-    const proj = project ? project : this.project;
-    const monitorDir: string = crossPlatformPath(path.join(
-      proj.location,
-      this.outDir,
-      proj.name,
-      this.targetProjNameForOrgBuild,
-      this.outDir,
-      'libs',
-    ));
-    return monitorDir;
-  }
-  //#endregion
-
   //#region copy compiled sources and declarations
   copyCompiledSourcesAndDeclarations(destination: Project, isTempLocalProj: boolean) {
 
@@ -170,8 +209,8 @@ export class CopyManagerOrganization extends CopyManager {
     // }
 
     const monitorDir = isTempLocalProj
-      ? this.monitoredOutDir(this.project)
-      : this.localTempProjPathes.package(this.rootPackageName);
+      ? this.monitoredOutDir
+      : this.localTempProjectPathes.package(this.rootPackageName);
 
     const worksapcePackageName = path.basename(destination.location);
 
@@ -312,8 +351,8 @@ export * from './libs/${worksapcePackageName}';\n
           Helpers.writeFile(f, this.transformMapFile(orgContent, true));
 
           const monitoredOutDirFileToReplaceBack = path.join(
-            this.monitoredOutDir(this.project),
-            crossPlatformPath(f).replace(this.localTempProjPathes.package(this.rootPackageName), ''),
+            this.monitoredOutDir,
+            crossPlatformPath(f).replace(this.localTempProjectPathes.package(this.rootPackageName), ''),
           );
 
           Helpers.writeFile(
@@ -334,8 +373,8 @@ export * from './libs/${worksapcePackageName}';\n
         Helpers.writeFile(f, this.transformMapFile(orgContent, false));
 
         const monitoredOutDirFileToReplaceBack = path.join(
-          this.monitoredOutDir(this.project),
-          crossPlatformPath(f).replace(this.localTempProjPathes.package(this.rootPackageName), ''),
+          this.monitoredOutDir,
+          crossPlatformPath(f).replace(this.localTempProjectPathes.package(this.rootPackageName), ''),
         );
 
         Helpers.writeFile(
@@ -348,7 +387,7 @@ export * from './libs/${worksapcePackageName}';\n
       //#endregion
     } else {
       //#region for other project thatn local temp -> copy files from local tmep
-      const localTempProjOutFolder = this.localTempProjPathes.package(this.rootPackageName);
+      const localTempProjOutFolder = this.localTempProjectPathes.package(this.rootPackageName);
 
       const allMjsBrowserFiles = CopyMangerHelpers.browserwebsqlFolders.map(currentBrowserFolder => {
         const mjsBrowserFilesPattern = `${localTempProjOutFolder}/`
@@ -434,7 +473,7 @@ export * from './libs/${worksapcePackageName}';\n
     }
 
     const sourceFileInLocalTempFolder = crossPlatformPath(path.join(
-      this.localTempProjPathes.package(this.rootPackageName),
+      this.localTempProjectPathes.package(this.rootPackageName),
       specyficFileRelativePath
     ));
 
@@ -445,7 +484,7 @@ export * from './libs/${worksapcePackageName}';\n
     }
 
     const sourceFile = crossPlatformPath(path.normalize(path.join(
-      this.monitoredOutDir(this.project),
+      this.monitoredOutDir,
       specyficFileRelativePath
     )));
 
@@ -477,8 +516,8 @@ export * from './libs/${worksapcePackageName}';\n
 
           if (isTempLocalProj) {
             const monitoredOutDirFileToReplaceBack = crossPlatformPath(path.join(
-              this.monitoredOutDir(this.project),
-              crossPlatformPath(sourceFile).replace(this.monitoredOutDir(this.project), ''),
+              this.monitoredOutDir,
+              crossPlatformPath(sourceFile).replace(this.monitoredOutDir, ''),
             ));
 
 
@@ -495,8 +534,8 @@ export * from './libs/${worksapcePackageName}';\n
 
           if (isTempLocalProj) {
             const monitoredOutDirFileToReplaceBack = crossPlatformPath(path.join(
-              this.monitoredOutDir(this.project),
-              crossPlatformPath(sourceFile).replace(this.monitoredOutDir(this.project), ''),
+              this.monitoredOutDir,
+              crossPlatformPath(sourceFile).replace(this.monitoredOutDir, ''),
             ));
 
             Helpers.writeFile(monitoredOutDirFileToReplaceBack, this.transformMapFile(
@@ -516,26 +555,6 @@ export * from './libs/${worksapcePackageName}';\n
       // Helpers.copyFile(sourceFile, path.join(path.dirname(destinationFile), config.folder.browser, path.basename(destinationFile)));
     }
     //#endregion
-  }
-  //#endregion
-
-  //#region get chhildren
-  getChildren(): Project[] {
-    return [
-      this.project.children.find(c => c.name === this.targetProjNameForOrgBuild),
-      ...this.project.children.filter(c => c.name !== this.targetProjNameForOrgBuild),
-    ];
-  }
-  //#endregion
-
-  //#region root package name
-  get rootPackageName() {
-    const rootPackageName = ((
-      _.isString(this.renameDestinationFolder) && this.renameDestinationFolder !== '')
-      ? this.renameDestinationFolder
-      : `@${this.project.name}`
-    );
-    return rootPackageName
   }
   //#endregion
 

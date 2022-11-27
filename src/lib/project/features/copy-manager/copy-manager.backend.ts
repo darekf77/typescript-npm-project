@@ -12,7 +12,7 @@ import type { CopyManagerOrganization } from "./copy-manager-organization.backen
 import type { CopyManagerStandalone } from "./copy-manager-standalone.backend";
 
 @CLASS.NAME('CopyManager')
-export class CopyManager extends BaseCopyManger {
+export abstract class CopyManager extends BaseCopyManger {
 
   static for(project: Project): CopyManager {
     if (project.isSmartContainer) {
@@ -29,7 +29,7 @@ export class CopyManager extends BaseCopyManger {
   //#endregion
 
   //#region monitored out dir
-  monitoredOutDir(project: Project): string { return '' }
+  get monitoredOutDir(): string { return '' }
   //#endregion
 
   //#region  inital fix for destination
@@ -66,15 +66,15 @@ export class CopyManager extends BaseCopyManger {
     this.projectChildren = this.project.children;
 
     // @ts-ignore
-    this.isomorphicPackages = this.project.availableIsomorphicPackagesInNodeModules;
+    this._isomorphicPackages = this.project.availableIsomorphicPackagesInNodeModules;
     Helpers.log(`Opearating on ${this.isomorphicPackages.length} isomorphic pacakges...`);
 
     Helpers.remove(this.localTempProjPath);
-    Helpers.writeFile(this.localTempProjPathes.packageJson, {
+    Helpers.writeFile(this.localTempProjectPathes.packageJson, {
       name: path.basename(this.localTempProjPath),
       version: '0.0.0'
     });
-    Helpers.mkdirp(this.localTempProjPathes.nodeModules);
+    Helpers.mkdirp(this.localTempProjectPathes.nodeModules);
   }
   //#endregion
 
@@ -113,5 +113,14 @@ export class CopyManager extends BaseCopyManger {
     return [];
   }
   //#endregion
+
+  //#region get source folder
+  abstract getSourceFolder(
+    monitorDir: string,
+    currentBrowserFolder: Models.dev.BuildDirBrowser,
+    isTempLocalProj: boolean
+  ): string;
+  //#endregion
+
 
 }
