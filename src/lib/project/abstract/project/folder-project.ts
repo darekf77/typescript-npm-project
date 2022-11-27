@@ -15,15 +15,6 @@ export abstract class FolderProject {
   //#region @backend
 
   // @ts-ignore
-  get sourceFolder(this: Project): 'src' | 'components' {
-    return (this.typeIs('angular-lib')
-      ? config.folder.components : config.folder.src) as any;
-  }
-  //#endregion
-
-  //#region @backend
-
-  // @ts-ignore
   get linkedProjectsExisted(this: Project): Project[] {
     return this.packageJson.linkedProjects
       .filter(f => !Helpers.isValidGitRepuUrl(f))

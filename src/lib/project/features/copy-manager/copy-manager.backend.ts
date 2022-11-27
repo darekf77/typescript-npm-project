@@ -25,5 +25,8 @@ export abstract class CopyManager extends BaseCopyManger {
     }
   }
   //#endregion
-
+  abstract init(
+    buildOptions: BuildOptions,
+    renameDestinationFolder?: string,
+  ): void;
 }

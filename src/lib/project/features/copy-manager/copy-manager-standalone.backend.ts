@@ -173,44 +173,83 @@ export class CopyManagerStandalone extends CopyManager {
   //#endregion
 
   //#region copy compiled sources and declarations
-
   copyCompiledSourcesAndDeclarations(destination: Project, isTempLocalProj: boolean) {
     const monitorDir = isTempLocalProj //
       ? this.monitoredOutDir // other package are getting data from temp-local-projecg
       : this.localTempProj.node_modules.pathFor(this.rootPackageName);
 
-    if (isTempLocalProj) {
+    if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist|bundle)
       CopyMangerHelpers.fixingDtsImports(monitorDir, this.isomorphicPackages);
     }
 
     //#region final copy from dist|bundle to node_moules/rootpackagename
     const pkgLocInDestNodeModules = destination.node_modules.pathFor(this.rootPackageName);
+    const filter = Helpers.filterDontCopy(this.sourceFolders, monitorDir);
 
-    const sourceFolders = [
-      config.folder.src,
-      config.folder.node_modules,
-      config.folder.tempSrcDist,
-      config.file.package_json,
-    ];
-    const filter = Helpers.filterDontCopy(sourceFolders, monitorDir);
-
-    sourceFolders.forEach(sourceFolder => {
+    this.sourceFolders.forEach(sourceFolder => {
       const toRemoveLink = crossPlatformPath(path.join(pkgLocInDestNodeModules, sourceFolder));
       if (Helpers.isSymlinkFileExitedOrUnexisted(toRemoveLink)) {
         Helpers.removeFileIfExists(crossPlatformPath(path.join(pkgLocInDestNodeModules, sourceFolder)));
       }
-    })
+    });
 
     Helpers.copy(monitorDir, pkgLocInDestNodeModules, {
       copySymlinksAsFiles: false,
       filter,
     });
 
+    if (this.watch) {
+      this.replaceIndexDtsFiles(destination);
+    }
+    //#endregion
+  }
+  //#endregion
+
+  //#region replace d.ts files in destination after copy
+  replaceIndexDtsFiles(destination: Project) {
+    const pkgLocInDestNodeModules = destination.node_modules.pathFor(this.rootPackageName);
     Helpers.writeFile(path.join( // override dts to easly debugging
       pkgLocInDestNodeModules,
       config.file.index_d_ts,
-    ), `export * from './${this.project.sourceFolder}';\n`);
-    //#endregion
+    ), `export * from './${config.folder.src}';\n`);
+  }
+  //#endregion
+
+  //#region add source symlinks
+  addSourceSymlinks(destination: Project) {
+    const destPackageLinkSourceLocation = crossPlatformPath(path.join(
+      destination.node_modules.pathFor(this.rootPackageName),
+      config.folder.src
+    ));
+
+    Helpers.removeIfExists(destPackageLinkSourceLocation);
+    Helpers.createSymLink(this.sourcePathToLink, destPackageLinkSourceLocation);
+  }
+  //#endregion
+
+  //#region remove source symlinks
+  removeSourceSymlinks(destination: Project) {
+    const destPackageLinkSourceLocation = crossPlatformPath(path.join(
+      destination.node_modules.pathFor(this.rootPackageName),
+      config.folder.src
+    ));
+
+    Helpers.removeIfExists(destPackageLinkSourceLocation);
+  }
+  //#endregion
+
+  //#region copy source maps
+  /**
+   *
+   * @param destination that already has node_modues/rootPackagename copied
+   * @param isTempLocalProj
+   */
+  copySourceMaps(destination: Project, isTempLocalProj: boolean) {
+    if (isTempLocalProj) { // destination === tmp-local-proj
+      this.fixBackendAndBrowserJsMapFilesIn();
+    } else {
+      this.copyBackendAndBrowserJsMapFilesFromLocalProjTo(destination);
+    }
   }
   //#endregion
 
@@ -312,39 +351,6 @@ export class CopyManagerStandalone extends CopyManager {
   }
   //#endregion
 
-  //#region prevent not fixing files in dist|bundle when source map hasn't been changed
-  /**
-   * if I am changing just thing in single line - maps are not being triggered asynch (it is good)
-   * BUT typescript/angular compiler changes maps files inside dist|bundle or dist|bundle/browser|websql
-   *
-   *
-   */
-  preventWeakDetectionOfchanges(specyficFileRelativePath: string, destination: Project, isTempLocalProj: boolean) {
-    const specyficFileRelativePathBackendMap = specyficFileRelativePath.replace('.js', '.js.map');
-    const possibleBackendMapFile = crossPlatformPath(path.normalize(path.join(
-      this.monitoredOutDir,
-      specyficFileRelativePathBackendMap,
-    )));
-
-    if (Helpers.exists(possibleBackendMapFile)) {
-      this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePathBackendMap);
-    }
-
-    for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
-      const browserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
-      const specyficFileRelativePathBrowserMap = specyficFileRelativePath.replace('.mjs', '.mjs.map');
-      const possibleBrowserMapFile = crossPlatformPath(path.normalize(path.join(
-        this.monitoredOutDir,
-        browserFolder,
-        specyficFileRelativePathBrowserMap,
-      )));
-      if (Helpers.exists(possibleBrowserMapFile)) {
-        this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePathBrowserMap);
-      }
-    }
-  }
-  //#endregion
-
   //#region fix d.ts import with wrong package names
   fixDtsImportsWithWronPackageName(absOrgFilePathInDistOrBundle: string, destinationFilePath: string) {
     if (path.basename(absOrgFilePathInDistOrBundle).endsWith('.d.ts')) {
@@ -410,9 +416,6 @@ export class CopyManagerStandalone extends CopyManager {
     const isBackendMapsFile = destinationFilePath.endsWith('.js.map');
     const isBrowserMapsFile = destinationFilePath.endsWith('.mjs.map');
 
-    // @LAST check possible js.map becaosue somethimg is not detefced
-
-
     if (isBackendMapsFile || isBrowserMapsFile) {
       if (isBackendMapsFile) {
         this.writeFixedMapFile(
@@ -438,6 +441,39 @@ export class CopyManagerStandalone extends CopyManager {
     if (specyficFileRelativePath === config.file.package_json) {
       // TODO this is VSCODE/typescirpt new fucking issue
       // Helpers.copyFile(sourceFile, path.join(path.dirname(destinationFile), config.folder.browser, path.basename(destinationFile)));
+    }
+  }
+  //#endregion
+
+  //#region prevent not fixing files in dist|bundle when source map hasn't been changed
+  /**
+   * if I am changing just thing in single line - maps are not being triggered asynch (it is good)
+   * BUT typescript/angular compiler changes maps files inside dist|bundle or dist|bundle/browser|websql
+   *
+   *
+   */
+  preventWeakDetectionOfchanges(specyficFileRelativePath: string, destination: Project, isTempLocalProj: boolean) {
+    const specyficFileRelativePathBackendMap = specyficFileRelativePath.replace('.js', '.js.map');
+    const possibleBackendMapFile = crossPlatformPath(path.normalize(path.join(
+      this.monitoredOutDir,
+      specyficFileRelativePathBackendMap,
+    )));
+
+    if (Helpers.exists(possibleBackendMapFile)) {
+      this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePathBackendMap);
+    }
+
+    for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
+      const browserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
+      const specyficFileRelativePathBrowserMap = specyficFileRelativePath.replace('.mjs', '.mjs.map');
+      const possibleBrowserMapFile = crossPlatformPath(path.normalize(path.join(
+        this.monitoredOutDir,
+        browserFolder,
+        specyficFileRelativePathBrowserMap,
+      )));
+      if (Helpers.exists(possibleBrowserMapFile)) {
+        this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePathBrowserMap);
+      }
     }
   }
   //#endregion
@@ -492,21 +528,6 @@ export class CopyManagerStandalone extends CopyManager {
       fixedContentCLIDebug,
     );
     //#endregion
-  }
-  //#endregion
-
-  //#region copy source maps
-  /**
-   *
-   * @param destination that already has node_modues/rootPackagename copied
-   * @param isTempLocalProj
-   */
-  copySourceMaps(destination: Project, isTempLocalProj: boolean) {
-    if (isTempLocalProj) { // destination === tmp-local-proj
-      this.fixBackendAndBrowserJsMapFilesIn();
-    } else {
-      this.copyBackendAndBrowserJsMapFilesFromLocalProjTo(destination);
-    }
   }
   //#endregion
 

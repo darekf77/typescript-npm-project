@@ -23,6 +23,13 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   protected readonly outDir: Models.dev.BuildDir;
   protected readonly watch: boolean;
   protected readonly renameDestinationFolder?: string;
+  protected readonly sourceFolders = [
+    config.folder.src,
+    config.folder.node_modules,
+    config.folder.tempSrcDist,
+    config.file.package_json,
+  ];
+
   //#endregion
 
   //#region getters
@@ -329,12 +336,10 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
 
       if (this.watch || isTempLocalProj) {
         log.data('addiing links')
-        Helpers.removeIfExists(destPackageLinkSourceLocation);
-        Helpers.createSymLink(this.sourcePathToLink, destPackageLinkSourceLocation);
-
+        this.addSourceSymlinks(destination);
       } else {
         log.data('removing links');
-        Helpers.removeIfExists(destPackageLinkSourceLocation);
+        this.removeSourceSymlinks(destination)
       }
 
       log.d('copying surce maps')
@@ -383,11 +388,10 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   ): string
 
   abstract initalFixForDestination(destination: Project): void;
-
   abstract copySourceMaps(destination: Project, isTempLocalProj: boolean);
-
+  abstract addSourceSymlinks(destination: Project);
+  abstract removeSourceSymlinks(destination: Project);
   abstract handleCopyOfSingleFile(destination: Project, isTempLocalProj: boolean, specyficFileRelativePath: string);
-
   /**
    * fix d.ts files in angular build - problem with require() in d.ts with wrong name
    */

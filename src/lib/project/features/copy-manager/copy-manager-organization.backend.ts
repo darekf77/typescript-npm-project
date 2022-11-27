@@ -10,7 +10,7 @@ import { CopyManagerStandalone } from "./copy-manager-standalone.backend";
 
 @CLASS.NAME('CopyManagerOrganization')
 export class CopyManagerOrganization extends CopyManagerStandalone {
-  protected readonly children: Project[] = this.getChildren();
+  protected readonly children: Project[];
 
   //#region target project name
   /**
@@ -36,6 +36,17 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   //#region target project
   get targetProj() {
     return Project.From(this.targetProjPath);
+  }
+  //#endregion
+
+  //#region init
+  init(
+    buildOptions: BuildOptions,
+    renameDestinationFolder?: string,
+  ) {
+    super.init(buildOptions, renameDestinationFolder);
+    // @ts-ignore
+    this.children = this.getChildren();
   }
   //#endregion
 
