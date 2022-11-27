@@ -99,7 +99,6 @@ export namespace CopyMangerHelpers {
 
   export function fixDtsImport(
     content: string,
-    filepath: string,
     browserFolder: Models.dev.BuildDirBrowser,
     isomorphicPackages: string[],
   ) {

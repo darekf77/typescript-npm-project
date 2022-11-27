@@ -85,25 +85,25 @@ export class CopyManagerOrganization extends CopyManager {
   }
   //#endregion
 
-  //#region get source folder
-  getSourceFolder(
-    monitorDir: string,
-    currentBrowserFolder: Models.dev.BuildDirBrowser,
-    isTempLocalProj: boolean
-  ) {
-    const sourceBrowser = crossPlatformPath(isTempLocalProj ?
-      path.join(
-        path.dirname(monitorDir),
-        currentBrowserFolder,
-      ) : path.join(
-        this.localTempProjPath,
-        config.folder.node_modules,
-        this.rootPackageName,
-        currentBrowserFolder,
-      ));
-    return sourceBrowser;
-  };
-  //#endregion
+  // //#region get source folder
+  // getSourceFolder(
+  //   monitorDir: string,
+  //   currentBrowserFolder: Models.dev.BuildDirBrowser,
+  //   isTempLocalProj: boolean
+  // ) {
+  //   const sourceBrowser = crossPlatformPath(isTempLocalProj ?
+  //     path.join(
+  //       path.dirname(monitorDir),
+  //       currentBrowserFolder,
+  //     ) : path.join(
+  //       this.localTempProjPath,
+  //       config.folder.node_modules,
+  //       this.rootPackageName,
+  //       currentBrowserFolder,
+  //     ));
+  //   return sourceBrowser;
+  // };
+  // //#endregion
 
   //#region initial fix for destination pacakge
   initalFixForDestination(destination: Project): void {
@@ -152,7 +152,7 @@ export class CopyManagerOrganization extends CopyManager {
   //#endregion
 
   //#region transform map files
-  transformMapFile(
+  changedJsMapFilesInternalPathesForDebug(
     content: string,
     isBrowser: boolean,
     isForCliDebuggerToWork?: boolean,
@@ -183,8 +183,8 @@ export class CopyManagerOrganization extends CopyManager {
   //#endregion
 
   //#region copy compiled sources and declarations
-  copyCompiledSourcesAndDeclarations(destination: Project, isTempLocalProj: boolean) {
 
+  copyCompiledSourcesAndDeclarations(destination: Project, isTempLocalProj: boolean) {
     // @LAST TODO
     // for (let index = 0; index < this.children.length; index++) {
     //   const c = this.children[index];
@@ -208,109 +208,48 @@ export class CopyManagerOrganization extends CopyManager {
     //   }
     // }
 
-    const monitorDir = isTempLocalProj
-      ? this.monitoredOutDir
-      : this.localTempProjectPathes.package(this.rootPackageName);
+    const monitorDir = isTempLocalProj //
+      ? this.monitoredOutDir // other package are getting data from temp-local-projecg
+      : this.localTempProj.node_modules.pathFor(this.rootPackageName);
 
-    const worksapcePackageName = path.basename(destination.location);
+    if (isTempLocalProj) {
+      this.fixingDtsImports(monitorDir);
+    }
 
-    for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
 
-      const isTargeOrgProjectAction = (path.basename(destination.location) === this.targetProjNameForOrgBuild);
+    //#region final copy from dist|bundle to node_moules/rootpackagename
+    const pkgLocInDestNodeModules = destination.node_modules.pathFor(this.rootPackageName);
 
-      const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
-      const sourceBrowser = this.getSourceFolder(monitorDir, currentBrowserFolder, isTempLocalProj);
+    const sourceFolders = [
+      config.folder.src,
+      config.folder.node_modules,
+      config.folder.tempSrcDist,
+      config.file.package_json,
+    ];
+    const filter = Helpers.filterDontCopy(sourceFolders, monitorDir);
 
-      if (isTempLocalProj && isTargeOrgProjectAction) {
-
-        Helpers.log('Fixing .d.ts. files start...')
-        const browserDtsFiles = Helpers.filesFrom(sourceBrowser, true).filter(f => f.endsWith('.d.ts'));
-        for (let index = 0; index < browserDtsFiles.length; index++) {
-          const dtsFileAbsolutePath = browserDtsFiles[index];
-          const dtsFileContent = Helpers.readFile(dtsFileAbsolutePath);
-          const dtsFixedContent = CopyMangerHelpers.fixDtsImport(
-            dtsFileContent,
-            dtsFileAbsolutePath,
-            currentBrowserFolder,
-            this.isomorphicPackages
-          );
-          if (dtsFileAbsolutePath.trim() !== dtsFileContent.trim()) {
-            Helpers.writeFile(dtsFileAbsolutePath, dtsFixedContent);
-          }
-          // Helpers.log(`[] Fixing files: ${}`)
-        }
-        Helpers.log('Fixing .d.ts. files done.')
+    sourceFolders.forEach(sourceFolder => {
+      const toRemoveLink = crossPlatformPath(path.join(pkgLocInDestNodeModules, sourceFolder));
+      if (Helpers.isSymlinkFileExitedOrUnexisted(toRemoveLink)) {
+        Helpers.removeFileIfExists(crossPlatformPath(path.join(pkgLocInDestNodeModules, sourceFolder)));
       }
-    }
+    })
 
-
-    for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
-      const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
-      const sourceBrowser = this.getSourceFolder(monitorDir, currentBrowserFolder, isTempLocalProj);
-
-      Helpers.writeFile(path.join(destination.location,
-        config.folder.node_modules,
-        this.rootPackageName,
-        config.file.index_d_ts,
-      ),
-        `// Plase use: import { < anything > } from `
-        + `'@${this.project.name}/<${this.children.map(c => c.name).join('|')}>';\n`
-      );
-
-      Helpers.copy(path.join(monitorDir, worksapcePackageName), destination.location, {
-        recursive: true,
-        overwrite: true,
-        omitFolders: [config.folder.browser, config.folder.websql, config.folder.node_modules]
-      });
-
-      const browserDest = path.join(
-        destination.location,
-        currentBrowserFolder
-      );
-
-      Helpers.copy(sourceBrowser, browserDest, {
-        recursive: true,
-        overwrite: true,
-      });
-
-      const browserDestPackageJson = path.join(
-        destination.location,
-        currentBrowserFolder,
-        config.file.package_json,
-      );
-      const packageJsonBrowserDest = Helpers.readJson(browserDestPackageJson, {});
-      packageJsonBrowserDest.name = worksapcePackageName;
-      Helpers.writeJson(browserDestPackageJson, packageJsonBrowserDest);
-
-      const browserDestPublicApiDest = path.join(
-        destination.location,
-        currentBrowserFolder,
-        'public-api.d.ts',
-      );
-      Helpers.writeFile(browserDestPublicApiDest,
-        (worksapcePackageName === this.targetProjNameForOrgBuild) ? `
-export * from './lib';\n
-`.trimLeft() : `
-export * from './libs/${worksapcePackageName}';\n
-`.trimLeft()
-      );
-
-
-      // TODO extract child specyfic things from browser build if it is possible
-
-    }
-
+    Helpers.copy(monitorDir, pkgLocInDestNodeModules, {
+      copySymlinksAsFiles: false,
+      filter,
+    });
 
     Helpers.writeFile(path.join( // override dts to easly debugging
-      destination.location,
+      pkgLocInDestNodeModules,
       config.file.index_d_ts,
     ), `export * from './${this.project.sourceFolder}';\n`);
+    //#endregion
   }
   //#endregion
 
-  //#region copy source maps
-  copySourceMaps(destination: Project, isTempLocalProj: boolean): void {
-
+  //#region fix backend and browser js (m)js.map files (for proper debugging)
+  fixBackendAndBrowserJsMapFilesIn() {
     // @LAST TODO
     // for (let index = 0; index < this.children.length; index++) {
     //   const c = this.children[index];
@@ -334,94 +273,125 @@ export * from './libs/${worksapcePackageName}';\n
     //   }
     // }
 
-    if (isTempLocalProj) {
-      //#region fix files in local temp project
-      for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
-        const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
-        Helpers.log('fixing js.maps started...')
-        const mjsBrowserFilesPattern = `${destination.location}/`
-          + `${currentBrowserFolder}`
-          + `/**/*.mjs.map`;
+    Helpers.log('fixing maps started...')
+    const destinationPackageLocation = this.localTempProj.node_modules.pathFor(this.rootPackageName);
 
-        const mjsBrwoserFiles = glob.sync(mjsBrowserFilesPattern);
+    //#region fixing (dist|bundle)/(browser/websql)/**.mjs.map* files
+    for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
+      const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
 
+      const mjsBrowserFilesPattern = `${destinationPackageLocation}/`
+        + `${currentBrowserFolder}`
+        + `/**/*.mjs.map`;
 
-        mjsBrwoserFiles.forEach(f => {
-          let orgContent = Helpers.readFile(f);
-          Helpers.writeFile(f, this.transformMapFile(orgContent, true));
+      const mjsBrwoserFiles = glob.sync(mjsBrowserFilesPattern);
 
-          const monitoredOutDirFileToReplaceBack = path.join(
-            this.monitoredOutDir,
-            crossPlatformPath(f).replace(this.localTempProjectPathes.package(this.rootPackageName), ''),
-          );
+      mjsBrwoserFiles.forEach(absBrowserJsMapFilePath => {
+        let orgContent = Helpers.readFile(absBrowserJsMapFilePath);
 
-          Helpers.writeFile(
-            monitoredOutDirFileToReplaceBack,
-            this.transformMapFile(orgContent, true, true),
-          );
-
-        });
-      }
-
-      const mapBackendFilesPattern = `${destination.location}/**/*.js.map`;
-      const mpaBackendFiles = glob.sync(mapBackendFilesPattern,
-        { ignore: [`${config.folder.browser}/**/*.*`, `${config.folder.websql}/**/*.*`] })
-
-
-      mpaBackendFiles.forEach(f => {
-        let orgContent = Helpers.readFile(f);
-        Helpers.writeFile(f, this.transformMapFile(orgContent, false));
+        // overriting original file
+        Helpers.writeFile(
+          absBrowserJsMapFilePath,
+          this.changedJsMapFilesInternalPathesForDebug(orgContent, true)
+        );
 
         const monitoredOutDirFileToReplaceBack = path.join(
           this.monitoredOutDir,
-          crossPlatformPath(f).replace(this.localTempProjectPathes.package(this.rootPackageName), ''),
+          crossPlatformPath(absBrowserJsMapFilePath).replace(destinationPackageLocation, ''),
         );
 
+        //
         Helpers.writeFile(
           monitoredOutDirFileToReplaceBack,
-          this.transformMapFile(orgContent, false, true)
+          this.changedJsMapFilesInternalPathesForDebug(orgContent, true, true),
         );
 
       });
-      Helpers.log('fixing js.maps done...')
-      //#endregion
-    } else {
-      //#region for other project thatn local temp -> copy files from local tmep
-      const localTempProjOutFolder = this.localTempProjectPathes.package(this.rootPackageName);
+    }
+    //#endregion
 
-      const allMjsBrowserFiles = CopyMangerHelpers.browserwebsqlFolders.map(currentBrowserFolder => {
-        const mjsBrowserFilesPattern = `${localTempProjOutFolder}/`
-          + `${currentBrowserFolder}`
-          + `/**/*.mjs.map`;
-
-        const mjsBrwoserFiles = glob.sync(mjsBrowserFilesPattern);
-        return mjsBrwoserFiles;
-      }).reduce((a, b) => a.concat(b), [])
+    //#region fixing (dist|bundle)/**.js.map* files
+    const mapBackendFilesPattern = `${destinationPackageLocation}/**/*.js.map`;
+    const mpaBackendFiles = glob.sync(mapBackendFilesPattern,
+      { ignore: [`${config.folder.browser}/**/*.*`, `${config.folder.websql}/**/*.*`] })
 
 
+    mpaBackendFiles.forEach(absBackendMapFilePath => {
+      let orgContent = Helpers.readFile(absBackendMapFilePath);
+      Helpers.writeFile(absBackendMapFilePath, this.changedJsMapFilesInternalPathesForDebug(orgContent, false));
 
-      const mapBackendFilesPattern = `${localTempProjOutFolder}/**/*.js.map`;
-      const mapBackendFiles = glob.sync(mapBackendFilesPattern,
-        { ignore: [`${config.folder.browser}/**/*.*`, `${config.folder.websql}/**/*.*`] })
 
+      const monitoredOutDirFileToReplaceBack = path.join(
+        this.monitoredOutDir,
+        crossPlatformPath(absBackendMapFilePath).replace(destinationPackageLocation, ''),
+      );
 
-      const toCopy = [
-        ...allMjsBrowserFiles,
-        ...mapBackendFiles,
-      ];
+      Helpers.writeFile(
+        monitoredOutDirFileToReplaceBack,
+        this.changedJsMapFilesInternalPathesForDebug(orgContent, false, true)
+      );
 
-      for (let index = 0; index < toCopy.length; index++) {
-        const fileAbsPath = toCopy[index];
-        const fileRelativePath = fileAbsPath.replace(`${localTempProjOutFolder}/`, '');
-        const destAbs = crossPlatformPath(path.join(
-          destination.location,
-          config.folder.node_modules,
-          this.rootPackageName,
-          fileRelativePath,
-        ));
-        Helpers.copyFile(fileAbsPath, destAbs, { dontCopySameContent: false });
-      }
-      //#endregion
+    });
+    //#endregion
+    Helpers.log('fixing maps done...')
+  }
+  //#endregion
+
+  //#region copy backend and browser jsM (m)js.map files to destination location
+  copyBackendAndBrowserJsMapFilesFromLocalProjTo(destination: Project) {
+    // @LAST TODO
+    // for (let index = 0; index < this.children.length; index++) {
+    //   const c = this.children[index];
+    //   const childName = CopyMangerHelpers.childPureName(c);
+    //   const sourceToLink = crossPlatformPath(path.join(c.location, config.folder.src));
+    //   const destPackageLinkSourceLocation = crossPlatformPath(path.join(
+    //     destination.location,
+    //     config.folder.node_modules,
+    //     this.rootPackageName,
+    //     childName,
+    //     config.folder.src,
+    //   ));
+
+    //   // const res = action(
+    //   //   sourceToLink,
+    //   //   destPackageLinkSourceLocation,
+    //   //   this.project
+    //   // );
+    //   if ((mode === 'check-dest-packge-source-link-ok') && !res) {
+    //     return false;
+    //   }
+    // }
+
+    const destinationPackageLocation = this.localTempProj.node_modules.pathFor(this.rootPackageName);
+
+    const allMjsBrowserFiles = CopyMangerHelpers.browserwebsqlFolders.map(currentBrowserFolder => {
+      const mjsBrowserFilesPattern = `${destinationPackageLocation}/`
+        + `${currentBrowserFolder}`
+        + `/**/*.mjs.map`;
+
+      const mjsBrwoserFiles = glob.sync(mjsBrowserFilesPattern);
+      return mjsBrwoserFiles;
+    }).reduce((a, b) => a.concat(b), [])
+
+    const mapBackendFilesPattern = `${destinationPackageLocation}/**/*.js.map`;
+    const mapBackendFiles = glob.sync(mapBackendFilesPattern,
+      { ignore: [`${config.folder.browser}/**/*.*`, `${config.folder.websql}/**/*.*`] })
+
+    const toCopy = [
+      ...allMjsBrowserFiles,
+      ...mapBackendFiles,
+    ];
+
+    for (let index = 0; index < toCopy.length; index++) {
+      const fileAbsPath = toCopy[index];
+      const fileRelativePath = fileAbsPath.replace(`${destinationPackageLocation}/`, '');
+      const destAbs = crossPlatformPath(path.join(
+        destination.location,
+        config.folder.node_modules,
+        this.rootPackageName,
+        fileRelativePath,
+      ));
+      Helpers.copyFile(fileAbsPath, destAbs, { dontCopySameContent: false });
     }
   }
   //#endregion
@@ -473,7 +443,7 @@ export * from './libs/${worksapcePackageName}';\n
     }
 
     const sourceFileInLocalTempFolder = crossPlatformPath(path.join(
-      this.localTempProjectPathes.package(this.rootPackageName),
+      this.localTempProj.node_modules.pathFor(this.rootPackageName),
       specyficFileRelativePath
     ));
 
@@ -497,7 +467,7 @@ export * from './libs/${worksapcePackageName}';\n
         const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
         contentToWriteInDestination = CopyMangerHelpers.fixDtsImport(
           contentToWriteInDestination,
-          sourceFile,
+          // sourceFile,
           currentBrowserFolder,
           this.isomorphicPackages,
         );
@@ -510,7 +480,7 @@ export * from './libs/${worksapcePackageName}';\n
 
       if (isBackendMapsFile || isBrowserMapsFile) {
         if (isBackendMapsFile) {
-          contentToWriteInDestination = this.transformMapFile(
+          contentToWriteInDestination = this.changedJsMapFilesInternalPathesForDebug(
             contentToWriteInDestination, false
           );
 
@@ -521,14 +491,14 @@ export * from './libs/${worksapcePackageName}';\n
             ));
 
 
-            Helpers.writeFile(monitoredOutDirFileToReplaceBack, this.transformMapFile(
+            Helpers.writeFile(monitoredOutDirFileToReplaceBack, this.changedJsMapFilesInternalPathesForDebug(
               contentToWriteInDestination, false, true
             ));
           }
 
         }
         if (isBrowserMapsFile) {
-          contentToWriteInDestination = this.transformMapFile(
+          contentToWriteInDestination = this.changedJsMapFilesInternalPathesForDebug(
             contentToWriteInDestination, true
           );
 
@@ -538,7 +508,7 @@ export * from './libs/${worksapcePackageName}';\n
               crossPlatformPath(sourceFile).replace(this.monitoredOutDir, ''),
             ));
 
-            Helpers.writeFile(monitoredOutDirFileToReplaceBack, this.transformMapFile(
+            Helpers.writeFile(monitoredOutDirFileToReplaceBack, this.changedJsMapFilesInternalPathesForDebug(
               contentToWriteInDestination, true, true
             ));
           }

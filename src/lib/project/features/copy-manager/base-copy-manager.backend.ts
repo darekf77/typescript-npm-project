@@ -14,8 +14,6 @@ import { Log } from 'ng2-logger';
 const log = Log.create(_.startCase(path.basename(__filename)));
 //#endregion
 
-
-
 export abstract class BaseCopyManger extends FeatureCompilerForProject {
 
   //#region fields
@@ -42,23 +40,6 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   get tempProjName() {
     const tempProjName = `tmp-local-copyto-proj-${this.outDir}`;
     return tempProjName;
-  }
-  //#endregion
-
-  //#region local temp proj pathes
-  get localTempProjectPathes() {
-    const self = this;
-    return {
-      get packageJson() {
-        return crossPlatformPath(path.join(self.localTempProjPath, config.file.package_json));
-      },
-      get nodeModules() {
-        return crossPlatformPath(path.join(self.localTempProjPath, config.folder.node_modules));
-      },
-      package(rootPackageName: string) {
-        return crossPlatformPath(path.join(self.localTempProjPath, config.folder.node_modules, rootPackageName));
-      }
-    }
   }
   //#endregion
 
@@ -381,10 +362,21 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
 
   //#region abstract
   abstract get rootPackageName(): string;
+  /**
+   * Path for local-temp-project-path
+   */
   abstract get localTempProjPath(): string;
+  /**
+   * connected with specyficRelativeFilePath
+   * gives file in compilation folder... meaning:
+   *
+   * monitoredOutDir/specyficRelativeFilePath
+   * equals:
+   * projectLocation/(dist|bundle)/specyficRelativeFilePath
+   */
   abstract get monitoredOutDir(): string;
 
-  abstract transformMapFile(
+  abstract changedJsMapFilesInternalPathesForDebug(
     content: string,
     isBrowser: boolean,
     isForCliDebuggerToWork?: boolean,

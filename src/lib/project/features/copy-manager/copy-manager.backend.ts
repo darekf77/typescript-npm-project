@@ -1,6 +1,6 @@
 import { IncCompiler } from "incremental-compiler";
 import { config } from "tnp-config";
-import { crossPlatformPath, path } from "tnp-core";
+import { crossPlatformPath, glob, path } from "tnp-core";
 import { BuildOptions } from "tnp-db";
 import { Helpers } from "tnp-helpers";
 import { Models } from "tnp-models";
@@ -32,7 +32,7 @@ export abstract class CopyManager extends BaseCopyManger {
   get monitoredOutDir(): string { return '' }
   //#endregion
 
-  //#region  inital fix for destination
+  //#region inital fix for destination
   initalFixForDestination(destination: Project): void { }
   //#endregion
 
@@ -70,11 +70,11 @@ export abstract class CopyManager extends BaseCopyManger {
     Helpers.log(`Opearating on ${this.isomorphicPackages.length} isomorphic pacakges...`);
 
     Helpers.remove(this.localTempProjPath);
-    Helpers.writeFile(this.localTempProjectPathes.packageJson, {
+    Helpers.writeFile([this.localTempProjPath, config.file.package_json], {
       name: path.basename(this.localTempProjPath),
       version: '0.0.0'
     });
-    Helpers.mkdirp(this.localTempProjectPathes.nodeModules);
+    Helpers.mkdirp([this.localTempProjPath, config.folder.node_modules]);
   }
   //#endregion
 
@@ -87,11 +87,101 @@ export abstract class CopyManager extends BaseCopyManger {
   //#endregion
 
   //#region transform map files
-  transformMapFile(
+  changedJsMapFilesInternalPathesForDebug(
     content: string,
     isBrowser: boolean,
     isForCliDebuggerToWork?: boolean,
   ): string { return ''; }
+  //#endregion
+
+  //#region fix d.ts import files in folder
+  /**
+   *  fixing d.ts for (dist|bundle)/(browser|websql) when destination local project
+   * @param distOrBuneleOrPkgFolder usually dist
+   * @param isTempLocalProj
+   */
+  protected fixingDtsImports(distOrBuneleOrPkgFolder: string) {
+
+    for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
+
+      const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
+      Helpers.log('Fixing .d.ts. files start...');
+      const sourceBrowser = path.join(distOrBuneleOrPkgFolder, currentBrowserFolder);
+      const browserDtsFiles = Helpers.filesFrom(sourceBrowser, true)
+        .filter(f => f.endsWith('.d.ts'));
+
+      for (let index = 0; index < browserDtsFiles.length; index++) {
+        const dtsFileAbsolutePath = browserDtsFiles[index];
+        const dtsFileContent = Helpers.readFile(dtsFileAbsolutePath);
+        const dtsFixedContent = CopyMangerHelpers.fixDtsImport(
+          dtsFileContent,
+          // dtsFileAbsolutePath,
+          currentBrowserFolder,
+          this.isomorphicPackages
+        );
+        if (dtsFileAbsolutePath.trim() !== dtsFileContent.trim()) {
+          Helpers.writeFile(dtsFileAbsolutePath, dtsFixedContent);
+        }
+      }
+      Helpers.log('Fixing .d.ts. files done.');
+    }
+  }
+  //#endregion
+
+  //#region fix backend and browser js map files
+  /**
+  *  fix backend and browser js (m)js.map files (for proper debugging)
+  * destination package here is temp project
+  *
+  * Fix for 2 things:
+  * - debugging when in cli mode (fix in actual (dist|bundle)/(browser/websql)  )
+  * - debugging when in node_modules of other project (fixing only tmp-local-project)
+  * @param destinationPackageLocation desitnation/node_modues/< rootPackageName >
+  */
+  protected abstract fixBackendAndBrowserJsMapFilesIn(): void;
+  //#endregion
+
+  //#region write fixed map files
+  protected writeFixedMapFile(
+    isForBrowser: boolean,
+    specyficFileRelativePath: string,
+    destinationPackageLocation: string,
+    content?: string
+  ) {
+
+    const absMapFilePathInLocalProjNodeModulesPackage = crossPlatformPath(path.join(
+      destinationPackageLocation,
+      specyficFileRelativePath,
+    ));
+
+    let orgContent = content ? content : Helpers.readFile(absMapFilePathInLocalProjNodeModulesPackage);
+
+    const fixedContentNonCLI = this.changedJsMapFilesInternalPathesForDebug(orgContent, isForBrowser);
+    Helpers.writeFile(
+      absMapFilePathInLocalProjNodeModulesPackage,
+      fixedContentNonCLI,
+    );
+
+    const monitoredOutDirFileToReplaceBack = path.join(
+      this.monitoredOutDir,
+      specyficFileRelativePath,
+    );
+
+    const fixedContentCLIDebug = this.changedJsMapFilesInternalPathesForDebug(orgContent, isForBrowser, true)
+    Helpers.writeFile(
+      monitoredOutDirFileToReplaceBack,
+      fixedContentCLIDebug,
+    );
+  }
+  //#endregion
+
+  //#region copy backend and browser js map files
+  /**
+   * Copy fixed maps from tmp-local-project to other projects
+   *
+   * @param destination any project other than tmp-local-proj
+   */
+  protected abstract copyBackendAndBrowserJsMapFilesFromLocalProjTo(destination: Project);
   //#endregion
 
   //#region copy compiled sources and declarations
@@ -99,28 +189,28 @@ export abstract class CopyManager extends BaseCopyManger {
   //#endregion
 
   //#region copy source maps
-  copySourceMaps(destination: Project, isTempLocalProj: boolean) { }
+  /**
+   *
+   * @param destination that already has node_modues/rootPackagename copied
+   * @param isTempLocalProj
+   */
+  copySourceMaps(destination: Project, isTempLocalProj: boolean) {
+    if (isTempLocalProj) { // destination === tmp-local-proj
+      this.fixBackendAndBrowserJsMapFilesIn();
+    } else {
+      this.copyBackendAndBrowserJsMapFilesFromLocalProjTo(destination);
+    }
+  }
   //#endregion
 
   //#region handle single file
   handleCopyOfSingleFile(destination: Project, isTempLocalProj: boolean, specyficFileRelativePath: string): void { }
   //#endregion
 
-  //#region handle all files actions
-
   //#region get children
   getChildren(): Project[] {
     return [];
   }
   //#endregion
-
-  //#region get source folder
-  abstract getSourceFolder(
-    monitorDir: string,
-    currentBrowserFolder: Models.dev.BuildDirBrowser,
-    isTempLocalProj: boolean
-  ): string;
-  //#endregion
-
 
 }
