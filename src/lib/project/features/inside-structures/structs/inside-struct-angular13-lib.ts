@@ -147,7 +147,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
             projectLocation,
             this.project.isStandaloneProject
               ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
-            `projects/${projectName}/src/public-api.ts`,
+            `projects/${projectName}/src/${config.file.public_api_ts}`,
           );
 
           let publicApiFile = Helpers.readFile(sourcePublicApi);

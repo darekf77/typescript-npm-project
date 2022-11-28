@@ -107,12 +107,12 @@ export class QuickFixes extends FeatureForProject {
         const indexTs = path.join(this.project.location, config.folder.components, 'index.ts');
         if (!Helpers.exists(indexTs)) {
           Helpers.writeFile(indexTs, `
-          export * from './public_api';
+          export * from './${config.file.public_api}';
           `.trimLeft())
 
         }
 
-        const pubilcApiLoc = path.join(this.project.location, config.folder.components, config.file.publicApi_ts);
+        const pubilcApiLoc = path.join(this.project.location, config.folder.components, config.file.public_api_ts);
         if (!Helpers.exists(pubilcApiLoc)) {
           Helpers.writeFile(pubilcApiLoc, `
           export function helloWorldFrom${_.upperFirst(_.camelCase(this.project.name))}() { }

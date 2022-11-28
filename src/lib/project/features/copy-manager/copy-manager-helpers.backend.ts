@@ -144,20 +144,29 @@ export namespace CopyMangerHelpers {
 
       for (let index = 0; index < browserDtsFiles.length; index++) {
         const dtsFileAbsolutePath = browserDtsFiles[index];
-        const dtsFileContent = Helpers.readFile(dtsFileAbsolutePath);
-        const dtsFixedContent = CopyMangerHelpers.fixDtsImport(
-          dtsFileContent,
-          // dtsFileAbsolutePath,
-          currentBrowserFolder,
-          isomorphicPackages
-        );
-        if (dtsFileAbsolutePath.trim() !== dtsFileContent.trim()) {
-          Helpers.writeFile(dtsFileAbsolutePath, dtsFixedContent);
-        }
+        writeFixedVersionOfDtsFile(dtsFileAbsolutePath, currentBrowserFolder, isomorphicPackages);
       }
       Helpers.log('Fixing .d.ts. files done.');
     }
   }
+
+  export function writeFixedVersionOfDtsFile(
+    dtsFileAbsolutePath: string,
+    currentBrowserFolder: Models.dev.BuildDirBrowser,
+    isomorphicPackages: string[],
+  ) {
+    const dtsFileContent = Helpers.readFile(dtsFileAbsolutePath);
+    const dtsFixedContent = CopyMangerHelpers.fixDtsImport(
+      dtsFileContent,
+      // dtsFileAbsolutePath,
+      currentBrowserFolder,
+      isomorphicPackages
+    );
+    if (dtsFixedContent.trim() !== dtsFileContent.trim()) {
+      Helpers.writeFile(dtsFileAbsolutePath, dtsFixedContent);
+    }
+  }
+
   //#endregion
 
 }

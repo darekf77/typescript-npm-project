@@ -172,6 +172,17 @@ export class CopyManagerStandalone extends CopyManager {
   }
   //#endregion
 
+  //#region remove source folder links
+  removeSourceLinksFolders(location: string) {
+    this.sourceFolders.forEach(sourceFolder => {
+      const toRemoveLink = crossPlatformPath(path.join(location, sourceFolder));
+      if (Helpers.isSymlinkFileExitedOrUnexisted(toRemoveLink)) {
+        Helpers.removeFileIfExists(crossPlatformPath(path.join(location, sourceFolder)));
+      }
+    });
+  }
+  //#endregion
+
   //#region copy compiled sources and declarations
   copyCompiledSourcesAndDeclarations(destination: Project, isTempLocalProj: boolean) {
     const monitorDir = isTempLocalProj //
@@ -186,12 +197,7 @@ export class CopyManagerStandalone extends CopyManager {
     const pkgLocInDestNodeModules = destination.node_modules.pathFor(this.rootPackageName);
     const filter = Helpers.filterDontCopy(this.sourceFolders, monitorDir);
 
-    this.sourceFolders.forEach(sourceFolder => {
-      const toRemoveLink = crossPlatformPath(path.join(pkgLocInDestNodeModules, sourceFolder));
-      if (Helpers.isSymlinkFileExitedOrUnexisted(toRemoveLink)) {
-        Helpers.removeFileIfExists(crossPlatformPath(path.join(pkgLocInDestNodeModules, sourceFolder)));
-      }
-    });
+    this.removeSourceLinksFolders(pkgLocInDestNodeModules);
 
     Helpers.copy(monitorDir, pkgLocInDestNodeModules, {
       copySymlinksAsFiles: false,
@@ -199,17 +205,16 @@ export class CopyManagerStandalone extends CopyManager {
     });
 
     if (this.watch) {
-      this.replaceIndexDtsFiles(destination);
+      this.replaceIndexDtsForEntryPorjIndex(pkgLocInDestNodeModules);
     }
     //#endregion
   }
   //#endregion
 
   //#region replace d.ts files in destination after copy
-  replaceIndexDtsFiles(destination: Project) {
-    const pkgLocInDestNodeModules = destination.node_modules.pathFor(this.rootPackageName);
+  replaceIndexDtsForEntryPorjIndex(location: string) {
     Helpers.writeFile(path.join( // override dts to easly debugging
-      pkgLocInDestNodeModules,
+      location,
       config.file.index_d_ts,
     ), `export * from './${config.folder.src}';\n`);
   }
@@ -372,7 +377,7 @@ export class CopyManagerStandalone extends CopyManager {
   //#endregion
 
   //#region handle copy of single file
-  handleCopyOfSingleFile(destination: Project, isTempLocalProj: boolean, specyficFileRelativePath: string): void {
+  handleCopyOfSingleFile(destination: Project, isTempLocalProj: boolean, specyficFileRelativePath: string, wasRecrusive = false): void {
 
     specyficFileRelativePath = specyficFileRelativePath.replace(/^\//, '');
 
@@ -387,7 +392,9 @@ export class CopyManagerStandalone extends CopyManager {
       return;
     }
 
-    this.preventWeakDetectionOfchanges(specyficFileRelativePath, destination, isTempLocalProj);
+    if (!wasRecrusive) {
+      this.preventWeakDetectionOfchanges(specyficFileRelativePath, destination, isTempLocalProj);
+    }
 
     const destinationFilePath = crossPlatformPath(path.normalize(path.join(
       destination.node_modules.pathFor(this.rootPackageName),
@@ -472,7 +479,7 @@ export class CopyManagerStandalone extends CopyManager {
         specyficFileRelativePathBrowserMap,
       )));
       if (Helpers.exists(possibleBrowserMapFile)) {
-        this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePathBrowserMap);
+        this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePathBrowserMap, true);
       }
     }
   }

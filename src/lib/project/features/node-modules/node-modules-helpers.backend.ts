@@ -395,7 +395,7 @@ export function stuberizeFrontendPackages(project: Project, packages?: string[])
       Helpers.copy(source, dest);
     })
 
-    const mainPublicApi = path.join(proj.location, config.folder.browser, config.file.publicApi_d_ts);
+    const mainPublicApi = path.join(proj.location, config.folder.browser, config.file.public_api_d_ts);
 
     if (Helpers.exists(mainPublicApi)) {
       Helpers.copyFile(

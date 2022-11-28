@@ -144,7 +144,7 @@ export class BackendCompilation extends IncCompiler.Base {
 
       // commandDts = `${tsExe} --emitDeclarationOnly  ${params.join(' ')}`;
       params[1] = ` --outDir ${nocutsrc}`;
-      commandMaps = `${tsExe} -d false  ${params.join(' ')} `;
+      commandMaps = `${tsExe} ${params.join(' ')} `;
       return {
         commandJs, commandMaps,
         // commandDts
