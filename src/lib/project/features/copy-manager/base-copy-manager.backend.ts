@@ -28,6 +28,9 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     config.folder.node_modules,
     config.folder.tempSrcDist,
     config.file.package_json,
+    ...CopyMangerHelpers.browserwebsqlFolders.map(currentBrowserFolder => {
+      return crossPlatformPath(path.join(currentBrowserFolder, config.folder.src))
+    })
   ];
 
   //#endregion

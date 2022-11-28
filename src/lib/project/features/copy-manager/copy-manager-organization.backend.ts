@@ -166,10 +166,14 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     isForCliDebuggerToWork: boolean,
     filePath: string,
   ): string {
+    // if (!content) { // additiaonal thing are added to (dist|bundle)
+    //   debugger;     // QUICK FIX below =@LAST
+    // }
+    content = content ? content : '';
 
     let toReplaceString2 = isBrowser
       ? `../tmp-libs-for-${this.outDir}/${this.project.name}/projects/${this.project.name}/${config.folder.src}`
-      : `../../../tmp-source-${this.outDir}`;
+      : (`../../../tmp-source-${this.outDir}`);
 
     let toReplaceString1 = `"${toReplaceString2}`;
     const addon = `/libs/(${this.children.map(c => {
@@ -183,39 +187,20 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       // content = content.replace(regex1, `"./${config.folder.src}`);
       // content = content.replace(regex2, config.folder.src);
     } else {
-      content = content.replace(regex1, `"./${config.folder.src}`);
-      content = content.replace(regex2, config.folder.src);
+      if (isForCliDebuggerToWork) {
+        // @LAST THING TO DO:
+        // 1. target/dist map files should be chaning correectlhy
+        // 2. handle single files
+        // 3. replace d.ts from no-cuts in normal dist or everywhere when copyto
+        // 4. check if debugging is working
+        // content = super.changedJsMapFilesInternalPathesForDebug(content, isBrowser, isForCliDebuggerToWork, filePath);
+      } else {
+        content = content.replace(regex1, `"./${config.folder.src}/lib`);
+        content = content.replace(regex2, `${config.folder.src}/lib`);
+      }
     }
 
     return content;
-  }
-  //#endregion
-
-  //#region fix additonal files and folder
-  fixAdditonalFilesAndFolders(destination: Project) {
-    // TODO
-    //   [
-    //     'index.d.ts',
-    //     'app.d.ts',
-    //   ].forEach(specyficFileRelativePath => {
-    //     CopyMangerHelpers.browserwebsqlFolders.forEach(currentBrowserFolder => {
-    //       const dtsFileAbsolutePath = path.join(specyficFileRelativePath, this.monitoredOutDir);
-    //       CopyMangerHelpers.writeFixedVersionOfDtsFile(
-    //         dtsFileAbsolutePath,
-    //         currentBrowserFolder,
-    //         this.isomorphicPackages,
-    //       );
-    //     });
-    //   });
-
-    //   [
-    //     'index.js.map',
-    //     'app.js.map',
-    //   ].forEach(specyficFileRelativePath => {
-    //     const destinationPackageLocation = destination.node_modules.pathFor(this.rootPackageName);
-    //     // this.writeFixedMapFile(true, specyficFileRelativePath, destinationPackageLocation);
-    //     // this.writeFixedMapFile(true, specyficFileRelativePath, destinationPackageLocation);
-    //   });
   }
   //#endregion
 
@@ -355,11 +340,31 @@ export * from './${config.file.public_api}';
 
       const monitorDirForModuleBrowser = isTempLocalProj ? pathInMonitoredLocation : pathInLocalTempProj;
 
+      const fixFile = (isMap: boolean = false) => {
+        const destinationLocationMjsFile = path.join(
+          destination.node_modules.pathFor(rootPackageNameForChildBrowser),
+          angularCompilationFolder,
+          `${this.targetProjName}.mjs${isMap ? '.map' : ''}`,
+        );
+
+        const destinationLocationMjsFileDest = path.join(
+          destination.node_modules.pathFor(rootPackageNameForChildBrowser),
+          angularCompilationFolder,
+          `${child.name}.mjs${isMap ? '.map' : ''}`,
+        );
+
+        if ((destinationLocationMjsFile !== destinationLocationMjsFileDest)
+          && Helpers.exists(destinationLocationMjsFile)) {
+          Helpers.move(destinationLocationMjsFile, destinationLocationMjsFileDest);
+        }
+      };
+
       if (angularCompilationFolder === this.angularBrowserComiplationFolders.esm2020) {
         // TODO better way to extract data for child module from angular build
         Helpers.copy(monitorDirForModuleBrowser, destinationLocation, {
           copySymlinksAsFiles: false,
         });
+        fixFile();
       }
 
       if (angularCompilationFolder === this.angularBrowserComiplationFolders.fesm2015) {
@@ -367,6 +372,8 @@ export * from './${config.file.public_api}';
         Helpers.copy(monitorDirForModuleBrowser, destinationLocation, {
           copySymlinksAsFiles: false,
         });
+        fixFile();
+        fixFile(true);
       }
 
       if (angularCompilationFolder === this.angularBrowserComiplationFolders.fesm2020) {
@@ -374,23 +381,10 @@ export * from './${config.file.public_api}';
         Helpers.copy(monitorDirForModuleBrowser, destinationLocation, {
           copySymlinksAsFiles: false,
         });
+        fixFile();
+        fixFile(true);
       }
 
-      const destinationLocationMjsFile = path.join(
-        destination.node_modules.pathFor(rootPackageNameForChildBrowser),
-        angularCompilationFolder,
-        `${this.targetProjName}.mjs`,
-      );
-
-      const destinationLocationMjsFileDest = path.join(
-        destination.node_modules.pathFor(rootPackageNameForChildBrowser),
-        angularCompilationFolder,
-        `${child.name}.mjs`,
-      );
-
-      if (destinationLocationMjsFile !== destinationLocationMjsFileDest) {
-        Helpers.move(destinationLocationMjsFile, destinationLocationMjsFileDest);
-      }
 
     })
 
@@ -420,6 +414,35 @@ export * from './${config.file.public_api}';
     console.log('done')
   }
   //#endregion
+
+  //#region fix additonal files and folder
+  fixAdditonalFilesAndFolders(destination: Project) {
+
+    [
+      'index.d.ts',
+      'app.d.ts',
+    ].forEach(specyficFileRelativePath => {
+      CopyMangerHelpers.browserwebsqlFolders.forEach(currentBrowserFolder => {
+        const dtsFileAbsolutePath = path.join(specyficFileRelativePath, this.monitoredOutDir);
+        CopyMangerHelpers.writeFixedVersionOfDtsFile(
+          dtsFileAbsolutePath,
+          currentBrowserFolder,
+          this.isomorphicPackages,
+        );
+      });
+    });
+
+    [
+      'index.js.map',
+      'app.js.map',
+    ].forEach(specyficFileRelativePath => {
+      const destinationPackageLocation = destination.node_modules.pathFor(this.rootPackageName);
+      this.writeFixedMapFile(true, specyficFileRelativePath, destinationPackageLocation);
+      // this.writeFixedMapFile(true, specyficFileRelativePath, destinationPackageLocation);
+    });
+  }
+  //#endregion
+
 
   //#region copy compiled sources and declarations
   copyCompiledSourcesAndDeclarations(destination: Project, isTempLocalProj: boolean) {
@@ -497,13 +520,13 @@ export * from './${config.file.public_api}';
   //#endregion
 
   //#region remove or add links
-  private removeOrAddLinks(destination: Project, removeOnly = false) {
+  private addOrRemoveSymlinks(destination: Project, remove = false) {
     for (let index = 0; index < this.children.length; index++) {
       const child = this.children[index];
 
       const destPackageLinkSourceLocation = this.destPackageLinkSourceLocation(destination, child);
       Helpers.removeIfExists(destPackageLinkSourceLocation);
-      if (removeOnly) {
+      if (!remove) {
         Helpers.createSymLink(this.sourcePathToLinkFor(child), destPackageLinkSourceLocation);
       }
 
@@ -515,7 +538,7 @@ export * from './${config.file.public_api}';
           currentBrowserFolder,
         );
         Helpers.removeIfExists(destPackageLinkSourceLocationForBrowser);
-        if (removeOnly) {
+        if (!remove) {
           Helpers.createSymLink(this.sourcePathToLinkFor(child), destPackageLinkSourceLocationForBrowser);
         }
       }
@@ -525,13 +548,32 @@ export * from './${config.file.public_api}';
 
   //#region add source symlinks
   addSourceSymlinks(destination: Project) {
-    this.removeOrAddLinks(destination);
+    this.addOrRemoveSymlinks(destination);
   }
   //#endregion
 
   //#region remove source symlinks
   removeSourceSymlinks(destination: Project) {
-    this.removeOrAddLinks(destination, true);
+    this.addOrRemoveSymlinks(destination, true);
   }
   //#endregion
+
+  fixBackendAndBrowserJsMapFilesIn() {
+    for (let index = 0; index < this.children.length; index++) {
+      const child = this.children[index];
+      const destinationPackageLocation = this.localTempProj.node_modules.pathFor(this.childPackageName(child));
+
+      for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
+        const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
+        this.fixJsMapFiles(destinationPackageLocation, currentBrowserFolder);
+      }
+
+      this.fixJsMapFiles(destinationPackageLocation);
+    }
+  }
+
+  copyBackendAndBrowserJsMapFilesFromLocalProjTo(destination: Project) {
+    const destinationPackageLocation = this.localTempProj.node_modules.pathFor(this.rootPackageName);
+    this.copyMapFilesesForModule(destination, destinationPackageLocation);
+  }
 }

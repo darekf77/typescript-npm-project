@@ -258,10 +258,31 @@ export class CopyManagerStandalone extends CopyManager {
   }
   //#endregion
 
+  fixJsMapFiles(destinationPackageLocation: string, currentBrowserFolder?: Models.dev.BuildDirBrowser) {
+    const forBrowser = !!currentBrowserFolder;
+    const filesPattern = `${destinationPackageLocation}`
+      + `${forBrowser ? `/${currentBrowserFolder}` : ''}`
+      + `/**/*.${forBrowser ? 'm' : ''}js.map`;
+
+    const mapFiles = glob.sync(filesPattern, {
+      ignore: forBrowser ? [] : [`${config.folder.browser}/**/*.*`, `${config.folder.websql}/**/*.*`]
+    });
+
+    mapFiles.forEach(absFilePath => {
+      const relative = crossPlatformPath(absFilePath)
+        .replace(destinationPackageLocation + '/', '');
+      this.writeFixedMapFile(
+        forBrowser,
+        relative,
+        destinationPackageLocation);
+    });
+  }
+
   //#region fix backend and browser js (m)js.map files (for proper debugging)
   /**
   *  fix backend and browser js (m)js.map files (for proper debugging)
-  * destination package here is temp project
+  *
+  * destination is (should be) tmp-local-project
   *
   * Fix for 2 things:
   * - debugging when in cli mode (fix in actual (dist|bundle)/(browser/websql)  )
@@ -269,62 +290,22 @@ export class CopyManagerStandalone extends CopyManager {
   * @param destinationPackageLocation desitnation/node_modues/< rootPackageName >
   */
   fixBackendAndBrowserJsMapFilesIn() {
-    Helpers.log('fixing maps started...')
     const destinationPackageLocation = this.localTempProj.node_modules.pathFor(this.rootPackageName);
 
-    //#region fixing (dist|bundle)/(browser/websql)/**.mjs.map* files
     for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
       const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
-
-      const mjsBrowserFilesPattern = `${destinationPackageLocation}/`
-        + `${currentBrowserFolder}`
-        + `/**/*.mjs.map`;
-
-      const mjsBrwoserFiles = glob.sync(mjsBrowserFilesPattern);
-
-      mjsBrwoserFiles.forEach(absBrowserJsMapFilePath => {
-        const relative = crossPlatformPath(absBrowserJsMapFilePath)
-          .replace(destinationPackageLocation + '/', '');
-        this.writeFixedMapFile(
-          true,
-          relative,
-          destinationPackageLocation);
-      });
+      this.fixJsMapFiles(destinationPackageLocation, currentBrowserFolder);
     }
-    //#endregion
 
-    //#region fixing (dist|bundle)/**.js.map* files
-    const mapBackendFilesPattern = `${destinationPackageLocation}/**/*.js.map`;
-    const mpaBackendFiles = glob.sync(mapBackendFilesPattern,
-      { ignore: [`${config.folder.browser}/**/*.*`, `${config.folder.websql}/**/*.*`] })
-
-
-    mpaBackendFiles.forEach(absBackendMapFilePath => {
-      const relative = crossPlatformPath(absBackendMapFilePath)
-        .replace(destinationPackageLocation + '/', '')
-      this.writeFixedMapFile(
-        false,
-        relative,
-        destinationPackageLocation
-      );
-    });
-    //#endregion
-    Helpers.log('fixing maps done...')
+    this.fixJsMapFiles(destinationPackageLocation);
   }
   //#endregion
 
-  //#region copy backend and browser jsM (m)js.map files to destination location
-  /**
-   * Copy fixed maps from tmp-local-project to other projects
-   *
-   * @param destination any project other than tmp-local-proj
-   */
-  copyBackendAndBrowserJsMapFilesFromLocalProjTo(destination: Project) {
-    const destinationPackageLocation = this.localTempProj.node_modules.pathFor(this.rootPackageName);
+  copyMapFilesesForModule(destination: Project, tmpLocalProjPackageLocation: string) {
 
     const allMjsBrowserFiles = CopyMangerHelpers.browserwebsqlFolders
       .map(currentBrowserFolder => {
-        const mjsBrowserFilesPattern = `${destinationPackageLocation}/`
+        const mjsBrowserFilesPattern = `${tmpLocalProjPackageLocation}/`
           + `${currentBrowserFolder}`
           + `/**/*.mjs.map`;
 
@@ -333,7 +314,7 @@ export class CopyManagerStandalone extends CopyManager {
       })
       .reduce((a, b) => a.concat(b), [])
 
-    const mapBackendFilesPattern = `${destinationPackageLocation}/**/*.js.map`;
+    const mapBackendFilesPattern = `${tmpLocalProjPackageLocation}/**/*.js.map`;
     const mapBackendFiles = glob.sync(mapBackendFilesPattern,
       { ignore: [`${config.folder.browser}/**/*.*`, `${config.folder.websql}/**/*.*`] })
 
@@ -344,15 +325,24 @@ export class CopyManagerStandalone extends CopyManager {
 
     for (let index = 0; index < toCopy.length; index++) {
       const fileAbsPath = toCopy[index];
-      const fileRelativePath = fileAbsPath.replace(`${destinationPackageLocation}/`, '');
+      const fileRelativePath = fileAbsPath.replace(`${tmpLocalProjPackageLocation}/`, '');
       const destAbs = crossPlatformPath(path.join(
-        destination.location,
-        config.folder.node_modules,
-        this.rootPackageName,
+        destination.node_modules.pathFor(this.rootPackageName),
         fileRelativePath,
       ));
       Helpers.copyFile(fileAbsPath, destAbs, { dontCopySameContent: false });
     }
+  }
+
+  //#region copy backend and browser jsM (m)js.map files to destination location
+  /**
+   * Copy fixed maps from tmp-local-project to other projects
+   *
+   * @param destination any project other than tmp-local-proj
+   */
+  copyBackendAndBrowserJsMapFilesFromLocalProjTo(destination: Project) {
+    const destinationPackageLocation = this.localTempProj.node_modules.pathFor(this.rootPackageName);
+    this.copyMapFilesesForModule(destination, destinationPackageLocation);
   }
   //#endregion
 
