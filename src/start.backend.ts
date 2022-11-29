@@ -180,9 +180,9 @@ export async function start(
     Helpers.log(`DO NOTHIGN`);
   } else {
     const db = await TnpDB.Instance();
-    Helpers.log('[db] staring setting command...')
+    Helpers.log('[db] staring setting command...', 1)
     await db.setCommand(argsv.join(' '));
-    Helpers.log('[db] finish setting command')
+    Helpers.log('[db] finish setting command', 1)
   }
 
 
@@ -226,7 +226,7 @@ export async function start(
   Helpers.log('checking commands... please wait')
   for (let index = 0; index < files.length; index++) {
     let breakLoop = false;
-    Helpers.log(`check function command`);
+    Helpers.log(`check function command`, 1);
     const file = files[index];
     const defaultObjectFunctionsOrHelpString = file; //require(path.resolve(file)).default;
     if (_.isObject(defaultObjectFunctionsOrHelpString)) {

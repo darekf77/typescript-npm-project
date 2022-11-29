@@ -38,8 +38,13 @@ global.useWorker = !(typeof process.argv.find(a => a.startsWith('-useWorker=fals
 global.useWebpackBackendBuild = (typeof process.argv.find(a => a.startsWith('-webpack')) !== 'undefined');
 const verboseLevelExists = (typeof process.argv.find(a => a.startsWith('-verbose=')) !== 'undefined');
 global.verboseLevel = (verboseLevelExists ? Number(
-  process.argv.find(a => a.startsWith('-verbose=').replace('-verbose=', ''))
+  process.argv.find(a => a.startsWith('-verbose='))?.replace('-verbose=', '')
 ) : 0) || 0;
+
+if(!verbose && verboseLevelExists) {
+  global.hideLog = false;
+}
+
 const distOnly = (process.argv.includes('-dist'));
 const npmOnly = (process.argv.includes('-npm'));
 const spinnerOnInArgs = process.argv.includes('-spinner');

@@ -62,7 +62,7 @@ export class FilesTemplatesBuilder extends FeatureForProject {
     reservedExpOne: any,
     soft: boolean) { // lodash
     const filePath = orgFilePath.replace(`.${config.filesExtensions.filetemplate}`, '');
-    Helpers.log('processing file template')
+    Helpers.log('processing file template', 1)
     // Helpers.pressKeyAndContinue();
     let newContent = content
       .split('\n')

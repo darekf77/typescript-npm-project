@@ -5,7 +5,6 @@ import { FeatureForProject } from '../abstract';
 import { chokidar } from 'tnp-core';
 import { child_process } from 'tnp-core';
 //#endregion
-global.hideLog = true;
 
 import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';

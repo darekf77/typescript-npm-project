@@ -193,16 +193,16 @@ export class NodeModulesBase extends NodeModulesCore {
           }
         }
 
-        const orghideInfos = global.hideInfos;
-        global.hideInfos = true;
-        const orghideWarnings = global.hideWarnings;
-        global.hideWarnings = true;
-        const orghideLog = global.hideLog;
-        global.hideLog = true;
+        // const orghideInfos = global.hideInfos;
+        // global.hideInfos = true;
+        // const orghideWarnings = global.hideWarnings;
+        // global.hideWarnings = true;
+        // const orghideLog = global.hideLog;
+        // global.hideLog = true;
         const depsNames = addDependenceis(self.project, self.project.location);
-        global.hideInfos = orghideInfos;
-        global.hideWarnings = orghideWarnings;
-        global.hideLog = orghideLog;
+        // global.hideInfos = orghideInfos;
+        // global.hideWarnings = orghideWarnings;
+        // global.hideLog = orghideLog;
         const prog = new TerminalProgressBar('Please wait: :current / :total', depsNames.length);
         depsNames
           // .filter(dep => dep !== self.project.name)

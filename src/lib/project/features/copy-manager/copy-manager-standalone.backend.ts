@@ -43,14 +43,19 @@ export class CopyManagerStandalone extends CopyManager {
     // @ts-ignore
     this._isomorphicPackages = this.project.availableIsomorphicPackagesInNodeModules;
     Helpers.log(`Opearating on ${this.isomorphicPackages.length} isomorphic pacakges...`);
+    this.recreateTempProj();
+    this.initWatching();
+  }
+  //#endregion
 
+  //#region recreate temp proj
+  recreateTempProj() {
     Helpers.remove(this.localTempProjPath);
     Helpers.writeFile([this.localTempProjPath, config.file.package_json], {
       name: path.basename(this.localTempProjPath),
       version: '0.0.0'
     });
     Helpers.mkdirp([this.localTempProjPath, config.folder.node_modules]);
-    this.initWatching();
   }
   //#endregion
 
@@ -251,13 +256,14 @@ export class CopyManagerStandalone extends CopyManager {
    */
   copySourceMaps(destination: Project, isTempLocalProj: boolean) {
     if (isTempLocalProj) { // destination === tmp-local-proj
-      this.fixBackendAndBrowserJsMapFilesIn();
+      this.fixBackendAndBrowserJsMapFilesInLocalProj();
     } else {
       this.copyBackendAndBrowserJsMapFilesFromLocalProjTo(destination);
     }
   }
   //#endregion
 
+  //#region fix js map files in destination folder
   fixJsMapFiles(destinationPackageLocation: string, currentBrowserFolder?: Models.dev.BuildDirBrowser) {
     const forBrowser = !!currentBrowserFolder;
     const filesPattern = `${destinationPackageLocation}`
@@ -277,6 +283,7 @@ export class CopyManagerStandalone extends CopyManager {
         destinationPackageLocation);
     });
   }
+  //#endregion
 
   //#region fix backend and browser js (m)js.map files (for proper debugging)
   /**
@@ -289,7 +296,7 @@ export class CopyManagerStandalone extends CopyManager {
   * - debugging when in node_modules of other project (fixing only tmp-local-project)
   * @param destinationPackageLocation desitnation/node_modues/< rootPackageName >
   */
-  fixBackendAndBrowserJsMapFilesIn() {
+  fixBackendAndBrowserJsMapFilesInLocalProj() {
     const destinationPackageLocation = this.localTempProj.node_modules.pathFor(this.rootPackageName);
 
     for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
@@ -301,7 +308,8 @@ export class CopyManagerStandalone extends CopyManager {
   }
   //#endregion
 
-  copyMapFilesesForModule(destination: Project, tmpLocalProjPackageLocation: string) {
+  //#region copy map files from local proj to copyto proj§
+  copyMapFilesesFromLocalToCopyToProj(destination: Project, tmpLocalProjPackageLocation: string) {
 
     const allMjsBrowserFiles = CopyMangerHelpers.browserwebsqlFolders
       .map(currentBrowserFolder => {
@@ -333,6 +341,7 @@ export class CopyManagerStandalone extends CopyManager {
       Helpers.copyFile(fileAbsPath, destAbs, { dontCopySameContent: false });
     }
   }
+  //#endregion
 
   //#region copy backend and browser jsM (m)js.map files to destination location
   /**
@@ -342,7 +351,7 @@ export class CopyManagerStandalone extends CopyManager {
    */
   copyBackendAndBrowserJsMapFilesFromLocalProjTo(destination: Project) {
     const destinationPackageLocation = this.localTempProj.node_modules.pathFor(this.rootPackageName);
-    this.copyMapFilesesForModule(destination, destinationPackageLocation);
+    this.copyMapFilesesFromLocalToCopyToProj(destination, destinationPackageLocation);
   }
   //#endregion
 
@@ -419,6 +428,7 @@ export class CopyManagerStandalone extends CopyManager {
           false,
           specyficFileRelativePath,
           destination.node_modules.pathFor(this.rootPackageName),
+
         )
       }
       if (isBrowserMapsFile) {
@@ -457,7 +467,7 @@ export class CopyManagerStandalone extends CopyManager {
     )));
 
     if (Helpers.exists(possibleBackendMapFile)) {
-      this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePathBackendMap);
+      this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePathBackendMap, true);
     }
 
     for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
@@ -475,19 +485,15 @@ export class CopyManagerStandalone extends CopyManager {
   }
   //#endregion
 
-  //#region write fixed map files
+  //#region write fixed map files for non cli
   /**
-   *
-   * @param isForBrowser
-   * @param specyficFileRelativePath
-   * @param destinationPackageLocation should be ONLY temp project
+   * fix contaen of map files in destination package location
    */
-  protected writeFixedMapFile(
+  writeFixedMapFileForNonCli(
     isForBrowser: boolean,
     specyficFileRelativePath: string,
     destinationPackageLocation: string,
   ) {
-
     //#region map fix for node_moules/pacakge
     const absMapFilePathInLocalProjNodeModulesPackage = crossPlatformPath(path.join(
       destinationPackageLocation,
@@ -506,6 +512,22 @@ export class CopyManagerStandalone extends CopyManager {
       fixedContentNonCLI,
     );
     //#endregion
+  }
+  //#endregion
+
+  //#region write fixed map files
+  /**
+   *
+   * @param isForBrowser
+   * @param specyficFileRelativePath
+   * @param destinationPackageLocation should be ONLY temp project
+   */
+  protected writeFixedMapFile(
+    isForBrowser: boolean,
+    specyficFileRelativePath: string,
+    destinationPackageLocation: string,
+  ) {
+    this.writeFixedMapFileForNonCli(isForBrowser, specyficFileRelativePath, destinationPackageLocation);
 
     //#region mpa fix for CLI
     const monitoredOutDirFileToReplaceBack = path.join(

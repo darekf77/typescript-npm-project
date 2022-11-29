@@ -66,7 +66,7 @@ export class PackageJsonBase extends PackageJsonCore {
   }
 
   private prepareForSave(action: 'save' | 'show' | 'hide' = 'save', caller?: Project) {
-    if (caller === this.project) {
+    if (caller?.location === this.project.location) {
       return;
     }
     if (this.project.isUnknowNpmProject) {
@@ -75,7 +75,8 @@ export class PackageJsonBase extends PackageJsonCore {
     }
 
     if (this.project.isStandaloneProject || this.project.isContainer || (this.project.isWorkspace && !this.project.isContainerChild)) {
-      (Project.Tnp as Project).packageJson.prepareForSave(action, Project.Tnp as Project);
+      const tnp = (Project.Tnp as Project);
+      tnp.packageJson.prepareForSave(action, tnp);
     }
 
     if ((this.project.isContainerChild && this.project.isWorkspace) || this.project.isWorkspaceChildProject) {

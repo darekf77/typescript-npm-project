@@ -44,25 +44,29 @@ ${exportsContainer}
 export function recreateApp(project: Project) {
   //#region @backend
   //#region when app.ts or app is not available is not
-  (() => {
-    const appFile = crossPlatformPath(path.join(
-      project.location,
-      config.folder.src,
-      'app.ts'
-    ));
 
-    const appFolder = crossPlatformPath(path.join(
-      project.location,
-      config.folder.src,
-      'app'
-    ));
+  const appFile = crossPlatformPath(path.join(
+    project.location,
+    config.folder.src,
+    'app.ts'
+  ));
 
-    if (!Helpers.exists(appFile) && !Helpers.exists(appFolder)) {
-      const componentName = `${_.upperFirst(_.camelCase(project.name))}Component`;
-      const moduleName = `${_.upperFirst(_.camelCase(project.name))}Module`;
+  const appFolderWithIndex = crossPlatformPath(path.join(
+    project.location,
+    config.folder.src,
+    'app',
+    'index.ts',
+  ));
 
-      // TODO quick fix for @ browser remover
-      Helpers.writeFile(appFile, `
+  project.quickFixes.removeAppFolder();
+
+  if (!Helpers.exists(appFile) && !Helpers.exists(appFolderWithIndex)) {
+
+    const componentName = `${_.upperFirst(_.camelCase(project.name))}Component`;
+    const moduleName = `${_.upperFirst(_.camelCase(project.name))}Module`;
+
+    // TODO quick fix for @ browser remover
+    Helpers.writeFile(appFile, `
 
 ${'//#reg' + 'ion'} ${'@not' + 'ForNpm'}
 
@@ -104,11 +108,10 @@ ${'//#end' + 'region'}
 
 
     `.trim());
-    }
+  }
 
 
 
-  })();
   //#endregion
   //#endregion
 }

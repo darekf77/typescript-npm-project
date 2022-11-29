@@ -1,5 +1,4 @@
-#!/usr/bin/env -S node --inspect-brk
+#!/usr/bin/env -S node --inspect-brk --stack-trace-limit=10000
 //#region @backend
-// --stack-trace-limit=10000
 require('./start');
 //#endregion

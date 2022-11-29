@@ -174,6 +174,20 @@ inside generated projects...
         this.project.insideStructure.recrate(buildOptions.outDir as any, buildOptions.watch);
       }
 
+      if (this.project.isSmartContainer) {
+        const childrenForINsideStruct = this.project.children.filter(c => c.typeIs('isomorphic-lib'));
+        const clientFromArgs = Helpers.removeSlashAtEnd(_.first((buildOptions.args || '').split(' '))) as any;
+        let client: Project = childrenForINsideStruct.find(f => f.name === clientFromArgs);
+        const smartContainerBuildTarget = this.project.smartContainerBuildTarget;
+        if (!client && smartContainerBuildTarget) {
+          client = smartContainerBuildTarget;
+        }
+
+        if (client) {
+          await client.insideStructure.recrate(buildOptions.outDir, buildOptions.watch);
+        }
+      }
+
       if (buildOptions.watch) {
         let config = void 0;
         while (true) {

@@ -20,19 +20,19 @@ export abstract class RecreatableProject {
       return this.browser.isCoreProject;
     }
     //#region @backend
-    if (this.isWorkspaceChildProject || (this.isContainerChild && this.isWorkspace)) {
-      if (this.parent.packageJson.isCoreProject != this.packageJson.isCoreProject) {
-        this.packageJson.data.tnp.isCoreProject = void 0; // TODO why is that
-        this.packageJson.writeToDisc();
-      }
-    }
-    if (this.isVscodeExtension && this.parent?.packageJson.isCoreProject) {
-      if (this.parent.packageJson.isCoreProject != this.packageJson.isCoreProject) {
-        this.packageJson.data.tnp.isCoreProject = true;
-        this.packageJson.writeToDisc();
-      }
-    }
-    return this.packageJson && this.packageJson.isCoreProject;
+    // if (this.isWorkspaceChildProject || (this.isContainerChild && this.isWorkspace)) {
+    //   if (this.parent.packageJson.isCoreProject != this.packageJson.isCoreProject) {
+    //     this.packageJson.data.tnp.isCoreProject = void 0; // TODO why is that
+    //     // this.packageJson.writeToDisc();
+    //   }
+    // }
+    // if (this.isVscodeExtension && this.parent?.packageJson.isCoreProject) {
+    //   if (this.parent.packageJson.isCoreProject != this.packageJson.isCoreProject) {
+    //     this.packageJson.data.tnp.isCoreProject = true;
+    //     // this.packageJson.writeToDisc();
+    //   }
+    // }
+    // return this.packageJson && this.packageJson.isCoreProject;
     //#endregion
   }
 

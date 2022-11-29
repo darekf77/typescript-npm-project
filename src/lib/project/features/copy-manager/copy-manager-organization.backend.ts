@@ -12,12 +12,14 @@ import { CopyManagerStandalone } from "./copy-manager-standalone.backend";
 export class CopyManagerOrganization extends CopyManagerStandalone {
   protected readonly children: Project[];
 
+  //#region angular browser compilation folders
   protected readonly angularBrowserComiplationFolders = {
     esm2020: 'esm2020',
     fesm2015: 'fesm2015',
     fesm2020: 'fesm2020',
   };
   protected readonly angularBrowserComiplationFoldersArr = Object.values(this.angularBrowserComiplationFolders);
+  //#endregion
 
   //#region target project name
   /**
@@ -56,6 +58,14 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     this.children = this.getChildren();
   }
   //#endregion
+
+  recreateTempProj() {
+    if (!this.targetProjName) {
+      // @ts-ignore
+      this.args = `${this.project.smartContainerBuildTarget.name} ${this.args}`;
+    }
+    super.recreateTempProj();
+  }
 
   //#region init watching
   public initWatching() {
@@ -127,9 +137,10 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       const destPackageInNodeModulesBrowser = path.join(destPackageInNodeModules, currentBrowserFolder);
 
       Helpers.remove(destPackageInNodeModulesBrowser);
+      const children = this.children;
 
-      for (let index = 0; index < this.children.length; index++) {
-        const c = this.children[index];
+      for (let index = 0; index < children.length; index++) {
+        const c = children[index];
         const childDestPackageInNodeModules = path.join(
           destPackageInNodeModules,
           CopyMangerHelpers.childPureName(c)
@@ -166,9 +177,9 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     isForCliDebuggerToWork: boolean,
     filePath: string,
   ): string {
-    // if (!content) { // additiaonal thing are added to (dist|bundle)
-    //   debugger;     // QUICK FIX below =@LAST
-    // }
+    if (!content) { // additiaonal thing are added to (dist|bundle)
+      debugger;     // QUICK FIX below =@LAST
+    }
     content = content ? content : '';
 
     let toReplaceString2 = isBrowser
@@ -193,7 +204,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         // 2. handle single files
         // 3. replace d.ts from no-cuts in normal dist or everywhere when copyto
         // 4. check if debugging is working
-        // content = super.changedJsMapFilesInternalPathesForDebug(content, isBrowser, isForCliDebuggerToWork, filePath);
+        content = super.changedJsMapFilesInternalPathesForDebug(content, isBrowser, isForCliDebuggerToWork, filePath);
       } else {
         content = content.replace(regex1, `"./${config.folder.src}/lib`);
         content = content.replace(regex2, `${config.folder.src}/lib`);
@@ -443,7 +454,6 @@ export * from './${config.file.public_api}';
   }
   //#endregion
 
-
   //#region copy compiled sources and declarations
   copyCompiledSourcesAndDeclarations(destination: Project, isTempLocalProj: boolean) {
     // @LAST
@@ -558,7 +568,8 @@ export * from './${config.file.public_api}';
   }
   //#endregion
 
-  fixBackendAndBrowserJsMapFilesIn() {
+  //#region fix backend and browser js map files in local project
+  fixBackendAndBrowserJsMapFilesInLocalProj() {
     for (let index = 0; index < this.children.length; index++) {
       const child = this.children[index];
       const destinationPackageLocation = this.localTempProj.node_modules.pathFor(this.childPackageName(child));
@@ -571,9 +582,41 @@ export * from './${config.file.public_api}';
       this.fixJsMapFiles(destinationPackageLocation);
     }
   }
+  //#endregion
 
+  //#region copy backend and browser js map files from local project to destination
   copyBackendAndBrowserJsMapFilesFromLocalProjTo(destination: Project) {
     const destinationPackageLocation = this.localTempProj.node_modules.pathFor(this.rootPackageName);
-    this.copyMapFilesesForModule(destination, destinationPackageLocation);
+    this.copyMapFilesesFromLocalToCopyToProj(destination, destinationPackageLocation);
   }
+  //#endregion
+
+  //#region write fixed map file
+  protected writeFixedMapFile(
+    isForBrowser: boolean,
+    specyficFileRelativePath: string,
+    destinationPackageLocation: string,
+  ) {
+    this.writeFixedMapFileForNonCli(isForBrowser, specyficFileRelativePath, destinationPackageLocation);
+    // @LAST
+    //#region mpa fix for CLI
+    const monitoredOutDirFileToReplaceBack = path.join(
+      this.monitoredOutDir,
+      specyficFileRelativePath,
+    );
+
+    const fixedContentCLIDebug = this.changedJsMapFilesInternalPathesForDebug(
+      Helpers.readFile(monitoredOutDirFileToReplaceBack),
+      isForBrowser,
+      true,
+      monitoredOutDirFileToReplaceBack,
+    );
+
+    Helpers.writeFile(
+      monitoredOutDirFileToReplaceBack,
+      fixedContentCLIDebug,
+    );
+    //#endregion
+  }
+  //#endregion
 }

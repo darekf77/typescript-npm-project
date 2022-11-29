@@ -89,6 +89,11 @@ export class PackageJsonCore {
     return 'v1' as any;
   }
 
+  get smartContainerBuildTarget(): string {
+    const res = this.data.tnp ? this.data.tnp.smartContainerBuildTarget : undefined;
+    return res ? res : void 0;
+  }
+
   get isSmart(): boolean {
     return !!this.data.tnp?.smart;
   }
@@ -320,13 +325,19 @@ export class PackageJsonCore {
   public setNamFromContainingFolder() {
     const name = path.basename(this.cwd);
     this.data.name = name;
-    this.writeToDisc();
   }
 
   private splitAndWriteToDisc(removeFromPj = false) {
     if ((['navi', 'scenario'] as ConfigModels.LibType[]).includes(this.type)) {
+
+      if(_.isObject(this.data) && this.data['']) {
+        delete this.data['']
+      }
       Helpers.writeFile(this.path, _.isObject(this.data) ? this.data : {});
       return;
+    }
+    if(_.isObject(this.data) && this.data['']) {
+      delete this.data['']
     }
     const data = _.cloneDeep(this.data) as Models.npm.IPackageJSON;
 
@@ -412,7 +423,7 @@ export class PackageJsonCore {
         Helpers.writeFile(this.path, d);
       }
     }
-
+    Helpers.log(`Writing done..`, 2);
   }
 
   public writeToDisc(removeFromPj = false) {

@@ -202,11 +202,12 @@ export async function $DEPS_UPDATE_FROM(args: string, exit = true) {
 
 function DEPS_SHOW_IF_STANDALONE(args: string) {
   Helpers.log(`Hook update start`)
-  if ((Project.Current as Project).isStandaloneProject) {
+  const proj = (Project.Current as Project);
+  if (proj.isStandaloneProject) {
     Helpers.info(`Showing deps for standalone project`);
-    (Project.Current as Project).packageJson.save('is standalone show')
+    proj.packageJson.save('is standalone show')
   }
-  Helpers.git.commitWhatIs(`show package.json dependencies`)
+  Helpers.git.commitWhatIs(proj.location, `show package.json dependencies`)
   Helpers.log(`Hook update ended`)
   process.exit(0)
 }

@@ -33,6 +33,7 @@
   },
 
   linkedProjects: [],
+  smartContainerBuildTarget: '',
   linkedRepos: [],
 
   libReleaseOptions: {

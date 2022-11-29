@@ -91,9 +91,15 @@ export class ProjectContainer
     if (!fse.existsSync(this.location)) {
       return;
     }
-    const { outDir, args } = buildOptions;
+    let { outDir, args } = buildOptions;
 
-    const proxy = this.proxyProjFor(_.first(args.split(' ')).trim(), outDir);
+    args = this.filesStructure.clearArgsFrom(args);
+    let client = Helpers.removeSlashAtEnd(_.first((args || '').split(' '))) as any;
+    if (!client) {
+      client = this.smartContainerBuildTarget?.name;
+    }
+
+    const proxy = this.proxyProjFor(client, outDir);
     if (!proxy && this.isSmartContainer) {
       const tmp = (c) => `${config.frameworkName} build:app:watch ${c} ${args}`;
       Helpers.error(`

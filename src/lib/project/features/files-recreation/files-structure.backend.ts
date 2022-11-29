@@ -69,19 +69,31 @@ export class FilesStructure extends FeatureForProject {
     await this.init(args);
   }
 
+  clearArgsFrom(originalArgs: string, toClear: string[] = ['websql', 'skipNodeModules', 'skipCopyToSelection', 'skipSmartContainerDistBundleInit']) {
+    for (let index = 0; index < toClear.length; index++) {
+      const element = toClear[index];
+      originalArgs = originalArgs.replace(`--${element} true`, '')
+      originalArgs = originalArgs.replace(`--${element} false`, '')
+      originalArgs = originalArgs.replace(`--${element}=true`, '')
+      originalArgs = originalArgs.replace(`--${element}=false`, '')
+      originalArgs = originalArgs.replace(`--${element}`, '')
+      originalArgs = originalArgs.replace(`-${element}`, '')
+    }
+    return originalArgs;
+  }
+
   public async init(args: string, options?: InitOptions) {
     if (!args) {
       args = '';
     }
     options = this.fixOptionsArgs(options);
 
-
-
     if (!options.initiator) {
       options.initiator = this.project;
     }
     const { alreadyInitedPorjects, watch, watchOnly } = options;
-    let { skipNodeModules, websql, recrusive, env, struct }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
+    let { skipNodeModules, websql, recrusive, env, struct, skipSmartContainerDistBundleInit }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
+    args = this.clearArgsFrom(args);
 
     // THIS IS SLOW... BUT I CAN AFORD IT HERE
     if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {
@@ -138,6 +150,7 @@ export class FilesStructure extends FeatureForProject {
       Helpers.log(`Not inited yet... ${chalk.bold(this.project.genericName)} in ${this.project.location}`);
     }
 
+    this.project.quickFixes.removeAppFolder();
     this.project.quickFixes.missingSourceFolders();
     this.project.quickFixes.linkSourceOfItselfToNodeModules();
     this.project.quickFixes.missingAngularLibFiles();
@@ -150,7 +163,7 @@ export class FilesStructure extends FeatureForProject {
     }
 
     if (this.project.isWorkspace || this.project.isStandaloneProject) {
-      Helpers.info(`Initing project: ${chalk.bold(this.project.genericName)}  ${websql ? '[WEBSQL]' : ''}`);
+      Helpers.info(`Initing project: ${chalk.bold(this.project.genericName)}  ${this.project.location} ${websql ? '[WEBSQL]' : ''}`);
     }
 
     alreadyInitedPorjects.push(this.project)
@@ -267,11 +280,11 @@ export class FilesStructure extends FeatureForProject {
     this.handleSmartContainer(this.project, client);
 
 
-    if (this.project.isSmartContainer) {
+    if (this.project.isSmartContainer && !skipSmartContainerDistBundleInit) {
       //#region handle smart container
       Helpers.writeFile([this.project.location, 'angular.json'], this.angularJsonContainer);
-      await this.project.singluarBuild.init(watch, false, 'dist', client);
-      await this.project.singluarBuild.init(watch, false, 'bundle', client);
+      await this.project.singluarBuild.init(watch, false, 'dist', args, client);
+      await this.project.singluarBuild.init(watch, false, 'bundle', args, client);
       //#endregion
     }
 
@@ -296,6 +309,7 @@ export class FilesStructure extends FeatureForProject {
     if (this.project.isWorkspace) {
       this.project.recreateCodeWorkspace();
     }
+
 
     this.project.quickFixes.missingSourceFolders();
 
@@ -338,7 +352,7 @@ export class FilesStructure extends FeatureForProject {
     baseline.children.forEach(c => {
       const siteChild = path.join(this.project.location, c.name);
       if (!fse.existsSync(siteChild)) {
-        ProjectFactory.Instance.create({
+        ProjectFactory.Instance.createWorksapceOrStandalone({
           type: c._type,
           name: c.name,
           cwd: this.project.location,

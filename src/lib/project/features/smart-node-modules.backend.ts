@@ -89,6 +89,12 @@ export class SmartNodeModules extends FeatureForProject {
   }
   //#endregion
 
+  setToSmartContainer() {
+    this.project.packageJson.data.tnp.type = 'container';
+    this.project.packageJson.data.tnp.smart = true;
+    this.project.packageJson.save('setting container as smart')
+  }
+
   //#region smart node_modules exists for whole project
   public get exists() {
     return Helpers.exists(this.path);
@@ -229,7 +235,7 @@ export class SmartNodeModules extends FeatureForProject {
       });
       this.handlePackagesOverride();
     }
-    Helpers.info(`DONE SMART INSTALL  for ${this.project.genericName}`);
+    Helpers.success(`smart install done for ${this.project.genericName}`);
   }
   //#endregion
 

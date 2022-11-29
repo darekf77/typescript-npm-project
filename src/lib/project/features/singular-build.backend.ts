@@ -42,7 +42,6 @@ export class SingularBuild extends FeatureForProject {
 
     [
       'lib',
-      'app',
       'app.ts',
       'app.html',
       'app.css',
@@ -50,7 +49,7 @@ export class SingularBuild extends FeatureForProject {
     ].forEach(f => {
       const source = path.join(client.location, config.folder.src, f);
       const dest = path.join(destProjPath, config.folder.src, f);
-      if (['app', 'lib'].includes(f)) {
+      if (['lib'].includes(f)) {
         if (!Helpers.exists(source)) {
           Helpers.mkdirp(source);
         }
@@ -188,7 +187,7 @@ export class SingularBuild extends FeatureForProject {
   }
 
 
-  async init(watch: boolean, prod: boolean, outDir: Models.dev.BuildDir, _client?: string | Project) {
+  async init(watch: boolean, prod: boolean, outDir: Models.dev.BuildDir, args: string, _client?: string | Project) {
     if (this.project.isWorkspace) {
       await this.workspace(watch, prod);
     }
@@ -205,15 +204,35 @@ export class SingularBuild extends FeatureForProject {
       await c.filesStructure.init('');
     }
 
-    const client: Project = _.isString(_client) ? children.find(f => f.name === _client) : _client;
+    const clientFromArgs = Helpers.removeSlashAtEnd(_.first((args || '').split(' '))) as any;
+    let client: Project = children.find(f => f.name === _client || f.name === clientFromArgs);
+
+    const smartContainerBuildTarget = this.project.smartContainerBuildTarget;
+
+    if (!client && smartContainerBuildTarget) {
+      client = smartContainerBuildTarget;
+    }
 
     if (!client) {
-      Helpers.error(`Please specify client argument.. example:
-        ${config.frameworkName} build my-client-name // client needs to be smart container child
-        `, false, true);
+      if (clientFromArgs) {
+        Helpers.error(`${clientFromArgs} has been add into your container`, false, true)
+      } else {
+        Helpers.error(`
+
+        Please specify client argument.. example:
+          ${config.frameworkName} build my-client-name // client needs to be smart container child
+          `, false, true);
+      }
+
     }
 
     Helpers.log(`[singularbuildcontainer] children for build: \n\n${children.map(c => c.name)}\n\n`);
+
+    if (!smartContainerBuildTarget) {
+      this.project.packageJson.data.tnp.smartContainerBuildTarget = client.name;
+      this.project.packageJson.save('updating smart container target');
+    }
+
     const singularWatchProj = await this.createSingluarTargeProjFor(this.project, client, outDir, watch);
 
     Helpers.log(`[singular build] init structure ${!!singularWatchProj}`);

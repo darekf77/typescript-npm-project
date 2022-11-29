@@ -92,7 +92,7 @@ export class QuickFixes extends FeatureForProject {
   }
 
   public missingAngularLibFiles() {
-    Helpers.log(`[quick fixes] missing angular lib fles start`);
+    Helpers.taskStarted(`[quick fixes] missing angular lib fles start`, true);
     if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
 
       const indexTs = crossPlatformPath(path.join(this.project.location, config.folder.src, 'lib/index.ts'));
@@ -122,7 +122,7 @@ export class QuickFixes extends FeatureForProject {
     }
 
 
-    Helpers.log(`[quick fixes] missing angular lib fles end`)
+    Helpers.taskDone(`[quick fixes] missing angular lib fles end`)
   }
 
   badTypesInNodeModules() {
@@ -280,11 +280,42 @@ export default _default;
     //   });
   }
 
+  removeAppFolder() {
+    if (this.project.typeIsNot('isomorphic-lib') && this.project.frameworkVersionAtLeast('v3')) {
+      return;
+    }
+
+    const appFolder = crossPlatformPath(path.join(
+      this.project.location,
+      config.folder.src,
+      'app',
+    ))
+
+    const appFolderWithIndex = crossPlatformPath(path.join(
+      appFolder,
+      'index.ts',
+    ));
+
+    if (!Helpers.exists(appFolderWithIndex)) {
+
+      const arrEmp = [
+        ...Helpers.filesFrom(appFolder, true),
+        ...Helpers.linksToFolderFrom(appFolder),
+        ...Helpers.foldersFrom(appFolder),
+      ];
+      if (arrEmp.length === 0) {
+        Helpers.remove(appFolder, true);
+      }
+    }
+
+
+  }
+
   public missingSourceFolders() { /// QUCIK_FIX make it more generic
     if (this.project.frameworkVersionEquals('v1')) {
       return;
     }
-    Helpers.log(`[quick fixes] missing source folder start`)
+    Helpers.taskStarted(`[quick fixes] missing source folder start`, true)
     if (!fse.existsSync(this.project.location)) {
       return;
     }
@@ -365,7 +396,7 @@ export default _default;
       }
 
     }
-    Helpers.log(`[quick fixes] missing source folder end`)
+    Helpers.taskDone(`[quick fixes] missing source folder end`)
   }
 
   public get nodeModulesReplacementsZips() {

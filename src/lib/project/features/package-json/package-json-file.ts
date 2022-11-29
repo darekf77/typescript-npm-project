@@ -297,6 +297,11 @@ function consistencyFixes(
     additionalSaveRequired = true;
   }
 
+  if (_.isUndefined(content[tnpProperty].smartContainerBuildTarget)) {
+    content[tnpProperty].smartContainerBuildTarget = '';
+    additionalSaveRequired = true;
+  }
+
   if (_.isUndefined(content[tnpProperty].linkedRepos)) {
     content[tnpProperty].linkedRepos = [];
     additionalSaveRequired = true;

@@ -4,10 +4,10 @@ import { path } from 'tnp-core';
 //#endregion
 import { _ } from 'tnp-core';
 import { config, ConfigModels } from 'tnp-config';
-import type { Project } from './project';
+import { Project } from './project';
 import { Helpers, Project as $Project } from 'tnp-helpers';
 import { Models } from 'tnp-models';
-
+const forStandAloneSrc = `${config.folder.src}-for-standalone`;
 export abstract class FolderProject {
 
   abstract location: string;
@@ -29,6 +29,25 @@ export abstract class FolderProject {
 
   hasChild(this: Project, child: Project) {
     return !_.isUndefined(this.children.find(c => c.name === child?.name));
+  }
+
+  // @ts-ignore
+  get smartContainerBuildTarget(this: Project) {
+    if (Helpers.isBrowser) {
+      return this.browser.smartContainerBuildTarget as any;
+    }
+    //#region @backend
+    const children = this.children;
+    let target = children
+      .filter(c => c.typeIs('isomorphic-lib'))
+      .find(c => c.name === this.packageJson.smartContainerBuildTarget);
+
+    if (!target && children.length === 1) {
+      target = _.first(children);
+    }
+
+    return target;
+    //#endregion
   }
 
   // @ts-ignore
@@ -118,28 +137,41 @@ export abstract class FolderProject {
   }
   //#endregion
 
+
+
+  addSourcesFromCore(this: Project) {
+    const corePath = Project.by(this._type, this._frameworkVersion).location
+
+    const srcInCore = path.join(corePath, config.folder.src);
+    const srcForStandAloenInCore = path.join(corePath, forStandAloneSrc);
+
+    const dest = path.join(this.location, config.folder.src);
+    const destForStandalone = path.join(this.location, forStandAloneSrc);
+
+    if (Helpers.exists(srcInCore)) {
+      Helpers.copy(srcInCore, dest, { recursive: true, overwrite: true });
+    }
+
+    if (Helpers.exists(srcForStandAloenInCore)) {
+      Helpers.copy(srcForStandAloenInCore, destForStandalone, { recursive: true, overwrite: true });
+    }
+  }
+
   //#region @backend
   replaceSourceForStandalone(this: Project) {
-    [
-      config.folder.src,
-      config.folder.components,
-    ].forEach(folderName => {
-      const orgSource = path.join(this.location, folderName);
-      Helpers.removeFolderIfExists(orgSource);
-      const standalone = path.join(this.location, `${folderName}-for-standalone`);
-      if (Helpers.exists(standalone)) {
-        Helpers.move(standalone, orgSource)
-      }
-    })
+
+    const folderName = config.folder.src;
+    const orgSource = path.join(this.location, folderName);
+    Helpers.removeFolderIfExists(orgSource);
+    const standalone = path.join(this.location, forStandAloneSrc);
+    if (Helpers.exists(standalone)) {
+      Helpers.move(standalone, orgSource)
+    }
+
   }
   removeStandaloneSources(this: Project) {
-    [
-      config.folder.src,
-      config.folder.components,
-    ].forEach(folderName => {
-      const standalone = path.join(this.location, `${folderName}-for-standalone`);
-      Helpers.removeFolderIfExists(standalone);
-    })
+    const standalone = path.join(this.location, forStandAloneSrc);
+    Helpers.removeFolderIfExists(standalone);
   }
   //#endregion
 
@@ -295,7 +327,7 @@ export abstract class FolderProject {
     relativePathToFolder = relativePathToFolder.replace(/^\//, '')
     const location = this.location;
     const p = path.join(location, relativePathToFolder);
-    Helpers.removeFolderIfExists(p);
+    Helpers.remove(p, true);
   }
   //#endregion
 
@@ -304,17 +336,17 @@ export abstract class FolderProject {
     if (!this.isStandaloneProject) {
       return;
     }
-    Helpers.log(`Reseting symbolic links from node_mouels.. start..`);
+    Helpers.log(`Reseting symbolic links from node_mouels..start..`);
     const node_modules = path.join(this.location, config.folder.node_modules);
     const folders = !fse.existsSync(node_modules) ? [] : fse.readdirSync(node_modules);
     folders
       .map(f => path.join(node_modules, f))
       .filter(f => fse.lstatSync(f).isSymbolicLink())
       .forEach(f => {
-        Helpers.log(`Deleting link  node_modules/${path.basename(f)}`);
+        Helpers.log(`Deleting link  node_modules / ${ path.basename(f) }`);
         Helpers.remove(f);
       });
-    Helpers.log(`Reseting symbolic links from node_mouels.. DONE `);
+    Helpers.log(`Reseting symbolic links from node_mouels..DONE`);
   }
   //#endregion
 
@@ -323,7 +355,7 @@ export abstract class FolderProject {
     await this.compilerCache.unsetData()
     this.quickFixes.removeUncessesaryFiles();
 
-    glob.sync(`${this.location}/*.filetemplate`).forEach(fileTemplate => {
+    glob.sync(`${ this.location }/*.filetemplate`).forEach(fileTemplate => {
       Helpers.remove(fileTemplate);
       Helpers.remove(fileTemplate.replace('.filetemplate', ''));
     });

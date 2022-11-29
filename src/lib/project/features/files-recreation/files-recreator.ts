@@ -44,7 +44,7 @@ export class FilesRecreator extends FeatureForProject {
       return;
     }
 
-    if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
+    if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib') && !this.project?.parent?.isSmartContainer) {
       await this.project.insideStructure.recrate('dist');
       await this.project.insideStructure.recrate('bundle');
     }
@@ -58,6 +58,11 @@ export class FilesRecreator extends FeatureForProject {
     this.customFolder();
     Helpers.log('recreation end')
 
+  }
+
+  initVscode() {
+    this.vscode.settings.excludedFiles(true);
+    this.vscode.settings.colorsFromWorkspace();
   }
 
 
@@ -615,7 +620,7 @@ ${coreFiles}
           const sour = path.join(folderAA, rp);
           const dest = path.join(folderForProject, rp);
           Helpers.log('SOUR' + sour)
-          Helpers.log('DEST'+ dest)
+          Helpers.log('DEST' + dest)
           if (!fse.lstatSync(sour).isDirectory()) {
             Helpers.copyFile(sour, dest);
           }

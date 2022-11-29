@@ -138,7 +138,7 @@ function nodeMOdulesOK(pathToFolder: string | string[], moreThan = 1) {
     pathToFolder = path.join(...pathToFolder) as string;
   }
   let res = false;
-  Helpers.log(`[node-modules] checking if exists in: ${pathToFolder}`)
+  Helpers.log(`[node-modules] checking if exists in: ${pathToFolder}`,1)
   if (Helpers.exists(pathToFolder)) {
     const count = {
       unknowFilesOrUnexitedLInks: 0,

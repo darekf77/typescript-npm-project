@@ -122,7 +122,7 @@ export class ProjectWorkspace
     })}`);
 
     if (watch) {
-      await this.singluarBuild.init(watch, prod, buildOptions.outDir);
+      await this.singluarBuild.init(watch, prod, buildOptions.outDir, args);
     } else {
       PROGRESS_DATA.log({ value: 0, msg: `Process started` });
       for (let index = 0; index < projects.length; index++) {
