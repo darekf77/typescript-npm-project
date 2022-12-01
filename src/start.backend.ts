@@ -1,6 +1,6 @@
 import { path, Helpers } from 'tnp-core';
 import { fse, crossPlatformPath } from 'tnp-core'
-import { ConfigModels, LibTypeArr } from 'tnp-config';
+
 declare const global: any;
 if (global.globalSystemToolMode) {
 
@@ -66,7 +66,6 @@ import axios from 'axios';
  */
 axios.defaults.timeout = config.CONST.BACKEND_HTTP_REQUEST_TIMEOUT; // TODO QUICK_FIX
 
-import chalk from 'chalk';
 import { Project } from './lib/project';
 // import { Ora } from 'ora';
 
@@ -78,6 +77,7 @@ import { TnpDB } from 'tnp-db';
 
 import { CLASS } from 'typescript-class-helpers';
 import { Ora } from 'ora';
+import { CLI } from 'tnp-cli';
 //#endregion
 
 
@@ -258,7 +258,7 @@ export async function start(
                 // process.exit(0)
                 Helpers.log('--- recognized command ---' + CLASS.getName(vFn))
                 global?.spinner?.stop();
-                vFn.apply(null, [globalArgumentsParser(check.restOfArgs)]);
+                vFn.apply(null, [TnpHelpers.cliTool.globalArgumentsParserTnp(check.restOfArgs)]);
                 breakLoop = true;
                 break;
               }
@@ -279,9 +279,9 @@ export async function start(
   } else {
     // Helpers.log("NOT RECOGNIZED !!")
     if (Array.isArray(argsv) && argsv.length == 3) {
-      Helpers.error(`\n${chalk.red('Not recognized command')}: ${chalk.bold(argsv[2])}\n`, false, true);
+      Helpers.error(`\n${CLI.chalk.red('Not recognized command')}: ${CLI.chalk.bold(argsv[2])}\n`, false, true);
     } else if (Array.isArray(argsv) && argsv.length >= 3) {
-      Helpers.error(`\n${chalk.red('Not recognized arguments:')} ${chalk.bold(argsv.slice(2).join(' '))}\n`, false, true);
+      Helpers.error(`\n${CLI.chalk.red('Not recognized arguments:')} ${CLI.chalk.bold(argsv.slice(2).join(' '))}\n`, false, true);
     } else {
       const p = void 0; //(Project.Current as Project);
 
@@ -295,7 +295,7 @@ export async function start(
         //   process.exit(1)
         // }
       } else {
-        Helpers.error(`\n${chalk.cyan('Please use help:')} ${chalk.bold(`${config.frameworkName} run help`)}\n`, false, true);
+        Helpers.error(`\n${CLI.chalk.cyan('Please use help:')} ${CLI.chalk.bold(`${config.frameworkName} run help`)}\n`, false, true);
       }
     }
   }
@@ -304,130 +304,3 @@ export async function start(
 }
 
 
-
-//#region remove non interactive mode args
-export function removeArg(arg: string, argsv: string[]) {
-  argsv = argsv.filter((f, i) => {
-    const regexString = `^\\-\\-(${arg}$|${arg}\\=)+`;
-    // Helpers.log(regexString)
-    if ((new RegExp(regexString)).test(f)) {
-      // Helpers.log(`true: ${f}`)
-      const nextParam = argsv[i + 1];
-      if (nextParam && !nextParam.startsWith(`--`)) {
-        argsv[i + 1] = '';
-      }
-      return false;
-    } else {
-      // Helpers.log(`false: ${f}`)
-    }
-    return true;
-  }).filter(f => !!f);
-  return argsv;
-}
-//#endregion
-
-//#region parse global arguments
-export function globalArgumentsParser(argsv: string[]) {
-
-  Helpers.log(`[${config.frameworkName}] Fixing global arguments started...`)
-  let options = require('minimist')(argsv);
-  const toCheck = {
-    'tnpNonInteractive': void 0,
-    'findNearestProject': void 0,
-    'findNearestProjectWithGitRoot': void 0,
-    'findNearestProjectType': void 0,
-    'findNearestProjectTypeWithGitRoot': void 0,
-    'cwd': void 0
-  };
-  Object.keys(toCheck).forEach(key => {
-    toCheck[key] = options[key];
-  });
-  options = _.cloneDeep(toCheck);
-  let {
-    tnpNonInteractive,
-    findNearestProject,
-    findNearestProjectWithGitRoot,
-    findNearestProjectType,
-    findNearestProjectTypeWithGitRoot,
-    cwd
-  } = options;
-
-  Object
-    .keys(options)
-    .filter(key => key.startsWith('tnp'))
-    .forEach(key => {
-      options[key] = !!options[key];
-      global[key] = options[key];
-      // Helpers.log(`[start.backend] assigned to global: ${key}:${global[key]}`)
-    });
-
-
-
-  if (global.tnpNoColorsMode) {
-    chalk.level = 0;
-  }
-
-  let cwdFromArgs = cwd;
-  const findProjectWithGitRoot = !!findNearestProjectWithGitRoot ||
-    !!findNearestProjectTypeWithGitRoot;
-
-  if (_.isBoolean(findNearestProjectType)) {
-    Helpers.error(`argument --findNearestProjectType `
-      + `needs to be library type:\n ${LibTypeArr.join(', ')}`, false, true);
-  }
-  if (_.isBoolean(findNearestProjectTypeWithGitRoot)) {
-    Helpers.error(`argument --findNearestProjectTypeWithGitRoot `
-      + `needs to be library type:\n ${LibTypeArr.join(', ')}`, false, true);
-  }
-
-  if (!!findNearestProjectWithGitRoot) {
-    findNearestProject = findNearestProjectWithGitRoot;
-  }
-  if (_.isString(findNearestProjectTypeWithGitRoot)) {
-    findNearestProjectType = findNearestProjectTypeWithGitRoot;
-  }
-
-  if (_.isString(cwdFromArgs)) {
-    if (findNearestProject || _.isString(findNearestProjectType)) {
-      // Helpers.log('look for nearest')
-      var nearest = Project.nearestTo<Project>(cwdFromArgs, {
-        type: findNearestProjectType,
-        findGitRoot: findProjectWithGitRoot,
-      });
-      if (!nearest) {
-        Helpers.error(`Not able to find neerest project for arguments: [\n ${argsv.join(',\n')}\n]`, false, true)
-      }
-    }
-    if (nearest) {
-      cwdFromArgs = nearest.location;
-    }
-    if (fse.existsSync(cwdFromArgs) && !fse.lstatSync(cwdFromArgs).isDirectory()) {
-      cwdFromArgs = path.dirname(cwdFromArgs);
-    }
-    if (fse.existsSync(cwdFromArgs) && fse.lstatSync(cwdFromArgs).isDirectory()) {
-      process.chdir(cwdFromArgs);
-    } else {
-      Helpers.error(`[${config.frameworkName}] Incorrect --cwd argument `
-        + `for args: [\n ${argsv.join(',\n')}\n]`, false, true)
-    }
-
-  }
-  argsv = removeArg('findNearestProjectType', argsv);
-
-  // process.exit(0)
-  Object.keys(toCheck).forEach(argName => {
-    argsv = removeArg(argName, argsv);
-  });
-
-  // Object
-  //   .keys(global)
-  //   .filter(key => key.startsWith('tnp'))
-  //   .forEach(key => {
-  //     Helpers.log(`globa.${key} = ${global[key]}`)
-  //   })
-  // Helpers.log('after remove', argsv)
-  // process.exit(0)
-  Helpers.log(`Fixing global arguments finish.`)
-  return argsv.join(' ');
-}
-//#endregion

@@ -158,7 +158,8 @@ export class CopyManagerStandalone extends CopyManager {
     let toReplaceString1 = `"${toReplaceString2}`;
 
 
-    if (isBrowser) { // TODO replace browser doesnt make sense ?? - for now yes
+    if (isBrowser) {
+      // TODO is angular maps not working in chrome debugger
       // content = content.replace(regex1, `"./${config.folder.src}`);
       // content = content.replace(regex2, config.folder.src);
     } else {
@@ -500,17 +501,20 @@ export class CopyManagerStandalone extends CopyManager {
       specyficFileRelativePath,
     ));
 
-    const fixedContentNonCLI = this.changedJsMapFilesInternalPathesForDebug(
-      Helpers.readFile(absMapFilePathInLocalProjNodeModulesPackage),
-      isForBrowser,
-      false,
-      absMapFilePathInLocalProjNodeModulesPackage
-    );
+    if (Helpers.exists(absMapFilePathInLocalProjNodeModulesPackage)) {
+      const fixedContentNonCLI = this.changedJsMapFilesInternalPathesForDebug(
+        Helpers.readFile(absMapFilePathInLocalProjNodeModulesPackage),
+        isForBrowser,
+        false,
+        absMapFilePathInLocalProjNodeModulesPackage
+      );
 
-    Helpers.writeFile(
-      absMapFilePathInLocalProjNodeModulesPackage,
-      fixedContentNonCLI,
-    );
+      Helpers.writeFile(
+        absMapFilePathInLocalProjNodeModulesPackage,
+        fixedContentNonCLI,
+      );
+    }
+
     //#endregion
   }
   //#endregion
@@ -535,17 +539,20 @@ export class CopyManagerStandalone extends CopyManager {
       specyficFileRelativePath,
     );
 
-    const fixedContentCLIDebug = this.changedJsMapFilesInternalPathesForDebug(
-      Helpers.readFile(monitoredOutDirFileToReplaceBack),
-      isForBrowser,
-      true,
-      monitoredOutDirFileToReplaceBack,
-    );
+    if (Helpers.exists(monitoredOutDirFileToReplaceBack)) {
+      const fixedContentCLIDebug = this.changedJsMapFilesInternalPathesForDebug(
+        Helpers.readFile(monitoredOutDirFileToReplaceBack),
+        isForBrowser,
+        true,
+        monitoredOutDirFileToReplaceBack,
+      );
 
-    Helpers.writeFile(
-      monitoredOutDirFileToReplaceBack,
-      fixedContentCLIDebug,
-    );
+      Helpers.writeFile(
+        monitoredOutDirFileToReplaceBack,
+        fixedContentCLIDebug,
+      );
+    }
+
     //#endregion
   }
   //#endregion

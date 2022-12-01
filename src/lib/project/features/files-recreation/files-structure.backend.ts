@@ -69,18 +69,6 @@ export class FilesStructure extends FeatureForProject {
     await this.init(args);
   }
 
-  clearArgsFrom(originalArgs: string, toClear: string[] = ['websql', 'skipNodeModules', 'skipCopyToSelection', 'skipSmartContainerDistBundleInit']) {
-    for (let index = 0; index < toClear.length; index++) {
-      const element = toClear[index];
-      originalArgs = originalArgs.replace(`--${element} true`, '')
-      originalArgs = originalArgs.replace(`--${element} false`, '')
-      originalArgs = originalArgs.replace(`--${element}=true`, '')
-      originalArgs = originalArgs.replace(`--${element}=false`, '')
-      originalArgs = originalArgs.replace(`--${element}`, '')
-      originalArgs = originalArgs.replace(`-${element}`, '')
-    }
-    return originalArgs;
-  }
 
   public async init(args: string, options?: InitOptions) {
     if (!args) {
@@ -93,7 +81,7 @@ export class FilesStructure extends FeatureForProject {
     }
     const { alreadyInitedPorjects, watch, watchOnly } = options;
     let { skipNodeModules, websql, recrusive, env, struct, skipSmartContainerDistBundleInit }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
-    args = this.clearArgsFrom(args);
+    args = Helpers.cliTool.removeArgFromString(args);
 
     // THIS IS SLOW... BUT I CAN AFORD IT HERE
     if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {
@@ -102,7 +90,7 @@ export class FilesStructure extends FeatureForProject {
         this.project.packageJson.updateHooks()
       }
       this.project.notAllowedFiles().forEach(f => {
-        // Helpers.log(`[init] removing not allowed ${path.basename(f)}`)
+        // Helpers.log(`[init] removing not allowed ${ path.basename(f) } `)
         Helpers.removeFileIfExists(path.join(this.project.location, f));
       });
     }
@@ -127,27 +115,27 @@ export class FilesStructure extends FeatureForProject {
       } else {
         if (this.project.isGenerated) {
           args += `${args} --env=static`;
-          Helpers.log(`ENVIRONMENT (for local static build): "${chalk.bold('static')}"`
+          Helpers.log(`ENVIRONMENT(for local static build): "${chalk.bold('static')}"`
             + ` initing for ${this.project.genericName}`)
         } else {
           args += `${args} --env=local`;
-          Helpers.log(`ENVIRONMENT (for local watch development): "${chalk.bold('local')}"`
+          Helpers.log(`ENVIRONMENT(for local watch development): "${chalk.bold('local')}"`
             + ` initing for ${this.project.genericName}`)
         }
       }
     }
 
-    Helpers.log(`[init] adding project is not exists... (${this.project.genericName}) `)
+    Helpers.log(`[init] adding project is not exists... (${this.project.genericName})`)
     const db = await TnpDB.Instance();
     // Helpers.log(`[init] db initined... `)
     await db.addProjectIfNotExist(this.project as any);
-    Helpers.log(`[init] adding project is not exists...done (${this.project.genericName})  `)
+    Helpers.log(`[init] adding project is not exists...done(${this.project.genericName})  `)
 
     if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {
       Helpers.log(`Already inited project: ${chalk.bold(this.project.genericName)} - skip`);
       return;
     } else {
-      Helpers.log(`Not inited yet... ${chalk.bold(this.project.genericName)} in ${this.project.location}`);
+      Helpers.log(`Not inited yet... ${chalk.bold(this.project.genericName)} in ${this.project.location} `);
     }
 
     this.project.quickFixes.removeAppFolder();
@@ -163,11 +151,11 @@ export class FilesStructure extends FeatureForProject {
     }
 
     if (this.project.isWorkspace || this.project.isStandaloneProject) {
-      Helpers.info(`Initing project: ${chalk.bold(this.project.genericName)}  ${this.project.location} ${websql ? '[WEBSQL]' : ''}`);
+      Helpers.info(`Initing project: ${chalk.bold(this.project.genericName)}  ${this.project.location} ${websql ? '[WEBSQL]' : ''} `);
     }
 
     alreadyInitedPorjects.push(this.project)
-    Helpers.log(`Push to alread inited ${this.project.genericName} from ${this.project.location}`)
+    Helpers.log(`Push to alread inited ${this.project.genericName} from ${this.project.location} `)
 
     //#region handle init of container
     if (this.project.isContainer) {
@@ -177,7 +165,7 @@ export class FilesStructure extends FeatureForProject {
         const containerChildren = this.project.children.filter(c => {
           Helpers.log('checking if git repo')
           if (c.git.isGitRepo) {
-            Helpers.log(`[init] not initing recrusively, it is git repo ${c.name}`)
+            Helpers.log(`[init] not initing recrusively, it is git repo ${c.name} `)
             return false;
           }
           Helpers.log('checking if git repo - done')
@@ -226,10 +214,10 @@ export class FilesStructure extends FeatureForProject {
 
     //#region report progress initing project
     if (this.project.isWorkspaceChildProject) {
-      Helpers.info(`Initing project (workspace child): ${chalk.bold(this.project.genericName)}`);
+      Helpers.info(`Initing project(workspace child): ${chalk.bold(this.project.genericName)} `);
     }
     if (global.tnpNonInteractive) {
-      PROGRESS_DATA.log({ msg: `Initing project:  "${this.project.genericName}" started` });
+      PROGRESS_DATA.log({ msg: `Initing project: "${this.project.genericName}" started` });
     }
     //#endregion
 
@@ -259,7 +247,7 @@ export class FilesStructure extends FeatureForProject {
             Helpers.mkdirp(path.join(this.project.location, config.folder.node_modules));
           }
         } else {
-          await this.project.npmPackages.installProcess(`initialize procedure of ${this.project.name}`);
+          await this.project.npmPackages.installProcess(`initialize procedure of ${this.project.name} `);
         }
       } else {
         if (this.project.isStandaloneProject && this.project.frameworkVersionAtLeast('v2')) {
@@ -275,7 +263,16 @@ export class FilesStructure extends FeatureForProject {
 
     //#endregion
 
-    const client = Helpers.removeSlashAtEnd(_.first((args || '').split(' '))) as any;
+    let client = Helpers.removeSlashAtEnd(_.first((args || '').split(' '))) as any;
+    const smartContainerBuildTarget = (
+      this.project.isSmartContainerChild
+        ? this.project?.parent.smartContainerBuildTarget
+        : (this.project.isSmartContainer ? this.project.smartContainerBuildTarget : void 0)
+    )
+
+    if (!client && smartContainerBuildTarget) {
+      client = smartContainerBuildTarget.name;
+    }
 
     this.handleSmartContainer(this.project, client);
 
@@ -341,7 +338,7 @@ export class FilesStructure extends FeatureForProject {
         // process.exit(0)
       }
     }
-    Helpers.log(`Init DONE for project: ${chalk.bold(this.project.genericName)}`);
+    Helpers.log(`Init DONE for project: ${chalk.bold(this.project.genericName)} `);
   }
 
 
@@ -430,9 +427,18 @@ export class FilesStructure extends FeatureForProject {
     if (!project.isSmartContainer && !project.isSmartContainerChild) {
       return;
     }
+    if (!client) {
+      Helpers.error(`Trying to init project ${project.name} without target.`, false, true);
+    }
+
     const parent = project.isSmartContainerChild ? project.parent : project;
 
     const nodeModulesContainer = path.join(parent.location, config.folder.node_modules, `@${parent.name}`);
+
+    if(Helpers.isUnexistedLink(nodeModulesContainer)) {
+       Helpers.remove(nodeModulesContainer);
+    }
+
     if (Helpers.isExistedSymlink(nodeModulesContainer) && !Helpers.isFolder(nodeModulesContainer)) {
       Helpers.remove(nodeModulesContainer);
     }
@@ -463,7 +469,7 @@ export class FilesStructure extends FeatureForProject {
     //   // FOR CONTAINER AND CHILD DIFFEREN LOCATION OF DIST
     //   if (project.isSmartContainer) {
     //     // dist/codete-blog-ngrx/ngrx-process/tmp-src-dist/libs // TODO QUICK_FIX
-    //     // const source = path.join(project.location, config.folder.dist, project.name, child.name, `tmp-src-dist`, 'libs', child.name);
+    //     // const source = path.join(project.location, config.folder.dist, project.name, child.name, `tmp - src - dist`, 'libs', child.name);
     //     // const dest = path.join(nodeModulesContainer, child.name, config.folder.browser);
     //     // Helpers.remove(dest);
     //     // Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true })

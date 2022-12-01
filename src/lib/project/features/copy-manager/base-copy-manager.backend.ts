@@ -336,6 +336,8 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       //#region handle all files
       log.data('copying all files')
       this.copyCompiledSourcesAndDeclarations(destination, isTempLocalProj);
+      log.d('copying surce maps')
+      this.copySourceMaps(destination, isTempLocalProj);
 
       if (this.watch || isTempLocalProj) {
         log.data('addiing links')
@@ -344,9 +346,6 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
         log.data('removing links');
         this.removeSourceSymlinks(destination)
       }
-
-      log.d('copying surce maps')
-      this.copySourceMaps(destination, isTempLocalProj);
 
       // TODO not working werid tsc issue with browser/index
       // {const projectOudBorwserSrc = path.join(destination.location,

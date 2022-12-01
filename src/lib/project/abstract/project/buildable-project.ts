@@ -18,10 +18,10 @@ import { CopyManagerOrganization } from '../../features/copy-manager/copy-manage
 
 export abstract class BuildableProject {
 
-
   //#region @backend
   public _buildOptions?: BuildOptions;
 
+  //#region getters
   // @ts-ignore
   get availableIsomorphicPackagesInNodeModules(this: Project): string[] {
     const jsonPath = path.join(this.location, PackagesRecognition.FILE_NAME_ISOMORPHIC_PACKAGES);
@@ -54,7 +54,9 @@ export abstract class BuildableProject {
     }
     return [];
   }
+  //#endregion
 
+  //#region select projects to copyto
   /**
    * return copyto array with absulute pathes
    */
@@ -117,6 +119,8 @@ export abstract class BuildableProject {
 
     return (result as Project[]).map(p => (p as Project).location);
   }
+  //#endregion
+
   //#endregion
 
   //#region @backend
@@ -329,7 +333,8 @@ export abstract class BuildableProject {
           const projectCurrent = this;
           const projectName = projectCurrent.name;
           const what = path.normalize(`${project.location}/${config.folder.node_modules}/${projectName}`);
-          Helpers.info(`\n\n${chalk.bold('+ After each build finish')} ${Helpers.formatPath(what)} will be update.`);
+
+          Helpers.info(`${chalk.bold('+ After each build finish')} ${Helpers.formatPath(what)} will be update.`);
         });
       }
 
@@ -348,7 +353,7 @@ export abstract class BuildableProject {
       if (f.typeIs('angular-lib', 'isomorphic-lib')) {
         return true;
       }
-      if (f.isContainerCoreProject || f.isSmartContainer) {
+      if (f.isContainer) {
         return true;
       }
       return false;

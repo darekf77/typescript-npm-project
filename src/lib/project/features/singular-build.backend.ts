@@ -203,7 +203,7 @@ export class SingularBuild extends FeatureForProject {
       const c = children[index];
       await c.filesStructure.init('');
     }
-
+    args = Helpers.cliTool.removeArgFromString(args);
     const clientFromArgs = Helpers.removeSlashAtEnd(_.first((args || '').split(' '))) as any;
     let client: Project = children.find(f => f.name === _client || f.name === clientFromArgs);
 
@@ -215,7 +215,7 @@ export class SingularBuild extends FeatureForProject {
 
     if (!client) {
       if (clientFromArgs) {
-        Helpers.error(`${clientFromArgs} has been add into your container`, false, true)
+        Helpers.error(`${clientFromArgs} hasn't been add into your container`, false, true)
       } else {
         Helpers.error(`
 

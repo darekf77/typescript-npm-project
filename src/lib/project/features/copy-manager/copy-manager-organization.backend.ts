@@ -67,6 +67,24 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     super.recreateTempProj();
   }
 
+  _copyBuildedDistributionTo(
+    destination: Project,
+    options?: {
+      specyficFileRelativePath?: string,
+      outDir?: Models.dev.BuildDir,
+      event?: any,
+      files?: string[]
+    }
+  ) {
+    super._copyBuildedDistributionTo(destination, options);
+    if (destination.location === this.localTempProjPath) {
+      const nodeModules = this.project.node_modules.pathFor(this.rootPackageName);
+      Helpers.remove(nodeModules);
+      Helpers.createSymLink(this.localTempProj.node_modules.pathFor(this.rootPackageName), nodeModules);
+    }
+  }
+
+
   //#region init watching
   public initWatching() {
     const monitoredOutDir = this.monitoredOutDir;
@@ -177,10 +195,6 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     isForCliDebuggerToWork: boolean,
     filePath: string,
   ): string {
-    if (!content) { // additiaonal thing are added to (dist|bundle)
-      debugger;     // QUICK FIX below =@LAST
-    }
-    content = content ? content : '';
 
     let toReplaceString2 = isBrowser
       ? `../tmp-libs-for-${this.outDir}/${this.project.name}/projects/${this.project.name}/${config.folder.src}`
@@ -194,17 +208,13 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     const regex1 = new RegExp(Helpers.escapeStringForRegEx(toReplaceString1) + addon, 'g');
     const regex2 = new RegExp(Helpers.escapeStringForRegEx(toReplaceString2) + addon, 'g');
 
-    if (isBrowser) { // TODO replace browser doesnt make sense ?? - for now yes
+    if (isBrowser) {
+      // TODO is angular maps not working in chrome debugger (the did not work whe switch lazy modules)
       // content = content.replace(regex1, `"./${config.folder.src}`);
       // content = content.replace(regex2, config.folder.src);
     } else {
       if (isForCliDebuggerToWork) {
-        // @LAST THING TO DO:
-        // 1. target/dist map files should be chaning correectlhy
-        // 2. handle single files
-        // 3. replace d.ts from no-cuts in normal dist or everywhere when copyto
-        // 4. check if debugging is working
-        content = super.changedJsMapFilesInternalPathesForDebug(content, isBrowser, isForCliDebuggerToWork, filePath);
+        // I am not allowing organizaition as cli tool
       } else {
         content = content.replace(regex1, `"./${config.folder.src}/lib`);
         content = content.replace(regex2, `${config.folder.src}/lib`);
@@ -410,6 +420,7 @@ export * from './${config.file.public_api}';
     destination: Project,
     isTempLocalProj: boolean
   ) {
+    // TODO LAST copy app.ts
     for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
       const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
 
@@ -422,7 +433,6 @@ export * from './${config.file.public_api}';
         //#endregion
       }
     }
-    console.log('done')
   }
   //#endregion
 
@@ -605,17 +615,19 @@ export * from './${config.file.public_api}';
       specyficFileRelativePath,
     );
 
-    const fixedContentCLIDebug = this.changedJsMapFilesInternalPathesForDebug(
-      Helpers.readFile(monitoredOutDirFileToReplaceBack),
-      isForBrowser,
-      true,
-      monitoredOutDirFileToReplaceBack,
-    );
+    if(Helpers.exists(monitoredOutDirFileToReplaceBack)) {
+      const fixedContentCLIDebug = this.changedJsMapFilesInternalPathesForDebug(
+        Helpers.readFile(monitoredOutDirFileToReplaceBack),
+        isForBrowser,
+        true,
+        monitoredOutDirFileToReplaceBack,
+      );
 
-    Helpers.writeFile(
-      monitoredOutDirFileToReplaceBack,
-      fixedContentCLIDebug,
-    );
+      Helpers.writeFile(
+        monitoredOutDirFileToReplaceBack,
+        fixedContentCLIDebug,
+      );
+    }
     //#endregion
   }
   //#endregion
