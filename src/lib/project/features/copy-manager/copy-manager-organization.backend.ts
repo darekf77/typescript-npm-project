@@ -336,6 +336,9 @@ export * from './${config.file.public_api}';
   writeSpecyficForChildDtsFiles(destination: Project, rootPackageNameForChildBrowser: string, monitorDirForModuleBrowser: string) {
     const pkgLocInDestNodeModulesForChildBrowser = destination.node_modules.pathFor(rootPackageNameForChildBrowser);
     const filter = Helpers.filterDontCopy(this.sourceFolders, monitorDirForModuleBrowser);
+    // console.log('COPY', {
+    //   monitorDirForModuleBrowser, pkgLocInDestNodeModulesForChildBrowser
+    // })
     this.removeSourceLinksFolders(pkgLocInDestNodeModulesForChildBrowser);
     Helpers.copy(monitorDirForModuleBrowser, pkgLocInDestNodeModulesForChildBrowser, {
       copySymlinksAsFiles: false,
@@ -378,7 +381,9 @@ export * from './${config.file.public_api}';
     if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist|bundle)
       CopyMangerHelpers.fixingDtsImports(monitorDirForModuleBrowser, this.isomorphicPackages);
     }
-    this.writeSpecyficForChildDtsFiles(destination, rootPackageNameForChildBrowser, monitorDirForModuleBrowser);
+    if (child.name !== this.targetProjName) { // target is in lib.... -> no need for target also being in libs
+      this.writeSpecyficForChildDtsFiles(destination, rootPackageNameForChildBrowser, monitorDirForModuleBrowser);
+    }
   }
   //#endregion
 
