@@ -7,6 +7,7 @@ import { CLASS } from "typescript-class-helpers";
 import { Project } from "../../abstract/project/project";
 import { CopyMangerHelpers } from "./copy-manager-helpers.backend";
 import { CopyManager } from "./copy-manager.backend";
+import { SourceMappingUrl } from "./source-maping-url.backend";
 
 @CLASS.NAME('CopyManagerStandalone')
 export class CopyManagerStandalone extends CopyManager {
@@ -44,7 +45,29 @@ export class CopyManagerStandalone extends CopyManager {
     this._isomorphicPackages = this.project.availableIsomorphicPackagesInNodeModules;
     Helpers.log(`Opearating on ${this.isomorphicPackages.length} isomorphic pacakges...`);
     this.recreateTempProj();
+
+    const files = Helpers.filesFrom(this.monitoredOutDir, true).filter(f => f.endsWith('.js'))
+
+    for (let index = 0; index < files.length; index++) {
+      const fileAbsPath = files[index];
+      SourceMappingUrl.fixContent(fileAbsPath);
+    }
+
+
     this.initWatching();
+  }
+  //#endregion
+
+  //#region links ofr packages are ok
+  linksForPackageAreOk(destination: Project): boolean {
+    const destPackageLinkSourceLocation = crossPlatformPath(path.join(
+      destination.location,
+      config.folder.node_modules,
+      this.rootPackageName,
+      config.folder.src
+    ));
+
+    return Helpers.exists(destPackageLinkSourceLocation);
   }
   //#endregion
 
@@ -147,9 +170,14 @@ export class CopyManagerStandalone extends CopyManager {
   changedJsMapFilesInternalPathesForDebug(
     content: string,
     isBrowser: boolean,
-    isForCliDebuggerToWork: boolean,
+    isForLaunchJsonDebugging: boolean,
     filePath: string,
   ): string {
+
+    if (!content) {
+      Helpers.warn(`[copytomanager] Empty content for ${filePath}`);
+      return content;
+    }
 
     let toReplaceString2 = isBrowser
       ? `../tmp-libs-for-${this.outDir}/${this.project.name}/projects/${this.project.name}/${config.folder.src}`
@@ -163,7 +191,7 @@ export class CopyManagerStandalone extends CopyManager {
       // content = content.replace(regex1, `"./${config.folder.src}`);
       // content = content.replace(regex2, config.folder.src);
     } else {
-      if (isForCliDebuggerToWork) {
+      if (isForLaunchJsonDebugging) {
         const regex2 = new RegExp(Helpers.escapeStringForRegEx(toReplaceString2), 'g');
         content = content.replace(regex2, `../${config.folder.src}`);
       } else {
@@ -275,14 +303,15 @@ export class CopyManagerStandalone extends CopyManager {
       ignore: forBrowser ? [] : [`${config.folder.browser}/**/*.*`, `${config.folder.websql}/**/*.*`]
     });
 
-    mapFiles.forEach(absFilePath => {
-      const relative = crossPlatformPath(absFilePath)
-        .replace(destinationPackageLocation + '/', '');
+    for (let index = 0; index < mapFiles.length; index++) {
+      const absFilePath = mapFiles[index];
+      const relative = crossPlatformPath(absFilePath).replace(destinationPackageLocation + '/', '');
       this.writeFixedMapFile(
         forBrowser,
         relative,
         destinationPackageLocation);
-    });
+    }
+
   }
   //#endregion
 
@@ -383,12 +412,7 @@ export class CopyManagerStandalone extends CopyManager {
 
     Helpers.log(`Handle single file: ${specyficFileRelativePath} for ${destination.location}`)
 
-    const notAllowedFiles = [
-      '.DS_Store',
-      config.file.index_d_ts,
-    ];
-
-    if (notAllowedFiles.includes(specyficFileRelativePath)) {
+    if (this.notAllowedFiles.includes(specyficFileRelativePath)) {
       return;
     }
 
@@ -517,21 +541,12 @@ export class CopyManagerStandalone extends CopyManager {
 
     //#endregion
   }
-  //#endregion
 
-  //#region write fixed map files
-  /**
-   *
-   * @param isForBrowser
-   * @param specyficFileRelativePath
-   * @param destinationPackageLocation should be ONLY temp project
-   */
-  protected writeFixedMapFile(
+  writeFixedMapFileForCli(
     isForBrowser: boolean,
     specyficFileRelativePath: string,
     destinationPackageLocation: string,
   ) {
-    this.writeFixedMapFileForNonCli(isForBrowser, specyficFileRelativePath, destinationPackageLocation);
 
     //#region mpa fix for CLI
     const monitoredOutDirFileToReplaceBack = path.join(
@@ -554,6 +569,24 @@ export class CopyManagerStandalone extends CopyManager {
     }
 
     //#endregion
+
+  }
+  //#endregion
+
+  //#region write fixed map files
+  /**
+   *
+   * @param isForBrowser
+   * @param specyficFileRelativePath
+   * @param destinationPackageLocation should be ONLY temp project
+   */
+  protected writeFixedMapFile(
+    isForBrowser: boolean,
+    specyficFileRelativePath: string,
+    destinationPackageLocation: string,
+  ) {
+    this.writeFixedMapFileForNonCli(isForBrowser, specyficFileRelativePath, destinationPackageLocation);
+    this.writeFixedMapFileForCli(isForBrowser, specyficFileRelativePath, destinationPackageLocation);
   }
   //#endregion
 

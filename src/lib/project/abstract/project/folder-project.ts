@@ -278,6 +278,13 @@ export abstract class FolderProject {
     }
   }
 
+  pathFor(relativePath: string) {
+    if (path.isAbsolute(relativePath)) {
+      Helpers.error(`Cannot join relative path with absolute: ${relativePath}`);
+    }
+    return crossPlatformPath(path.join(this.location, relativePath))
+  }
+
   path(this: Project, relativePath: string, currentProjectLocation?: string) {
 
     const self = this;
@@ -343,7 +350,7 @@ export abstract class FolderProject {
       .map(f => path.join(node_modules, f))
       .filter(f => fse.lstatSync(f).isSymbolicLink())
       .forEach(f => {
-        Helpers.log(`Deleting link  node_modules / ${ path.basename(f) }`);
+        Helpers.log(`Deleting link  node_modules / ${path.basename(f)}`);
         Helpers.remove(f);
       });
     Helpers.log(`Reseting symbolic links from node_mouels..DONE`);
@@ -355,7 +362,7 @@ export abstract class FolderProject {
     await this.compilerCache.unsetData()
     this.quickFixes.removeUncessesaryFiles();
 
-    glob.sync(`${ this.location }/*.filetemplate`).forEach(fileTemplate => {
+    glob.sync(`${this.location}/*.filetemplate`).forEach(fileTemplate => {
       Helpers.remove(fileTemplate);
       Helpers.remove(fileTemplate.replace('.filetemplate', ''));
     });

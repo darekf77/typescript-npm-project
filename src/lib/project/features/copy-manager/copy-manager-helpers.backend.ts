@@ -155,6 +155,9 @@ export namespace CopyMangerHelpers {
     currentBrowserFolder: Models.dev.BuildDirBrowser,
     isomorphicPackages: string[],
   ) {
+    if (!dtsFileAbsolutePath.endsWith('.d.ts')) {
+      return;
+    }
     const dtsFileContent = Helpers.readFile(dtsFileAbsolutePath);
     const dtsFixedContent = CopyMangerHelpers.fixDtsImport(
       dtsFileContent,

@@ -85,6 +85,10 @@ export class SingularBuild extends FeatureForProject {
       const dest_assets = path.join(destProjPath, config.folder.src, 'assets', 'assets-for', c.name);
       Helpers.createSymLink(source_lib, dest_lib);
 
+      if(!Helpers.exists(source_assets)) {
+        Helpers.mkdirp(source_assets);
+      }
+
       if (watch) {
         // SYNCING FOLDERS
         Helpers.copy(source_assets, dest_assets, { recursive: true, overwrite: true });

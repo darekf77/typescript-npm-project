@@ -151,7 +151,7 @@ export async function start(
   // // const proc = require('process');
   // global?.spinner?.start()
 
-  Helpers.log(`in start, mode: "${mode}"`);
+  Helpers.log(`ins start, mode: "${mode}"`);
   config.frameworkName = frameworkName;
 
 
@@ -223,7 +223,7 @@ export async function start(
   const functionsToCHeck: Function[] = []
   const files = scriptsFnArr;
 
-  Helpers.log('checking commands... please wait')
+  Helpers.log('checking asdasd... please wait')
   for (let index = 0; index < files.length; index++) {
     let breakLoop = false;
     Helpers.log(`check function command`, 1);

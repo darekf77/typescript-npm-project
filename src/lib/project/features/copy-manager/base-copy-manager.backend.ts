@@ -10,6 +10,7 @@ import { FeatureCompilerForProject } from '../../abstract';
 import { CopyMangerHelpers } from './copy-manager-helpers.backend';
 import { IncCompiler } from 'incremental-compiler';
 import { Log } from 'ng2-logger';
+import { SourceMappingUrl } from './source-maping-url.backend';
 
 const log = Log.create(_.startCase(path.basename(__filename)));
 //#endregion
@@ -23,6 +24,12 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   protected readonly outDir: Models.dev.BuildDir;
   protected readonly watch: boolean;
   protected readonly renameDestinationFolder?: string;
+
+  protected readonly notAllowedFiles = [
+    '.DS_Store',
+    config.file.index_d_ts,
+  ];
+
   protected readonly sourceFolders = [
     config.folder.src,
     config.folder.node_modules,
@@ -222,6 +229,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
+    SourceMappingUrl.fixContent(absoluteFilePath);
 
     const outDir = this.outDir;
     const specyficFileRelativePath = absoluteFilePath.replace(this.monitoredOutDir + '/', '');
@@ -248,7 +256,6 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   //#region sync action
   async syncAction(files: string[]) {
     Helpers.log('SYNC ACTION');
-
     const outDir = this.outDir;
 
     const projectToCopyTo = this.projectToCopyTo;
@@ -304,13 +311,6 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       return;
     }
 
-    const destPackageLinkSourceLocation = crossPlatformPath(path.join(
-      destination.location,
-      config.folder.node_modules,
-      this.rootPackageName,
-      config.folder.src
-    ));
-
     const isTempLocalProj = (destination.location === this.localTempProjPath);
 
 
@@ -318,9 +318,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       this.initalFixForDestination(destination);
     }
 
-
-    const allFolderLinksExists = !this.watch ? true : Helpers.exists(destPackageLinkSourceLocation);
-
+    const allFolderLinksExists = !this.watch ? true : this.linksForPackageAreOk(destination);
 
     // if(specyficFileRelativePath) {
     //   Helpers.log(`[${destination?.name}] Specyfic file change (allFolderLinksExists=${allFolderLinksExists}) (event:${event})`
@@ -398,6 +396,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
    * fix d.ts files in angular build - problem with require() in d.ts with wrong name
    */
   abstract copyCompiledSourcesAndDeclarations(destination: Project, isTempLocalProj: boolean);
+  abstract linksForPackageAreOk(destination: Project): boolean;
 
   //#endregion
 
