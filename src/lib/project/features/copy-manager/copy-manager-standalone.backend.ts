@@ -86,22 +86,12 @@ export class CopyManagerStandalone extends CopyManager {
   initWatching() {
     const monitoredOutDir = this.monitoredOutDir;
 
-    const toMonitorBrowser = CopyMangerHelpers.browserwebsqlFolders
-      .map(currentBrowserFolder => path.join(monitoredOutDir, currentBrowserFolder));
-
     this.initOptions({
       folderPath: [
-        path.join(monitoredOutDir, config.file.package_json),
-        path.join(monitoredOutDir, config.file.index_d_ts),
-        path.join(monitoredOutDir, config.file.index_js),
-        path.join(monitoredOutDir, config.file.index_js_map),
-        path.join(monitoredOutDir, config.folder.lib),
-
-        ...toMonitorBrowser,
+        monitoredOutDir
       ],
       folderPathContentCheck: [
-        path.join(monitoredOutDir, config.folder.lib),
-        ...toMonitorBrowser,
+        monitoredOutDir
       ]
     });
   }
@@ -525,6 +515,10 @@ export class CopyManagerStandalone extends CopyManager {
       specyficFileRelativePath,
     ));
 
+    // console.log('SHOULD FIX NON CLI', {
+    //   absMapFilePathInLocalProjNodeModulesPackage
+    // })
+
     if (Helpers.exists(absMapFilePathInLocalProjNodeModulesPackage)) {
       const fixedContentNonCLI = this.changedJsMapFilesInternalPathesForDebug(
         Helpers.readFile(absMapFilePathInLocalProjNodeModulesPackage),
@@ -553,6 +547,10 @@ export class CopyManagerStandalone extends CopyManager {
       this.monitoredOutDir,
       specyficFileRelativePath,
     );
+
+    // console.log('SHOULD FIX CLI', {
+    //   monitoredOutDirFileToReplaceBack
+    // })
 
     if (Helpers.exists(monitoredOutDirFileToReplaceBack)) {
       const fixedContentCLIDebug = this.changedJsMapFilesInternalPathesForDebug(
@@ -585,6 +583,7 @@ export class CopyManagerStandalone extends CopyManager {
     specyficFileRelativePath: string,
     destinationPackageLocation: string,
   ) {
+
     this.writeFixedMapFileForNonCli(isForBrowser, specyficFileRelativePath, destinationPackageLocation);
     this.writeFixedMapFileForCli(isForBrowser, specyficFileRelativePath, destinationPackageLocation);
   }

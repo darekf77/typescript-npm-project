@@ -90,22 +90,6 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   }
   //#endregion
 
-  //#region init watching
-  public initWatching() {
-    const monitoredOutDir = this.monitoredOutDir;
-
-    this.initOptions({
-      folderPath: [
-        monitoredOutDir,
-      ],
-      folderPathContentCheck: [
-        monitoredOutDir
-      ]
-    })
-
-  }
-  //#endregion
-
   //#region local temp proj path
   get localTempProjPath() {
     const targetProjPath = crossPlatformPath(path.join(

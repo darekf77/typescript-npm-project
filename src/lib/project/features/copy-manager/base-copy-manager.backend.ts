@@ -229,6 +229,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
+    // console.log('async event '+ absoluteFilePath)
     SourceMappingUrl.fixContent(absoluteFilePath);
 
     const outDir = this.outDir;
