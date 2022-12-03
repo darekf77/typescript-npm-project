@@ -27,7 +27,7 @@ export class SourceMappingUrl {
     private absFilePath: string,
     // private passedContent?: string
   ) {
-    console.log(`Fixging ${absFilePath}`, 1)
+    // console.log(`Fixging ${absFilePath}`, 1)
     // this.content = (passedContent ? passedContent : (Helpers.readFile(absFilePath)) || '');
     this.content = ((Helpers.readFile(absFilePath)) || '');
     this.contentLines = this.content.split(/\r?\n/);

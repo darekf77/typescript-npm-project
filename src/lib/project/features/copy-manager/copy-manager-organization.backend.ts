@@ -236,12 +236,12 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         const relative = absFilePath.replace(`${this.monitoredOutDir}/`, '');
 
         if (this.isForSpecyficTargetCompilation(relative)) {
-          console.log(`[changeamp] relative: ${relative}`)
+          // console.log(`[changeamp] relative: ${relative}`)
           content = content.replace(regex2, `../../../../${this.targetProjName}/${config.folder.src}`);
         } else {
           const childName = relative.startsWith(config.folder.libs) ? _.first(relative.split('/').slice(1)) : void 0;
-          console.log(`[changeamp]
-          childName: ${childName} relative: ${relative}`)
+          // console.log(`[changeamp]
+          // childName: ${childName} relative: ${relative}`)
           if (childName) {
             content = content.replace(regex2, `../../../../${childName}/${config.folder.src}/${config.folder.lib}`);
           } else {
@@ -372,7 +372,7 @@ export * from './${config.file.public_api}';
     const rootPackageNameForChildBrowser = this.rootPackageNameForChildBrowser(child, currentBrowserFolder);
 
     const monitorDirForModuleBrowser = isTempLocalProj //
-      ? path.join(this.monitoredOutDir, currentBrowserFolder, 'libs', child.name)
+      ? path.join(this.monitoredOutDir, currentBrowserFolder, config.folder.libs, child.name)
       : this.localTempProj.node_modules.pathFor(rootPackageNameForChildBrowser);
 
     if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist|bundle)
@@ -406,6 +406,7 @@ export * from './${config.file.public_api}';
 
       const monitorDirForModuleBrowser = isTempLocalProj ? pathInMonitoredLocation : pathInLocalTempProj;
 
+      //#region  fix file fn
       const fixFile = (isMap: boolean = false) => {
         const destinationLocationMjsFile = path.join(
           destination.node_modules.pathFor(rootPackageNameForChildBrowser),
@@ -424,6 +425,7 @@ export * from './${config.file.public_api}';
           Helpers.move(destinationLocationMjsFile, destinationLocationMjsFileDest);
         }
       };
+      //#endregion
 
       if (angularCompilationFolder === this.angularBrowserComiplationFolders.esm2020) {
         // TODO better way to extract data for child module from angular build
@@ -708,8 +710,8 @@ export * from './${config.file.public_api}';
       specyficFileRelativePath,
     ))
 
-    console.log(`tryingfix: ${monitoredOutDirFileToReplaceBack}
-     "${destinationPackageLocation}" "${specyficFileRelativePath}" child: ${childName}`)
+    // console.log(`tryingfix: ${monitoredOutDirFileToReplaceBack}
+    //  "${destinationPackageLocation}" "${specyficFileRelativePath}" child: ${childName}`)
 
     if (!child) {
       super.writeFixedMapFileForCli(isForBrowser, specyficFileRelativePath, destinationPackageLocation);
