@@ -55,6 +55,7 @@ export class CodeCut {
       this.buildOptions,
       this.sourceOutBrowser
     ))
+      .readFiles()
       .REPLACERegionsForIsomorphicLib(_.cloneDeep(this.options) as any)
       .FLATTypescriptImportExport('export')
       .FLATTypescriptImportExport('import')

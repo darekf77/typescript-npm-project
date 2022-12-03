@@ -36,7 +36,7 @@ export class BrowserCodeCut {
 
   protected isDebuggingFile = false;
 
-  protected rawContent: string;
+  protected rawContentForBrowser: string;
   public rawContentBackend: string;
   readonly allowedToReplace = Models.other.CutableFileExtArr;
 
@@ -46,7 +46,7 @@ export class BrowserCodeCut {
     .map(ext => `.${ext}`);
 
   get isEmptyBrowserFile() {
-    return this.rawContent.replace(/\s/g, '').trim() === '';
+    return this.rawContentForBrowser.replace(/\s/g, '').trim() === '';
   }
 
   get isEmptyBackendFile() {
@@ -56,34 +56,63 @@ export class BrowserCodeCut {
   get isEmptyModuleBackendFile() {
     return (this.rawContentBackend || '').replace(/\/\*\ \*\//g, '').trim().length === 0;
   }
+
+  get relativePath() {
+    const relativePath = this.absoluteFilePathBrowserWebsql
+      .replace(`${this.compilationProject.location}/`, '')
+      .replace(/^\//, '')
+    return relativePath;
+  }
+
+  get isWebsqlMode() {
+    return this.relativePath.startsWith(`tmp-src-${config.folder.dist}-${config.folder.websql}`) ||
+      this.relativePath.startsWith(`tmp-src-${config.folder.bundle}-${config.folder.websql}`);
+  }
+
+  get absoluteBackendFilePath() {
+    const absoluteBackendFilePath = path.join(
+      this.compilationProject.location,
+      this.relativePath.replace('tmp-src', 'tmp-source'), // .replace('-websql', '') // backend is ONE
+    );
+    return absoluteBackendFilePath;
+  }
+
   //#endregion
 
   //#region constructor
   constructor(
-    protected absoluteFilePath: string,
+    protected absoluteFilePathBrowserWebsql: string,
     private project?: Project,
     private compilationProject?: Project,
     private buildOptions?: BuildOptions,
     private sourceOutBrowser?: string,
   ) {
-    this.rawContent = fse.existsSync(absoluteFilePath) ?
-      fse.readFileSync(absoluteFilePath, 'utf8').toString()
-      : '';
+
   }
   //#endregion
+
+  readFiles() {
+    // console.log('PROCESSING', {
+    //   absoluteFilePathBrowserWebsql: this.absoluteFilePathBrowserWebsql,
+    //   absoluteBackendFilePath: this.absoluteBackendFilePath,
+    // })
+    this.rawContentForBrowser = Helpers.readFile(this.absoluteFilePathBrowserWebsql) || '';
+    this.rawContentBackend = this.rawContentForBrowser; // at the beginning those are normal files from src
+    return this;
+  }
 
   //#region methods
   debug(fileName: string) {
     // console.log('path.basename(this.absoluteFilePath)',path.basename(this.absoluteFilePath))
-    this.isDebuggingFile = (path.basename(this.absoluteFilePath) === fileName);
+    this.isDebuggingFile = (path.basename(this.absoluteFilePathBrowserWebsql) === fileName);
   }
 
   public FLATTypescriptImportExport(usage: ConfigModels.TsUsage) {
-    if (!this.absoluteFilePath.endsWith('.ts')) {
+    if (!this.absoluteFilePathBrowserWebsql.endsWith('.ts')) {
       return this;
     }
     const isExport = (usage === 'export');
-    const fileContent: string = this.rawContent;
+    const fileContent: string = this.rawContentForBrowser;
     const commentStart = new RegExp(`\\/\\*`);
     const commentEnds = new RegExp(`\\*\\/`);
     const commentEndExportOnly = new RegExp(`^(\\ )*\\}\\;?\\ *`);
@@ -150,7 +179,7 @@ export class BrowserCodeCut {
         }
 
       })
-      this.rawContent = newFlatOutput;
+      this.rawContentForBrowser = newFlatOutput;
     }
     // console.log('\n\n\n\n')
     return this;
@@ -292,10 +321,10 @@ export class BrowserCodeCut {
         `${inlinePkg.realName}/${this.buildOptions.websql ? config.folder.websql : config.folder.browser}`
       );
 
-      this.rawContent = this.rawContent.replace(imp, replacedImp);
+      this.rawContentForBrowser = this.rawContentForBrowser.replace(imp, replacedImp);
       return;
     }
-    if (this.compilationProject.isWorkspaceChildProject && this.absoluteFilePath) {
+    if (this.compilationProject.isWorkspaceChildProject && this.absoluteFilePathBrowserWebsql) {
       // console.log(`check child: ${pkgName}`)
       const parent = (this.compilationProject.isGenerated && !this.compilationProject.isWorkspaceChildProject
       ) ? this.compilationProject.grandpa : this.compilationProject.parent;
@@ -348,7 +377,7 @@ export class BrowserCodeCut {
         }
         const replacedImp = imp.replace(pkgName,
           `${pkgName}/${Helpers.getBrowserVerPath(this.project && this.project.name, this.buildOptions.websql)}`);
-        this.rawContent = this.rawContent.replace(orgImp, replacedImp);
+        this.rawContentForBrowser = this.rawContentForBrowser.replace(orgImp, replacedImp);
         return;
 
       }
@@ -361,16 +390,16 @@ export class BrowserCodeCut {
     // if (debug) {
     //   debugger
     // }
-    if (!this.absoluteFilePath.endsWith('.ts')
+    if (!this.absoluteFilePathBrowserWebsql.endsWith('.ts')
       // && !this.absoluteFilePath.endsWith('.tsx')
     ) {
       return this;
     }
-    if (!_.isString(this.rawContent)) return;
+    if (!_.isString(this.rawContentForBrowser)) return;
     const importRegex = new RegExp(`${usage}.+from\\s+(\\'|\\").+(\\'|\\")`, 'g');
 
-    const asynMatches = (usage === 'import') ? this.rawContent.match(regexAsyncImportG) : [];
-    const normalMatches = this.rawContent.match(importRegex);
+    const asynMatches = (usage === 'import') ? this.rawContentForBrowser.match(regexAsyncImportG) : [];
+    const normalMatches = this.rawContentForBrowser.match(importRegex);
 
     const asyncImports = (Array.isArray(asynMatches) ? asynMatches : []);
     let imports = [
@@ -392,15 +421,15 @@ export class BrowserCodeCut {
   }
 
   REPLACERegionsFromJSrequire() {
-    if (!this.absoluteFilePath.endsWith('.ts')
+    if (!this.absoluteFilePathBrowserWebsql.endsWith('.ts')
       // && !this.absoluteFilePath.endsWith('.tsx')
     ) {
       return this;
     }
-    if (!_.isString(this.rawContent)) return;
+    if (!_.isString(this.rawContentForBrowser)) return;
     // fileContent = IsomorphicRegions.flattenRequiresForContent(fileContent, usage)
     const importRegex = new RegExp(`require\\((\\'|\\").+(\\'|\\")\\)`, 'g')
-    let imports = this.rawContent.match(importRegex)
+    let imports = this.rawContentForBrowser.match(importRegex)
     // console.log(imports)
     if (_.isArray(imports)) {
       imports.forEach(imp => {
@@ -417,22 +446,25 @@ export class BrowserCodeCut {
     options = _.clone(options);
     this.options = options;
     // Helpers.log(`[REPLACERegionsForIsomorphicLib] options.replacements ${this.absoluteFilePath}`)
-    const ext = path.extname(this.absoluteFilePath).replace('.', '') as ConfigModels.CutableFileExt;
+    const ext = path.extname(this.absoluteFilePathBrowserWebsql).replace('.', '') as ConfigModels.CutableFileExt;
     // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
     if (this.allowedToReplace.includes(ext)) {
-      this.rawContent = this.project.sourceModifier.replaceBaslieneFromSiteBeforeBrowserCodeCut(this.rawContent);
+      this.rawContentForBrowser = this.project.sourceModifier.replaceBaslieneFromSiteBeforeBrowserCodeCut(this.rawContentForBrowser);
 
-      const orgContent = this.rawContent;
-      this.rawContent = RegionRemover.from(this.absoluteFilePath, orgContent, options.replacements, this.project).output;
-      if (this.project.isStandaloneProject || this.project.isSmartContainer) {
+      const orgContent = this.rawContentForBrowser;
+      this.rawContentForBrowser = RegionRemover.from(this.absoluteFilePathBrowserWebsql, orgContent, options.replacements, this.project).output;
+      if ((this.project.isStandaloneProject || this.project.isSmartContainer) && !this.isWebsqlMode) {
+
         const regionsToRemove = ['@bro' + 'wser', '@web' + 'sqlOnly'];
 
+        const orgContentBackend = this.rawContentBackend;
         this.rawContentBackend = RegionRemover.from(
-          this.absoluteFilePath,
-          orgContent,
+          this.absoluteBackendFilePath,
+          orgContentBackend,
           regionsToRemove,
           this.project
         ).output;
+
       }
     }
 
@@ -445,8 +477,8 @@ export class BrowserCodeCut {
         .forEach(c => {
           const from = `${c.name}/src/assets/`;
           const to = `/assets/assets-for/${c.name}/`;
-          this.rawContent = this.rawContent.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
-          this.rawContent = this.rawContent.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
+          this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
         });
     }
 
@@ -455,7 +487,7 @@ export class BrowserCodeCut {
 
   handleTickInCode(replacement: string): string {
     if (replacement.search('`') !== -1) {
-      Helpers.warn(`[browsercodecut] Please dont use tick \` ... in ${path.basename(this.absoluteFilePath)}`)
+      Helpers.warn(`[browsercodecut] Please dont use tick \` ... in ${path.basename(this.absoluteFilePathBrowserWebsql)}`)
       replacement = replacement.replace(/\`/g, '\\`');
     }
     return replacement;
@@ -469,9 +501,7 @@ export class BrowserCodeCut {
 
   saveOrDelete() {
     const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
-    const relativePath = this.absoluteFilePath
-      .replace(`${this.compilationProject.location}/`, '')
-      .replace(/^\//, '')
+    const relativePath = this.relativePath;
 
     // Helpers.log(`saving ismoprhic file: ${this.absoluteFilePath}`, 1)
     if (this.isEmptyBrowserFile && this.allowedToReplaceDotPref
@@ -483,18 +513,23 @@ export class BrowserCodeCut {
         '.less',
         '.json',
       ].includes(f))
-      .includes(path.extname(this.absoluteFilePath))
+      .includes(path.extname(this.absoluteFilePathBrowserWebsql))
     ) {
-      if (fse.existsSync(this.absoluteFilePath)) {
-        fse.unlinkSync(this.absoluteFilePath)
+      // if (fse.existsSync(this.absoluteFilePathBrowserWebsql)) {
+      //   fse.unlinkSync(this.absoluteFilePathBrowserWebsql)
+      // }
+      if (!fse.existsSync(path.dirname(this.absoluteFilePathBrowserWebsql))) { // write empty instead unlink
+        fse.mkdirpSync(path.dirname(this.absoluteFilePathBrowserWebsql));
       }
+      fse.writeFileSync(this.absoluteFilePathBrowserWebsql,
+        `/* files for browser${this.isWebsqlMode ? '-websql' : ''} mode */`, 'utf8');
       // Helpers.log(`Delete empty: ${this.absoluteFilePath}`, 1);
     } else {
       // Helpers.log(`Not empty: ${this.absoluteFilePath}`, 1)
-      if (!fse.existsSync(path.dirname(this.absoluteFilePath))) {
-        fse.mkdirpSync(path.dirname(this.absoluteFilePath));
+      if (!fse.existsSync(path.dirname(this.absoluteFilePathBrowserWebsql))) {
+        fse.mkdirpSync(path.dirname(this.absoluteFilePathBrowserWebsql));
       }
-      fse.writeFileSync(this.absoluteFilePath, this.rawContent, 'utf8');
+      fse.writeFileSync(this.absoluteFilePathBrowserWebsql, this.rawContentForBrowser, 'utf8');
 
 
       // if (path.isAbsolute(relativePath)) {
@@ -511,30 +546,30 @@ export class BrowserCodeCut {
       );
     }
 
-    const isEmptyModuleBackendFile = this.isEmptyModuleBackendFile
-    if ((!this.isEmptyBackendFile || isEmptyModuleBackendFile) && this.allowedToReplaceDotPref
-      .includes(path.extname(this.absoluteFilePath))
-    ) {
-      const absoluteBackendFilePath = path.join(
-        this.compilationProject.location,
-        relativePath.replace('tmp-src', 'tmp-source').replace('-websql', '') // backend is ONE
-      );
-
-      if (!fse.existsSync(path.dirname(absoluteBackendFilePath))) {
-        fse.mkdirpSync(path.dirname(absoluteBackendFilePath));
-      }
-
-      if (
-        !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist/tests/`) &&
-        !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle/tests/`) &&
-        !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist-websql/tests/`) &&
-        !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle-websql/tests/`)
+    if (!this.isWebsqlMode) {
+      const isEmptyModuleBackendFile = this.isEmptyModuleBackendFile
+      if ((!this.isEmptyBackendFile || isEmptyModuleBackendFile) && this.allowedToReplaceDotPref
+        .includes(path.extname(this.absoluteFilePathBrowserWebsql))
       ) {
-        // console.log(relativePath)
-        fse.writeFileSync(absoluteBackendFilePath,
-          isEmptyModuleBackendFile ? `export function dummy${(new Date()).getTime()}() { }`
-            : this.rawContentBackend,
-          'utf8');
+
+
+        const absoluteBackendFilePath = this.absoluteBackendFilePath;
+        if (!fse.existsSync(path.dirname(absoluteBackendFilePath))) {
+          fse.mkdirpSync(path.dirname(absoluteBackendFilePath));
+        }
+
+        if (
+          !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist/tests/`) &&
+          !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle/tests/`) &&
+          !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist-websql/tests/`) &&
+          !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle-websql/tests/`)
+        ) {
+          // console.log(relativePath)
+          fse.writeFileSync(absoluteBackendFilePath,
+            isEmptyModuleBackendFile ? `export function dummy${(new Date()).getTime()}() { }`
+              : this.rawContentBackend,
+            'utf8');
+        }
       }
     }
     // }
