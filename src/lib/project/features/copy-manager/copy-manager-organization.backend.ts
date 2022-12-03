@@ -162,15 +162,18 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       const children = this.children;
 
       for (let index = 0; index < children.length; index++) {
-        const c = children[index];
+        const child = children[index];
+        if (!child) {
+          debugger
+        }
         const childDestPackageInNodeModules = path.join(
           destPackageInNodeModules,
-          CopyMangerHelpers.childPureName(c)
+          CopyMangerHelpers.childPureName(child)
         );
 
         const childDestPackageInNodeModulesBrowser = path.join(
           destPackageInNodeModules,
-          CopyMangerHelpers.childPureName(c),
+          CopyMangerHelpers.childPureName(child),
           currentBrowserFolder,
         );
 
@@ -245,8 +248,8 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         const regex1 = new RegExp(Helpers.escapeStringForRegEx(toReplaceString1) + addon, 'g');
         const regex2 = new RegExp(Helpers.escapeStringForRegEx(toReplaceString2) + addon, 'g');
 
-        content = content.replace(regex1, `"./${config.folder.src}/lib`);
-        content = content.replace(regex2, `${config.folder.src}/lib`);
+        content = content.replace(regex1, `"./${config.folder.src}`);
+        content = content.replace(regex2, `${config.folder.src}`);
       }
     }
 
@@ -588,7 +591,7 @@ export * from './${config.file.public_api}';
 
   //#region source for child
   sourcePathToLinkFor(child: Project) {
-    const sourceToLink = crossPlatformPath(path.join(this.project.location, child.name, config.folder.src));
+    const sourceToLink = crossPlatformPath(path.join(this.project.location, child.name, config.folder.src, config.folder.lib));
     return sourceToLink;
   }
   //#endregion

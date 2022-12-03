@@ -27,6 +27,8 @@ export class CopyManagerStandalone extends CopyManager {
     // @ts-ignore
     this.args = buildOptions.args;
     // @ts-ignore
+    this.args = Helpers.cliTool.removeArgFromString(this.args);
+    // @ts-ignore
     this.watch = !!buildOptions.watch;
 
     if (!Array.isArray(this.copyto)) {

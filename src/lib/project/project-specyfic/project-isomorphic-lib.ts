@@ -717,7 +717,9 @@ export class ProjectIsomorphicLib
 
     if (this.isSmartContainerTarget) {
       const parent = this.smartContainerTargetParentContainer;
+      args = Helpers.cliTool.removeArgFromString(args);
       const target = (crossPlatformPath(_.first(args.split(' '))) || '').replace('/', '');
+
       Helpers.taskDone(`${CLI.chalk.underline(`
 
       ${buildLibDone}... for target project "`
