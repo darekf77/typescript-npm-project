@@ -41,6 +41,7 @@ export class SingularBuild extends FeatureForProject {
     });
 
     [
+      'app',
       'lib',
       'app.ts',
       'app.html',
@@ -49,7 +50,7 @@ export class SingularBuild extends FeatureForProject {
     ].forEach(f => {
       const source = path.join(client.location, config.folder.src, f);
       const dest = path.join(destProjPath, config.folder.src, f);
-      if (['lib'].includes(f)) {
+      if (['lib', 'app'].includes(f)) {
         if (!Helpers.exists(source)) {
           Helpers.mkdirp(source);
         }
@@ -78,21 +79,21 @@ export class SingularBuild extends FeatureForProject {
     // Helpers.createSymLink(clientAppHtmlPath, appHtmlPath);
 
     children.forEach(c => {
-      const source = path.join(c.location, config.folder.src, 'lib');
-      const sourceAssets = path.join(c.location, config.folder.src, 'assets');
-      const dest = path.join(destProjPath, config.folder.src, 'libs', c.name);
-      const destAssets = path.join(destProjPath, config.folder.src, 'assets', 'assets-for', c.name);
-      Helpers.createSymLink(source, dest);
+      const source_lib = path.join(c.location, config.folder.src, 'lib');
+      const source_assets = path.join(c.location, config.folder.src, 'assets');
+      const dest_lib = path.join(destProjPath, config.folder.src, 'libs', c.name);
+      const dest_assets = path.join(destProjPath, config.folder.src, 'assets', 'assets-for', c.name);
+      Helpers.createSymLink(source_lib, dest_lib);
 
       if (watch) {
         // SYNCING FOLDERS
-        Helpers.copy(sourceAssets, destAssets, { recursive: true, overwrite: true });
-        const watcher = chokidar.watch(sourceAssets, {
+        Helpers.copy(source_assets, dest_assets, { recursive: true, overwrite: true });
+        const watcher = chokidar.watch(source_assets, {
           ignoreInitial: true,
           followSymlinks: false,
           ignorePermissionErrors: true,
         }).on('all', (event, f) => {
-          const dest = (path.join(destAssets, Helpers.removeSlashAtBegin(f.replace(`${sourceAssets}`, ''))))
+          const dest = (path.join(dest_assets, Helpers.removeSlashAtBegin(f.replace(`${source_assets}`, ''))))
           if ((event === 'add') || (event === 'change')) {
             Helpers.copyFile(f, dest);
           }
@@ -108,7 +109,7 @@ export class SingularBuild extends FeatureForProject {
         })
         this.watchers.push(watcher);
       } else {
-        Helpers.copy(sourceAssets, destAssets, { recursive: true, overwrite: true });
+        Helpers.copy(source_assets, dest_assets, { recursive: true, overwrite: true });
       }
     });
 

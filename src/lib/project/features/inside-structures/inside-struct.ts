@@ -36,7 +36,7 @@ export class InsideStruct {
 
   private constructor(
     public relateivePathesFromContainer?: string[],
-    public projtectType?: ConfigModels.NewFactoryType,
+    public projectType?: ConfigModels.NewFactoryType,
     public frameworkVersion?: ConfigModels.FrameworkVersion,
     /**
      * Replace pathes while copying relateivePathesFromContainer
@@ -60,7 +60,7 @@ export class InsideStruct {
   }
 
   public get coreContainer() {
-    return Project.by(this.projtectType, this.frameworkVersion) as Project;
+    return Project.by(this.projectType, this.frameworkVersion) as Project;
   }
 
   recreate(outFolder: ConfigModels.OutFolder = 'dist') {

@@ -58,7 +58,7 @@ export function recreateApp(project: Project) {
     'index.ts',
   ));
 
-  project.quickFixes.removeAppFolder();
+
 
   if (!Helpers.exists(appFile) && !Helpers.exists(appFolderWithIndex)) {
 

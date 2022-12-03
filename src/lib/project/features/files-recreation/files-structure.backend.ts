@@ -138,7 +138,6 @@ export class FilesStructure extends FeatureForProject {
       Helpers.log(`Not inited yet... ${chalk.bold(this.project.genericName)} in ${this.project.location} `);
     }
 
-    this.project.quickFixes.removeAppFolder();
     this.project.quickFixes.missingSourceFolders();
     this.project.quickFixes.linkSourceOfItselfToNodeModules();
     this.project.quickFixes.missingAngularLibFiles();
@@ -435,8 +434,8 @@ export class FilesStructure extends FeatureForProject {
 
     const nodeModulesContainer = path.join(parent.location, config.folder.node_modules, `@${parent.name}`);
 
-    if(Helpers.isUnexistedLink(nodeModulesContainer)) {
-       Helpers.remove(nodeModulesContainer);
+    if (Helpers.isUnexistedLink(nodeModulesContainer)) {
+      Helpers.remove(nodeModulesContainer);
     }
 
     if (Helpers.isExistedSymlink(nodeModulesContainer) && !Helpers.isFolder(nodeModulesContainer)) {
@@ -450,7 +449,15 @@ export class FilesStructure extends FeatureForProject {
       const childrens = parent.children.filter(f => f.typeIs('isomorphic-lib') && f.frameworkVersionAtLeast('v3'));
       for (let index = 0; index < childrens.length; index++) {
         const child = childrens[index];
-        const source = path.join(parent.location, config.folder.dist, parent.name, client, config.folder.dist, 'libs', child.name);
+        const source = path.join(
+          parent.location,
+          config.folder.dist,
+          parent.name,
+          client,
+          config.folder.dist,
+          config.folder.libs,
+          child.name,
+        );
         const dest = path.join(nodeModulesContainer, child.name);
         if (!Helpers.exists(path.dirname(dest))) {
           Helpers.mkdirp(path.dirname(dest));

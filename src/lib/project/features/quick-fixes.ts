@@ -280,36 +280,34 @@ export default _default;
     //   });
   }
 
-  removeAppFolder() {
-    if (this.project.typeIsNot('isomorphic-lib') && this.project.frameworkVersionAtLeast('v3')) {
-      return;
-    }
+  // removeAppFolder() {
+    // if (this.project.typeIsNot('isomorphic-lib') && this.project.frameworkVersionAtLeast('v3')) {
+    //   return;
+    // }
 
-    const appFolder = crossPlatformPath(path.join(
-      this.project.location,
-      config.folder.src,
-      'app',
-    ))
+    // const appFolder = crossPlatformPath(path.join(
+    //   this.project.location,
+    //   config.folder.src,
+    //   'app',
+    // ))
 
-    const appFolderWithIndex = crossPlatformPath(path.join(
-      appFolder,
-      'index.ts',
-    ));
+    // const appFolderWithIndex = crossPlatformPath(path.join(
+    //   appFolder,
+    //   'index.ts',
+    // ));
 
-    if (!Helpers.exists(appFolderWithIndex)) {
+    // if (!Helpers.exists(appFolderWithIndex)) {
 
-      const arrEmp = [
-        ...Helpers.filesFrom(appFolder, true),
-        ...Helpers.linksToFolderFrom(appFolder),
-        ...Helpers.foldersFrom(appFolder),
-      ];
-      if (arrEmp.length === 0) {
-        Helpers.remove(appFolder, true);
-      }
-    }
-
-
-  }
+    //   const arrEmp = [
+    //     ...Helpers.filesFrom(appFolder, true),
+    //     ...Helpers.linksToFolderFrom(appFolder),
+    //     ...Helpers.foldersFrom(appFolder),
+    //   ];
+    //   if (arrEmp.length === 0) {
+    //     Helpers.remove(appFolder, true);
+    //   }
+    // }
+  // }
 
   public missingSourceFolders() { /// QUCIK_FIX make it more generic
     if (this.project.frameworkVersionEquals('v1')) {

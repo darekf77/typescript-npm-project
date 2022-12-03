@@ -27,9 +27,9 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
     const tmpProjects = `tmp-libs-for-{{{outFolder}}}${this.websql ? '-websql' : ''}/${project.name}--for--{{{client}}}`;
     const tmpSource = `tmp-src-{{{outFolder}}}${this.websql ? '-websql' : ''}`;
     const result = InsideStruct.from({
-
+      //#region pathes from container codere isomrophic lib
       relateivePathesFromContainer: [
-        //#region releative pathes from core project
+        //#region files to copy from core isomorphic lib
         'lib/src/app/app.component.html',
         'lib/src/app/app.component.scss',
         'lib/src/app/app.component.spec.ts',
@@ -68,7 +68,8 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
         'lib/projects/my-lib/karma.conf.js',
         //#endregion
       ],
-      projtectType: project._type,
+      //#endregion
+      projectType: project._type,
       frameworkVersion: project._frameworkVersion,
       pathReplacements: [
         [new RegExp('^lib\\/'), ({ client }) => {
@@ -81,6 +82,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
       linkNodeModulesTo: ['lib/'],
       endAction: (({ outFolder, projectName, client, replacement, projectLocation }) => {
 
+        //#region fixing package json dependencies in target proj
         (() => {
           const jsonPath = path.join(
             projectLocation,
@@ -106,7 +108,9 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
           Helpers.writeJson(jsonPath, json);
 
         })();
+        //#endregion
 
+        //#region replace my-lib from container in targe proj
         (() => {
           const source = path.join(
             projectLocation,
@@ -125,9 +129,10 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
           Helpers.remove(dest);
           Helpers.move(source, dest);
         })();
-
+        //#endregion
 
         (() => {
+          //#region hande / src / lib
           const source = path.join(
             projectLocation,
             `tmp-src-${outFolder}${this.websql ? '-websql' : ''}`,
@@ -141,8 +146,11 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
             `projects/${projectName}/src/lib`
           );
           Helpers.remove(dest);
-          Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
+          Helpers.createSymLink(source, dest,
+            { continueWhenExistedFolderDoesntExists: true });
+          //#endregion
 
+          //#region resolve varaibles
           const sourcePublicApi = path.join(
             projectLocation,
             this.project.isStandaloneProject
@@ -165,8 +173,10 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
           if (tsconfigJson) {
             tsconfigJson.compilerOptions ? tsconfigJson.compilerOptions : {};
           }
+          //#endregion
 
           if (this.project.isSmartContainerTarget) {
+            //#region fixing tsconfig pathes
             const parent = this.project.smartContainerTargetParentContainer;
             const otherChildren = parent.children.filter(c => c.name !== this.project.name);
             const base = this.project.name;
@@ -188,9 +198,8 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
               tsconfigJson.compilerOptions.paths[`@${parent.name}/${this.project.name}/${this.websql ? config.folder.websql : config.folder.browser}/*`] = [
                 `./projects/${base}/src/lib/*`
               ];
-
-
             }
+            //#endregion
 
             if (otherChildren.length > 0) {
               publicApiFile = `
@@ -207,6 +216,8 @@ export * from './lib';
 
             for (let index = 0; index < otherChildren.length; index++) {
               const child = otherChildren[index];
+
+              //#region replace browser cut code in destination lib
               const sourceChild = path.join(
                 projectLocation,
                 `tmp-src-${outFolder}${this.websql ? '-websql' : ''}`,
@@ -223,6 +234,8 @@ export * from './lib';
 
               Helpers.remove(destChild);
               Helpers.createSymLink(sourceChild, destChild, { continueWhenExistedFolderDoesntExists: true });
+              //#endregion
+
             }
           } else {
             if (tsconfigJson) {
