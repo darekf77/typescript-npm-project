@@ -164,7 +164,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       for (let index = 0; index < children.length; index++) {
         const child = children[index];
         if (!child) {
-          debugger
+          // debugger
         }
         const childDestPackageInNodeModules = path.join(
           destPackageInNodeModules,
