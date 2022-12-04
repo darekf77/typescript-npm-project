@@ -591,4 +591,27 @@ export class CopyManagerStandalone extends CopyManager {
   }
   //#endregion
 
+  updateBackendFullDtsFiles(destinationOrBundleOrDist: Project | string) {
+    const base = crossPlatformPath(path.join(this.project.location, `${this.outDir}-nocutsrc`));
+
+    const filesToUpdate = Helpers
+      .filesFrom(base, true)
+      .filter(f => f.endsWith('.d.ts'))
+      .map(f => f.replace(`${base}/`, ''))
+
+    for (let index = 0; index < filesToUpdate.length; index++) {
+      const relativePath = filesToUpdate[index];
+      const source = crossPlatformPath(path.join(base, relativePath));
+      const dest = crossPlatformPath(path.join(
+        _.isString(destinationOrBundleOrDist)
+          ? this.monitoredOutDir :
+          destinationOrBundleOrDist.node_modules.pathFor(this.rootPackageName),
+        relativePath,
+      ));
+      if (Helpers.exists(dest)) {
+        // console.log(dest)
+        Helpers.copyFile(source, dest);
+      }
+    }
+  }
 }

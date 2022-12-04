@@ -135,15 +135,15 @@ export class BackendCompilation extends IncCompiler.Base {
 
     let cmd = (specificTsconfig?: string) => {
       let commandJs, commandMaps, commandDts;
-      const nocutsrc = `${project.location}/${buildOutDir}-nocutsrc`;
+      const nocutsrcFolder = `${project.location}/${buildOutDir}-nocutsrc`;
       // commandJs = `${tsExe} -d false  --mapRoot ${nocutsrc} ${params.join(' ')} `
       //   + (specificTsconfig ? `--project ${specificTsconfig}` : '');
 
-      commandJs = `${tsExe} --mapRoot ${nocutsrc} ${params.join(' ')} `
+      commandJs = `${tsExe} --mapRoot ${nocutsrcFolder} ${params.join(' ')} `
         + (specificTsconfig ? `--project ${specificTsconfig}` : '');
 
       // commandDts = `${tsExe} --emitDeclarationOnly  ${params.join(' ')}`;
-      params[1] = ` --outDir ${nocutsrc}`;
+      params[1] = ` --outDir ${nocutsrcFolder}`;
       commandMaps = `${tsExe} ${params.join(' ')} `;
       return {
         commandJs, commandMaps,

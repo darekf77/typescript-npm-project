@@ -346,6 +346,11 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
         this.removeSourceSymlinks(destination)
       }
 
+      if (!this.watch) {
+        this.updateBackendFullDtsFiles(this.monitoredOutDir);
+        this.updateBackendFullDtsFiles(destination);
+      }
+
       // TODO not working werid tsc issue with browser/index
       // {const projectOudBorwserSrc = path.join(destination.location,
       //   config.folder.node_modules,
@@ -398,6 +403,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
    */
   abstract copyCompiledSourcesAndDeclarations(destination: Project, isTempLocalProj: boolean);
   abstract linksForPackageAreOk(destination: Project): boolean;
+  abstract updateBackendFullDtsFiles(destinationOrBundleOrDist: Project | string): void;
 
   //#endregion
 

@@ -853,4 +853,32 @@ export * from './${config.file.public_api}';
   }
   //#endregion
 
+  updateBackendFullDtsFiles(destinationOrBundleOrDist: Project | string) {
+    const base = crossPlatformPath(path.join(this.targetProj.location, `${this.outDir}-nocutsrc`, config.folder.libs));
+
+    const filesToUpdate = Helpers
+      .filesFrom(base, true)
+      .filter(f => f.endsWith('.d.ts'))
+      .map(f => f.replace(`${base}/`, ''))
+
+    for (let index = 0; index < filesToUpdate.length; index++) {
+      const relativePath = filesToUpdate[index];
+      // const childName = _.first(relativePath.split('/'));
+      const source = crossPlatformPath(path.join(base, relativePath));
+      const dest = crossPlatformPath(path.join(
+        _.isString(destinationOrBundleOrDist)
+          ? crossPlatformPath(path.join(this.monitoredOutDir, config.folder.libs))
+          : destinationOrBundleOrDist.node_modules.pathFor(crossPlatformPath(path.join(
+            this.rootPackageName,
+            // childName,
+          ))),
+        relativePath,
+      ));
+      if (Helpers.exists(dest)) {
+        console.log(dest)
+        Helpers.copyFile(source, dest);
+      }
+    }
+  }
+
 }
