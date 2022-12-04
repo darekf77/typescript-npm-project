@@ -874,10 +874,10 @@ export * from './${config.file.public_api}';
           ))),
         relativePath,
       ));
-      if (Helpers.exists(dest)) {
-        console.log(dest)
-        Helpers.copyFile(source, dest);
-      }
+      // if (Helpers.exists(dest)) {
+      //   console.log(dest)
+      Helpers.copyFile(source, dest);
+      // }
     }
   }
 

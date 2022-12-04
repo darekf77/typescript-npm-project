@@ -214,7 +214,7 @@
         // all isomorphic application config
         "tnp-config": '13.1.46',
         "tnp-models": '13.1.5',
-        "tnp-helpers": '13.1.5',
+        "tnp-helpers": '13.1.6',
         "tnp-db": '13.1.4',
         'firedev-typeorm': '13.1.5',
         'firedev-crud': '13.1.34',
@@ -303,7 +303,7 @@
           "jscodeshift": "^0.6.3",
           "@types/fs-extra": "^7.0.0",
           "@types/rimraf": "^2.0.2",
-          "incremental-compiler": '13.1.6',
+          "incremental-compiler": '13.1.7',
           open: "7.2.1",
           // "sharp": "0.23.3", - > proble with dependncies
           "@types/sharp": "0.23.1",

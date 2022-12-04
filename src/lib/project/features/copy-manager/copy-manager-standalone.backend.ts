@@ -608,10 +608,10 @@ export class CopyManagerStandalone extends CopyManager {
           destinationOrBundleOrDist.node_modules.pathFor(this.rootPackageName),
         relativePath,
       ));
-      if (Helpers.exists(dest)) {
-        // console.log(dest)
-        Helpers.copyFile(source, dest);
-      }
+      // if (Helpers.exists(dest)) {
+      // console.log(dest)
+      Helpers.copyFile(source, dest);
+      // }
     }
   }
 }
