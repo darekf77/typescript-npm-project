@@ -591,6 +591,7 @@ export class CopyManagerStandalone extends CopyManager {
   }
   //#endregion
 
+  //#region update backend full dts files
   updateBackendFullDtsFiles(destinationOrBundleOrDist: Project | string) {
     const base = crossPlatformPath(path.join(this.project.location, `${this.outDir}-nocutsrc`));
 
@@ -614,4 +615,6 @@ export class CopyManagerStandalone extends CopyManager {
       // }
     }
   }
+  //#endregion
+
 }

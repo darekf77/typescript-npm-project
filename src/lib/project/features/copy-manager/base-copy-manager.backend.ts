@@ -73,9 +73,10 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       return [
         this.localTempProj,
         ...this.copyto,
+        this.project,
       ] as Project[];
     }
-    return [this.localTempProj];
+    return [this.localTempProj, this.project,];
   }
   //#endregion
 

@@ -314,7 +314,7 @@ export class ProjectIsomorphicLib
       //#region prepare angular variables for new v3 inside structure build
       const portToServe = _.isNumber(port) ? `--port=${port}` : '';
       const aot = flags.includes('aot');
-      // const ngBuildCmd = `${loadNvm} && npm-run ng build `
+      // const ngBuildCmd = // TODO LOAD NVME HERE
       const ngBuildCmd = `npm-run ng build `
         + `${aot ? '--aot=true' : ''} `
         + `${prod ? '--prod' : ''} `
@@ -580,15 +580,15 @@ export class ProjectIsomorphicLib
         );
 
         await incrementalBuildProcessWebsql.startAndWatch('isomorphic compilation (watch mode) [WEBSQL]',
-        //#region options
-        {
-          watchOnly: this.buildOptions.watchOnly,
-          afterInitCallBack: async () => {
-            await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
+          //#region options
+          {
+            watchOnly: this.buildOptions.watchOnly,
+            afterInitCallBack: async () => {
+              await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
+            }
           }
-        }
-        //#endregion
-      );
+          //#endregion
+        );
 
         if (this.frameworkVersionAtLeast('v3')) { // TOOD
           showInfoAngular()
@@ -706,7 +706,10 @@ export class ProjectIsomorphicLib
   private showMesageWhenBuildLibDoneForSmartContainer(args: string, watch: boolean) {
     const buildLibDone = `LIB BUILD DONE.. `;
     const ifapp = 'if you want to start app build -> please run in other terminal command:';
-    const ngserve = `${watch ? '--port 4201 # or whatever port' : '#'} to run angular ${watch ? 'ng serve' : 'ng build (for application - not lib)'}.`;
+    const ngserve = `${watch ? '--port 4201 # or whatever port' : '#'} to run angular ${watch
+      ? 'ng serve'
+      : 'ng build (for application - not lib)'
+      }.`;
     const bawOrba = watch ? 'baw' : 'ba';
     const bawOrbaLong = watch ? ' build:app:watch ' : ' build:app ';
     const bawOrbaLongWebsql = watch ? 'build:app:watch --websql' : 'build:app --websql';

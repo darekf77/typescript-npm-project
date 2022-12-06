@@ -12,6 +12,19 @@ import { CopyManagerStandalone } from "./copy-manager-standalone.backend";
 export class CopyManagerOrganization extends CopyManagerStandalone {
   protected readonly children: Project[];
 
+  //#region getters / project to copy to
+  get projectToCopyTo() {
+    if (Array.isArray(this.copyto) && this.copyto.length > 0) {
+      // @ts-ignore
+      return [
+        this.localTempProj,
+        ...this.copyto
+      ] as Project[];
+    }
+    return [this.localTempProj];
+  }
+  //#endregion
+
   //#region angular browser compilation folders
   protected readonly angularBrowserComiplationFolders = {
     esm2020: 'esm2020',
@@ -257,41 +270,64 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   }
   //#endregion
 
+  fixAngularPackageJson(child: Project, destination: Project, currentBrowserFolder?: Models.dev.BuildDirBrowser) {
+    const childPackageName = path.join(this.rootPackageName, child.name);
+
+    if (currentBrowserFolder) {
+      const rootPackageNameForChildBrowser = path.join(childPackageName, currentBrowserFolder);
+      const location = destination.node_modules.pathFor(rootPackageNameForChildBrowser);
+      const childName = child.name;
+      const pj = {
+        "name": rootPackageNameForChildBrowser,
+        "version": "0.0.0",
+        "module": `fesm2015/${childName}.mjs`,
+        "es2020": `fesm2020/${childName}.mjs`,
+        "esm2020": `esm2020/${childName}.mjs`,
+        "fesm2020": `fesm2020/${childName}.mjs`,
+        "fesm2015": `fesm2015/${childName}.mjs`,
+        "typings": `${childName}.d.ts`,
+        "exports": {
+          "./package.json": {
+            "default": "./package.json"
+          },
+          ".": {
+            "types": `./${childName}.d.ts`,
+            "esm2020": `./esm2020/${childName}.mjs`,
+            "es2020": `./fesm2020/${childName}.mjs`,
+            "es2015": `./fesm2015/${childName}.mjs`,
+            "node": `./fesm2015/${childName}.mjs`,
+            "default": `./fesm2020/${childName}.mjs`
+          }
+        },
+        "sideEffects": false
+      };
+      Helpers.writeJson([location, config.file.package_json], pj);
+    } else {
+      const location = destination.node_modules.pathFor(childPackageName);
+      // const childName = child.name;
+      const pj = {
+        "name": childPackageName,
+        "version": "0.0.0",
+      };
+      // const exportsKey = 'exports';
+      // pj[exportsKey] = {};
+      for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
+        const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
+        pj[`.${currentBrowserFolder}`] = `./${currentBrowserFolder}`;
+        // pj[`${exportsKey}${currentBrowserFolder}`] =
+      }
+      Helpers.writeJson([location, config.file.package_json], pj);
+    }
+
+  }
+
   //#region fix angular package browser files
-  fixAngularPackageBrowserFiles(child: Project, destination: Project, currentBrowserFolder: Models.dev.BuildDirBrowser) {
+  fixAngularBuildRelatedFiles(child: Project, destination: Project, currentBrowserFolder: Models.dev.BuildDirBrowser) {
 
     const childPackageName = path.join(this.rootPackageName, child.name);
     const rootPackageNameForChildBrowser = path.join(childPackageName, currentBrowserFolder);
-    const location = destination.node_modules.pathFor(rootPackageNameForChildBrowser)
-
-    //#region package.json
-    const childName = child.name;
-    const pj = {
-      "name": childPackageName,
-      "version": "0.0.0",
-      "module": `fesm2015/${childName}.mjs`,
-      "es2020": `fesm2020/${childName}.mjs`,
-      "esm2020": `esm2020/${childName}.mjs`,
-      "fesm2020": `fesm2020/${childName}.mjs`,
-      "fesm2015": `fesm2015/${childName}.mjs`,
-      "typings": `${childName}.d.ts`,
-      "exports": {
-        "./package.json": {
-          "default": "./package.json"
-        },
-        ".": {
-          "types": `./${childName}.d.ts`,
-          "esm2020": `./esm2020/${childName}.mjs`,
-          "es2020": `./fesm2020/${childName}.mjs`,
-          "es2015": `./fesm2015/${childName}.mjs`,
-          "node": `./fesm2015/${childName}.mjs`,
-          "default": `./fesm2020/${childName}.mjs`
-        }
-      },
-      "sideEffects": false
-    };
-    Helpers.writeJson([location, config.file.package_json], pj);
-    //#endregion
+    const location = destination.node_modules.pathFor(rootPackageNameForChildBrowser);
+    this.fixAngularPackageJson(child, destination, currentBrowserFolder);
 
     //#region <child-name>.d.ts
     Helpers.writeFile([location, `${child.name}.d.ts`], `
@@ -460,16 +496,15 @@ export * from './${config.file.public_api}';
     isTempLocalProj: boolean
   ) {
     // TODO LAST copy app.ts
+    for (let index = 0; index < this.children.length; index++) {
+      //#region prepare variables
+      const child = this.children[index];
+      this.fixAngularPackageJson(child, destination);
 
-
-    for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
-      const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
-
-      for (let index = 0; index < this.children.length; index++) {
-        //#region prepare variables
-        const child = this.children[index];
+      for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
+        const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
         this.fixesForChildDtsFile(destination, isTempLocalProj, child, currentBrowserFolder);
-        this.fixAngularPackageBrowserFiles(child, destination, currentBrowserFolder);
+        this.fixAngularBuildRelatedFiles(child, destination, currentBrowserFolder);
         this.copyAngularBrowserFolders(destination, isTempLocalProj, child, currentBrowserFolder);
         //#endregion
       }
@@ -749,7 +784,7 @@ export * from './${config.file.public_api}';
 
     //#region handle addtional files
     if (!specyficFileRelativePath.startsWith(config.folder.libs)) {
-      console.log(`ommiting: ${specyficFileRelativePath}`)
+      // console.log(`ommiting: ${specyficFileRelativePath}`)
 
       const isBackendMapsFileAppJS = specyficFileRelativePath.endsWith('.js.map');
       const isBrowserMapsFileAppJS = specyficFileRelativePath.endsWith('.mjs.map');
@@ -853,6 +888,11 @@ export * from './${config.file.public_api}';
   }
   //#endregion
 
+  //#region update backend full dts files
+  /**
+   * package ready to realse should have all/full *.d.ts files.. .to avoid any
+   * erors when we import more "ui package" to backend code
+   */
   updateBackendFullDtsFiles(destinationOrBundleOrDist: Project | string) {
     const base = crossPlatformPath(path.join(this.targetProj.location, `${this.outDir}-nocutsrc`, config.folder.libs));
 
@@ -880,5 +920,6 @@ export * from './${config.file.public_api}';
       // }
     }
   }
+  //#endregion
 
 }
