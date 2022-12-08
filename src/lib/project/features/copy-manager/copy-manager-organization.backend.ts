@@ -5,6 +5,7 @@ import { Helpers } from "tnp-helpers";
 import { Models } from "tnp-models";
 import { CLASS } from "typescript-class-helpers";
 import { Project } from "../../abstract/project/project";
+import { BundleMjsFesmModuleSpliter } from "./bundle-mjs-fesm-module-spliter.backend";
 import { CopyMangerHelpers } from "./copy-manager-helpers.backend";
 import { CopyManagerStandalone } from "./copy-manager-standalone.backend";
 
@@ -451,6 +452,10 @@ export * from './${config.file.public_api}';
         if ((destinationLocationMjsFile !== destinationLocationMjsFileDest)
           && Helpers.exists(destinationLocationMjsFile)) {
           Helpers.move(destinationLocationMjsFile, destinationLocationMjsFileDest);
+          // BundleMjsFesmModuleSpliter.fixForTarget(
+          //   this.targetProj,
+          //   destinationLocationMjsFileDest,
+          // ); // @LAST
         }
       };
       //#endregion

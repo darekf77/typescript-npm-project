@@ -2,7 +2,7 @@ import { crossPlatformPath, path, _ } from "tnp-core";
 import { Helpers } from "tnp-helpers";
 
 export class SourceMappingUrl {
-  private readonly SOURCEMAPDES = '//# sourceMappingURL='
+  public static readonly SOURCEMAPDES = '//# sourceMappingURL='
 
   static fixContent(absFilePath: string,
     // content?: string
@@ -34,7 +34,7 @@ export class SourceMappingUrl {
 
     for (let index = (this.contentLines.length - 1); index >= 0; index--) {
       const line = this.contentLines[index];
-      if (line.trim().startsWith(this.SOURCEMAPDES)) {
+      if (line.trim().startsWith(SourceMappingUrl.SOURCEMAPDES)) {
         this.mappingLineIndex = index;
         break;
       }
@@ -43,7 +43,7 @@ export class SourceMappingUrl {
 
   process(): string {
     if (this.mappingLineIndex !== -1) {
-      this.contentLines[this.mappingLineIndex] = `${this.SOURCEMAPDES}${path.basename(this.absFilePath)}.map`;
+      this.contentLines[this.mappingLineIndex] = `${SourceMappingUrl.SOURCEMAPDES}${path.basename(this.absFilePath)}.map`;
     }
     const fixedContent = this.contentLines.join('\n');
     if (fixedContent !== this.content) {
