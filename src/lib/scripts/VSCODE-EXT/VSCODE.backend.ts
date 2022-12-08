@@ -230,7 +230,8 @@ function $VSCODE_GLOBAL() {
     "workbench.editor.enablePreview": true,
     "security.workspace.trust.banner": "never",
     "telemetry.enableTelemetry": false,
-    "security.workspace.trust.enabled": false
+    "security.workspace.trust.enabled": false,
+    "git.detectSubmodules": false,
   };
   const settingspathWindows = path.join(crossPlatformPath(os.userInfo().homedir), 'AppData/Roaming/Code/User/settings.json');
   const settingspathLinux = path.join(crossPlatformPath(os.userInfo().homedir), '.config/Code/User/settings.json');
