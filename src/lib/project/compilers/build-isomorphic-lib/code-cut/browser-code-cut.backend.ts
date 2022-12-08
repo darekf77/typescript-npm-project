@@ -3,6 +3,7 @@ import {
   _,
   path,
   fse,
+  crossPlatformPath,
 } from 'tnp-core';
 
 import { config, ConfigModels } from 'tnp-config';
@@ -11,6 +12,7 @@ import { Helpers } from 'tnp-helpers';
 import type { Project } from '../../../abstract/project/project';
 import { BuildOptions } from 'tnp-db';
 import { RegionRemover } from 'isomorphic-region-loader';
+import { MjsModule } from '../../../features/copy-manager/bundle-mjs-fesm-module-spliter.backend';
 //#endregion
 
 //#region consts
@@ -58,7 +60,7 @@ export class BrowserCodeCut {
   }
 
   get relativePath() {
-    const relativePath = this.absoluteFilePathBrowserWebsql
+    const relativePath = crossPlatformPath(this.absoluteFilePathBrowserOrWebsql)
       .replace(`${this.compilationProject.location}/`, '')
       .replace(/^\//, '')
     return relativePath;
@@ -81,7 +83,7 @@ export class BrowserCodeCut {
 
   //#region constructor
   constructor(
-    protected absoluteFilePathBrowserWebsql: string,
+    protected absoluteFilePathBrowserOrWebsql: string,
     private project?: Project,
     private compilationProject?: Project,
     private buildOptions?: BuildOptions,
@@ -96,7 +98,7 @@ export class BrowserCodeCut {
     //   absoluteFilePathBrowserWebsql: this.absoluteFilePathBrowserWebsql,
     //   absoluteBackendFilePath: this.absoluteBackendFilePath,
     // })
-    this.rawContentForBrowser = Helpers.readFile(this.absoluteFilePathBrowserWebsql) || '';
+    this.rawContentForBrowser = Helpers.readFile(this.absoluteFilePathBrowserOrWebsql) || '';
     this.rawContentBackend = this.rawContentForBrowser; // at the beginning those are normal files from src
     return this;
   }
@@ -104,11 +106,11 @@ export class BrowserCodeCut {
   //#region methods
   debug(fileName: string) {
     // console.log('path.basename(this.absoluteFilePath)',path.basename(this.absoluteFilePath))
-    this.isDebuggingFile = (path.basename(this.absoluteFilePathBrowserWebsql) === fileName);
+    this.isDebuggingFile = (path.basename(this.absoluteFilePathBrowserOrWebsql) === fileName);
   }
 
   public FLATTypescriptImportExport(usage: ConfigModels.TsUsage) {
-    if (!this.absoluteFilePathBrowserWebsql.endsWith('.ts')) {
+    if (!this.absoluteFilePathBrowserOrWebsql.endsWith('.ts')) {
       return this;
     }
     const isExport = (usage === 'export');
@@ -324,7 +326,7 @@ export class BrowserCodeCut {
       this.rawContentForBrowser = this.rawContentForBrowser.replace(imp, replacedImp);
       return;
     }
-    if (this.compilationProject.isWorkspaceChildProject && this.absoluteFilePathBrowserWebsql) {
+    if (this.compilationProject.isWorkspaceChildProject && this.absoluteFilePathBrowserOrWebsql) {
       // console.log(`check child: ${pkgName}`)
       const parent = (this.compilationProject.isGenerated && !this.compilationProject.isWorkspaceChildProject
       ) ? this.compilationProject.grandpa : this.compilationProject.parent;
@@ -390,7 +392,7 @@ export class BrowserCodeCut {
     // if (debug) {
     //   debugger
     // }
-    if (!this.absoluteFilePathBrowserWebsql.endsWith('.ts')
+    if (!this.absoluteFilePathBrowserOrWebsql.endsWith('.ts')
       // && !this.absoluteFilePath.endsWith('.tsx')
     ) {
       return this;
@@ -421,7 +423,7 @@ export class BrowserCodeCut {
   }
 
   REPLACERegionsFromJSrequire() {
-    if (!this.absoluteFilePathBrowserWebsql.endsWith('.ts')
+    if (!this.absoluteFilePathBrowserOrWebsql.endsWith('.ts')
       // && !this.absoluteFilePath.endsWith('.tsx')
     ) {
       return this;
@@ -446,13 +448,13 @@ export class BrowserCodeCut {
     options = _.clone(options);
     this.options = options;
     // Helpers.log(`[REPLACERegionsForIsomorphicLib] options.replacements ${this.absoluteFilePath}`)
-    const ext = path.extname(this.absoluteFilePathBrowserWebsql).replace('.', '') as ConfigModels.CutableFileExt;
+    const ext = path.extname(this.absoluteFilePathBrowserOrWebsql).replace('.', '') as ConfigModels.CutableFileExt;
     // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
     if (this.allowedToReplace.includes(ext)) {
       this.rawContentForBrowser = this.project.sourceModifier.replaceBaslieneFromSiteBeforeBrowserCodeCut(this.rawContentForBrowser);
 
       const orgContent = this.rawContentForBrowser;
-      this.rawContentForBrowser = RegionRemover.from(this.absoluteFilePathBrowserWebsql, orgContent, options.replacements, this.project).output;
+      this.rawContentForBrowser = RegionRemover.from(this.absoluteFilePathBrowserOrWebsql, orgContent, options.replacements, this.project).output;
       if ((this.project.isStandaloneProject || this.project.isSmartContainer) && !this.isWebsqlMode) {
 
         const regionsToRemove = ['@bro' + 'wser', '@web' + 'sqlOnly'];
@@ -487,7 +489,7 @@ export class BrowserCodeCut {
 
   handleTickInCode(replacement: string): string {
     if (replacement.search('`') !== -1) {
-      Helpers.warn(`[browsercodecut] Please dont use tick \` ... in ${path.basename(this.absoluteFilePathBrowserWebsql)}`)
+      Helpers.warn(`[browsercodecut] Please dont use tick \` ... in ${path.basename(this.absoluteFilePathBrowserOrWebsql)}`)
       replacement = replacement.replace(/\`/g, '\\`');
     }
     return replacement;
@@ -504,6 +506,9 @@ export class BrowserCodeCut {
     const relativePath = this.relativePath;
 
     // Helpers.log(`saving ismoprhic file: ${this.absoluteFilePath}`, 1)
+    const isFromLibs = (_.first(relativePath.split('/').slice(1)) === config.folder.libs);
+    const module = isFromLibs ? _.first(relativePath.split('/').slice(2)) : this.project.name; // taget
+    const endOfBrowserOrWebsqlCode = `\n // ${MjsModule.KEY_END_MODULE_FILE}${module}`;
     if (this.isEmptyBrowserFile && this.allowedToReplaceDotPref
       .filter(f => ![
         '.html', // fix for angular
@@ -513,23 +518,32 @@ export class BrowserCodeCut {
         '.less',
         '.json',
       ].includes(f))
-      .includes(path.extname(this.absoluteFilePathBrowserWebsql))
+      .includes(path.extname(this.absoluteFilePathBrowserOrWebsql))
     ) {
       // if (fse.existsSync(this.absoluteFilePathBrowserWebsql)) {
       //   fse.unlinkSync(this.absoluteFilePathBrowserWebsql)
       // }
-      if (!fse.existsSync(path.dirname(this.absoluteFilePathBrowserWebsql))) { // write empty instead unlink
-        fse.mkdirpSync(path.dirname(this.absoluteFilePathBrowserWebsql));
+      if (!fse.existsSync(path.dirname(this.absoluteFilePathBrowserOrWebsql))) { // write empty instead unlink
+        fse.mkdirpSync(path.dirname(this.absoluteFilePathBrowserOrWebsql));
       }
-      fse.writeFileSync(this.absoluteFilePathBrowserWebsql,
-        `/* files for browser${this.isWebsqlMode ? '-websql' : ''} mode */`, 'utf8');
+      fse.writeFileSync(
+        this.absoluteFilePathBrowserOrWebsql,
+        `/* files for browser${this.isWebsqlMode
+          ? '-websql' + endOfBrowserOrWebsqlCode
+          : '' + endOfBrowserOrWebsqlCode
+        } mode */`,
+        'utf8'
+      );
       // Helpers.log(`Delete empty: ${this.absoluteFilePath}`, 1);
     } else {
       // Helpers.log(`Not empty: ${this.absoluteFilePath}`, 1)
-      if (!fse.existsSync(path.dirname(this.absoluteFilePathBrowserWebsql))) {
-        fse.mkdirpSync(path.dirname(this.absoluteFilePathBrowserWebsql));
+      if (!fse.existsSync(path.dirname(this.absoluteFilePathBrowserOrWebsql))) {
+        fse.mkdirpSync(path.dirname(this.absoluteFilePathBrowserOrWebsql));
       }
-      fse.writeFileSync(this.absoluteFilePathBrowserWebsql, this.rawContentForBrowser, 'utf8');
+      fse.writeFileSync(this.absoluteFilePathBrowserOrWebsql,
+        this.rawContentForBrowser + endOfBrowserOrWebsqlCode,
+        'utf8'
+      );
 
 
       // if (path.isAbsolute(relativePath)) {
@@ -549,7 +563,7 @@ export class BrowserCodeCut {
     if (!this.isWebsqlMode) {
       const isEmptyModuleBackendFile = this.isEmptyModuleBackendFile
       if ((!this.isEmptyBackendFile || isEmptyModuleBackendFile) && this.allowedToReplaceDotPref
-        .includes(path.extname(this.absoluteFilePathBrowserWebsql))
+        .includes(path.extname(this.absoluteFilePathBrowserOrWebsql))
       ) {
 
 

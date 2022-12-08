@@ -452,10 +452,12 @@ export * from './${config.file.public_api}';
         if ((destinationLocationMjsFile !== destinationLocationMjsFileDest)
           && Helpers.exists(destinationLocationMjsFile)) {
           Helpers.move(destinationLocationMjsFile, destinationLocationMjsFileDest);
-          // BundleMjsFesmModuleSpliter.fixForTarget(
-          //   this.targetProj,
-          //   destinationLocationMjsFileDest,
-          // ); // @LAST
+          if (!isMap) {
+            BundleMjsFesmModuleSpliter.fixForTarget(
+              child,
+              destinationLocationMjsFileDest,
+            );
+          }
         }
       };
       //#endregion
@@ -578,7 +580,7 @@ export * from './${config.file.public_api}';
 
   //#region copy compiled sources and declarations
   copyCompiledSourcesAndDeclarations(destination: Project, isTempLocalProj: boolean) {
-    // @LAST
+
     if (isTempLocalProj) {
       this.fixAdditonalFilesAndFolders(destination);
     }

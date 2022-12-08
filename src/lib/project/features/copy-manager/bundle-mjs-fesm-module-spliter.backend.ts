@@ -5,9 +5,10 @@ import { SourceMappingUrl } from './source-maping-url.backend';
 
 export class MjsModule {
   //#region static
-  static KEY_END_MODULE_FILE = '@--end--of-file-for-module=';
-  static EXPORT_STRING = 'export {';
-  static EXPORT_STRING_END = ' };';
+  static readonly KEY_END_MODULE_FILE = '@--end-of-file-for-module=';
+  static readonly EXPORT_STRING = 'export {';
+  static readonly COMMENTS = ['*/', '/*', '*']
+  static readonly EXPORT_STRING_END = ' };';
   static EXPORT_STRING_ALL = 'export *';
   //#endregion
 
@@ -24,10 +25,10 @@ export class MjsModule {
   hasSymbol(symbolofConstFnClass: string) {
     const symbolsToFind = [
       `class ${symbolofConstFnClass}`,
-      `const ${symbolofConstFnClass}`,
-      `let ${symbolofConstFnClass}`,
-      `var ${symbolofConstFnClass}`,
-      `function ${symbolofConstFnClass}`,
+      `const ${symbolofConstFnClass} =`,
+      `let ${symbolofConstFnClass} =`,
+      `var ${symbolofConstFnClass} =`,
+      `function ${symbolofConstFnClass}(`,
     ];
 
     for (let j = 0; j < this.startIndexes.length; j++) {
@@ -56,7 +57,7 @@ export class MjsModule {
       const startIndex = this.startIndexes[j];
       const endIndex = this.endIndexes[j];
       for (let index = startIndex; index <= endIndex; index++) {
-        this.contentLines[index] = '/* */'
+        this.contentLines[index] = `/* code-for-module=${this.childModuleName} */`
       }
     }
   }
@@ -74,35 +75,34 @@ export class BundleMjsFesmModuleSpliter {
   private readonly content: string;
   private readonly originalContent: string;
   private readonly contentLines: string[];
-  private indexFirstImportIndex: number;
-  private indexLastImportIndex: number;
+  private beginLineToOmit: number | null;
   private modules: MjsModule[] = [];
   //#endregion
 
   //#region target module
-  private get targetModule(): MjsModule {
-    let founded = this.modules.find(m => m.childModuleName === this.smartContainerChild.name);
+  private get targetModules(): MjsModule[] {
+    let founded = this.modules.filter(m => m.childModuleName === this.smartContainerChild.name);
     if (!founded) {
       if (this.modules.length === 1) {
         const first = _.first(this.modules);
         first.childModuleName = this.smartContainerChild.name;
-        return first;
+        return [first];
       }
-      const line = this.contentLines[this.indexLastImportIndex + 1];
+      const line = this.contentLines[this.beginLineToOmit + 1];
       if (line
         && !line.startsWith(MjsModule.EXPORT_STRING_ALL)
         && !line.startsWith(MjsModule.EXPORT_STRING)
         && !line.startsWith(SourceMappingUrl.SOURCEMAPDES)
-        && ((this.indexLastImportIndex + 1) <= this.contentLines.length)
+        && ((this.beginLineToOmit + 1) <= this.contentLines.length)
       ) {
         const dummyModule = new MjsModule(
           this.contentLines,
-          [this.indexLastImportIndex + 1],
+          [this.beginLineToOmit + 1],
           [this.contentLines.length - 1],
           this.smartContainerChild.name,
         );
         this.modules.push(dummyModule);
-        return dummyModule;
+        return [dummyModule];
       }
       return void 0;
     }
@@ -136,38 +136,44 @@ export class BundleMjsFesmModuleSpliter {
   //#endregion
 
   //#region search for begin module index
-  private lineIsImport(line: string) {
-    return line.trim().startsWith('import {') || line.trim().startsWith('import *');
+  private isBeginLineToOmit(line: string) {
+    return line.trim().startsWith('import {')
+      || line.trim().startsWith('import *')
+      || line.trim() === ''
+      || !_.isUndefined(MjsModule.COMMENTS.find(c => line.trim().startsWith(c)))
+      ;
   }
   private searchForBeginModulesImportIndexs() {
-    this.indexFirstImportIndex = this.contentLines.findIndex(line => this.lineIsImport(line));
-    if (this.indexFirstImportIndex < 0) {
-      this.indexFirstImportIndex = 0;
-      this.indexLastImportIndex = 0;
+    const indexFirstLineToOmit = this.contentLines.findIndex(line => this.isBeginLineToOmit(line));
+    if (indexFirstLineToOmit < 0) {
+      this.beginLineToOmit = null;
       return;
     }
-    let index = this.indexFirstImportIndex;
-    this.indexLastImportIndex = this.indexFirstImportIndex;
+    let index = indexFirstLineToOmit;
+    this.beginLineToOmit = indexFirstLineToOmit;
     while (index <= (this.contentLines.length - 1)) {
+      index++;
       const line = this.contentLines[index];
-      if (this.lineIsImport(line)) {
-        this.indexLastImportIndex = index;
+      if (this.isBeginLineToOmit(line)) {
+        this.beginLineToOmit = index;
       } else {
         return;
       }
-      index++;
     }
   }
   //#endregion
 
   //#region search for modules
   private searchForModules() {
-    let index = this.indexLastImportIndex + 1;
+    let index = (this.beginLineToOmit !== null) ? (this.beginLineToOmit + 1) : 0;
     const regexEndOfFile = /\@\-\-end\-of\-file\-for\-module\=[a-z0-9|\-|\.|\-]+/;
 
     while (index <= (this.contentLines.length - 1)) {
       const line = this.contentLines[index];
-      if (line.trim().startsWith(MjsModule.EXPORT_STRING)) {
+      if (line.trim().startsWith(MjsModule.EXPORT_STRING)
+        || line.trim().startsWith(SourceMappingUrl.SOURCEMAPDES)
+        || line.trim().startsWith(MjsModule.EXPORT_STRING_ALL)
+      ) {
         return;
       }
       if (this.modules.length === 0) {
@@ -175,12 +181,19 @@ export class BundleMjsFesmModuleSpliter {
       }
       const lastModule = _.last(this.modules);
 
-      if (line.search(MjsModule.KEY_END_MODULE_FILE) !== -1) {
-        const [__, childName] = _.first(line.match(regexEndOfFile)).split('=');
+      if (line.trim().startsWith(`// ${MjsModule.KEY_END_MODULE_FILE}`)) {
+        const mathes = line.match(regexEndOfFile);
+        // if(!mathes) {
+        //   debugger
+        // }
+        const [__, childName] = (_.first(mathes)).split('=');
         lastModule.childModuleName = childName;
         lastModule.endIndexes[lastModule.endIndexes.length - 1] = index;
-        const nextLine = this.contentLines[index + 1];
-        if (!(nextLine || '').trim().startsWith(MjsModule.EXPORT_STRING)) {
+        const nextLine = (this.contentLines[index + 1] || '').trim();
+        if (!nextLine.startsWith(MjsModule.EXPORT_STRING)
+          && !nextLine.startsWith(SourceMappingUrl.SOURCEMAPDES)
+          && !nextLine.startsWith(MjsModule.EXPORT_STRING_ALL)
+        ) {
           this.modules.push(new MjsModule(this.contentLines, [index + 1], [index + 1]));
         }
       } else {
@@ -198,16 +211,18 @@ export class BundleMjsFesmModuleSpliter {
     });
 
     if (exportLineIndex !== -1) {
-      const targetModule = this.targetModule;
+      const targetModules = this.targetModules;
 
-      if (targetModule) {
+      if (targetModules) {
         let exLine = this.contentLines[exportLineIndex];
         const symbols = exLine
           .replace(MjsModule.EXPORT_STRING, '')
           .replace(MjsModule.EXPORT_STRING_END, ' ')
           .split(',')
           .map(classOrConstOrFn => classOrConstOrFn.trim())
-          .filter(f => targetModule.hasSymbol(f));
+          .filter(f => {
+            return !_.isUndefined(targetModules.find(m => m.hasSymbol(f)));
+          });
 
         this.contentLines[exportLineIndex] = `${MjsModule.EXPORT_STRING} ${symbols.join(', ')} ${MjsModule.EXPORT_STRING_END}`;
       }
@@ -228,12 +243,13 @@ export class BundleMjsFesmModuleSpliter {
   //#region write file
   private writeFile() {
     const fixedContent = this.contentLines.join('\n');
-    console.log(`${this.originalContent}
+    // this.originalContent
+    // console.log(`${this.originalContent}
 
 
-    fixed:
+    // fixed:
 
-    ${fixedContent}`);
+    // ${fixedContent}`);
     Helpers.writeFile(this.mjsFileAbsPath, fixedContent);
     // @LAST
   }

@@ -33,14 +33,14 @@
   },
 
   linkedProjects: [],
+  smartContainerBuildTarget: '',
   linkedRepos: [],
+
   libReleaseOptions: {
     nodts: false,
     obscure: false,
     ugly: false,
   },
-
-  smartContainerBuildTarget: '',
 
   type: "isomorphic-lib",
   version: "v3",
