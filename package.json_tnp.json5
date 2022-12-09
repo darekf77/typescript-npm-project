@@ -38,8 +38,8 @@
 
   libReleaseOptions: {
     nodts: false,
-    obscure: false,
-    ugly: false,
+    obscure: true,
+    ugly: true,
   },
 
   type: "isomorphic-lib",
