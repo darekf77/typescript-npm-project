@@ -3,6 +3,8 @@ import { Helpers } from "tnp-helpers";
 import { Project } from "../../abstract";
 import { SourceMappingUrl } from './source-maping-url.backend';
 
+const debugMode = false;
+
 export class MjsModule {
   //#region static
   static readonly KEY_END_MODULE_FILE = '@--end-of-file-for-module=';
@@ -57,7 +59,11 @@ export class MjsModule {
       const startIndex = this.startIndexes[j];
       const endIndex = this.endIndexes[j];
       for (let index = startIndex; index <= endIndex; index++) {
-        this.contentLines[index] = `/* code-for-module=${this.childModuleName} */`
+        if (debugMode) {
+          this.contentLines[index] = `/* code-for-module=${this.childModuleName} */`
+        } else {
+          this.contentLines[index] = '';
+        }
       }
     }
   }
@@ -242,7 +248,8 @@ export class BundleMjsFesmModuleSpliter {
 
   //#region write file
   private writeFile() {
-    const fixedContent = this.contentLines.join('\n');
+    const fixedContent = (debugMode ? this.contentLines
+      : this.contentLines.filter(f => f.trim() !== '')).join('\n');
     // this.originalContent
     // console.log(`${this.originalContent}
 

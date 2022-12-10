@@ -420,6 +420,7 @@ export * from './${config.file.public_api}';
   ) {
 
     const rootPackageNameForChildBrowser = this.rootPackageNameForChildBrowser(child, currentBrowserFolder);
+
     this.angularBrowserComiplationFoldersArr.forEach(angularCompilationFolder => {
 
       const destinationLocation = path.join(
@@ -427,16 +428,55 @@ export * from './${config.file.public_api}';
         angularCompilationFolder
       );
 
-      const pathInMonitoredLocation = path.join(this.monitoredOutDir, currentBrowserFolder, angularCompilationFolder);
-      const pathInLocalTempProj = path.join(
+      const pathInMonitoredLocation = crossPlatformPath(path.join(
+        this.monitoredOutDir,
+        currentBrowserFolder,
+        angularCompilationFolder
+      ));
+
+      const pathInLocalTempProj = crossPlatformPath(path.join(
         this.localTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
         angularCompilationFolder,
-      );
+      ));
 
       const monitorDirForModuleBrowser = isTempLocalProj ? pathInMonitoredLocation : pathInLocalTempProj;
 
       //#region  fix file fn
+      const fixNotNeeded = () => {
+        if (!isTempLocalProj) {
+          return;
+        }
+
+        const destinationPathMjs = crossPlatformPath(path.join(
+          destination.node_modules.pathFor(rootPackageNameForChildBrowser),
+          angularCompilationFolder,
+          'public-api.mjs'
+        ));
+
+        Helpers.writeFile(destinationPathMjs, `export * from './libs/${child.name}';\n`);
+
+        const destinationPathLibsFolder = crossPlatformPath(path.join(
+          destination.node_modules.pathFor(rootPackageNameForChildBrowser),
+          angularCompilationFolder,
+          config.folder.libs
+        ));
+
+        Helpers.foldersFrom(destinationPathLibsFolder)
+          .filter(f => path.basename(f) !== child.name)
+          .forEach(f => Helpers.remove(f, true));
+
+        Helpers.removeFolderIfExists(crossPlatformPath(path.join(
+          destination.node_modules.pathFor(rootPackageNameForChildBrowser),
+          angularCompilationFolder,
+          config.folder.lib,
+        )))
+      };
+
       const fixFile = (isMap: boolean = false) => {
+        if (!isTempLocalProj) {
+          return;
+        }
+
         const destinationLocationMjsFile = path.join(
           destination.node_modules.pathFor(rootPackageNameForChildBrowser),
           angularCompilationFolder,
@@ -468,6 +508,7 @@ export * from './${config.file.public_api}';
           copySymlinksAsFiles: false,
         });
         fixFile();
+        fixNotNeeded();
       }
 
       if (angularCompilationFolder === this.angularBrowserComiplationFolders.fesm2015) {
@@ -788,6 +829,21 @@ export * from './${config.file.public_api}';
       distOrBundleLocation,
       orgSpecyficFileRelativePath
     )));
+
+    /* handle this
+    "websql/esm2020/lib/index.mjs"
+    "browser/esm2020/lib/index.mjs"
+    "browser/fesm2020/main.mjs.map"
+    "browser/fesm2020/main.mjs"
+    "websql/fesm2020/main.mjs.map"
+    "websql/fesm2020/main.mjs"
+    "websql/fesm2015/main.mjs.map"
+    "websql/fesm2015/main.mjs"
+    "browser/fesm2015/main.mjs.map"
+    "browser/fesm2015/main.mjs"
+    "websql/package.json"
+    "browser/package.json"
+    */
 
     //#region handle addtional files
     if (!specyficFileRelativePath.startsWith(config.folder.libs)) {
