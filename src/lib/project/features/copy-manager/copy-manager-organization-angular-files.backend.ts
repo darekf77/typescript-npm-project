@@ -112,6 +112,8 @@ export class CopyMangerOrganizationAngularFiles {
       specyficFileRelativePathForBrowserModule: void 0 as string
     };
 
+    const isEsm2020 = (angularCompilationFolder === CopyMangerHelpers.angularBrowserComiplationFolders.esm2020);
+
     const children = this.children;
     for (let index = 0; index < children.length; index++) {
       const child = children[index];
@@ -136,16 +138,16 @@ export class CopyMangerOrganizationAngularFiles {
         angularCompilationFolder,
       ));
 
-      const broserOrWerbsqlFolderAbsPath = isTempLocalProj ? path_InMonitoredLocation : path_InLocalTempProj;
-
-      const isEsm2020 = (angularCompilationFolder === CopyMangerHelpers.angularBrowserComiplationFolders.esm2020);
+      const sourceBrowserOrWerbsqlFolderAbsPath = isTempLocalProj ? path_InMonitoredLocation : path_InLocalTempProj;
 
       Helpers.remove(childBrowserOrWebsqlDestAbsPath); // TODO This may be expensive
-      Helpers.copy(broserOrWerbsqlFolderAbsPath, childBrowserOrWebsqlDestAbsPath, {
+      Helpers.copy(sourceBrowserOrWerbsqlFolderAbsPath, childBrowserOrWebsqlDestAbsPath, {
         copySymlinksAsFiles: false,
       });
 
       this.fixBrowserFolderMjsFilesInLocalTempProj(
+        isTempLocalProj,
+        sourceBrowserOrWerbsqlFolderAbsPath,
         child,
         angularCompilationFolder,
         currentBrowserFolder,
@@ -157,6 +159,7 @@ export class CopyMangerOrganizationAngularFiles {
       );
       if (isEsm2020) {
         this.fixNotNeededFilesInESMforChildLocalTempProj(
+          isTempLocalProj,
           child,
           angularCompilationFolder,
           currentBrowserFolder,
@@ -164,6 +167,7 @@ export class CopyMangerOrganizationAngularFiles {
         );
       } else {
         this.fixBrowserFolderMjsFilesInLocalTempProj(
+          sourceBrowserOrWerbsqlFolderAbsPath,
           child,
           angularCompilationFolder,
           currentBrowserFolder,
@@ -275,6 +279,7 @@ export * from './${config.file.public_api}';
    * only for tmp-local-proj as destination
    */
   private fixNotNeededFilesInESMforChildLocalTempProj(
+    isTempLocalProj: boolean,
     child: Project,
     angularCompilationFolder: keyof typeof CopyMangerHelpers.angularBrowserComiplationFolders,
     currentBrowserFolder: Models.dev.BuildDirBrowser,
@@ -283,7 +288,7 @@ export * from './${config.file.public_api}';
 
     // ex:  '@angular/core/(browser|websql)'
     const rootPackageNameForChildBrowser = this.manager
-      .rootPackageNameForChildBrowser(this.targetProj, currentBrowserFolder);
+      .rootPackageNameForChildBrowser(child, currentBrowserFolder);
 
     const destinationPathMjs_publcApi = crossPlatformPath(path.join(
       destinationTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
@@ -291,23 +296,29 @@ export * from './${config.file.public_api}';
       'public-api.mjs'
     ));
 
-    Helpers.writeFile(destinationPathMjs_publcApi, `export * from './libs/${child.name}';\n`);
-
     const destinationPathLibsFolder = crossPlatformPath(path.join(
       destinationTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
       angularCompilationFolder,
       config.folder.libs
     ));
 
-    Helpers.foldersFrom(destinationPathLibsFolder)
-      .filter(f => path.basename(f) !== child.name)
-      .forEach(f => Helpers.remove(f, true));
+    if (child.name === this.targetProjName) {
+      Helpers.removeFolderIfExists(destinationPathLibsFolder);
+      Helpers.writeFile(destinationPathMjs_publcApi, `export * from './lib';\n`);
+    } else {
+      Helpers.writeFile(destinationPathMjs_publcApi, `export * from './libs/${child.name}';\n`);
 
-    Helpers.removeFolderIfExists(crossPlatformPath(path.join(
-      destinationTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
-      angularCompilationFolder,
-      config.folder.lib,
-    )))
+      Helpers.foldersFrom(destinationPathLibsFolder)
+        .filter(f => path.basename(f) !== child.name)
+        .forEach(f => Helpers.remove(f, true));
+
+      Helpers.removeFolderIfExists(crossPlatformPath(path.join(
+        destinationTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
+        angularCompilationFolder,
+        config.folder.lib,
+      )))
+    }
+
   };
   //#endregion
 
@@ -319,6 +330,8 @@ export * from './${config.file.public_api}';
    * that needs to be copy to proper module (with maps)
    */
   private fixBrowserFolderMjsFilesInLocalTempProj(
+    isTempLocalProj: boolean,
+    sourceBrowserOrWerbsqlFolderAbsPath: string,
     child: Project,
     angularCompilationFolder: keyof typeof CopyMangerHelpers.angularBrowserComiplationFolders,
     currentBrowserFolder: Models.dev.BuildDirBrowser,
@@ -332,11 +345,10 @@ export * from './${config.file.public_api}';
 
     // ex:  '@angular/core/(browser|websql)'
     const rootPackageNameForChildBrowser = this.manager
-      .rootPackageNameForChildBrowser(this.targetProj, currentBrowserFolder);
+      .rootPackageNameForChildBrowser(child, currentBrowserFolder);
 
-    const sourceLocationMjsFile = path.join(
-      destinationTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
-      angularCompilationFolder,
+    const sourceMjsFile = path.join(
+      sourceBrowserOrWerbsqlFolderAbsPath,
       `${this.targetProjName}.mjs${isMap ? '.map' : ''}`,
     );
 
@@ -346,20 +358,34 @@ export * from './${config.file.public_api}';
       `${child.name}.mjs${isMap ? '.map' : ''}`,
     );
 
-    const allowedToMoveFile = (sourceLocationMjsFile !== destinationLocationMjsFileDest)
-      && Helpers.exists(sourceLocationMjsFile);
 
-    if (allowedToMoveFile) {
-      Helpers.move(sourceLocationMjsFile, destinationLocationMjsFileDest);
+    Helpers.copyFile(sourceMjsFile, destinationLocationMjsFileDest);
 
-      if (useModuleSpliter && !isMap) {
-        BundleMjsFesmModuleSpliter.fixForTarget(
-          child,
-          destinationLocationMjsFileDest,
-        );
-      }
+    // if (!isTempLocalProj && (child.name !== this.targetProjName)) {
+    //   const destinationLocationMjsFileDestTargeFileToRemove = path.join(
+    //     destinationTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
+    //     angularCompilationFolder,
+    //     `${this.targetProjName}.mjs${isMap ? '.map' : ''}`,
+    //   );
+    //   Helpers.removeFileIfExists(destinationLocationMjsFileDestTargeFileToRemove);
+    // }
 
+    if (useModuleSpliter && !isMap) {
+      BundleMjsFesmModuleSpliter.fixForTarget(
+        child,
+        destinationLocationMjsFileDest,
+      );
     }
+
+    // if (child.name !== this.targetProjName) {
+    //   const destinationLocationMjsFileDestToRemove = path.join(
+    //     destinationTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
+    //     angularCompilationFolder,
+    //     `${this.targetProjName}.mjs${isMap ? '.map' : ''}`,
+    //   );
+    //   Helpers.removeIfExists(destinationLocationMjsFileDestToRemove);
+    // }
+
   };
   //#endregion
 

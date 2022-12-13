@@ -3,7 +3,7 @@ import { Helpers } from "tnp-helpers";
 import { Project } from "../../abstract";
 import { SourceMappingUrl } from './source-maping-url.backend';
 
-const debugMode = false;
+const debugMode = true;
 
 export class MjsModule {
   //#region static
