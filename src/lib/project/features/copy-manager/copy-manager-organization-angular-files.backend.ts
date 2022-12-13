@@ -167,6 +167,7 @@ export class CopyMangerOrganizationAngularFiles {
         );
       } else {
         this.fixBrowserFolderMjsFilesInLocalTempProj(
+          isTempLocalProj,
           sourceBrowserOrWerbsqlFolderAbsPath,
           child,
           angularCompilationFolder,
@@ -361,14 +362,15 @@ export * from './${config.file.public_api}';
 
     Helpers.copyFile(sourceMjsFile, destinationLocationMjsFileDest);
 
-    // if (!isTempLocalProj && (child.name !== this.targetProjName)) {
-    //   const destinationLocationMjsFileDestTargeFileToRemove = path.join(
-    //     destinationTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
-    //     angularCompilationFolder,
-    //     `${this.targetProjName}.mjs${isMap ? '.map' : ''}`,
-    //   );
-    //   Helpers.removeFileIfExists(destinationLocationMjsFileDestTargeFileToRemove);
-    // }
+
+    if (!isTempLocalProj && (child.name !== this.targetProjName)) {
+      const destinationLocationMjsFileDestTargeFileToRemove = path.join(
+        destinationTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
+        angularCompilationFolder,
+        `${this.targetProjName}.mjs${isMap ? '.map' : ''}`,
+      );
+      Helpers.removeFileIfExists(destinationLocationMjsFileDestTargeFileToRemove);
+    }
 
     if (useModuleSpliter && !isMap) {
       BundleMjsFesmModuleSpliter.fixForTarget(
