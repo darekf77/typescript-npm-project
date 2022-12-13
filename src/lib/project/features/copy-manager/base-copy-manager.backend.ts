@@ -21,7 +21,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   private readonly _isomorphicPackages = [] as string[];
   protected readonly copyto: Project[] = [];
   protected readonly args: string;
-  protected readonly outDir: Models.dev.BuildDir;
+  readonly outDir: Models.dev.BuildDir;
   protected readonly watch: boolean;
   protected readonly renameDestinationFolder?: string;
 

@@ -7,11 +7,13 @@ import { CLASS } from "typescript-class-helpers";
 import { Project } from "../../abstract/project/project";
 import { BundleMjsFesmModuleSpliter } from "./bundle-mjs-fesm-module-spliter.backend";
 import { CopyMangerHelpers } from "./copy-manager-helpers.backend";
+import { CopyMangerOrganizationAngularFiles } from "./copy-manager-organization-angular-files.backend";
 import { CopyManagerStandalone } from "./copy-manager-standalone.backend";
 
 @CLASS.NAME('CopyManagerOrganization')
 export class CopyManagerOrganization extends CopyManagerStandalone {
   protected readonly children: Project[];
+  protected readonly angularCopyManger: CopyMangerOrganizationAngularFiles;
 
   //#region getters / project to copy to
   get projectToCopyTo() {
@@ -24,15 +26,6 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     }
     return [this.localTempProj];
   }
-  //#endregion
-
-  //#region angular browser compilation folders
-  protected readonly angularBrowserComiplationFolders = {
-    esm2020: 'esm2020',
-    fesm2015: 'fesm2015',
-    fesm2020: 'fesm2020',
-  };
-  protected readonly angularBrowserComiplationFoldersArr = Object.values(this.angularBrowserComiplationFolders);
   //#endregion
 
   //#region target project name
@@ -70,6 +63,8 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     super.init(buildOptions, renameDestinationFolder);
     // @ts-ignore
     this.children = this.getChildren();
+    // @ts-ignore
+    this.angularCopyManger = new CopyMangerOrganizationAngularFiles(this);
   }
   //#endregion
 
@@ -271,88 +266,6 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   }
   //#endregion
 
-  fixAngularPackageJson(child: Project, destination: Project, currentBrowserFolder?: Models.dev.BuildDirBrowser) {
-    const childPackageName = path.join(this.rootPackageName, child.name);
-
-    if (currentBrowserFolder) {
-      const rootPackageNameForChildBrowser = path.join(childPackageName, currentBrowserFolder);
-      const location = destination.node_modules.pathFor(rootPackageNameForChildBrowser);
-      const childName = child.name;
-      const pj = {
-        "name": rootPackageNameForChildBrowser,
-        "version": "0.0.0",
-        "module": `fesm2015/${childName}.mjs`,
-        "es2020": `fesm2020/${childName}.mjs`,
-        "esm2020": `esm2020/${childName}.mjs`,
-        "fesm2020": `fesm2020/${childName}.mjs`,
-        "fesm2015": `fesm2015/${childName}.mjs`,
-        "typings": `${childName}.d.ts`,
-        "exports": {
-          "./package.json": {
-            "default": "./package.json"
-          },
-          ".": {
-            "types": `./${childName}.d.ts`,
-            "esm2020": `./esm2020/${childName}.mjs`,
-            "es2020": `./fesm2020/${childName}.mjs`,
-            "es2015": `./fesm2015/${childName}.mjs`,
-            "node": `./fesm2015/${childName}.mjs`,
-            "default": `./fesm2020/${childName}.mjs`
-          }
-        },
-        "sideEffects": false
-      };
-      Helpers.writeJson([location, config.file.package_json], pj);
-    } else {
-      const location = destination.node_modules.pathFor(childPackageName);
-      // const childName = child.name;
-      const pj = {
-        "name": childPackageName,
-        "version": "0.0.0",
-      };
-      // const exportsKey = 'exports';
-      // pj[exportsKey] = {};
-      for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
-        const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
-        pj[`.${currentBrowserFolder}`] = `./${currentBrowserFolder}`;
-        // pj[`${exportsKey}${currentBrowserFolder}`] =
-      }
-      Helpers.writeJson([location, config.file.package_json], pj);
-    }
-
-  }
-
-  //#region fix angular package browser files
-  fixAngularBuildRelatedFiles(child: Project, destination: Project, currentBrowserFolder: Models.dev.BuildDirBrowser) {
-
-    const childPackageName = path.join(this.rootPackageName, child.name);
-    const rootPackageNameForChildBrowser = path.join(childPackageName, currentBrowserFolder);
-    const location = destination.node_modules.pathFor(rootPackageNameForChildBrowser);
-    this.fixAngularPackageJson(child, destination, currentBrowserFolder);
-
-    //#region <child-name>.d.ts
-    Helpers.writeFile([location, `${child.name}.d.ts`], `
-/**
- * Generated bundle index. Do not edit.
- */
-/// <amd-module name="main" />
-export * from './${config.file.public_api}';
-    `.trimLeft());
-    //#endregion
-
-    //#region public api.ts
-    Helpers.writeFile([location, config.file.public_api_d_ts], `
-     /**
-      * Generated bundle index. Do not edit.
-      */
-     /// <amd-module name="main" />
-     export * from './${config.file.index}';
-         `.trimLeft());
-    //#endregion
-
-  }
-  //#endregion
-
   //#region write specyfic for child dts files
   /**
    * final copy from dist|bundle to node_moules/rootpackagename
@@ -411,130 +324,6 @@ export * from './${config.file.public_api}';
   }
   //#endregion
 
-  //#region fixes for dts child files
-  copyAngularBrowserFolders(
-    destination: Project,
-    isTempLocalProj: boolean,
-    child: Project,
-    currentBrowserFolder: Models.dev.BuildDirBrowser,
-  ) {
-
-    const rootPackageNameForChildBrowser = this.rootPackageNameForChildBrowser(child, currentBrowserFolder);
-
-    this.angularBrowserComiplationFoldersArr.forEach(angularCompilationFolder => {
-
-      const destinationLocation = path.join(
-        destination.node_modules.pathFor(rootPackageNameForChildBrowser),
-        angularCompilationFolder
-      );
-
-      const pathInMonitoredLocation = crossPlatformPath(path.join(
-        this.monitoredOutDir,
-        currentBrowserFolder,
-        angularCompilationFolder
-      ));
-
-      const pathInLocalTempProj = crossPlatformPath(path.join(
-        this.localTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
-        angularCompilationFolder,
-      ));
-
-      const monitorDirForModuleBrowser = isTempLocalProj ? pathInMonitoredLocation : pathInLocalTempProj;
-
-      //#region  fix file fn
-      const fixNotNeeded = () => {
-        if (!isTempLocalProj) {
-          return;
-        }
-
-        const destinationPathMjs = crossPlatformPath(path.join(
-          destination.node_modules.pathFor(rootPackageNameForChildBrowser),
-          angularCompilationFolder,
-          'public-api.mjs'
-        ));
-
-        Helpers.writeFile(destinationPathMjs, `export * from './libs/${child.name}';\n`);
-
-        const destinationPathLibsFolder = crossPlatformPath(path.join(
-          destination.node_modules.pathFor(rootPackageNameForChildBrowser),
-          angularCompilationFolder,
-          config.folder.libs
-        ));
-
-        Helpers.foldersFrom(destinationPathLibsFolder)
-          .filter(f => path.basename(f) !== child.name)
-          .forEach(f => Helpers.remove(f, true));
-
-        Helpers.removeFolderIfExists(crossPlatformPath(path.join(
-          destination.node_modules.pathFor(rootPackageNameForChildBrowser),
-          angularCompilationFolder,
-          config.folder.lib,
-        )))
-      };
-
-      const fixFile = (isMap: boolean = false) => {
-        if (!isTempLocalProj) {
-          return;
-        }
-
-        const destinationLocationMjsFile = path.join(
-          destination.node_modules.pathFor(rootPackageNameForChildBrowser),
-          angularCompilationFolder,
-          `${this.targetProjName}.mjs${isMap ? '.map' : ''}`,
-        );
-
-        const destinationLocationMjsFileDest = path.join(
-          destination.node_modules.pathFor(rootPackageNameForChildBrowser),
-          angularCompilationFolder,
-          `${child.name}.mjs${isMap ? '.map' : ''}`,
-        );
-
-        if ((destinationLocationMjsFile !== destinationLocationMjsFileDest)
-          && Helpers.exists(destinationLocationMjsFile)) {
-          Helpers.move(destinationLocationMjsFile, destinationLocationMjsFileDest);
-          if (!isMap) {
-            BundleMjsFesmModuleSpliter.fixForTarget(
-              child,
-              destinationLocationMjsFileDest,
-            );
-          }
-        }
-      };
-      //#endregion
-
-      if (angularCompilationFolder === this.angularBrowserComiplationFolders.esm2020) {
-        // TODO better way to extract data for child module from angular build
-        Helpers.copy(monitorDirForModuleBrowser, destinationLocation, {
-          copySymlinksAsFiles: false,
-        });
-        fixFile();
-        fixNotNeeded();
-      }
-
-      if (angularCompilationFolder === this.angularBrowserComiplationFolders.fesm2015) {
-        // TODO better way to extract data for child module from angular build
-        Helpers.copy(monitorDirForModuleBrowser, destinationLocation, {
-          copySymlinksAsFiles: false,
-        });
-        fixFile();
-        fixFile(true);
-      }
-
-      if (angularCompilationFolder === this.angularBrowserComiplationFolders.fesm2020) {
-        // TODO better way to extract data for child module from angular build
-        Helpers.copy(monitorDirForModuleBrowser, destinationLocation, {
-          copySymlinksAsFiles: false,
-        });
-        fixFile();
-        fixFile(true);
-      }
-
-
-    })
-
-  }
-  //#endregion
-
   //#region copy compiled source and declaration (browser)
   /**
    * Problem here: spliting es2022, esfm2015 to modules
@@ -547,16 +336,31 @@ export * from './${config.file.public_api}';
     for (let index = 0; index < this.children.length; index++) {
       //#region prepare variables
       const child = this.children[index];
-      this.fixAngularPackageJson(child, destination);
-
+      this.angularCopyManger.fixPackageJson(child, destination);
       for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
         const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
         this.fixesForChildDtsFile(destination, isTempLocalProj, child, currentBrowserFolder);
-        this.fixAngularBuildRelatedFiles(child, destination, currentBrowserFolder);
-        this.copyAngularBrowserFolders(destination, isTempLocalProj, child, currentBrowserFolder);
+        this.angularCopyManger.fixPackageJson(child, destination, currentBrowserFolder);
+        this.angularCopyManger.fixBuildRelatedFiles(child, destination, currentBrowserFolder);
         //#endregion
       }
     }
+
+    for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
+      const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
+      CopyMangerHelpers.angularBrowserComiplationFoldersArr
+        .forEach(angularCompilationFolder => {
+          this.angularCopyManger.actionForFolder(
+            destination,
+            isTempLocalProj,
+            currentBrowserFolder,
+            angularCompilationFolder,
+          )
+        });
+    }
+
+
+
   }
   //#endregion
 
@@ -810,14 +614,14 @@ export * from './${config.file.public_api}';
   //#endregion
 
   //#region handle copy of single file
-  handleCopyOfSingleFile(
+
+  //#region handle copy of single file / from child from libs
+  handleCopyOfSingleFileForChildFromLibs(
+    specyficFileRelativePath: string,
     destination: Project,
     isTempLocalProj: boolean,
-    specyficFileRelativePath: string,
-    wasRecrusive = false
-  ): void {
-
-    specyficFileRelativePath = specyficFileRelativePath.replace(/^\//, '');
+    wasRecrusive: boolean,
+  ) {
 
     const orgSpecyficFileRelativePath = specyficFileRelativePath;
 
@@ -829,53 +633,6 @@ export * from './${config.file.public_api}';
       distOrBundleLocation,
       orgSpecyficFileRelativePath
     )));
-
-    /* handle this
-    "websql/esm2020/lib/index.mjs"
-    "browser/esm2020/lib/index.mjs"
-    "browser/fesm2020/main.mjs.map"
-    "browser/fesm2020/main.mjs"
-    "websql/fesm2020/main.mjs.map"
-    "websql/fesm2020/main.mjs"
-    "websql/fesm2015/main.mjs.map"
-    "websql/fesm2015/main.mjs"
-    "browser/fesm2015/main.mjs.map"
-    "browser/fesm2015/main.mjs"
-    "websql/package.json"
-    "browser/package.json"
-    */
-
-    //#region handle addtional files
-    if (!specyficFileRelativePath.startsWith(config.folder.libs)) {
-      // console.log(`ommiting: ${specyficFileRelativePath}`)
-
-      const isBackendMapsFileAppJS = specyficFileRelativePath.endsWith('.js.map');
-      const isBrowserMapsFileAppJS = specyficFileRelativePath.endsWith('.mjs.map');
-
-      this.fixDtsImportsWithWronPackageName(
-        absOrgFilePathInDistOrBundle,
-        absOrgFilePathInDistOrBundle,
-      );
-
-      if (isBackendMapsFileAppJS || isBrowserMapsFileAppJS) {
-        if (isBackendMapsFileAppJS) {
-          this.writeFixedMapFile(
-            false,
-            specyficFileRelativePath,
-            distOrBundleLocation,
-          )
-        }
-        if (isBrowserMapsFileAppJS) {
-          this.writeFixedMapFile(
-            true,
-            specyficFileRelativePath,
-            distOrBundleLocation
-          )
-        }
-      }
-      return;
-    }
-    //#endregion
 
     const childName = _.first(specyficFileRelativePath.split('/').slice(1));
     const child = this.children.find(c => c.name === childName);
@@ -889,11 +646,6 @@ export * from './${config.file.public_api}';
     const rootPackageNameForChild = path.join(this.rootPackageName, child.name);
 
     Helpers.log(`Handle single file: ${specyficFileRelativePath} for ${rootPackageNameForChild}`)
-
-
-    if (this.notAllowedFiles.includes(specyficFileRelativePath)) {
-      return;
-    }
 
 
     if (!wasRecrusive) {
@@ -915,9 +667,7 @@ export * from './${config.file.public_api}';
       return;
     }
 
-
     this.fixDtsImportsWithWronPackageName(absOrgFilePathInDistOrBundle, destinationFilePath)
-
 
     const isBackendMapsFile = destinationFilePath.endsWith('.js.map');
     const isBrowserMapsFile = destinationFilePath.endsWith('.mjs.map');
@@ -940,13 +690,89 @@ export * from './${config.file.public_api}';
     } else {
       Helpers.writeFile(destinationFilePath, (Helpers.readFile(absOrgFilePathInDistOrBundle) || ''));
     }
+  }
+  //#endregion
 
+  //#region handle copy of single file / from app or root of (dist|bundle)
+  handleCopyOfSingleFileFromAppAndRoot(
+    specyficFileRelativePath: string,
+    destination: Project,
+    isTempLocalProj: boolean,
+    wasRecrusive: boolean,
+  ) {
+    const orgSpecyficFileRelativePath = specyficFileRelativePath;
 
+    const distOrBundleLocation = crossPlatformPath(path.join(
+      this.targetProj.location,
+      this.outDir,
+    ))
+    const absOrgFilePathInDistOrBundle = crossPlatformPath(path.normalize(path.join(
+      distOrBundleLocation,
+      orgSpecyficFileRelativePath
+    )));
 
-    // TODO check this
-    if (specyficFileRelativePath === config.file.package_json) {
-      // TODO this is VSCODE/typescirpt new fucking issue
-      // Helpers.copyFile(sourceFile, path.join(path.dirname(destinationFile), config.folder.browser, path.basename(destinationFile)));
+    const isBackendMapsFileAppJS = specyficFileRelativePath.endsWith('.js.map');
+    const isBrowserMapsFileAppJS = specyficFileRelativePath.endsWith('.mjs.map');
+
+    this.fixDtsImportsWithWronPackageName(
+      absOrgFilePathInDistOrBundle,
+      absOrgFilePathInDistOrBundle,
+    );
+
+    if (isBackendMapsFileAppJS || isBrowserMapsFileAppJS) {
+      if (isBackendMapsFileAppJS) {
+        this.writeFixedMapFile(
+          false,
+          specyficFileRelativePath,
+          distOrBundleLocation,
+        )
+      }
+      if (isBrowserMapsFileAppJS) {
+        this.writeFixedMapFile(
+          true,
+          specyficFileRelativePath,
+          distOrBundleLocation
+        )
+      }
+    }
+  }
+  //#endregion
+
+  handleCopyOfSingleFile(
+    destination: Project,
+    isTempLocalProj: boolean,
+    specyficFileRelativePath: string,
+    wasRecrusive = false
+  ): void {
+    specyficFileRelativePath = specyficFileRelativePath.replace(/^\//, '');
+    if (this.notAllowedFiles.includes(specyficFileRelativePath)) {
+      return;
+    }
+
+    if (specyficFileRelativePath.startsWith(config.folder.libs)) {
+      this.handleCopyOfSingleFileForChildFromLibs(
+        specyficFileRelativePath,
+        destination,
+        isTempLocalProj,
+        wasRecrusive,
+      );
+    } else if (
+      specyficFileRelativePath.startsWith(config.folder.browser) ||
+      specyficFileRelativePath.startsWith(config.folder.websql)
+    ) {
+      this.angularCopyManger.handleCopyOfSingleFile(
+        specyficFileRelativePath,
+        destination,
+        isTempLocalProj,
+        wasRecrusive,
+      );
+    } else {
+      this.handleCopyOfSingleFileFromAppAndRoot(
+        specyficFileRelativePath,
+        destination,
+        isTempLocalProj,
+        wasRecrusive,
+      );
     }
   }
   //#endregion

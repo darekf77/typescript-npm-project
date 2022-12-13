@@ -10,6 +10,17 @@ import { Helpers } from 'tnp-helpers';;
 //#endregion
 export namespace CopyMangerHelpers {
 
+
+  export const angularBrowserComiplationFolders = {
+    esm2020: 'esm2020',
+    fesm2015: 'fesm2015',
+    fesm2020: 'fesm2020',
+  };
+
+  export const angularBrowserComiplationFoldersArr = Object.values(
+    angularBrowserComiplationFolders
+  ) as (keyof typeof angularBrowserComiplationFolders)[]
+
   //#region helpers / browser websql folders
   export const browserwebsqlFolders = [
     config.folder.browser,
