@@ -501,6 +501,26 @@ export class BrowserCodeCut {
     return replacement;
   }
 
+  private fixComments(s: string, fileAbsPath: string, endComment?: string) {
+    if (!fileAbsPath.endsWith('.ts')) {
+      return s;
+    }
+
+    const endOfFile = ((fileAbsPath.endsWith('.ts') && endComment) ? endComment : '');
+
+    const splited = s.split('\n');
+    return splited
+      .map((line) => {
+        if ((line.trimLeft().startsWith('// ') || line.trimLeft().startsWith('//#'))
+          && (line.search('@ts-ignore') === -1)
+        ) {
+          return ''
+        }
+        return line;
+      })
+      .join('\n') + endOfFile;
+  }
+
   saveOrDelete() {
     const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
     const relativePath = this.relativePath;
@@ -508,7 +528,7 @@ export class BrowserCodeCut {
     // Helpers.log(`saving ismoprhic file: ${this.absoluteFilePath}`, 1)
     const isFromLibs = (_.first(relativePath.split('/').slice(1)) === config.folder.libs);
     const module = isFromLibs ? _.first(relativePath.split('/').slice(2)) : this.project.name; // taget
-    const endOfBrowserOrWebsqlCode = `\n // ${MjsModule.KEY_END_MODULE_FILE}${module}`;
+    const endOfBrowserOrWebsqlCode = `\n ${MjsModule.KEY_END_MODULE_FILE}${module} ${relativePath}`;
     if (this.isEmptyBrowserFile && this.allowedToReplaceDotPref
       .filter(f => ![
         '.html', // fix for angular
@@ -541,7 +561,7 @@ export class BrowserCodeCut {
         fse.mkdirpSync(path.dirname(this.absoluteFilePathBrowserOrWebsql));
       }
       fse.writeFileSync(this.absoluteFilePathBrowserOrWebsql,
-        this.rawContentForBrowser + endOfBrowserOrWebsqlCode,
+        this.fixComments(this.rawContentForBrowser, this.absoluteFilePathBrowserOrWebsql, endOfBrowserOrWebsqlCode),
         'utf8'
       );
 

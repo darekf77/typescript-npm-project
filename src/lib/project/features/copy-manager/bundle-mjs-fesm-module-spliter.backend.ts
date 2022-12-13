@@ -7,7 +7,7 @@ const debugMode = true;
 
 export class MjsModule {
   //#region static
-  static readonly KEY_END_MODULE_FILE = '@--end-of-file-for-module=';
+  static readonly KEY_END_MODULE_FILE = ';({}); // @--end-of-file-for-module=';
   static readonly EXPORT_STRING = 'export {';
   static readonly COMMENTS = ['*/', '/*', '*']
   static readonly EXPORT_STRING_END = ' };';
@@ -26,7 +26,7 @@ export class MjsModule {
   //#region has symbol
   hasSymbol(symbolofConstFnClass: string) {
     const symbolsToFind = [
-      `class ${symbolofConstFnClass}`,
+      `class ${symbolofConstFnClass} `,
       `const ${symbolofConstFnClass} =`,
       `let ${symbolofConstFnClass} =`,
       `var ${symbolofConstFnClass} =`,
@@ -172,6 +172,13 @@ export class BundleMjsFesmModuleSpliter {
   //#region search for modules
   private searchForModules() {
     let index = (this.beginLineToOmit !== null) ? (this.beginLineToOmit + 1) : 0;
+    // const stringForRegex = `${Helpers.escapeStringForRegEx(MjsModule.KEY_END_MODULE_FILE)}[a-z0-9|\\-|\\.|\\-]+`; // TODO
+    // console.log({
+    //   stringForRegex
+    // })
+    // const regexEndOfFile = new RegExp(stringForRegex);
+    // const regexEndOfFile = /\;\(\{\}\)\;\ \/\/ \@\-\-end\-of\-file\-for\-module\=[a-z0-9|\-|\.|\-]+/;
+    // const regexEndOfFile = /\(\{\}\)\;\ \/\/\ @--end-of-file-for-module=/
     const regexEndOfFile = /\@\-\-end\-of\-file\-for\-module\=[a-z0-9|\-|\.|\-]+/;
 
     while (index <= (this.contentLines.length - 1)) {
@@ -187,12 +194,18 @@ export class BundleMjsFesmModuleSpliter {
       }
       const lastModule = _.last(this.modules);
 
-      if (line.trim().startsWith(`// ${MjsModule.KEY_END_MODULE_FILE}`)) {
+      if (line.trimLeft().startsWith(MjsModule.KEY_END_MODULE_FILE.slice(1))) {
         const mathes = line.match(regexEndOfFile);
         // if(!mathes) {
         //   debugger
         // }
-        const [__, childName] = (_.first(mathes)).split('=');
+        // console.log('founded')
+        // console.log({
+        //   mathes
+        // })
+        let [__, childName] = (_.first(mathes)).split('=');
+        childName = _.first(childName.split(' '));
+
         lastModule.childModuleName = childName;
         lastModule.endIndexes[lastModule.endIndexes.length - 1] = index;
         const nextLine = (this.contentLines[index + 1] || '').trim();

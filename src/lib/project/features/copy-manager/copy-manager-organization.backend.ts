@@ -399,6 +399,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   //#endregion
 
   //#region fix additonal files and folder
+  // @LAST not working for organization websql + add // @ts-nocheckto to of dts
   fixAdditonalFilesAndFolders(destination: Project) {
     const additonakFiles = this.filesForSpecyficTarget();
     // console.log({
