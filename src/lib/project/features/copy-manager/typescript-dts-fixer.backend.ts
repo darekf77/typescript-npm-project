@@ -101,7 +101,7 @@ export class TypescriptDtsFixer {
     if (!dtsFileAbsolutePath.endsWith('.d.ts')) {
       return;
     }
-    console.log({ dtsFileAbsolutePath })
+    // console.log({ dtsFileAbsolutePath })
 
     const dtsFileContent = Helpers.readFile(dtsFileAbsolutePath);
     const dtsFixedContent = this.forContent(

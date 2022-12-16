@@ -310,7 +310,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     currentBrowserFolder: Models.dev.BuildDirBrowser,
   ) {
 
-    // ex. @anguar/code/browser or @anguar/code/websqkl
+    // ex. @anguar/code/browser or @anguar/code/websql
     const rootPackageNameForChildBrowser = this.rootPackageNameForChildBrowser(child, currentBrowserFolder);
 
     if (child.name === this.targetProjName) { // target is in lib.... -> no need for target also being in libs
@@ -410,7 +410,6 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   //#endregion
 
   //#region fix additonal files and folder
-  // @LAST not working for organization websql + add // @ts-nocheckto to of dts
   fixAdditonalFilesAndFolders(destination: Project) {
     const additonakFiles = this.filesForSpecyficTarget();
     // console.log({
@@ -678,7 +677,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       return;
     }
 
-    this.fixDtsImportsWithWronPackageName(absOrgFilePathInDistOrBundle, destinationFilePath)
+    // this.fixDtsImportsWithWronPackageName(absOrgFilePathInDistOrBundle, destinationFilePath)
 
     const isBackendMapsFile = destinationFilePath.endsWith('.js.map');
     const isBrowserMapsFile = destinationFilePath.endsWith('.mjs.map');
@@ -725,10 +724,10 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     const isBackendMapsFileAppJS = specyficFileRelativePath.endsWith('.js.map');
     const isBrowserMapsFileAppJS = specyficFileRelativePath.endsWith('.mjs.map');
 
-    this.fixDtsImportsWithWronPackageName(
-      absOrgFilePathInDistOrBundle,
-      absOrgFilePathInDistOrBundle,
-    );
+    // this.fixDtsImportsWithWronPackageName(
+    //   absOrgFilePathInDistOrBundle,
+    //   absOrgFilePathInDistOrBundle,
+    // );
 
     if (isBackendMapsFileAppJS || isBrowserMapsFileAppJS) {
       if (isBackendMapsFileAppJS) {

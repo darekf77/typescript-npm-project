@@ -15,6 +15,10 @@ export class CopyMangerOrganizationAngularFiles {
     return this.manager.targetProj;
   }
 
+  get dtsFixer() {
+    return this.manager.dtsFixer;
+  }
+
   get targetProjName() {
     return this.manager.targetProjName;
   }
@@ -77,23 +81,46 @@ export class CopyMangerOrganizationAngularFiles {
       specyficFileRelativePath.split('/')
     ) as Models.dev.BuildDirBrowser;
 
-    const angularCompilationFolder = _.first(
+    const angularCompilationFolderOrLibs = _.first(
       specyficFileRelativePath.split('/').slice(1)
     ) as keyof typeof CopyMangerHelpers.angularBrowserComiplationFolders;
 
-    if (CopyMangerHelpers.angularBrowserComiplationFoldersArr.includes(angularCompilationFolder)) {
+    if (CopyMangerHelpers.angularBrowserComiplationFoldersArr.includes(angularCompilationFolderOrLibs)) {
       this.actionForFolder(
         destination,
         isTempLocalProj,
         currentBrowserFolder,
-        angularCompilationFolder,
+        angularCompilationFolderOrLibs,
         {
           specyficFileRelativePathForBrowserModule: specyficFileRelativePath.split('/').slice(2).join('/')
         }
       );
+    } else if (angularCompilationFolderOrLibs === config.folder.libs) {
+      const childName = _.first(specyficFileRelativePath.split('/').slice(2));
+      const child = this.children.find(c => c.name === childName);
+      const rootPackageNameForChildBrowser = this.rootPackageNameForChildBrowser(child, currentBrowserFolder);
+      const relativePath = specyficFileRelativePath.split('/').splice(3).join('/');
+      const absSourcePath = isTempLocalProj
+        ? path.join(this.monitoredOutDir, specyficFileRelativePath)
+        : path.join(
+          this.localTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
+          relativePath,
+        );
+
+      let content = Helpers.readFile(absSourcePath);
+      if (isTempLocalProj && relativePath.endsWith('.d.ts')) {
+        content = this.dtsFixer.forContent(content, currentBrowserFolder);
+      }
+      const detinationFilePath = path.join(
+        destination.node_modules.pathFor(rootPackageNameForChildBrowser),
+        relativePath,
+      );
+      Helpers.writeFile(detinationFilePath, content);
     } else {
+      // console.log('should be something here?')
       // TODO
       // copyt file ?? or fix package json ?
+      // debugger
     }
   }
   //#endregion
@@ -390,6 +417,10 @@ export * from './${config.file.public_api}';
 
   };
   //#endregion
+
+  rootPackageNameForChildBrowser(child: Project, currentBrowserFolder: Models.dev.BuildDirBrowser) {
+    return this.manager.rootPackageNameForChildBrowser(child, currentBrowserFolder);
+  }
 
   //#endregion
 }

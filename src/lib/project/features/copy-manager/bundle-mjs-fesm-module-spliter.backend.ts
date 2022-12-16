@@ -271,7 +271,6 @@ export class BundleMjsFesmModuleSpliter {
 
     // ${fixedContent}`);
     Helpers.writeFile(this.mjsFileAbsPath, fixedContent);
-    // @LAST
   }
   //#endregion
 
