@@ -488,7 +488,12 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
 
   //#region source for child
   sourcePathToLinkFor(child: Project) {
-    const sourceToLink = crossPlatformPath(path.join(this.project.location, child.name, config.folder.src, config.folder.lib));
+    const sourceToLink = crossPlatformPath(path.join(
+      this.project.location,
+      child.name,
+      config.folder.src,
+      config.folder.lib,
+    ));
     return sourceToLink;
   }
   //#endregion
