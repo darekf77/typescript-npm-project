@@ -309,16 +309,27 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     child: Project,
     currentBrowserFolder: Models.dev.BuildDirBrowser,
   ) {
+
+    // ex. @anguar/code/browser or @anguar/code/websqkl
     const rootPackageNameForChildBrowser = this.rootPackageNameForChildBrowser(child, currentBrowserFolder);
 
-    const monitorDirForModuleBrowser = isTempLocalProj //
-      ? path.join(this.monitoredOutDir, currentBrowserFolder, config.folder.libs, child.name)
-      : this.localTempProj.node_modules.pathFor(rootPackageNameForChildBrowser);
+    if (child.name === this.targetProjName) { // target is in lib.... -> no need for target also being in libs
+      const monitorDirForModuleBrowser = isTempLocalProj //
+        ? path.join(this.monitoredOutDir, currentBrowserFolder, config.folder.lib)
+        : this.localTempProj.node_modules.pathFor(rootPackageNameForChildBrowser);
 
-    if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist|bundle)
-      CopyMangerHelpers.fixingDtsImports(monitorDirForModuleBrowser, this.isomorphicPackages);
-    }
-    if (child.name !== this.targetProjName) { // target is in lib.... -> no need for target also being in libs
+      if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist|bundle)
+        this.dtsFixer.processFolder(monitorDirForModuleBrowser, currentBrowserFolder);
+      }
+      this.writeSpecyficForChildDtsFiles(destination, rootPackageNameForChildBrowser, monitorDirForModuleBrowser);
+    } else {
+      const monitorDirForModuleBrowser = isTempLocalProj //
+        ? path.join(this.monitoredOutDir, currentBrowserFolder, config.folder.libs, child.name)
+        : this.localTempProj.node_modules.pathFor(rootPackageNameForChildBrowser);
+
+      if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist|bundle)
+        this.dtsFixer.processFolder(monitorDirForModuleBrowser, currentBrowserFolder);
+      }
       this.writeSpecyficForChildDtsFiles(destination, rootPackageNameForChildBrowser, monitorDirForModuleBrowser);
     }
   }
@@ -407,19 +418,18 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     // })
     additonakFiles.forEach(specyficFileAbsPath => {
       const specyficFileRelativePath = specyficFileAbsPath.replace(`${this.monitoredOutDir}/`, '');
-      if (specyficFileRelativePath.endsWith('.d.ts')) {
-        CopyMangerHelpers.browserwebsqlFolders.forEach(currentBrowserFolder => {
-          const dtsFileAbsolutePath = crossPlatformPath(path.join(this.monitoredOutDir, specyficFileRelativePath));
-          CopyMangerHelpers.writeFixedVersionOfDtsFile(
-            dtsFileAbsolutePath,
-            currentBrowserFolder,
-            this.isomorphicPackages,
-          );
-        });
-      } else if (specyficFileRelativePath.endsWith('.js.map')) {
-        this.writeFixedMapFile(true, specyficFileRelativePath, this.monitoredOutDir);
-        this.writeFixedMapFile(false, specyficFileRelativePath, this.monitoredOutDir);
-      }
+      // if (specyficFileRelativePath.endsWith('.d.ts')) {
+      //   CopyMangerHelpers.browserwebsqlFolders.forEach(currentBrowserFolder => {
+      //     const dtsFileAbsolutePath = crossPlatformPath(path.join(this.monitoredOutDir, specyficFileRelativePath));
+      //     this.dtsFixer.forFile(
+      //       dtsFileAbsolutePath,
+      //       currentBrowserFolder,
+      //     );
+      //   });
+      // } else if (specyficFileRelativePath.endsWith('.js.map')) {
+      this.writeFixedMapFile(true, specyficFileRelativePath, this.monitoredOutDir);
+      this.writeFixedMapFile(false, specyficFileRelativePath, this.monitoredOutDir);
+      // }
     });
   }
   //#endregion
@@ -438,9 +448,9 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         ? path.join(this.monitoredOutDir, config.folder.libs, child.name)
         : this.localTempProj.node_modules.pathFor(rootPackageNameForChild);
 
-      if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist|bundle)
-        CopyMangerHelpers.fixingDtsImports(monitorDirForModule, this.isomorphicPackages);
-      }
+      // if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist|bundle)
+      //   this.dtsFixer.processFolderWithBrowserWebsqlFolders(monitorDirForModule); // no need for fixing backend
+      // }
 
       //#region final copy from dist|bundle to node_moules/rootpackagename
       const pkgLocInDestNodeModulesForChild = destination.node_modules.pathFor(rootPackageNameForChild);

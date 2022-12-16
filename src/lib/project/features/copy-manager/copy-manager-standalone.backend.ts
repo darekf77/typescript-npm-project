@@ -8,9 +8,12 @@ import { Project } from "../../abstract/project/project";
 import { CopyMangerHelpers } from "./copy-manager-helpers.backend";
 import { CopyManager } from "./copy-manager.backend";
 import { SourceMappingUrl } from "./source-maping-url.backend";
+import { TypescriptDtsFixer } from "./typescript-dts-fixer.backend";
 
 @CLASS.NAME('CopyManagerStandalone')
 export class CopyManagerStandalone extends CopyManager {
+
+  dtsFixer: TypescriptDtsFixer;
 
   //#region init
   public init(
@@ -54,7 +57,7 @@ export class CopyManagerStandalone extends CopyManager {
       const fileAbsPath = files[index];
       SourceMappingUrl.fixContent(fileAbsPath);
     }
-
+    this.dtsFixer = TypescriptDtsFixer.for(this.isomorphicPackages);
 
     this.initWatching();
   }
@@ -216,7 +219,7 @@ export class CopyManagerStandalone extends CopyManager {
       : this.localTempProj.node_modules.pathFor(this.rootPackageName);
 
     if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist|bundle)
-      CopyMangerHelpers.fixingDtsImports(monitorDir, this.isomorphicPackages);
+      this.dtsFixer.processFolderWithBrowserWebsqlFolders(monitorDir);
     }
 
     //#region final copy from dist|bundle to node_moules/rootpackagename
@@ -383,11 +386,10 @@ export class CopyManagerStandalone extends CopyManager {
       const contentToWriteInDestination = (Helpers.readFile(absOrgFilePathInDistOrBundle) || '');
       for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
         const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
-        const newContent = CopyMangerHelpers.fixDtsImport(
+        const newContent = this.dtsFixer.forContent(
           contentToWriteInDestination,
           // sourceFile,
           currentBrowserFolder,
-          this.isomorphicPackages,
         );
         if (newContent !== contentToWriteInDestination) {
           Helpers.writeFile(destinationFilePath, newContent);

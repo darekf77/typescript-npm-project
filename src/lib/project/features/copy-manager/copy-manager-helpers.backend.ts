@@ -1,4 +1,3 @@
-
 //#region imports
 import { _, crossPlatformPath } from 'tnp-core';
 import { fse } from 'tnp-core';
@@ -9,7 +8,6 @@ import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';;
 //#endregion
 export namespace CopyMangerHelpers {
-
 
   export const angularBrowserComiplationFolders = {
     esm2020: 'esm2020',
@@ -27,6 +25,13 @@ export namespace CopyMangerHelpers {
     config.folder.websql,
   ] as Models.dev.BuildDirBrowser[];
   //#endregion
+
+  //#region helpers / pure child name
+  export function childPureName(child: Project) {
+    return child.name.startsWith('@') ? child.name.split('/')[1] : child.name; // pure name
+  }
+  //#endregion
+
 
   //#region helpers / excute copy
   export function executeCopy(
@@ -104,83 +109,6 @@ export namespace CopyMangerHelpers {
     }
 
   }
-  //#endregion
-
-  //#region helpers / fix dts import
-
-  export function fixDtsImport(
-    content: string,
-    browserFolder: Models.dev.BuildDirBrowser,
-    isomorphicPackages: string[],
-  ) {
-
-    content = content ? content : '';
-
-    // if(path.basename(filepath) === 'framework-context.d.ts') {
-    //   debugger
-    // }
-
-    for (let index = 0; index < isomorphicPackages.length; index++) {
-      const isomorphicPackageName = isomorphicPackages[index];
-      content = (content || '').replace(
-        new RegExp(Helpers.escapeStringForRegEx(`import("${isomorphicPackageName}"`), 'g'),
-        `import("${isomorphicPackageName}/${browserFolder}"`);
-    }
-
-    return content;
-  }
-  //#endregion
-
-  //#region helpers / pure child name
-  export function childPureName(child: Project) {
-    return child.name.startsWith('@') ? child.name.split('/')[1] : child.name; // pure name
-  }
-  //#endregion
-
-  //#region helpers / fix d.ts import files in folder
-  /**
-   *  fixing d.ts for (dist|bundle)/(browser|websql) when destination local project
-   * @param distOrBuneleOrPkgFolder usually dist
-   * @param isTempLocalProj
-   */
-  export function fixingDtsImports(distOrBuneleOrPkgFolder: string, isomorphicPackages: string[]) {
-
-    for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
-
-      const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
-      Helpers.log('Fixing .d.ts. files start...');
-      const sourceBrowser = path.join(distOrBuneleOrPkgFolder, currentBrowserFolder);
-      const browserDtsFiles = Helpers.filesFrom(sourceBrowser, true)
-        .filter(f => f.endsWith('.d.ts'));
-
-      for (let index = 0; index < browserDtsFiles.length; index++) {
-        const dtsFileAbsolutePath = browserDtsFiles[index];
-        writeFixedVersionOfDtsFile(dtsFileAbsolutePath, currentBrowserFolder, isomorphicPackages);
-      }
-      Helpers.log('Fixing .d.ts. files done.');
-    }
-  }
-
-  export function writeFixedVersionOfDtsFile(
-    dtsFileAbsolutePath: string,
-    currentBrowserFolder: Models.dev.BuildDirBrowser,
-    isomorphicPackages: string[],
-  ) {
-    if (!dtsFileAbsolutePath.endsWith('.d.ts')) {
-      return;
-    }
-    const dtsFileContent = Helpers.readFile(dtsFileAbsolutePath);
-    const dtsFixedContent = CopyMangerHelpers.fixDtsImport(
-      dtsFileContent,
-      // dtsFileAbsolutePath,
-      currentBrowserFolder,
-      isomorphicPackages
-    );
-    if (dtsFixedContent.trim() !== dtsFileContent.trim()) {
-      Helpers.writeFile(dtsFileAbsolutePath, dtsFixedContent);
-    }
-  }
-
   //#endregion
 
 }
