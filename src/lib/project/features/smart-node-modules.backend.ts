@@ -39,7 +39,7 @@ export class SmartNodeModules extends FeatureForProject {
 
   public remove = () => {
     Helpers.info(`Removing smart node_modules from ${this.project?.name}`);
-    Helpers.remove(this.path, true)
+    Helpers.remove(this.path)
   };
 
   //#region getters/private methods

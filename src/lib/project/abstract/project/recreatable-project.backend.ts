@@ -20,6 +20,7 @@ export abstract class RecreatableProject {
       return this.browser.isCoreProject;
     }
     //#region @backend
+    // @LAST UNCOMMENT PROBASBLY ?
     // if (this.isWorkspaceChildProject || (this.isContainerChild && this.isWorkspace)) {
     //   if (this.parent.packageJson.isCoreProject != this.packageJson.isCoreProject) {
     //     this.packageJson.data.tnp.isCoreProject = void 0; // TODO why is that
@@ -32,7 +33,7 @@ export abstract class RecreatableProject {
     //     // this.packageJson.writeToDisc();
     //   }
     // }
-    // return this.packageJson && this.packageJson.isCoreProject;
+    return this.packageJson && this.packageJson.isCoreProject;
     //#endregion
   }
 
