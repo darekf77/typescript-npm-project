@@ -235,6 +235,7 @@ export abstract class VscodeProject {
         "program": "${workspaceFolder}" + `/dist/${container.name}/${c.name}/run.js`,
         "args": [
         ],
+        // "sourceMaps": true,
         // "outFiles": [ // TODOD this is causing unbound breakpoing in thir party modules
         //   "${workspaceFolder}" + `/dist/${container.name}/${c.name}/dist/**/*.js`
         // ],

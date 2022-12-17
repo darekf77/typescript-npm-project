@@ -166,13 +166,14 @@ export class CopyManagerStandalone extends CopyManager {
     content: string,
     isBrowser: boolean,
     isForLaunchJsonDebugging: boolean,
-    filePath: string,
+    absFilePath: string,
   ): string {
 
-    if (!content) {
-      Helpers.warn(`[copytomanager] Empty content for ${filePath}`);
+    if (!content || (!absFilePath.endsWith('.js.map') && !absFilePath.endsWith('.mjs.map'))) {
+      // Helpers.warn(`[copytomanager] Empty content for ${absFilePath}`);
       return content;
     }
+
 
     let toReplaceString2 = isBrowser
       ? `../tmp-libs-for-${this.outDir}/${this.project.name}/projects/${this.project.name}/${config.folder.src}`
@@ -523,7 +524,9 @@ export class CopyManagerStandalone extends CopyManager {
     //   absMapFilePathInLocalProjNodeModulesPackage
     // })
 
-    if (Helpers.exists(absMapFilePathInLocalProjNodeModulesPackage)) {
+    if (Helpers.exists(absMapFilePathInLocalProjNodeModulesPackage)
+      && (path.basename(absMapFilePathInLocalProjNodeModulesPackage) !== config.file.package_json) // TODO QUICK_FIX
+    ) {
       const fixedContentNonCLI = this.changedJsMapFilesInternalPathesForDebug(
         Helpers.readFile(absMapFilePathInLocalProjNodeModulesPackage),
         isForBrowser,
@@ -556,7 +559,9 @@ export class CopyManagerStandalone extends CopyManager {
     //   monitoredOutDirFileToReplaceBack
     // })
 
-    if (Helpers.exists(monitoredOutDirFileToReplaceBack)) {
+    if (Helpers.exists(monitoredOutDirFileToReplaceBack)
+      && (path.basename(monitoredOutDirFileToReplaceBack) !== config.file.package_json) // TODO QUICK_FIX
+    ) {
       const fixedContentCLIDebug = this.changedJsMapFilesInternalPathesForDebug(
         Helpers.readFile(monitoredOutDirFileToReplaceBack),
         isForBrowser,

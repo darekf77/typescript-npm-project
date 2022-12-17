@@ -212,8 +212,8 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     absFilePath: string,
   ): string {
 
-    if (!content) {
-      Helpers.warn(`[copytomanager] Empty content for ${absFilePath}`);
+    if (!content || (!absFilePath.endsWith('.js.map') && !absFilePath.endsWith('.mjs.map'))) {
+      // Helpers.warn(`[copytomanager] Empty content for ${absFilePath}`);
       return content;
     }
 
@@ -224,18 +224,26 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     } else {
       if (isForLaunchJsonDebugging) { // files is in dist or bundle or container target project
         // I am not allowing organizaition as cli tool
-        let toReplaceString2 = `../tmp-source-${this.outDir}`;
 
-        let toReplaceString1 = `"${toReplaceString2}`;
-
-        const regex2 = new RegExp(Helpers.escapeStringForRegEx(toReplaceString2), 'g');
         const relative = absFilePath.replace(`${this.monitoredOutDir}/`, '');
 
+
         if (this.isForSpecyficTargetCompilation(relative)) {
+          let toReplaceString2 = `../tmp-source-${this.outDir}`;
+
+          // let toReplaceString1 = `"${toReplaceString2}`;
+
+          const regex2 = new RegExp(Helpers.escapeStringForRegEx(toReplaceString2), 'g');
           // console.log(`[changeamp] relative: ${relative}`)
           content = content.replace(regex2, `../../../../${this.targetProjName}/${config.folder.src}`);
+          // console.log({ absFilePathTARGET: absFilePath })
         } else {
+
           const childName = relative.startsWith(config.folder.libs) ? _.first(relative.split('/').slice(1)) : void 0;
+          let toReplaceString2 = `../tmp-source-${this.outDir}/${config.folder.libs}/${childName}`;
+          const regex2 = new RegExp(Helpers.escapeStringForRegEx(toReplaceString2), 'g');
+
+          // let toReplaceString1 = `"${toReplaceString2}`;
           // console.log(`[changeamp]
           // childName: ${childName} relative: ${relative}`)
           if (childName) {
@@ -243,6 +251,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
           } else {
             // don not modify anything
           }
+          // console.log({ absFilePathLIBS: absFilePath })
         }
       } else { // debugging inside someone else project/node_modules/<pacakge>
         let toReplaceString2 = isBrowser
@@ -381,7 +390,6 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
 
     const shouldNotStartWith = [
       ...CopyMangerHelpers.browserwebsqlFolders,
-      config.folder.lib,
       config.folder.libs,
       config.folder.node_modules,
       config.folder.src,
@@ -398,10 +406,12 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   filesForSpecyficTarget() {
     const base = this.monitoredOutDir;
     const appFiles = Helpers.filesFrom([base, config.folder.app], true);
+    const libFiles = Helpers.filesFrom([base, config.folder.lib], true);
     const appFlatFiles = Helpers.filesFrom(base);
 
     const allFiles = [
       ...appFiles,
+      ...libFiles,
       ...appFlatFiles,
     ];
 
