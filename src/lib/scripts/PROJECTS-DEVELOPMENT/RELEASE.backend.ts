@@ -54,7 +54,7 @@ const $RELEASE = async (args: string) => {
 
   const proj = Project.Current as Project;
 
-  if (proj.isSmartContainer || proj.isSmartContainerChild) {
+  if (proj.isSmartContainerChild) {
     Helpers.info(`Smart container not supported yet...`);
     process.exit(0);
   }
@@ -88,7 +88,7 @@ const $RELEASE = async (args: string) => {
   proj.packageJson.showDeps('Release');
   //#endregion
 
-  if (proj.isContainer) {
+  if (proj.isContainer && !proj.isSmartContainer) {
     //#region container release
     let { resolved, commandString } = Helpers.cliTool.argsFromBegin<Project>(args, (a) => {
       return Project.From(path.join(proj.location, a));

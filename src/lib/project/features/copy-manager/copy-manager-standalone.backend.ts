@@ -525,6 +525,8 @@ export class CopyManagerStandalone extends CopyManager {
     // })
 
     if (Helpers.exists(absMapFilePathInLocalProjNodeModulesPackage)
+      && !Helpers.isFolder(absMapFilePathInLocalProjNodeModulesPackage)
+      && !Helpers.isSymlinkFileExitedOrUnexisted(absMapFilePathInLocalProjNodeModulesPackage)
       && (path.basename(absMapFilePathInLocalProjNodeModulesPackage) !== config.file.package_json) // TODO QUICK_FIX
     ) {
       const fixedContentNonCLI = this.changedJsMapFilesInternalPathesForDebug(
@@ -560,6 +562,8 @@ export class CopyManagerStandalone extends CopyManager {
     // })
 
     if (Helpers.exists(monitoredOutDirFileToReplaceBack)
+      && !Helpers.isFolder(monitoredOutDirFileToReplaceBack)
+      && !Helpers.isSymlinkFileExitedOrUnexisted(monitoredOutDirFileToReplaceBack)
       && (path.basename(monitoredOutDirFileToReplaceBack) !== config.file.package_json) // TODO QUICK_FIX
     ) {
       const fixedContentCLIDebug = this.changedJsMapFilesInternalPathesForDebug(

@@ -158,7 +158,7 @@ export abstract class LibProject {
     const baseFolder = path.join(this.location, 'tmp-bundle-release');
     const absolutePathReleaseProject = path.join(baseFolder, 'bundle', 'project', this.name);
 
-    if (this.isStandaloneProject) {
+    if (this.isStandaloneProject || this.isSmartContainer) {
       if (releaseOptions.useTempFolder) {
 
         Helpers.removeFolderIfExists(baseFolder);
@@ -183,6 +183,7 @@ export abstract class LibProject {
           forceCopyPackageJSON: true, // TODO not needed
           // @ts-ignore
           dereference: true,
+          regenerateProjectChilds: this.isSmartContainer,
         });
 
         this.packageJson.linkTo(absolutePathReleaseProject, true);
@@ -212,12 +213,11 @@ export abstract class LibProject {
     }
     //#endregion
 
-    const realCurrentProjLocation = (!releaseOptions.useTempFolder && this.isStandaloneProject) ?
+    const realCurrentProjLocation = (!releaseOptions.useTempFolder && (this.isStandaloneProject || this.isSmartContainer)) ?
       path.resolve(path.join(this.location, '..', '..', '..', '..')) : this.location;
     // const PorjectClass = CLASS.getBy('Project') as typeof Project;
 
     const realCurrentProj = Project.From(realCurrentProjLocation) as Project;
-
 
     this.bumpVersionForPath(realCurrentProj);
 
@@ -229,18 +229,14 @@ export abstract class LibProject {
     this.checkIfReadyForNpm();
     const newVersion = realCurrentProj.version;
 
-    function removeTagAndCommit() {
-      // Helpers.error(`PLEASE RUN: `, true, true);
-      // if (!tagOnly) {
-      //   Helpers.error(`git reset --hard HEAD~1`, true, true);
-      // }
-      Helpers.error(`'release problem... `, automaticRelease, true);
-      // if (automaticRelease) {
-      //   Helpers.error('release problem...', false, true);
-      // }
-    }
+    // TODO detecting changes for children when start container
+    const message = this.isStandaloneProject ? `Release new version: ${newVersion} ?`
+      : `Release new versions for container packages:
+${realCurrentProj.children.map((c, index) => `\t${index + 1}. @${realCurrentProj.name}/${c.name} v${newVersion}`).join('\n')}
 
-    await Helpers.questionYesNo(`Release new version: ${newVersion} ?`, async () => {
+?`
+
+    await Helpers.questionYesNo(message, async () => {
 
       await this.bumpVersionInOtherProjects(newVersion, true)
 
@@ -254,12 +250,25 @@ export abstract class LibProject {
 
       // this.run(`${config.frameworkName} reset`).sync();
 
-      if (!this.node_modules.exist) {
-        await this.npmPackages.installProcess(`release procedure`)
-      }
+
+
+
       this.packageJson.data.version = newVersion;
       this.packageJson.save('show for release')
-      this.run(`${config.frameworkName} init`).sync();
+
+      this.run(`${config.frameworkName} init ${this.isStandaloneProject ? '' : this.smartContainerBuildTarget.name}`).sync();
+      const specyficProjectForBuild = this.isStandaloneProject ? this : Project.From(crossPlatformPath(path.join(
+        this.location,
+        config.folder.bundle,
+        this.name,
+        this.smartContainerBuildTarget.name,
+      ))) as Project;
+
+      // if (!this.node_modules.exist) {
+      //   await this.npmPackages.installProcess(`release procedure`)
+      // }
+
+
 
       Helpers.info(`BUILD OPTION (${this.name}):
       prod=${!!prod},
@@ -281,14 +290,30 @@ export abstract class LibProject {
       // Helpers.move(browserBundle, websqlBundleTemp);
       // Helpers.move(browserBundleTemp, browserBundle);
 
-      if (!this.isCommandLineToolOnly) {
-        this.createClientVersionAsCopyOfBrowser();
+      if (!specyficProjectForBuild.isCommandLineToolOnly) {
+        specyficProjectForBuild.createClientVersionAsCopyOfBrowser();
       }
 
-      this.compileBrowserES5version();
+      specyficProjectForBuild.compileBrowserES5version();
 
-      this.bundleResources()
+      specyficProjectForBuild.bundleResources()
       this.commit(newVersion);
+
+      if (this.isSmartContainer) {
+        specyficProjectForBuild.prepareSmartContainerRelaasePackages(this, newVersion);
+      }
+
+
+      if (this.isSmartContainer && !global.tnpNonInteractive) {
+
+        specyficProjectForBuild.run(`code .`).sync(); // @LAST from local proj prepare bundle projects
+        Helpers.pressKeyAndContinue(`Check your bundle and press any key...`)
+      }
+
+      if (this.isSmartContainer) {
+        await specyficProjectForBuild.publishSmartContainerRelaasePackages(`@${this.name}`, newVersion, automaticRelease)
+      }
+
     }, () => {
       process.exit(0);
     });
@@ -305,169 +330,179 @@ export abstract class LibProject {
     //     property, void 0);
     // });
 
-    [
-      // config.folder.browser, /// TODO FIX for typescript
-      config.folder.client,
-      '',
-    ].forEach(c => {
-      const pjPath = path.join(this.location, config.folder.bundle, c, config.file.package_json);
-      const content = Helpers.readJson(pjPath);
-      Helpers.remove(pjPath);
-      Helpers.writeFile(pjPath, content);
-    });
-    this.packageJson.showDeps(`after release show when ok`);
-
-    if (this.packageJson.name === 'tnp') {  // TODO QUICK_FIX
-      Helpers.setValueToJSON(path.join(this.location, config.folder.bundle, config.file.package_json), 'dependencies',
-        this.TnpProject.packageJson.data.tnp.overrided.includeOnly.reduce((a, b) => {
-          return _.merge(a, {
-            [b]: this.TnpProject.packageJson.data.dependencies[b]
-          })
-        }, {})
-      );
-    } else { ///
-      const packageJsonInBundlePath = path.join(this.location, config.folder.bundle, config.file.package_json);
-      Helpers.setValueToJSON(packageJsonInBundlePath, 'devDependencies', {});
-      //#region QUICK FIX include only
-      const includeOnly = realCurrentProj.packageJson.data.tnp?.overrided?.includeOnly || [];
-      const dependencies = Helpers.readJson(packageJsonInBundlePath, {}).dependencies || {};
-      Object.keys(dependencies).forEach(packageName => {
-        if (!includeOnly.includes(packageName)) {
-          delete dependencies[packageName];
-        }
+    if (this.isStandaloneProject) {
+      [
+        // config.folder.browser, /// TODO FIX for typescript
+        config.folder.client,
+        '',
+      ].forEach(c => {
+        const pjPath = path.join(this.location, config.folder.bundle, c, config.file.package_json);
+        const content = Helpers.readJson(pjPath);
+        Helpers.remove(pjPath);
+        Helpers.writeFile(pjPath, content);
       });
-      Helpers.setValueToJSON(packageJsonInBundlePath, 'dependencies', dependencies);
-      //#endregion
+
+      this.packageJson.showDeps(`after release show when ok`);
+
+      if (this.packageJson.name === 'tnp') {  // TODO QUICK_FIX
+        Helpers.setValueToJSON(path.join(this.location, config.folder.bundle, config.file.package_json), 'dependencies',
+          this.TnpProject.packageJson.data.tnp.overrided.includeOnly.reduce((a, b) => {
+            return _.merge(a, {
+              [b]: this.TnpProject.packageJson.data.dependencies[b]
+            })
+          }, {})
+        );
+      } else { ///
+        const packageJsonInBundlePath = path.join(this.location, config.folder.bundle, config.file.package_json);
+        Helpers.setValueToJSON(packageJsonInBundlePath, 'devDependencies', {});
+        //#region QUICK FIX include only
+        const includeOnly = realCurrentProj.packageJson.data.tnp?.overrided?.includeOnly || [];
+        const dependencies = Helpers.readJson(packageJsonInBundlePath, {}).dependencies || {};
+        Object.keys(dependencies).forEach(packageName => {
+          if (!includeOnly.includes(packageName)) {
+            delete dependencies[packageName];
+          }
+        });
+        Helpers.setValueToJSON(packageJsonInBundlePath, 'dependencies', dependencies);
+        //#endregion
+      }
+    } else {
+      // TODO
+
     }
 
-    if (!global.tnpNonInteractive) {
+    if (this.isStandaloneProject && !global.tnpNonInteractive) {
       this.run(`code .`).sync();
       Helpers.pressKeyAndContinue(`Check your bundle and press any key...`)
     }
 
-    await Helpers.questionYesNo(`Publish on npm version: ${newVersion} ?`, async () => {
-      let successPublis = false;
-      try {
-        this.run('npm publish', {
-          cwd: path.join(this.location, config.folder.bundle),
-          output: true
-        }).sync();
-        successPublis = true;
-      } catch (e) {
-        removeTagAndCommit()
-      }
+    if (this.isStandaloneProject) {
+      await Helpers.questionYesNo(`Publish on npm version: ${newVersion} ?`, async () => {
 
-      if (successPublis) {
-        //#region release additional packages names
-        const names = this.packageJson.additionalNpmNames;
-        for (let index = 0; index < names.length; index++) {
-          const c = names[index];
-          const existedBundle = crossPlatformPath(path.join(this.location, 'bundle'));
-          const additionBase = crossPlatformPath(path.resolve(path.join(this.location, `../../../additional-bundle-${c}`)));
-          Helpers.mkdirp(additionBase);
-          Helpers.copy(existedBundle, additionBase, {
-            copySymlinksAsFiles: true,
-            omitFolders: [config.folder.node_modules],
-            omitFoldersBaseFolder: existedBundle
-          });
-          const pathPackageJsonRelease = path.join(additionBase, config.file.package_json);
-          const packageJsonAdd: Models.npm.IPackageJSON = Helpers.readJson(path.join(additionBase, config.file.package_json));
-          packageJsonAdd.name = c;
-          // const keys = Object.keys(packageJsonAdd.bin || {});
-          // keys.forEach(k => {
-          //   const v = packageJsonAdd.bin[k] as string;
-          //   packageJsonAdd.bin[k.replace(this.name, c)] = v.replace(this.name, c);
-          //   delete packageJsonAdd.bin[k];
-          // });
-          Helpers.writeFile(pathPackageJsonRelease, packageJsonAdd);
-          Helpers.info('log addtional bundle created');
-          try {
-            if (!global.tnpNonInteractive) {
-              Helpers.run(`code ${additionBase}`).sync();
-              Helpers.info(`Check you additional bundle for ${chalk.bold(c)} and press any key to publish...`);
-              Helpers.pressKeyAndContinue();
-            }
-            Helpers.run('npm publish', { cwd: additionBase }).sync();
-          } catch (error) {
-            Helpers.warn(`No able to push additional bundle for name: ${c}`)
-          }
+        //#region publishing standalone
+        let successPublis = false;
+        try {
+          this.run('npm publish', {
+            cwd: path.join(this.location, config.folder.bundle),
+            output: true
+          }).sync();
+          successPublis = true;
+        } catch (e) {
+          this.removeTagAndCommit(automaticRelease)
         }
-        //#endregion
 
-        await this.bumpVersionInOtherProjects(newVersion);
-
-        if ((this.typeIs('angular-lib') || (this.typeIs('isomorphic-lib') && this.frameworkVersionAtLeast('v3')))
-          && !global.tnpNonInteractive) {
-          await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
-
-            let appBuildOptions = { docsAppInProdMode: prod };
-
-            await Helpers.questionYesNo(`Do you wanna build in production mode`, () => {
-              appBuildOptions.docsAppInProdMode = true;
-            }, () => {
-              appBuildOptions.docsAppInProdMode = false;
+        if (successPublis) {
+          //#region release additional packages names
+          const names = this.packageJson.additionalNpmNames;
+          for (let index = 0; index < names.length; index++) {
+            const c = names[index];
+            const existedBundle = crossPlatformPath(path.join(this.location, 'bundle'));
+            const additionBase = crossPlatformPath(path.resolve(path.join(this.location, `../../../additional-bundle-${c}`)));
+            Helpers.mkdirp(additionBase);
+            Helpers.copy(existedBundle, additionBase, {
+              copySymlinksAsFiles: true,
+              omitFolders: [config.folder.node_modules],
+              omitFoldersBaseFolder: existedBundle
             });
+            const pathPackageJsonRelease = path.join(additionBase, config.file.package_json);
+            const packageJsonAdd: Models.npm.IPackageJSON = Helpers.readJson(path.join(additionBase, config.file.package_json));
+            packageJsonAdd.name = c;
+            // const keys = Object.keys(packageJsonAdd.bin || {});
+            // keys.forEach(k => {
+            //   const v = packageJsonAdd.bin[k] as string;
+            //   packageJsonAdd.bin[k.replace(this.name, c)] = v.replace(this.name, c);
+            //   delete packageJsonAdd.bin[k];
+            // });
+            Helpers.writeFile(pathPackageJsonRelease, packageJsonAdd);
+            Helpers.info('log addtional bundle created');
+            try {
+              if (!global.tnpNonInteractive) {
+                Helpers.run(`code ${additionBase}`).sync();
+                Helpers.info(`Check you additional bundle for ${chalk.bold(c)} and press any key to publish...`);
+                Helpers.pressKeyAndContinue();
+              }
+              Helpers.run('npm publish', { cwd: additionBase }).sync();
+            } catch (error) {
+              Helpers.warn(`No able to push additional bundle for name: ${c}`)
+            }
+          }
+          //#endregion
 
-            Helpers.log(`
+          await this.bumpVersionInOtherProjects(newVersion);
+
+          if ((this.typeIs('angular-lib') || (this.typeIs('isomorphic-lib') && this.frameworkVersionAtLeast('v3')))
+            && !global.tnpNonInteractive) {
+            await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
+
+              let appBuildOptions = { docsAppInProdMode: prod };
+
+              await Helpers.questionYesNo(`Do you wanna build in production mode`, () => {
+                appBuildOptions.docsAppInProdMode = true;
+              }, () => {
+                appBuildOptions.docsAppInProdMode = false;
+              });
+
+              Helpers.log(`
 
           Building docs prevew - start
 
           `);
-            const init = this.frameworkVersionAtLeast('v3') ? `${config.frameworkName} build:dist && ` : '';
-            await this.run(`${init}`
-              + `${config.frameworkName} build:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''}`).sync();
+              const init = this.frameworkVersionAtLeast('v3') ? `${config.frameworkName} build:dist && ` : '';
+              await this.run(`${init}`
+                + `${config.frameworkName} build:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''}`).sync();
 
-            if (this.frameworkVersionAtLeast('v3')) {
-              const currentDocs = path.join(this.location, config.folder.docs);
-              const currentDocsDest = path.join(this.location, '..', '..', '..', '..', config.folder.docs);
-              Helpers.removeFolderIfExists(currentDocsDest);
-              Helpers.copy(currentDocs, currentDocsDest, { recursive: true })
-            }
+              if (this.frameworkVersionAtLeast('v3')) {
+                const currentDocs = path.join(this.location, config.folder.docs);
+                const currentDocsDest = path.join(this.location, '..', '..', '..', '..', config.folder.docs);
+                Helpers.removeFolderIfExists(currentDocsDest);
+                Helpers.copy(currentDocs, currentDocsDest, { recursive: true })
+              }
 
-            Helpers.log(`
+              Helpers.log(`
 
           Building docs prevew - done
 
           `);
+              await this.pushToGitRepo(newVersion, realCurrentProj)
+            }, async () => {
+              await this.pushToGitRepo(newVersion, realCurrentProj)
+            });
+          } else {
             await this.pushToGitRepo(newVersion, realCurrentProj)
-          }, async () => {
-            await this.pushToGitRepo(newVersion, realCurrentProj)
-          });
-        } else {
-          await this.pushToGitRepo(newVersion, realCurrentProj)
+          }
+
         }
+        //#endregion
 
-      }
-    }, () => {
-      removeTagAndCommit();
-    });
-
-
+      }, () => {
+        this.removeTagAndCommit(automaticRelease);
+      });
 
 
-    const tnpProj = Project.Tnp as Project;
+      const tnpProj = Project.Tnp as Project;
 
-    if (tnpProj) {
-      tnpProj.packageJson.save('showing for trusted')
+      if (tnpProj) {
+        tnpProj.packageJson.save('showing for trusted')
 
-      let firedeProj: Project;
-      if (this.packageJson.name === config.frameworkNames.tnp) {  // TODO QUICK_FIX
-        firedeProj = Project.From(path.join(path.dirname(realCurrentProj.location), config.frameworkNames.firedev))
-      }
-      const coreCont = Project.by('container', realCurrentProj._frameworkVersion) as Project;
+        let firedeProj: Project;
+        if (this.packageJson.name === config.frameworkNames.tnp) {  // TODO QUICK_FIX
+          firedeProj = Project.From(path.join(path.dirname(realCurrentProj.location), config.frameworkNames.firedev))
+        }
+        const coreCont = Project.by('container', realCurrentProj._frameworkVersion) as Project;
 
-      const arrTrusted = tnpProj.packageJson.data.tnp.core.dependencies.trusted[this._frameworkVersion];
-      if (
-        (_.isString(arrTrusted) && (arrTrusted === '*')) ||
-        (_.isArray(arrTrusted) && arrTrusted.includes(this.name))
-      ) {
-        [
-          firedeProj,
-          coreCont,
-        ].filter(f => !!f)
-          .forEach(c => {
-            c.smartNodeModules.updateFromReleaseBundle(realCurrentProj);
-          });
+        const arrTrusted = tnpProj.packageJson.data.tnp.core.dependencies.trusted[this._frameworkVersion];
+        if (
+          (_.isString(arrTrusted) && (arrTrusted === '*')) ||
+          (_.isArray(arrTrusted) && arrTrusted.includes(this.name))
+        ) {
+          [
+            firedeProj,
+            coreCont,
+          ].filter(f => !!f)
+            .forEach(c => {
+              c.smartNodeModules.updateFromReleaseBundle(realCurrentProj);
+            });
+        }
       }
     }
 
@@ -494,6 +529,84 @@ export abstract class LibProject {
     //#endregion
   }
   //#endregion
+
+  getTempProjName(outdir: Models.dev.BuildDir) {
+    const tempProjName = `tmp-local-copyto-proj-${outdir}`;
+    return tempProjName;
+  }
+
+  private prepareSmartContainerRelaasePackages(this: Project, smartContainer: Project, newVersion: string) {
+    const rootPackageName = `@${smartContainer.name}`;
+    const base = path.join(
+      this.location,
+      this.getTempProjName('bundle'),
+      config.folder.node_modules,
+      rootPackageName,
+    )
+    Helpers
+      .foldersFrom(base)
+      .forEach(absFolder => {
+
+        Helpers.filesFrom(absFolder, true)
+          .filter(f => f.endsWith('.js.map'))
+          .forEach(f => Helpers.removeFileIfExists(f));
+
+        let proj = Project.From(absFolder) as Project;
+        proj.packageJson.data.tnp.type = 'isomorphic-lib';
+        proj.packageJson.data.tnp.version = config.defaultFrameworkVersion;
+        proj.packageJson.save('updating version for publish');
+        Project.unload(proj);
+        proj = Project.From(absFolder) as Project;
+        const child = smartContainer.children.find(c => c.name === path.basename(absFolder));
+        const packgeJsonPath = proj.packageJson.path;
+        const pj = Helpers.readJson(packgeJsonPath) as Models.npm.IPackageJSON;
+        pj.version = newVersion;
+        pj.name = `${rootPackageName}/${proj.name}`;
+        delete pj.devDependencies;
+        pj.dependencies = child.packageJson.data.tnp.overrided.dependencies;
+        pj.peerDependencies = child.packageJson.data.peerDependencies;
+        pj.engines = child.packageJson.data.engines;
+        pj.homepage = child.packageJson.data.homepage;
+        Helpers.writeJson(packgeJsonPath, pj);
+        Project.unload(proj);
+      });
+
+  }
+
+  private async publishSmartContainerRelaasePackages(this: Project, rootPackageName: string, newVersion: string, automaticRelease: boolean) {
+
+    await Helpers.questionYesNo(`Publish on npm version: ${newVersion} ?`, async () => {
+
+      const base = path.join(
+        this.location,
+        this.getTempProjName('bundle'),
+        config.folder.node_modules,
+        rootPackageName,
+      )
+      Helpers
+        .foldersFrom(base)
+        .forEach(cwd => {
+
+          let successPublis = false;
+          // const proj = Project.From(absFolder) as Project;
+
+          try {
+            Helpers.run('npm publish --access public', {
+              cwd,
+              output: true
+            }).sync();
+            successPublis = true;
+          } catch (e) {
+            this.removeTagAndCommit(automaticRelease)
+          }
+
+        });
+
+    }, () => {
+      process.exit(0);
+    });
+
+  }
 
   //#region api / bundle resource
   public bundleResources(this: Project) {
@@ -531,6 +644,18 @@ export abstract class LibProject {
   //#endregion
 
   //#region methods
+
+
+  removeTagAndCommit(automaticRelease: boolean) {
+    // Helpers.error(`PLEASE RUN: `, true, true);
+    // if (!tagOnly) {
+    //   Helpers.error(`git reset --hard HEAD~1`, true, true);
+    // }
+    Helpers.error(`'release problem... `, automaticRelease, true);
+    // if (automaticRelease) {
+    //   Helpers.error('release problem...', false, true);
+    // }
+  }
 
   //#region methods / project linked files
   projectLinkedFiles(this: Project): { sourceProject: Project, relativePath: string }[] {
@@ -629,6 +754,9 @@ export abstract class LibProject {
    * @param onlyInThisProjectSubprojects
    */
   async bumpVersionInOtherProjects(this: Project, newVersion, onlyInThisProjectSubprojects = false) {
+    if (!this.isStandaloneProject) {
+      return; // TODO
+    }
     if (onlyInThisProjectSubprojects) {
       // console.log('UPDATE VERSION !!!!!!!!!!!!!')
       updateChildrenVersion(this, newVersion, this.name);

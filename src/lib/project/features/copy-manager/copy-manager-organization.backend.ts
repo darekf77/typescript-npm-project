@@ -90,7 +90,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     }
   ) {
     super._copyBuildedDistributionTo(destination, options);
-    if ((destination.location === this.localTempProjPath) && this.isFirstRun) {
+    if ((destination.location === this.localTempProjPath) && this.isFirstRun && this.outDir === config.folder.dist) {
       this.isFirstRun = false;
       const nodeModules = this.project.node_modules.pathFor(this.rootPackageName);
       Helpers.remove(nodeModules);
@@ -142,7 +142,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   //#region links for packages are ok
   linksForPackageAreOk(destination: Project): boolean {
     return true;
-    // TODO QUICKFIX @LAST
+    // TODO
     const destPackageLinkSourceLocation = crossPlatformPath(path.join(
       destination.location,
       config.folder.node_modules,
@@ -212,10 +212,13 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     absFilePath: string,
   ): string {
 
+
     if (!content || (!absFilePath.endsWith('.js.map') && !absFilePath.endsWith('.mjs.map'))) {
       // Helpers.warn(`[copytomanager] Empty content for ${absFilePath}`);
       return content;
     }
+
+    // console.log({ fixing: absFilePath })
 
     if (isBrowser) {
       // TODO is angular maps not working in chrome debugger (the did not work whe switch lazy modules)
@@ -225,7 +228,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       if (isForLaunchJsonDebugging) { // files is in dist or bundle or container target project
         // I am not allowing organizaition as cli tool
 
-        const relative = absFilePath.replace(`${this.monitoredOutDir}/`, '');
+        const relative = crossPlatformPath(absFilePath).replace(`${this.monitoredOutDir}/`, '');
 
 
         if (this.isForSpecyficTargetCompilation(relative)) {

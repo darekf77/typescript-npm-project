@@ -329,7 +329,7 @@ export * from './${config.file.public_api}';
       config.folder.libs
     ));
 
-    if (child.name === this.targetProjName) { // @LAST
+    if (child.name === this.targetProjName) {
       const libFolderPathSource = crossPlatformPath(path.join(
         destinationTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
         angularCompilationFolder,

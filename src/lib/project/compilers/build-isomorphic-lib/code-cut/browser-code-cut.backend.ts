@@ -98,7 +98,7 @@ export class BrowserCodeCut {
     //   absoluteFilePathBrowserWebsql: this.absoluteFilePathBrowserWebsql,
     //   absoluteBackendFilePath: this.absoluteBackendFilePath,
     // })
-    this.rawContentForBrowser = Helpers.readFile(this.absoluteFilePathBrowserOrWebsql) || '';
+    this.rawContentForBrowser = Helpers.readFile(this.absoluteFilePathBrowserOrWebsql, void 0, true) || '';
     this.rawContentBackend = this.rawContentForBrowser; // at the beginning those are normal files from src
     return this;
   }
@@ -242,8 +242,7 @@ export class BrowserCodeCut {
     };
   }
 
-  protected getInlinePackage(packageName: string, packagesNames = BrowserCodeCut.IsomorphicLibs): Models.InlinePkg {
-
+  getParent() {
     let parent: Project;
     if (this.project.isSmartContainer) {
       parent = this.project;
@@ -254,12 +253,22 @@ export class BrowserCodeCut {
     if (this.project.isSmartContainerTarget) {
       parent = this.project.smartContainerTargetParentContainer;
     }
+    return parent;
+  }
 
+  get additionalSmartPckages() {
+    const parent = this.getParent();
     const additionalSmartPckages = (!parent ? [] : parent.children.map(c => `@${parent.name}/${c.name}`));
 
-    const packages = packagesNames.concat([
+    return additionalSmartPckages;
+  }
+
+  protected getInlinePackage(packageName: string, packagesNames = BrowserCodeCut.IsomorphicLibs): Models.InlinePkg {
+    const parent = this.getParent();
+
+    packagesNames = packagesNames.concat([
       ...(parent ? [] : [this.project.name]),
-      ...additionalSmartPckages,
+      ...this.additionalSmartPckages,
     ]);
 
 
@@ -598,11 +607,22 @@ export class BrowserCodeCut {
           !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist-websql/tests/`) &&
           !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle-websql/tests/`)
         ) {
-          // console.log(relativePath)
-          fse.writeFileSync(absoluteBackendFilePath,
-            isEmptyModuleBackendFile ? `export function dummy${(new Date()).getTime()}() { }`
-              : this.rawContentBackend,
-            'utf8');
+
+          if (this.project.isSmartContainerTarget) {
+            // console.log(relativePath)
+            fse.writeFileSync(absoluteBackendFilePath,
+              isEmptyModuleBackendFile ? `export function dummy${(new Date()).getTime()}() { }`
+                : this.changeJsFileImportForOrgnanizaiton(this.rawContentBackend, absoluteBackendFilePath),
+              'utf8');
+          } else {
+            // console.log(relativePath)
+            fse.writeFileSync(absoluteBackendFilePath,
+              isEmptyModuleBackendFile ? `export function dummy${(new Date()).getTime()}() { }`
+                : this.rawContentBackend,
+              'utf8');
+          }
+
+
         }
       }
     }
@@ -610,6 +630,47 @@ export class BrowserCodeCut {
   }
 
 
+  changeJsFileImportForOrgnanizaiton(
+    content: string,
+    absFilePath: string,
+  ) {
+    if (!absFilePath.endsWith('.ts')) {
+      return content;
+    }
+
+    const relative = crossPlatformPath(absFilePath)
+      .replace(`${this.project.location}/`, '')
+      .split('/')
+      .slice(1)
+      .join('/')
+    // require("@codete-ngrx-quick-start/shared")
+
+    const howMuchBack = (relative.split('/').length - 1);
+    const additionalSmartPckages = this.additionalSmartPckages;
+    for (let index = 0; index < additionalSmartPckages.length; index++) {
+      const rootChildPackage = additionalSmartPckages[index];
+      const [__, childName] = rootChildPackage.split('/');
+      const back = (howMuchBack === 0) ? './' : _.times(howMuchBack).map(() => '../').join('');
+
+      (() => {
+        content = content.replace(
+          new RegExp(`from\\s+(\\'|\\")${Helpers.escapeStringForRegEx(rootChildPackage)}(\\'|\\")`, 'g'),
+          `from '${back}${config.folder.libs}/${childName}'`
+        );
+      })();
+
+      (() => {
+        content = content.replace(
+          new RegExp(`from\\s+(\\'|\\")${Helpers.escapeStringForRegEx(rootChildPackage)}\\/`, 'g'),
+          `from '${back}${config.folder.libs}/${childName}/`
+        );
+      })();
+
+    }
+    // Helpers.warn(`[copytomanager] Empty content for ${absFilePath}`);
+    // console.log({ absFilePathJSJSJ: absFilePath })
+    return content;
+  }
 
 
   //#endregion

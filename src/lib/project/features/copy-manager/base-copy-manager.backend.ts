@@ -54,7 +54,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
 
   //#region getters / temp project name
   get tempProjName() {
-    const tempProjName = `tmp-local-copyto-proj-${this.outDir}`;
+    const tempProjName = this.project.getTempProjName(this.outDir);
     return tempProjName;
   }
   //#endregion
@@ -202,12 +202,12 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       let childs = this.project.children.filter(f => !['lib', 'app'].includes(path.basename(f.location)));
 
       if (options.regenerateOnlyCoreProjects) {
-        if (this.project.isCoreProject) {
-          if (this.project.isContainer) {
+        if (this.project.isCoreProject || this.project.isSmartContainer) {
+          if (this.project.isSmartContainer) {
+            childs = this.project.children.filter(c => c.typeIs('isomorphic-lib') && c.frameworkVersionAtLeast('v3'));
+          } else if (this.project.isContainer) {
             childs = this.project.children.filter(c => c.name === 'workspace');
-          }
-
-          if (this.project.isWorkspace) {
+          } else if (this.project.isWorkspace) {
             childs = this.project.children.filter(c => config.projectTypes.forNpmLibs.includes(c.name as any));
           }
         } else {
@@ -218,7 +218,20 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       childs.forEach(c => {
         // console.log('GENERATING CHILD ' + c.genericName)
         c.copyManager.generateSourceCopyIn(path.join(destinationLocation, c.name), options);
+
       });
+      if (this.project.isSmartContainer) {
+        childs.forEach(c => {
+          let generatedVer = Project.From(path.join(destinationLocation, c.name)) as Project;
+          generatedVer.packageJson.data.tnp = {
+            type: 'isomorphic-lib',
+            version: "v3",
+          } as any;
+          generatedVer.packageJson.save('saving proper child version');
+          Project.unload(generatedVer);
+          generatedVer = Project.From(path.join(destinationLocation, c.name));
+        });
+      }
     }
     //#endregion
 

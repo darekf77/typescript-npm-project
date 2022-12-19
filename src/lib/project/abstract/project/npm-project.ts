@@ -462,13 +462,20 @@ export class NpmProject {
     if (this.typeIs('unknow')) {
       return false;
     }
+
+    if(this.isSmartContainer) {
+      return true;
+    }
+
     // log('TYPEEEEE', this.type)
     const libs: ConfigModels.LibType[] = ['angular-lib', 'isomorphic-lib', 'vscode-ext'];
     if (this.typeIsNot(...libs)) {
       if (soft) {
         return false;
       }
-      Helpers.error(`This project '${chalk.bold(this.name)}' isn't library type project (${libs.join(', ')}).`, false, true);
+      Helpers.error(`This project '${chalk.bold(this.name)}' in ${this.location}
+
+      isn't library type project (${libs.join(', ')}).`, false, true);
     }
     return true;
   }
