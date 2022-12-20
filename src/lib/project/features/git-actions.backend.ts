@@ -128,7 +128,7 @@ ${shouldBeProjectArr.map(p => `- ${p}`).join('\n')}
         ;
         await this.project.git.pushCurrentBranch(force, origin);
       }
-    }, `${action.toUpperCase()}ing project ${chalk.bold(this.project.name)}...`);
+    }, `${action.toUpperCase()}ing project ${chalk.bold(this.project.genericName)}...`);
   }
   //#endregion
 
