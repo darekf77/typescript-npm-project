@@ -131,15 +131,35 @@ export async function STATIC_INIT_ALL(args: string, exit = true) {
 }
 
 export async function CLEAN(args: string, exit = true) {
-  const proj = (Project.Current as Project);
-  await proj.filesStructure.clearFromArgs(args);
+  const currentProj = (Project.Current as Project);
+
+  const clear = async (proj: Project) => {
+    if (proj.isContainer) {
+      // await clear(proj);
+      const children = proj.children.filter(c => (c.typeIs('isomorphic-lib') || c.isSmartContainer)
+        && c.frameworkVersionAtLeast('v3') && c.npmPackages.useSmartInstall);
+      for (let index = 0; index < children.length; index++) {
+        const c = children[index];
+        await clear(c);
+      }
+    } else if (proj.isStandaloneProject) {
+      await proj.filesStructure.clearFromArgs(args);
+    }
+  };
+
+  await clear(currentProj);
 
   if (exit) {
     process.exit(0);
   }
 }
 
-export const CLEAR = CLEAN;
+export const CLEAR = async (args, exit = true) => {
+  await CLEAN(args, exit);
+  if (exit) {
+    process.exit(0);
+  }
+}
 
 export async function STATIC_CLEAN(args: string, exit = true) {
   await (await (Project.Current as Project).StaticVersion(false)).filesStructure.clearFromArgs(args)

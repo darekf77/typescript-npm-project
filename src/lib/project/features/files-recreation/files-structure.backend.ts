@@ -418,11 +418,8 @@ export class FilesStructure extends FeatureForProject {
     if (this.project.npmPackages.useSmartInstall) {
       await this.clear({ recrusive });
     } else {
-      await Helpers.questionYesNo(`Do you wanna delete node_modules and reset ${recrusive ? 'project recursively' : 'project'} ?`, async () => {
+      await Helpers.questionYesNo(`Do you wanna delete node_modules and reset ${recrusive ? 'project(s) recursively' : 'project(s)'} ?`, async () => {
         await this.clear({ recrusive });
-        process.exit(0)
-      }, () => {
-        process.exit(0)
       });
     }
 

@@ -210,7 +210,10 @@ export abstract class BuildableProject {
       }
 
       // @ts-ignore
-      this.buildOptions.copyto = projects as any;
+      this.buildOptions.copyto = [
+        ...projects,
+        ...this.buildOptions.copyto
+      ]
     } else {
       const db = await TnpDB.Instance();
       const projects = (await db.getProjects())
@@ -218,7 +221,10 @@ export abstract class BuildableProject {
         .filter(p => p.location !== this.location);
 
       // @ts-ignore
-      this.buildOptions.copyto = projects as any;
+      this.buildOptions.copyto = [
+        ...projects,
+        ...this.buildOptions.copyto
+      ]
     }
   }
   //#endregion
