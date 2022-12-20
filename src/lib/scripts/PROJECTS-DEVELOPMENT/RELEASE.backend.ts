@@ -129,7 +129,7 @@ const $RELEASE = async (args: string) => {
         (!child.isSmartContainer && !child.isSmartContainerChild)
         && (argsObj.trusted ? allTrusted.includes(child.name) : true)
         && versionIsOk
-        && !child.isPrivate
+        // && !child.isPrivate
         && !child.targetProjects.exists
         && (!sameHashes || forceReleaseAll)
       );

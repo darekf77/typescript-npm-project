@@ -213,18 +213,17 @@ export abstract class LibProject {
 
     if (_.isUndefined(releaseOptions.useTempFolder)) {
       if (!this.checkIfReadyForNpm(true)) {
-        Helpers.warn(`Project "${this.name}" is not ready for npm release`)
-        return;
+        Helpers.error(`Project "${this.name}" is not ready for npm release`, false, true)
       }
-      if (this.isPrivate) {
-        Helpers.warn(`Cannot release private project ${chalk.bold(this.genericName)}`)
-        return;
-      }
+      // if (this.isPrivate) {
+      //   Helpers.warn(`Cannot release private project ${chalk.bold(this.genericName)}`)
+      //   return;
+      // }
       if (this.targetProjects.exists) {
         if (global.tnpNonInteractive) {
           Helpers.warn(`Ommiting relese for project with "target projects"`);
           Helpers.sleep(3);
-          return;
+          return true;
         }
         Helpers.error(`You can't release project with target projects`, false, true);
       }
@@ -589,13 +588,14 @@ export abstract class LibProject {
   // methods / push to git repo
   async pushToGitRepo(this: Project, newVersion: string, realCurrentProj: Project) {
     //
-    newVersion = await this.tagVersion(newVersion);
-    realCurrentProj.packageJson.setBuildHash(this.git.lastCommitHash());
+    newVersion = await realCurrentProj.tagVersion(newVersion);
+    const lastCommitHash = realCurrentProj.git.lastCommitHash();
+    realCurrentProj.packageJson.setBuildHash(lastCommitHash);
     realCurrentProj.packageJson.save('updating hash');
-    this.commit(newVersion, `build hash update`);
+    realCurrentProj.commit(newVersion, `build hash update`);
     Helpers.log('Pushing to git repository... ')
-    Helpers.log(`Git branch: ${this.git.currentBranchName}`);
-    this.git.pushCurrentBranch();
+    Helpers.log(`Git branch: ${realCurrentProj.git.currentBranchName}`);
+    realCurrentProj.git.pushCurrentBranch();
     Helpers.info('Pushing to git repository done.');
 
   }

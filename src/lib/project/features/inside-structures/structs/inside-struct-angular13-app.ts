@@ -259,7 +259,9 @@ ${appModuleFile}
               .replace('http://', '')
               .split('/')).split(':'))
 
-            manifestJson.start_url = `https://${remoteUsername}.github.io/${project.name}/`
+            const projForName = this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer : this.project;
+
+            manifestJson.start_url = `https://${remoteUsername}.github.io/${projForName.name}/`
           }
 
 

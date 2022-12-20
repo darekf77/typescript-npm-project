@@ -162,20 +162,16 @@ export class LibProjectStandalone {
 
 
       await this.bumpVersionInOtherProjects(newVersion);
-
-      if ((this.lib.typeIs('isomorphic-lib') && this.lib.frameworkVersionAtLeast('v3')) && !global.tnpNonInteractive) {
-        await this.buildDocs(prod, newVersion, realCurrentProj);
-      } else {
-        await this.lib.pushToGitRepo(newVersion, realCurrentProj)
-      }
-
-
-
-    }, () => {
-      this.lib.removeTagAndCommit(automaticRelease);
+      this.updateTnpAndCoreContainers(realCurrentProj);
     });
 
+    if ((this.lib.typeIs('isomorphic-lib') && this.lib.frameworkVersionAtLeast('v3')) && !global.tnpNonInteractive) {
+      await this.buildDocs(prod, newVersion, realCurrentProj);
+    }
+    await realCurrentProj.pushToGitRepo(newVersion, realCurrentProj);
+  }
 
+  updateTnpAndCoreContainers(realCurrentProj: Project) {
     const tnpProj = Project.Tnp as Project;
 
     if (tnpProj) {

@@ -88,12 +88,11 @@ export class LibProjectSmartContainer {
 
         });
 
-
-      await this.buildDocs(prod, newVersion, realCurrentProj)
-
-    }, () => {
-      process.exit(0);
     });
+
+    await this.buildDocs(prod, newVersion, realCurrentProj)
+
+
 
   }
 

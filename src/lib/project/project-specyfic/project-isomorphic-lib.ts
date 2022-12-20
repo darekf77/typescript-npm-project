@@ -239,7 +239,10 @@ export class ProjectIsomorphicLib
       baseHref = `${baseHref}/`;
       baseHref = baseHref.replace(/\/\//g, '/')
     }
-    baseHref = this.isStandaloneProject ? `base-href ${this.name}` : (baseHref ? `base-href ${baseHref}` : '');
+    baseHref = this.isStandaloneProject
+      ? `base-href ${this.isSmartContainerTarget ? this.smartContainerTargetParentContainer.name : this.name}`
+      : (baseHref ? `base-href ${baseHref}` : '')
+      ;
     baseHref = `--${baseHref}`;
     //#endregion
 
@@ -704,7 +707,7 @@ export class ProjectIsomorphicLib
 
   //#region private methods / show message when build lib done for smart container
   private showMesageWhenBuildLibDoneForSmartContainer(args: string, watch: boolean, project: Project) {
-    if(project.location.includes('tmp-bundle-release/bundle')) {
+    if (project.location.includes('tmp-bundle-release/bundle')) {
       Helpers.info('Release lib build done.');
       return;
     }
