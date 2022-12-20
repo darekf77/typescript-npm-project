@@ -183,11 +183,22 @@ export abstract class LibProject {
       }
 
       if (this.isSmartContainer) {
-        await specyficProjectForBuild.smartcontainer.publish(`@${this.name}`, newVersion, automaticRelease)
+        await specyficProjectForBuild.smartcontainer.publish(
+          realCurrentProj,
+          `@${this.name}`,
+          newVersion,
+          automaticRelease,
+          prod,
+        )
       }
 
       if (this.isStandaloneProject) {
-        await specyficProjectForBuild.standalone.publish(realCurrentProj, newVersion, automaticRelease, prod);
+        await specyficProjectForBuild.standalone.publish(
+          realCurrentProj,
+          newVersion,
+          automaticRelease,
+          prod,
+        );
       }
 
     }, () => {
@@ -367,7 +378,7 @@ export abstract class LibProject {
   private questionMessage(this: Project, newVersion: string, realCurrentProj: Project) {
     // TODO detecting changes for children when start container
     const message = this.isStandaloneProject ? `Release new version: ${newVersion} ?`
-      : `Release new versions for container packages:`
+      : `Release new versions for container packages:\n`
       + `${realCurrentProj.children.map((c, index) => `\t${index + 1}. `
         + `@${realCurrentProj.name}/${c.name} v${newVersion}`).join('\n')}\n?`;
 

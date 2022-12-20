@@ -63,106 +63,112 @@ export class LibProjectStandalone {
     }
   }
 
+  async buildDocs(prod: boolean, newVersion: string, realCurrentProj: Project) {
+    await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
+
+      let appBuildOptions = { docsAppInProdMode: prod, websql: false };
+
+      await Helpers.questionYesNo(`Do you wanna build in production mode`, () => {
+        appBuildOptions.docsAppInProdMode = true;
+      }, () => {
+        appBuildOptions.docsAppInProdMode = false;
+      });
+
+      await Helpers.questionYesNo(`Do you wanna use websql mode ?`, () => {
+        appBuildOptions.websql = true;
+      }, () => {
+        appBuildOptions.websql = false;
+      });
+
+      Helpers.log(`
+
+  Building docs prevew - start
+
+  `);
+      const init = this.lib.frameworkVersionAtLeast('v3') ? `${config.frameworkName} build:dist && ` : '';
+      await this.lib.run(`${init}`
+        + `${config.frameworkName} build:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
+        + `${appBuildOptions.websql ? '--websql' : ''}`).sync();
+
+      if (this.lib.frameworkVersionAtLeast('v3')) {
+        const currentDocs = path.join(this.lib.location, config.folder.docs);
+        const currentDocsDest = path.join(this.lib.location, '..', '..', '..', '..', config.folder.docs);
+        Helpers.removeFolderIfExists(currentDocsDest);
+        Helpers.copy(currentDocs, currentDocsDest, { recursive: true })
+      }
+
+      Helpers.log(`
+
+  Building docs prevew - done
+
+  `);
+      await this.lib.pushToGitRepo(newVersion, realCurrentProj)
+    }, async () => {
+      await this.lib.pushToGitRepo(newVersion, realCurrentProj)
+    });
+  }
+
+
   async publish(realCurrentProj: Project, newVersion: string, automaticRelease: boolean, prod: boolean) {
     const cwd = path.join(this.lib.location, config.folder.bundle)
     Helpers.info(`Publish cwd: ${cwd}`)
     await Helpers.questionYesNo(`Publish on npm version: ${newVersion} ?`, async () => {
 
       // publishing standalone
-      let successPublis = false;
       try {
         this.lib.run('npm publish', {
           cwd,
           output: true
         }).sync();
-        successPublis = true;
       } catch (e) {
         this.lib.removeTagAndCommit(automaticRelease)
       }
 
-      if (successPublis) {
-        // release additional packages names
-        const names = this.lib.packageJson.additionalNpmNames;
-        for (let index = 0; index < names.length; index++) {
-          const c = names[index];
-          const existedBundle = crossPlatformPath(path.join(this.lib.location, 'bundle'));
-          const additionBase = crossPlatformPath(path.resolve(path.join(this.lib.location, `../../../additional-bundle-${c}`)));
-          Helpers.mkdirp(additionBase);
-          Helpers.copy(existedBundle, additionBase, {
-            copySymlinksAsFiles: true,
-            omitFolders: [config.folder.node_modules],
-            omitFoldersBaseFolder: existedBundle
-          });
-          const pathPackageJsonRelease = path.join(additionBase, config.file.package_json);
-          const packageJsonAdd: Models.npm.IPackageJSON = Helpers.readJson(path.join(additionBase, config.file.package_json));
-          packageJsonAdd.name = c;
-          // const keys = Object.keys(packageJsonAdd.bin || {});
-          // keys.forEach(k => {
-          //   const v = packageJsonAdd.bin[k] as string;
-          //   packageJsonAdd.bin[k.replace(this.name, c)] = v.replace(this.name, c);
-          //   delete packageJsonAdd.bin[k];
-          // });
-          Helpers.writeFile(pathPackageJsonRelease, packageJsonAdd);
-          Helpers.info('log addtional bundle created');
-          try {
-            if (!global.tnpNonInteractive) {
-              Helpers.run(`code ${additionBase}`).sync();
-              Helpers.info(`Check you additional bundle for ${CLI.chalk.bold(c)} and press any key to publish...`);
-              Helpers.pressKeyAndContinue();
-            }
-            Helpers.run('npm publish', { cwd: additionBase }).sync();
-          } catch (error) {
-            Helpers.warn(`No able to push additional bundle for name: ${c}`)
+
+      // release additional packages names
+      const names = this.lib.packageJson.additionalNpmNames;
+      for (let index = 0; index < names.length; index++) {
+        const c = names[index];
+        const existedBundle = crossPlatformPath(path.join(this.lib.location, 'bundle'));
+        const additionBase = crossPlatformPath(path.resolve(path.join(this.lib.location, `../../../additional-bundle-${c}`)));
+        Helpers.mkdirp(additionBase);
+        Helpers.copy(existedBundle, additionBase, {
+          copySymlinksAsFiles: true,
+          omitFolders: [config.folder.node_modules],
+          omitFoldersBaseFolder: existedBundle
+        });
+        const pathPackageJsonRelease = path.join(additionBase, config.file.package_json);
+        const packageJsonAdd: Models.npm.IPackageJSON = Helpers.readJson(path.join(additionBase, config.file.package_json));
+        packageJsonAdd.name = c;
+        // const keys = Object.keys(packageJsonAdd.bin || {});
+        // keys.forEach(k => {
+        //   const v = packageJsonAdd.bin[k] as string;
+        //   packageJsonAdd.bin[k.replace(this.name, c)] = v.replace(this.name, c);
+        //   delete packageJsonAdd.bin[k];
+        // });
+        Helpers.writeFile(pathPackageJsonRelease, packageJsonAdd);
+        Helpers.info('log addtional bundle created');
+        try {
+          if (!global.tnpNonInteractive) {
+            Helpers.run(`code ${additionBase}`).sync();
+            Helpers.info(`Check you additional bundle for ${CLI.chalk.bold(c)} and press any key to publish...`);
+            Helpers.pressKeyAndContinue();
           }
+          Helpers.run('npm publish', { cwd: additionBase }).sync();
+        } catch (error) {
+          Helpers.warn(`No able to push additional bundle for name: ${c}`)
         }
-
-
-        await this.bumpVersionInOtherProjects(newVersion);
-
-        if ((this.lib.typeIs('angular-lib') || (this.lib.typeIs('isomorphic-lib') && this.lib.frameworkVersionAtLeast('v3')))
-          && !global.tnpNonInteractive) {
-          await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
-
-            let appBuildOptions = { docsAppInProdMode: prod };
-
-            await Helpers.questionYesNo(`Do you wanna build in production mode`, () => {
-              appBuildOptions.docsAppInProdMode = true;
-            }, () => {
-              appBuildOptions.docsAppInProdMode = false;
-            });
-
-            Helpers.log(`
-
-        Building docs prevew - start
-
-        `);
-            const init = this.lib.frameworkVersionAtLeast('v3') ? `${config.frameworkName} build:dist && ` : '';
-            await this.lib.run(`${init}`
-              + `${config.frameworkName} build:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''}`).sync();
-
-            if (this.lib.frameworkVersionAtLeast('v3')) {
-              const currentDocs = path.join(this.lib.location, config.folder.docs);
-              const currentDocsDest = path.join(this.lib.location, '..', '..', '..', '..', config.folder.docs);
-              Helpers.removeFolderIfExists(currentDocsDest);
-              Helpers.copy(currentDocs, currentDocsDest, { recursive: true })
-            }
-
-            Helpers.log(`
-
-        Building docs prevew - done
-
-        `);
-            await this.lib.pushToGitRepo(newVersion, realCurrentProj)
-          }, async () => {
-            await this.lib.pushToGitRepo(newVersion, realCurrentProj)
-          });
-
-
-        } else {
-          await this.lib.pushToGitRepo(newVersion, realCurrentProj)
-        }
-
       }
+
+
+      await this.bumpVersionInOtherProjects(newVersion);
+
+      if ((this.lib.typeIs('isomorphic-lib') && this.lib.frameworkVersionAtLeast('v3')) && !global.tnpNonInteractive) {
+        await this.buildDocs(prod, newVersion, realCurrentProj);
+      } else {
+        await this.lib.pushToGitRepo(newVersion, realCurrentProj)
+      }
+
 
 
     }, () => {

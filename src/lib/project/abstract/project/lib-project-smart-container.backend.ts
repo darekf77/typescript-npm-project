@@ -1,5 +1,5 @@
 import { config } from "tnp-config";
-import { path } from "tnp-core";
+import { crossPlatformPath, path } from "tnp-core";
 import { Helpers } from "tnp-helpers";
 import { Models } from "tnp-models";
 import { CLASS } from "typescript-class-helpers";
@@ -52,7 +52,14 @@ export class LibProjectSmartContainer {
 
   }
 
-  async publish(rootPackageName: string, newVersion: string, automaticRelease: boolean) {
+  async publish(
+    realCurrentProj: Project,
+    rootPackageName: string,
+    newVersion: string,
+    automaticRelease: boolean,
+    prod: boolean,
+  ) {
+
     const base = path.join(
       this.lib.location,
       this.lib.getTempProjName('bundle'),
@@ -66,7 +73,6 @@ export class LibProjectSmartContainer {
       Helpers
         .foldersFrom(base)
         .forEach(cwd => {
-
           let successPublis = false;
           // const proj = Project.From(absFolder) as Project;
 
@@ -82,6 +88,9 @@ export class LibProjectSmartContainer {
 
         });
 
+
+      await this.buildDocs(prod, newVersion, realCurrentProj)
+
     }, () => {
       process.exit(0);
     });
@@ -91,15 +100,21 @@ export class LibProjectSmartContainer {
 
   async buildDocs(prod: boolean, newVersion: string, realCurrentProj: Project) {
     // TODO
-    return;
+
     await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
 
-      let appBuildOptions = { docsAppInProdMode: prod };
+      let appBuildOptions = { docsAppInProdMode: prod, websql: false };
 
       await Helpers.questionYesNo(`Do you wanna build in production mode`, () => {
         appBuildOptions.docsAppInProdMode = true;
       }, () => {
         appBuildOptions.docsAppInProdMode = false;
+      });
+
+      await Helpers.questionYesNo(`Do you wanna use websql mode ?`, () => {
+        appBuildOptions.websql = true;
+      }, () => {
+        appBuildOptions.websql = false;
       });
 
       Helpers.log(`
@@ -109,11 +124,15 @@ export class LibProjectSmartContainer {
   `);
       const init = this.lib.frameworkVersionAtLeast('v3') ? `${config.frameworkName} build:dist && ` : '';
       await this.lib.run(`${init}`
-        + `${config.frameworkName} build:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''}`).sync();
+        + `${config.frameworkName} build:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
+        + `${appBuildOptions.websql ? '--websql' : ''}`).sync();
 
       if (this.lib.frameworkVersionAtLeast('v3')) {
         const currentDocs = path.join(this.lib.location, config.folder.docs);
-        const currentDocsDest = path.join(this.lib.location, '..', '..', '..', '..', config.folder.docs);
+        const currentDocsDest = crossPlatformPath(path.join(this.lib.location,
+          '..', '..', '..', '..', '..', '..', '..',
+          config.folder.docs,
+        ));
         Helpers.removeFolderIfExists(currentDocsDest);
         Helpers.copy(currentDocs, currentDocsDest, { recursive: true })
       }

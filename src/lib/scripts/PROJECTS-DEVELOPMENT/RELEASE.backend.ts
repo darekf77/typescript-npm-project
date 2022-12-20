@@ -10,7 +10,7 @@ const $RELEASE_ALL = async (args: string) => {
 };
 
 const $RELEASE_TRUSTED = async (args: string) => {
-  const trusted = `--trusted`;  ;
+  const trusted = `--trusted`;;
   const all = `--all`;
   await $RELEASE(
     args
@@ -334,7 +334,10 @@ processing...
       await proj.targetProjects.update();
       process.exit(0);
     } else {
-      await proj.release(handleStandalone(proj, argsObj), automaticRelease);
+      if (!proj.node_modules.exist) {
+        proj.npmPackages.installFromArgs('');
+      }
+      await proj.release(handleStandaloneOrSmartContainer(proj, argsObj), automaticRelease);
       process.exit(0);
     }
     //#endregion
@@ -408,7 +411,7 @@ const SET_MAJOR_VER = async (args: string) => {
 }
 
 
-function handleStandalone(proj: Project, argsObj: any) {
+function handleStandaloneOrSmartContainer(proj: Project, argsObj: any) {
   if (proj.packageJson.libReleaseOptions.obscure) {
     argsObj.obscure = true;
   }

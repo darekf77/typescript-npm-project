@@ -272,6 +272,12 @@ export class FilesStructure extends FeatureForProject {
     if (!client && smartContainerBuildTarget) {
       client = smartContainerBuildTarget.name;
     }
+    if (!client) {
+      const fisrtChild = _.first(this.project.isSmartContainer ? this.project.children : this.project.parent?.children);
+      if (fisrtChild) {
+        client = fisrtChild.name;
+      }
+    }
 
     this.handleSmartContainer(this.project, client);
 
