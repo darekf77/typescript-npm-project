@@ -205,7 +205,7 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('singluarBuild', SingularBuild);
       this.defineProperty<Project>('webpackBackendBuild', WebpackBackendCompilation);
       this.defineProperty<Project>('linkedRepos', LinkedRepos);
-
+      this.libProjectInit();
     }
 
   }

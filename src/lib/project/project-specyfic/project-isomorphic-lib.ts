@@ -610,7 +610,7 @@ export class ProjectIsomorphicLib
               ...sharedOptions(),
             });
           }
-          this.showMesageWhenBuildLibDoneForSmartContainer(args, watch);
+          this.showMesageWhenBuildLibDoneForSmartContainer(args, watch, this);
         }
         //#endregion
       }
@@ -681,7 +681,7 @@ export class ProjectIsomorphicLib
           await proxyProjectWebsql.execute(command, {
             ...sharedOptions(),
           });
-          this.showMesageWhenBuildLibDoneForSmartContainer(args, watch);
+          this.showMesageWhenBuildLibDoneForSmartContainer(args, watch, this);
         } catch (e) {
           Helpers.log(e)
           Helpers.error(`
@@ -703,7 +703,11 @@ export class ProjectIsomorphicLib
   //#region private methods
 
   //#region private methods / show message when build lib done for smart container
-  private showMesageWhenBuildLibDoneForSmartContainer(args: string, watch: boolean) {
+  private showMesageWhenBuildLibDoneForSmartContainer(args: string, watch: boolean, project: Project) {
+    if(project.location.includes('tmp-bundle-release/bundle')) {
+      Helpers.info('Release lib build done.');
+      return;
+    }
     const buildLibDone = `LIB BUILD DONE.. `;
     const ifapp = 'if you want to start app build -> please run in other terminal command:';
     const ngserve = `${watch ? '--port 4201 # or whatever port' : '#'} to run angular ${watch

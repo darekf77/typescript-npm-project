@@ -397,7 +397,7 @@ const $INSTALL_LOCALLY = async (args) => {
   argsObj.args = args;
   const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
   if (proj.isVscodeExtension) {
-    await proj.installLocaly(argsObj);
+    await proj.vscodext.installLocaly(argsObj);
   }
   process.exit(0);
 };

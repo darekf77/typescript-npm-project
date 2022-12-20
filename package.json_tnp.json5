@@ -221,7 +221,7 @@
         'firedev-ports': '13.1.29',
         'firedev-crud-deamon': '13.1.25',
         "tnp-ui": '13.1.27',
-        "tnp-core": '13.1.33',
+        "tnp-core": '13.1.46',
         "tnp-cli": '13.1.32',
         "tnp-tools": '0.0.58',
         'any-project-cli': '13.1.16',
@@ -336,7 +336,7 @@
           "eslint-plugin-prefer-arrow": "1.2.2",
           nodemon: "^1.14.11",
           "enum-values": "1.2.1",
-          'isomorphic-region-loader': '13.1.13',
+          'isomorphic-region-loader': '13.1.14',
         },
         angular: {
           "@angular-devkit/build-optimizer": "^0.3.1",

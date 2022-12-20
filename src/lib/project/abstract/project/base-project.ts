@@ -10,10 +10,6 @@ import { config } from 'tnp-config';
 
 export abstract class BaseProject {
 
-  // @ts-ignore
-  public get extensionVsixName(this: Project) {
-    return `${this.name}-${this.version}.vsix`;
-  }
 
   // @ts-ignore
   public get genericName(this: Project): string {

@@ -37,7 +37,9 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     config.file.package_json,
     ...CopyMangerHelpers.browserwebsqlFolders.map(currentBrowserFolder => {
       return crossPlatformPath(path.join(currentBrowserFolder, config.folder.src))
-    })
+    }),
+    // probably is not needed -> I ma not using bundle for node_modules
+    crossPlatformPath(path.join(config.folder.client, config.file.package_json)),
   ];
 
   //#endregion
@@ -73,10 +75,13 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       return [
         this.localTempProj,
         ...this.copyto,
-        this.project,
+        ...(this.outDir === 'dist' ? [this.project] : []),
       ] as Project[];
     }
-    return [this.localTempProj, this.project,];
+    return [
+      this.localTempProj,
+      ...(this.outDir === 'dist' ? [this.project] : []),
+    ];
   }
   //#endregion
 
