@@ -487,7 +487,16 @@ export class BrowserCodeCut {
         .filter(f => f.typeIs('isomorphic-lib'))
         .forEach(c => {
           const from = `${c.name}/src/assets/`;
-          const to = `/assets/assets-for/${c.name}/`;
+          const to = `assets/assets-for/${c.name}/`;
+          this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
+          this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+        });
+    } else if (this.project.isStandaloneProject) {
+      [this.project]
+        .filter(f => f.typeIs('isomorphic-lib'))
+        .forEach(c => {
+          const from = `src/assets/`;
+          const to = `assets/assets-for/${c.name}/`;
           this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
           this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
         });

@@ -81,103 +81,103 @@ export class ProjectAngularClient
   }
 
   async buildApp(watch = false, prod: boolean, port?: number, baseHref?: string, flags: string[] = [], args?: string) {
-    //#region @backendFunc
-    const outDirApp = 'dist-app';
-    const argsAdditionalParams: { port: number; } = Helpers.cliTool.argsFrom(args) || {} as any;
-    if (watch) {
-      const portNumber = (argsAdditionalParams.port && this.isStandaloneProject)
-        ? argsAdditionalParams.port : (port !== undefined ? port : void 0);
+//     //#region @backendFunc
+//     const outDirApp = 'dist-app';
+//     const argsAdditionalParams: { port: number; } = Helpers.cliTool.argsFrom(args) || {} as any;
+//     if (watch) {
+//       const portNumber = (argsAdditionalParams.port && this.isStandaloneProject)
+//         ? argsAdditionalParams.port : (port !== undefined ? port : void 0);
 
-      const p = _.isNumber(portNumber) ? `--port=${portNumber}` : '';
-      let command: string;
-      if (this.isEjectedProject) {
-        await Helpers.killProcessByPort(port)
-        command = `npm-run webpack-dev-server  --host 0.0.0.0 ${p} `;
-      } else {
-        command = `npm-run ng serve ${p} --aot=false`;
-      }
-      Helpers.info(`
+//       const p = _.isNumber(portNumber) ? `--port=${portNumber}` : '';
+//       let command: string;
+//       if (this.isEjectedProject) {
+//         await Helpers.killProcessByPort(port)
+//         command = `npm-run webpack-dev-server  --host 0.0.0.0 ${p} `;
+//       } else {
+//         command = `npm-run ng serve ${p} --aot=false`;
+//       }
+//       Helpers.info(`
 
-      ANGULAR SERVE COMMAND: ${command}
+//       ANGULAR SERVE COMMAND: ${command}
 
-      `);
-      this.run(command, { biggerBuffer: true }).async()
-    } else {
-      baseHref = this.isStandaloneProject ? `base-href ${this.name}` : (baseHref ? `base-href ${baseHref}` : '')
-      if (this.isEjectedProject) {
-        baseHref = `--env.${baseHref}`
-        const aot = (prod ? 'aot.' : '');
-        // const stats = [
-        //   "--display-chunks false",
-        //   "--display-optimization-bailout false",
-        //   "--display-provided-exports false',
-        //   "--display-used-exports false',
-        //   "--display-depth false",
-        //   "--display-reasons false",
-        //   "--display-cached-assets false",
-        //   "--display-cached false",
-        //   "--display-origins false",
-        //   "--display-entrypoints false",
-        //   "--display-max-modules false",
-        //   "--display-modules false",
-        //   "--display-exclude true",
-        //   "--verbose  false",
-        //   "--progress false",
-        //   "--hide-modules true",
-        //   "--display none"
-        // ]
-        Helpers.tryRemoveDir(path.join(this.location, outDirApp));
-        this.run(`npx webpack@3 --config=webpack.config.build.${aot}js ${baseHref}`,
-          {
-            output: (this.env.config.name === 'local'),
-            silence: (this.env.config.name !== 'local'),
-            biggerBuffer: true
-          }).sync();
-      } else {
+//       `);
+//       this.run(command, { biggerBuffer: true }).async()
+//     } else {
+//       baseHref = this.isStandaloneProject ? `base-href ${this.name}` : (baseHref ? `base-href ${baseHref}` : '')
+//       if (this.isEjectedProject) {
+//         baseHref = `--env.${baseHref}`
+//         const aot = (prod ? 'aot.' : '');
+//         // const stats = [
+//         //   "--display-chunks false",
+//         //   "--display-optimization-bailout false",
+//         //   "--display-provided-exports false',
+//         //   "--display-used-exports false',
+//         //   "--display-depth false",
+//         //   "--display-reasons false",
+//         //   "--display-cached-assets false",
+//         //   "--display-cached false",
+//         //   "--display-origins false",
+//         //   "--display-entrypoints false",
+//         //   "--display-max-modules false",
+//         //   "--display-modules false",
+//         //   "--display-exclude true",
+//         //   "--verbose  false",
+//         //   "--progress false",
+//         //   "--hide-modules true",
+//         //   "--display none"
+//         // ]
+//         Helpers.tryRemoveDir(path.join(this.location, outDirApp));
+//         this.run(`npx webpack@3 --config=webpack.config.build.${aot}js ${baseHref}`,
+//           {
+//             output: (this.env.config.name === 'local'),
+//             silence: (this.env.config.name !== 'local'),
+//             biggerBuffer: true
+//           }).sync();
+//       } else {
 
-        baseHref = `--${baseHref}`
+//         baseHref = `--${baseHref}`
 
-        if (prod) {
-          Helpers.info(`BUILDING PRODUCTION`)
-        }
-        let command: string;
-        const statsCommand = (!this.isStandaloneProject ? (
-          this.env.config.name === 'static' ? '--stats-json' : ''
-        ) : '');
-        const outPutPathCommand = `--output-path ${this.isStandaloneProject ? config.folder.docs : config.folder.previewDistApp} ${baseHref}`;
+//         if (prod) {
+//           Helpers.info(`BUILDING PRODUCTION`)
+//         }
+//         let command: string;
+//         const statsCommand = (!this.isStandaloneProject ? (
+//           this.env.config.name === 'static' ? '--stats-json' : ''
+//         ) : '');
+//         const outPutPathCommand = `--output-path ${this.isStandaloneProject ? config.folder.docs : config.folder.previewDistApp} ${baseHref}`;
 
-        if (this.frameworkVersionEquals('v1')) {
-          command = `npm-run ng build  ${statsCommand} `
-            + ` --aot=false ${prod ? '-prod' : ''} ${outPutPathCommand}`
-        } else {
-          const aot = flags.includes('aot');
-          command = `npm-run ng build  ${statsCommand} --serviceWorker=true `
-            + ` --aot=${aot ? 'true' : 'false --build-optimizer=false'} ${prod ? '--prod' : ''} ${outPutPathCommand}`
-        }
+//         if (this.frameworkVersionEquals('v1')) {
+//           command = `npm-run ng build  ${statsCommand} `
+//             + ` --aot=false ${prod ? '-prod' : ''} ${outPutPathCommand}`
+//         } else {
+//           const aot = flags.includes('aot');
+//           command = `npm-run ng build  ${statsCommand} --serviceWorker=true `
+//             + ` --aot=${aot ? 'true' : 'false --build-optimizer=false'} ${prod ? '--prod' : ''} ${outPutPathCommand}`
+//         }
 
-        Helpers.info(`
+//         Helpers.info(`
 
-Angular cli build command: "${command}"
+// Angular cli build command: "${command}"
 
-        `)
+//         `)
 
-        try {
-          const showOutput = this.isStandaloneProject ? true : (['local', 'static'] as ConfigModels.EnvironmentName[])
-            .includes(this.env.config.name);
-          this.run(command,
-            {
-              output: showOutput,
-              silence: !showOutput,
-              biggerBuffer: true
-            }).sync()
-        } catch (e) {
-          Helpers.error(e, true, true);
-          Helpers.error(`Build app from lib command failed: ${command}`, false, true);
-        }
+//         try {
+//           const showOutput = this.isStandaloneProject ? true : (['local', 'static'] as ConfigModels.EnvironmentName[])
+//             .includes(this.env.config.name);
+//           this.run(command,
+//             {
+//               output: showOutput,
+//               silence: !showOutput,
+//               biggerBuffer: true
+//             }).sync()
+//         } catch (e) {
+//           Helpers.error(e, true, true);
+//           Helpers.error(`Build app from lib command failed: ${command}`, false, true);
+//         }
 
-      }
-    }
-    //#endregion
+//       }
+//     }
+//     //#endregion
   }
 
   async buildSteps(buildOptions?: BuildOptions) {

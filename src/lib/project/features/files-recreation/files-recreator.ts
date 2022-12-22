@@ -316,6 +316,8 @@ export class FilesRecreator extends FeatureForProject {
 
                 s['files.exclude'] = {};
 
+                s['files.exclude'][`**/*____ORIGINAL____.ts`] = true;
+
                 s['files.exclude']['tsconfig.backend.dist.json'] = true;
                 s['files.exclude']['tsconfig.backend.bundle.json'] = true;
                 s['files.exclude']['tsconfig.backend.dist.json.filetemplate'] = true;

@@ -216,7 +216,7 @@
         "tnp-models": '13.1.6',
         "tnp-helpers": '13.1.7',
         "tnp-db": '13.1.5',
-        'firedev-typeorm': '13.1.6',
+        'firedev-typeorm': '13.1.7',
         'firedev-crud': '13.1.35',
         'firedev-ports': '13.1.29',
         'firedev-crud-deamon': '13.1.25',

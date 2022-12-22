@@ -90,14 +90,12 @@ export class LibProjectSmartContainer {
 
     });
 
-    await this.buildDocs(prod, newVersion, realCurrentProj)
-
-
+    await this.buildDocs(prod, newVersion, realCurrentProj, false);
 
   }
 
 
-  async buildDocs(prod: boolean, newVersion: string, realCurrentProj: Project) {
+  async buildDocs(prod: boolean, newVersion: string, realCurrentProj: Project, buildLib: boolean) {
     // TODO
 
     await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
@@ -121,9 +119,9 @@ export class LibProjectSmartContainer {
   Building docs prevew - start
 
   `);
-      const init = this.lib.frameworkVersionAtLeast('v3') ? `${config.frameworkName} build:dist && ` : '';
+      const init = buildLib ? `${config.frameworkName} build:${config.folder.bundle} && ` : '';
       await this.lib.run(`${init}`
-        + `${config.frameworkName} build:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
+        + `${config.frameworkName} build:${config.folder.bundle}:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
         + `${appBuildOptions.websql ? '--websql' : ''}`).sync();
 
       if (this.lib.frameworkVersionAtLeast('v3')) {

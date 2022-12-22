@@ -72,6 +72,10 @@ export class ProjectIsomorphicLib
     ]
   }
 
+  get isInRelaseBundle() {
+    return this.location.includes('tmp-bundle-release/bundle');
+  };
+
   //#endregion
 
   //#region methods
@@ -179,11 +183,11 @@ export class ProjectIsomorphicLib
   async buildSteps(buildOptions?: BuildOptions) {
     //#region @backendFunc
     this.buildOptions = buildOptions;
-    const { prod, watch, outDir, onlyWatchNoBuild, appBuild, args, forClient = [], baseHref } = buildOptions;
+    const { prod, watch, outDir, onlyWatchNoBuild, appBuild, args, forClient = [], baseHref, websql } = buildOptions;
 
     if (!onlyWatchNoBuild) {
       if (appBuild) {
-        await this.buildApp(outDir, watch, forClient as any, buildOptions.args, baseHref, prod);
+        await this.buildApp(outDir, watch, forClient as any, buildOptions.args, baseHref, prod, websql);
       } else {
         await this.buildLib();
       }
@@ -227,6 +231,7 @@ export class ProjectIsomorphicLib
     args: string,
     baseHref: string,
     prod: boolean,
+    websql: boolean,
     //#endregion
     //#endregion
   ) {
@@ -250,9 +255,12 @@ export class ProjectIsomorphicLib
     let webpackEnvParams = `--env.outFolder=${outDir}`;
     webpackEnvParams = webpackEnvParams + (watch ? ' --env.watch=true' : '');
 
-    const outPutPathCommand = `--output-path ../../${this.isStandaloneProject
-      ? config.folder.docs
-      : config.folder.previewDistApp} ${baseHref}`;
+
+    const backFFolders = `../../`;
+
+    const outDirApp = this.isInRelaseBundle ? config.folder.docs : `${outDir}-app${websql ? '-websql' : ''}`;
+
+    const outPutPathCommand = `--output-path ${backFFolders}${outDirApp} ${this.isInRelaseBundle ? baseHref : ''}`;
 
     let { flags } = require('minimist')(args.split(' '));
     flags = (_.isString(flags) ? [flags] : []);
@@ -459,9 +467,6 @@ export class ProjectIsomorphicLib
     const { obscure, uglify, nodts } = this.buildOptions;
     const isWebpackBundleProductionBuild = ((outDir === 'bundle') && (obscure || uglify || nodts))
 
-    if (outDir === 'bundle') {
-      this.cutReleaseCode();
-    }
 
     if (outDir === 'bundle' && (obscure || uglify)) {
       this.quickFixes.overritenBadNpmPackages();
@@ -613,11 +618,14 @@ export class ProjectIsomorphicLib
               ...sharedOptions(),
             });
           }
-          this.showMesageWhenBuildLibDoneForSmartContainer(args, watch, this);
+          this.showMesageWhenBuildLibDoneForSmartContainer(args, watch, this.isInRelaseBundle);
         }
         //#endregion
       }
     } else {
+      if (outDir === 'bundle') {
+        this.cutReleaseCode();
+      }
       //#region non watch build
       if (isWebpackBundleProductionBuild) {
         //#region release production backend build for firedev/tnp specyfic
@@ -684,7 +692,7 @@ export class ProjectIsomorphicLib
           await proxyProjectWebsql.execute(command, {
             ...sharedOptions(),
           });
-          this.showMesageWhenBuildLibDoneForSmartContainer(args, watch, this);
+          this.showMesageWhenBuildLibDoneForSmartContainer(args, watch, this.isInRelaseBundle);
         } catch (e) {
           Helpers.log(e)
           Helpers.error(`
@@ -692,10 +700,16 @@ export class ProjectIsomorphicLib
 
           Not able to build project: ${this.genericName}`, false, true)
         }
+
         //#endregion
       }
       //#endregion
+      if (outDir === 'bundle') {
+        this.cutReleaseCodeRestore();
+      }
     }
+
+
 
     //#endregion
   }
@@ -706,8 +720,8 @@ export class ProjectIsomorphicLib
   //#region private methods
 
   //#region private methods / show message when build lib done for smart container
-  private showMesageWhenBuildLibDoneForSmartContainer(args: string, watch: boolean, project: Project) {
-    if (project.location.includes('tmp-bundle-release/bundle')) {
+  private showMesageWhenBuildLibDoneForSmartContainer(args: string, watch: boolean, isInRelease: boolean) {
+    if (isInRelease) {
       Helpers.info('Release lib build done.');
       return;
     }
@@ -880,15 +894,37 @@ export class ProjectIsomorphicLib
   //#endregion
 
   //#region private methods / cut release code
+
+  private get tempSourceNpmCodeCut() {
+    const releaseSrcLocationOrg = path.join(this.location, `tmp-org-src-${config.folder.src}${this.buildOptions.websql ? '-websql' : ''}`);
+    return releaseSrcLocationOrg;
+  }
+
+  private get cutRelaseFolder() {
+    return `tmp-src-${config.folder.bundle}${this.buildOptions.websql ? '-websql' : ''}`
+  }
+
+  private cutReleaseCodeRestore() {
+    const releaseSrcLocation = path.join(this.location, this.cutRelaseFolder);
+    const releaseSrcLocationOrg = this.tempSourceNpmCodeCut;
+    if (Helpers.exists(releaseSrcLocationOrg)) {
+      Helpers.removeFolderIfExists(releaseSrcLocation);
+      Helpers.copy(releaseSrcLocationOrg, releaseSrcLocation);
+    }
+  }
+
   private cutReleaseCode() {
     //#region @backend
-    if (!(path.basename(path.dirname(path.dirname(this.location))) === config.folder.bundle &&
-      path.basename(path.dirname(this.location)) === config.folder.project)) {
+    if (!this.isInRelaseBundle) {
       Helpers.warn(`Npm code cut available only for command: ${config.frameworkName} release`);
       return;
     }
 
-    const releaseSrcLocation = path.join(this.location, config.folder.src);
+    const releaseSrcLocation = path.join(this.location, this.cutRelaseFolder);
+    const releaseSrcLocationOrg = path.join(this.location, this.tempSourceNpmCodeCut);
+    Helpers.removeFolderIfExists(releaseSrcLocationOrg);
+    Helpers.copy(releaseSrcLocation, releaseSrcLocationOrg);
+
     const filesForModyficaiton = glob.sync(`${releaseSrcLocation}/**/*`);
     filesForModyficaiton
       .filter(absolutePath => !Helpers.isFolder(absolutePath))

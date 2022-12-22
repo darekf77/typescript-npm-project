@@ -63,7 +63,7 @@ export class LibProjectStandalone {
     }
   }
 
-  async buildDocs(prod: boolean, newVersion: string, realCurrentProj: Project) {
+  async buildDocs(prod: boolean, newVersion: string, realCurrentProj: Project, buildLib: boolean) {
     await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
 
       let appBuildOptions = { docsAppInProdMode: prod, websql: false };
@@ -85,9 +85,9 @@ export class LibProjectStandalone {
   Building docs prevew - start
 
   `);
-      const init = this.lib.frameworkVersionAtLeast('v3') ? `${config.frameworkName} build:dist && ` : '';
+      const init = buildLib ? `${config.frameworkName} build:${config.folder.bundle} && ` : '';
       await this.lib.run(`${init}`
-        + `${config.frameworkName} build:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
+        + `${config.frameworkName} build:${config.folder.bundle}:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
         + `${appBuildOptions.websql ? '--websql' : ''}`).sync();
 
       if (this.lib.frameworkVersionAtLeast('v3')) {
@@ -166,7 +166,7 @@ export class LibProjectStandalone {
     });
 
     if ((this.lib.typeIs('isomorphic-lib') && this.lib.frameworkVersionAtLeast('v3')) && !global.tnpNonInteractive) {
-      await this.buildDocs(prod, newVersion, realCurrentProj);
+      await this.buildDocs(prod, newVersion, realCurrentProj, false);
     }
     await realCurrentProj.pushToGitRepo(newVersion, realCurrentProj);
   }

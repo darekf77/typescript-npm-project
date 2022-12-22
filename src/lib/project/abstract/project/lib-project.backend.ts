@@ -133,14 +133,14 @@ export abstract class LibProject {
 
     const newVersion = realCurrentProj.version;
 
-    const message = this.questionMessage(newVersion, realCurrentProj);
+    const shouldReleaseLibraryQuestionMessage = this.questionMessage(newVersion, realCurrentProj);
 
     this.checkIfLogginInToNpm();
 
     this.checkIfReadyForNpm();
     //#endregion
 
-    await Helpers.questionYesNo(message, async () => {
+    await Helpers.questionYesNo(shouldReleaseLibraryQuestionMessage, async () => {
 
       if (this.isStandaloneProject) {
         await this.standalone.bumpVersionInOtherProjects(newVersion, true)
@@ -179,7 +179,6 @@ export abstract class LibProject {
 
         });
 
-
       }
 
       if (this.isSmartContainer) {
@@ -201,10 +200,19 @@ export abstract class LibProject {
         );
       }
 
-    }, () => {
+      Helpers.info('RELEASE DONE');
       process.exit(0);
     });
 
+    if (this.isStandaloneProject) {
+      await this.standalone.buildDocs(prod, newVersion, realCurrentProj, true);
+    }
+
+    if (this.isSmartContainer) {
+      await this.smartcontainer.buildDocs(prod, newVersion, realCurrentProj, true);
+    }
+    Helpers.info('DOCS RELEASE DONE');
+    process.exit(0);
   }
   //#endregion
 

@@ -170,6 +170,8 @@ ${appModuleFile}
         //#region link assets
         (() => {
 
+
+
           const assetsSource = crossPlatformPath(path.join(
             project.location,
             config.folder.src,
@@ -180,16 +182,31 @@ ${appModuleFile}
             Helpers.mkdirp(assetsSource);
           }
 
-          const assetsDest = crossPlatformPath(path.join(
-            project.location
-            ,
-            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
-            ,
-            `/src/assets`
-          ));
+          if(this.project.isSmartContainerChild || this.project.isSmartContainer || this.project.isSmartContainerTarget) {
+            const assetsDest = crossPlatformPath(path.join(
+              project.location
+              ,
+              replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+              ,
+              `/src/assets`
+            ));
 
-          Helpers.remove(assetsDest);
-          Helpers.createSymLink(assetsSource, assetsDest)
+            Helpers.remove(assetsDest);
+            Helpers.copy(assetsSource, assetsDest)
+          } else {
+            const assetsDest = crossPlatformPath(path.join(
+              project.location
+              ,
+              replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+              ,
+              `/src/assets/assets-for/${this.project.name}`
+            ));
+
+            Helpers.remove(assetsDest);
+            Helpers.copy(assetsSource, assetsDest)
+          }
+
+
 
         })();
         //#endregion

@@ -293,9 +293,9 @@ export function $BREW(args) {
   const isM1MacOS = os.cpus()[0].model.includes('Apple M1');
   if (process.platform === 'darwin') {
     if (isM1MacOS) {
-      Helpers.run(`arch -x86_64 brew install ${args}`).sync();
+      Helpers.run(`arch -x86_64 brew ${args}`).sync();
     } else {
-      Helpers.run(`brew install ${args}`).sync();
+      Helpers.run(`brew ${args}`).sync();
     }
   }
   process.exit(0);
