@@ -1,5 +1,6 @@
 //#region @backend
 import {
+  crossPlatformPath,
   path, _
 } from 'tnp-core';
 //#endregion
@@ -107,12 +108,13 @@ export class InsideStructures extends FeatureForProject {
           [
             ...insideStruct.struct.relateivePathesFromContainer,
           ].forEach(f => {
-            const orgPath = path.join(insideStruct.struct.coreContainer.location, f);
-            const destPath = path.join(
+            const orgPath = crossPlatformPath(Helpers.resolve(path.join(insideStruct.struct.coreContainer.location, f)));
+            const destPath = clearUnexistedLinks(path.join(
               this.project.location,
               replacement(f) || f,
               // f.replace('app/', `${tmpProjects}/`)
-            );
+            ))
+
             if (orgPath !== destPath) {
               if (Helpers.isFolder(orgPath)) {
                 Helpers.copy(orgPath, destPath);
@@ -121,8 +123,8 @@ export class InsideStructures extends FeatureForProject {
               }
             } else {
               Helpers.warn(`${config.frameworkName} [initAngularAppStructure] trying to copy same thing:
-            ${orgPath}
-            `)
+              ${orgPath}
+              `)
             }
           });
         }
@@ -184,4 +186,24 @@ export class InsideStructures extends FeatureForProject {
   }
   //#endregion
 
+}
+
+function clearUnexistedLinks(pathToClear: string) {
+  pathToClear = (crossPlatformPath(pathToClear) || '');
+  const orgPath = pathToClear;
+  const splited = pathToClear.split('/');
+  let previous: string;
+  do {
+    splited.pop();
+    var pathDir = splited.join('/');
+    if (pathDir === previous) {
+      return orgPath;
+    }
+    if (Helpers.isUnexistedLink(pathDir)) {
+      Helpers.removeFileIfExists(pathDir);
+      return orgPath;
+    }
+    previous = pathDir;
+  } while (!!pathDir);
+  return orgPath;
 }

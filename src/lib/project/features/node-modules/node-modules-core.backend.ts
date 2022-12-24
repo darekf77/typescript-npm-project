@@ -1,5 +1,5 @@
 //#region imports
-import { path } from 'tnp-core';
+import { crossPlatformPath, path } from 'tnp-core';
 import { fse } from 'tnp-core';
 import { _ } from 'tnp-core';
 import { config } from 'tnp-config';
@@ -13,9 +13,9 @@ import {
 
 export class NodeModulesCore extends FeatureForProject {
 
-  public get path() { return path.join(this.project.location, config.folder.node_modules); }
+  public get path() { return crossPlatformPath(path.join(this.project.location, config.folder.node_modules)); }
   public pathFor(packageName: string) {
-    return path.join(this.path, packageName);
+    return crossPlatformPath(path.join(this.path, packageName));
   }
   public get exist() { return nodeModulesExists(this.project); }
   public get itIsSmartInstalation() { return nodeModulesHasOnlyLinks(this.project); }

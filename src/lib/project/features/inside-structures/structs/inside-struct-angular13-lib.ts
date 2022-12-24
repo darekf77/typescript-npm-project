@@ -1,4 +1,5 @@
 import {
+  crossPlatformPath,
   //#region @backend
   path,
   //#endregion
@@ -286,7 +287,7 @@ export * from './lib';
           content = content.replace(new RegExp('my\\-lib', 'g'), projectName);
           if (path.basename(f) === 'tsconfig.json') {
             content = content.replace(
-              new RegExp(Helpers.escapeStringForRegEx(`"dist/${projectName}`), 'g'),
+              new RegExp(Helpers.escapeStringForRegEx(`"${config.folder.bundle}/${projectName}`), 'g'),
               `"../../${outFolder}/${this.websql ? config.folder.websql : config.folder.browser}/${projectName}`);
           }
 
@@ -294,13 +295,17 @@ export * from './lib';
         });
 
         (() => {
-          const ngPath = path.join(
+          const ngPath =  crossPlatformPath( path.join(
             projectLocation,
             this.project.isStandaloneProject
               ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
-            `projects/${projectName}/ng-package.json`);
+            `projects/${projectName}/ng-package.json`));
+
+            // console.log({
+            //    ngPath
+            // })
           const json = Helpers.readJson(ngPath);
-          json.dest = json.dest.replace(`/dist/${projectName}`, `/../../${outFolder}/`
+          json.dest = json.dest.replace(`/${outFolder}/${projectName}`, `/../../${outFolder}/`
             + `${this.websql ? config.folder.websql : config.folder.browser}`);
 
           Helpers.writeJson(ngPath, json);

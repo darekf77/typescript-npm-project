@@ -290,11 +290,17 @@ export class CopyManagerStandalone extends CopyManager {
 
   //#region fix js map files in destination folder
   fixJsMapFiles(destinationPackageLocation: string, currentBrowserFolder?: Models.dev.BuildDirBrowser) {
+
     const forBrowser = !!currentBrowserFolder;
     const filesPattern = `${destinationPackageLocation}`
       + `${forBrowser ? `/${currentBrowserFolder}` : ''}`
       + `/**/*.${forBrowser ? 'm' : ''}js.map`;
 
+    // console.log({
+    //   destinationPackageLocation,
+    //   currentBrowserFolder,
+    //   filesPattern
+    // })
     const mapFiles = glob.sync(filesPattern, {
       ignore: forBrowser ? [] : [`${config.folder.browser}/**/*.*`, `${config.folder.websql}/**/*.*`]
     });

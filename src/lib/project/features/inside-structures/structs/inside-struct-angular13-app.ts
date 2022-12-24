@@ -182,28 +182,29 @@ ${appModuleFile}
             Helpers.mkdirp(assetsSource);
           }
 
-          if(this.project.isSmartContainerChild || this.project.isSmartContainer || this.project.isSmartContainerTarget) {
-            const assetsDest = crossPlatformPath(path.join(
-              project.location
-              ,
-              replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
-              ,
-              `/src/assets`
-            ));
+          const assetsDest = crossPlatformPath(path.join(
+            project.location
+            ,
+            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+            ,
+            `/src/assets`
+          ));
 
+
+          if (this.project.isSmartContainerChild || this.project.isSmartContainer || this.project.isSmartContainerTarget) {
             Helpers.remove(assetsDest);
             Helpers.copy(assetsSource, assetsDest)
           } else {
-            const assetsDest = crossPlatformPath(path.join(
+            const assetsDestFor = crossPlatformPath(path.join(
               project.location
               ,
               replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
               ,
               `/src/assets/assets-for/${this.project.name}`
             ));
-
             Helpers.remove(assetsDest);
-            Helpers.copy(assetsSource, assetsDest)
+            Helpers.remove(assetsDestFor);
+            Helpers.copy(assetsSource, assetsDestFor)
           }
 
 
