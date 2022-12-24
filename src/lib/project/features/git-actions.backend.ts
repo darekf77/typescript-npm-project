@@ -57,12 +57,19 @@ export class GitActions extends FeatureForProject {
     const shouldBeProjectArr = this.project.packageJson.linkedProjects
       .map(relativePath => {
         const possibleProjPath = crossPlatformPath(path.join(this.project.location, relativePath))
-        const possibleProj = Project.From(possibleProjPath) as Project;
+        let possibleProj = Project.From(possibleProjPath) as Project;
         console.log({
           possibleProjPath,
           possibleProj: possibleProj?.name
         })
         // const possibleProj2 = Project.From(path.join(this.project.location, '--', relativePath));
+        if (possibleProj) {
+          return void 0;
+        }
+        if (Helpers.git.isInMergeProcess(possibleProjPath)) {
+          Helpers.run('git reset --hard', { cwd: possibleProjPath }).sync();
+        }
+        possibleProj = Project.From(possibleProjPath) as Project;
         if (possibleProj) {
           return void 0;
         }
@@ -274,6 +281,10 @@ ${remotes.map((r, i) => `${i + 1}. ${r.origin} ${r.url}`).join('\n')}
       }
       // this.project.run(`code .`).async();
       // Helpers.pressKeyAndContinue(`Commit your changes and press any key...`);
+    }
+
+    if (this.project.git.isInMergeProcess) {
+      this.project.run('git reset --hard').sync();
     }
 
     await this.repeatMenu('pull');
