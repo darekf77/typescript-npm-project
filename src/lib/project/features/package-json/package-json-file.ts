@@ -297,6 +297,17 @@ function consistencyFixes(
     additionalSaveRequired = true;
   }
 
+  if(_.isArray(content[tnpProperty].linkedProjects)) {
+    const arr = content[tnpProperty].linkedProjects;
+    if(arr.length > 0) {
+      const sorted = _.cloneDeep(content[tnpProperty].linkedProjects).sort();
+      if(!_.isEqual(arr,sorted)) {
+        content[tnpProperty].linkedProjects = sorted;
+        additionalSaveRequired = true;
+      }
+    }
+  }
+
   if (_.isUndefined(content[tnpProperty].smartContainerBuildTarget)) {
     content[tnpProperty].smartContainerBuildTarget = '';
     additionalSaveRequired = true;

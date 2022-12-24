@@ -18,12 +18,13 @@ export abstract class FolderProject {
   get linkedProjectsExisted(this: Project): Project[] {
     return this.packageJson.linkedProjects
       .filter(f => !Helpers.isValidGitRepuUrl(f))
+      .sort()
       .map(f => {
         const p = path.join(this.location, f);
         const proj = $Project.From(p) as Project;
         return proj;
       })
-      .filter(f => !!f);
+      .filter(f => !!f)
   }
   //#endregion
 

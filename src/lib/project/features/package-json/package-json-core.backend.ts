@@ -43,7 +43,7 @@ export class PackageJsonCore {
 
     const res = this.data.tnp ? this.data.tnp.linkedProjects : undefined;
     if (_.isArray(res)) {
-      return res;
+      return res.sort()
     }
     return [];
   }

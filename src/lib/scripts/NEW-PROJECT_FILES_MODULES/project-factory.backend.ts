@@ -306,7 +306,8 @@ export class ProjectFactory {
           parentContainer.packageJson.linkedProjects.push(path.basename(currentContainer.location));
           parentContainer.packageJson.data.tnp.linkedProjects = Helpers
             .arrays
-            .uniqArray(parentContainer.packageJson.linkedProjects);
+            .uniqArray(parentContainer.packageJson.linkedProjects)
+            .sort()
 
           parentContainer.packageJson.save(`updating container: `
             + `${grandpa ? `${grandpa.name}/` : ''}${CLI.chalk.bold(parentContainer.name)}`
@@ -373,7 +374,8 @@ export class ProjectFactory {
       lastContainer.packageJson.linkedProjects.push(path.basename(projName));
       lastContainer.packageJson.data.tnp.linkedProjects = Helpers
         .arrays
-        .uniqArray(lastContainer.packageJson.linkedProjects);
+        .uniqArray(lastContainer.packageJson.linkedProjects)
+        .sort()
 
       lastContainer.parent.packageJson.save(`updating container: ${CLI.chalk.bold(lastContainer.name)} linked projects for ${projName}"`);
     }
@@ -666,7 +668,8 @@ export class ProjectFactory {
         newCreatedProject.parent.packageJson.linkedProjects.push(path.basename(newCreatedProject.location));
         newCreatedProject.parent.packageJson.data.tnp.linkedProjects = Helpers
           .arrays
-          .uniqArray(newCreatedProject.parent.packageJson.linkedProjects);
+          .uniqArray(newCreatedProject.parent.packageJson.linkedProjects)
+          .sort()
 
         newCreatedProject.parent.packageJson.save(`updating "${newCreatedProject.parent._type}" or work linked projects`);
 

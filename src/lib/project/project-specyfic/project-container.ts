@@ -30,6 +30,7 @@ export class ProjectContainer
   public addGitReposAsLinkedProjects() {
     //#region @backendFunc
     const repoChilds = this.getFolders()
+      .sort()
       .map(c => {
         const proj = Project.From<Project>(c);
         if (!proj) {

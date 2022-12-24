@@ -1,5 +1,5 @@
 //#region imports
-import { _ } from 'tnp-core';
+import { crossPlatformPath, _ } from 'tnp-core';
 import { fse } from 'tnp-core';
 import chalk from 'chalk';
 import { Helpers } from 'tnp-helpers';
@@ -54,19 +54,27 @@ export class GitActions extends FeatureForProject {
 
   //#region get unexisted projects
   private async cloneUnexistedProjects() {
-    const shouldBeProjectArr = this.project.packageJson.
-      linkedProjects.map(relativePath => {
-        const possibleProj = Project.From(path.join(this.project.location, relativePath));
+    const shouldBeProjectArr = this.project.packageJson.linkedProjects
+      .map(relativePath => {
+        const possibleProjPath = crossPlatformPath(path.join(this.project.location, relativePath))
+        const possibleProj = Project.From(possibleProjPath) as Project;
+        console.log({
+          possibleProjPath,
+          possibleProj: possibleProj?.name
+        })
         // const possibleProj2 = Project.From(path.join(this.project.location, '--', relativePath));
-        if (!possibleProj) {
-          return relativePath;
+        if (possibleProj) {
+          return void 0;
         }
-      }).filter(f => !!f);
+        return relativePath;
+      })
+      .filter(f => !!f)
+      .sort()
 
     if (shouldBeProjectArr.length > 0) {
       Helpers.pressKeyAndContinue(`
 
-${shouldBeProjectArr.map(p => `- ${p}`).join('\n')}
+${shouldBeProjectArr.map((p, index) => `- ${index + 1}. ${p}`).join('\n')}
 
       press any key to clone each above project..`);
       for (let index = 0; index < shouldBeProjectArr.length; index++) {
