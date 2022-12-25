@@ -167,8 +167,8 @@ export abstract class LibProject {
 
       if (!global.tnpNonInteractive) {
         await Helpers.questionYesNo(`Do you wanna check bundle folder before publishing ?`, async () => {
-          if (this.isSmartContainer) {
-            specyficProjectForBuild.run(`code ${this.getTempProjName('bundle')}/${config.folder.node_modules}/@${this.name}`).sync(); // @LAST from local proj prepare bundle projects
+          if (this.isSmartContainer) { // TODO from local proj prepare bundle projects
+            specyficProjectForBuild.run(`code ${this.getTempProjName('bundle')}/${config.folder.node_modules}/@${this.name}`).sync();
             Helpers.pressKeyAndContinue(`Check your compiled code and press any key ...`)
           }
 

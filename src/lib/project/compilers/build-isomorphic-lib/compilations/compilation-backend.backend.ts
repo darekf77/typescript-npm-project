@@ -26,8 +26,8 @@ export class BackendCompilation extends IncCompiler.Base {
     return 'tsconfig.browser.json'
   }
   public get compilationFolderPath() {
-    if (_.isString(this.location) && _.isString(this.cwd)) {
-      return crossPlatformPath(path.join(this.cwd, this.location));
+    if (_.isString(this.srcFolder) && _.isString(this.cwd)) {
+      return crossPlatformPath(path.join(this.cwd, this.srcFolder));
     }
   }
   //#endregion
@@ -44,7 +44,7 @@ export class BackendCompilation extends IncCompiler.Base {
      * Source location
      * Ex. src | components
      */
-    public location: string,
+    public srcFolder: string,
     /**
      * Current cwd same for browser and backend
      * but browser project has own compilation folder
@@ -55,7 +55,7 @@ export class BackendCompilation extends IncCompiler.Base {
 
   ) {
     super({
-      folderPath: [path.join(cwd, location)],
+      folderPath: [path.join(cwd, srcFolder)],
       notifyOnFileUnlink: true,
     });
   }
@@ -80,7 +80,7 @@ export class BackendCompilation extends IncCompiler.Base {
         outDir: (`../${this.outFolder}` as any),
         generateDeclarations: generatedDeclarations,
         hideErrors: hideErrorsForBackend,
-        locationOfMainProject: this.location,
+        locationOfMainProject: this.srcFolder,
         buildType: this.outFolder as any
       });
   }

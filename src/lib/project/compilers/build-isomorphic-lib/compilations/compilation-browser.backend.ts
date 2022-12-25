@@ -101,7 +101,7 @@ export class BroswerCompilation extends BackendCompilation {
     // console.log(`copying ${path.join(this.cwd, this.location)}/ to  ${this.compilationFolderPath} dereference: ${dereference},`)
 
     // TODO_NOT_IMPORTANT this may be replaced by filesPathes
-    Helpers.copy(`${crossPlatformPath(path.join(this.cwd, this.location))}/`, this.compilationFolderPath, {
+    Helpers.copy(`${crossPlatformPath(path.join(this.cwd, this.srcFolder))}/`, this.compilationFolderPath, {
       copySymlinksAsFiles: true,
       filter: (src: string, dest: string) => {
         return isNotASpecFileCondition(src);
@@ -130,7 +130,7 @@ export class BroswerCompilation extends BackendCompilation {
     }
 
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
-    const relativeFilePath = crossPlatformPath(absoluteFilePath.replace(crossPlatformPath(path.join(this.cwd, this.location)), ''));
+    const relativeFilePath = crossPlatformPath(absoluteFilePath.replace(crossPlatformPath(path.join(this.cwd, this.srcFolder)), ''));
     const destinationFilePath = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, relativeFilePath));
 
     // console.log({
@@ -172,7 +172,7 @@ export class BroswerCompilation extends BackendCompilation {
   async superAsyncAction(event: IncCompiler.Change) {
     // console.log(`[compilation-browser][asyncAction] ${event.eventName} ${event.fileAbsolutePath}`)
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
-    const relativeFilePath = absoluteFilePath.replace(crossPlatformPath(crossPlatformPath(path.join(this.cwd, this.location))), '');
+    const relativeFilePath = absoluteFilePath.replace(crossPlatformPath(crossPlatformPath(path.join(this.cwd, this.srcFolder))), '');
     const destinationFilePath = crossPlatformPath(path.join(
       this.cwd,
       this.sourceOutBrowser,
@@ -299,7 +299,7 @@ export class BroswerCompilation extends BackendCompilation {
 
     filesPathes = filesPathes.map(f => {
       f = crossPlatformPath(f);
-      return f.replace(crossPlatformPath(path.join(this.cwd, this.location)), '').replace(/^\//, '');
+      return f.replace(crossPlatformPath(path.join(this.cwd, this.srcFolder)), '').replace(/^\//, '');
     });
 
     Helpers.log(`[initCodeCut] filesPathes after:

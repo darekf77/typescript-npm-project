@@ -285,7 +285,7 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
 
   }
   const smartTempContainerCorePackagesProj = Project.From(path.dirname(containerCoreProject.smartNodeModules.path)) as Project;
-  // TODO @LAST this is not available when moving things
+  // TODO this is not available when moving things
   const reinstallForceSmartNodeModules = (
     (
       containerCoreProject.isContainerCoreProject && (containerCoreProject.location === currentProject.location)

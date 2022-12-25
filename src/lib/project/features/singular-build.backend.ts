@@ -1,4 +1,4 @@
-import { chokidar, _ } from 'tnp-core';
+import { chokidar, crossPlatformPath, _ } from 'tnp-core';
 import { glob } from 'tnp-core';
 import { path } from 'tnp-core'
 import { fse } from 'tnp-core'
@@ -9,6 +9,7 @@ import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { VscodeProject } from '../abstract/project/vscode-project.backend';
+import { BrowserCodeCut } from '../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
 
 /**
  * DEPRAECATED
@@ -30,6 +31,8 @@ export class SingularBuild extends FeatureForProject {
     const destProjPath = SingularBuild.getProxyProj(parent, client.name, outFolder); // path.join(parent.location, outFolder, parent.name, client.name);
     Helpers.log(`dist project: ${destProjPath}`);
     Helpers.mkdirp(destProjPath);
+    const appRelatedFiles = BrowserCodeCut.allowedToReplace.map(ext => `app${ext}`);
+
     [
       config.file.package_json,
       config.file.package_json__tnp_json5,
@@ -43,20 +46,22 @@ export class SingularBuild extends FeatureForProject {
     [
       'app',
       'lib',
-      'app.ts',
-      'app.html',
-      'app.css',
-      'app.scss',
+      ...appRelatedFiles,
     ].forEach(f => {
-      const source = path.join(client.location, config.folder.src, f);
-      const dest = path.join(destProjPath, config.folder.src, f);
-      if (['lib', 'app'].includes(f)) {
+      const source = crossPlatformPath(path.join(client.location, config.folder.src, f));
+      const dest = crossPlatformPath(path.join(destProjPath, config.folder.src, f));
+      const isCatalog = ['lib', 'app'].includes(f)
+      if (isCatalog) {
         if (!Helpers.exists(source)) {
           Helpers.mkdirp(source);
         }
       }
       if (Helpers.exists(source)) {
+        Helpers.removeFileIfExists(dest);
         Helpers.createSymLink(source, dest);
+      } else if (!isCatalog) {
+        Helpers.removeFileIfExists(dest);
+        Helpers.writeFile(dest, '');
       }
     });
 
@@ -79,41 +84,95 @@ export class SingularBuild extends FeatureForProject {
     // Helpers.createSymLink(clientAppHtmlPath, appHtmlPath);
 
     children.forEach(c => {
-      const source_lib = path.join(c.location, config.folder.src, 'lib');
-      const source_assets = path.join(c.location, config.folder.src, 'assets');
-      const dest_lib = path.join(destProjPath, config.folder.src, 'libs', c.name);
-      const dest_assets = path.join(destProjPath, config.folder.src, 'assets', 'assets-for', c.name);
+      const source_lib = crossPlatformPath(path.join(c.location, config.folder.src, 'lib'));
+      const source_assets = crossPlatformPath(path.join(c.location, config.folder.src, 'assets'));
+      const dest_lib = crossPlatformPath(path.join(destProjPath, config.folder.src, 'libs', c.name));
+      const dest_assets = crossPlatformPath(path.join(destProjPath, config.folder.src, 'assets', 'assets-for', c.name));
       Helpers.createSymLink(source_lib, dest_lib);
 
-      if(!Helpers.exists(source_assets)) {
+      if (!Helpers.exists(source_assets)) {
         Helpers.mkdirp(source_assets);
       }
 
+      const sourcesAppAFilesAbsPathes = appRelatedFiles.map(a => {
+        return crossPlatformPath(path.join(c.location, config.folder.src, a));
+      });
+
+      const copySourcesToDest = () => {
+
+        for (let index = 0; index < sourcesAppAFilesAbsPathes.length; index++) {
+          const absFileSource = sourcesAppAFilesAbsPathes[index];
+          const relativeAfile = absFileSource.replace(
+            `${crossPlatformPath(path.join(c.location, config.folder.src))}/`,
+            '',
+          );
+          if (Helpers.exists(absFileSource)) {
+            const dest = crossPlatformPath(path.join(destProjPath, config.folder.src, relativeAfile));
+            Helpers.removeFileIfExists(dest);
+            Helpers.copyFile(absFileSource, dest);
+          }
+        }
+      };
+
       if (watch) {
         // SYNCING FOLDERS
-        Helpers.copy(source_assets, dest_assets, { recursive: true, overwrite: true });
-        const watcher = chokidar.watch(source_assets, {
-          ignoreInitial: true,
-          followSymlinks: false,
-          ignorePermissionErrors: true,
-        }).on('all', (event, f) => {
-          const dest = (path.join(dest_assets, Helpers.removeSlashAtBegin(f.replace(`${source_assets}`, ''))))
-          if ((event === 'add') || (event === 'change')) {
-            Helpers.copyFile(f, dest);
-          }
-          if (event === 'addDir') {
-            Helpers.copy(f, dest, { recursive: true, overwrite: true });
-          }
-          if (event === 'unlink') {
-            Helpers.removeFileIfExists(dest);
-          }
-          if (event === 'unlinkDir') {
-            Helpers.remove(dest, true);
-          }
-        })
-        this.watchers.push(watcher);
+        (() => {
+          //#region handle assets watch/copy
+          Helpers.copy(source_assets, dest_assets, { recursive: true, overwrite: true });
+          const watcher = chokidar.watch(source_assets, {
+            ignoreInitial: true,
+            followSymlinks: false,
+            ignorePermissionErrors: true,
+          }).on('all', (event, f) => {
+            f = crossPlatformPath(f);
+            const dest = (path.join(dest_assets, Helpers.removeSlashAtBegin(f.replace(`${source_assets}`, ''))))
+            if ((event === 'add') || (event === 'change')) {
+              Helpers.removeFileIfExists(dest);
+              Helpers.copyFile(f, dest);
+            }
+            if (event === 'addDir') {
+              Helpers.copy(f, dest, { recursive: true, overwrite: true });
+            }
+            if (event === 'unlink') {
+              Helpers.removeFileIfExists(dest);
+            }
+            if (event === 'unlinkDir') {
+              Helpers.remove(dest, true);
+            }
+          })
+          this.watchers.push(watcher);
+          //#endregion
+        })();
+        (() => {
+          //#region handle app.* files
+          copySourcesToDest();
+          const watcher = chokidar.watch(sourcesAppAFilesAbsPathes, {
+            ignoreInitial: true,
+            followSymlinks: false,
+            ignorePermissionErrors: true,
+          }).on('all', (event, f) => {
+            f = crossPlatformPath(f);
+            const relativeAfile = f.replace(
+              `${crossPlatformPath(path.join(c.location, config.folder.src))}/`,
+              '',
+            );
+            const dest = crossPlatformPath(path.join(destProjPath, config.folder.src, relativeAfile));
+
+            if ((event === 'add') || (event === 'change')) {
+              // Helpers.removeFileIfExists(dest);
+              Helpers.copyFile(f, dest);
+            }
+            if (event === 'unlink') {
+              Helpers.removeFileIfExists(dest);
+            }
+          })
+          this.watchers.push(watcher);
+          //#endregion
+        })();
+
       } else {
         Helpers.copy(source_assets, dest_assets, { recursive: true, overwrite: true });
+        copySourcesToDest();
       }
     });
 

@@ -1,7 +1,7 @@
 //#region imports
-import { crossPlatformPath, path, _ } from "tnp-core";
+import { crossPlatformPath,  fse,  path, _ } from "tnp-core";
 import { BuildOptions } from "tnp-db";
-import { PREFIXES } from "tnp-helpers";
+import { PREFIXES, Helpers } from "tnp-helpers";
 import { Models } from "tnp-models";
 import type { Project } from "../../../abstract/project/project";
 import { BrowserCodeCut } from "./browser-code-cut.backend";
@@ -46,6 +46,16 @@ export class CodeCut {
       path.basename(absolutePathToFile).search(PREFIXES.DELETED) !== -1
     ) {
       return;
+    }
+
+    if(!BrowserCodeCut.allowedToReplace.includes(path.extname(absolutePathToFile))) {
+      return (new BrowserCodeCut(
+        absolutePathToFile,
+        this.project,
+        this.compilationProject,
+        this.buildOptions,
+        this.sourceOutBrowser
+      )).copyToDest();
     }
 
     return (new BrowserCodeCut(

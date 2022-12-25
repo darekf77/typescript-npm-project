@@ -200,7 +200,7 @@ export class IncrementalBuildProcess {
     }
 
     const compilationsInfo = this.browserCompilations
-      .map(c => `compilationProject: ${c.compilationProject?.name}, location: ${c.location}`).join('\n');
+      .map(c => `compilationProject: ${c.compilationProject?.name}, location: ${c.srcFolder}`).join('\n');
 
     Helpers.log(`BROWSER COMPILATIONS (length: ${this.browserCompilations.length} )`
       + `\n\n` + compilationsInfo + `\n\n`);
