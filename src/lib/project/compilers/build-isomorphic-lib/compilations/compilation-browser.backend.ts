@@ -104,7 +104,7 @@ export class BroswerCompilation extends BackendCompilation {
     Helpers.copy(`${crossPlatformPath(path.join(this.cwd, this.location))}/`, this.compilationFolderPath, {
       copySymlinksAsFiles: true,
       filter: (src: string, dest: string) => {
-        return copyToBrowserSrcCodition(src);
+        return isNotASpecFileCondition(src);
       }
     })
     // console.log('browser', this.filesAndFoldesRelativePathes.slice(0, 5))
@@ -146,29 +146,27 @@ export class BroswerCompilation extends BackendCompilation {
       Helpers.removeFolderIfExists(destinationFilePath);
     } else {
       // console.log(`[compilation-browser][asyncAction][compilations.ts] ${event.eventName} ${event.fileAbsolutePath}`)
-      const triggerTsEventExts = Models.other.CutableFileExtArr.map(ext => `.${ext}`);
-      if (triggerTsEventExts
-        .includes(path.extname(event.fileAbsolutePath))) {
-        if (event.eventName === 'unlink') {
-          Helpers.removeFileIfExists(destinationFilePath);
-          // console.log('FILE UNLINKED')
-        } else {
-          if (fse.existsSync(absoluteFilePath)) {
-            if (!fse.existsSync(path.dirname(destinationFilePath))) {
-              Helpers.mkdirp(path.dirname(destinationFilePath));
-            }
-            if (fse.existsSync(destinationFilePath) && fse.lstatSync(destinationFilePath).isDirectory()) {
-              fse.removeSync(destinationFilePath);
-            }
-            Helpers.copyFile(absoluteFilePath, destinationFilePath);
+
+      if (event.eventName === 'unlink') {
+        Helpers.removeFileIfExists(destinationFilePath);
+        // console.log('FILE UNLINKED')
+      } else {
+        if (fse.existsSync(absoluteFilePath)) {
+          if (!fse.existsSync(path.dirname(destinationFilePath))) {
+            Helpers.mkdirp(path.dirname(destinationFilePath));
           }
-          // console.log('FILE COPIED')
+          if (fse.existsSync(destinationFilePath) && fse.lstatSync(destinationFilePath).isDirectory()) {
+            fse.removeSync(destinationFilePath);
+          }
+          Helpers.copyFile(absoluteFilePath, destinationFilePath);
         }
-        // changeAbsoluteFilePathExt(event, 'ts'); // TODO
-        // console.log(`AFTER CHAGE: ${event.fileAbsolutePath}`)
+        // console.log('FILE COPIED')
       }
-      await this.superAsyncAction(event as any);
+      // changeAbsoluteFilePathExt(event, 'ts'); // TODO
+      // console.log(`AFTER CHAGE: ${event.fileAbsolutePath}`)
     }
+    await this.superAsyncAction(event as any);
+
   }
 
   async superAsyncAction(event: IncCompiler.Change) {
@@ -208,7 +206,7 @@ export class BroswerCompilation extends BackendCompilation {
       // console.log('destinationFilePath', destinationFilePath)
       // console.log(`[asyncAction][${config.frameworkName}][cb] relativeFilePath: ${relativeFilePath}`)
       // console.log(`[asyncAction][${config.frameworkName}][cb] destinationFilePath: ${destinationFilePath}`);
-      if (copyToBrowserSrcCodition(absoluteFilePath)) {
+      if (isNotASpecFileCondition(absoluteFilePath)) {
         if (event.eventName === 'unlink') {
           if (fse.existsSync(destinationFilePath)) {
             fse.unlinkSync(destinationFilePath)
@@ -216,18 +214,6 @@ export class BroswerCompilation extends BackendCompilation {
           if (fse.existsSync(destinationFileBackendPath)) {
             fse.unlinkSync(destinationFileBackendPath)
           }
-
-          // console.log('unlink browser', destinationFilePath);
-          // console.log('unlink backend', destinationFileBackendPath);
-
-          // if (['module', 'component']
-          //   .map(c => `.${c}.ts`)
-          //   .filter(c => destinationFilePath.endsWith(c)).length > 0) {
-          //   const orgFil = `${destinationFilePath}.orginal`;
-          //   if (fse.existsSync(orgFil)) {
-          //     fse.unlinkSync(orgFil)
-          //   }
-          // }
         } else {
           if (fse.existsSync(absoluteFilePath)) {
 
@@ -356,8 +342,7 @@ export class BroswerCompilation extends BackendCompilation {
 }
 
 //#region helpers
-function copyToBrowserSrcCodition(absoluteFilePath: string) {
+function isNotASpecFileCondition(absoluteFilePath: string) {
   return !absoluteFilePath.endsWith('.spec.ts')
-  // && !absoluteFilePath.endsWith('.backend.ts');
 }
 //#endregion

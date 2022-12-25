@@ -61,13 +61,12 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
     if (event.eventName === 'unlinkDir') {
-      const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
       const absolutePath = event.fileAbsolutePath;
       const relativePath = this.resolveRelativePath(absolutePath);
       if (!relativePath) {
         return;
       }
-      this.merge(relativePath, modifiedFiles);
+      this.merge(relativePath);
     }
   }
 
@@ -120,15 +119,13 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
     // console.log('relatives', filesAbsolutePathes)
     // process.exit(0)
     // console.log('filesAbsolutePathes', filesAbsolutePathes)
-    const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] }
     for (let index = 0; index < filesAbsolutePathes.length; index++) {
       const relativePath = filesAbsolutePathes[index];
       // console.log(`= ${relativePath}`)
-      this.merge(relativePath, modifiedFiles);
+      this.merge(relativePath);
     }
     // console.log('filesAbsolutePathes',filesAbsolutePathes);
     // process.exit(0)
-    // console.log('modifierFiled', modifiedFiles);
   }
 
   private returnRelativePathIfAllowed(relativePath: string, contactWith: string) {
@@ -166,8 +163,7 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
   /**
    * relativeBaselineCustomPath -> example src/apps/auth/AuthController.ts
    */
-  private merge(relativeBaselineCustomPath: string, modifiedFiles: Models.other.ModifiedFiles)
-    : Models.other.ModifiedFiles {
+  private merge(relativeBaselineCustomPath: string) {
     // console.log('relativeBaselineCustomPath', relativeBaselineCustomPath)
 
     //#region debug
@@ -204,16 +200,12 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
         isDebugMode && Helpers.log(`[merge] ${variant}`)
         Helpers.copyFile(
           baselineAbsoluteLocation,
-          HelpersMerge.getPrefixedPathInJoin(relativeBaselineCustomPath, this.project),
-          { modifiedFiles }
-        )
+          HelpersMerge.getPrefixedPathInJoin(relativeBaselineCustomPath, this.project))
       } else {
         variant = 'no-in-baseline'
         isDebugMode && Helpers.log(`[merge] ${variant}`)
         Helpers.removeFileIfExists(
-          HelpersMerge.getPrefixedPathInJoin(relativeBaselineCustomPath, this.project),
-          { modifiedFiles }
-        );
+          HelpersMerge.getPrefixedPathInJoin(relativeBaselineCustomPath, this.project));
         // Helpers.log('after');
       }
 
@@ -230,30 +222,23 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
         {
           transformTextFn,
           debugMode: isDebugMode,
-          fast: false,
-          modifiedFiles
+          fast: false
         }
       )
     } else {
       if (fse.existsSync(baselineAbsoluteLocation)) {
         variant = 'no-in-custom'
         isDebugMode && Helpers.log(`[merge] ${variant}`)
-        Helpers.copyFile(baselineAbsoluteLocation, joinFilePath, { fast: true, modifiedFiles });
+        Helpers.copyFile(baselineAbsoluteLocation, joinFilePath, { fast: true });
         Helpers.removeFileIfExists(
-          HelpersMerge.getPrefixedPathInJoin(relativeBaselineCustomPath, this.project),
-          { modifiedFiles }
-        );
+          HelpersMerge.getPrefixedPathInJoin(relativeBaselineCustomPath, this.project));
       } else {
         variant = 'deleted'
         isDebugMode && Helpers.log(`[merge] ${variant}`)
         Helpers.removeFileIfExists(
-          joinFilePath,
-          { modifiedFiles }
-        );
+          joinFilePath);
         Helpers.removeFileIfExists(
-          HelpersMerge.getPrefixedPathInJoin(relativeBaselineCustomPath, this.project),
-          { modifiedFiles }
-        );
+          HelpersMerge.getPrefixedPathInJoin(relativeBaselineCustomPath, this.project));
       }
     }
     //#region debug
@@ -261,7 +246,6 @@ export class BaselineSiteJoin extends FeatureCompilerForProject {
       Helpers.log(`[merge] ${chalk.blueBright('Baseline/Site modyfication OK ')}, (action: ${variant}) `)
     }
     //#endregion
-    return modifiedFiles;
   }
 
   private replacePathFn(relativeBaselineCustomPath: string) {

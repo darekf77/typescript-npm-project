@@ -40,20 +40,22 @@ export class BrowserCodeCut {
 
   protected rawContentForBrowser: string;
   public rawContentBackend: string;
-  readonly allowedToReplace = Models.other.CutableFileExtArr;
-
-
-  readonly allowedToReplaceDotPref = Models.other.CutableFileExtArr
-    .concat(['js'])
-    .map(ext => `.${ext}`);
+  public static readonly allowedToReplace = [
+    'scss',
+    'css',
+    'less',
+    'sass',
+    'html',
+    'ts',
+  ]
 
   get isEmptyBrowserFile() {
     return this.rawContentForBrowser.replace(/\s/g, '').trim() === '';
   }
 
-  get isEmptyBackendFile() {
-    return !this.rawContentBackend || (this.rawContentBackend.replace(/\s/g, '').trim() === '');
-  }
+  // get isEmptyBackendFile() {
+  //   return !this.rawContentBackend || (this.rawContentBackend.replace(/\s/g, '').trim() === '');
+  // }
 
   get isEmptyModuleBackendFile() {
     return (this.rawContentBackend || '').replace(/\/\*\ \*\//g, '').trim().length === 0;
@@ -457,9 +459,9 @@ export class BrowserCodeCut {
     options = _.clone(options);
     this.options = options;
     // Helpers.log(`[REPLACERegionsForIsomorphicLib] options.replacements ${this.absoluteFilePath}`)
-    const ext = path.extname(this.absoluteFilePathBrowserOrWebsql).replace('.', '') as ConfigModels.CutableFileExt;
+    const ext = path.extname(this.absoluteFilePathBrowserOrWebsql).replace('.', '');
     // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
-    if (this.allowedToReplace.includes(ext)) {
+    if (BrowserCodeCut.allowedToReplace.includes(ext)) {
       this.rawContentForBrowser = this.project.sourceModifier.replaceBaslieneFromSiteBeforeBrowserCodeCut(this.rawContentForBrowser);
 
       const orgContent = this.rawContentForBrowser;
@@ -505,20 +507,6 @@ export class BrowserCodeCut {
     return this;
   }
 
-  handleTickInCode(replacement: string): string {
-    if (replacement.search('`') !== -1) {
-      Helpers.warn(`[browsercodecut] Please dont use tick \` ... in ${path.basename(this.absoluteFilePathBrowserOrWebsql)}`)
-      replacement = replacement.replace(/\`/g, '\\`');
-    }
-    return replacement;
-  }
-
-  handleOutput(replacement: string, ext: ConfigModels.CutableFileExt): string {
-    replacement = this.handleTickInCode(replacement);
-
-    return replacement;
-  }
-
   private fixComments(s: string, fileAbsPath: string, endComment?: string) {
     if (!fileAbsPath.endsWith('.ts')) {
       return s;
@@ -539,31 +527,11 @@ export class BrowserCodeCut {
       .join('\n') + endOfFile;
   }
 
-  saveOrDelete() {
-    const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
-    const relativePath = this.relativePath;
-
-    // Helpers.log(`saving ismoprhic file: ${this.absoluteFilePath}`, 1)
-    const isFromLibs = (_.first(relativePath.split('/').slice(1)) === config.folder.libs);
-    const module = isFromLibs ? _.first(relativePath.split('/').slice(2)) : this.project.name; // taget
-    const endOfBrowserOrWebsqlCode = `\n ${MjsModule.KEY_END_MODULE_FILE}${module} ${relativePath}`;
-    if (this.isEmptyBrowserFile && this.allowedToReplaceDotPref
-      .filter(f => ![
-        '.html', // fix for angular
-        '.scss',
-        '.css',
-        '.sass',
-        '.less',
-        '.json',
-      ].includes(f))
-      .includes(path.extname(this.absoluteFilePathBrowserOrWebsql))
-    ) {
-      // if (fse.existsSync(this.absoluteFilePathBrowserWebsql)) {
-      //   fse.unlinkSync(this.absoluteFilePathBrowserWebsql)
-      // }
-      if (!fse.existsSync(path.dirname(this.absoluteFilePathBrowserOrWebsql))) { // write empty instead unlink
-        fse.mkdirpSync(path.dirname(this.absoluteFilePathBrowserOrWebsql));
-      }
+  private saveEmptyFile(isTsFile: boolean, endOfBrowserOrWebsqlCode: string) {
+    if (!fse.existsSync(path.dirname(this.absoluteFilePathBrowserOrWebsql))) { // write empty instead unlink
+      fse.mkdirpSync(path.dirname(this.absoluteFilePathBrowserOrWebsql));
+    }
+    if (isTsFile) {
       fse.writeFileSync(
         this.absoluteFilePathBrowserOrWebsql,
         `/* files for browser${this.isWebsqlMode
@@ -572,68 +540,84 @@ export class BrowserCodeCut {
         } mode */`,
         'utf8'
       );
-      // Helpers.log(`Delete empty: ${this.absoluteFilePath}`, 1);
     } else {
-      // Helpers.log(`Not empty: ${this.absoluteFilePath}`, 1)
-      if (!fse.existsSync(path.dirname(this.absoluteFilePathBrowserOrWebsql))) {
-        fse.mkdirpSync(path.dirname(this.absoluteFilePathBrowserOrWebsql));
-      }
+      fse.writeFileSync(
+        this.absoluteFilePathBrowserOrWebsql, ``,
+        'utf8'
+      );
+    }
+  }
+
+  private saveNormalFile(isTsFile: boolean, endOfBrowserOrWebsqlCode: string, relativePath: string) {
+    if (!fse.existsSync(path.dirname(this.absoluteFilePathBrowserOrWebsql))) {
+      fse.mkdirpSync(path.dirname(this.absoluteFilePathBrowserOrWebsql));
+    }
+    if (isTsFile) {
       fse.writeFileSync(this.absoluteFilePathBrowserOrWebsql,
         this.fixComments(this.rawContentForBrowser, this.absoluteFilePathBrowserOrWebsql, endOfBrowserOrWebsqlCode),
         'utf8'
       );
-
-
-      // if (path.isAbsolute(relativePath)) {
-      //   console.log(`is ABsolute !`, relativePath)
-      //   // process.exit(0)
-      // }
-
-      // Helpers.log(`Written file: ${relativePath}`, 1)
       this.compilationProject.sourceModifier.processFile(
         relativePath,
-        modifiedFiles,
         'tmp-src-for',
         this.buildOptions.websql,
       );
+    } else {
+      fse.writeFileSync(this.absoluteFilePathBrowserOrWebsql,
+        this.rawContentForBrowser,
+        'utf8'
+      );
+    }
+  }
+
+  private isAllowedPathForSave(relativePath: string) {
+    return !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist/tests/`) &&
+      !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle/tests/`) &&
+      !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist-websql/tests/`) &&
+      !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle-websql/tests/`);
+  }
+
+  save() {
+    const relativePath = this.relativePath;
+
+    // Helpers.log(`saving ismoprhic file: ${this.absoluteFilePath}`, 1)
+    const isFromLibs = (_.first(relativePath.split('/').slice(1)) === config.folder.libs);
+    const module = isFromLibs ? _.first(relativePath.split('/').slice(2)) : this.project.name; // taget
+    const endOfBrowserOrWebsqlCode = `\n ${MjsModule.KEY_END_MODULE_FILE}${module} ${relativePath}`;
+    const isTsFile = ['.ts'].includes(path.extname(this.absoluteFilePathBrowserOrWebsql));
+    const backendFileSaveMode = !this.isWebsqlMode; // websql does not do anything on be
+
+
+    if (this.isEmptyBrowserFile) {
+      this.saveEmptyFile(isTsFile, endOfBrowserOrWebsqlCode);
+    } else {
+      this.saveNormalFile(isTsFile, endOfBrowserOrWebsqlCode, relativePath);
     }
 
-    if (!this.isWebsqlMode) {
-      const isEmptyModuleBackendFile = this.isEmptyModuleBackendFile
-      if ((!this.isEmptyBackendFile || isEmptyModuleBackendFile) && this.allowedToReplaceDotPref
-        .includes(path.extname(this.absoluteFilePathBrowserOrWebsql))
-      ) {
+    if (backendFileSaveMode) {
+      const isEmptyModuleBackendFile = this.isEmptyModuleBackendFile;
 
+      const absoluteBackendFilePath = this.absoluteBackendFilePath;
+      if (!fse.existsSync(path.dirname(absoluteBackendFilePath))) {
+        fse.mkdirpSync(path.dirname(absoluteBackendFilePath));
+      }
 
-        const absoluteBackendFilePath = this.absoluteBackendFilePath;
-        if (!fse.existsSync(path.dirname(absoluteBackendFilePath))) {
-          fse.mkdirpSync(path.dirname(absoluteBackendFilePath));
-        }
-
-        if (
-          !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist/tests/`) &&
-          !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle/tests/`) &&
-          !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist-websql/tests/`) &&
-          !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle-websql/tests/`)
-        ) {
-
-          if (this.project.isSmartContainerTarget) {
-            // console.log(relativePath)
-            fse.writeFileSync(absoluteBackendFilePath,
-              isEmptyModuleBackendFile ? `export function dummy${(new Date()).getTime()}() { }`
-                : this.changeJsFileImportForOrgnanizaiton(this.rawContentBackend, absoluteBackendFilePath),
-              'utf8');
-          } else {
-            // console.log(relativePath)
-            fse.writeFileSync(absoluteBackendFilePath,
-              isEmptyModuleBackendFile ? `export function dummy${(new Date()).getTime()}() { }`
-                : this.rawContentBackend,
-              'utf8');
-          }
-
-
+      if (this.isAllowedPathForSave(relativePath)) {
+        if (this.project.isSmartContainerTarget) {
+          // console.log(relativePath)
+          fse.writeFileSync(absoluteBackendFilePath,
+            (isEmptyModuleBackendFile && isTsFile) ? `export function dummy${(new Date()).getTime()}() { }`
+              : this.changeJsFileImportForOrgnanizaiton(this.rawContentBackend, absoluteBackendFilePath),
+            'utf8');
+        } else {
+          // console.log(relativePath)
+          fse.writeFileSync(absoluteBackendFilePath,
+            (isEmptyModuleBackendFile && isTsFile) ? `export function dummy${(new Date()).getTime()}() { }`
+              : this.rawContentBackend,
+            'utf8');
         }
       }
+
     }
     // }
   }

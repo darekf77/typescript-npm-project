@@ -120,7 +120,7 @@ export class SourceModifier extends SourceModForSite {
   }
 
   @IncCompiler.methods.AsyncAction()
-  async asyncAction(event: IncCompiler.Change): Promise<Models.other.ModifiedFiles> {
+  async asyncAction(event: IncCompiler.Change) {
     if (!IS_ENABLE) {
       return;
     }
@@ -131,25 +131,21 @@ export class SourceModifier extends SourceModForSite {
         .replace(this.project.location, '')
         .replace(/^\//, '');
 
-      const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
 
       // Helpers.log(`Source modifer async action for ${relativePathToProject}`)
 
-      this.processFile(relativePathToProject, modifiedFiles, void 0, this.websql);
+      this.processFile(relativePathToProject, void 0, this.websql);
 
       if (fse.existsSync(event.fileAbsolutePath)) {
-        this.replikatorAction(relativePathToProject, modifiedFiles)
+        this.replikatorAction(relativePathToProject)
       }
-      return modifiedFiles;
     }
-    return { modifiedFiles: [] };
   }
 
-  async syncAction(absoluteFilePathes: string[]): Promise<Models.other.ModifiedFiles> {
+  async syncAction(absoluteFilePathes: string[]) {
 
     Helpers.log(`[sourceModifer][sync] files to check: \n\n${absoluteFilePathes.map(f => `${f}\n`)}\n\n`, 1);
 
-    const modifiedFiles: Models.other.ModifiedFiles = { modifiedFiles: [] };
     // console.log('absoluteFilePathes sm', absoluteFilePathes)
 
     const relativePathesToProject = absoluteFilePathes.map(absoluteFilePath => {
@@ -160,7 +156,7 @@ export class SourceModifier extends SourceModForSite {
 
     relativePathesToProject.forEach(relativePathToProject => {
       Helpers.log(`[sourceModifier][syn] ${relativePathToProject}`, 1)
-      this.processFile(relativePathToProject, modifiedFiles, void 0, this.websql);
+      this.processFile(relativePathToProject, void 0, this.websql);
     });
 
     // console.log(relativePathesToProject)
@@ -171,24 +167,23 @@ export class SourceModifier extends SourceModForSite {
       Helpers.tryRemoveDir(path.join(this.project.location, config.folder.tempSrc));
       // console.log('for app replikator', relativePathesToProject)
       relativePathesToProject.forEach(relativePathToProject => {
-        this.replikatorAction(relativePathToProject, modifiedFiles)
+        this.replikatorAction(relativePathToProject)
       });
     }
-    return modifiedFiles;
   }
 
-  private replikatorAction(relativePathToProject: string, modifiedFiles: Models.other.ModifiedFiles) {
+  private replikatorAction(relativePathToProject: string) {
     if (relativePathToProject.startsWith(config.folder.src)) {
       Helpers.log(`[replikatorAction] OK ${relativePathToProject}`, 1);
       const orgAbsolutePath = path.join(this.project.location, relativePathToProject);
       const relativePathToTempSrc = relativePathToProject.replace(/^src/, config.folder.tempSrc);
       const destinationPath = path.join(this.project.location, relativePathToTempSrc);
       // console.log('destinationPath', destinationPath)
-      if (Helpers.copyFile(orgAbsolutePath, destinationPath, { modifiedFiles })) {
+      if (Helpers.copyFile(orgAbsolutePath, destinationPath)) {
         // console.log('process tmp file', destinationPath)
         if (fse.existsSync(destinationPath)) {
 
-          this.processFile(relativePathToTempSrc, modifiedFiles, void 0, this.websql);
+          this.processFile(relativePathToTempSrc, void 0, this.websql);
         }
       } else {
         // console.log('WRONG process tmp file', destinationPath)

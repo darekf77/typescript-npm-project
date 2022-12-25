@@ -10,8 +10,7 @@ import { Models } from 'tnp-models';
 import { impReplace } from './source-modifier.helpers.backend';
 import { optionsSourceModifier } from './source-modifier.backend';
 
-export class SourceModForStandaloneProjects
-  extends FeatureCompilerForProject<Models.other.ModifiedFiles, Models.other.ModifiedFiles> {
+export class SourceModForStandaloneProjects extends FeatureCompilerForProject {
 
   protected websql: boolean = false;
   constructor(public project: Project) {
@@ -45,7 +44,7 @@ export class SourceModForStandaloneProjects
     return input;
   }
 
-  public processFile(relativePath: string, files: Models.other.ModifiedFiles, source?: 'tmp-src-for', websql = false): boolean {
+  public processFile(relativePath: string, source?: 'tmp-src-for', websql = false): boolean {
     //#region process file
     this.websql = websql;
     const absoluteFilePath = path.join(this.project.location, relativePath);
@@ -72,7 +71,6 @@ export class SourceModForStandaloneProjects
 
     if (input !== modified) {
       Helpers.writeFile(absoluteFilePath, modified);
-      files.modifiedFiles.push(absoluteFilePath);
       return true;
     }
     //#endregion

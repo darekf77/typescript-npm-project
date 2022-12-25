@@ -486,15 +486,18 @@ export class CopyManagerStandalone extends CopyManager {
    *
    */
   preventWeakDetectionOfchanges(specyficFileRelativePath: string, destination: Project, isTempLocalProj: boolean) {
-    const specyficFileRelativePathBackendMap = specyficFileRelativePath.replace('.js', '.js.map');
-    const possibleBackendMapFile = crossPlatformPath(path.normalize(path.join(
-      this.monitoredOutDir,
-      specyficFileRelativePathBackendMap,
-    )));
+    (() => {
+      const specyficFileRelativePathBackendMap = specyficFileRelativePath.replace('.js', '.js.map');
+      const possibleBackendMapFile = crossPlatformPath(path.normalize(path.join(
+        this.monitoredOutDir,
+        specyficFileRelativePathBackendMap,
+      )));
 
-    if (Helpers.exists(possibleBackendMapFile)) {
-      this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePathBackendMap, true);
-    }
+      if (Helpers.exists(possibleBackendMapFile)) {
+        this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePathBackendMap, true);
+      }
+    })();
+
 
     for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
       const browserFolder = CopyMangerHelpers.browserwebsqlFolders[index];

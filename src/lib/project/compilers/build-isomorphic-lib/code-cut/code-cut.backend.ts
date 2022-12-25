@@ -62,7 +62,7 @@ export class CodeCut {
       .REPLACERegionsFromTsImportExport('export')
       .REPLACERegionsFromTsImportExport('import')
       .REPLACERegionsFromJSrequire()
-      .saveOrDelete();
+      .save();
   }
 
   //#endregion
