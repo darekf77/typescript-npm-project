@@ -1,10 +1,6 @@
 import { chokidar, crossPlatformPath, _ } from 'tnp-core';
-import { glob } from 'tnp-core';
 import { path } from 'tnp-core'
-import { fse } from 'tnp-core'
-import chalk from 'chalk';
 import { FeatureForProject, Project } from '../abstract';
-import { ProjectFactory } from '../../scripts/NEW-PROJECT_FILES_MODULES/project-factory.backend';
 import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
@@ -28,96 +24,64 @@ export class SingularBuild extends FeatureForProject {
       .filter(c => (c.typeIs('isomorphic-lib')) && c.frameworkVersionAtLeast('v3'))
       ;
 
-    const destProjPath = SingularBuild.getProxyProj(parent, client.name, outFolder); // path.join(parent.location, outFolder, parent.name, client.name);
-    Helpers.log(`dist project: ${destProjPath}`);
-    Helpers.mkdirp(destProjPath);
-    const appRelatedFiles = BrowserCodeCut.allowedToReplace.map(ext => `app${ext}`);
+    const smartContainerTargetProjPath = SingularBuild.getProxyProj(parent, client.name, outFolder); // path.join(parent.location, outFolder, parent.name, client.name);
+    Helpers.log(`dist project: ${smartContainerTargetProjPath}`);
+    Helpers.mkdirp(smartContainerTargetProjPath);
+    const appRelatedFiles = BrowserCodeCut.extAllowedToReplace.map(ext => `app${ext}`);
 
-    [
-      config.file.package_json,
-      config.file.package_json__tnp_json5,
-      config.file.tnpEnvironment_json,
-    ].forEach(fileOrFolder => {
-      const source = path.join(client.location, fileOrFolder);
-      const dest = path.join(destProjPath, fileOrFolder);
-      Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
-    });
+    //#region symlinks package.json, tmp-environemnt
+    (() => {
+      [
+        config.file.package_json,
+        config.file.package_json__tnp_json5,
+        config.file.tnpEnvironment_json,
+      ].forEach(fileOrFolder => {
+        const source = path.join(client.location, fileOrFolder);
+        const dest = path.join(smartContainerTargetProjPath, fileOrFolder);
+        Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
+      });
+    })();
 
-    [
-      'app',
-      'lib',
-      ...appRelatedFiles,
-    ].forEach(f => {
-      const source = crossPlatformPath(path.join(client.location, config.folder.src, f));
-      const dest = crossPlatformPath(path.join(destProjPath, config.folder.src, f));
-      const isCatalog = ['lib', 'app'].includes(f)
-      if (isCatalog) {
+    //#endregion
+
+    //#region symlinks app/lib
+    (() => {
+      [
+        'app',
+        'lib',
+      ].forEach(f => {
+        const source = crossPlatformPath(path.join(client.location, config.folder.src, f));
+        const dest = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, f));
         if (!Helpers.exists(source)) {
           Helpers.mkdirp(source);
         }
-      }
-      if (Helpers.exists(source)) {
         Helpers.removeFileIfExists(dest);
         Helpers.createSymLink(source, dest);
-      } else if (!isCatalog) {
-        Helpers.removeFileIfExists(dest);
-        Helpers.writeFile(dest, '');
-      }
-    });
+      });
+    })();
+    //#endregion
 
-    // const libPath = path.join(destProjPath, config.folder.src, 'lib');
-    // const appPath = path.join(destProjPath, config.folder.src, 'app');
-    // const appTsPath = path.join(destProjPath, config.folder.src, 'app.ts');
-    // const appHtmlPath = path.join(destProjPath, config.folder.src, 'app.html');
-
-    // const clientLibPath = path.join(client.location, config.folder.src, 'lib');
-    // const clientAppPath = path.join(client.location, config.folder.src, 'app');
-    // const clientAppTsPath = path.join(client.location, config.folder.src, 'app.ts');
-    // const clientAppHtmlPath = path.join(client.location, config.folder.src, 'app.html');
-
-    // Helpers.createSymLink(clientLibPath, libPath);
-    // if (!Helpers.exists(clientAppPath)) {
-    //   Helpers.mkdirp(clientAppPath);
-    // }
-    // Helpers.createSymLink(clientAppPath, appPath);
-    // Helpers.createSymLink(clientAppTsPath, appTsPath);
-    // Helpers.createSymLink(clientAppHtmlPath, appHtmlPath);
-
+    //#region symlinks lib => libs
     children.forEach(c => {
       const source_lib = crossPlatformPath(path.join(c.location, config.folder.src, 'lib'));
-      const source_assets = crossPlatformPath(path.join(c.location, config.folder.src, 'assets'));
-      const dest_lib = crossPlatformPath(path.join(destProjPath, config.folder.src, 'libs', c.name));
-      const dest_assets = crossPlatformPath(path.join(destProjPath, config.folder.src, 'assets', 'assets-for', c.name));
+      const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, 'libs', c.name));
       Helpers.createSymLink(source_lib, dest_lib);
+    });
+    //#endregion
+
+    //#region handle assets watch/copy
+    children.forEach(c => {
+      const source_assets = crossPlatformPath(path.join(c.location, config.folder.src, 'assets'));
+      const dest_assets = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, 'assets', 'assets-for', parent.name + '--' + c.name));
 
       if (!Helpers.exists(source_assets)) {
         Helpers.mkdirp(source_assets);
       }
 
-      const sourcesAppAFilesAbsPathes = appRelatedFiles.map(a => {
-        return crossPlatformPath(path.join(c.location, config.folder.src, a));
-      });
-
-      const copySourcesToDest = () => {
-
-        for (let index = 0; index < sourcesAppAFilesAbsPathes.length; index++) {
-          const absFileSource = sourcesAppAFilesAbsPathes[index];
-          const relativeAfile = absFileSource.replace(
-            `${crossPlatformPath(path.join(c.location, config.folder.src))}/`,
-            '',
-          );
-          if (Helpers.exists(absFileSource)) {
-            const dest = crossPlatformPath(path.join(destProjPath, config.folder.src, relativeAfile));
-            Helpers.removeFileIfExists(dest);
-            Helpers.copyFile(absFileSource, dest);
-          }
-        }
-      };
-
       if (watch) {
         // SYNCING FOLDERS
         (() => {
-          //#region handle assets watch/copy
+
           Helpers.copy(source_assets, dest_assets, { recursive: true, overwrite: true });
           const watcher = chokidar.watch(source_assets, {
             ignoreInitial: true,
@@ -141,111 +105,69 @@ export class SingularBuild extends FeatureForProject {
             }
           })
           this.watchers.push(watcher);
-          //#endregion
         })();
-        (() => {
-          //#region handle app.* files
-          copySourcesToDest();
-          const watcher = chokidar.watch(sourcesAppAFilesAbsPathes, {
-            ignoreInitial: true,
-            followSymlinks: false,
-            ignorePermissionErrors: true,
-          }).on('all', (event, f) => {
-            f = crossPlatformPath(f);
-            const relativeAfile = f.replace(
-              `${crossPlatformPath(path.join(c.location, config.folder.src))}/`,
-              '',
-            );
-            const dest = crossPlatformPath(path.join(destProjPath, config.folder.src, relativeAfile));
-
-            if ((event === 'add') || (event === 'change')) {
-              // Helpers.removeFileIfExists(dest);
-              Helpers.copyFile(f, dest);
-            }
-            if (event === 'unlink') {
-              Helpers.removeFileIfExists(dest);
-            }
-          })
-          this.watchers.push(watcher);
-          //#endregion
-        })();
-
       } else {
         Helpers.copy(source_assets, dest_assets, { recursive: true, overwrite: true });
-        copySourcesToDest();
       }
     });
+    //#endregion
 
+    //#region handle app.* files watch/copy
+    (() => {
 
-    let singularWatchProj = Project.From<Project>(destProjPath);
+      const sourcesAppAFilesAbsPathes = appRelatedFiles.map(a => {
+        return crossPlatformPath(path.join(client.location, config.folder.src, a));
+      });
+
+      const copySourcesToDest = () => {
+        for (let index = 0; index < sourcesAppAFilesAbsPathes.length; index++) {
+          const absFileSource = sourcesAppAFilesAbsPathes[index];
+          const relativeAfile = absFileSource.replace(
+            `${crossPlatformPath(path.join(client.location, config.folder.src))}/`,
+            '',
+          );
+          if (Helpers.exists(absFileSource)) {
+            const dest = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, relativeAfile));
+            Helpers.removeFileIfExists(dest);
+            Helpers.copyFile(absFileSource, dest);
+          }
+        }
+      };
+
+      if (watch) {
+        copySourcesToDest();
+        const watcher = chokidar.watch(sourcesAppAFilesAbsPathes, {
+          ignoreInitial: true,
+          followSymlinks: false,
+          ignorePermissionErrors: true,
+        }).on('all', (event, f) => {
+          f = crossPlatformPath(f);
+          const relativeAfile = f.replace(
+            `${crossPlatformPath(path.join(client.location, config.folder.src))}/`,
+            '',
+          );
+          const dest = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, relativeAfile));
+
+          if ((event === 'add') || (event === 'change')) {
+            // Helpers.removeFileIfExists(dest);
+            Helpers.copyFile(f, dest);
+          }
+          if (event === 'unlink') {
+            Helpers.removeFileIfExists(dest);
+          }
+        })
+        this.watchers.push(watcher);
+      } else {
+        copySourcesToDest();
+      }
+    })();
+    //#endregion
+
+    let singularWatchProj = Project.From<Project>(smartContainerTargetProjPath);
     parent.node_modules.linkToProject(singularWatchProj);
     await singularWatchProj.filesStructure.init(''); // THIS CAUSE NOT NICE SHIT
 
-
     VscodeProject.launchFroSmartContaienr(parent);
-
-    // (() => {
-    //   const tsconfigPath = path.join(parent.location, config.file.tsconfig_json);
-    //   const paths = children.reduce((a, c) => {
-    //     return _.merge(a, {
-    //       [`@${parent.name}/${c.name}`]: [`./${c.name}/${config.folder.src}/lib`],
-    //       [`@${parent.name}/${c.name}/*`]: [`./${c.name}/${config.folder.src}/lib/*`],
-    //     });
-    //   }, {})
-
-    //   const content = {
-    //     "compilerOptions": {
-    //       "rootDir": "./",
-    //       paths
-    //     }
-    //   };
-    //   Helpers.writeJson(tsconfigPath, content);
-    // })();
-
-    // (() => {
-    //   const targetSrc = path.join(destProjPath, config.folder.src);
-    //   const srcContainerSmart = path.join(parent.location, config.folder.src);
-    //   Helpers.createSymLink(targetSrc, srcContainerSmart);
-    // })();
-
-    //#region tsconfig pathes are only good for FE (THIS CODE DOESN'T MAKE SENSE)
-    // (() => {
-    //   const tsconfigPath = path.join(parent.location, config.file.tsconfig_json);
-    //   const paths = children.reduce((a, c) => {
-    //     return _.merge(a, {
-    //       [`@${parent.name}/${c.name}`]: [`./${c.name}/${config.folder.src}/lib`],
-    //       [`@${parent.name}/${c.name}/*`]: [`./${c.name}/${config.folder.src}/lib/*`],
-    //     });
-    //   }, {})
-
-    //   const content = {
-    //     "compilerOptions": {
-    //       "rootDir": "./",
-    //       paths
-    //     }
-    //   };
-    //   Helpers.writeJson(tsconfigPath, content);
-    // })();
-
-    // const tsconfigParentBase = path.join(parent.location, 'tsconfig.base.json');
-
-    // (() => {
-    //   const tsconfigPath = path.join(singularWatchProj.location, config.file.tsconfig_json);
-    //   const content = Helpers.readJson(tsconfigPath);
-    //   const paths = children.reduce((a, c) => {
-    //     return _.merge(a, {
-    //       [`@${parent.name}/${c.name}`]: [`./${config.folder.src}/libs/${c.name}`],
-    //       [`@${parent.name}/${c.name}/*`]: [`./${config.folder.src}/libs/${c.name}/*`],
-    //     });
-    //   }, {})
-
-    //   content.compilerOptions.paths = paths;
-    //   Helpers.writeJson(tsconfigPath, content);
-    // })();
-
-
-    // Helpers.writeJson(tsconfigParentBase, contenttsconfig);
-    //#endregion
 
     return singularWatchProj;
   }

@@ -40,14 +40,19 @@ export class BrowserCodeCut {
 
   protected rawContentForBrowser: string;
   public rawContentBackend: string;
-  public static readonly allowedToReplace = [
+  public static readonly extForStyles = [
     'scss',
     'css',
     'less',
     'sass',
-    'html',
-    'ts',
   ].map(ext => `.${ext}`);
+  public static readonly extAllowedToReplace = [
+    ...BrowserCodeCut.extForStyles,
+    ...[
+      'html',
+      'ts',
+    ].map(ext => `.${ext}`),
+  ];
 
   get isEmptyBrowserFile() {
     return this.rawContentForBrowser.replace(/\s/g, '').trim() === '';
@@ -461,7 +466,7 @@ export class BrowserCodeCut {
     // Helpers.log(`[REPLACERegionsForIsomorphicLib] options.replacements ${this.absoluteFilePath}`)
     const ext = path.extname(this.absFileSourcePathBrowserOrWebsql);
     // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
-    if (BrowserCodeCut.allowedToReplace.includes(ext)) {
+    if (BrowserCodeCut.extAllowedToReplace.includes(ext)) {
       this.rawContentForBrowser = this.project.sourceModifier.replaceBaslieneFromSiteBeforeBrowserCodeCut(this.rawContentForBrowser);
 
       const orgContent = this.rawContentForBrowser;
@@ -483,13 +488,19 @@ export class BrowserCodeCut {
 
     // console.log(`isTarget fixing ? ${this.project.isSmartContainerTarget}`)
     // no modification of any code straight ng is being use
+
+
+
+
+    const slashAtBegin = BrowserCodeCut.extForStyles.includes(path.extname(this.absFileSourcePathBrowserOrWebsql));
+
     if (this.project.isSmartContainerTarget) {
       const parent = this.project.smartContainerTargetParentContainer;
       parent.children
         .filter(f => f.typeIs('isomorphic-lib'))
         .forEach(c => {
           const from = `${c.name}/src/assets/`;
-          const to = `assets/assets-for/${c.name}/`;
+          const to = `${slashAtBegin ? '/' : ''}assets/assets-for/${parent.name + '--' + c.name}/`;
           this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
           this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
         });
@@ -498,7 +509,7 @@ export class BrowserCodeCut {
         .filter(f => f.typeIs('isomorphic-lib'))
         .forEach(c => {
           const from = `src/assets/`;
-          const to = `assets/assets-for/${c.name}/`;
+          const to = `${slashAtBegin ? '/' : ''}assets/assets-for/${c.name}/`;
           this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
           this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
         });

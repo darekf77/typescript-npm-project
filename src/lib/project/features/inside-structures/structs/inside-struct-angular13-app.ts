@@ -155,7 +155,7 @@ ${appModuleFile}
 
           let appHtmlFile = Helpers.readFile(appModuleFilePath);
 
-          const tagName = `<app-${project.name}>`;
+          const tagName = `<app-${project.name}></app-${project.name}>`;
 
           appHtmlFile = appHtmlFile.replace(
             '<!-- <<<TO_REPLACE_COMPONENT_TAG>>> -->',
@@ -182,30 +182,34 @@ ${appModuleFile}
             Helpers.mkdirp(assetsSource);
           }
 
-          const assetsDest = crossPlatformPath(path.join(
-            project.location
-            ,
-            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
-            ,
-            `/src/assets`
-          ));
-
-
-          if (this.project.isSmartContainerChild || this.project.isSmartContainer || this.project.isSmartContainerTarget) {
-            Helpers.remove(assetsDest);
-            Helpers.copy(assetsSource, assetsDest)
-          } else {
-            const assetsDestFor = crossPlatformPath(path.join(
+          (() => {
+            const assetsDest = crossPlatformPath(path.join(
               project.location
               ,
               replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
               ,
-              `/src/assets/assets-for/${this.project.name}`
+              `/src/assets`
             ));
             Helpers.remove(assetsDest);
-            Helpers.remove(assetsDestFor);
-            Helpers.copy(assetsSource, assetsDestFor)
-          }
+            Helpers.createSymLink(assetsSource, assetsDest)
+          })()
+
+
+          // if (this.project.isSmartContainerChild || this.project.isSmartContainer || this.project.isSmartContainerTarget) {
+          //   Helpers.remove(assetsDest);
+          //   Helpers.copy(assetsSource, assetsDest)
+          // } else {
+          //   const assetsDestFor = crossPlatformPath(path.join(
+          //     project.location
+          //     ,
+          //     replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+          //     ,
+          //     `/src/assets/assets-for/${this.project.name}`
+          //   ));
+          //   Helpers.remove(assetsDest);
+          //   Helpers.remove(assetsDestFor);
+          //   Helpers.copy(assetsSource, assetsDestFor)
+          // }
 
 
 

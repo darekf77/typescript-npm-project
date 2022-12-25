@@ -48,7 +48,7 @@ export class CodeCut {
       return;
     }
 
-    if(!BrowserCodeCut.allowedToReplace.includes(path.extname(absolutePathToFile))) {
+    if(!BrowserCodeCut.extAllowedToReplace.includes(path.extname(absolutePathToFile))) {
       return (new BrowserCodeCut(
         absolutePathToFile,
         this.project,
