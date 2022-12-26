@@ -1,5 +1,7 @@
+import { config } from 'tnp-config';
 import { _ } from 'tnp-core';
 import { Helpers } from "tnp-helpers";
+import { Models } from 'tnp-models';
 import { Project } from "../../abstract";
 import { SourceMappingUrl } from './source-maping-url.backend';
 
@@ -11,7 +13,7 @@ export class MjsModule {
   static readonly EXPORT_STRING = 'export {';
   static readonly COMMENTS = ['*/', '/*', '*']
   static readonly EXPORT_STRING_END = ' };';
-  static EXPORT_STRING_ALL = 'export *';
+  static readonly EXPORT_STRING_ALL = 'export *';
   //#endregion
 
   //#region constructor
@@ -72,8 +74,8 @@ export class MjsModule {
 export class BundleMjsFesmModuleSpliter {
 
   //#region static
-  public static fixForTarget(smartContainerChild: Project, mjsFileAbsPath: string) {
-    return (new BundleMjsFesmModuleSpliter(smartContainerChild, mjsFileAbsPath)).process();
+  public static fixForTarget(smartContainerChild: Project, mjsFileAbsPath: string, buildDirBrowser: Models.dev.BuildDirBrowser) {
+    return (new BundleMjsFesmModuleSpliter(smartContainerChild, mjsFileAbsPath, buildDirBrowser)).process();
   }
   //#endregion
 
@@ -120,6 +122,7 @@ export class BundleMjsFesmModuleSpliter {
   private constructor(
     private smartContainerChild: Project,
     private mjsFileAbsPath: string,
+    private buildDirBrowser: Models.dev.BuildDirBrowser
   ) {
     this.content = Helpers.readFile(mjsFileAbsPath) || '';
     this.originalContent = this.content;
@@ -135,8 +138,11 @@ export class BundleMjsFesmModuleSpliter {
     }
     this.searchForBeginModulesImportIndexs()
     this.searchForModules();
+    this.preventNotExportingAll();
     this.replaceExportForSpecyficTarget();
     this.cleanModuleExceptTarget();
+    this.preventNotUsingImports();
+    this.fixBigExport();
     this.writeFile();
   }
   //#endregion
@@ -224,6 +230,7 @@ export class BundleMjsFesmModuleSpliter {
   //#endregion
 
   //#region replace export for specyfic target
+
   private replaceExportForSpecyficTarget() {
     const exportLineIndex = this.contentLines.findIndex((line) => {
       return line.startsWith(MjsModule.EXPORT_STRING);
@@ -234,6 +241,7 @@ export class BundleMjsFesmModuleSpliter {
 
       if (targetModules) {
         let exLine = this.contentLines[exportLineIndex];
+
         const symbols = exLine
           .replace(MjsModule.EXPORT_STRING, '')
           .replace(MjsModule.EXPORT_STRING_END, ' ')
@@ -245,9 +253,71 @@ export class BundleMjsFesmModuleSpliter {
 
         this.contentLines[exportLineIndex] = `${MjsModule.EXPORT_STRING} ${symbols.join(', ')} ${MjsModule.EXPORT_STRING_END}`;
       }
+
     }
   }
   //#endregion
+
+
+  private candidates: { className: string; className1: string; }[] = [];
+  private megaImportLine?: string;
+  /**
+    * TODO SUPER DIRTY QUICK_FIX
+    * @LAST
+    */
+  preventNotExportingAll() {
+    // const importsFor: {
+    //   childName:string,
+    //   parentName: string,
+    //   imports: string[];
+    // }[] = [];
+
+
+    const exportLineIndex = this.contentLines.findIndex((line) => {
+      return line.startsWith(MjsModule.EXPORT_STRING);
+    });
+
+    if (exportLineIndex !== -1) {
+      let exLine = this.contentLines[exportLineIndex];
+      // let indexForModuleImport = (this.beginLineToOmit !== null) ? (this.beginLineToOmit + 1) : 0;
+
+      const modulesExcepTarget = this.modules.filter(f => f.childModuleName !== this.smartContainerChild.name);
+      const allSymbols = exLine
+        .replace(MjsModule.EXPORT_STRING, '')
+        .replace(MjsModule.EXPORT_STRING_END, ' ')
+        .split(',')
+        .map(classOrConstOrFn => classOrConstOrFn.trim());
+
+      const parent = this.smartContainerChild.parent;
+      const childsExceptTarget = parent.children.filter(f => f.name !== this.smartContainerChild.name);
+      const megaImportLine = childsExceptTarget.map(c => {
+        const modulesForChild = modulesExcepTarget.filter(f => f.childModuleName === c.name);
+        const symbolsForChild = allSymbols
+          .filter(f => {
+            return !_.isUndefined(modulesForChild.find(m => m.hasSymbol(f)));
+          })
+          .map(s => {
+            this.candidates.push({
+              className: s,
+              className1: `${s}$1`
+            });
+            return `${s} as ${s}$1`
+          });
+
+        if (symbolsForChild.length === 0) {
+          return void 0;
+        }
+        return `import { ${symbolsForChild.join(', ')} } from '@${parent.name}/${c.name}/${this.buildDirBrowser}'`;
+      }).filter(f => !!f).join(';')
+
+      this.megaImportLine = megaImportLine;
+
+      // console.log({
+      //   megaImportLine
+      // })
+    }
+
+  }
 
   //#region clean module except target
   private cleanModuleExceptTarget() {
@@ -258,6 +328,63 @@ export class BundleMjsFesmModuleSpliter {
     }
   }
   //#endregion
+
+
+  preventNotUsingImports() {
+    // DIRTY FIX
+    // const regex = /[A-Z]([a-zA-Z0-9])+\ as\ [A-Z][a-zA-Z0-9]+\$[0-9]/g;
+    // const candidates: { className: string; className1: string; }[] = [];
+    // for (let index = 0; index < this.contentLines.length; index++) {
+    //   const line = this.contentLines[index];
+    //   if (line.startsWith('import {')) {
+    //     const m = (line.match(regex) || []);
+    //     for (let index2 = 0; index2 < m.length; index2++) {
+    //       const [className, className1] = m[index2].split(' as ');
+    //       candidates.push({
+    //         className, className1
+    //       });
+    //     }
+    //   }
+    // }
+
+
+
+  }
+
+  /**
+   * QUICK_FIX
+   */
+  fixBigExport() {
+    for (let index = 0; index < this.contentLines.length; index++) {
+      const line = this.contentLines[index];
+      if (line.startsWith('import {') && line.search(`from '@${this.smartContainerChild.parent.name}/`) !== -1) {
+        this.contentLines[index] = '';
+      }
+    }
+    let indexForModuleImport = (this.beginLineToOmit !== null) ? (this.beginLineToOmit) : 0;
+    this.contentLines[indexForModuleImport] = this.megaImportLine;
+
+    const candidates = this.candidates;
+    for (let index = 0; index < this.contentLines.length; index++) {
+      const line = this.contentLines[index];
+      if (
+        !line.startsWith('import {')
+        && !line.startsWith('import *')
+        && !line.startsWith(MjsModule.EXPORT_STRING)
+        && !line.startsWith(MjsModule.EXPORT_STRING_ALL)
+      ) {
+        for (let index2 = 0; index2 < candidates.length; index2++) {
+          const { className, className1 } = candidates[index2];
+          if (line.search(`: ${className},`) !== -1) {
+            this.contentLines[index] = line.replace(
+              new RegExp(Helpers.escapeStringForRegEx(`: ${className},`), 'g'),
+              `: ${className1},`
+            );
+          }
+        }
+      }
+    }
+  }
 
   //#region write file
   private writeFile() {

@@ -411,6 +411,7 @@ export * from './${config.file.public_api}';
       BundleMjsFesmModuleSpliter.fixForTarget(
         child,
         destinationLocationMjsFileDest,
+        currentBrowserFolder,
       );
     }
 
