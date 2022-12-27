@@ -69,6 +69,20 @@ export class SingularBuild extends FeatureForProject {
     });
     //#endregion
 
+    //#region copy core asset files
+    (() => {
+      const corepro = Project.by('isomorphic-lib', client._frameworkVersion) as Project;
+      const coreAssetsPath = corepro.pathFor('app/src/assets');
+      const filesToCopy = Helpers.filesFrom(coreAssetsPath, true);
+      for (let index = 0; index < filesToCopy.length; index++) {
+        const fileAbsPath = crossPlatformPath(filesToCopy[index]);
+        const relativeFilePath = fileAbsPath.replace(`${coreAssetsPath}/`, '');
+        const destAbsPath = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, 'assets', relativeFilePath));
+        Helpers.copyFile(fileAbsPath, destAbsPath);
+      }
+    })();
+    //#endregion
+
     //#region handle assets watch/copy
     children.forEach(c => {
       const source_assets = crossPlatformPath(path.join(c.location, config.folder.src, 'assets'));

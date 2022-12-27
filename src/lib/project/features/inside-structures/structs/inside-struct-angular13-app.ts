@@ -111,22 +111,20 @@ ${appModuleFile}
         })();
         //#endregion
 
-
-
         //#region replace app.component.ts websql things
         (() => {
-          const appModuleFilePath = path.join(
+          const appMainFilePath = path.join(
             project.location,
             replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
-            `/src/app/app.component.ts`
+            `/src/main.ts`
           );
 
 
-          let appModuleFile = Helpers.readFile(appModuleFilePath);
+          let appMainFile = Helpers.readFile(appMainFilePath);
 
 
           if (!this.websql) {
-            appModuleFile = appModuleFile.replace(
+            appMainFile = appMainFile.replace(
               `require('sql.js');`,
               `(arg: any) => {
                 console.error('This should not be available in non-sql mode');
@@ -135,13 +133,13 @@ ${appModuleFile}
             );
           }
 
-          appModuleFile = appModuleFile.replace(
+          appMainFile = appMainFile.replace(
             `import { Helpers } from 'tnp-core';`,
             `import { Helpers } from 'tnp-core/${this.websql ? config.folder.websql : config.folder.browser}';`,
           )
 
 
-          Helpers.writeFile(appModuleFilePath, appModuleFile);
+          Helpers.writeFile(appMainFilePath, appMainFile);
         })();
         //#endregion
 
@@ -170,47 +168,27 @@ ${appModuleFile}
         //#region link assets
         (() => {
 
-
-
           const assetsSource = crossPlatformPath(path.join(
             project.location,
             config.folder.src,
             config.folder.assets,
-          ))
+          ));
+
 
           if (!Helpers.exists(assetsSource)) {
             Helpers.mkdirp(assetsSource);
           }
 
-          (() => {
-            const assetsDest = crossPlatformPath(path.join(
-              project.location
-              ,
-              replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
-              ,
-              `/src/assets`
-            ));
-            Helpers.remove(assetsDest);
-            Helpers.createSymLink(assetsSource, assetsDest)
-          })()
 
-
-          // if (this.project.isSmartContainerChild || this.project.isSmartContainer || this.project.isSmartContainerTarget) {
-          //   Helpers.remove(assetsDest);
-          //   Helpers.copy(assetsSource, assetsDest)
-          // } else {
-          //   const assetsDestFor = crossPlatformPath(path.join(
-          //     project.location
-          //     ,
-          //     replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
-          //     ,
-          //     `/src/assets/assets-for/${this.project.name}`
-          //   ));
-          //   Helpers.remove(assetsDest);
-          //   Helpers.remove(assetsDestFor);
-          //   Helpers.copy(assetsSource, assetsDestFor)
-          // }
-
+          const assetsDest = crossPlatformPath(path.join(
+            project.location
+            ,
+            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+            ,
+            `/src/assets`
+          ));
+          Helpers.remove(assetsDest);
+          Helpers.createSymLink(assetsSource, assetsDest)
 
 
         })();
@@ -372,7 +350,7 @@ ${appModuleFile}
 
 
           let libs = Helpers.linksToFoldersFrom(libsPathes);
-          const parentPath = path.resolve(path.join(project.location, '../../..'));
+          const parentPath = crossPlatformPath(path.resolve(path.join(project.location, '../../..')));
 
           const parent = Project.From(parentPath) as Project;
           if (parent && parent.isSmartContainer && libs.length > 0 && content.compilerOptions) {
