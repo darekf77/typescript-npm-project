@@ -256,11 +256,25 @@ export class ProjectIsomorphicLib
     webpackEnvParams = webpackEnvParams + (watch ? ' --env.watch=true' : '');
 
 
-    const backFFolders = `../../`;
+    const backAppTmpFolders = `../../`;
+    const backeFromRelase = `../../../../`;
+    const backeFromContainerTarget = `../../../`;
+    let back = backAppTmpFolders;
+    if (this.isInRelaseBundle) {
+      if(this.isSmartContainerTarget) {
+        back = `${backAppTmpFolders}${backeFromContainerTarget}${backeFromRelase}`;
+      } else {
+        back = `${backAppTmpFolders}${backeFromRelase}`;
+      }
+    } else {
+      if(this.isSmartContainerTarget) {
+        back = `${backAppTmpFolders}${backeFromContainerTarget}`;
+      }
+    }
 
     const outDirApp = this.isInRelaseBundle ? config.folder.docs : `${outDir}-app${websql ? '-websql' : ''}`;
 
-    const outPutPathCommand = `--output-path ${backFFolders}${outDirApp} ${this.isInRelaseBundle ? baseHref : ''}`;
+    const outPutPathCommand = `--output-path ${back}${outDirApp} ${this.isInRelaseBundle ? baseHref : ''}`;
 
     let { flags } = require('minimist')(args.split(' '));
     flags = (_.isString(flags) ? [flags] : []);
@@ -801,13 +815,13 @@ export class ProjectIsomorphicLib
   //#region private methods / get proxy ng projects
   private proxyNgProj(project: Project, buildOptions: BuildOptions, type: 'app' | 'lib' = 'app') {
     //#region @backendFunc
-    const projepath = path.join(this.location, ProjectIsomorphicLib.angularProjProxyPath(
+    const projepath = crossPlatformPath(path.join(this.location, ProjectIsomorphicLib.angularProjProxyPath(
       project,
       buildOptions.outDir as any,
       void 0, // TODO
       buildOptions.websql,
       type
-    ));
+    )));
     const proj = Project.From(projepath);
     return proj as Project;
     //#endregion

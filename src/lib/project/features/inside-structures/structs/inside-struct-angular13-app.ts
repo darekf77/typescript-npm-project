@@ -163,6 +163,26 @@ ${appModuleFile}
         })();
         //#endregion
 
+        //#region replace app.component.html
+        (() => {
+          const mainFilePath = path.join(
+            project.location,
+            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+            `/src/main.ts`
+          );
+
+          let mainTsFile = Helpers.readFile(mainFilePath);
+
+          const basename = this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name;
+
+          mainTsFile = mainTsFile.replace(
+            '<<<TO_REPLACE_BASENAME>>>',
+            basename,
+          );
+          Helpers.writeFile(mainFilePath, mainTsFile);
+        })();
+        //#endregion
+
 
 
         //#region link assets

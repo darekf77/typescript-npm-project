@@ -595,17 +595,17 @@ export abstract class LibProject {
 
   // methods / push to git repo
   async pushToGitRepo(this: Project, newVersion: string, realCurrentProj: Project) {
-    //
-    newVersion = await realCurrentProj.tagVersion(newVersion);
-    const lastCommitHash = realCurrentProj.git.lastCommitHash();
-    realCurrentProj.packageJson.setBuildHash(lastCommitHash);
-    realCurrentProj.packageJson.save('updating hash');
-    realCurrentProj.commit(newVersion, `build hash update`);
-    Helpers.log('Pushing to git repository... ')
-    Helpers.log(`Git branch: ${realCurrentProj.git.currentBranchName}`);
-    realCurrentProj.git.pushCurrentBranch();
-    Helpers.info('Pushing to git repository done.');
-
+    await Helpers.questionYesNo('Push changes to git repo ?', async () => {
+      newVersion = await realCurrentProj.tagVersion(newVersion);
+      const lastCommitHash = realCurrentProj.git.lastCommitHash();
+      realCurrentProj.packageJson.setBuildHash(lastCommitHash);
+      realCurrentProj.packageJson.save('updating hash');
+      realCurrentProj.commit(newVersion, `build hash update`);
+      Helpers.log('Pushing to git repository... ')
+      Helpers.log(`Git branch: ${realCurrentProj.git.currentBranchName}`);
+      realCurrentProj.git.pushCurrentBranch();
+      Helpers.info('Pushing to git repository done.');
+    });
   }
   //#endregion
 

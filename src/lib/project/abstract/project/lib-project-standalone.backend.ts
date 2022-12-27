@@ -85,17 +85,11 @@ export class LibProjectStandalone {
   Building docs prevew - start
 
   `);
-      const init = buildLib ? `${config.frameworkName} build:${config.folder.bundle} && ` : '';
+      const init = buildLib ? `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'} && ` : '';
       await this.lib.run(`${init}`
         + `${config.frameworkName} build:${config.folder.bundle}:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
-        + `${appBuildOptions.websql ? '--websql' : ''}`).sync();
+        + `${appBuildOptions.websql ? '--websql' : ''} ${global.hideLog ? '' : '-verbose'}`).sync();
 
-      if (this.lib.frameworkVersionAtLeast('v3')) {
-        const currentDocs = path.join(this.lib.location, config.folder.docs);
-        const currentDocsDest = path.join(this.lib.location, '..', '..', '..', '..', config.folder.docs);
-        Helpers.removeFolderIfExists(currentDocsDest);
-        Helpers.copy(currentDocs, currentDocsDest, { recursive: true })
-      }
 
       Helpers.log(`
 
