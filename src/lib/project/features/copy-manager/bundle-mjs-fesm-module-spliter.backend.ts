@@ -261,9 +261,9 @@ export class BundleMjsFesmModuleSpliter {
 
   private candidates: { className: string; className1: string; }[] = [];
   private megaImportLine?: string;
+
   /**
     * TODO SUPER DIRTY QUICK_FIX
-    * @LAST
     */
   preventNotExportingAll() {
     // const importsFor: {

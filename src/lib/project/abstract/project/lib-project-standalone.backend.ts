@@ -85,7 +85,10 @@ export class LibProjectStandalone {
   Building docs prevew - start
 
   `);
-      const init = buildLib ? `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'} && ` : '';
+      const init = buildLib ?
+        `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'} && `
+        : '';
+
       await this.lib.run(`${init}`
         + `${config.frameworkName} build:${config.folder.bundle}:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
         + `${appBuildOptions.websql ? '--websql' : ''} ${global.hideLog ? '' : '-verbose'}`).sync();

@@ -240,15 +240,12 @@ export class ProjectIsomorphicLib
     //#region prepare variables
 
     //#region prepare variables / baseHref
-    if (baseHref) {
-      baseHref = `${baseHref}/`;
-      baseHref = baseHref.replace(/\/\//g, '/')
+
+    let basename = ''
+    if (this.isInRelaseBundle) {
+      basename = `--base-href /${this.isSmartContainerTarget ? this.smartContainerTargetParentContainer.name : this.name}/`;
     }
-    baseHref = this.isStandaloneProject
-      ? `base-href ${this.isSmartContainerTarget ? this.smartContainerTargetParentContainer.name : this.name}`
-      : (baseHref ? `base-href ${baseHref}` : '')
-      ;
-    baseHref = `--${baseHref}`;
+
     //#endregion
 
     //#region prepare variables / webpack params
@@ -261,20 +258,20 @@ export class ProjectIsomorphicLib
     const backeFromContainerTarget = `../../../`;
     let back = backAppTmpFolders;
     if (this.isInRelaseBundle) {
-      if(this.isSmartContainerTarget) {
+      if (this.isSmartContainerTarget) {
         back = `${backAppTmpFolders}${backeFromContainerTarget}${backeFromRelase}`;
       } else {
         back = `${backAppTmpFolders}${backeFromRelase}`;
       }
     } else {
-      if(this.isSmartContainerTarget) {
+      if (this.isSmartContainerTarget) {
         back = `${backAppTmpFolders}${backeFromContainerTarget}`;
       }
     }
 
     const outDirApp = this.isInRelaseBundle ? config.folder.docs : `${outDir}-app${websql ? '-websql' : ''}`;
 
-    const outPutPathCommand = `--output-path ${back}${outDirApp} ${this.isInRelaseBundle ? baseHref : ''}`;
+    const outPutPathCommand = `--output-path ${back}${outDirApp} ${basename}`;
 
     let { flags } = require('minimist')(args.split(' '));
     flags = (_.isString(flags) ? [flags] : []);
@@ -910,7 +907,7 @@ export class ProjectIsomorphicLib
   //#region private methods / cut release code
 
   private get tempSourceNpmCodeCut() {
-    const releaseSrcLocationOrg = path.join(this.location, `tmp-org-src-${config.folder.src}${this.buildOptions.websql ? '-websql' : ''}`);
+    const releaseSrcLocationOrg = path.join(this.location, `tmp-org-${config.folder.src}${this.buildOptions.websql ? '-websql' : ''}`);
     return releaseSrcLocationOrg;
   }
 
@@ -944,8 +941,8 @@ export class ProjectIsomorphicLib
       .filter(absolutePath => !Helpers.isFolder(absolutePath))
       .forEach(absolutePath => {
         let rawContent = Helpers.readFile(absolutePath);
-        rawContent = RegionRemover.from(absolutePath, rawContent, ['@notForNpm'], this.project).output;
-        // rawContent = this.replaceRegionsWith(rawContent, ['@notForNpm']);
+        rawContent = RegionRemover.from(absolutePath, rawContent, ['@notFor'+'Npm'], this.project).output;
+        // rawContent = this.replaceRegionsWith(rawContent, ['@notFor'+'Npm']);
         Helpers.writeFile(absolutePath, rawContent);
       });
     //#endregion

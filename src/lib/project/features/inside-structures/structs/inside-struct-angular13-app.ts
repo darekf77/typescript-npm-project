@@ -173,7 +173,10 @@ ${appModuleFile}
 
           let mainTsFile = Helpers.readFile(mainFilePath);
 
-          const basename = this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name;
+
+          const basename = this.isInRelaseBundle ?
+            `/${(this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name)}`
+            : '';
 
           mainTsFile = mainTsFile.replace(
             '<<<TO_REPLACE_BASENAME>>>',

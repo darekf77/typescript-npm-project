@@ -460,6 +460,10 @@ export class BrowserCodeCut {
     return this;
   }
 
+  get isInRelaseBundle() {
+    return this.project.location.includes('tmp-bundle-release/bundle');
+  };
+
   REPLACERegionsForIsomorphicLib(options: Models.dev.ReplaceOptionsExtended) {
     options = _.clone(options);
     this.options = options;
@@ -492,7 +496,12 @@ export class BrowserCodeCut {
 
 
 
-    const slashAtBegin = BrowserCodeCut.extForStyles.includes(path.extname(this.absFileSourcePathBrowserOrWebsql));
+    // const slashAtBegin = BrowserCodeCut.extForStyles.includes(path.extname(this.absFileSourcePathBrowserOrWebsql));
+
+    const pathname = this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name
+
+    const basename = this.isInRelaseBundle ? `/${pathname}/` : '/';
+
 
     if (this.project.isSmartContainerTarget) {
       const parent = this.project.smartContainerTargetParentContainer;
@@ -500,7 +509,7 @@ export class BrowserCodeCut {
         .filter(f => f.typeIs('isomorphic-lib'))
         .forEach(c => {
           const from = `${c.name}/src/assets/`;
-          const to = `${slashAtBegin ? '/' : ''}assets/assets-for/${parent.name + '--' + c.name}/`;
+          const to = `${basename}assets/assets-for/${parent.name + '--' + c.name}/`;
           this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
           this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
         });
@@ -509,7 +518,7 @@ export class BrowserCodeCut {
         .filter(f => f.typeIs('isomorphic-lib'))
         .forEach(c => {
           const from = `src/assets/`;
-          const to = `${slashAtBegin ? '/' : ''}assets/assets-for/${c.name}/`;
+          const to = `${basename}assets/assets-for/${c.name}/`;
           this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
           this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
         });

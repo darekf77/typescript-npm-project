@@ -135,11 +135,14 @@ export async function CLEAN(args: string, exit = true) {
 
   const clear = async (proj: Project) => {
     if (proj.isContainer) {
-      if(proj.isSmartContainer) {
+      if (proj.isSmartContainer) {
         proj.node_modules.remove();
         proj.smartNodeModules.remove();
         proj.removeFolderByRelativePath(config.folder.dist);
         proj.removeFolderByRelativePath(config.folder.bundle);
+        proj.removeFolderByRelativePath(config.folder.dist + '-app');
+        proj.removeFolderByRelativePath(config.folder.bundle + '-app');
+        proj.removeFolderByRelativePath(config.folder.tmpBundleRelease);
       }
       // await clear(proj);
       const children = proj.children.filter(c => (c.typeIs('isomorphic-lib') || c.isSmartContainer)
