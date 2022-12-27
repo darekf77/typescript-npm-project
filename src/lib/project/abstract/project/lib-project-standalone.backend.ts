@@ -3,18 +3,11 @@ import { config } from "tnp-config";
 import { crossPlatformPath, path, _ } from "tnp-core";
 import { Helpers } from "tnp-helpers";
 import { Models } from "tnp-models";
-import type { LibProject } from "./lib-project.backend";
+import { LibPorjectBase } from "./lib-project-base.backend";
 import { Project } from "./project";
 
 
-export class LibProjectStandalone {
-
-
-  constructor(
-    private lib: Project
-  ) {
-
-  }
+export class LibProjectStandalone extends LibPorjectBase {
 
   preparePackage(smartContainer: Project, newVersion: string) {
     const base = path.join(
@@ -63,9 +56,10 @@ export class LibProjectStandalone {
     }
   }
 
-  async buildDocs(prod: boolean, newVersion: string, realCurrentProj: Project, buildLib: boolean) {
+  async buildDocs(prod: boolean, newVersion: string, realCurrentProj: Project) {
     await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
 
+      //#region questions
       let appBuildOptions = { docsAppInProdMode: prod, websql: false };
 
       await Helpers.questionYesNo(`Do you wanna build in production mode`, () => {
@@ -82,23 +76,22 @@ export class LibProjectStandalone {
 
       Helpers.log(`
 
-  Building docs prevew - start
+      Building docs prevew - start
 
-  `);
-      const init = buildLib ?
-        `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'} && `
-        : '';
+      `);
+      //#endregion
 
-      await this.lib.run(`${init}`
+      const libBuildCommand = `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'} && `
+      await this.lib.run(`${libBuildCommand}`
         + `${config.frameworkName} build:${config.folder.bundle}:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
         + `${appBuildOptions.websql ? '--websql' : ''} ${global.hideLog ? '' : '-verbose'}`).sync();
 
 
       Helpers.log(`
 
-  Building docs prevew - done
+      Building docs prevew - done
 
-  `);
+      `);
       await this.lib.pushToGitRepo(newVersion, realCurrentProj)
     }, async () => {
       await this.lib.pushToGitRepo(newVersion, realCurrentProj)
@@ -106,7 +99,20 @@ export class LibProjectStandalone {
   }
 
 
-  async publish(realCurrentProj: Project, newVersion: string, automaticRelease: boolean, prod: boolean) {
+  async publish(options: {
+    realCurrentProj: Project,
+    newVersion: string,
+    automaticRelease: boolean,
+    prod: boolean,
+  }) {
+
+    const {
+      realCurrentProj,
+      newVersion,
+      automaticRelease,
+      prod,
+    } = options;
+
     const cwd = path.join(this.lib.location, config.folder.bundle)
     Helpers.info(`Publish cwd: ${cwd}`)
     await Helpers.questionYesNo(`Publish on npm version: ${newVersion} ?`, async () => {
@@ -163,7 +169,7 @@ export class LibProjectStandalone {
     });
 
     if ((this.lib.typeIs('isomorphic-lib') && this.lib.frameworkVersionAtLeast('v3')) && !global.tnpNonInteractive) {
-      await this.buildDocs(prod, newVersion, realCurrentProj, false);
+      await this.buildDocs(prod, newVersion, realCurrentProj);
     }
     await realCurrentProj.pushToGitRepo(newVersion, realCurrentProj);
   }

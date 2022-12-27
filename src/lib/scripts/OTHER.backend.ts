@@ -193,25 +193,25 @@ async function $AA() {
   console.log(CLASS.getBy('Project'))
 }
 
-function CROP(args: string) {
-  const argv = args.split(' ');
-  const replacements = [
-    ['@backendFunc', `return (void 0);`],
-    '@backend' as any,
-    '@notForNpm',
-    ['@cutCodeIfTrue', codeCuttFn(true)],
-    ['@cutCodeIfFalse', codeCuttFn(false)]
-  ] as Models.dev.Replacement[];
-  let filePath = _.first(argv);
-  if (!path.isAbsolute(filePath)) {
-    filePath = path.join(process.cwd(), filePath);
-  }
-  const rm = RegionRemover.from(filePath, Helpers.readFile(filePath), replacements, Project.Current as Project);
-  const output = rm.output;
-  Helpers.writeFile(path.join(process.cwd(), `output-${path.basename(filePath)}`), output);
-  Helpers.info('DONE');
-  process.exit(0);
-}
+// function CROP(args: string) {
+//   const argv = args.split(' ');
+//   const replacements = [
+//     ['@backendFunc', `return (void 0);`],
+//     '@backend' as any,
+//     '@notForNpm',
+//     ['@cutCodeIfTrue', codeCuttFn(true)],
+//     ['@cutCodeIfFalse', codeCuttFn(false)]
+//   ] as Models.dev.Replacement[];
+//   let filePath = _.first(argv);
+//   if (!path.isAbsolute(filePath)) {
+//     filePath = path.join(process.cwd(), filePath);
+//   }
+//   const rm = RegionRemover.from(filePath, Helpers.readFile(filePath), replacements, Project.Current as Project);
+//   const output = rm.output;
+//   Helpers.writeFile(path.join(process.cwd(), `output-${path.basename(filePath)}`), output);
+//   Helpers.info('DONE');
+//   process.exit(0);
+// }
 
 async function $SEND_EMAIL(args: string) {
   // Helpers.info('Send email');
@@ -313,7 +313,7 @@ export default {
   $THROW_ERR: Helpers.CLIWRAP($THROW_ERR, '$THROW_ERR'),
   $SEND_EMAIL: Helpers.CLIWRAP($SEND_EMAIL, '$SEND_EMAIL'),
   $AA: Helpers.CLIWRAP($AA, '$AA'),
-  CROP: Helpers.CLIWRAP(CROP, 'CROP'),
+  // CROP: Helpers.CLIWRAP(CROP, 'CROP'),
   NPM_FIXES: Helpers.CLIWRAP(NPM_FIXES, 'NPM_FIXES'),
   // $COPY_FROM(args: string) {
   //   const [from, to, pkgName] = args.trim().split(' ');

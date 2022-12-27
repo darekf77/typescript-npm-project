@@ -3,19 +3,12 @@ import { crossPlatformPath, path } from "tnp-core";
 import { Helpers } from "tnp-helpers";
 import { Models } from "tnp-models";
 import { CLASS } from "typescript-class-helpers";
+import { LibPorjectBase } from "./lib-project-base.backend";
 import type { LibProject } from "./lib-project.backend";
 import { Project } from "./project";
 
+export class LibProjectSmartContainer extends LibPorjectBase {
 
-export class LibProjectSmartContainer {
-
-  constructor(
-    private lib: Project
-  ) {
-
-  }
-
-  // @ts-ignore
   preparePackage(smartContainer: Project, newVersion: string) {
     const rootPackageName = `@${smartContainer.name}`;
     const base = path.join(
@@ -52,13 +45,21 @@ export class LibProjectSmartContainer {
 
   }
 
-  async publish(
+  async publish(options: {
     realCurrentProj: Project,
-    rootPackageName: string,
     newVersion: string,
     automaticRelease: boolean,
     prod: boolean,
-  ) {
+    rootPackageName?: string,
+  }) {
+
+    const {
+      realCurrentProj,
+      newVersion,
+      automaticRelease,
+      prod,
+      rootPackageName,
+    } = options;
 
     const base = path.join(
       this.lib.location,
@@ -90,16 +91,17 @@ export class LibProjectSmartContainer {
 
     });
 
-    await this.buildDocs(prod, newVersion, realCurrentProj, false);
+    await this.buildDocs(prod, newVersion, realCurrentProj);
 
   }
 
 
-  async buildDocs(prod: boolean, newVersion: string, realCurrentProj: Project, buildLib: boolean) {
+  async buildDocs(prod: boolean, newVersion: string, realCurrentProj: Project) {
     // TODO
 
     await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
 
+      //#region questions
       let appBuildOptions = { docsAppInProdMode: prod, websql: false };
 
       await Helpers.questionYesNo(`Do you wanna build in production mode`, () => {
@@ -116,20 +118,22 @@ export class LibProjectSmartContainer {
 
       Helpers.log(`
 
-  Building docs prevew - start
+      Building docs prevew - start
 
-  `);
-      const init = buildLib ? `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'} && ` : '';
-      await this.lib.run(`${init}`
+      `);
+      //#endregion
+
+      const libBuildCOmmand = `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'} && `;
+      await this.lib.run(`${libBuildCOmmand}`
         + `${config.frameworkName} build:${config.folder.bundle}:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
         + `${appBuildOptions.websql ? '--websql' : ''} ${global.hideLog ? '' : '-verbose'}`).sync();
 
 
       Helpers.log(`
 
-  Building docs prevew - done
+      Building docs prevew - done
 
-  `);
+      `);
       await this.lib.pushToGitRepo(newVersion, realCurrentProj)
     }, async () => {
       await this.lib.pushToGitRepo(newVersion, realCurrentProj)

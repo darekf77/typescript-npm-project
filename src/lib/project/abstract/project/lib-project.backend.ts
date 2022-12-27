@@ -182,22 +182,22 @@ export abstract class LibProject {
       }
 
       if (this.isSmartContainer) {
-        await specyficProjectForBuild.smartcontainer.publish(
+        await specyficProjectForBuild.smartcontainer.publish({
           realCurrentProj,
-          `@${this.name}`,
+          rootPackageName: `@${this.name}`,
           newVersion,
           automaticRelease,
           prod,
-        )
+        })
       }
 
       if (this.isStandaloneProject) {
-        await specyficProjectForBuild.standalone.publish(
+        await specyficProjectForBuild.standalone.publish({
           realCurrentProj,
           newVersion,
           automaticRelease,
           prod,
-        );
+        });
       }
 
       Helpers.info('RELEASE DONE');
@@ -205,11 +205,11 @@ export abstract class LibProject {
     });
 
     if (this.isStandaloneProject) {
-      await this.standalone.buildDocs(prod, newVersion, realCurrentProj, true);
+      await this.standalone.buildDocs(prod, newVersion, realCurrentProj);
     }
 
     if (this.isSmartContainer) {
-      await this.smartcontainer.buildDocs(prod, newVersion, realCurrentProj, true);
+      await this.smartcontainer.buildDocs(prod, newVersion, realCurrentProj);
     }
     Helpers.info('DOCS RELEASE DONE');
     process.exit(0);
@@ -328,7 +328,7 @@ export abstract class LibProject {
       nodts,
       uglify,
       outDir: config.folder.bundle as 'bundle',
-      args
+      args: args + ' --codeCutRelease'
     }, this) as any);
 
 

@@ -474,6 +474,7 @@ export class ProjectIsomorphicLib
     Helpers.info(`[buildLib] start of building...`);
     this.beforeLibBuild(outDir);
 
+    const { codeCutRelease } = require('minimist')((args || '').split(' '));
 
     const { obscure, uglify, nodts } = this.buildOptions;
     const isWebpackBundleProductionBuild = ((outDir === 'bundle') && (obscure || uglify || nodts))
@@ -634,7 +635,7 @@ export class ProjectIsomorphicLib
         //#endregion
       }
     } else {
-      if (outDir === 'bundle') {
+      if (codeCutRelease) {
         this.cutReleaseCode();
       }
       //#region non watch build
@@ -715,7 +716,7 @@ export class ProjectIsomorphicLib
         //#endregion
       }
       //#endregion
-      if (outDir === 'bundle') {
+      if (codeCutRelease) {
         this.cutReleaseCodeRestore();
       }
     }
@@ -906,33 +907,25 @@ export class ProjectIsomorphicLib
 
   //#region private methods / cut release code
 
-  private get tempSourceNpmCodeCut() {
-    const releaseSrcLocationOrg = path.join(this.location, `tmp-org-${config.folder.src}${this.buildOptions.websql ? '-websql' : ''}`);
-    return releaseSrcLocationOrg;
-  }
-
-  private get cutRelaseFolder() {
-    return `tmp-src-${config.folder.bundle}${this.buildOptions.websql ? '-websql' : ''}`
+  private get tmpSrcBundleFolder() {
+    return `tmp-cut-relase-src-${config.folder.bundle}${this.buildOptions.websql ? '-websql' : ''}`
   }
 
   private cutReleaseCodeRestore() {
-    const releaseSrcLocation = path.join(this.location, this.cutRelaseFolder);
-    const releaseSrcLocationOrg = this.tempSourceNpmCodeCut;
-    if (Helpers.exists(releaseSrcLocationOrg)) {
-      Helpers.removeFolderIfExists(releaseSrcLocation);
-      Helpers.copy(releaseSrcLocationOrg, releaseSrcLocation);
-    }
+    //#region @backend
+    const releaseSrcLocation = crossPlatformPath(path.join(this.location, config.folder.src));
+    const releaseSrcLocationOrg = crossPlatformPath(path.join(this.location, this.tmpSrcBundleFolder));
+
+    Helpers.removeFolderIfExists(releaseSrcLocation);
+    Helpers.copy(releaseSrcLocationOrg, releaseSrcLocation);
+
+    //#endregion
   }
 
   private cutReleaseCode() {
     //#region @backend
-    if (!this.isInRelaseBundle) {
-      Helpers.warn(`Npm code cut available only for command: ${config.frameworkName} release`);
-      return;
-    }
-
-    const releaseSrcLocation = path.join(this.location, this.cutRelaseFolder);
-    const releaseSrcLocationOrg = path.join(this.location, this.tempSourceNpmCodeCut);
+    const releaseSrcLocation = crossPlatformPath(path.join(this.location, config.folder.src));
+    const releaseSrcLocationOrg = crossPlatformPath(path.join(this.location, this.tmpSrcBundleFolder));
     Helpers.removeFolderIfExists(releaseSrcLocationOrg);
     Helpers.copy(releaseSrcLocation, releaseSrcLocationOrg);
 
@@ -940,8 +933,11 @@ export class ProjectIsomorphicLib
     filesForModyficaiton
       .filter(absolutePath => !Helpers.isFolder(absolutePath))
       .forEach(absolutePath => {
+        // console.log({
+        //   absolutePath
+        // })
         let rawContent = Helpers.readFile(absolutePath);
-        rawContent = RegionRemover.from(absolutePath, rawContent, ['@notFor'+'Npm'], this.project).output;
+        rawContent = RegionRemover.from(absolutePath, rawContent, ['@notFor' + 'Npm'], this.project).output;
         // rawContent = this.replaceRegionsWith(rawContent, ['@notFor'+'Npm']);
         Helpers.writeFile(absolutePath, rawContent);
       });
