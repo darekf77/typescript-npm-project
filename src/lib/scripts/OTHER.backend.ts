@@ -38,14 +38,6 @@ function INSTALL_ENV() {
   ENV_INSTALL()
 }
 
-
-function recreate() {
-  (Project.Current as Project).recreate.initAssets();
-  (Project.Current as Project).recreate.gitignore();
-  process.exit(0)
-
-}
-
 async function version() {
   Helpers.log(`Framework name: ${config.frameworkName}`)
   //#region @notForNpm
@@ -134,7 +126,6 @@ function $isbundlemode(args) {
   process.exit(0)
 }
 
-const $ASSETS = () => recreate();
 const $VERSION = () => version();
 
 async function $VERSIONS() {
@@ -326,7 +317,6 @@ export default {
   RUN_PROCESS: Helpers.CLIWRAP(RUN_PROCESS, 'RUN_PROCESS'),
   PSINFO: Helpers.CLIWRAP(PSINFO, 'PSINFO'),
   $isbundlemode: Helpers.CLIWRAP($isbundlemode, '$isbundlemode'),
-  $ASSETS: Helpers.CLIWRAP($ASSETS, '$ASSETS'),
   $VERSION: Helpers.CLIWRAP($VERSION, '$VERSION'),
   $VERSIONS: Helpers.CLIWRAP($VERSIONS, '$VERSIONS'),
   $VERSIONS_TRUSTED: Helpers.CLIWRAP($VERSIONS_TRUSED, '$VERSIONS_TRUSTED'),

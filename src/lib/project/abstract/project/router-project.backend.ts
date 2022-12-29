@@ -11,7 +11,6 @@ import { Morphi } from 'morphi';
 import { Models } from 'tnp-models';
 import { config } from 'tnp-config';
 import { EnvironmentConfig } from '../../features';
-import type { ProjectDocker } from '../../project-specyfic';
 
 export abstract class RouterProject {
   protected __defaultPort: number;

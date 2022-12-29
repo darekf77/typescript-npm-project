@@ -16,6 +16,7 @@ import { FeatureForProject } from '../../abstract';
 import { Helpers } from 'tnp-helpers';
 import { config, ConfigModels } from 'tnp-config';
 import { Models } from 'tnp-models';
+import { BuildOptions } from 'tnp-db';
 
 
 //#region @backend
@@ -70,7 +71,7 @@ export class EnvironmentConfig
   }
 
 
-  public async init(args?: string, overridePortsOnly: boolean = void 0) {
+  public async init(buildOptions?: BuildOptions, overridePortsOnly: boolean = void 0) {
     if (this.project.isStandaloneProject && this.project.isGenerated) {
       return;
     }
@@ -97,7 +98,7 @@ export class EnvironmentConfig
       }
 
       if (this.project.isWorkspaceChildProject && this.isChildProjectWithoutConfig) {
-        await (this.project.parent.env as any as EnvironmentConfig).init(args, overridePortsOnly);
+        await (this.project.parent.env as any as EnvironmentConfig).init(buildOptions, overridePortsOnly);
         this.project.parent.filesTemplatesBuilder.rebuild();
         // error(`[${path.basename(crossPlartformPath(__filename))}] Please override parent config first`);
       }
@@ -114,8 +115,7 @@ export class EnvironmentConfig
     }
 
 
-    const { generateIps, env }: { generateIps: boolean, env: ConfigModels.EnvironmentName } =
-      _.isString(args) ? require('minimist')(args.split(' ')) : { generateIps: false };
+    const { generateIps, env } = buildOptions;
 
     const environmentName = (_.isString(env) && env.trim() !== '') ? env : 'local'
 

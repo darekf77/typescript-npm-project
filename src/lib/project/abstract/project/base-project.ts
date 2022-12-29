@@ -24,10 +24,7 @@ export abstract class BaseProject {
     if (!_.isNil(this.cache['genericName'])) {
       this.cache['genericName'];
     }
-    let result = [
-      (this.isWorkspace && this.isGenerated) ? `${(this.origin && this.origin.parent) ?
-        this.origin.parent.name : ' - no origin - '}` : ''
-    ];
+    let result = [];
     result = result.concat(this.findParentsNames(this));
     if (this.isGenerated) {
       result.push(`((${chalk.bold('GENERATED')}))${this.name}`)

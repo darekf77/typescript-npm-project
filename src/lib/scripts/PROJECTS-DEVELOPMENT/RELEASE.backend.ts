@@ -1,5 +1,6 @@
 import { config } from 'tnp-config';
 import { chalk, path, _ } from 'tnp-core';
+import { BuildOptions } from 'tnp-db';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { Project } from '../../project/abstract/project';
@@ -293,7 +294,7 @@ processing...
 
         if (depForPush.typeIs('angular-lib', 'isomorphic-lib') && depForPush.isSmartContainer) {
           try {
-            await depForPush.filesStructure.init('')
+            await depForPush.filesStructure.init(BuildOptions.fromJson({}))
           } catch (error) {
             Helpers.info(`Not able to init fully...`);
           }

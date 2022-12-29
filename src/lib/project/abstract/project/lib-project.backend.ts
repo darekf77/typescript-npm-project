@@ -289,7 +289,9 @@ export abstract class LibProject {
         releaseOptions.useTempFolder = false;
         const vscodeFolder = path.join(generatedProject.location, config.folder._vscode);
         Helpers.removeFolderIfExists(vscodeFolder);
-        await generatedProject.insideStructure.recrate('bundle')
+        await generatedProject.insideStructure.recrate(BuildOptions.fromJson({
+          outDir: 'bundle'
+        }))
         await generatedProject.release(releaseOptions, automaticRelease);
         return true;
       }

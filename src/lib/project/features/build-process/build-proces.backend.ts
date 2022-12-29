@@ -22,61 +22,17 @@ const log = Log.create(__filename)
 //#endregion
 
 export class BuildProcess extends FeatureForProject {
-
-  //#region prepare build options
-  public static prepareOptionsBuildProcess(options: Models.dev.StartForOptions, project: Project): BuildOptions {
-    if (_.isUndefined(options)) {
-      options = {} as any;
-    }
-    if (_.isUndefined(options.outDir)) {
-      options.outDir = 'dist';
-    }
-    if (_.isUndefined(options.prod)) {
-      options.prod = false;
-    }
-    if (_.isUndefined(options.watch)) {
-      options.watch = false;
-    }
-    if (_.isUndefined(options.staticBuildAllowed)) {
-      options.staticBuildAllowed = false;
-    }
-    if (project.isGenerated && !options.staticBuildAllowed) {
-      log.error(`Please use command:
-$ ${config.frameworkName} static:build
-inside generated projects...
-`, false, true);
-    }
-
-    if (!_.isString(options.args)) {
-      options.args = ''
-    }
-    return BuildOptions.fromJson(options);
-  }
-  //#endregion
-
   //#region start for ...
-  async startForLibFromArgs(prod: boolean, watch: boolean, outDir: Models.dev.BuildDir, args: string) {
-    return this.startForLib({ prod, watch, outDir, args });
-  }
-
   /**
    * prod, watch, outDir, args, overrideOptions
    */
-  async startForLib(options: Models.dev.StartForOptions, exit = true) {
-    options = BuildProcess.prepareOptionsBuildProcess(options, this.project);
-    options.appBuild = false;
-    const buildOptions: BuildOptions = await BuildOptions.from(options.args, this.project as any, options, 'startForLib');
+  async startForLib(options: BuildOptions, exit = true) {
+    const buildOptions: BuildOptions<Project> = await BuildOptions.from(options.argsString, this.project as any, options, 'startForLib') as any;
     await this.build(buildOptions, config.allowedTypes.libs, exit);
   }
 
-  async startForAppFromArgs(prod: boolean, watch: boolean, outDir: Models.dev.BuildDir, args: string) {
-    return this.startForApp({ prod, watch, outDir, args });
-  }
-
-  async startForApp(options: Models.dev.StartForOptions, exit = true) {
-    options = BuildProcess.prepareOptionsBuildProcess(options, this.project);
-    options.appBuild = true;
-    const buildOptions: BuildOptions = await BuildOptions.from(options.args, this.project as any, options, 'startForApp');
+  async startForApp(options: BuildOptions, exit = true) {
+    const buildOptions: BuildOptions<Project> = await BuildOptions.from(options.argsString, this.project as any, options, 'startForApp') as any;
     await this.build(buildOptions, config.allowedTypes.app, exit);
   }
   //#endregion
@@ -115,7 +71,7 @@ inside generated projects...
   }
   //#endregion
 
-  private async build(buildOptions: BuildOptions, allowedLibs: ConfigModels.LibType[], exit = true) {
+  private async build(buildOptions: BuildOptions<Project>, allowedLibs: ConfigModels.LibType[], exit = true) {
 
     log.data(`
 
@@ -167,76 +123,32 @@ inside generated projects...
       if (this.project.node_modules.exist) {
         log.data(`NODE MODULE EXISTS`)
       } else {
-        await this.project.filesStructure.init(buildOptions.args);
+        await this.project.filesStructure.init(buildOptions);
       }
 
       if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
-        this.project.insideStructure.recrate(buildOptions.outDir as any, buildOptions.watch);
+        this.project.insideStructure.recrate(buildOptions);
       }
 
       if (this.project.isSmartContainer) {
-        const childrenForINsideStruct = this.project.children.filter(c => c.typeIs('isomorphic-lib'));
-        const clientFromArgs = Helpers.removeSlashAtEnd(_.first((buildOptions.args || '').split(' '))) as any;
-        let client: Project = childrenForINsideStruct.find(f => f.name === clientFromArgs);
-        const smartContainerBuildTarget = this.project.smartContainerBuildTarget;
-        if (!client && smartContainerBuildTarget) {
-          client = smartContainerBuildTarget;
-        }
 
-        if (client) {
-          await client.insideStructure.recrate(buildOptions.outDir, buildOptions.watch);
+        if (buildOptions.client) {
+          await (buildOptions.client as Project).insideStructure.recrate(buildOptions);
         }
       }
 
       if (buildOptions.watch) {
-        let config = void 0;
-        while (true) {
-          if (this.project.isWorkspace) {
-            if (this.project.env.config) {
-              config = this.project.env.config.workspace.workspace;
-            }
-          } else if (this.project.isWorkspaceChildProject) {
-            if (this.project.env.config) {
-              config = this.project.env.config.workspace.projects.find(({ name }) => name === this.project.name);
-              if (!config) {
-                Helpers.error(`Please include this project (${this.project.genericName}) in your environment*.js.`,
-                  false, true)
-              }
-            }
-          } else {
-            break;
-          }
-          if (config) {
-            break;
-          } else {
-            await this.project.filesStructure.init(buildOptions.args);
-          }
-        }
-        if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
-          await handleProjectsPorts(this.project, config, false);
-        }
+        await this.project.filesStructure.init(buildOptions);
       }
 
     } else {
-      if (buildOptions.watch) {
-        log.data('is lib build watch')
-        if (this.project.isWorkspace) {
-          log.data(`Removing on purpose tmp-environment.json from wokspace, before init`);
-          Helpers.remove(path.join(this.project.location, config.file.tnpEnvironment_json));
-        }
-        await this.project.filesStructure.init(buildOptions.args, { watch: true, watchOnly: buildOptions.watchOnly });
-      } else {
-        await this.project.filesStructure.init(buildOptions.args);
-      }
+      await this.project.filesStructure.init(buildOptions);
     }
     log.data('before file templates')
 
     //#region update environment data for "childs"
-    if (this.project.isStandaloneProject || this.project.isWorkspaceChildProject) {
+    if (this.project.isStandaloneProject) {
       await (this.project.env as any as EnvironmentConfig).updateData();
-      if (this.project.typeIs('angular-lib')) {
-        this.project.filesTemplatesBuilder.rebuildFile('src/index.html.filetemplate');
-      }
     }
     //#endregion
 

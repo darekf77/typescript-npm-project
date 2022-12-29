@@ -201,16 +201,6 @@ export class ProjectIsomorphicLib
 
   //#region api
 
-  //#region api / init procedure
-  async initProcedure() {
-    //#region @backend
-    if (this.isCoreProject && this.frameworkVersionAtLeast('v2')) {
-
-    }
-    //#endregion
-  }
-  //#endregion
-
   //#region api / start on command
 
   startOnCommand(args: string) {

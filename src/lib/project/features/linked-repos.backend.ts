@@ -38,9 +38,9 @@ export class LinkedRepos extends FeatureForProject {
     }
   }
 
-  async update(struct = false) {
+  async update() {
 
-    if (this.project.packageJson.linkedRepos.length > 0 && !struct) {
+    if (this.project.packageJson.linkedRepos.length > 0) {
       const toClone = this.project.packageJson.linkedRepos;
       for (let index = 0; index < toClone.length; index++) {
         const repo = toClone[index];

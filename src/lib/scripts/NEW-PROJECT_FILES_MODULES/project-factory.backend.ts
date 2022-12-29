@@ -242,7 +242,7 @@ export class ProjectFactory {
 
       Use different name: ${CLI.chalk.bold(containersAndProj.join('/').replace('app', 'my-app-or-something-else'))}
 
-      `,false,true);
+      `, false, true);
     }
     let firstContainer: Project;
     let lastContainer: Project;
@@ -362,7 +362,7 @@ export class ProjectFactory {
       lastContainer.smartNodeModules.setToSmartContainer();
     }
 
-    await appProj.filesStructure.init(appProj.name);
+    await appProj.filesStructure.init({ args: appProj.name });
 
     if (lastContainer?.isSmartContainer) {
       appProj.removeStandaloneSources();
@@ -424,10 +424,10 @@ export class ProjectFactory {
     for (let index = 0; index < containers.length; index++) {
       const container = containers[index];
       if (container.isSmartContainer) {
-        await container.filesStructure.init(``);
+        await container.filesStructure.init({ args: '' });
         container.recreate.initVscode();
       } else {
-        await container.filesStructure.init('');
+        await container.filesStructure.init({ args: '' });
         container.recreate.initVscode();
       }
     }
@@ -487,7 +487,7 @@ export class ProjectFactory {
         cwd = containerPath;
         const containerProj = (Project.From(containerPath) as Project);
         if (containerProj) {
-          await containerProj.filesStructure.init(smart ? projName : '')
+          await containerProj.filesStructure.init({ args: smart ? projName : '' })
           containerProj.run('git init').sync();
           if (!firstContainer) {
             firstContainer = containerProj;
@@ -497,7 +497,7 @@ export class ProjectFactory {
     }
 
     if (firstContainer && firstContainer.parent?.isContainer) {
-      await firstContainer.parent.filesStructure.init(firstContainer.parent.isSmartContainer ? projName : '')
+      await firstContainer.parent.filesStructure.init({ args: firstContainer.parent.isSmartContainer ? projName : '' })
     }
 
 
@@ -529,7 +529,7 @@ export class ProjectFactory {
 
     // await baseline.reset();
     Helpers.log('[create] Baseline reset done')
-    await baseline.filesStructure.init(` --recrusive `);
+    await baseline.filesStructure.init({ args: ` --recrusive ` });
     Helpers.log('[create] Baseline init done')
     // await baseline.run(`${ config.frameworkName } reset && ${ config.frameworkName } init--recrusive`, {
     //   prefix: CLI.chalk.bold(`[INITING BASELINE ${ baseline.genericName } ]`)
@@ -652,12 +652,12 @@ export class ProjectFactory {
           `['workbench.colorCustomizations']['statusBar.background']`, void 0);
         Helpers.setValueToJSON(newCreatedProject.path('.vscode/settings.json').absolute.normal,
           `['workbench.colorCustomizations']['statusBar.debuggingBackground']`, void 0);
-        await newCreatedProject.filesStructure.init('');
+        await newCreatedProject.filesStructure.init({ args: '' });
       } else {
         // if (!skipInit) {
         const skipNodeModules = !newCreatedProject.frameworkVersionAtLeast('v3');
         const argsForInit = `--recrusive ${(skipNodeModules ? '--skipNodeModules' : '')} `;
-        await newCreatedProject.filesStructure.init(argsForInit);
+        await newCreatedProject.filesStructure.init({ args: argsForInit });
         // }
       }
       if (
@@ -692,7 +692,7 @@ export class ProjectFactory {
           await newCreatedProject.parent.filesStructure.struct('');
         }
         if (newCreatedProject.parent.isSmartContainer) {
-          await newCreatedProject.parent.filesStructure.init(newCreatedProject.name)
+          await newCreatedProject.parent.filesStructure.init({ args: newCreatedProject.name })
         } else {
           await newCreatedProject.parent.filesStructure.struct('')
         }
@@ -700,7 +700,7 @@ export class ProjectFactory {
       }
     }
     if (firstContainer) {
-      await firstContainer.filesStructure.init('');
+      await firstContainer.filesStructure.init({ args: '' });
     }
 
     return newCreatedProject;

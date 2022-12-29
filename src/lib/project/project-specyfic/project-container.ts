@@ -1,3 +1,4 @@
+//#region imports
 //#region @backend
 import { _ } from 'tnp-core';
 import { path } from 'tnp-core'
@@ -11,6 +12,7 @@ import { CLASS } from 'typescript-class-helpers';
 import type { ProjectIsomorphicLib } from './project-isomorphic-lib';
 import { Models } from 'tnp-models';
 import { config } from 'tnp-config';
+//#endregion
 
 //#region @backend
 @CLASS.NAME('ProjectContainer')
@@ -21,43 +23,55 @@ export class ProjectContainer
 //#endregion
 {
 
-  async initProcedure() {
-    //#region @backendFunc
-    this.addGitReposAsLinkedProjects();
-    //#endregion
-  }
+  //#region static
+  public static handleSmartContainer(smartContainerOrChild: Project, client: string) { // TODO everything will be in src
+    if (!smartContainerOrChild.isSmartContainer && !smartContainerOrChild.isSmartContainerChild) {
+      return;
+    }
+    if (!client) {
+      Helpers.error(`Trying to init project ${smartContainerOrChild.name} without target.`, false, true);
+    }
 
-  public addGitReposAsLinkedProjects() {
-    //#region @backendFunc
-    const repoChilds = this.getFolders()
-      .sort()
-      .map(c => {
-        const proj = Project.From<Project>(c);
-        if (!proj) {
-          Helpers.info(`No project from ${c}`);
+    const parent = smartContainerOrChild.isSmartContainerChild ? smartContainerOrChild.parent : smartContainerOrChild;
+
+    const nodeModulesContainer = path.join(parent.location, config.folder.node_modules, `@${parent.name}`);
+
+    if (Helpers.isUnexistedLink(nodeModulesContainer)) {
+      Helpers.remove(nodeModulesContainer);
+    }
+
+    if (Helpers.isExistedSymlink(nodeModulesContainer) && !Helpers.isFolder(nodeModulesContainer)) {
+      Helpers.remove(nodeModulesContainer);
+    }
+    if (!Helpers.exists(nodeModulesContainer)) {
+      Helpers.mkdirp(nodeModulesContainer);
+    }
+
+    if (client) {
+      const childrens = parent.children.filter(f => f.typeIs('isomorphic-lib') && f.frameworkVersionAtLeast('v3'));
+      for (let index = 0; index < childrens.length; index++) {
+        const child = childrens[index];
+        const source = path.join(
+          parent.location,
+          config.folder.dist,
+          parent.name,
+          client,
+          config.folder.dist,
+          config.folder.libs,
+          child.name,
+        );
+        const dest = path.join(nodeModulesContainer, child.name);
+        if (!Helpers.exists(path.dirname(dest))) {
+          Helpers.mkdirp(path.dirname(dest));
         }
-        return proj;
-      })
-      .filter(f => !!f)
-      .filter(c => c.git.isGitRoot)
-      .map(c => c.name);
-
-
-    // TODO Too much things to check here
-    // let chagned = false;
-
-    // repoChilds.forEach(name => {
-    //   if (_.isUndefined(this.packageJson.linkedProjects.find(p => p === name))
-    //     && Project.From<Project>(path.join(this.location, name))?.git.isGitRepo) {
-    //     chagned = true;
-    //     this.packageJson.linkedProjects.push(name);
-    //   }
-    // });
-    // if (chagned) {
-    //   this.packageJson.writeToDisc();
-    // }
-    //#endregion
+        Helpers.removeFileIfExists(dest);
+        // console.log(source)
+        Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
+      }
+    }
   }
+
+  //#endregion
 
   async buildLib() { }
 
@@ -92,17 +106,12 @@ export class ProjectContainer
     if (!fse.existsSync(this.location)) {
       return;
     }
-    let { outDir, args } = buildOptions;
+    let { outDir, client, clientArgString } = buildOptions;
 
-    args = Helpers.cliTool.removeArgFromString(args);
-    let client = Helpers.removeSlashAtEnd(_.first((args || '').split(' '))) as any;
-    if (!client) {
-      client = this.smartContainerBuildTarget?.name;
-    }
 
-    const proxy = this.proxyProjFor(client, outDir);
+    const proxy = this.proxyProjFor(client.name, outDir);
     if (!proxy && this.isSmartContainer) {
-      const tmp = (c) => `${config.frameworkName} build:app:watch ${c} ${args}`;
+      const tmp = (c) => `${config.frameworkName} build:app:watch ${c} `;
       Helpers.error(`
 
       Please provide target for angular build:

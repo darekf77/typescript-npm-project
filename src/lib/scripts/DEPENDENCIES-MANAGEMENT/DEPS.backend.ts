@@ -123,7 +123,7 @@ const SMART_REINSTALL = async (args) => {
       Helpers.info(`Recreating node_module for ${c.genericName}`)
       c.node_modules.remove();
       c.smartNodeModules.remove();
-      await c.filesStructure.init('');
+      await c.filesStructure.init({ args: '' });
     }
   } else {
     Helpers.error(`[${config.frameworkName}] This is not a container type project.`, false, true);
@@ -149,7 +149,7 @@ const $REINSTALL = async (args) => {
         Helpers.info(`Recreating node_module for ${c.genericName}`)
         c.node_modules.remove();
         c.smartNodeModules.remove();
-        await c.filesStructure.init('');
+        await c.filesStructure.init({ args: '' });
       }
     }
   } else if (proj.isStandaloneProject && proj.npmPackages.useSmartInstall) {

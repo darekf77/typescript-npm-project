@@ -78,18 +78,6 @@ export abstract class RecreatableProject {
   }
   //#endregion
 
-  //#region @backend
-  async initProcedure(this: Project) {
-    return void 0;
-  }
-
-  public async __initProcedure(this: Project) {
-    Helpers.log(`Started init procedure of project (${this._type}) "${this.genericName}...`);
-    await this.initProcedure();
-    Helpers.log(`End init procedure of project (${this._type}) "${this.genericName}" started...`);
-  }
-  //#endregion
-
   // @ts-ignore
   get customizableFilesAndFolders(this: Project) {
     if (Helpers.isBrowser) {

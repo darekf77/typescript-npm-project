@@ -163,31 +163,6 @@ export class QuickFixes extends FeatureForProject {
         });
     }
 
-    if (this.project.isWorkspace) {
-      if (this.project.isGenerated) {
-        this.project.origin.node_modules.fixesForNodeModulesPackages
-          .forEach(f => {
-            const source = path.join(this.project.origin.location, f);
-            const dest = path.join(this.project.location, f);
-            if (fse.existsSync(dest)) {
-              Helpers.tryRemoveDir(dest);
-            }
-            Helpers.tryCopyFrom(source, dest);
-          });
-      }
-      if (this.project.isSite) {
-        this.project.baseline.node_modules.fixesForNodeModulesPackages
-          .forEach(f => {
-            const source = path.join(this.project.baseline.location, f);
-            const dest = path.join(this.project.location, f);
-            if (fse.existsSync(dest)) {
-              Helpers.tryRemoveDir(dest);
-            }
-            Helpers.tryCopyFrom(source, dest);
-          });
-      }
-    }
-
     Helpers.log(`Fixing bad npm packages - COMPLETE`);
   }
 

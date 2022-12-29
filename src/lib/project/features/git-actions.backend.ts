@@ -185,7 +185,7 @@ ${remotes.map((r, i) => `${i + 1}. ${r.origin} ${r.url}`).join('\n')}
     }
     if (this.project.isContainer) {
       if (!this.project.isSmartContainer) {
-        await this.project.filesStructure.init('');
+        await this.project.filesStructure.init({ args: '' });
       }
       await this.project.recent.saveActiveProjects(false);
     }

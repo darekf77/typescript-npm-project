@@ -4,6 +4,7 @@ import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
 import { PROGRESS_DATA } from 'tnp-models';
 import { config } from 'tnp-config';
+import { BuildOptions } from 'tnp-db';
 
 
 function SHOW_LOOP(c = 0 as any, maximum = Infinity, errExit = false) {
@@ -56,23 +57,23 @@ function $PROCESS_CWD() {
 }
 
 const $TEST_WATCH = async (args: string) => {
-  await (Project.Current as Project).filesStructure.init(args);
+  await (Project.Current as Project).filesStructure.init(BuildOptions.fromJson({}));
   await (Project.Current as Project).tests.startAndWatch(args.trim().split(' '))
 }
 
 const $TEST_WATCH_DEBUG = async (args: string) => {
-  await (Project.Current as Project).filesStructure.init(args);
+  await (Project.Current as Project).filesStructure.init(BuildOptions.fromJson({}));
   await (Project.Current as Project).tests.startAndWatch(args.trim().split(' '), true)
 }
 
 const $TEST = async (args: string) => {
-  await (Project.Current as Project).filesStructure.init(args);
+  await (Project.Current as Project).filesStructure.init(BuildOptions.fromJson({}));
   await (Project.Current as Project).tests.start(args.trim().split(' '))
   process.exit(0)
 }
 
 const $TEST_DEBUG = async (args: string) => {
-  await (Project.Current as Project).filesStructure.init(args);
+  await (Project.Current as Project).filesStructure.init(BuildOptions.fromJson({}));
   await (Project.Current as Project).tests.start(args.trim().split(' '), false, true)
   process.exit(0)
 }

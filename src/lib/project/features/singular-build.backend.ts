@@ -1,3 +1,4 @@
+//#region imports
 import { chokidar, crossPlatformPath, _ } from 'tnp-core';
 import { path } from 'tnp-core'
 import { FeatureForProject, Project } from '../abstract';
@@ -6,25 +7,26 @@ import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { VscodeProject } from '../abstract/project/vscode-project.backend';
 import { BrowserCodeCut } from '../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
+import { BuildOptions } from 'tnp-db';
+//#endregion
 
-/**
- * DEPRAECATED
- */
 export class SingularBuild extends FeatureForProject {
 
   static getProxyProj(workspaceOrContainer: Project, client: string, outFolder: Models.dev.BuildDir = 'dist') {
     return path.join(workspaceOrContainer.location, outFolder, workspaceOrContainer.name, client);
   }
 
-  watchers: chokidar.FSWatcher[] = [];
+  private watchers: chokidar.FSWatcher[] = [];
 
-  async createSingluarTargeProjFor(parent: Project, client: Project, outFolder: Models.dev.BuildDir, watch = false): Promise<Project> {
+  async createSingluarTargeProjFor(parent: Project, buildOptions: BuildOptions<Project>): Promise<Project> {
+
+    const { outDir, watch, client, clientArgString } = buildOptions;
 
     const children = this.project.children
       .filter(c => (c.typeIs('isomorphic-lib')) && c.frameworkVersionAtLeast('v3'))
       ;
 
-    const smartContainerTargetProjPath = SingularBuild.getProxyProj(parent, client.name, outFolder); // path.join(parent.location, outFolder, parent.name, client.name);
+    const smartContainerTargetProjPath = SingularBuild.getProxyProj(parent, client.name, outDir); // path.join(parent.location, outFolder, parent.name, client.name);
     Helpers.log(`dist project: ${smartContainerTargetProjPath}`);
     Helpers.mkdirp(smartContainerTargetProjPath);
     const appRelatedFiles = BrowserCodeCut.extAllowedToReplace.map(ext => `app${ext}`);
@@ -179,7 +181,7 @@ export class SingularBuild extends FeatureForProject {
 
     let singularWatchProj = Project.From<Project>(smartContainerTargetProjPath);
     parent.node_modules.linkToProject(singularWatchProj);
-    await singularWatchProj.filesStructure.init(''); // THIS CAUSE NOT NICE SHIT
+    await singularWatchProj.filesStructure.init(buildOptions); // THIS CAUSE NOT NICE SHIT
 
     VscodeProject.launchFroSmartContaienr(parent);
 
@@ -187,13 +189,13 @@ export class SingularBuild extends FeatureForProject {
   }
 
 
-  async init(watch: boolean, prod: boolean, outDir: Models.dev.BuildDir, args: string, _client?: string | Project) {
-    if (this.project.isWorkspace) {
-      await this.workspace(watch, prod);
-    }
+  async init(buildOptions: BuildOptions<Project>) {
+
     if (!this.project.isSmartContainer) {
       return;
     }
+
+    const { client, clientArgString } = buildOptions;
 
     const children = this.project.children
       .filter(c => (c.typeIs('isomorphic-lib')) && c.frameworkVersionAtLeast('v3'))
@@ -201,21 +203,16 @@ export class SingularBuild extends FeatureForProject {
 
     for (let index = 0; index < children.length; index++) {
       const c = children[index];
-      await c.filesStructure.init('');
+      await c.filesStructure.init(buildOptions);
     }
-    args = Helpers.cliTool.removeArgFromString(args);
-    const clientFromArgs = Helpers.removeSlashAtEnd(_.first((args || '').split(' '))) as any;
-    let client: Project = children.find(f => f.name === _client || f.name === clientFromArgs);
+
 
     const smartContainerBuildTarget = this.project.smartContainerBuildTarget;
 
-    if (!client && smartContainerBuildTarget) {
-      client = smartContainerBuildTarget;
-    }
 
     if (!client) {
-      if (clientFromArgs) {
-        Helpers.error(`${clientFromArgs} hasn't been add into your container`, false, true)
+      if (clientArgString) {
+        Helpers.error(`${clientArgString} hasn't been add into your container`, false, true)
       } else {
         Helpers.error(`
 
@@ -233,134 +230,10 @@ export class SingularBuild extends FeatureForProject {
       this.project.packageJson.save('updating smart container target');
     }
 
-    const singularWatchProj = await this.createSingluarTargeProjFor(this.project, client, outDir, watch);
+    const singularWatchProj = await this.createSingluarTargeProjFor(this.project, buildOptions);
 
     Helpers.log(`[singular build] init structure ${!!singularWatchProj}`);
 
   }
 
-
-  async workspace(watch: boolean, prod: boolean) {
-
-    // Helpers.log(`[singular build]
-    // FOP: ${this.project.genericName},
-    // TYPE: ${this.project._type},
-    // LOCATION: ${this.project.location}
-    // `);
-
-    // const children = this.project.children
-    //   .filter(c => c.location !== this.project.location)
-    //   .filter(c => !c.name.startsWith('tnp'))
-    //   .filter(c => (c.typeIs('isomorphic-lib', 'angular-lib')) && c.frameworkVersionAtLeast('v2'))
-    //   ;
-
-    // Helpers.log(`[singularbuild] children for build: \n\n${children.map(c => c.name)}\n\n`);
-
-    // const newFactory = ProjectFactory.Instance;
-    // const tmpWorkspaceName = this.project.name;
-    // const tmpWorkspaceDirpath = path.join(this.project.location, config.folder.dist);
-    // const projjjj = path.join(tmpWorkspaceDirpath, tmpWorkspaceName);
-    // Helpers.log(`dist project: ${projjjj}`);
-    // let singularWatchProj = Project.From<Project>(projjjj);
-    // if (!singularWatchProj) {
-    //   Helpers.removeFolderIfExists(projjjj);
-    //   singularWatchProj = await newFactory.create({
-    //     type: 'isomorphic-lib',
-    //     name: tmpWorkspaceName,
-    //     cwd: tmpWorkspaceDirpath,
-    //     basedOn: void 0,
-    //     version: this.project._frameworkVersion,
-    //     skipInit: true
-    //   });
-    //   Helpers.log(`[singular build] singularWatchProj: ${singularWatchProj && singularWatchProj.genericName}`);
-    //   // console.log('this.this.project.node_modules.path', this.project.node_modules.path)
-    //   this.project.node_modules.linkToProject(singularWatchProj);
-    // }
-
-    // const singularDistSrc = path.join(singularWatchProj.location, config.folder.src);
-    // Helpers.removeFolderIfExists(singularDistSrc);
-    // Helpers.mkdirp(singularDistSrc);
-
-    // Helpers.log(`[singular build] init structure`);
-
-    // await singularWatchProj.filesStructure.init('');
-    // Helpers.copyFile(
-    //   path.join(this.project.location, config.file.tnpEnvironment_json),
-    //   path.join(singularWatchProj.location, config.file.tnpEnvironment_json)
-    // );
-
-    // singularWatchProj.packageJson.data.tnp.isGenerated = true;
-    // singularWatchProj.packageJson.writeToDisc();
-
-    // children.forEach(c => {
-    //   const source = (c.typeIs('angular-lib') ? config.folder.components : config.folder.src);
-    //   Helpers.createSymLink(
-    //     path.join(c.location, source),
-    //     path.join(singularDistSrc, c.name));
-    // });
-
-    // Helpers.info(`[singular build] symlink creation done`);
-    // Helpers.log(`[singular build] singularWatchProjsingularWatchProj` +
-    //   `${singularWatchProj.genericName}, type: $this.{singularWatchProj.type}`);
-
-    // await singularWatchProj.buildProcess.startForLib({
-    //   watch,
-    //   prod,
-    //   outDir: 'dist',
-    //   staticBuildAllowed: true,
-    // }, false);
-    // const targets = children
-    //   .map(c => c.name);
-
-    // // if (this.project.isContainer) {
-    // //   const db = await TnpDB.Instance();
-    // //   var projectsToUpdate = (await db.getProjects()).map(c => c.project as Project)
-    // //     .filter(c => !c.name.startsWith('tnp'))
-    // //     .filter(c => !!this.singularWatchProj ? (c.location !== this.singularWatchProj.location) : true)
-    // //     .filter(c => c.location !== this.project.location)
-    // //     .filter(c => !c.isWorkspaceChildProject);
-    // //   Helpers.info(`Statndalone projects to update:` +
-    // //     `\n\n${projectsToUpdate.map(c => c.genericName).join('\n')}\n\n`);
-    // //   // process.exit(0)
-    // // }
-
-    // let projectsToUpdate = [];
-
-
-    // children.forEach(c => {
-    //   if (this.project.typeIs('container')) {
-    //     // console.log(`Do something for ${c.genericName}`)
-    //     const source = path.join(singularWatchProj.location, config.folder.dist, c.name);
-    //     const sourceBrowser = path.join(singularWatchProj.location, config.folder.dist, config.folder.browser, c.name);
-    //     const destBrowser = path.join(singularWatchProj.location, config.folder.dist, c.name, config.folder.browser);
-    //     Helpers.remove(destBrowser, true);
-    //     Helpers.createSymLink(sourceBrowser, destBrowser, { continueWhenExistedFolderDoesntExists: true });
-
-    //     projectsToUpdate.forEach(projForUp => {
-    //       const dest = path.join(projForUp.location, config.folder.node_modules, c.name);
-    //       Helpers.remove(dest, true);
-    //       Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
-    //       console.log(`LINK: ${source} -> ${dest}`, 1);
-    //     });
-    //   } else if (this.project.typeIs('workspace')) {
-    //     const source = path.join(singularWatchProj.location, config.folder.dist, c.name);
-    //     const dest = path.join(c.location, config.folder.dist);
-    //     Helpers.remove(dest, true);
-    //     Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
-
-    //     targets.forEach(targetName => {
-    //       const sourceBrowser = path.join(
-    //         singularWatchProj.location, config.folder.dist,
-    //         `${config.folder.browser}-for-${targetName}`, c.name);
-
-    //       const destBrowser = path.join(c.location, `${config.folder.browser}-for-${targetName}`);
-    //       Helpers.remove(destBrowser, true);
-    //       Helpers.createSymLink(sourceBrowser, destBrowser, { continueWhenExistedFolderDoesntExists: true });
-    //     });
-    //   }
-    // });
-    // if (this.project.isContainer) {
-    //   console.info(`All Projects are linked OK... watching...`)
-    // }
-  }
 }

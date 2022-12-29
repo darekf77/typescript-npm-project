@@ -21,14 +21,13 @@ import { TnpProject } from './tnp-project';
 import { FolderProject } from './folder-project';
 import { LibProject } from './lib-project.backend';
 import { VscodeProject } from './vscode-project.backend';
-import { StaticProject } from './static-project.backend';
 import { RouterProject } from './router-project.backend';
 import { RecreatableProject } from './recreatable-project.backend';
 import { EntityProject } from './entity-projects.backend';
 import { BuildableProject } from './buildable-project';
 import { SiteProject } from './site-project.backend';
 import {
-  PackageJSON, QuickFixes, StaticBuild, WorkspaceSymlinks,
+  PackageJSON, QuickFixes, WorkspaceSymlinks,
   NpmPackages, NodeModules, FilesRecreator, FilesFactory,
   FilesTemplatesBuilder, TestRunner, EnvironmentConfig,
   ProxyRouter, FilesStructure, BuildProcess, TargetProject,
@@ -153,7 +152,6 @@ export class Project extends $Project<Project>
       this.setType(this.packageJson ? this.packageJson.type : 'unknow');
 
       this.defineProperty<Project>('quickFixes', QuickFixes);
-      this.defineProperty<Project>('staticBuild', StaticBuild);
       this.defineProperty<Project>('workspaceSymlinks', WorkspaceSymlinks);
       this.defineProperty<Project>('node_modules', NodeModules);
       this.defineProperty<Project>('npmPackages', NpmPackages);
@@ -200,7 +198,6 @@ export interface Project extends
   LibProject,
   VscodeProject,
   TnpProject,
-  StaticProject,
   RouterProject,
   RecreatableProject,
   EntityProject,
@@ -225,7 +222,6 @@ Helpers.applyMixins(Project, [
   LibProject,
   VscodeProject,
 
-  StaticProject,
   RouterProject,
   RecreatableProject,
   EntityProject,

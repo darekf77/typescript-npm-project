@@ -3,7 +3,7 @@ import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import chalk from 'chalk';
 import {
-  StaticBuild, TestRunner,
+  TestRunner,
   FilesStructure, FilesTemplatesBuilder, BuildProcess,
   WorkspaceSymlinks, NodeModules, FilesRecreator, FilesFactory,
   QuickFixes, NpmPackages, ProxyRouter, TargetProject, GitActions,

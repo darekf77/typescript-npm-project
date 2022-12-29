@@ -1,71 +1,24 @@
 //#region @backend
+
+//#region imports
 import { fse, crossPlatformPath } from 'tnp-core'
 import { path } from 'tnp-core'
-import * as JSON5 from 'json5';
-import { glob } from 'tnp-core';
 import { _ } from 'tnp-core';
-// local
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
+import { FiredevModels, Helpers } from 'tnp-helpers';
 import { config, ConfigModels } from 'tnp-config';
 import { HelpersMerge } from 'tnp-helpers';
 import { FeatureForProject } from '../../abstract';
-
-interface VSCodeSettings {
-  'files.exclude': { [files: string]: boolean; };
-  'workbench.colorTheme': 'Default Light+' | 'Kimbie Dark',
-  'workbench.colorCustomizations': {
-    'activityBar.background'?: string;
-    'activityBar.foreground'?: string;
-    'statusBar.background'?: string;
-  }
-}
-
-
-function getVscodeSettingsFrom(project: Project) {
-  let settings: VSCodeSettings;
-  const pathSettingsVScode = path.join(project.location, '.vscode', 'settings.json')
-  if (Helpers.exists(pathSettingsVScode)) {
-    settings = JSON5.parse(Helpers.readFile(pathSettingsVScode))
-  }
-  return settings;
-}
-
-
+import { BuildOptions } from 'tnp-db';
+import * as JSON5 from 'json5';
+//#endregion
 
 export class FilesRecreator extends FeatureForProject {
 
-  public async init() {
-    Helpers.log('recreation init')
-    if (this.project.typeIs('container')) {
-      this.gitignore();
-      this.handleProjectSpecyficFiles();
-      return;
-    }
+  //#region fields & getters
 
-    if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib') && !this.project?.parent?.isSmartContainer) {
-      await this.project.insideStructure.recrate('dist');
-      await this.project.insideStructure.recrate('bundle');
-    }
-
-    this.initAssets();
-    this.handleProjectSpecyficFiles();
-    this.commonFiles();
-
-    this.gitignore();
-    this.npmignore();
-    this.customFolder();
-    Helpers.log('recreation end')
-
-  }
-
-  initVscode() {
-    this.vscode.settings.excludedFiles(true);
-    this.vscode.settings.colorsFromWorkspace();
-  }
-
-
+  //#region fields & getters / common files for all projects
   private get commonFilesForAllProjects() {
     return [
       '.npmrc',
@@ -73,7 +26,9 @@ export class FilesRecreator extends FeatureForProject {
       '.editorconfig'
     ];
   }
+  //#endregion
 
+  //#region fields & getters  / files ignored by
   get filesIgnoredBy() {
     const self = this;
     return {
@@ -158,10 +113,6 @@ export class FilesRecreator extends FeatureForProject {
               config.folder.components,
             ].map(f => `${f}-for-stanalone`)
           )
-          .concat(self.project.isWorkspaceChildProject ? [
-            ...self.assetsToIgnore,
-            // 'src/assets/*/*'
-          ] : [])
           .concat((!self.project.isStandaloneProject && !self.project.isCoreProject) ? self.project.projectSpecyficIgnoredFiles() : [])
           .concat(self.project.isTnp ? ['projects/tmp*'] : [])
           .concat([
@@ -194,46 +145,9 @@ export class FilesRecreator extends FeatureForProject {
       }
     }
   }
+  //#endregion
 
-
-
-  private modifyVscode(modifyFN: (settings: VSCodeSettings, project?: Project) => VSCodeSettings) {
-    const pathSettingsVScode = path.join(this.project.location, '.vscode', 'settings.json');
-    Helpers.log('[modifyVscode] setting things...')
-    if (this.project.isSite) {
-      if (!fse.existsSync(pathSettingsVScode)) {
-        Helpers.mkdirp(path.dirname(pathSettingsVScode));
-        const settingsFromBaseline = path.join(this.project.baseline.location, '.vscode', 'settings.json');
-        if (fse.existsSync(settingsFromBaseline)) {
-          fse.copyFileSync(settingsFromBaseline, pathSettingsVScode);
-        }
-      }
-    }
-    if (Helpers.exists(pathSettingsVScode)) {
-      try {
-        Helpers.log('parsing 1 ...')
-        let settings: VSCodeSettings = JSON5.parse(Helpers.readFile(pathSettingsVScode))
-        settings = modifyFN(settings, this.project);
-        Helpers.writeFile(pathSettingsVScode, settings);
-      } catch (e) {
-        Helpers.log(e)
-      }
-    } else {
-      try {
-        Helpers.log('parsing 2...')
-        const settingFromCore = path.join(Project.by<Project>(this.project._type).location, '.vscode', 'settings.json');
-        Helpers.mkdirp(path.dirname(pathSettingsVScode));
-        if (Helpers.exists(settingFromCore)) {
-          var settings: VSCodeSettings = JSON5.parse(Helpers.readFile(settingFromCore))
-          settings = modifyFN(settings, this.project);
-          Helpers.writeFile(pathSettingsVScode, settings)
-        }
-      } catch (e) {
-        Helpers.log(e)
-      }
-    }
-  }
-
+  //#region fields & getters  / vscode
   get vscode() {
     const self = this;
     return {
@@ -285,7 +199,7 @@ export class FilesRecreator extends FeatureForProject {
                 }
 
                 // update activity bar color
-                const parentSettings = getVscodeSettingsFrom(project.parent);
+                const parentSettings = Helpers.vscode.getSettingsFrom(project.parent);
                 const statuBarColor = parentSettings &&
                   parentSettings['workbench.colorCustomizations'] &&
                   parentSettings['workbench.colorCustomizations']['statusBar.background'];
@@ -294,7 +208,7 @@ export class FilesRecreator extends FeatureForProject {
 
                 // update background color
                 if (project.isSite) {
-                  const baselineColor = getVscodeSettingsFrom(project.baseline);
+                  const baselineColor = Helpers.vscode.getSettingsFrom(project.baseline);
                   const activityBarBcg = baselineColor &&
                     baselineColor['workbench.colorCustomizations'] &&
                     baselineColor['workbench.colorCustomizations']['activityBar.background'];
@@ -419,25 +333,97 @@ export class FilesRecreator extends FeatureForProject {
 
 
   }
+  //#endregion
 
-  customFolder() {
-    if (this.project.isBasedOnOtherProject) {
-      const customFolder = path.join(this.project.location, config.folder.custom)
-      const srcFolder = path.join(this.project.location, config.folder.src)
-      if (!fse.existsSync(customFolder)) {
-        Helpers.mkdirp(customFolder);
-        Helpers.mkdirp(srcFolder);
+  //#endregion
+
+  //#region api
+
+  //#region api / init
+  public async init(buildOptions: BuildOptions) {
+    Helpers.log('recreation init')
+    if (this.project.typeIs('container')) {
+      this.writeGitignore();
+      this.handleProjectSpecyficFiles();
+      return;
+    }
+
+    if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib') && !this.project?.parent?.isSmartContainer) {
+      if (buildOptions.outDir) {
+        await this.project.insideStructure.recrate(buildOptions);
+      } else {
+        await this.project.insideStructure.recrate(BuildOptions.fromJson(_.merge(buildOptions, { outDir: 'dist' } as BuildOptions)));
+        await this.project.insideStructure.recrate(BuildOptions.fromJson(_.merge(buildOptions, { outDir: 'bundle' } as BuildOptions)));
+      }
+    }
+
+    this.handleProjectSpecyficFiles();
+    this.writeGitignore();
+    this.writeNpmignore();
+    Helpers.log('recreation end')
+
+  }
+  //#endregion
+
+  //#region api / init vscode
+  initVscode() {
+    this.vscode.settings.excludedFiles(true);
+    this.vscode.settings.colorsFromWorkspace();
+  }
+  //#endregion
+
+  //#endregion
+
+  //#region methods
+
+  //#region methods / modify vscode
+  private modifyVscode(modifyFN: (settings: FiredevModels.VSCodeSettings, project?: Project) => FiredevModels.VSCodeSettings) {
+    const pathSettingsVScode = path.join(this.project.location, '.vscode', 'settings.json');
+    Helpers.log('[modifyVscode] setting things...')
+    if (this.project.isSite) {
+      if (!fse.existsSync(pathSettingsVScode)) {
+        Helpers.mkdirp(path.dirname(pathSettingsVScode));
+        const settingsFromBaseline = path.join(this.project.baseline.location, '.vscode', 'settings.json');
+        if (fse.existsSync(settingsFromBaseline)) {
+          fse.copyFileSync(settingsFromBaseline, pathSettingsVScode);
+        }
+      }
+    }
+    if (Helpers.exists(pathSettingsVScode)) {
+      try {
+        Helpers.log('parsing 1 ...')
+        let settings: FiredevModels.VSCodeSettings = JSON5.parse(Helpers.readFile(pathSettingsVScode))
+        settings = modifyFN(settings, this.project);
+        Helpers.writeFile(pathSettingsVScode, settings);
+      } catch (e) {
+        Helpers.log(e)
+      }
+    } else {
+      try {
+        Helpers.log('parsing 2...')
+        const settingFromCore = path.join(Project.by<Project>(this.project._type).location, '.vscode', 'settings.json');
+        Helpers.mkdirp(path.dirname(pathSettingsVScode));
+        if (Helpers.exists(settingFromCore)) {
+          var settings: FiredevModels.VSCodeSettings = JSON5.parse(Helpers.readFile(settingFromCore))
+          settings = modifyFN(settings, this.project);
+          Helpers.writeFile(pathSettingsVScode, settings)
+        }
+      } catch (e) {
+        Helpers.log(e)
       }
     }
   }
+  //#endregion
 
-
-  npmignore() {
+  //#region methods / write npm ignore
+  private writeNpmignore() {
     Helpers.writeFile(path.join(this.project.location, '.npmignore'),
       this.filesIgnoredBy.npmignore.join('\n').concat('\n'));
   }
+  //#endregion
 
-  gitignore() {
+  //#region methods / write git ignore
+  private writeGitignore() {
 
     const coreFiles = !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
       .map(({ relativePath }) => {
@@ -494,10 +480,10 @@ ${coreFiles}
 
 
   }
+  //#endregion
 
-
-
-  handleProjectSpecyficFiles() {
+  //#region methods / handle project specyfic files
+  private handleProjectSpecyficFiles() {
 
     const linkedFolder = this.project.linkedFolders;
     linkedFolder.forEach((c) => {
@@ -509,10 +495,10 @@ ${coreFiles}
         Helpers.info(`Linked folder ${path.basename(from)} to ./${to.replace(this.project.location, '')}`);
       } else {
         Helpers.warn(`Not able to link folders:
-        from: ${from}
-        to: ${to}
+      from: ${from}
+      to: ${to}
 
-        `)
+      `)
       }
 
     });
@@ -586,123 +572,129 @@ ${coreFiles}
     }
 
   }
+  //#endregion
 
-  commonFiles() {
-    const wokrspace = Project.by<Project>('workspace', this.project._frameworkVersion);
 
-    const files = this.commonFilesForAllProjects;
-    files.map(file => {
-      return {
-        from: path.join(wokrspace.location, file),
-        where: path.join(this.project.location, file)
-      }
-    }).forEach(file => {
-      Helpers.copyFile(file.from, file.where);
-    })
-  }
+  //#endregion
 
-  private quickFixForFileNotInRightFolder() {
-    const folderAA = path.join(
-      this.project.location,
-      config.folder.components,
-      config.folder.assets,
-    );
-    const folderForProject = path.join(
-      folderAA,
-      this.project.name,
-    );
-    const notInRightPlace = glob.sync(`${folderAA}/**/*.*`);
-    Helpers.log('notInRightPlace' + notInRightPlace)
-    if (notInRightPlace.length > 0) {
-      notInRightPlace
-        .map(f => {
-          return f.replace(folderAA, '')
-        })
-        .forEach(rp => {
-          const sour = path.join(folderAA, rp);
-          const dest = path.join(folderForProject, rp);
-          Helpers.log('SOUR' + sour)
-          Helpers.log('DEST' + dest)
-          if (!fse.lstatSync(sour).isDirectory()) {
-            Helpers.copyFile(sour, dest);
-          }
-        })
-
-    }
-  }
-
-  get assetsRelativePathes() {
-    const assetsFolders = [];
-    if (this.project.typeIsNot('angular-lib')) {
-      return [];
-    }
-    const assetsRelativeAngularLib = path.join(
-      config.folder.components,
-      config.folder.assets,
-      this.project.name
-    );
-
-    const pathTOCheck = path.join(this.project.location, assetsRelativeAngularLib)
-    if (!Helpers.exists(pathTOCheck)) {
-      Helpers.mkdirp(pathTOCheck);
-      Helpers.writeFile(path.join(pathTOCheck, 'put-your-assets-here.txt'), `
-    This file is generated..
-    Please put asset files related for this project here..
-      ` );
-      // this.quickFixForFileNotInRightFolder();
-    }
-    assetsFolders.push(assetsRelativeAngularLib);
-    return assetsFolders;
-  }
-
-  get assetsToIgnore() {
-    if (!this.project.isWorkspaceChildProject) {
-      return [];
-    }
-    return this.project.parent.children
-      .filter(f => {
-        return f.typeIs('angular-lib');
-      })
-      .map(a => a.recreate.assetsRelativePathes)
-      .reduce((a, b) => {
-        return a.concat(b);
-      }, [])
-      .map(asset => {
-        return crossPlatformPath(path.join(config.folder.src, asset.replace(new RegExp(`^${config.folder.components}\/`), '')));
-      })
-  }
 
   /**
-   * QUICK_FIX needs to be before gitignore recreatino ! change it
+   * dummy angular.json file for scss generation
    */
-  initAssets() {
-    if (!this.project.isWorkspaceChildProject) {
-      return;
+  get angularJsonContainer() {
+    return {
+      "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+      "version": 1,
+      "newProjectRoot": "projects",
+      "projects": {
+        "sassy-project": {
+          "projectType": "application",
+          "schematics": {
+            "@schematics/angular:component": {
+              "style": "scss"
+            },
+            "@schematics/angular:application": {
+              "strict": true
+            }
+          },
+          "root": "",
+          "sourceRoot": "src",
+          "prefix": "app",
+          "architect": {
+            "build": {
+              "builder": "@angular-devkit/build-angular:browser",
+              "options": {
+                "outputPath": "dist/sassy-project",
+                "index": "src/index.html",
+                "main": "src/main.ts",
+                "polyfills": "src/polyfills.ts",
+                "tsConfig": "tsconfig.app.json",
+                "inlineStyleLanguage": "scss",
+                "assets": [
+                  "src/favicon.ico",
+                  "src/assets"
+                ],
+                "styles": [
+                  "src/styles.scss"
+                ],
+                "scripts": []
+              },
+              "configurations": {
+                "production": {
+                  "budgets": [
+                    {
+                      "type": "initial",
+                      "maximumWarning": "500kb",
+                      "maximumError": "1mb"
+                    },
+                    {
+                      "type": "anyComponentStyle",
+                      "maximumWarning": "2kb",
+                      "maximumError": "4kb"
+                    }
+                  ],
+                  "fileReplacements": [
+                    {
+                      "replace": "src/environments/environment.ts",
+                      "with": "src/environments/environment.prod.ts"
+                    }
+                  ],
+                  "outputHashing": "all"
+                },
+                "development": {
+                  "buildOptimizer": false,
+                  "optimization": false,
+                  "vendorChunk": true,
+                  "extractLicenses": false,
+                  "sourceMap": true,
+                  "namedChunks": true
+                }
+              },
+              "defaultConfiguration": "production"
+            },
+            "serve": {
+              "builder": "@angular-devkit/build-angular:dev-server",
+              "configurations": {
+                "production": {
+                  "browserTarget": "sassy-project:build:production"
+                },
+                "development": {
+                  "browserTarget": "sassy-project:build:development"
+                }
+              },
+              "defaultConfiguration": "development"
+            },
+            "extract-i18n": {
+              "builder": "@angular-devkit/build-angular:extract-i18n",
+              "options": {
+                "browserTarget": "sassy-project:build"
+              }
+            },
+            "test": {
+              "builder": "@angular-devkit/build-angular:karma",
+              "options": {
+                "main": "src/test.ts",
+                "polyfills": "src/polyfills.ts",
+                "tsConfig": "tsconfig.spec.json",
+                "karmaConfig": "karma.conf.js",
+                "inlineStyleLanguage": "scss",
+                "assets": [
+                  "src/favicon.ico",
+                  "src/assets"
+                ],
+                "styles": [
+                  "src/styles.scss"
+                ],
+                "scripts": []
+              }
+            }
+          }
+        }
+      },
+      "defaultProject": "sassy-project"
     }
 
-    this.project.parent.children
-      .filter(f => {
-        return f.typeIs('angular-lib');
-      })
-      .forEach(p => {
-        p.recreate.assetsRelativePathes
-          .map(rp => crossPlatformPath(path.join(p.location, rp)))
-          .filter(ap => fse.existsSync(ap))
-          .forEach(ap => {
-            const dest = path.join(
-              this.project.location,
-              config.folder.src,
-              config.folder.assets,
-              p.name,
-            );
-            // Helpers.info(`COPY ASSET FROM ${ap} to ${dest}`)
-            Helpers.copy(ap, dest);
-          })
-      });
 
-    // this.assetsToIgnore.forEach(rp => {
-
-    // })
   }
 
 

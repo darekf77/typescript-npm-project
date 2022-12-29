@@ -24,9 +24,9 @@ export async function RM(args: string, exit = true) {
         }
         rootProj.removeFolderByRelativePath(config.folder.node_modules)
         if (rootProj.children.length === 0) {
-          await rootProj.filesStructure.init('--skipSmartContainerDistBundleInit')
+          await rootProj.filesStructure.init({ args: '--skipSmartContainerDistBundleInit' })
         } else {
-          await rootProj.filesStructure.init('')
+          await rootProj.filesStructure.init({ args: '' })
         }
 
       }

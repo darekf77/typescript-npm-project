@@ -13,6 +13,7 @@ import { Project } from '../../abstract/project/project';
 import { InsideStruct, Opt } from './inside-struct';
 import { InsideStructAngular13App, InsideStructAngular13Lib } from './structs';
 import { BaseInsideStruct } from './structs/base-inside-struct';
+import { BuildOptions } from 'tnp-db';
 
 const structs = {
   InsideStructAngular13App,
@@ -66,10 +67,13 @@ export class InsideStructures extends FeatureForProject {
   //#region api
 
   //#region api / recreate
-  public async recrate(outFolder: ConfigModels.OutFolder, watchBuild = true) {
+  public async recrate(buildOptions: BuildOptions) {
     // console.log('recreate start')
     const clients: Project[] = this.project.isWorkspaceChildProject
       ? this.project.parent.childrenThatAreLibs : [];
+
+    const outFolder = buildOptions.outDir;
+    const watchBuild = buildOptions.watch;
 
     const action = async (client: Project) => {
       const structs = [
@@ -83,6 +87,7 @@ export class InsideStructures extends FeatureForProject {
         if (!insideStruct) {
           continue;
         }
+
 
         const opt: Opt = {
           outFolder,
