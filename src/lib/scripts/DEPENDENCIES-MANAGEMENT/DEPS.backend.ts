@@ -409,14 +409,6 @@ export function $DEPS_JSON() {
 
 //#region link / unlink
 
-//#region core link
-async function $LINK_CORE() {
-  Project.linkCoreFolders();
-  Helpers.info('Done linking core folders');
-  process.exit(0);
-}
-//#endregion
-
 //#region ln
 async function $LN(args: string) {
   const [source, dest] = args.split(' ');
@@ -870,7 +862,6 @@ export default {
   $I: Helpers.CLIWRAP($I, '$I'),
   $SINSTALL: Helpers.CLIWRAP($SINSTALL, '$SINSTALL'),
   $REINSTALL: Helpers.CLIWRAP($REINSTALL, '$REINSTALL'),
-  $LINK_CORE: Helpers.CLIWRAP($LINK_CORE, '$LINK_CORE'),
   $LINK: Helpers.CLIWRAP($LINK, '$LINK'),
   $LN: Helpers.CLIWRAP($LN, '$LN'),
   $UNLINK: Helpers.CLIWRAP($UNLINK, '$UNLINK'),

@@ -10,15 +10,10 @@ function $UPDATE_ISOMORPHIC() {
   process.exit(0)
 }
 
-
-function $UPDATE_GLOBAL_DEPS_CACHE(args: string) {
-
-}
-
-
 function $UPDATE(args: string) {
 
   if (config.frameworkName === 'firedev') {
+    Helpers.run('npm i -g firedev').sync();
     const morphiPathUserInUserDir = config.morphiPathUserInUserDir;
     try {
       Helpers.run(`git reset --hard && git pull origin master`,
@@ -26,10 +21,12 @@ function $UPDATE(args: string) {
     } catch (error) {
       Helpers.error(`[config] Not pull origin of morphi: ${config.urlMorphi} in:    ${morphiPathUserInUserDir}`);
     }
+    Helpers.success('FIREDEV AUTOUPDATE DONE');
   }
   if (config.frameworkName === 'tnp') {
-    Project.Tnp.run('npm i && tnp dedupe').sync();
-    Project.by('container', (Project.Tnp as Project)._frameworkVersion).run('tnp i ').sync();
+    Project.Tnp.run('rimraf tmp-node_modules').sync();
+    Project.Tnp.run('mv node_modules tmp-node_modules && npm i --force && tnp dedupe').sync();
+    Project.by('container', (Project.Tnp as Project)._frameworkVersion).run('tnp reinstall').sync();
   }
 
 

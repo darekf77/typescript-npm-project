@@ -548,7 +548,7 @@ ${coreFiles}
 
           const linked = defaultProjectProptotype.projectLinkedFiles().find(a => a.relativePath === f);
           if (linked) {
-            Helpers.info(`FIXING LINKED`);
+            Helpers.warn(`[firedev]]FIXING LINKED projects`);
             Helpers.createSymLink(
               path.join(linked.sourceProject.location, linked.relativePath),
               path.join(defaultProjectProptotype.location, f));
