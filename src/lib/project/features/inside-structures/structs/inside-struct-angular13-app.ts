@@ -29,7 +29,6 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         'app/src/app/app.component.spec.ts',
         'app/src/app/app.component.ts',
         'app/src/app/app.module.ts',
-        'app/src/assets/.gitkeep',
         'app/src/environments/environment.prod.ts',
         'app/src/environments/environment.ts',
         'app/src/app',
@@ -186,22 +185,18 @@ ${appModuleFile}
         })();
         //#endregion
 
-
-
         //#region link assets
         (() => {
 
           const assetsSource = crossPlatformPath(path.join(
             project.location,
-            config.folder.src,
+            replacement('tmp-src-{{{outFolder}}}'),
             config.folder.assets,
           ));
-
 
           if (!Helpers.exists(assetsSource)) {
             Helpers.mkdirp(assetsSource);
           }
-
 
           const assetsDest = crossPlatformPath(path.join(
             project.location
@@ -253,13 +248,10 @@ ${appModuleFile}
             config.folder.assets
           ));
 
-
-
           const iconsPath = crossPlatformPath(path.join(
             assetsPath,
             'icons'
           ));
-
 
           const iconsFilesPathes = Helpers.filesFrom(iconsPath).filter(f => {
             // @ts-ignore
@@ -292,37 +284,6 @@ ${appModuleFile}
 
         })();
         //#endregion
-
-        //#region  assets syncing - NOW WORKING SYMLINKS IN SRC
-        (() => {
-
-          // const anuglarJsonPath = crossPlatformPath(path.join(
-          //   project.location
-          //   ,
-          //   replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
-          //   ,
-          //   `/angular.json`
-          // ));
-
-          // const json = Helpers.readJson(anuglarJsonPath, void 0, true);
-          // // console.log(anuglarJsonPath)
-          // // console.log(json)
-          // const assets = json.projects.app.architect.build.options.assets;
-          // if (this.project.isSmartContainerTarget) {
-          //   const parent = Project.From(project.smartContainerTargetParentContainerPath);
-          //   parent.children.map(c => {
-          //     assets.push(`src/app/${project.name}/assets/${c.name}/assets`);
-          //   });
-          //   json.projects.app.architect.build.options.assets = Helpers.arrays.uniqArray(assets);
-          // } else {
-
-          // }
-
-          // Helpers.writeFile(anuglarJsonPath, json)
-
-        })();
-        //#endregion
-
 
         //#region inject environment => done throught reading json
         (() => {

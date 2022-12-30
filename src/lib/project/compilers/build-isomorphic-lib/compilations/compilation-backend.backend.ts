@@ -25,7 +25,7 @@ export class BackendCompilation extends IncCompiler.Base {
   get tsConfigBrowserName() {
     return 'tsconfig.browser.json'
   }
-  public get compilationFolderPath() {
+  public get absPathTmpSrcDistBundleFolder() {
     if (_.isString(this.srcFolder) && _.isString(this.cwd)) {
       return crossPlatformPath(path.join(this.cwd, this.srcFolder));
     }
@@ -70,11 +70,11 @@ export class BackendCompilation extends IncCompiler.Base {
     const generatedDeclarations = !currentProject.isWorkspaceChildProject;
 
     const hideErrorsForBackend = currentProject.typeIs('angular-lib')
-      && this.compilationFolderPath.endsWith(config.folder.components);
+      && this.absPathTmpSrcDistBundleFolder.endsWith(config.folder.components);
 
     await this.libCompilation
       ({
-        cwd: this.compilationFolderPath,
+        cwd: this.absPathTmpSrcDistBundleFolder,
         websql: this.websql,
         watch,
         outDir: (`../${this.outFolder}` as any),

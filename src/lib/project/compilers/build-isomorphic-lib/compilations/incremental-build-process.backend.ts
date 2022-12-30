@@ -210,11 +210,11 @@ export class IncrementalBuildProcess {
 
   //#region  methods
   protected browserTaksName(taskName: string, bc: BroswerCompilation) {
-    return `browser ${taskName} in ${path.basename(bc.compilationFolderPath)}`
+    return `browser ${taskName} in ${path.basename(bc.absPathTmpSrcDistBundleFolder)}`
   }
 
   protected backendTaskName(taskName) {
-    return `${taskName} in ${path.basename(this.backendCompilation.compilationFolderPath)}`
+    return `${taskName} in ${path.basename(this.backendCompilation.absPathTmpSrcDistBundleFolder)}`
   }
 
   private recreateBrowserLinks(bc: BroswerCompilation) {

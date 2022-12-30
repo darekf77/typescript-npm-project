@@ -90,6 +90,7 @@ export class BrowserCodeCut {
 
   //#region constructor
   constructor(
+    protected absSourcePathFromSrc: string,
     protected absFileSourcePathBrowserOrWebsql: string,
     private project?: Project,
     private compilationProject?: Project,
@@ -100,11 +101,9 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  readFiles() {
-    // console.log('PROCESSING', {
-    //   absoluteFilePathBrowserWebsql: this.absoluteFilePathBrowserWebsql,
-    //   absoluteBackendFilePath: this.absoluteBackendFilePath,
-    // })
+  init() {
+    Helpers.copyFile(this.absSourcePathFromSrc, this.absFileSourcePathBrowserOrWebsql);
+    this.absFileSourcePathBrowserOrWebsql = crossPlatformPath(this.absFileSourcePathBrowserOrWebsql);
     this.rawContentForBrowser = Helpers.readFile(this.absFileSourcePathBrowserOrWebsql, void 0, true) || '';
     this.rawContentBackend = this.rawContentForBrowser; // at the beginning those are normal files from src
     return this;
@@ -642,17 +641,26 @@ export class BrowserCodeCut {
     // }
   }
 
+  initAndSave(absPathTmpSrcDistBundleFolder: string) {
 
+    absPathTmpSrcDistBundleFolder = crossPlatformPath(absPathTmpSrcDistBundleFolder);
 
-  copyToDest() {
+    const relativePath = this.absFileSourcePathBrowserOrWebsql.replace(`${absPathTmpSrcDistBundleFolder}/`, '');
 
-    const absoluteBackendDestFilePath = this.absoluteBackendDestFilePath;
-    if (!fse.existsSync(path.dirname(absoluteBackendDestFilePath))) {
-      fse.mkdirpSync(path.dirname(absoluteBackendDestFilePath));
+    if (!this.project.isSmartContainerTarget && relativePath.startsWith(`${config.folder.assets}/`)) {
+      const absFileSourcePathBrowserOrWebsqlForAsset = this.absFileSourcePathBrowserOrWebsql
+        .replace('/assets/', `/assets/assets-for/${this.project.name}/`);
+
+      Helpers.copyFile(this.absSourcePathFromSrc, absFileSourcePathBrowserOrWebsqlForAsset);
+
+    } else {
+      // this is needed for css, html etc
+      Helpers.copyFile(this.absSourcePathFromSrc, this.absFileSourcePathBrowserOrWebsql);
+
+      // final straight copy to tmp-source-folder
+      Helpers.copyFile(this.absFileSourcePathBrowserOrWebsql, this.absoluteBackendDestFilePath);
     }
-    Helpers.copyFile(this.absFileSourcePathBrowserOrWebsql, absoluteBackendDestFilePath);
   }
-
 
   changeJsFileImportForOrgnanizaiton(
     content: string,

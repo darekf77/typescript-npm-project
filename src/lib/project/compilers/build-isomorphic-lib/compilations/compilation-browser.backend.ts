@@ -1,4 +1,3 @@
-
 //#region imports
 import {
   _,
@@ -12,7 +11,7 @@ import { ConfigModels } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { BackendCompilation } from './compilation-backend.backend';
 import { BuildOptions } from 'tnp-db';
-import type { Project } from '../../../abstract/project/project';
+import { Project } from '../../../abstract/project/project';
 import { Models } from 'tnp-models';
 import { JSON10 } from 'json10';
 import { CodeCut } from '../code-cut/code-cut.backend';
@@ -28,7 +27,11 @@ export class BroswerCompilation extends BackendCompilation {
   //#region fields & getters
   compilerName = 'Browser standard compiler'
   public codecut: CodeCut;
-  public get compilationFolderPath() {
+
+  /**
+   * ex: <project-path>/tmp-src-dist
+   */
+  public get absPathTmpSrcDistBundleFolder() {
     if (_.isString(this.sourceOutBrowser) && _.isString(this.cwd)) {
       return crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser));
     }
@@ -45,6 +48,7 @@ export class BroswerCompilation extends BackendCompilation {
   //#endregion
 
   //#region constructor
+  readonly project: Project;
   constructor(
     isWatchBuild: boolean,
     public compilationProject: Project,
@@ -87,35 +91,46 @@ export class BroswerCompilation extends BackendCompilation {
     // console.log('LOCATION', location)
     // console.log('MODULE NAME', moduleName)
     // console.log(Helpers.terminalLine())
+    this.project = Project.From(this.cwd) as Project;
   }
   //#endregion
 
   //#region methods
 
   //#region methods / sync action
-  async syncAction(files: string[]) {
-    // console.log('[compilation browser] syncAction', files)
-    Helpers.removeFolderIfExists(this.compilationFolderPath)
-    Helpers.mkdirp(this.compilationFolderPath)
-    // const dereference = true; // Copy symlinks as normal files
-    // console.log(`copying ${path.join(this.cwd, this.location)}/ to  ${this.compilationFolderPath} dereference: ${dereference},`)
+  async syncAction(absFilesFromSrc: string[]) {
 
-    // TODO_NOT_IMPORTANT this may be replaced by filesPathes
-    Helpers.copy(`${crossPlatformPath(path.join(this.cwd, this.srcFolder))}/`, this.compilationFolderPath, {
-      copySymlinksAsFiles: true,
-      filter: (src: string, dest: string) => {
-        return isNotASpecFileCondition(src);
+    // console.log('[compilation browser] syncAction', absFileFromSrc)
+    Helpers.removeFolderIfExists(this.absPathTmpSrcDistBundleFolder);
+    Helpers.mkdirp(this.absPathTmpSrcDistBundleFolder);
+
+    this.initCodeCut();
+    this.copyTsConfig();
+
+    const filesBase = crossPlatformPath(path.join(this.cwd, this.srcFolder))
+    const relativePathesToProcess = absFilesFromSrc.map(absFilePath => {
+      return absFilePath.replace(`${filesBase}/`, '');
+    });
+
+    //#region copy core asset files
+    if (!this.project.isSmartContainerTarget) {
+      const corepro = Project.by('isomorphic-lib', this.project._frameworkVersion) as Project;
+      const coreAssetsPath = corepro.pathFor('app/src/assets');
+      const filesToCopy = Helpers.filesFrom(coreAssetsPath, true);
+      for (let index = 0; index < filesToCopy.length; index++) {
+        const fileAbsPath = crossPlatformPath(filesToCopy[index]);
+        const relativeFilePath = fileAbsPath.replace(`${coreAssetsPath}/`, '');
+        const destAbsPath = crossPlatformPath(path.join(
+          this.absPathTmpSrcDistBundleFolder,
+          'assets',
+          relativeFilePath,
+        ));
+        Helpers.copyFile(fileAbsPath, destAbsPath);
       }
-    })
-    // console.log('browser', this.filesAndFoldesRelativePathes.slice(0, 5))
+    }
+    //#endregion
 
-    this.initCodeCut(files)
-    // tsconfig.browser.json
-    const source = crossPlatformPath(path.join(this.cwd, this.tsConfigBrowserName));
-    const dest = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, this.tsConfigName));
-
-    fse.copyFileSync(source, dest);
-    this.codecut.files();
+    this.codecut.files(relativePathesToProcess);
     await this.compile();
   }
   //#endregion
@@ -130,68 +145,65 @@ export class BroswerCompilation extends BackendCompilation {
     }
 
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
-    const relativeFilePath = crossPlatformPath(absoluteFilePath.replace(crossPlatformPath(path.join(this.cwd, this.srcFolder)), ''));
-    const destinationFilePath = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, relativeFilePath));
-
-    // console.log({
-    //   absoluteFilePath,
-    //   relativeFilePath,
-    //   destinationFilePath,
-    //   cwd: this.cwd,
-    //   location: this.location,
-    // })
-
-    if (event.eventName === 'unlinkDir') {
-      // console.log('REMOVING DIR', destinationFilePath)
-      Helpers.removeFolderIfExists(destinationFilePath);
-    } else {
-      // console.log(`[compilation-browser][asyncAction][compilations.ts] ${event.eventName} ${event.fileAbsolutePath}`)
-
-      if (event.eventName === 'unlink') {
-        Helpers.removeFileIfExists(destinationFilePath);
-        // console.log('FILE UNLINKED')
-      } else {
-        if (fse.existsSync(absoluteFilePath)) {
-          if (!fse.existsSync(path.dirname(destinationFilePath))) {
-            Helpers.mkdirp(path.dirname(destinationFilePath));
-          }
-          if (fse.existsSync(destinationFilePath) && fse.lstatSync(destinationFilePath).isDirectory()) {
-            fse.removeSync(destinationFilePath);
-          }
-          Helpers.copyFile(absoluteFilePath, destinationFilePath);
-        }
-        // console.log('FILE COPIED')
-      }
-      // changeAbsoluteFilePathExt(event, 'ts'); // TODO
-      // console.log(`AFTER CHAGE: ${event.fileAbsolutePath}`)
+    const relativeFilePath = crossPlatformPath(absoluteFilePath.replace(`${crossPlatformPath(path.join(this.cwd, this.srcFolder))}/`, ''));
+    if (path.basename(relativeFilePath) === '.DS_Store') {
+      return;
     }
-    await this.superAsyncAction(event as any);
 
-  }
-
-  async superAsyncAction(event: IncCompiler.Change) {
-    // console.log(`[compilation-browser][asyncAction] ${event.eventName} ${event.fileAbsolutePath}`)
-    const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
-    const relativeFilePath = absoluteFilePath.replace(crossPlatformPath(crossPlatformPath(path.join(this.cwd, this.srcFolder))), '');
-    const destinationFilePath = crossPlatformPath(path.join(
-      this.cwd,
-      this.sourceOutBrowser,
-      relativeFilePath,
-    ));
+    const destinationFilePath = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, relativeFilePath));
     const destinationFileBackendPath = crossPlatformPath(path.join(
       this.cwd,
       this.sourceOutBrowser.replace('tmp-src', 'tmp-source'),
       relativeFilePath
     ));
 
-    // console.log({
-    //   absoluteFilePath,
-    //   relativeFilePath,
-    //   destinationFilePath,
-    //   destinationFileBackendPath,
-    //   cwd: this.cwd,
-    //   location: this.location,
-    // })
+    if (event.eventName === 'unlinkDir') {
+      Helpers.removeFolderIfExists(destinationFilePath);
+      Helpers.removeFolderIfExists(destinationFileBackendPath);
+    } else {
+      if (this.isNotASpecFileCondition(absoluteFilePath)) {
+        if (event.eventName === 'unlink') {
+          Helpers.removeFileIfExists(destinationFilePath);
+          Helpers.removeFileIfExists(destinationFileBackendPath);
+        } else {
+          if (fse.existsSync(absoluteFilePath)) {
+            //#region mkdirp basedir
+            if (!fse.existsSync(path.dirname(destinationFilePath))) {
+              fse.mkdirpSync(path.dirname(destinationFilePath));
+            }
+            if (!fse.existsSync(path.dirname(destinationFileBackendPath))) {
+              fse.mkdirpSync(path.dirname(destinationFileBackendPath));
+            }
+            //#endregion
+
+            //#region remove deist if directory
+            if (fse.existsSync(destinationFilePath) && fse.lstatSync(destinationFilePath).isDirectory()) {
+              fse.removeSync(destinationFilePath);
+            }
+            if (fse.existsSync(destinationFileBackendPath) && fse.lstatSync(destinationFileBackendPath).isDirectory()) {
+              fse.removeSync(destinationFileBackendPath);
+            }
+            //#endregion
+
+            this.codecut.files([relativeFilePath]);
+          }
+        }
+
+      }
+    }
+  }
+
+  async superAsyncAction(event: IncCompiler.Change) {
+    // console.log(`[compilation-browser][asyncAction] ${event.eventName} ${event.fileAbsolutePath}`)
+    const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
+    const relativeFilePath = crossPlatformPath(absoluteFilePath.replace(crossPlatformPath(path.join(this.cwd, this.srcFolder)), ''));
+    const destinationFilePath = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, relativeFilePath));
+
+    const destinationFileBackendPath = crossPlatformPath(path.join(
+      this.cwd,
+      this.sourceOutBrowser.replace('tmp-src', 'tmp-source'),
+      relativeFilePath
+    ));
 
     if (event.eventName === 'unlinkDir') {
       // console.log('REMOVING DIR', destinationFilePath)
@@ -199,14 +211,8 @@ export class BroswerCompilation extends BackendCompilation {
       Helpers.removeFolderIfExists(destinationFilePath);
       Helpers.removeFolderIfExists(destinationFileBackendPath);
     } else {
-      // noting here for backend
 
-      // console.log('this.cwd', this.cwd)
-      // console.log('this.sourceOutBrowser', this.sourceOutBrowser)
-      // console.log('destinationFilePath', destinationFilePath)
-      // console.log(`[asyncAction][${config.frameworkName}][cb] relativeFilePath: ${relativeFilePath}`)
-      // console.log(`[asyncAction][${config.frameworkName}][cb] destinationFilePath: ${destinationFilePath}`);
-      if (isNotASpecFileCondition(absoluteFilePath)) {
+      if (this.isNotASpecFileCondition(absoluteFilePath)) {
         if (event.eventName === 'unlink') {
           if (fse.existsSync(destinationFilePath)) {
             fse.unlinkSync(destinationFilePath)
@@ -230,7 +236,8 @@ export class BroswerCompilation extends BackendCompilation {
             if (fse.existsSync(destinationFileBackendPath) && fse.lstatSync(destinationFileBackendPath).isDirectory()) {
               fse.removeSync(destinationFileBackendPath);
             }
-
+            // @LAST
+            const relativePath = absoluteFilePath.replace(`${this.absPathTmpSrcDistBundleFolder}/`, '');
             fse.copyFileSync(absoluteFilePath, destinationFilePath);
           }
         }
@@ -246,7 +253,7 @@ export class BroswerCompilation extends BackendCompilation {
     try {
       await this.libCompilation({
         websql: this.websql,
-        cwd: this.compilationFolderPath,
+        cwd: this.absPathTmpSrcDistBundleFolder,
         watch,
         outDir: (`../${this.backendOutFolder}/${this.outFolder}` as any),
         generateDeclarations: true,
@@ -255,7 +262,7 @@ export class BroswerCompilation extends BackendCompilation {
         buildType: this.backendOutFolder as any
       });
     } catch (e) {
-      Helpers.log(e);
+      console.log(e);
       // console.log(require('callsite-record')({
       //   forError: e
       // }).renderSync({
@@ -263,18 +270,13 @@ export class BroswerCompilation extends BackendCompilation {
       //   //   return !frame.getFileName().includes('node_modules');
       //   // }
       // }))
-      Helpers.error(`Browser compilation fail: ${e}`, false, true);
+      Helpers.error(`Browser compilation fail`, false, true);
     }
   }
   //#endregion
 
   //#region methods / init code cut
-  initCodeCut(filesPathes: string[]) {
-    Helpers.log(`[initCodeCut] filesPathes:
-
-    ${filesPathes.map(c => `${c}\n`)}
-
-    `, 1);
+  initCodeCut() {
 
     // console.log('inside')
     let env: Models.env.EnvConfig = this.ENV;
@@ -297,16 +299,6 @@ export class BroswerCompilation extends BackendCompilation {
       project = compilationProject;
     }
 
-    filesPathes = filesPathes.map(f => {
-      f = crossPlatformPath(f);
-      return f.replace(crossPlatformPath(path.join(this.cwd, this.srcFolder)), '').replace(/^\//, '');
-    });
-
-    Helpers.log(`[initCodeCut] filesPathes after:
-
-    ${filesPathes.map(c => `${c}\n`)}
-
-    `, 1);
 
     const replacements = [];
 
@@ -323,8 +315,7 @@ export class BroswerCompilation extends BackendCompilation {
     replacements.push(['@cutCod' + 'eIfFalse', codeCuttFn(false)]);
 
     this.codecut = new CodeCut(
-      this.compilationFolderPath,
-      filesPathes,
+      this.absPathTmpSrcDistBundleFolder,
       {
         replacements: replacements.filter(f => !!f),
         env
@@ -337,12 +328,28 @@ export class BroswerCompilation extends BackendCompilation {
   }
   //#endregion
 
+
+  private copyTsConfig() {
+    //#region copy tsconfig
+    const source = crossPlatformPath(path.join(this.cwd, this.tsConfigBrowserName));
+    const dest = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, this.tsConfigName));
+    Helpers.copyFile(source, dest);
+    //#endregion
+  }
+
+
+  public isNotASpecFileCondition(absoluteFilePath: string) {
+    return !absoluteFilePath.endsWith('.spec.ts')
+  }
+
+  public isNotFromAssets(absoluteFilePath: string, base: string) {
+    absoluteFilePath = crossPlatformPath(absoluteFilePath);
+    const relativePath = absoluteFilePath.replace(`${base}/`, '');
+    // console.log({ relativePath })
+    return !relativePath.startsWith('assets/');
+  }
+
+
   //#endregion
 
 }
-
-//#region helpers
-function isNotASpecFileCondition(absoluteFilePath: string) {
-  return !absoluteFilePath.endsWith('.spec.ts')
-}
-//#endregion
