@@ -26,7 +26,9 @@ export class SingularBuild extends FeatureForProject {
 
     const smartContainerTargetProjPath = SingularBuild.getProxyProj(parent, client.name, outFolder); // path.join(parent.location, outFolder, parent.name, client.name);
     Helpers.log(`dist project: ${smartContainerTargetProjPath}`);
-    Helpers.mkdirp(smartContainerTargetProjPath);
+    if(!Helpers.exists(smartContainerTargetProjPath)) {
+      Helpers.mkdirp(smartContainerTargetProjPath);
+    }
     const appRelatedFiles = BrowserCodeCut.extAllowedToReplace.map(ext => `app${ext}`);
 
     //#region symlinks package.json, tmp-environemnt
