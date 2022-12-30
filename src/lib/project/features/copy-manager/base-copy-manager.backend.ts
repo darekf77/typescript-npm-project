@@ -70,17 +70,22 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
 
   //#region getters / project to copy to
   get projectToCopyTo() {
+    const canCopyToNodeModules = (this.outDir === 'dist'
+      && this.project.isStandaloneProject
+      && !this.project.isSmartContainerTarget
+    ); // TODO @LAST what about container
+
     if (Array.isArray(this.copyto) && this.copyto.length > 0) {
       // @ts-ignore
       return [
         this.localTempProj,
         ...this.copyto,
-        // ...(this.outDir === 'dist' ? [this.project] : []), // TODO @LAST is this causing problems ?
+        ...(canCopyToNodeModules ? [this.project] : []), // TODO @LAST is this causing problems ?
       ] as Project[];
     }
     return [
       this.localTempProj,
-      // ...(this.outDir === 'dist' ? [this.project] : []), // TODO @LAST is this causing problems ?
+      ...(canCopyToNodeModules ? [this.project] : []), // TODO @LAST is this causing problems ?
     ];
   }
   //#endregion
