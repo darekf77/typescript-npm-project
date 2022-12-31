@@ -276,23 +276,29 @@ ${remotes.map((r, i) => `${i + 1}. ${r.origin} ${r.url}`).join('\n')}
       } catch (error) { }
       try {
         this.project.run(`git stash`).sync();
-      } catch (error) {
-        uncommitedChanges = false;
-      }
+      } catch (error) { }
+      try {
+        this.project.run(`git reset --hard`).sync();
+      } catch (error) { }
       // this.project.run(`code .`).async();
       // Helpers.pressKeyAndContinue(`Commit your changes and press any key...`);
     }
 
     if (this.project.git.isInMergeProcess) {
-      this.project.run('git reset --hard').sync();
+      try {
+        this.project.run(`git reset --hard`).sync();
+      } catch (error) { }
     }
 
     await this.repeatMenu('pull');
-    if (uncommitedChanges) {
-      try {
-        this.project.run(`git stash apply`).sync();
-      } catch (error) { }
-    }
+    // if (uncommitedChanges) {
+    //   try {
+    //     this.project.run(`git stash apply`).sync();
+    //   } catch (error) { }
+    //   try {
+    //     this.project.run(`git reset --hard`).sync();
+    //   } catch (error) { }
+    // }
 
     const location = this.project.location;
     Project.unload(this.project);
