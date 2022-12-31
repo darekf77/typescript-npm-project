@@ -2,9 +2,7 @@
   resources: [],
 
   overrided: {
-    dependencies: {
-      'firedev-stor': '0.0.2',
-    },
+    dependencies: {},
     ignoreDepsPattern: [
       "bs4-breakpoint",
       "base-model-wrap",
