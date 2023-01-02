@@ -58,10 +58,10 @@ export class GitActions extends FeatureForProject {
       .map(relativePath => {
         const possibleProjPath = crossPlatformPath(path.join(this.project.location, relativePath))
         let possibleProj = Project.From(possibleProjPath) as Project;
-        console.log({
-          possibleProjPath,
-          possibleProj: possibleProj?.name
-        })
+        // console.log({
+        //   possibleProjPath,
+        //   possibleProj: possibleProj?.name
+        // })
         // const possibleProj2 = Project.From(path.join(this.project.location, '--', relativePath));
         if (possibleProj) {
           return void 0;
