@@ -42,12 +42,10 @@ export class CodeCut {
   //#region methods
 
   private isAllowedPathForSave(relativePath: string) {
+    // console.log({ relativePath })
     return (path.basename(relativePath).search(PREFIXES.BASELINE) === -1) &&
       (path.basename(relativePath).search(PREFIXES.DELETED) === -1) &&
-      !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist/tests/`) &&
-      !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle/tests/`) &&
-      !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist-websql/tests/`) &&
-      !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle-websql/tests/`);
+      !relativePath.replace(/^\\/, '').startsWith(`tests/`);
   }
 
   /**

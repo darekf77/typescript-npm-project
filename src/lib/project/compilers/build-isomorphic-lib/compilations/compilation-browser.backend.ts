@@ -104,6 +104,10 @@ export class BroswerCompilation extends BackendCompilation {
     Helpers.removeFolderIfExists(this.absPathTmpSrcDistBundleFolder);
     Helpers.mkdirp(this.absPathTmpSrcDistBundleFolder);
 
+    const tmpSource = this.absPathTmpSrcDistBundleFolder.replace('tmp-src-', 'tmp-source-');
+    Helpers.removeFolderIfExists(tmpSource);
+    Helpers.mkdirp(tmpSource);
+
     this.initCodeCut();
     this.copyTsConfig();
 
