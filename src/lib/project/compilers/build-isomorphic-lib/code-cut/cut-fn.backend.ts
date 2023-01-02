@@ -3,7 +3,7 @@ import { Helpers } from 'tnp-core';
 export function codeCuttFn(cutIftrue: boolean) {
   return function (expression: string, reservedExpOne: any, reservedExpSec?: string) {
 
-    const exp = `(function(ENV,absoluteFilePath){
+    const exp = `(function(ENV,relativeOrAbsFilePath){
         return ${expression.trim()};
       })(reservedExpOne,reservedExpSec)`;
     try {

@@ -26,6 +26,10 @@ export class CodeCut {
      * it may be not available for global, for all compilatoin
      */
     private project: Project,
+    /**
+     * same as project for standalone isomorphic-lib
+     * @deprecated
+     */
     private compilationProject: Project,
     private buildOptions: BuildOptions,
     public sourceOutBrowser: string,
@@ -37,21 +41,28 @@ export class CodeCut {
 
   //#region methods
 
+  private isAllowedPathForSave(relativePath: string) {
+    return (path.basename(relativePath).search(PREFIXES.BASELINE) === -1) &&
+      (path.basename(relativePath).search(PREFIXES.DELETED) === -1) &&
+      !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist/tests/`) &&
+      !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle/tests/`) &&
+      !relativePath.replace(/^\\/, '').startsWith(`tmp-src-dist-websql/tests/`) &&
+      !relativePath.replace(/^\\/, '').startsWith(`tmp-src-bundle-websql/tests/`);
+  }
+
   /**
    * ex: assets/file.png or my-app/component.ts
    */
-  files(relativeFilesToProcess: string[]) {
+  files(relativeFilesToProcess: string[], remove: boolean = false) {
     // console.log('options in fiels', this.options)
     for (let index = 0; index < relativeFilesToProcess.length; index++) {
       const relativeFilePath = relativeFilesToProcess[index];
-      this.file(relativeFilePath);
+      this.file(relativeFilePath, remove);
     }
   }
 
-  file(relativePathToFile: string) {
-    if (path.basename(relativePathToFile).search(PREFIXES.BASELINE) !== -1 ||
-      path.basename(relativePathToFile).search(PREFIXES.DELETED) !== -1
-    ) {
+  file(relativePathToFile: string, remove: boolean = false) {
+    if (!this.isAllowedPathForSave(relativePathToFile)) {
       return;
     }
 
@@ -71,20 +82,18 @@ export class CodeCut {
       return (new BrowserCodeCut(
         absSourceFromSrc,
         absolutePathToFile,
+        this.absPathTmpSrcDistBundleFolder,
         this.project,
-        this.compilationProject,
         this.buildOptions,
-        this.sourceOutBrowser,
-      )).initAndSave(this.absPathTmpSrcDistBundleFolder);
+      )).initAndSave(remove);
     }
 
     return (new BrowserCodeCut(
       absSourceFromSrc,
       absolutePathToFile,
+      this.absPathTmpSrcDistBundleFolder,
       this.project,
-      this.compilationProject,
       this.buildOptions,
-      this.sourceOutBrowser
     ))
       .init()
       .REPLACERegionsForIsomorphicLib(_.cloneDeep(this.options) as any)

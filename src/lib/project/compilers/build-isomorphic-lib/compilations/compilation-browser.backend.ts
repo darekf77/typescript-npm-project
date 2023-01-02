@@ -7,7 +7,7 @@ import {
   crossPlatformPath,
 } from 'tnp-core';
 import { IncCompiler } from 'incremental-compiler';
-import { ConfigModels } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { BackendCompilation } from './compilation-backend.backend';
 import { BuildOptions } from 'tnp-db';
@@ -163,8 +163,12 @@ export class BroswerCompilation extends BackendCompilation {
     } else {
       if (this.isNotASpecFileCondition(absoluteFilePath)) {
         if (event.eventName === 'unlink') {
-          Helpers.removeFileIfExists(destinationFilePath);
-          Helpers.removeFileIfExists(destinationFileBackendPath);
+          if (relativeFilePath.startsWith(`${config.folder.assets}/`)) {
+            this.codecut.files([relativeFilePath], true);
+          } else {
+            Helpers.removeFileIfExists(destinationFilePath);
+            Helpers.removeFileIfExists(destinationFileBackendPath);
+          }
         } else {
           if (fse.existsSync(absoluteFilePath)) {
             //#region mkdirp basedir
@@ -191,60 +195,6 @@ export class BroswerCompilation extends BackendCompilation {
 
       }
     }
-  }
-
-  async superAsyncAction(event: IncCompiler.Change) {
-    // console.log(`[compilation-browser][asyncAction] ${event.eventName} ${event.fileAbsolutePath}`)
-    const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
-    const relativeFilePath = crossPlatformPath(absoluteFilePath.replace(crossPlatformPath(path.join(this.cwd, this.srcFolder)), ''));
-    const destinationFilePath = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, relativeFilePath));
-
-    const destinationFileBackendPath = crossPlatformPath(path.join(
-      this.cwd,
-      this.sourceOutBrowser.replace('tmp-src', 'tmp-source'),
-      relativeFilePath
-    ));
-
-    if (event.eventName === 'unlinkDir') {
-      // console.log('REMOVING DIR', destinationFilePath)
-      // console.log('REMOVING DIR BACKEND', destinationFileBackendPath)
-      Helpers.removeFolderIfExists(destinationFilePath);
-      Helpers.removeFolderIfExists(destinationFileBackendPath);
-    } else {
-
-      if (this.isNotASpecFileCondition(absoluteFilePath)) {
-        if (event.eventName === 'unlink') {
-          if (fse.existsSync(destinationFilePath)) {
-            fse.unlinkSync(destinationFilePath)
-          }
-          if (fse.existsSync(destinationFileBackendPath)) {
-            fse.unlinkSync(destinationFileBackendPath)
-          }
-        } else {
-          if (fse.existsSync(absoluteFilePath)) {
-
-            if (!fse.existsSync(path.dirname(destinationFilePath))) {
-              fse.mkdirpSync(path.dirname(destinationFilePath));
-            }
-            if (!fse.existsSync(path.dirname(destinationFileBackendPath))) {
-              fse.mkdirpSync(path.dirname(destinationFileBackendPath));
-            }
-
-            if (fse.existsSync(destinationFilePath) && fse.lstatSync(destinationFilePath).isDirectory()) {
-              fse.removeSync(destinationFilePath);
-            }
-            if (fse.existsSync(destinationFileBackendPath) && fse.lstatSync(destinationFileBackendPath).isDirectory()) {
-              fse.removeSync(destinationFileBackendPath);
-            }
-            // @LAST
-            const relativePath = absoluteFilePath.replace(`${this.absPathTmpSrcDistBundleFolder}/`, '');
-            fse.copyFileSync(absoluteFilePath, destinationFilePath);
-          }
-        }
-        this.codecut.file(destinationFilePath);
-      }
-    }
-
   }
   //#endregion
 

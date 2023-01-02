@@ -114,7 +114,7 @@ export class PackagesRecognition {
         const pj = Helpers.readJson(pjPath);
         if (_.isArray(pj[config.array.isomorphicPackages])) {
           this.recognizedPackages = pj[config.array.isomorphicPackages];
-          BrowserCodeCut.IsomorphicLibs = _.cloneDeep(this.recognizedPackages);
+          BrowserCodeCut.resolveAndAddIsomorphicLibs(_.cloneDeep(this.recognizedPackages));
           Helpers.log(`[${config.frameworkName}] Recognized (${this.recognizedPackages}) in ${pjPath}`)
           return;
         }
@@ -180,7 +180,7 @@ export class PackagesRecognition {
       const pj = Helpers.readJson(pjPath);
       pj[config.array.isomorphicPackages] = this.recognizedPackages;
       Helpers.writeJson(pjPath, pj);
-      BrowserCodeCut.IsomorphicLibs = _.cloneDeep(this.recognizedPackages);
+      BrowserCodeCut.resolveAndAddIsomorphicLibs(_.cloneDeep(this.recognizedPackages));
     } catch (e) {
       Helpers.log(`[${config.frameworkName}]`, e)
       Helpers.log(`[${config.frameworkName}] Error during update ismorphic packages list cache`);

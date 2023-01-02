@@ -110,7 +110,27 @@ ${appModuleFile}
         })();
         //#endregion
 
-        //#region replace app.component.ts websql things
+        //#region replace app.component.ts
+        (() => {
+          const appComponentFilePath = path.join(
+            project.location,
+            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+            `/src/app/app.component.ts`
+          );
+
+
+          let appComponentFile = Helpers.readFile(appComponentFilePath);
+
+          appComponentFile = appComponentFile.replace(
+            `import { Firedev } from 'firedev';`,
+            `import { Firedev } from 'firedev/${this.websql ? config.folder.websql : config.folder.browser}';`,
+          );
+
+          Helpers.writeFile(appComponentFilePath, appComponentFile);
+        })();
+        //#endregion
+
+        //#region replace main.ts websql things
         (() => {
           const appMainFilePath = path.join(
             project.location,
