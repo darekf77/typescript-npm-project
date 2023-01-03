@@ -343,6 +343,7 @@ function consistencyFixes(
       nodts: false,
       obscure: false,
       ugly: false,
+      includeNodeModules: false,
     };
     additionalSaveRequired = true;
   }
@@ -356,6 +357,10 @@ function consistencyFixes(
   }
   if (_.isUndefined(content[tnpProperty].libReleaseOptions.ugly)) {
     content[tnpProperty].libReleaseOptions.ugly = false;
+    additionalSaveRequired = true;
+  }
+  if (_.isUndefined(content[tnpProperty].libReleaseOptions.includeNodeModules)) {
+    content[tnpProperty].libReleaseOptions.includeNodeModules = false;
     additionalSaveRequired = true;
   }
   if (_.isUndefined(content[tnpProperty].overrided.linkedFolders)) {

@@ -40,6 +40,7 @@
     nodts: false,
     obscure: true,
     ugly: true,
+    includeNodeModules: false,
   },
 
   type: "isomorphic-lib",

@@ -23,6 +23,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   protected readonly args: string;
   readonly outDir: Models.dev.BuildDir;
   protected readonly watch: boolean;
+  protected readonly nodts: boolean;
   protected readonly renameDestinationFolder?: string;
 
   protected readonly notAllowedFiles = [
@@ -370,7 +371,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
         this.removeSourceSymlinks(destination)
       }
 
-      if (!this.watch) {
+      if (!this.watch && !this.nodts) {
         this.updateBackendFullDtsFiles(this.monitoredOutDir);
         this.updateBackendFullDtsFiles(destination);
       }

@@ -476,15 +476,15 @@ export class ProjectIsomorphicLib
 
     const { codeCutRelease } = require('minimist')((args || '').split(' '));
 
-    const { obscure, uglify, nodts } = this.buildOptions;
-    const isWebpackBundleProductionBuild = ((outDir === 'bundle') && (obscure || uglify || nodts))
+    const { obscure, uglify, nodts, includeNodeModules } = this.buildOptions;
+    const productionModeButIncludePackageJsonDeps = (obscure || uglify) && !includeNodeModules;
 
 
     if (outDir === 'bundle' && (obscure || uglify)) {
       this.quickFixes.overritenBadNpmPackages();
     }
 
-    if (isWebpackBundleProductionBuild) {
+    if (productionModeButIncludePackageJsonDeps) {
       this.buildOptions.genOnlyClientCode = true;
     }
     //#endregion
@@ -567,7 +567,7 @@ export class ProjectIsomorphicLib
     //#endregion
 
     if (this.buildOptions.watch) {
-      if (isWebpackBundleProductionBuild) {
+      if (productionModeButIncludePackageJsonDeps) {
         //#region webpack bundle build
         await incrementalBuildProcess.startAndWatch(`isomorphic compilation (only browser) `);
         await incrementalBuildProcessWebsql.startAndWatch(`isomorphic compilation (only browser) [WEBSQL]`);
@@ -580,7 +580,8 @@ export class ProjectIsomorphicLib
             buildType: 'lib',
             outDir,
             watch,
-            uglify
+            uglify,
+            includeNodeModules,
           });
         } catch (er) {
           Helpers.error(`WATCH BUNDLE build failed`, false, true);
@@ -639,7 +640,7 @@ export class ProjectIsomorphicLib
         this.cutReleaseCode();
       }
       //#region non watch build
-      if (isWebpackBundleProductionBuild) {
+      if (productionModeButIncludePackageJsonDeps) {
         //#region release production backend build for firedev/tnp specyfic
         // console.log('k1')
         await incrementalBuildProcess.start('isomorphic compilation (only browser) ');
@@ -650,7 +651,8 @@ export class ProjectIsomorphicLib
             buildType: 'lib',
             outDir,
             watch,
-            uglify
+            uglify,
+            includeNodeModules,
           });
         } catch (er) {
           Helpers.error(`BUNDLE (single file compilation) build failed`, false, true);
@@ -658,20 +660,20 @@ export class ProjectIsomorphicLib
 
         try {
           if (obscure || uglify) {
-            this.backendCompileToEs5();
+            this.backendCompileToEs5(outDir);
           }
           if (uglify) {
-            this.backendUglifyCode(config.reservedArgumentsNamesUglify)
+            this.backendUglifyCode(outDir, config.reservedArgumentsNamesUglify)
           };
           if (obscure) {
             this.backendObscureCode(config.reservedArgumentsNamesUglify);
           }
           if (!nodts) {
-            this.backendCompilerDeclarationFiles()
+            this.backendCompilerDeclarationFiles(outDir)
           };
           // process.exit(0)
         } catch (er) {
-          Helpers.error(`BUNDLE (obscure || uglify || nodts) process failed`, false, true);
+          Helpers.error(`BUNDLE (obscure || uglify) process failed`, false, true);
         }
 
         try {
@@ -715,6 +717,32 @@ export class ProjectIsomorphicLib
 
         //#endregion
       }
+
+      if (nodts) {
+        this.backendRemoveDts(outDir);
+      }
+      // @LAST
+      // 1. check if firedev build cuts dts...
+      // 2. check combinations of build
+      // 3. remove tnp-db
+      // 4. release
+
+
+      if (includeNodeModules) {
+        this.backendIncludeNodeModulesInCompilation(outDir);
+        if (!productionModeButIncludePackageJsonDeps) {
+          if (obscure || uglify) {
+            this.backendCompileToEs5(outDir);
+          }
+          if (uglify) {
+            this.backendUglifyCode(outDir, config.reservedArgumentsNamesUglify)
+          };
+          if (obscure) {
+            this.backendObscureCode(config.reservedArgumentsNamesUglify);
+          }
+        }
+      }
+
       //#endregion
       if (codeCutRelease) {
         this.cutReleaseCodeRestore();
@@ -827,41 +855,71 @@ export class ProjectIsomorphicLib
   //#endregion
 
   //#region private methods / compile backend declaration files
-  private backendCompilerDeclarationFiles() {
+  private backendCompilerDeclarationFiles(outDir: Models.dev.BuildDir) {
     //#region @backend
-    this.run(`npm-run tsc --emitDeclarationOnly --declarationDir ${config.folder.bundle}`).sync();
+    this.run(`npm-run tsc --emitDeclarationOnly --declarationDir ${outDir}`).sync();
+    //#endregion
+  }
+  //#endregion
+
+  //#region private methods / include node_modules in compilation
+  private backendRemoveDts(outDir: Models.dev.BuildDir) {
+    this.run(`rimraf ${outDir}/lib/**/*.d.ts`).sync();
+    Helpers.writeFile([this.location, outDir, 'lib/index.d.ts'], `export declare const dummy${(new Date()).getTime()};`);
+  }
+  //#endregion
+
+  //#region private methods / include node_modules in compilation
+  private backendIncludeNodeModulesInCompilation(outDir: Models.dev.BuildDir) {
+    //#region @backend
+    this.run(`ncc build ${outDir}/index.js -o ${outDir}`).sync();
+    this.run(`rimraf ${outDir}/lib/**/*.js && rimraf ${outDir}/lib/**/*.js.map`).sync();
+
+    // remove dependencies
+    const pjPath = this.pathFor(`${outDir}/${config.file.package_json}`);
+    const pj: Models.npm.IPackageJSON = Helpers.readJson(pjPath);
+    pj.dependencies = {};
+    pj.peerDependencies = {};
+    pj.devDependencies = {};
+    Helpers.removeFileIfExists(pjPath);
+    Helpers.writeFile(pjPath, pj);
+
     //#endregion
   }
   //#endregion
 
   //#region private methods / compile backend es5
-  private backendCompileToEs5() {
+  /**
+   * TODO not working
+   */
+  private backendCompileToEs5(outDir: Models.dev.BuildDir) {
+    return;
     //#region @backend
-    if (!Helpers.exists(path.join(this.location, config.folder.bundle, 'index.js'))) {
-      Helpers.warn(`[compileToEs5] Nothing to compile to es5... no index.js in bundle`)
+    if (!Helpers.exists(path.join(this.location, outDir, 'index.js'))) {
+      Helpers.warn(`[compileToEs5] Nothing to compile to es5... no index.js in ${outDir}`)
       return;
     }
     const indexEs5js = `index-es5.js`;
-    Helpers.writeFile(path.join(this.location, config.folder.bundle, config.file._babelrc), '{ "presets": ["env"] }\n');
-    this.run(`npm-run babel  ./bundle/index.js --out-file ./bundle/${indexEs5js}`).sync();
+    Helpers.writeFile(path.join(this.location, outDir, config.file._babelrc), '{ "presets": ["env"] }\n');
+    this.run(`npm-run babel  ./${outDir}/index.js --out-file ./${outDir}/${indexEs5js}`).sync();
     Helpers.writeFile(
-      path.join(this.location, config.folder.bundle, config.file.index_js),
-      Helpers.readFile(path.join(this.location, config.folder.bundle, indexEs5js))
+      path.join(this.location, outDir, config.file.index_js),
+      Helpers.readFile(path.join(this.location, outDir, indexEs5js))
     );
-    Helpers.removeFileIfExists(path.join(this.location, config.folder.bundle, indexEs5js));
-    Helpers.removeFileIfExists(path.join(this.location, config.folder.bundle, config.file._babelrc));
+    Helpers.removeFileIfExists(path.join(this.location, outDir, indexEs5js));
+    Helpers.removeFileIfExists(path.join(this.location, outDir, config.file._babelrc));
     //#endregion
   }
   //#endregion
 
   //#region private methods / compile/uglify backend code
-  private backendUglifyCode(reservedNames: string[]) {
+  private backendUglifyCode(outDir: Models.dev.BuildDir, reservedNames: string[]) {
     //#region @backendFunc
     if (!Helpers.exists(path.join(this.location, config.folder.bundle, 'index.js'))) {
-      Helpers.warn(`[uglifyCode] Nothing to uglify... no index.js in bundle`)
+      Helpers.warn(`[uglifyCode] Nothing to uglify... no index.js in /${outDir}`)
       return
     }
-    const command = `npm-run uglifyjs bundle/index.js --output bundle/index.js`
+    const command = `npm-run uglifyjs ${outDir}/index.js --output ${outDir}/index.js`
       + ` --mangle reserved=[${reservedNames.map(n => `'${n}'`).join(',')}]`
     // + ` --mangle-props reserved=[${reservedNames.join(',')}]` // it breakes code
 

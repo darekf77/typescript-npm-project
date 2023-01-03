@@ -421,6 +421,9 @@ function handleStandaloneOrSmartContainer(proj: Project, argsObj: any) {
   if (proj.packageJson.libReleaseOptions.nodts) {
     argsObj.nodts = true;
   }
+  if (proj.packageJson.libReleaseOptions.includeNodeModules) {
+    argsObj.includeNodeModules = true;
+  }
   return argsObj;
 }
 

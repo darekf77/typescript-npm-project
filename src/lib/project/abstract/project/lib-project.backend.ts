@@ -299,7 +299,7 @@ export abstract class LibProject {
 
 
   async relaseBuild(this: Project, newVersion: string, releaseOptions: Models.dev.ReleaseOptions,) {
-    const { prod, obscure, nodts, uglify, args } = releaseOptions;
+    const { prod, obscure, includeNodeModules, nodts, uglify, args } = releaseOptions;
 
     this.run(`${config.frameworkName} init ${this.isStandaloneProject ? '' : this.smartContainerBuildTarget.name}`).sync();
     const specyficProjectForBuild = this.isStandaloneProject ? this : Project.From(crossPlatformPath(path.join(
@@ -318,6 +318,7 @@ export abstract class LibProject {
     Helpers.info(`BUILD OPTION (${this.name}):
     prod=${!!prod},
     obscure=${!!obscure},
+    includeNodeModules=${!!includeNodeModules},
     nodts=${!!nodts},
     uglify=${!!uglify}
     `)
@@ -325,6 +326,7 @@ export abstract class LibProject {
     await this.build(BuildProcess.prepareOptionsBuildProcess({
       prod,
       obscure,
+      includeNodeModules,
       nodts,
       uglify,
       outDir: config.folder.bundle as 'bundle',

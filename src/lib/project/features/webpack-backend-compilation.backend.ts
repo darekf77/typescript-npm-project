@@ -12,6 +12,7 @@ export interface WebpackBackendCompilationOpt {
   outDir: 'dist' | 'bundle';
   uglify?: boolean;
   buildTitle?: string;
+  includeNodeModules?: boolean;
 }
 
 export class WebpackBackendCompilation extends FeatureForProject {
@@ -21,8 +22,8 @@ export class WebpackBackendCompilation extends FeatureForProject {
     const webpackGlob = this.project.npmPackages.global('webpack');
 
     const webpackCommand = `node ${webpackGlob} --version && node ${webpackGlob} `
-      + `--config webpack.backend-${outDir}-build.js ${watch ? '--watch' : ''
-      } ${uglify ? '--env=useUglify' : ''}`;
+      + `--config webpack.backend-bundle-build.js ${watch ? '--watch' : ''
+      } ${uglify ? '--env=useUglify' : ''} --env.outDir=${outDir} `;
 
     const showInfoWebpack = () => {
       Helpers.info(`

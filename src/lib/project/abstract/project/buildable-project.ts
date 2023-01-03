@@ -244,11 +244,12 @@ export abstract class BuildableProject {
     //#region TODO refactor this part
     const options = require('minimist')(buildOptions.args.split(' '));
     // console.log({ options })
-    const { obscure, uglify, nodts, websql }: {
+    const { obscure, uglify, nodts, websql, includeNodeModules }: {
       obscure: boolean,
       nodts: boolean,
       uglify: boolean,
       websql: boolean,
+      includeNodeModules: boolean,
     } = options
 
     if (_.isUndefined(buildOptions.obscure) && obscure) {
@@ -262,6 +263,9 @@ export abstract class BuildableProject {
     }
     if (_.isUndefined(buildOptions.websql) && websql) {
       buildOptions.websql = true;
+    }
+    if (_.isUndefined(buildOptions.includeNodeModules) && includeNodeModules) {
+      buildOptions.includeNodeModules = true;
     }
     //#endregion
 
