@@ -126,6 +126,11 @@ ${appModuleFile}
             `import { Firedev } from 'firedev/${this.websql ? config.folder.websql : config.folder.browser}';`,
           );
 
+          appComponentFile = appComponentFile.replace(
+            `import { Morphi } from 'morphi';`,
+            `import { Morphi } from 'morphi/${this.websql ? config.folder.websql : config.folder.browser}';`,
+          );
+
           Helpers.writeFile(appComponentFilePath, appComponentFile);
         })();
         //#endregion
