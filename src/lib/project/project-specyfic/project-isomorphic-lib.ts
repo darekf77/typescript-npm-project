@@ -581,7 +581,7 @@ export class ProjectIsomorphicLib
             watch,
           });
         } catch (er) {
-          Helpers.error(`WATCH BUNDLE build failed`, false, true);
+          Helpers.error(`WATCH ${outDir.toUpperCase()} build failed`, false, true);
         }
         //#endregion
       } else {
@@ -650,7 +650,7 @@ export class ProjectIsomorphicLib
             watch,
           });
         } catch (er) {
-          Helpers.error(`BUNDLE (single file compilation) build failed`, false, true);
+          Helpers.error(`${outDir.toUpperCase()} (single file compilation) build failed`, false, true);
         }
 
         try {
@@ -664,11 +664,14 @@ export class ProjectIsomorphicLib
             this.backendObscureCode(outDir, config.reservedArgumentsNamesUglify);
           }
           if (!nodts) {
-            this.backendCompilerDeclarationFiles(outDir)
+            // dist is on purpose -> I could just move thing from this (dist|bundle)/dist to (dist|bundle)/
+            // but too much effor.. for now TODO
+            Helpers.removeIfExists(path.join(outDir, 'dist'));
+            this.backendCompilerDeclarationFiles(outDir);
           };
           // process.exit(0)
         } catch (er) {
-          Helpers.error(`BUNDLE (obscure || uglify) process failed`, false, true);
+          Helpers.error(`${outDir.toUpperCase()} (obscure || uglify) process failed`, false, true);
         }
 
         try {
