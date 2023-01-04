@@ -874,7 +874,11 @@ export class ProjectIsomorphicLib
 
   //#region private methods / include node_modules in compilation
   private backendRemoveDts(outDir: Models.dev.BuildDir) {
-    this.run(`rimraf ${outDir}/lib/**/*.d.ts`).sync();
+    Helpers
+      .filesFrom([this.location, outDir, 'lib'], true)
+      .filter(f => f.endsWith('.d.ts'))
+      .forEach(f => Helpers.removeFileIfExists(f))
+      ;
     Helpers.writeFile([this.location, outDir, 'lib/index.d.ts'], `export declare const dummy${(new Date()).getTime()};`);
   }
   //#endregion
