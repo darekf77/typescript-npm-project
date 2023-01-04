@@ -17,13 +17,13 @@ export interface WebpackBackendCompilationOpt {
 
 export class WebpackBackendCompilation extends FeatureForProject {
 
-  async run(options: WebpackBackendCompilationOpt) {
-    const { outDir, watch, uglify, buildType, buildTitle } = options;
+  async run(options: Pick<BuildOptions, 'watch' | 'appBuild' | 'outDir'>) {
+    const { outDir, watch, appBuild } = options;
     const webpackGlob = this.project.npmPackages.global('webpack');
 
     const webpackCommand = `node ${webpackGlob} --version && node ${webpackGlob} `
       + `--config webpack.backend-bundle-build.js ${watch ? '--watch' : ''
-      } ${uglify ? '--env=useUglify' : ''} --env.outDir=${outDir} `;
+      } --env.outDir=${outDir} `;
 
     const showInfoWebpack = () => {
       Helpers.info(`
@@ -55,9 +55,8 @@ export class WebpackBackendCompilation extends FeatureForProject {
     } catch (er) {
       Helpers.error(`
 
-      Build ${buildTitle ? (buildTitle + ' ') : ' '
-        }fail...
-  outdir: ${CLI.chalk(outDir)}, build type: ${CLI.chalk(buildType)}
+      Webpack build fail...
+  outdir: ${CLI.chalk(outDir)}, build type: ${CLI.chalk(appBuild ? 'app' : 'lib')}
 
 `, false, true);
     }

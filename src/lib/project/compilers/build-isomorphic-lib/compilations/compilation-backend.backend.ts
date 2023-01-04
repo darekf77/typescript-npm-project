@@ -201,12 +201,12 @@ export class BackendCompilation extends IncCompiler.Base {
     } else {
 
       if (global['useWebpackBackendBuild']) {
-        project.webpackBackendBuild.run({
-          buildType: 'lib',
-          outDir: buildOutDir as any,
-          watch,
-          // uglify,
-        })
+        // project.webpackBackendBuild.run({
+        //   buildType: 'lib',
+        //   outDir: buildOutDir as any,
+        //   watch,
+        //   // uglify,
+        // })
       } else {
         await this.buildStandardLibVer({
           watch, ...tscCommands, generateDeclarations, cwd, project, buildOutDir, websql

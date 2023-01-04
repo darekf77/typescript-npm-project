@@ -115,8 +115,7 @@ export class ProjectIsomorphicLib
     }
 
     if (this.frameworkVersionAtLeast('v3')) {
-      files = files.filter(f => !this.ignoreInV3.includes(f))
-      files.push('webpack.backend-dist-build.js')
+      files = files.filter(f => !this.ignoreInV3.includes(f));
     }
 
     return files;
@@ -577,11 +576,9 @@ export class ProjectIsomorphicLib
 
         try {
           await this.webpackBackendBuild.run({
-            buildType: 'lib',
+            appBuild: false,
             outDir,
             watch,
-            uglify,
-            includeNodeModules,
           });
         } catch (er) {
           Helpers.error(`WATCH BUNDLE build failed`, false, true);
@@ -648,11 +645,9 @@ export class ProjectIsomorphicLib
 
         try {
           await this.webpackBackendBuild.run({
-            buildType: 'lib',
+            appBuild: false,
             outDir,
             watch,
-            uglify,
-            includeNodeModules,
           });
         } catch (er) {
           Helpers.error(`BUNDLE (single file compilation) build failed`, false, true);
@@ -666,7 +661,7 @@ export class ProjectIsomorphicLib
             this.backendUglifyCode(outDir, config.reservedArgumentsNamesUglify)
           };
           if (obscure) {
-            this.backendObscureCode(config.reservedArgumentsNamesUglify);
+            this.backendObscureCode(outDir, config.reservedArgumentsNamesUglify);
           }
           if (!nodts) {
             this.backendCompilerDeclarationFiles(outDir)
@@ -738,7 +733,7 @@ export class ProjectIsomorphicLib
             this.backendUglifyCode(outDir, config.reservedArgumentsNamesUglify)
           };
           if (obscure) {
-            this.backendObscureCode(config.reservedArgumentsNamesUglify);
+            this.backendObscureCode(outDir, config.reservedArgumentsNamesUglify);
           }
         }
       }
@@ -915,7 +910,7 @@ export class ProjectIsomorphicLib
   //#region private methods / compile/uglify backend code
   private backendUglifyCode(outDir: Models.dev.BuildDir, reservedNames: string[]) {
     //#region @backendFunc
-    if (!Helpers.exists(path.join(this.location, config.folder.bundle, 'index.js'))) {
+    if (!Helpers.exists(path.join(this.location, outDir, 'index.js'))) {
       Helpers.warn(`[uglifyCode] Nothing to uglify... no index.js in /${outDir}`)
       return
     }
@@ -936,7 +931,7 @@ export class ProjectIsomorphicLib
   //#endregion
 
   //#region private methods / compile/obscure backend code
-  private backendObscureCode(reservedNames: string[]) {
+  private backendObscureCode(outDir: Models.dev.BuildDir, reservedNames: string[]) {
     //#region @backendFunc
     if (!Helpers.exists(path.join(this.location, config.folder.bundle, 'index.js'))) {
       Helpers.warn(`[obscureCode] Nothing to obscure... no index.js in bundle`)
