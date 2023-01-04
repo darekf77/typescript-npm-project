@@ -37,7 +37,7 @@
   linkedRepos: [],
 
   libReleaseOptions: {
-    nodts: false,
+    nodts: true,
     obscure: true,
     ugly: true,
     includeNodeModules: false,

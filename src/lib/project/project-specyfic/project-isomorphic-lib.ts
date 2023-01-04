@@ -135,6 +135,8 @@ export class ProjectIsomorphicLib
     if (this.frameworkVersionAtLeast('v2')) {
       files = [
         'tsconfig.isomorphic.json.filetemplate',
+        'tsconfig.isomorphic-flat-dist.json.filetemplate',
+        'tsconfig.isomorphic-flat-bundle.json.filetemplate',
         'tsconfig.browser.json.filetemplate',
         ...this.vscodeFileTemplates,
         ...files,
@@ -653,6 +655,22 @@ export class ProjectIsomorphicLib
           Helpers.error(`${outDir.toUpperCase()} (single file compilation) build failed`, false, true);
         }
 
+        if (nodts) {
+          //#region fix webpack dt
+          const baseDistGenWebpackDts = crossPlatformPath(path.join(this.location, outDir, 'dist'));
+          Helpers
+            .filesFrom(baseDistGenWebpackDts, true)
+            .forEach(absSource => {
+              const destDtsFile = path.join(
+                this.location,
+                outDir,
+                absSource.replace(`${baseDistGenWebpackDts}/`, '')
+              );
+              Helpers.copyFile(absSource, destDtsFile);
+            });
+        }
+        Helpers.removeIfExists(path.join(this.location, outDir, 'dist'));
+
         try {
           if (obscure || uglify) {
             this.backendCompileToEs5(outDir);
@@ -663,12 +681,6 @@ export class ProjectIsomorphicLib
           if (obscure) {
             this.backendObscureCode(outDir, config.reservedArgumentsNamesUglify);
           }
-          if (!nodts) {
-            // dist is on purpose -> I could just move thing from this (dist|bundle)/dist to (dist|bundle)/
-            // but too much effor.. for now TODO
-            Helpers.removeIfExists(path.join(outDir, 'dist'));
-            this.backendCompilerDeclarationFiles(outDir);
-          };
           // process.exit(0)
         } catch (er) {
           Helpers.error(`${outDir.toUpperCase()} (obscure || uglify) process failed`, false, true);

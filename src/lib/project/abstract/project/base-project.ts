@@ -245,6 +245,8 @@ export abstract class BaseProject {
       'tsconfig.json',
       'tsconfig.browser.json',
       'tsconfig.isomorphic.json',
+      'tsconfig.isomorphic-flat-bundle.json',
+      'tsconfig.isomorphic-flat-dist.json',
       config.file._npmrc,
       config.file._npmignore,
       config.file._gitignore,
