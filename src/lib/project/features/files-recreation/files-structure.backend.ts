@@ -279,8 +279,6 @@ export class FilesStructure extends FeatureForProject {
       }
     }
 
-    this.handleSmartContainer(this.project, client);
-
 
     if (this.project.isSmartContainer && !skipSmartContainerDistBundleInit) {
       //#region handle smart container
@@ -424,109 +422,6 @@ export class FilesStructure extends FeatureForProject {
     }
 
   }
-
-  handleSmartContainer(project: Project, client: string) { // TODO everything will be in src
-    if (!project.isSmartContainer && !project.isSmartContainerChild) {
-      return;
-    }
-    if (!client) {
-      Helpers.error(`Trying to init project ${project.name} without target.`, false, true);
-    }
-
-    const parent = project.isSmartContainerChild ? project.parent : project;
-
-    const nodeModulesContainer = path.join(parent.location, config.folder.node_modules, `@${parent.name}`);
-
-    if (Helpers.isUnexistedLink(nodeModulesContainer)) {
-      Helpers.remove(nodeModulesContainer);
-    }
-
-    if (Helpers.isExistedSymlink(nodeModulesContainer) && !Helpers.isFolder(nodeModulesContainer)) {
-      Helpers.remove(nodeModulesContainer);
-    }
-    if (!Helpers.exists(nodeModulesContainer)) {
-      Helpers.mkdirp(nodeModulesContainer);
-    }
-
-    if (client) {
-      const childrens = parent.children.filter(f => f.typeIs('isomorphic-lib') && f.frameworkVersionAtLeast('v3'));
-      for (let index = 0; index < childrens.length; index++) {
-        const child = childrens[index];
-        const source = path.join(
-          parent.location,
-          config.folder.dist,
-          parent.name,
-          client,
-          config.folder.dist,
-          config.folder.libs,
-          child.name,
-        );
-        const dest = path.join(nodeModulesContainer, child.name);
-        if (!Helpers.exists(path.dirname(dest))) {
-          Helpers.mkdirp(path.dirname(dest));
-        }
-        Helpers.removeFileIfExists(dest);
-        // console.log(source)
-        Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
-      }
-    }
-
-
-
-    //#region  for browser code tsconfig links can be usefull
-    // (() => {
-
-    //   // FOR CONTAINER AND CHILD DIFFEREN LOCATION OF DIST
-    //   if (project.isSmartContainer) {
-    //     // dist/codete-blog-ngrx/ngrx-process/tmp-src-dist/libs // TODO QUICK_FIX
-    //     // const source = path.join(project.location, config.folder.dist, project.name, child.name, `tmp - src - dist`, 'libs', child.name);
-    //     // const dest = path.join(nodeModulesContainer, child.name, config.folder.browser);
-    //     // Helpers.remove(dest);
-    //     // Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true })
-    //   } else if (project.isSmartContainerChild) {
-    //     // const source = path.join(child.location, config.folder.dist, config.folder.browser);
-    //     // const dest = path.join(nodeModulesContainer, child.name, config.folder.browser);
-    //     // Helpers.remove(dest);
-    //     // Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true })
-    //   }
-    // })();
-
-    // (() => {
-    //   const source = path.join(child.location, config.folder.dist, 'lib');
-    //   const dest = path.join(nodeModulesContainer, child.name, 'lib');
-    //   if (!Helpers.exists(path.dirname(dest))) {
-    //     Helpers.mkdirp(path.dirname(dest));
-    //   }
-    //   Helpers.remove(dest);
-    //   Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true })
-    // })();
-
-    // (() => {
-    //   const source = path.join(child.location, config.folder.dist, config.folder.browser);
-    //   const dest = path.join(nodeModulesContainer, child.name, config.folder.browser);
-    //   Helpers.remove(dest);
-    //   Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true })
-    // })();
-    //#endregion
-
-    // (() => {
-    //   const dest = path.join(nodeModulesContainer, child.name, config.file.index_js);
-    //   Helpers.writeFile(dest, Helpers.generatedFileWrap(`
-    //     "use strict";
-    //     Object.defineProperty(exports, '__esModule', { value: true });
-    //     var tslib_1 = require('tslib');
-    //     tslib_1.__exportStar(require('./lib'), exports);
-    //             `.trim()))
-    // })();
-
-    // (() => {
-    //   const dest = path.join(nodeModulesContainer, child.name, config.file.index_d_ts);
-    //   Helpers.writeFile(dest, Helpers.generatedFileWrap(`export * from './lib';`))
-    // })();
-
-
-  }
-
 
   /**
    * dummy angular.json file for scss generation

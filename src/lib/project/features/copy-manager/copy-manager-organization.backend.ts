@@ -15,19 +15,6 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   protected readonly children: Project[];
   protected readonly angularCopyManger: CopyMangerOrganizationAngularFiles;
 
-  //#region getters / project to copy to
-  get projectToCopyTo() {
-    if (Array.isArray(this.copyto) && this.copyto.length > 0) {
-      // @ts-ignore
-      return [
-        this.localTempProj,
-        ...this.copyto
-      ] as Project[];
-    }
-    return [this.localTempProj];
-  }
-  //#endregion
-
   //#region target project name
   /**
    * target name for organizaiton (smart container) build
@@ -79,7 +66,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   //#endregion
 
   //#region _ copy builded distibutino to
-  isFirstRun = true;
+
   _copyBuildedDistributionTo(
     destination: Project,
     options?: {
@@ -90,12 +77,6 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     }
   ) {
     super._copyBuildedDistributionTo(destination, options);
-    if ((destination.location === this.localTempProjPath) && this.isFirstRun && this.outDir === config.folder.dist) {
-      this.isFirstRun = false;
-      const nodeModules = this.project.node_modules.pathFor(this.rootPackageName);
-      Helpers.remove(nodeModules);
-      Helpers.createSymLink(this.localTempProj.node_modules.pathFor(this.rootPackageName), nodeModules);
-    }
   }
   //#endregion
 
