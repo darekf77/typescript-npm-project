@@ -728,9 +728,6 @@ export class ProjectIsomorphicLib
         //#endregion
       }
 
-      if (nodts) {
-        this.backendRemoveDts(outDir);
-      }
       // @LAST
       // 1. check if firedev build cuts dts...
       // 2. check combinations of build
@@ -751,6 +748,10 @@ export class ProjectIsomorphicLib
             this.backendObscureCode(outDir, config.reservedArgumentsNamesUglify);
           }
         }
+      }
+
+      if (nodts) {
+        this.backendRemoveDts(outDir);
       }
 
       //#endregion
@@ -887,7 +888,11 @@ export class ProjectIsomorphicLib
   private backendIncludeNodeModulesInCompilation(outDir: Models.dev.BuildDir) {
     //#region @backend
     this.run(`ncc build ${outDir}/index.js -o ${outDir}`).sync();
-    this.run(`rimraf ${outDir}/lib/**/*.js && rimraf ${outDir}/lib/**/*.js.map`).sync();
+    Helpers
+      .filesFrom([this.location, outDir, 'lib'], true)
+      .filter(f => f.endsWith('.js') || f.endsWith('.js.map'))
+      .forEach(f => Helpers.removeFileIfExists(f))
+      ;
 
     // remove dependencies
     const pjPath = this.pathFor(`${outDir}/${config.file.package_json}`);
