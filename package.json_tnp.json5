@@ -408,7 +408,7 @@
             "ngx-pipes": "^2.1.7",
             "ngx-wig": "^1.2.7",
             "ngx-store": "2.1.0",
-            "firedev-storage": '13.1.22',
+            "firedev-storage": '13.1.23',
             "node-localstorage": "2.1.6",
             "ng2-file-upload": "^1.3.0",
             "ngx-toastr": "^8",

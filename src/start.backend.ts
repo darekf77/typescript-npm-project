@@ -67,7 +67,6 @@ import axios from 'axios';
 axios.defaults.timeout = config.CONST.BACKEND_HTTP_REQUEST_TIMEOUT; // TODO QUICK_FIX
 
 import { Project } from './lib/project';
-// import { Ora } from 'ora';
 
 
 // import { ConsoleUi } from './console-ui';
@@ -76,7 +75,6 @@ import { CLI_FUNCTIONS } from 'tnp-db';
 import { TnpDB } from 'tnp-db';
 
 import { CLASS } from 'typescript-class-helpers';
-import { Ora } from 'ora';
 import { CLI } from 'tnp-cli';
 //#endregion
 

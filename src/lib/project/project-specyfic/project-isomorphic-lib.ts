@@ -736,14 +736,11 @@ export class ProjectIsomorphicLib
 
 
       if (includeNodeModules) {
-        this.backendIncludeNodeModulesInCompilation(outDir);
+        this.backendIncludeNodeModulesInCompilation(outDir, uglify);
         if (!productionModeButIncludePackageJsonDeps) {
           if (obscure || uglify) {
             this.backendCompileToEs5(outDir);
           }
-          if (uglify) {
-            this.backendUglifyCode(outDir, config.reservedArgumentsNamesUglify)
-          };
           if (obscure) {
             this.backendObscureCode(outDir, config.reservedArgumentsNamesUglify);
           }
@@ -885,19 +882,37 @@ export class ProjectIsomorphicLib
   //#endregion
 
   //#region private methods / include node_modules in compilation
-  private backendIncludeNodeModulesInCompilation(outDir: Models.dev.BuildDir) {
+  private backendIncludeNodeModulesInCompilation(outDir: Models.dev.BuildDir, uglify: boolean) {
     //#region @backend
-    this.run(`ncc build ${outDir}/index.js -o ${outDir}`).sync();
+    this.run(`ncc build ${outDir}/index.js -o ${outDir}/temp/ncc ${uglify ? '-m' : ''}`).sync();
     Helpers
       .filesFrom([this.location, outDir, 'lib'], true)
       .filter(f => f.endsWith('.js') || f.endsWith('.js.map'))
       .forEach(f => Helpers.removeFileIfExists(f))
       ;
 
+    const baseBundleOrDist = crossPlatformPath(path.join(this.location, outDir));
+    const nccBase = crossPlatformPath(path.join(this.location, outDir, 'temp', 'ncc'));
+
+    Helpers
+      .filesFrom(nccBase, true)
+      .filter(f => f.replace(`${nccBase}/`, '') !== config.file.package_json)
+      .forEach(f => {
+        const relativePath = f.replace(`${nccBase}/`, '');
+        const dest = crossPlatformPath(path.join(baseBundleOrDist, relativePath));
+        Helpers.copyFile(f, dest);
+      });
+
+    Helpers.removeFolderIfExists(path.dirname(nccBase));
+
     // remove dependencies
     const pjPath = this.pathFor(`${outDir}/${config.file.package_json}`);
     const pj: Models.npm.IPackageJSON = Helpers.readJson(pjPath);
-    pj.dependencies = {};
+    Object.keys(pj.dependencies).forEach(name => {
+      if (!['tnp-config', 'ora'].includes(name)) {
+        delete pj.dependencies[name];
+      } // @LAST
+    })
     pj.peerDependencies = {};
     pj.devDependencies = {};
     Helpers.removeFileIfExists(pjPath);
