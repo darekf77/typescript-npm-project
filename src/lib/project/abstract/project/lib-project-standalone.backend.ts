@@ -18,7 +18,7 @@ export class LibProjectStandalone extends LibPorjectBase {
     this.lib.removeJsMapsFrom(base);
   }
 
-  updateOtherProject(realCurrentProj: Project) {
+  fixPackageJson(realCurrentProj: Project) {
     // [
     //   // config.folder.browser, /// TODO FIX for typescript
     //   config.folder.client,
@@ -184,6 +184,7 @@ export class LibProjectStandalone extends LibPorjectBase {
   }
 
   updateTnpAndCoreContainers(realCurrentProj: Project) {
+    //#region @notForNpm
     const tnpProj = Project.Tnp as Project;
 
     if (tnpProj) {
@@ -209,6 +210,7 @@ export class LibProjectStandalone extends LibPorjectBase {
           });
       }
     }
+    //#endregion
   }
 
 

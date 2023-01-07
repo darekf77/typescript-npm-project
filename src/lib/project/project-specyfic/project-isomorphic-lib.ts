@@ -736,7 +736,13 @@ export class ProjectIsomorphicLib
 
 
       if (includeNodeModules) {
-        this.backendIncludeNodeModulesInCompilation(outDir, uglify);
+        this.backendIncludeNodeModulesInCompilation(
+          outDir,
+          false, // uglify,
+        );
+        if (uglify) {
+          this.backendUglifyCode(outDir, config.reservedArgumentsNamesUglify)
+        };
         if (!productionModeButIncludePackageJsonDeps) {
           if (obscure || uglify) {
             this.backendCompileToEs5(outDir);
@@ -953,7 +959,7 @@ export class ProjectIsomorphicLib
       Helpers.warn(`[uglifyCode] Nothing to uglify... no index.js in /${outDir}`)
       return
     }
-    const command = `npm-run uglifyjs ${outDir}/index.js --output ${outDir}/index.js`
+    const command = `npm-run uglifyjs ${outDir}/index.js --output ${outDir}/index.js -b`
       + ` --mangle reserved=[${reservedNames.map(n => `'${n}'`).join(',')}]`
     // + ` --mangle-props reserved=[${reservedNames.join(',')}]` // it breakes code
 

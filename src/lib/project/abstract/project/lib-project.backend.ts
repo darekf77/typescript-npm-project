@@ -162,7 +162,7 @@ export abstract class LibProject {
       }
 
       if (this.isStandaloneProject) {
-        this.standalone.updateOtherProject(realCurrentProj)
+        this.standalone.fixPackageJson(realCurrentProj)
       }
 
       if (!global.tnpNonInteractive) {
