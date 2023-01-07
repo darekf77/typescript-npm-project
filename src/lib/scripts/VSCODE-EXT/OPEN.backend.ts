@@ -114,12 +114,6 @@ function $OPEN_BASELINE() {
 }
 //#endregion
 
-//#region open / navi cli
-function $OPEN_NAVI_CLI() {
-  Helpers.run(`code ${Project.NaviCliLocation}`, { biggerBuffer: false }).sync();
-}
-//#endregion
-
 //#region open / unstage
 async function $OPEN_UNSTAGE() {
   const proj = (Project.Current as Project);
@@ -278,7 +272,6 @@ export default {
   $OPEN_UNSTAGE: Helpers.CLIWRAP($OPEN_UNSTAGE, '$OPEN_UNSTAGE'),
   $OPEN_WORKSPACE_CHILDS: Helpers.CLIWRAP($OPEN_WORKSPACE_CHILDS, '$OPEN_WORKSPACE_CHILDS'),
   $OPEN_WORKSPACE: Helpers.CLIWRAP($OPEN_WORKSPACE, '$OPEN_WORKSPACE'),
-  $OPEN_NAVI_CLI: Helpers.CLIWRAP($OPEN_NAVI_CLI, '$OPEN_NAVI_CLI'),
   $IS_CORE_PROJECT: Helpers.CLIWRAP($IS_CORE_PROJECT, '$IS_CORE_PROJECT'),
   $OPEN_CORE_PROJECT: Helpers.CLIWRAP($OPEN_CORE_PROJECT, '$OPEN_CORE_PROJECT'),
   $OPEN_CORE_CONTAINER: Helpers.CLIWRAP($OPEN_CORE_CONTAINER, '$OPEN_CORE_CONTAINER'),

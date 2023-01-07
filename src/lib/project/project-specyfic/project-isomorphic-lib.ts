@@ -884,7 +884,7 @@ export class ProjectIsomorphicLib
   //#region private methods / include node_modules in compilation
   private backendIncludeNodeModulesInCompilation(outDir: Models.dev.BuildDir, uglify: boolean) {
     //#region @backend
-    this.run(`ncc build ${outDir}/index.js -o ${outDir}/temp/ncc ${uglify ? '-m' : ''}`).sync();
+    this.run(`ncc build ${outDir}/index.js -o ${outDir}/temp/ncc ${uglify ? '-m' : ''}  --no-cache `).sync();
     Helpers
       .filesFrom([this.location, outDir, 'lib'], true)
       .filter(f => f.endsWith('.js') || f.endsWith('.js.map'))
@@ -908,11 +908,7 @@ export class ProjectIsomorphicLib
     // remove dependencies
     const pjPath = this.pathFor(`${outDir}/${config.file.package_json}`);
     const pj: Models.npm.IPackageJSON = Helpers.readJson(pjPath);
-    Object.keys(pj.dependencies).forEach(name => {
-      if (!['tnp-config', 'ora'].includes(name)) {
-        delete pj.dependencies[name];
-      } // @LAST
-    })
+    pj.dependencies = {};
     pj.peerDependencies = {};
     pj.devDependencies = {};
     Helpers.removeFileIfExists(pjPath);

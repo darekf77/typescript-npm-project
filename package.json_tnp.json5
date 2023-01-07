@@ -27,7 +27,6 @@
       'progress',
       'open',
       'isomorphic-region-loader',
-      'any-project-cli',
     ],
     linkedFolders: [],
   },
@@ -38,9 +37,9 @@
 
   libReleaseOptions: {
     nodts: false,
-    obscure: true,
+    obscure: false,
     ugly: true,
-    includeNodeModules: false,
+    includeNodeModules: true,
   },
 
   type: "isomorphic-lib",

@@ -177,41 +177,30 @@ export abstract class BuildableProject {
 
   //#region @backend
   private async selectAllProjectCopyto(this: Project) {
-    if (this.parent?.isContainer && this.parent.frameworkVersionAtLeast('v2')) {
+    if (this.parent?.isContainer) {
 
-      const containerProj = Project.by('container', this._frameworkVersion) as Project;
+      const containerCoreProj = Project.by('container', this._frameworkVersion) as Project;
 
       // const projsChain = this.parent.projectsInOrderForChainBuild([]);
       const projsChain = this.parent.children;
 
 
-      const projects = projsChain.filter(d => d.name !== this.parent.name
-        && d.frameworkVersionAtLeast(this._frameworkVersion)
-        && d.typeIs(
-          'isomorphic-lib',
-          'angular-lib',
-          'vscode-ext',
-          'workspace',
-          'scenario',
-          'electron-client',
-          'ionic-client',
-          'container'
-        ) || d.isSmartContainer);
+      const independentProjects = projsChain
+        .filter(parentChild => {
+          return (parentChild.name !== this.parent.name)
+            && (parentChild.typeIs('isomorphic-lib') && (parentChild.name === 'tnp'))
+        });
 
-      if (containerProj.packageJson.data.dependencies[this.name]
-        || Object.keys(config.frameworkNames).includes(this.name) // TODO QUICK_FIX
-      ) {
-        Helpers.info(`UPDATING ALSO container core ${this._frameworkVersion}...`)
-        projects.push(containerProj);
-        const tmpSmartNodeModulesProj = Project.From(path.dirname(containerProj.smartNodeModules.path)) as Project;
-        if (tmpSmartNodeModulesProj) {
-          projects.push(tmpSmartNodeModulesProj);
-        }
+      Helpers.log(`UPDATING ALSO container core ${this._frameworkVersion}...`)
+      independentProjects.push(containerCoreProj);
+      const tmpSmartNodeModulesProj = Project.From(path.dirname(containerCoreProj.smartNodeModules.path)) as Project;
+      if (tmpSmartNodeModulesProj) {
+        independentProjects.push(tmpSmartNodeModulesProj);
       }
 
       // @ts-ignore
       this.buildOptions.copyto = [
-        ...projects,
+        ...independentProjects,
         ...this.buildOptions.copyto
       ]
     } else {
@@ -344,7 +333,7 @@ export abstract class BuildableProject {
           const projectName = projectCurrent.name;
           const what = path.normalize(`${project.location}/${config.folder.node_modules}/${projectName}`);
 
-          Helpers.info(`${chalk.bold('+ After each build finish')} ${Helpers.formatPath(what)} will be update.`);
+          Helpers.log(`${chalk.bold('+ After each build finish')} ${Helpers.formatPath(what)} will be update.`);
         });
       }
 
@@ -373,7 +362,7 @@ export abstract class BuildableProject {
     if (_.isArray(this.buildOptions.copyto) && !global.tnpNonInteractive) {
       // @ts-ignore
       (this.buildOptions.copyto as Project[]).forEach((c) => {
-        Helpers.info(`Checking node_modules for ${c.genericName}`);
+        Helpers.log(`Checking node_modules for ${c.genericName}`, 1);
         if (!c.node_modules.exist) {
           withoutNodeModules.push(c);
         }

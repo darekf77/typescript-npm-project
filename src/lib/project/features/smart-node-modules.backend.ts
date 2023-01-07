@@ -226,7 +226,7 @@ export class SmartNodeModules extends FeatureForProject {
 
   //#region install/reinstall all packages
   public install(action: 'install' | 'uninstall' = 'install', ...packages: PackageType[]) {
-    Helpers.info(`START SMART INSTALL...  for ${this.project.genericName}`);
+    Helpers.log(`START SMART INSTALL...  for ${this.project.genericName}`);
     if (packages.length > 0) {
       packages.forEach(p => {
         this.project.packageJson.data.tnp.overrided.dependencies[p.name] = (action === 'uninstall')
@@ -248,7 +248,7 @@ export class SmartNodeModules extends FeatureForProject {
       });
       this.handlePackagesOverride();
     }
-    Helpers.success(`smart install done for ${this.project.genericName}`);
+    Helpers.success(`node_modules install done for ${this.project.genericName}`);
   }
   //#endregion
 
