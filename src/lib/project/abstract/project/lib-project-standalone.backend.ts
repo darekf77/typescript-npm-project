@@ -32,28 +32,30 @@ export class LibProjectStandalone extends LibPorjectBase {
 
     this.lib.packageJson.showDeps(`after release show when ok`);
 
-    if (this.lib.packageJson.name === 'tnp') {  // TODO QUICK_FIX
-      Helpers.setValueToJSON(path.join(this.lib.location, config.folder.bundle, config.file.package_json), 'dependencies',
-        this.lib.TnpProject.packageJson.data.tnp.overrided.includeOnly.reduce((a, b) => {
-          return _.merge(a, {
-            [b]: this.lib.TnpProject.packageJson.data.dependencies[b]
-          })
-        }, {})
-      );
-    } else { ///
-      const packageJsonInBundlePath = path.join(this.lib.location, config.folder.bundle, config.file.package_json);
-      Helpers.setValueToJSON(packageJsonInBundlePath, 'devDependencies', {});
-      // QUICK FIX include only
-      const includeOnly = realCurrentProj.packageJson.data.tnp?.overrided?.includeOnly || [];
-      const dependencies = Helpers.readJson(packageJsonInBundlePath, {}).dependencies || {};
-      Object.keys(dependencies).forEach(packageName => {
-        if (!includeOnly.includes(packageName)) {
-          delete dependencies[packageName];
-        }
-      });
-      Helpers.setValueToJSON(packageJsonInBundlePath, 'dependencies', dependencies);
-
+    if (!this.lib.TnpProject.packageJson.data.tnp.libReleaseOptions.includeNodeModules) {
+      if (this.lib.packageJson.name === 'tnp') {  // TODO QUICK_FIX
+        Helpers.setValueToJSON(path.join(this.lib.location, config.folder.bundle, config.file.package_json), 'dependencies',
+          this.lib.TnpProject.packageJson.data.tnp.overrided.includeOnly.reduce((a, b) => {
+            return _.merge(a, {
+              [b]: this.lib.TnpProject.packageJson.data.dependencies[b]
+            })
+          }, {})
+        );
+      } else { ///
+        const packageJsonInBundlePath = path.join(this.lib.location, config.folder.bundle, config.file.package_json);
+        Helpers.setValueToJSON(packageJsonInBundlePath, 'devDependencies', {});
+        // QUICK FIX include only
+        const includeOnly = realCurrentProj.packageJson.data.tnp?.overrided?.includeOnly || [];
+        const dependencies = Helpers.readJson(packageJsonInBundlePath, {}).dependencies || {};
+        Object.keys(dependencies).forEach(packageName => {
+          if (!includeOnly.includes(packageName)) {
+            delete dependencies[packageName];
+          }
+        });
+        Helpers.setValueToJSON(packageJsonInBundlePath, 'dependencies', dependencies);
+      }
     }
+
   }
 
   async buildDocs(prod: boolean, newVersion: string, realCurrentProj: Project) {
