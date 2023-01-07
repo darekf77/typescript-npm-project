@@ -909,7 +909,7 @@ export class ProjectIsomorphicLib
     const pjPath = this.pathFor(`${outDir}/${config.file.package_json}`);
     const pj: Models.npm.IPackageJSON = Helpers.readJson(pjPath);
     Object.keys(pj.dependencies).forEach(name => {
-      if (!['ora'].includes(name)) {
+      if (!['ora'].includes(name)) { // TODO QUICK FIX FOF TNP
         delete pj.dependencies[name];
       } // @LAST
     })

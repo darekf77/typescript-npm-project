@@ -31,8 +31,16 @@ export class LibProjectStandalone extends LibPorjectBase {
     // });
 
     this.lib.packageJson.showDeps(`after release show when ok`);
+    if (this.lib.packageJson.data.tnp.libReleaseOptions.includeNodeModules) {
+      // this.lib.packageJson.clearForRelase('bundle');
+    } else {
+      //#region copy packagejson before relase (beacuse it may be link)
+      const packageJsonInBundlePath = path.join(this.lib.location, config.folder.bundle, config.file.package_json);
+      const orgPj = Helpers.readFile(packageJsonInBundlePath);
+      Helpers.removeFileIfExists(packageJsonInBundlePath);
+      Helpers.writeFile(packageJsonInBundlePath, orgPj);
+      //#endregion
 
-    if (!this.lib.TnpProject.packageJson.data.tnp.libReleaseOptions.includeNodeModules) {
       if (this.lib.packageJson.name === 'tnp') {  // TODO QUICK_FIX
         Helpers.setValueToJSON(path.join(this.lib.location, config.folder.bundle, config.file.package_json), 'dependencies',
           this.lib.TnpProject.packageJson.data.tnp.overrided.includeOnly.reduce((a, b) => {
@@ -41,8 +49,7 @@ export class LibProjectStandalone extends LibPorjectBase {
             })
           }, {})
         );
-      } else { ///
-        const packageJsonInBundlePath = path.join(this.lib.location, config.folder.bundle, config.file.package_json);
+      } else {
         Helpers.setValueToJSON(packageJsonInBundlePath, 'devDependencies', {});
         // QUICK FIX include only
         const includeOnly = realCurrentProj.packageJson.data.tnp?.overrided?.includeOnly || [];

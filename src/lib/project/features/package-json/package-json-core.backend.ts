@@ -1,5 +1,5 @@
 //#region imports
-import { fse, CoreConfig } from 'tnp-core'
+import { fse, CoreConfig, crossPlatformPath } from 'tnp-core'
 import { path } from 'tnp-core'
 import * as JSON5 from 'json5';
 import * as json5Write from 'json10-writer';
@@ -332,13 +332,13 @@ export class PackageJsonCore {
   private splitAndWriteToDisc(removeFromPj = false) {
     if ((['navi', 'scenario'] as ConfigModels.LibType[]).includes(this.type)) {
 
-      if(_.isObject(this.data) && this.data['']) {
+      if (_.isObject(this.data) && this.data['']) {
         delete this.data['']
       }
       Helpers.writeFile(this.path, _.isObject(this.data) ? this.data : {});
       return;
     }
-    if(_.isObject(this.data) && this.data['']) {
+    if (_.isObject(this.data) && this.data['']) {
       delete this.data['']
     }
     const data = _.cloneDeep(this.data) as Models.npm.IPackageJSON;
@@ -406,7 +406,7 @@ export class PackageJsonCore {
           delete data[property];
         });
       if (Helpers.isExistedSymlink(this.path)) {
-        Helpers.warn(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`,trace)
+        Helpers.warn(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`, trace)
       } else {
         const d = (_.isObject(data) ? data : {}) as Models.npm.IPackageJSON;
         if (d.tnp?.type === 'isomorphic-lib') {
@@ -416,7 +416,7 @@ export class PackageJsonCore {
       }
     } else {
       if (Helpers.isExistedSymlink(this.path)) {
-        Helpers.warn(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`,trace)
+        Helpers.warn(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`, trace)
       } else {
         const d = (_.isObject(data) ? data : {}) as Models.npm.IPackageJSON;
         if (d.tnp?.type === 'isomorphic-lib') {
