@@ -19,16 +19,16 @@ export class LibProjectStandalone extends LibPorjectBase {
   }
 
   updateOtherProject(realCurrentProj: Project) {
-    [
-      // config.folder.browser, /// TODO FIX for typescript
-      config.folder.client,
-      '',
-    ].forEach(c => {
-      const pjPath = path.join(this.lib.location, config.folder.bundle, c, config.file.package_json);
-      const content = Helpers.readJson(pjPath);
-      Helpers.remove(pjPath);
-      Helpers.writeFile(pjPath, content);
-    });
+    // [
+    //   // config.folder.browser, /// TODO FIX for typescript
+    //   config.folder.client,
+    //   '',
+    // ].forEach(c => {
+    //   const pjPath = path.join(this.lib.location, config.folder.bundle, c, config.file.package_json);
+    //   const content = Helpers.readJson(pjPath);
+    //   Helpers.remove(pjPath);
+    //   Helpers.writeFile(pjPath, content);
+    // });
 
     this.lib.packageJson.showDeps(`after release show when ok`);
 
