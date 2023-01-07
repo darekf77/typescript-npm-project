@@ -913,7 +913,6 @@ export class ProjectIsomorphicLib
         delete pj.dependencies[name];
       } // @LAST
     })
-    pj.dependencies = {};
     pj.peerDependencies = {};
     pj.devDependencies = {};
     Helpers.removeFileIfExists(pjPath);
