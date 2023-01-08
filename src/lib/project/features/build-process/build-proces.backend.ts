@@ -10,10 +10,8 @@ import { BuildOptions } from 'tnp-db';
 import { Models } from 'tnp-models';
 import { config, ConfigModels } from 'tnp-config';
 import { Helpers, Condition } from 'tnp-helpers';
-import { TnpDB } from 'tnp-db';
 import { PROGRESS_DATA } from 'tnp-models';
 import { handleProjectsPorts } from '../environment-config/environment-config-helpers';
-import { selectClients } from '../../project-specyfic/select-clients.backend';
 import { EnvironmentConfig } from '../environment-config';
 import { Log } from 'ng2-logger';
 
@@ -144,24 +142,6 @@ inside generated projects...
     }
     //#endregion
 
-    log.data(`[db] chekcking started... `);
-    const db = await TnpDB.Instance();
-
-    if (buildOptions.appBuild) {
-      log.data('FIST check if build allowed')
-      await db.checkBuildIfAllowed(
-        this.project as any,
-        buildOptions,
-        process.pid,
-        process.ppid,
-        true
-      );
-      log.data(`[db]] finish `);
-    } else {
-      log.data(`[db] no needed for dist`);
-    }
-
-
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
 
       if (this.project.node_modules.exist) {
@@ -245,16 +225,6 @@ inside generated projects...
       PROGRESS_DATA.log({ value: 0, msg: `Static build initing` });
     }
     //#endregion
-    if (buildOptions.appBuild) {
-      log.data('Second check if build allowed')
-      await db.checkBuildIfAllowed(
-        this.project as any,
-        buildOptions,
-        process.pid,
-        process.ppid,
-        false
-      )
-    }
 
     //#region handle build clients projects
 
@@ -265,15 +235,6 @@ inside generated projects...
     generated: ${this.project.isGenerated}
     `);
 
-
-    if (buildOptions.appBuild) {
-      // if (!singularBuildInParent) { // TODO UNCOMMENT
-      //   await waitForAppBuildToBePossible(db, this.project);
-      // }
-    } else {
-      await selectClients(buildOptions, this.project, db);
-      // await waitForRequiredDistsBuilds(db, this.project, buildOptions.forClient as any[]);
-    }
 
     //#endregion
 

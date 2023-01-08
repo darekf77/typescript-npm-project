@@ -4,7 +4,6 @@ import { PackagesRecognition } from '../../features/package-recognition/packages
 import { BuildOptions } from 'tnp-db';
 import * as inquirer from 'inquirer';
 import { path } from 'tnp-core';
-import { TnpDB } from 'tnp-db';
 import chalk from 'chalk';
 //#endregion
 import { _ } from 'tnp-core';
@@ -53,71 +52,6 @@ export abstract class BuildableProject {
       return value;
     }
     return [];
-  }
-  //#endregion
-
-  //#region select projects to copyto
-  /**
-   * return copyto array with absulute pathes
-   */
-  public async selectProjectToCopyTO(this: Project, buildOptions?: BuildOptions): Promise<string[]> {
-    let result = [] as Project[];
-    const project = this;
-    if (buildOptions && !_.isArray(buildOptions.copyto)) {
-      buildOptions.copyto = [];
-    }
-    if (project.typeIs('unknow', 'docker') || (buildOptions && buildOptions.skipCopyToSelection)) {
-      return;
-    }
-    // clearConsole()
-    const db = await TnpDB.Instance();
-    if (!global.tnpNonInteractive) {
-      const existedProjects = (await db.getProjects())
-        .map(p => p.project)
-        .filter(p => p && !p.isWorkspaceChildProject && !p.isContainer)
-        .filter(p => p.location !== project.location);
-
-      _.sortBy(existedProjects, ['genericName']);
-      // console.log('sorted', (existedProjects as Project[]).map(s => s.name))
-
-      if (global.tnpNonInteractive) {
-        // buildOptions.copyto = [];
-        result = [];
-      } else {
-        if (project.isTnp || project.isNaviCli) {
-          // buildOptions.copyto = [];
-          result = [];
-        } else {
-          // global.spinner?.stop();
-          const { projects = [] }: { projects: string[] } = await inquirer
-            .prompt([
-              {
-                type: 'checkbox',
-                name: 'projects',
-                message: `Select projects where to copy bundle after ${buildOptions?.watch ? 'each compilation finish' : 'finish'} :`,
-                choices: existedProjects
-                  .map(c => {
-                    return { value: c.location, name: `${chalk.bold(c.name)} (${c.genericName})` };
-                  })
-              }
-            ]) as any;
-          // global.spinner?.start();
-          // buildOptions.copyto = projects.map(p => $Project.From<Project>(p)) as any;
-          result = projects.map(p => $Project.From<Project>(p)) as any;
-        }
-
-      }
-
-    }
-
-    if (buildOptions) {
-      // @ts-ignore
-      buildOptions.copyto = result;
-      await db.updateCommandBuildOptions(project.location, buildOptions);
-      await db.updateBuildOptions(buildOptions, process.pid);
-    }
-
-    return (result as Project[]).map(p => (p as Project).location);
   }
   //#endregion
 
@@ -204,14 +138,9 @@ export abstract class BuildableProject {
         ...this.buildOptions.copyto
       ]
     } else {
-      const db = await TnpDB.Instance();
-      const projects = (await db.getProjects())
-        .map(p => p.project)
-        .filter(p => p.location !== this.location);
 
       // @ts-ignore
       this.buildOptions.copyto = [
-        ...projects,
         ...this.buildOptions.copyto
       ]
     }
@@ -294,7 +223,7 @@ export abstract class BuildableProject {
           if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
             if (this.isStandaloneProject && this.buildOptions.watch) {
               if (!this.isGenerated) {
-                await this.selectProjectToCopyTO(this.buildOptions);
+                // await this.selectProjectToCopyTO(this.buildOptions);
               }
             }
           }

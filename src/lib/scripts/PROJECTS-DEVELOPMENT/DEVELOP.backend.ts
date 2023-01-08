@@ -5,7 +5,6 @@ import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
 import { path } from 'tnp-core'
 import { config } from 'tnp-config';
-import { TnpDB } from 'tnp-db';
 import { chokidar } from 'tnp-core';
 import { notify } from 'node-notifier';
 import { CLASS } from 'typescript-class-helpers';
@@ -21,7 +20,6 @@ async function $SYNC_TO(args) {
 
   if (destinationIps.length > 0) {
     //#region notify sync server
-    // const db = await TnpDB.Instance();
     // const projects = (await db.getProjects()).map(p => p.project) as Project[];
     // const res = await Helpers.autocompleteAsk(`Select project to sync notify`,
     //   projects.map(p => {
@@ -149,19 +147,6 @@ function $SYNC_FROM(args) {
 //#endregion
 
 //#region kill
-export async function killAll() {
-  const db = await TnpDB.Instance();
-  let projectsToKill = [];
-  let p = (Project.Current as Project);
-  projectsToKill.push(p)
-  let workspace = p.isWorkspaceChildProject ? p.parent : void 0;
-  if (!!workspace) {
-    projectsToKill = projectsToKill.concat(workspace.children)
-  }
-  await db.killInstancesFrom(projectsToKill)
-  process.exit(0)
-}
-
 export async function killonport(args, noExit = false) {
   const port = parseInt(args.trim())
   await Helpers.killProcessByPort(port);
@@ -178,10 +163,6 @@ const $KILLONPORT = async (args: string) => {
   await killonport(args);
 }
 
-const $KILLALL = () => {
-  killAll()
-}
-
 const $KILLALLNODE = () => {
   if (process.platform === 'win32') {
     Helpers.run(`taskkill /f /im node.exe`).sync();
@@ -190,103 +171,9 @@ const $KILLALLNODE = () => {
   Helpers.run(`fkill -f node`).sync();
 }
 
-const $KILLWORKER = async () => {
-  const db = await TnpDB.Instance();
-  await db.killWorker();
-  Helpers.info(`Done killing worker`);
-  process.exit(0)
-}
 //#endregion
 
 //#region develop
-export async function $DEVELOP(args: string, exit = true) {
-  // console.log('adasdas')
-  const { kill = false } = require('minimist')(!args ? [] : args.split(' '));
-  const projectsToOpen = args.trim().split(' ');
-  const projectForAction: Project[] = [];
-
-  const db = await TnpDB.Instance();
-  // @ts-ignore
-  let projects = (await db.getProjects()).map(p => p.project as Project)
-    .filter(p => !p.isGenerated && !p.isGeneratedForRelease);
-
-  const projs = path.join((Project.Tnp as Project).location, '../..');
-
-  const unknowNPm: Project[] = [];
-  if (fse.existsSync(projs)) {
-
-    Helpers.foldersFrom(projs).forEach(folderWithProjects => {
-      projects = projects.concat(fse.readdirSync(folderWithProjects)
-        .map(f => {
-          f = path.join(projs, f);
-          const proj = Project.From<Project>(f)
-          // console.log(`${f} proj name: ${proj && proj.name}`);
-          if (proj) {
-            unknowNPm.push(proj)
-          }
-          return proj;
-        }));
-    })
-
-
-  }
-
-  unknowNPm.forEach(p => {
-    const external = path.join(p.location, 'external');
-    if (fse.existsSync(external)) {
-      projects = projects.concat(fse.readdirSync(external)
-        .map(f => {
-          f = path.join(external, f);
-          const proj = Project.From<Project>(f)
-          // console.log(`external proj name: ${proj && proj.name}`);
-          if (proj) {
-            unknowNPm.push(proj)
-          }
-          return proj;
-        }));
-    }
-  });
-
-
-
-  projectsToOpen.forEach(projectName => {
-    try {
-      var regex = new RegExp(projectName);
-    } catch (err) {
-      Helpers.error(`Invalid regular expresion: ${projectName}`, false, true)
-    }
-
-    // console.log(`source: "${regex.source}"`)
-    const projs = projects.filter(p => {
-      return p && (p.genericName === projectName || regex.test(p.name))
-    });
-    if (projs) {
-      projs.forEach(c => projectForAction.push(c));
-    } else {
-      Helpers.error(`Cannot find project: "${projectName}"`, true, true)
-    }
-
-    // projects.forEach(p => {
-    //   console.log(`Test: ${p && p.name} with ${regex.source} ${p && regex.test(p.name)}`)
-    //   return p && regex.test(p.name);
-    // });
-
-  });
-
-  Helpers.info(`
-
-  TO OPEN:
-  ${projectForAction.map(p => `${chalk.bold(p.name)} (${p.location})`).join('\n')}
-
-  `)
-  killvscode('', false);
-  for (let index = 0; index < projectForAction.length; index++) {
-    const projectToOpen = projectForAction[index];
-    projectToOpen.openInVscode();
-  }
-  process.exit(0)
-}
-
 function killvscode(args: string, exit = true) {
   try {
     Helpers.run(`kill -9 $(pgrep Electron)`).sync();
@@ -424,17 +311,6 @@ async function $CHILDS_REQUIRED(args: string) {
 }
 //#endregion
 
-//#region all projects
-export async function $ALL_PROJECTS(args: string) {
-  //#region @backend
-  const db = await TnpDB.Instance();
-  // @ts-ignore
-  const projects = (await db.getProjects()).map(p => p.project as Project);
-  console.log(projects.map(p => p.info).join('\n'));
-  process.exit(0)
-  //#endregion
-}
-//#endregion
 
 export async function $NAME_TEST() {
   // CLASS.getConfig($NAME_TEST)[0].
@@ -468,17 +344,13 @@ export default {
   $TARGET_PROJ_UPDATE: Helpers.CLIWRAP($TARGET_PROJ_UPDATE, '$TARGET_PROJ_UPDATE'),
   $INFO: Helpers.CLIWRAP($INFO, '$INFO'),
   $CHECK: Helpers.CLIWRAP($CHECK, '$CHECK'),
-  $ALL_PROJECTS: Helpers.CLIWRAP($ALL_PROJECTS, '$ALL_PROJECTS'),
   $CHILDS_REQUIRE: Helpers.CLIWRAP($CHILDS_REQUIRED, '$CHILDS_REQUIRED'),
-  $DEVELOP: Helpers.CLIWRAP($DEVELOP, '$DEVELOP'),
   killvscode: Helpers.CLIWRAP(killvscode, 'killvscode'),
   vscodekill: Helpers.CLIWRAP(vscodekill, 'vscodekill'),
   close: Helpers.CLIWRAP(close, 'close'),
   $KILL_ON_PORT: Helpers.CLIWRAP($KILL_ON_PORT, '$KILL_ON_PORT'),
   $KILLONPORT: Helpers.CLIWRAP($KILLONPORT, '$KILLONPORT'),
-  $KILLALL: Helpers.CLIWRAP($KILLALL, '$KILLALL'),
   $KILLALLNODE: Helpers.CLIWRAP($KILLALLNODE, '$KILLALLNODE'),
-  $KILLWORKER: Helpers.CLIWRAP($KILLWORKER, '$KILLWORKER'),
   CHOKI: Helpers.CLIWRAP(CHOKI, 'CHOKI'),
   NOT: Helpers.CLIWRAP(NOT, 'NOT'),
   $FORK: Helpers.CLIWRAP($FORK, '$FORK'),

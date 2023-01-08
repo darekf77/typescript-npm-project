@@ -8,7 +8,6 @@ import chalk from 'chalk';
 import { Project } from '../../project/abstract/project';
 import { Helpers } from 'tnp-helpers';
 import { config } from 'tnp-config';
-import { TnpDB, DbDaemonController, BuildOptions } from 'tnp-db';
 import { resolvePacakgesFromArgs } from '../../project/features/npm-packages/npm-packages-helpers.backend';
 import { Morphi } from 'morphi';
 import { $VSCODE_TEMP_HIDE, $VSCODE_TEMP_SHOW } from '../VSCODE-EXT/VSCODE.backend';
@@ -224,20 +223,6 @@ export async function $RESET_NPM(args: string, exit = true) {
   }
 }
 
-export async function $RESET_NPM_ALL(args: string, exit = true) {
-  const db = await TnpDB.Instance();
-  const projects = await db.getProjects();
-  for (let index = 0; index < projects.length; index++) {
-    const project = projects[index];
-    // console.log(project.project.genericName)
-    // @ts-ignore
-    (project.project as Project).packageJson.reset();
-  }
-  if (exit) {
-    process.exit(0);
-  }
-}
-
 
 function DEPS_SHOW(args: string) {
   (Project.Current as Project).packageJson.showDeps('deps show')
@@ -300,9 +285,6 @@ function $DEPS_RESET(args) {
   $RESET_NPM(args)
 }
 
-function $DEPS_RESET_ALL(args) {
-  $RESET_NPM_ALL(args)
-}
 
 function $DEDUPE(args: string) {
   (Project.Current as Project).node_modules.dedupe(args.trim() === '' ? void 0 : args.split(' '))
@@ -658,48 +640,6 @@ async function $UNLINK() {
 //#endregion
 
 //#region copyto
-async function ACTION_COPYTO(action: 'add' | 'remove', args) {
-  const proj = Helpers.cliTool.resolveProject<Project>(args, Project.Current, Project as any);
-  if (proj) {
-    Helpers.info(`[copyto] ${action.toUpperCase()} project: ${proj.name}`);
-    const db = await TnpDB.Instance();
-    Helpers.log(`instance ok`);
-    const cmd = (await db.getCommands()).find(c => c.isBuildCommand && c.location === Project.Current.location);
-    if (cmd) {
-      try {
-        // @ts-ignore
-        var b = await BuildOptions.from(cmd.command, Project.Current);
-      } catch (error) {
-        console.log(error);
-      }
-      if (action === 'add') {
-        // @ts-ignore
-        (b.copyto as Project[]).push(proj)
-      }
-      if (action === 'remove') {
-        // @ts-ignore
-        (b.copyto as Project[]) = (b.copyto as Project[]).filter(p => p !== proj);
-      }
-      Helpers.info(`Updating command`);
-      await db.updateCommandBuildOptions(Project.Current.location, b);
-      Helpers.info(`Build option update done.. ${action}ed ${chalk.bold(proj.genericName)}`);
-      // @ts-ignore
-      await db.triggerChangeForProject(Project.Current, `tnp-copyto-${action}` as any);
-    } else {
-      Helpers.warn(`No command to update`)
-    }
-  }
-  Helpers.info(`DONE`);
-  process.exit(0);
-}
-
-async function $COPY_TO_REMOVE(args) {
-  await ACTION_COPYTO('remove', args);
-}
-
-async function $COPY_TO_ADD(args) {
-  await ACTION_COPYTO('add', args);
-}
 
 const $copytoproject = (args) => {
   copyToHandleArgs(args)
@@ -720,54 +660,7 @@ const $copy_module_to_project = async (args) => {
 //#endregion
 
 //#region db
-async function $SHOW_DB() {
-  const db = await TnpDB.Instance();
-  const port = await db.getWokerPort();
-  if (_.isNumber(port)) {
-    const addressToShow = Morphi.getHttpPathBy<DbDaemonController>(DbDaemonController, port, 'info');
-    await open(addressToShow);
-  } else {
-    Helpers.run(`code --goto ${config.dbLocation}`).sync(); // TODO it will never happen
-  }
-  process.exit(0);
-}
 
-async function $DB_SHOW() {
-  await $SHOW_DB();
-}
-async function $DB_CODE() {
-  const db = await TnpDB.Instance();
-  Helpers.run(`code ${db.location}`).sync();
-  process.exit(0)
-}
-
-async function $CODE_DB() {
-  await $DB_CODE();
-}
-
-
-const $DB = async () => await $SHOW_DB();
-const $DB_OPEN = async () => await $SHOW_DB();
-
-async function $SHOW_WORKER() {
-  await $SHOW_DB();
-}
-
-//#region db / show projects
-async function $SHOW_PROJECTS() {
-  const db = await TnpDB.Instance();
-  const projects = (await db.getProjects())
-  console.log(projects.map(p => p.locationOfProject).join('\n'));
-  process.exit(0)
-}
-
-async function $SHOW_PROJECTS_NAVI() {
-  const db = await TnpDB.Instance();
-  const projects = (await db.getProjects())
-  console.log(projects.filter(p => p.project.typeIs('navi')).map(p => p.locationOfProject).join('\n'));
-  process.exit(0)
-}
-//#endregion
 
 function $SHOW_CORE_MODULES() {
   const container = Project.by('container', 'v1');
@@ -831,9 +724,7 @@ export default {
   $DEPS_COPY_FROM: Helpers.CLIWRAP($DEPS_COPY_FROM, '$DEPS_COPY_FROM'),
   $DEPS_FROM: Helpers.CLIWRAP($DEPS_FROM, '$DEPS_FROM'),
   $RESET_NPM: Helpers.CLIWRAP($RESET_NPM, '$RESET_NPM'),
-  $RESET_NPM_ALL: Helpers.CLIWRAP($RESET_NPM_ALL, '$RESET_NPM_ALL'),
   $DEPS_RESET: Helpers.CLIWRAP($DEPS_RESET, '$DEPS_RESET'),
-  $DEPS_RESET_ALL: Helpers.CLIWRAP($DEPS_RESET_ALL, '$DEPS_RESET_ALL'),
   $DEDUPE: Helpers.CLIWRAP($DEDUPE, '$DEDUPE'),
   $DEDUPE_COUNT: Helpers.CLIWRAP($DEDUPE_COUNT, '$DEDUPE_COUNT'),
   $DEDUPE_CHECK: Helpers.CLIWRAP($DEDUPE_CHECK, '$DEDUPE_CHECK'),
@@ -843,14 +734,6 @@ export default {
   HIDE: Helpers.CLIWRAP(HIDE, 'HIDE'),
   SHOW_DEPS: Helpers.CLIWRAP(SHOW_DEPS, 'SHOW_DEPS'),
   $DEPS_RECREATE: Helpers.CLIWRAP($DEPS_RECREATE, '$DEPS_RECREATE'),
-  $SHOW_PROJECTS: Helpers.CLIWRAP($SHOW_PROJECTS, '$SHOW_PROJECTS'),
-  $SHOW_PROJECTS_NAVI: Helpers.CLIWRAP($SHOW_PROJECTS_NAVI, '$SHOW_PROJECTS_NAVI'),
-  $DB_CODE: Helpers.CLIWRAP($DB_CODE, '$DB_CODE'),
-  $CODE_DB: Helpers.CLIWRAP($CODE_DB, '$CODE_DB'),
-  // $SHOW_DB: Helpers.CLIWRAP($SHOW_DB, '$SHOW_DB'),
-  // $DB_SHOW: Helpers.CLIWRAP($DB_SHOW, '$DB_SHOW'),
-  $DB: Helpers.CLIWRAP($DB, '$DB'),
-  $SHOW_WORKER: Helpers.CLIWRAP($SHOW_WORKER, '$SHOW_WORKER'),
   $SHOW_CORE_MODULES: Helpers.CLIWRAP($SHOW_CORE_MODULES, '$SHOW_CORE_MODULES'),
   DEPS_SHOW_IF_STANDALONE: Helpers.CLIWRAP(DEPS_SHOW_IF_STANDALONE, 'DEPS_SHOW_IF_STANDALONE'),
   DEPS_HIDE: Helpers.CLIWRAP(DEPS_HIDE, 'DEPS_HIDE'),
@@ -868,8 +751,6 @@ export default {
   $copytoproject: Helpers.CLIWRAP($copytoproject, '$copytoproject'),
   $copy_to_project: Helpers.CLIWRAP($copy_to_project, '$copy_to_project'),
   $copyto: Helpers.CLIWRAP($copyto, '$copyto'),
-  $COPY_TO_ADD: Helpers.CLIWRAP($COPY_TO_ADD, '$COPY_TO_ADD'),
-  $COPY_TO_REMOVE: Helpers.CLIWRAP($COPY_TO_REMOVE, '$COPY_TO_REMOVE'),
   $copymoduletoproject: Helpers.CLIWRAP($copymoduletoproject, '$copymoduletoproject'),
   $copy_module_to_project: Helpers.CLIWRAP($copy_module_to_project, '$copy_module_to_project'),
 }

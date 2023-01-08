@@ -6,39 +6,16 @@ import { fse } from 'tnp-core'
 import { config } from 'tnp-config';
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
-import { TnpDB } from 'tnp-db';
 import chalk from 'chalk';
 //#endregion
 
 //#region open
 
 //#region open / open
+
 async function $OPEN(args: string) {
-  const db = await TnpDB.Instance();
-  if (args.length === 0) {
-    Helpers.openFolderInFileExploer(process.cwd());
-    process.exit(0)
-  }
-  const name = _.first(args.split(' '));
-  let projects = []
-  if (config.coreProjectVersions.includes(name) && Project.Current.isContainer) {
-    projects = (Project.Current.children as Project[]).filter(c => c.frameworkVersionAtLeast(name as any));
-  } else {
-    projects = (await db.getProjects()).filter(p => {
-      // @ts-ignore
-      return ((p.project as Project).name === name) || ((p.project as Project).genericName === name)
-    }).map(c => c.project);
-  }
-  if (projects.length > 0) {
-    for (let index = 0; index < projects.length; index++) {
-      const p = projects[index];
-      Helpers.run(`code ${p.location}`, { biggerBuffer: false }).sync();
-    }
-    process.exit(0);
-  } else {
-    Helpers.log(`Projects not found`);
-    process.exit(0)
-  }
+  Helpers.openFolderInFileExploer(process.cwd());
+  process.exit(0);
 
 }
 //#endregion

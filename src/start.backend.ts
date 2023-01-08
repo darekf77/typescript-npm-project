@@ -71,8 +71,6 @@ import { Project } from './lib/project';
 
 // import { ConsoleUi } from './console-ui';
 import { Helpers as TnpHelpers } from 'tnp-helpers';
-import { CLI_FUNCTIONS } from 'tnp-db';
-import { TnpDB } from 'tnp-db';
 
 import { CLASS } from 'typescript-class-helpers';
 import { CLI } from 'tnp-cli';
@@ -167,22 +165,6 @@ export async function start(
 
   Helpers.log(`[start] instance access granted`)
   // Helpers.log(argsv)
-
-  const lastCmds = CLI_FUNCTIONS.map(f => TnpHelpers.cliTool.simplifiedCmd(CLASS.getName(f)));
-  const arg = TnpHelpers.cliTool.simplifiedCmd(argsv[2]);
-  Helpers.log(`lastCmds: ${lastCmds}`)
-  Helpers.log(`args=${argsv.join(',')} , argsv.length=${argsv.length}`)
-  Helpers.log(`Helpers.cliTool.simplifiedCmd(argsv[2]) "${TnpHelpers.cliTool.simplifiedCmd(argsv[2])}" `);
-  // process.exit(0)
-  if (lastCmds.includes(arg)) {
-    Helpers.log(`DO NOTHIGN`);
-  } else {
-    const db = await TnpDB.Instance();
-    Helpers.log('[db] staring setting command...', 1)
-    await db.setCommand(argsv.join(' '));
-    Helpers.log('[db] finish setting command', 1)
-  }
-
 
   //#region local libs run
   // if (Array.isArray(argsv) && argsv.length >= 3) {

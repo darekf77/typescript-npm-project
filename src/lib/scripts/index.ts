@@ -1,5 +1,4 @@
 //#region  @backend
-import BENCHMARKS from './BENCHMARK/BENCHMARK-TNP-PROJECTS.backend';
 import COMPILERS from './COMPILERS-TESTING/COMPILERS.backend';
 import { DB } from 'tnp-db';
 import DEPS from './DEPENDENCIES-MANAGEMENT/DEPS.backend';
@@ -9,7 +8,6 @@ import BUILD from './PROJECTS-DEVELOPMENT/BUILD.backend';
 import RELEASE from './PROJECTS-DEVELOPMENT/RELEASE.backend';
 import BRANDING from './PROJECTS-DEVELOPMENT/BRANDING.backend';
 import DEVELOP from './PROJECTS-DEVELOPMENT/DEVELOP.backend';
-import STUB from './PROJECTS-DEVELOPMENT/STUB.backend';
 import TESTS from './PROJECTS-DEVELOPMENT/TESTS';
 import FILES_STRUCTURE from './PROJECTS-DEVELOPMENT/FILES_STRUCTURE';
 import VSCODE from './VSCODE-EXT/VSCODE.backend';
@@ -23,7 +21,6 @@ import UPDATE from './UPDATE.backend';
 import JAVA from './JAVA.backend';
 
 export default [
-  BENCHMARKS,
   COMPILERS,
   DB,
   DEPS,
@@ -34,7 +31,6 @@ export default [
   RELEASE,
   BRANDING,
   DEVELOP,
-  STUB,
   TESTS,
   FILES_STRUCTURE,
   VSCODE,

@@ -1,7 +1,6 @@
 import { Helpers } from 'tnp-helpers';
-import { path, _, crossPlatformPath, fse, os } from 'tnp-core';
+import { path, _, crossPlatformPath, os } from 'tnp-core';
 import { config } from 'tnp-config';
-import { TnpDB } from 'tnp-db';
 import { Project } from '../../project/abstract/project';
 
 export function $VSCODE_EXT(args: string, exit = true) {
@@ -47,18 +46,6 @@ export function $INIT_VSCODE() {
   process.exit(0);
 }
 
-export async function $VSCODE_INIT_ALL() {
-  const db = await TnpDB.Instance();
-  const projects = await db.getProjects();
-  for (let index = 0; index < projects.length; index++) {
-    const proj = projects[index];
-    // @ts-ignore
-    (proj.project as Project).recreate.vscode.settings.excludedFiles();
-    // @ts-ignore
-    (proj.project as Project).recreate.vscode.settings.colorsFromWorkspace();
-  }
-  process.exit(0);
-}
 
 function $WSL_FIX() {
   Helpers.run(`echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`).sync();
@@ -71,11 +58,6 @@ function $VSCODE() {
 
 function $VSCODE_INIT() {
   $INIT_VSCODE();
-}
-
-
-async function $INIT_ALL_VSCODE() {
-  await $VSCODE_INIT_ALL();
 }
 
 async function PROJECT_KILL_ALL() {
@@ -254,30 +236,6 @@ function $VSCODE_GLOBAL() {
   process.exit(0);
 }
 
-const $VSCODE_FIX = async () => {
-  const db = await TnpDB.Instance();
-  const projects = await db.getProjects();
-  for (let index = 0; index < projects.length; index++) {
-    const proj = projects[index];
-    // @ts-ignore
-    proj.project && (proj.project as Project).recreate.vscode.settings.changeColorTheme(false);
-  }
-  await new Promise(resolve => setTimeout(() => resolve(void 0), 1000));
-  for (let index = 0; index < projects.length; index++) {
-    const proj = projects[index];
-    // @ts-ignore
-    proj.project && (proj.project as Project).recreate.vscode.settings.changeColorTheme();
-  }
-  await new Promise(resolve => setTimeout(() => resolve(void 0), 1000));
-  for (let index = 0; index < projects.length; index++) {
-    const proj = projects[index];
-    // @ts-ignore
-    proj.project && (proj.project as Project).recreate.vscode.settings.gitReset();
-  }
-  process.exit(0);
-};
-
-
 const $FILES_HIDE = (args, exit) => $VSCODE_TEMP_HIDE(args, exit);
 const $FILES_SHOW = (args, exit) => $VSCODE_TEMP_SHOW(args, exit);
 const $FILES_SHOW_ALL = (args, exit = true) => {
@@ -340,13 +298,10 @@ export default {
   $FILES_HIDE: Helpers.CLIWRAP($FILES_HIDE, '$FILES_HIDE'),
   $FILES_HIDE_ALL: Helpers.CLIWRAP($FILES_HIDE_ALL, '$FILES_HIDE_ALL'),
   $INIT_VSCODE: Helpers.CLIWRAP($INIT_VSCODE, '$INIT_VSCODE'),
-  $VSCODE_INIT_ALL: Helpers.CLIWRAP($VSCODE_INIT_ALL, '$VSCODE_INIT_ALL'),
   $VSCODE: Helpers.CLIWRAP($VSCODE, '$VSCODE'),
   $VSCODE_INIT: Helpers.CLIWRAP($VSCODE_INIT, '$VSCODE_INIT'),
-  $INIT_ALL_VSCODE: Helpers.CLIWRAP($INIT_ALL_VSCODE, '$INIT_ALL_VSCODE'),
   PROJECT_KILL_ALL: Helpers.CLIWRAP(PROJECT_KILL_ALL, 'PROJECT_KILL_ALL'),
   $WSL_FIX: Helpers.CLIWRAP($WSL_FIX, '$WSL_FIX'),
   $FIX_WSL: Helpers.CLIWRAP($FIX_WSL, '$FIX_WSL'),
   $VSCODE_GLOBAL: Helpers.CLIWRAP($VSCODE_GLOBAL, '$VSCODE_GLOBAL'),
-  $VSCODE_FIX: Helpers.CLIWRAP($VSCODE_FIX, '$VSCODE_FIX'),
 };

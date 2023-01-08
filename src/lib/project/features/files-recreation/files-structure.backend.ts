@@ -5,7 +5,6 @@ import { fse } from 'tnp-core'
 
 import { Helpers } from 'tnp-helpers';
 import { FeatureForProject, Project } from '../../abstract';
-import { TnpDB } from 'tnp-db';
 import { config } from 'tnp-config';
 import { ProjectFactory } from '../../../scripts/NEW-PROJECT_FILES_MODULES';
 import { PROGRESS_DATA } from 'tnp-models';
@@ -125,10 +124,7 @@ export class FilesStructure extends FeatureForProject {
       }
     }
 
-    Helpers.log(`[init] adding project is not exists... (${this.project.genericName})`)
-    const db = await TnpDB.Instance();
-    // Helpers.log(`[init] db initined... `)
-    await db.addProjectIfNotExist(this.project as any);
+
     Helpers.log(`[init] adding project is not exists...done(${this.project.genericName})  `)
 
     if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {

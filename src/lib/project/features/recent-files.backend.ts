@@ -6,7 +6,6 @@ import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { FeatureForProject } from '../abstract/feature-for-project';
 import { Project } from '../abstract/project';
-import { TnpDB } from 'tnp-db';
 
 export type RecentFilesJson = {
   recentOpenProjects: string[];
@@ -28,27 +27,7 @@ export class RecentFilesForContainer extends FeatureForProject {
   //#endregion
 
   async saveActiveProjects(override = true) {
-    if (this.project.isSmartContainer) {
-      return;
-    }
-    if (!this.project.isContainer) {
-      Helpers.error(`[tnp-recent-files] Project is not container... `, false, true);
-    }
-    const db = await TnpDB.Instance();
-
-    // let projects = (await db.getProjects())
-    //   .map(p => p.project)
-    //   .filter(p => p.typeIsNot(...config.notFiredevProjects));
-
-    const builds = await db.getBuildsBy({
-      watch: true,
-    });
-    const container = this.project;
-    // @ts-ignore
-    const onlyChildren = builds.map(c => c.project as Project).filter(p => p.location.startsWith(container.location));
-    this.setFrom(onlyChildren.map(c => {
-      return c.location.replace(`${container.location}/`, '');
-    }).join(' '), override);
+    return; // TODO
   }
 
   //#region read config

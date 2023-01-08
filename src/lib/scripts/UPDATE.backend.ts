@@ -24,9 +24,13 @@ function $UPDATE(args: string) {
     Helpers.success('FIREDEV AUTOUPDATE DONE');
   }
   if (config.frameworkName === 'tnp') {
+    Helpers.taskStarted('Removing old node_modules..');
     Project.Tnp.run('rimraf tmp-node_modules').sync();
-    Project.Tnp.run('mv node_modules tmp-node_modules && npm i --force && tnp dedupe').sync();
-    Project.by('container', (Project.Tnp as Project)._frameworkVersion).run('tnp reinstall').sync();
+    Helpers.taskDone();
+    Helpers.taskStarted('Installing new version of firedev pacakges')
+    Project.Tnp.run(`mv node_modules tmp-node_modules && npm i --force && npm-run tsc && ${config.frameworkName} dedupe`).sync();
+    Project.by('container', (Project.Tnp as Project)._frameworkVersion).run(`${config.frameworkName} reinstall`).sync();
+    Helpers.taskDone('UPDATE DONE');
   }
 
 

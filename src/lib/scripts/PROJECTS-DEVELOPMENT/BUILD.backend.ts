@@ -2,14 +2,11 @@
 import { _, crossPlatformPath } from 'tnp-core';
 import * as express from 'express';
 import { path } from 'tnp-core';
-import { TnpDB } from 'tnp-db';
 import { Project } from '../../project';
 import type { ProjectDocker } from '../../project';
 import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
-import chalk from 'chalk';
-import { chainBuild } from './chain-build.backend';
 //#endregion
 
 //#region BUILD
@@ -28,7 +25,7 @@ const $BUILD = async (args) => {
   if (proj.isSmartContainerChild) {
     await BUILD_DIST(args);
   } else {
-    await chainBuild(args);
+
   }
 };
 
@@ -173,67 +170,10 @@ async function $BUILD_DOCS_PROD(args) {
 }
 //#endregion
 
-//#region BUILD / STOP BUILD WATCH
-const $STOP_BUILD_DIST_WATCH = async (args) => {
-  const db = await TnpDB.Instance();
-  const projectLocation = (Project.Current as Project).location;
-  await db.updateProcesses();
-  const pidsToKill = (await db.getBuilds())
-    .filter(f =>
-      f.location === projectLocation
-      && f.buildOptions
-      && f.buildOptions.watch
-      && !f.buildOptions.appBuild
-    )
-    .map(f => f.pid);
-  Helpers.info(`Killing build dist process in ${projectLocation}`);
-  for (let index = 0; index < pidsToKill.length; index++) {
-    const pid = pidsToKill[index];
-    try {
-      Helpers.killProcess(pid);
-      Helpers.info(`Process killed on pid ${pid}`);
-    } catch (error) {
-      Helpers.warn(`Not able to kill process on pid ${pid}`);
-    }
-  }
-  Helpers.info('Done');
-  process.exit(0);
-};
-//#endregion
-
-//#region BUILD / SINGLUAR (deprecated)
-async function $ACTIVE_SINGULAR_BUILD(args) {
-  await (Project.Current as Project).hasParentWithSingularBuild();
-  // process.stdout.write();
-  process.exit(0);
-}
-//#endregion
 
 //#endregion
 
 //#region STATIC BUILD
-const STATIC_BUILD = async (args) => {
-  const project = (Project.Current as Project);
-  if
-    (!project.isWorkspace
-    // && !project.isStandaloneProject
-  ) {
-    Helpers.error(`Please use:
-${chalk.gray(`$ ${config.frameworkName} static:build:lib`)}
-or
-${chalk.gray(`$ ${config.frameworkName} static:build:app`)}
-
-inside workspace children or inside standalone project.
-    `, false, true);
-  }
-  const staticVersionOfProject = await project.StaticVersion();
-  if (staticVersionOfProject) {
-    await staticVersionOfProject.buildProcess.startForLib({ args, staticBuildAllowed: true });
-  } else {
-    Helpers.log(`No static version for project: ${(Project.Current as Project).name}`);
-  }
-
-};
 
 const STATIC_BUILD_LIB = async (args) => {
   const staticVersionOfProject = await (Project.Current as Project).StaticVersion();
@@ -263,7 +203,6 @@ const STATIC_BUILD_APP = async (args) => (await (Project.Current as Project).Sta
 const STATIC_BUILD_APP_PROD = async (args) => (await (Project.Current as Project).StaticVersion()).buildProcess
   .startForApp({ prod: true, args, staticBuildAllowed: true });
 
-const SB = (args) => STATIC_BUILD(args);
 const SBP = (args) => STATIC_BUILD_PROD(args);
 const SBL = (args) => STATIC_BUILD_LIB(args);
 const SBLP = (args) => STATIC_BUILD_LIB_PROD(args);
@@ -415,13 +354,6 @@ const $STOP = async (args) => {
 };
 
 
-
-async function $DB_BUILDS_UPDATE() {
-  const db = await TnpDB.Instance();
-  await db.updateProcesses();
-  process.exit(0);
-}
-
 //#endregion
 
 export default {
@@ -435,22 +367,7 @@ export default {
   $BUILD: Helpers.CLIWRAP($BUILD, '$BUILD'),
   $CLEAN_BUILD: Helpers.CLIWRAP($CLEAN_BUILD, '$CLEAN_BUILD'),
   $BUILD_WATCH: Helpers.CLIWRAP($BUILD_WATCH, '$BUILD_WATCH'),
-  $ACTIVE_SINGULAR_BUILD: Helpers.CLIWRAP($ACTIVE_SINGULAR_BUILD, '$ACTIVE_SINGULAR_BUILD'),
   $DEFAULT_BUILD: Helpers.CLIWRAP($DEFAULT_BUILD, '$DEFAULT_BUILD'),
-  $DB_BUILDS_UPDATE: Helpers.CLIWRAP($DB_BUILDS_UPDATE, '$DB_BUILDS_UPDATE'),
-  $STOP_BUILD_DIST_WATCH: Helpers.CLIWRAP($STOP_BUILD_DIST_WATCH, '$STOP_BUILD_DIST_WATCH'),
-  STATIC_BUILD: Helpers.CLIWRAP(STATIC_BUILD, 'STATIC_BUILD'),
-  SB: Helpers.CLIWRAP(SB, 'SB'),
-  STATIC_BUILD_PROD: Helpers.CLIWRAP(STATIC_BUILD_PROD, 'STATIC_BUILD_PROD'),
-  SBP: Helpers.CLIWRAP(STATIC_BUILD_PROD, 'STATIC_BUILD_PROD'),
-  STATIC_BUILD_LIB: Helpers.CLIWRAP(STATIC_BUILD_LIB, 'STATIC_BUILD_LIB'),
-  SBL: Helpers.CLIWRAP(SBL, 'SBL'),
-  STATIC_BUILD_LIB_PROD: Helpers.CLIWRAP(STATIC_BUILD_LIB_PROD, 'STATIC_BUILD_LIB_PROD'),
-  SBLP: Helpers.CLIWRAP(SBLP, 'SBLP'),
-  STATIC_BUILD_APP: Helpers.CLIWRAP(STATIC_BUILD_APP, 'STATIC_BUILD_APP'),
-  SBA: Helpers.CLIWRAP(SBA, 'SBA'),
-  STATIC_BUILD_APP_PROD: Helpers.CLIWRAP(STATIC_BUILD_APP_PROD, 'STATIC_BUILD_APP_PROD'),
-  SBAP: Helpers.CLIWRAP(SBAP, 'SBAP'),
   BUILD_DIST: Helpers.CLIWRAP(BUILD_DIST, 'BUILD_DIST'),
   BUILD_DIST_ALL: Helpers.CLIWRAP(BUILD_DIST_ALL, 'BUILD_DIST_ALL'),
   BUILD_LIB: Helpers.CLIWRAP(BUILD_LIB, 'BUILD_LIB'),

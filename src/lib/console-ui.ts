@@ -5,9 +5,7 @@
 // import { fse } from 'tnp-core'
 // import { path } from 'tnp-core'
 // import { EnumValues } from 'enum-values'
-// import { CommandInstance } from './tnp-db/entites';
 // import { Helpers } from 'tnp-helpers';
-// import { TnpDB } from './tnp-db/wrapper-db';
 // import * as fuzzy from 'fuzzy'
 // import * as inquirer from 'inquirer'
 // import * as inquirerAutocomplete from 'inquirer-autocomplete-prompt'
@@ -45,10 +43,6 @@
 
 // export class ConsoleUi {
 
-//   private readonly lastCommandFileName = 'last-command.txt'
-//   constructor(public project: Project, private db: TnpDB) {
-
-//   }
 
 //   lastCmd: CommandInstance;
 //   get lastCommandAvailable(): Boolean {
