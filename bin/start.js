@@ -36,12 +36,13 @@ global.hideLog = !verbose;
 global.verboseLevel = 0;
 global.useWorker = !(typeof process.argv.find(a => a.startsWith('-useWorker=false')) !== 'undefined');
 global.useWebpackBackendBuild = (typeof process.argv.find(a => a.startsWith('-webpack')) !== 'undefined');
+global.skipCoreCheck = (typeof process.argv.find(a => a.startsWith('--skipCoreCheck')) !== 'undefined');
 const verboseLevelExists = (typeof process.argv.find(a => a.startsWith('-verbose=')) !== 'undefined');
 global.verboseLevel = (verboseLevelExists ? Number(
   process.argv.find(a => a.startsWith('-verbose='))?.replace('-verbose=', '')
 ) : 0) || 0;
 
-if(!verbose && verboseLevelExists) {
+if (!verbose && verboseLevelExists) {
   global.hideLog = false;
 }
 
@@ -54,6 +55,7 @@ const spinnerOffInArgs = (process.argv.includes('-spinner=false') || process.arg
 //#region clear argument from variables
 process.argv = process.argv.filter(a => !a.startsWith('-spinner'));
 process.argv = process.argv.filter(a => a !== '-childproc');
+process.argv = process.argv.filter(a => a !== '--skipCoreCheck');
 process.argv = process.argv.filter(a => a !== '-dist');
 process.argv = process.argv.filter(a => a !== '-npm');
 process.argv = process.argv.filter(a => !a.startsWith('-verbose'));
