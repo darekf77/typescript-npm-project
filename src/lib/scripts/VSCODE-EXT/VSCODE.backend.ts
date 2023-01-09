@@ -17,12 +17,12 @@ export function $VSCODE_EXT(args: string, exit = true) {
 }
 
 function showfilesfor(project: Project) {
-  project.recreate.vscode.settings.excludedFiles(false);
+  project.recreate.vscode.settings.hideOrShowFilesInVscode(false);
   project.recreate.vscode.settings.colorsFromWorkspace();
 }
 
 function hidefilesfor(project: Project) {
-  project.recreate.vscode.settings.excludedFiles(true);
+  project.recreate.vscode.settings.hideOrShowFilesInVscode(true);
   project.recreate.vscode.settings.colorsFromWorkspace();
 }
 
@@ -41,7 +41,7 @@ export function $VSCODE_TEMP_HIDE(args: string, exit = true) {
 }
 
 export function $INIT_VSCODE() {
-  (Project.Current as Project).recreate.vscode.settings.excludedFiles();
+  (Project.Current as Project).recreate.vscode.settings.hideOrShowFilesInVscode();
   (Project.Current as Project).recreate.vscode.settings.colorsFromWorkspace();
   process.exit(0);
 }

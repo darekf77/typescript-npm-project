@@ -61,7 +61,7 @@ export class FilesRecreator extends FeatureForProject {
   }
 
   initVscode() {
-    this.vscode.settings.excludedFiles(true);
+    this.vscode.settings.hideOrShowFilesInVscode(true);
     this.vscode.settings.colorsFromWorkspace();
   }
 
@@ -239,7 +239,7 @@ export class FilesRecreator extends FeatureForProject {
     return {
       get settings() {
         return {
-          hideOrShowDeps() {
+          toogleHideOrShowDeps() {
             let action: 'hide' | 'show' | 'nothing';
             self.modifyVscode((settings) => {
               const exclude = settings['files.exclude'];
@@ -255,11 +255,11 @@ export class FilesRecreator extends FeatureForProject {
             });
             if (action === 'hide') {
               Helpers.log(`Auto hiding while init`);
-              self.vscode.settings.excludedFiles(true);
+              self.vscode.settings.hideOrShowFilesInVscode(true);
             }
             if (action === 'show') {
               Helpers.info(`Auto showing while init`);
-              self.vscode.settings.excludedFiles(false);
+              self.vscode.settings.hideOrShowFilesInVscode(false);
             }
           },
           gitReset() {
@@ -308,7 +308,7 @@ export class FilesRecreator extends FeatureForProject {
             });
           },
 
-          excludedFiles(hide: boolean = true) {
+          hideOrShowFilesInVscode(hide: boolean = true) {
             self.modifyVscode(settings => {
               settings['files.exclude'] = {};
 

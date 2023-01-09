@@ -224,7 +224,7 @@ export class FilesStructure extends FeatureForProject {
     }
 
     await this.project.recreate.init();
-    this.project.recreate.vscode.settings.hideOrShowDeps();
+    this.project.recreate.vscode.settings.toogleHideOrShowDeps();
 
     if (this.project.isStandaloneProject) {
       if (_.isNil(this.project.buildOptions)) { // TODO QUICK_FIX

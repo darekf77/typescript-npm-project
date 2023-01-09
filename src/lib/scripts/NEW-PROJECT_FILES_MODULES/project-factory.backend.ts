@@ -316,7 +316,11 @@ export class ProjectFactory {
         parentContainer = currentContainer;
 
         if (isLastContainer && smart && isBrandNew && (!parentContainer || !parentContainer.isSmartContainer)) {
-          currentContainer.run('git init').sync();
+          try {
+            currentContainer.run('git init').sync();
+          } catch (error) {
+            Helpers.warn(`Not able to git init inside: ${currentContainer?.location}`)
+          }
         }
 
         if (!firstContainer) {
@@ -349,7 +353,14 @@ export class ProjectFactory {
     } as Models.npm.IPackageJSON);
     appProj = (Project.From(appLocation) as Project);
     if (lastContainer && lastContainer.isContainer && !lastContainer.isMonorepo) {
-      appProj.run('git init').sync();
+
+      try {
+        appProj.run('git init').sync();
+      } catch (error) {
+        console.log(error);
+        Helpers.warn(`Not able to git init inside: ${appProj.location}`)
+      }
+
     }
     appProj.addSourcesFromCore();
 
@@ -387,6 +398,8 @@ export class ProjectFactory {
     // if (grandpa && (grandpa.isContainer || grandpa.isStandaloneProject)) {
     //   await grandpa.filesStructure.init(grandpa.isSmartContainer ? appProj.name : '')
     // }
+
+    appProj.recreate.vscode.settings.hideOrShowFilesInVscode(false);
 
     return { containers, firstContainer, lastContainer, lastIsBrandNew, appProj };
   }
@@ -488,7 +501,12 @@ export class ProjectFactory {
         const containerProj = (Project.From(containerPath) as Project);
         if (containerProj) {
           await containerProj.filesStructure.init(smart ? projName : '')
-          containerProj.run('git init').sync();
+          try {
+            containerProj.run('git init').sync();
+          } catch (error) {
+            Helpers.warn(`Not able to git init inside: ${containerProj?.location}`)
+          }
+
           if (!firstContainer) {
             firstContainer = containerProj;
           }
@@ -636,7 +654,7 @@ export class ProjectFactory {
     // }
     Helpers.log(`[create] Project from create method: ${newCreatedProject && newCreatedProject.genericName} `)
     if (newCreatedProject) {
-      newCreatedProject.recreate.vscode.settings.excludedFiles();
+      newCreatedProject.recreate.vscode.settings.hideOrShowFilesInVscode();
       newCreatedProject.recreate.vscode.settings.colorsFromWorkspace();
 
       if (siteProjectMode === 'dependency') {
