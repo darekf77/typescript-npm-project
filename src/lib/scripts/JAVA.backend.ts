@@ -5,7 +5,10 @@ import { Helpers } from "tnp-helpers";
 async function SELECT_JAVA() {
   Helpers.clearConsole()
   const questions = (await Helpers
-    .commnadOutputAsStringAsync('/usr/libexec/java_home -V', process.cwd(), false, true))
+    .commnadOutputAsStringAsync('/usr/libexec/java_home -V', process.cwd(), {
+      biggerBuffer: false,
+      showWholeCommandNotOnlyLastLine: true
+    }))
     .split('\n')
     .map(f => crossPlatformPath(f).trim())
     .filter(f => f.endsWith('Home'))
@@ -22,7 +25,7 @@ async function SELECT_JAVA() {
     })
 
   const v = await Helpers.autocompleteAsk('Choose java sdk version:', questions);
-  Helpers.terminal.copyText (`export JAVA_HOME=${v}`);
+  Helpers.terminal.copyText(`export JAVA_HOME=${v}`);
   Helpers.info(`press ctrl(cmd) - v  and then ENTER `);
 
   process.exit(0)

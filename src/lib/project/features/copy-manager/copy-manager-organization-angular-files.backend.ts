@@ -260,6 +260,7 @@ export class CopyMangerOrganizationAngularFiles {
       // pj[exportsKey] = {};
       for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
         const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
+        // TODO @LAST
         pj[`.${currentBrowserFolder}`] = `./${currentBrowserFolder}`;
         // pj[`${exportsKey}${currentBrowserFolder}`] =
       }

@@ -63,7 +63,7 @@ export class SmartNodeModules extends FeatureForProject {
 
   //#region container core project for this project
   private get containerCore() {
-    Helpers.info('Preparing cointainer core ...')
+    Helpers.taskStarted('Preparing cointainer core ...', true)
     const frameworkVersion = this.project._frameworkVersion;
     const container = Project.by('container', frameworkVersion) as Project;
     if (this.project.location === container?.location) {
@@ -73,7 +73,7 @@ export class SmartNodeModules extends FeatureForProject {
       prepareContainerProject(container, this.project);
     }
     SmartNodeModules._prepared[container.location] = container;
-    Helpers.info('Preparing cointainer core ... done')
+    Helpers.taskDone('Preparing cointainer core ... done', true)
     return container;
   }
   //#endregion
@@ -316,7 +316,7 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
   }
 
   if (!reinstallForceSmartNodeModules && containerCoreProject.node_modules.exist) {
-    Helpers.info(`
+    Helpers.log(`
 
     No need for update of node_modules links for ${CLI.chalk.bold(containerCoreProject.genericName)}
 

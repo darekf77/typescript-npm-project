@@ -728,13 +728,6 @@ export class ProjectIsomorphicLib
         //#endregion
       }
 
-      // @LAST
-      // 1. check if firedev build cuts dts...
-      // 2. check combinations of build
-      // 3. remove tnp-db
-      // 4. release
-
-
       if (includeNodeModules) {
         this.backendIncludeNodeModulesInCompilation(
           outDir,
