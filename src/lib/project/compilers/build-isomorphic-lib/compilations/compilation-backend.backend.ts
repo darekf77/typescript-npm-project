@@ -1,7 +1,7 @@
 //#region imports
 import { IncCompiler } from "incremental-compiler";
 import { config, ConfigModels } from "tnp-config";
-import { child_process, crossPlatformPath, fse, path, _ } from "tnp-core";
+import { crossPlatformPath, fse, path, _ } from "tnp-core";
 import { Helpers } from "tnp-helpers";
 import { Models } from "tnp-models";
 import { CLASS } from "typescript-class-helpers";
@@ -289,65 +289,65 @@ Starting backend typescirpt build....
     // console.log({ isStandalone, buildOutDir })
     //#region normal js build
     // if (watch) {
-    await Helpers.execute(child_process.exec(commandJs, { cwd }),
-      {
-        exitOnError: true,
-        exitOnErrorCallback: async (code) => {
-          Helpers.error(`[${config.frameworkName}] Typescript compilation (backend) error (code=${code})`
-            , false, true);
-        },
-        outputLineReplace: (line: string) => {
-          if (isStandalone) {
+    await Helpers.execute(commandJs, cwd,
+    {
+      exitOnError: true,
+      exitOnErrorCallback: async (code) => {
+        Helpers.error(`[${config.frameworkName}] Typescript compilation (backend) error (code=${code})`
+          , false, true);
+      },
+      outputLineReplace: (line: string) => {
+        if (isStandalone) {
+          return additionalReplace(line.replace(
+            `../tmp-source-${buildOutDir}/`,
+            `./src/`
+          ));
+        } else {
+          line = line.trimLeft();
+          // console.log({ line })
+          if (line.startsWith('./src/libs/')) {
+            const [__, ___, moduleName] = line.split('/');
+            return additionalReplace(line.replace(
+              `./src/libs/${moduleName}/`,
+              `./${moduleName}/src/lib/`,
+            ));
+          } else if (line.startsWith(`../tmp-source-${buildOutDir}/libs/`)) {
+            const [__, ___, ____, moduleName] = line.split('/');
+            return additionalReplace(line.replace(
+              `../tmp-source-${buildOutDir}/libs/${moduleName}/`,
+              `./${moduleName}/src/lib/`,
+            ));
+          } else if (line.startsWith(`../tmp-source-${buildOutDir}/`)) {
             return additionalReplace(line.replace(
               `../tmp-source-${buildOutDir}/`,
-              `./src/`
+              `./${project.name}/src/`,
             ));
-          } else {
-            line = line.trimLeft();
-            // console.log({ line })
-            if (line.startsWith('./src/libs/')) {
-              const [__, ___, moduleName] = line.split('/');
-              return additionalReplace(line.replace(
-                `./src/libs/${moduleName}/`,
-                `./${moduleName}/src/lib/`,
-              ));
-            } else if (line.startsWith(`../tmp-source-${buildOutDir}/libs/`)) {
-              const [__, ___, ____, moduleName] = line.split('/');
-              return additionalReplace(line.replace(
-                `../tmp-source-${buildOutDir}/libs/${moduleName}/`,
-                `./${moduleName}/src/lib/`,
-              ));
-            } else if (line.startsWith(`../tmp-source-${buildOutDir}/`)) {
-              return additionalReplace(line.replace(
-                `../tmp-source-${buildOutDir}/`,
-                `./${project.name}/src/`,
-              ));
 
-            } else {
-              return additionalReplace(line.replace(
-                `./src/`,
-                `./${project.name}/src/lib/`
-              ));
-            }
+          } else {
+            return additionalReplace(line.replace(
+              `./src/`,
+              `./${project.name}/src/lib/`
+            ));
           }
-        },
-        resolvePromiseMsg: {
-          stdout: ['Watching for file changes.']
         }
-      });
+      },
+      resolvePromiseMsg: {
+        stdout: ['Watching for file changes.']
+      }
+    });
 
     Helpers.info(`* Typescirpt compilation first part done (${buildOutDir} build). ${websql ? '[WEBSQL]' : ''} `)
 
-    await Helpers.execute(child_process.exec(commandMaps, { cwd }),
-      {
-        hideOutput: {
-          stderr: true,
-          stdout: true,
-        },
-        resolvePromiseMsg: {
-          stdout: ['Watching for file changes.']
-        }
-      });
+    await Helpers.execute(commandMaps, cwd,
+    {
+      hideOutput: {
+        stderr: true,
+        stdout: true,
+      },
+      resolvePromiseMsg: {
+        stdout: ['Watching for file changes.']
+      }
+    });
     Helpers.info(`* Typescirpt compilation second part done (${buildOutDir}  build).  ${websql ? '[WEBSQL]' : ''} `)
     // if (generateDeclarations) {
     //   Helpers.log(`(${this.compilerName}) Execute second command : ${commandDts}    # inside: ${cwd}`)

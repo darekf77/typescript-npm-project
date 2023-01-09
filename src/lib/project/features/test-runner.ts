@@ -50,6 +50,7 @@ export class TestRunner
         // Running command: ${command}
 
         // `)
+        command = Helpers._fixCommand(command);
         const result = child_process.execSync(command, {
           stdio: ['pipe', 'pipe', 'pipe'],
           env: { ...process.env, FORCE_COLOR: '1' },
