@@ -53,7 +53,7 @@ async function $INIT_CORE() {
 function $UPDATE(args: string) {
 
   if (config.frameworkName === 'firedev') {
-    Helpers.run('npm i -g firedev').sync();
+    Helpers.run('npm i -g firedev --force').sync();
     const morphiPathUserInUserDir = config.morphiPathUserInUserDir;
     try {
       Helpers.run(`git reset --hard && git pull origin master`,
