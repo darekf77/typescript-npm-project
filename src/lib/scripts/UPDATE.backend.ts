@@ -18,7 +18,7 @@ async function $INIT_CORE() {
   })[] = [];
 
   (config.coreProjectVersions as ConfigModels.FrameworkVersion[]).forEach(v => {
-    let corePorjectsTypes: ConfigModels.LibType[] = ['angular-lib', 'isomorphic-lib'];
+    let corePorjectsTypes: ConfigModels.LibType[] = ['isomorphic-lib'];
     if ((['v3', 'v1'] as ConfigModels.FrameworkVersion[]).includes(v)) {
       corePorjectsTypes = ['isomorphic-lib'];
     }
@@ -30,7 +30,7 @@ async function $INIT_CORE() {
   });
 
   for (let index = 0; index < allCoreProject.length; index++) {
-    const projectToInit = allCoreProject[index];
+    const projectToInit = allCoreProject[index] as Project;
     Helpers.log(`${projectToInit.genericName} ${projectToInit.location}`);
     const linkedFiles = projectToInit.projectLinkedFiles();
     for (let index2 = 0; index2 < linkedFiles.length; index2++) {
@@ -46,7 +46,8 @@ async function $INIT_CORE() {
     }
     await projectToInit.filesStructure.struct();
   }
-  Helpers.taskDone()
+  Helpers.taskDone('DONE');
+  process.exit(0)
 }
 
 function $UPDATE(args: string) {
