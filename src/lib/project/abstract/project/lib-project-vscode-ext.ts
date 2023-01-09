@@ -46,7 +46,7 @@ export class LibProjectVscodeExt {
     const vsixPackageName = this.extensionVsixName;
     try {
       await Helpers.actionWrapper(() => {
-        this.lib.run(`vsce package`).sync();
+        this.lib.run(`firedev-vsce package`).sync();
       }, `Building vsix package ` + CLI.chalk.bold(vsixPackageName) + `... `);
       if (showInfo) {
         const commandInstall = CLI.chalk.bold(`${config.frameworkName} install:locally`);

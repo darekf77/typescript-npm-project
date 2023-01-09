@@ -478,7 +478,7 @@ Thumbs.db
 ${this.project.isVscodeExtension ? '/*.vsix' : ''}
 ${this.project.isVscodeExtension ? '/out' : ''}
 `+ ignoredByGit + `
-${this.project.isTnp ? '!tsconfig*' : ''}
+${(this.project.isTnp || this.project.isVscodeExtension) ? '!tsconfig*' : ''}
 ${this.project.isTnp ? 'webpack.*' : ''}
 ${this.project.isContainerOrWorkspaceWithLinkedProjects ? `
 # container/workspace git projects
@@ -488,7 +488,7 @@ ${this.project.isMonorepo ? [] : this.project.packageJson.linkedProjects.map(c =
 ${this.project.isCoreProject ? '!*.filetemplate' : '*.filetemplate'}
 ${this.project.isDocker ? '!Dockerfile.filetemplate' : ''}
 ${this.project.isSmartContainer ? '/angular.json' : ''}
-${coreFiles}
+${this.project.isVscodeExtension ? '': coreFiles}
 
 `.trimRight() + '\n');
 
