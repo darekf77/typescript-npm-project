@@ -65,11 +65,27 @@ function $UPDATE(args: string) {
   }
   if (config.frameworkName === 'tnp') {
     Helpers.taskStarted('Removing old node_modules..');
-    Project.Tnp.run('rimraf tmp-node_modules').sync();
+    const nm = (Project.Tnp as Project).node_modules.path;
+    const nm2 = (Project.Tnp as Project).pathFor(`tmp-${config.folder.node_modules}2`)
+    const nm1 = (Project.Tnp as Project).pathFor(`tmp-${config.folder.node_modules}1`)
+
+    Helpers.removeIfExists(nm2);
+    if (Helpers.exists(nm1)) {
+      Helpers.move(nm1, nm2);
+    }
+    Helpers.removeIfExists(nm1);
+    if (Helpers.exists(nm)) {
+      Helpers.move(nm, nm1);
+    }
     Helpers.taskDone();
+
     Helpers.taskStarted('Installing new version of firedev pacakges')
-    Project.Tnp.run(`mv node_modules tmp-node_modules && npm i --force && npm-run tsc && ${config.frameworkName} dedupe`).sync();
+    Project.Tnp.run(`npm i --force && npm-run tsc && ${config.frameworkName} dedupe`).sync();
+    Helpers.taskDone();
+    Helpers.taskStarted('Installing new versions smart container pacakges')
     Project.by('container', (Project.Tnp as Project)._frameworkVersion).run(`${config.frameworkName} reinstall`).sync();
+    Helpers.taskDone();
+
     Helpers.taskDone('UPDATE DONE');
   }
 
