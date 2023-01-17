@@ -336,7 +336,7 @@ Starting backend typescirpt build....
       }
     });
 
-    Helpers.info(`* Typescirpt compilation first part done (${buildOutDir} build). ${websql ? '[WEBSQL]' : ''} `)
+    Helpers.log(`* Typescirpt compilation first part done (${buildOutDir} build). ${websql ? '[WEBSQL]' : ''} `)
 
     await Helpers.execute(commandMaps, cwd,
     {
@@ -348,7 +348,7 @@ Starting backend typescirpt build....
         stdout: ['Watching for file changes.']
       }
     });
-    Helpers.info(`* Typescirpt compilation second part done (${buildOutDir}  build).  ${websql ? '[WEBSQL]' : ''} `)
+    Helpers.log(`* Typescirpt compilation second part done (${buildOutDir}  build).  ${websql ? '[WEBSQL]' : ''} `)
     // if (generateDeclarations) {
     //   Helpers.log(`(${this.compilerName}) Execute second command : ${commandDts}    # inside: ${cwd}`)
     //   await Helpers.logProc2(child_process.exec(commandDts, { cwd }), ['Watching for file changes.']);

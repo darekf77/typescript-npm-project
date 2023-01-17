@@ -341,12 +341,13 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
       await this.buildSteps(buildOptions);
     }
 
-    Helpers.info(`[buildable-project] Build steps ended (project type: ${this._type}) ... `);
+    Helpers.info(`[buildable-project] Build steps ended... ${buildOptions.watch ? 'files watch started...' : ''}`);
+    Helpers.log(`[buildable-project] Build steps ended (project type: ${this._type}) ... `);
 
     if (!buildOptions.appBuild) {
       if ((this.isStandaloneProject && this.typeIs('isomorphic-lib')) || this.isSmartContainer) {
         if (buildOptions.copyto.length > 0) {
-          Helpers.info(`[buildable-project] copying build data to ${buildOptions.copyto.length} projects... `);
+          Helpers.info(`[buildable-project] copying compiled code/assets to ${buildOptions.copyto.length} other projects... `);
         }
         // console.log('after build steps')
         (() => {
