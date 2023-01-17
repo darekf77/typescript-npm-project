@@ -406,7 +406,7 @@ export class PackageJsonCore {
           delete data[property];
         });
       if (Helpers.isExistedSymlink(this.path)) {
-        Helpers.warn(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`, trace)
+        Helpers.log(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`)
       } else {
         const d = (_.isObject(data) ? data : {}) as Models.npm.IPackageJSON;
         if (d.tnp?.type === 'isomorphic-lib') {
@@ -416,7 +416,7 @@ export class PackageJsonCore {
       }
     } else {
       if (Helpers.isExistedSymlink(this.path)) {
-        Helpers.warn(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`, trace)
+        Helpers.log(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`)
       } else {
         const d = (_.isObject(data) ? data : {}) as Models.npm.IPackageJSON;
         if (d.tnp?.type === 'isomorphic-lib') {

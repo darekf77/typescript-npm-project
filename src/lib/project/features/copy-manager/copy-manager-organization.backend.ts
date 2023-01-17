@@ -672,7 +672,9 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         specyficFileRelativePath
       ));
       // Helpers.log(`Eqal content with temp proj: ${}`)
-      Helpers.copyFile(readyToCopyFileInLocalTempProj, destinationFilePath);
+      if (Helpers.exists(readyToCopyFileInLocalTempProj)) { // TODO QUICK_FIX when creating empty file
+        Helpers.copyFile(readyToCopyFileInLocalTempProj, destinationFilePath);
+      }
       return;
     }
 

@@ -258,7 +258,7 @@ export class FilesRecreator extends FeatureForProject {
               self.vscode.settings.hideOrShowFilesInVscode(true);
             }
             if (action === 'show') {
-              Helpers.info(`Auto showing while init`);
+              Helpers.log(`Auto showing while init`);
               self.vscode.settings.hideOrShowFilesInVscode(false);
             }
           },

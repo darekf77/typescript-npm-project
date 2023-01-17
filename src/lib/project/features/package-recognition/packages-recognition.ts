@@ -72,7 +72,7 @@ export class PackagesRecognition {
       this.superStart(true, reasonToSearch, local); // TODO QUICK_FIX
 
     });
-    Helpers.info(`[${config.frameworkName}] [package-recognition] Founded ${this.count} isomorphic packages`);
+    Helpers.log(`[${config.frameworkName}] [package-recognition] Founded ${this.count} isomorphic packages`);
     this.processAlreadyDone = true;
   }
 

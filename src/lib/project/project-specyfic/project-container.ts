@@ -34,7 +34,7 @@ export class ProjectContainer
       .map(c => {
         const proj = Project.From<Project>(c);
         if (!proj) {
-          Helpers.info(`No project from ${c}`);
+          Helpers.log(`No project from ${c}`);
         }
         return proj;
       })

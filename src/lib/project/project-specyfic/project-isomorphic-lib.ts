@@ -399,7 +399,7 @@ export class ProjectIsomorphicLib
 
     //#region prepare variables / angular info
     const showInfoAngular = () => {
-      Helpers.info(`
+      Helpers.log(`
 
   ANGULAR BUILD APP COMMAND: ${command}
 

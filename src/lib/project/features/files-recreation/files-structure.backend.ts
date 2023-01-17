@@ -146,7 +146,9 @@ export class FilesStructure extends FeatureForProject {
     }
 
     if (this.project.isWorkspace || this.project.isStandaloneProject) {
-      Helpers.info(`Initing project: ${chalk.bold(this.project.genericName)}  ${this.project.location} ${websql ? '[WEBSQL]' : ''} `);
+      Helpers.info(`Initing project: ${chalk.bold(this.project.genericName)}`);
+      Helpers.log(` (from locaiton: ${this.project.location})`);
+      Helpers.log(`Init mode: ${websql ? '[WEBSQL]' : ''}`)
     }
 
     alreadyInitedPorjects.push(this.project)
