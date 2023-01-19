@@ -472,7 +472,7 @@ export class ProjectIsomorphicLib
     this.fixBuildDirs(outDir);
 
     // Helpers.info(`[buildLib] start of building ${websql ? '[WEBSQL]' : ''}`);
-    Helpers.info(`[buildLib] start of building...`);
+    Helpers.log(`[buildLib] start of building...`);
     this.beforeLibBuild(outDir);
 
     const { codeCutRelease } = require('minimist')((args || '').split(' '));
