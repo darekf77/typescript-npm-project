@@ -50,7 +50,7 @@ export function executeCommand(command: string, project: Project) {
    ${project.location}
 
    `);
-  project.run(command, { output: true, biggerBuffer: true }).sync();
+  project.run(command, { output: (config.frameworkName === 'tnp'), biggerBuffer: true }).sync();
   Helpers.writeFile([project.node_modules.path, '.install-date'], moment(new Date()).format('L LTS'))
 }
 
