@@ -434,7 +434,9 @@ export class CopyManagerStandalone extends CopyManager {
         specyficFileRelativePath
       ));
       // Helpers.log(`Eqal content with temp proj: ${}`)
-      Helpers.copyFile(readyToCopyFileInLocalTempProj, destinationFilePath);
+      if(Helpers.exists(readyToCopyFileInLocalTempProj)) {
+        Helpers.copyFile(readyToCopyFileInLocalTempProj, destinationFilePath);
+      }
       return;
     }
 
