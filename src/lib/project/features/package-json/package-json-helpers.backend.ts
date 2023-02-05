@@ -604,7 +604,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
 
   Helpers.log(`Project: ${chalk.bold(project.genericName)}, framework verison: ${project._frameworkVersion}`);
   if (project.isTnp) {
-    Helpers.info(`Execute ${config.frameworkName} action`);
+    Helpers.log(`Execute ${config.frameworkName} action`);
     const keysToDelete = [];
     Object.keys(project.packageJson.data.tnp.overrided.dependencies).forEach((pkgName) => {
       const version = project.packageJson.data.tnp.overrided.dependencies[pkgName];

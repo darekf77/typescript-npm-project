@@ -86,7 +86,11 @@ export class FilesRecreator extends FeatureForProject {
             '.npmrc',
             '.babelrc',
             'package.json_devDependencies.json',
-            'package.json',
+            ...(  // TODO or firedev json
+              Helpers.exists(self.project.pathFor(config.file.package_json__tnp_json))
+                ? [config.file.package_json]
+                : []
+            ),
             'docs',
             'logo.svg',
             // ...(self.project.isWorkspace ? self.project.children.map(c => c.name) : [])
@@ -162,7 +166,8 @@ export class FilesRecreator extends FeatureForProject {
             ...self.assetsToIgnore,
             // 'src/assets/*/*'
           ] : [])
-          .concat((!self.project.isStandaloneProject && !self.project.isCoreProject) ? self.project.projectSpecyficIgnoredFiles() : [])
+          .concat((!self.project.isStandaloneProject && !self.project.isCoreProject)
+            ? self.project.projectSpecyficIgnoredFiles() : [])
           .concat(self.project.isTnp ? ['projects/tmp*'] : [])
           .concat([
             'tsconfig.backend.dist.json',
@@ -488,7 +493,7 @@ ${this.project.isMonorepo ? [] : this.project.packageJson.linkedProjects.map(c =
 ${this.project.isCoreProject ? '!*.filetemplate' : '*.filetemplate'}
 ${this.project.isDocker ? '!Dockerfile.filetemplate' : ''}
 ${this.project.isSmartContainer ? '/angular.json' : ''}
-${this.project.isVscodeExtension ? '': coreFiles}
+${this.project.isVscodeExtension ? '' : coreFiles}
 
 `.trimRight() + '\n');
 

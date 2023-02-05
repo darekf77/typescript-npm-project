@@ -189,7 +189,7 @@ export async function standaloneConfigBy(standaloneProject: Project,
   const envSurfix = (environment === 'local') ? '' : `.${environment}`;
   var pathToProjectEnvironment = path.join(standaloneProject.location, `${config.file.environment}${envSurfix}`);
   if (!fse.existsSync(`${pathToProjectEnvironment}.js`)) {
-    Helpers.warn(`Standalone project ${standaloneProject.location}
+    Helpers.log(`Standalone project ${standaloneProject.location}
       ...without environment${envSurfix}.js config... creating new... `);
     Helpers.writeFile(`${pathToProjectEnvironment}.js`, createExampleConfigFor(standaloneProject));
     Helpers.tsCodeModifier.formatFile(`${pathToProjectEnvironment}.js`);
