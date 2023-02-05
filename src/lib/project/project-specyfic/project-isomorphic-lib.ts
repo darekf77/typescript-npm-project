@@ -808,7 +808,7 @@ export class ProjectIsomorphicLib
       ${config.frameworkName} ${bawOrba} ${target} ${ngserve}
 
       ${orIfWebsql}
-      ${bawOrbaLongWebsql}
+      ${config.frameworkName} ${bawOrbaLongWebsql}
 
             `);
     } else if (this.isStandaloneProject) {
