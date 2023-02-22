@@ -41,7 +41,7 @@
     nodts: false,
     obscure: false,
     ugly: false,
-    includeNodeModules: true,
+    includeNodeModules: false,
   },
 
   type: "isomorphic-lib",
@@ -226,7 +226,7 @@
         "firedev-crud-deamon": "13.1.27",
         "tnp-ui": "13.1.27",
         "firedev-ui": "13.0.1",
-        "tnp-core": "13.1.58",
+        "tnp-core": '13.1.59',
         "tnp-cli": "13.1.41",
         "tnp-tools": "0.0.58",
         "any-project-cli": "13.1.18",
