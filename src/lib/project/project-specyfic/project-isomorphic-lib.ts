@@ -729,7 +729,7 @@ export class ProjectIsomorphicLib
       }
 
       if (includeNodeModules) {
-        const cliJsFile = 'cli.js'
+        const cliJsFile = 'cli.js';
         this.backendIncludeNodeModulesInCompilation(
           outDir,
           false, // uglify,
@@ -883,12 +883,22 @@ export class ProjectIsomorphicLib
   //#endregion
 
   //#region private methods / include node_modules in compilation
-  private backendIncludeNodeModulesInCompilation(outDir: Models.dev.BuildDir, uglify: boolean, mainCliJSFileName: string = 'index.js') {
+  private backendIncludeNodeModulesInCompilation(outDir: Models.dev.BuildDir, uglify: boolean, mainCliJSFileName: string = config.file.index_js) {
     //#region @backend
+
+    // QUICK_FIX TODO ncc input change does not work (it takes always index.js)
+    //#region QUICK_FIX
+    const indexOrg = this.pathFor(`${outDir}/${config.file.index_js}`);
+    const indexOrgBackup = this.pathFor(`${outDir}/${config.file.index_js}-backup`);
+    if (mainCliJSFileName !== config.file.index_js) {
+      Helpers.copyFile(indexOrg, indexOrgBackup);
+    }
+    //#endregion
+
     const nccComand = `ncc build ${outDir}/${mainCliJSFileName} -o ${outDir}/temp/ncc ${uglify ? '-m' : ''}  --no-cache `;
-    console.log({
-      nccComand
-    })
+    // console.log({
+    //   nccComand
+    // })
     this.run(nccComand).sync();
     Helpers
       .filesFrom([this.location, outDir, 'lib'], true)
@@ -922,6 +932,11 @@ export class ProjectIsomorphicLib
     pj.devDependencies = {};
     Helpers.removeFileIfExists(pjPath);
     Helpers.writeFile(pjPath, pj);
+
+    if (mainCliJSFileName !== config.file.index_js) {
+      Helpers.copyFile(indexOrg, mainCliJSFileName);
+      Helpers.copyFile(indexOrgBackup, indexOrg);
+    }
 
     //#endregion
   }
