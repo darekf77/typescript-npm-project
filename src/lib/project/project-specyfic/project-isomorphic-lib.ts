@@ -890,6 +890,7 @@ export class ProjectIsomorphicLib
     //#region QUICK_FIX
     const indexOrg = this.pathFor(`${outDir}/${config.file.index_js}`);
     const indexOrgBackup = this.pathFor(`${outDir}/${config.file.index_js}-backup`);
+    const mainFileAbs = this.pathFor(`${outDir}/${mainCliJSFileName}`);
     const useBackupFile = (mainCliJSFileName !== config.file.index_js);
     if (useBackupFile) {
       Helpers.copyFile(indexOrg, indexOrgBackup);
@@ -938,7 +939,7 @@ export class ProjectIsomorphicLib
     Helpers.writeFile(pjPath, pj);
 
     if (useBackupFile) {
-      Helpers.copyFile(indexOrg, mainCliJSFileName);
+      Helpers.copyFile(indexOrg, mainFileAbs);
       Helpers.copyFile(indexOrgBackup, indexOrg);
     }
     // Helpers.removeIfExists(indexOrgBackup);
