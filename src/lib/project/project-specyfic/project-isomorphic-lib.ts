@@ -898,12 +898,12 @@ export class ProjectIsomorphicLib
     //#endregion
 
     const nccComand = `ncc build ${outDir}/${config.file.index_js} -o ${outDir}/temp/ncc ${uglify ? '-m' : ''}  --no-cache `;
-    console.log({
-      useBackupFile,
-      indexOrg,
-      indexOrgBackup,
-      nccComand
-    })
+    // console.log({
+    //   useBackupFile,
+    //   indexOrg,
+    //   indexOrgBackup,
+    //   nccComand
+    // })
     this.run(nccComand).sync();
     Helpers
       .filesFrom([this.location, outDir, 'lib'], true)
@@ -942,7 +942,7 @@ export class ProjectIsomorphicLib
       Helpers.copyFile(indexOrg, mainFileAbs);
       Helpers.copyFile(indexOrgBackup, indexOrg);
     }
-    // Helpers.removeIfExists(indexOrgBackup);
+    Helpers.removeIfExists(indexOrgBackup);
 
     //#endregion
   }

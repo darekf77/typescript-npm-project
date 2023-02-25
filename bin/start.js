@@ -197,7 +197,7 @@ if (startSpinner) {
     !global.hideLog && setText('- dist only -', true);
     process.argv = process.argv.filter(f => !!f);
 
-    const pathToDistRun = path.join(__dirname, '../dist/index.js');
+    const pathToDistRun = path.join(__dirname, '../dist/cli.js');
     start = require(pathToDistRun.replace(/\.js$/g, '')).start;
     //#endregion
   } else if (npmOnly) {
@@ -208,7 +208,7 @@ if (startSpinner) {
     process.argv = process.argv.filter(a => a !== '-npm');
     process.argv = process.argv.filter(f => !!f);
 
-    const pathToDistRun = path.join(__dirname, '../index.js');
+    const pathToDistRun = path.join(__dirname, '../cli.js');
     start = require(pathToDistRun.replace(/\.js$/g, '')).start;
     //#endregion
   } else {
