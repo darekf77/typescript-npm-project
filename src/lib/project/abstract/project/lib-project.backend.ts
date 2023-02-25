@@ -258,7 +258,7 @@ export abstract class LibProject {
           Helpers.remove(websqlFolder);
         }
 
-        Helpers.removeFolderIfExists(absolutePathReleaseProject);
+          Helpers.removeFolderIfExists(absolutePathReleaseProject);
         Helpers.mkdirp(absolutePathReleaseProject);
         this.copyManager.generateSourceCopyIn(absolutePathReleaseProject, {
           useTempLocation: true, // TODO not needed

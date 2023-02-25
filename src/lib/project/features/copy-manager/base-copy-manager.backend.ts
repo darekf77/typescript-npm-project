@@ -201,7 +201,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       if (fse.existsSync(path.dirname(path.dirname(destinationLocation)))) {
         dir = `${path.basename(path.dirname(path.dirname(destinationLocation)))}/${dir}`
       }
-      Helpers.info(`Source of project "${this.project.genericName}" generated in ${dir} /(< here >) `);
+      Helpers.log(`Source of project "${this.project.genericName}" generated in ${dir} /(< here >) `);
       //#endregion
     }
 

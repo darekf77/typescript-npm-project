@@ -1018,7 +1018,9 @@ export class ProjectIsomorphicLib
     const releaseSrcLocation = crossPlatformPath(path.join(this.location, config.folder.src));
     const releaseSrcLocationOrg = crossPlatformPath(path.join(this.location, this.tmpSrcBundleFolder));
     Helpers.removeFolderIfExists(releaseSrcLocationOrg);
-    Helpers.copy(releaseSrcLocation, releaseSrcLocationOrg);
+    Helpers.copy(releaseSrcLocation, releaseSrcLocationOrg, { copySymlinksAsFiles: true, recursive: true });
+    Helpers.removeFolderIfExists(releaseSrcLocation);
+    Helpers.copy(releaseSrcLocationOrg, releaseSrcLocation);
 
     const filesForModyficaiton = glob.sync(`${releaseSrcLocation}/**/*`);
     filesForModyficaiton
