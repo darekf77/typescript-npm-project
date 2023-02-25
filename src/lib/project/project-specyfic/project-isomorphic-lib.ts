@@ -729,19 +729,21 @@ export class ProjectIsomorphicLib
       }
 
       if (includeNodeModules) {
+        const cliJsFile = 'cli.js'
         this.backendIncludeNodeModulesInCompilation(
           outDir,
           false, // uglify,
+          cliJsFile,
         );
         if (uglify) {
-          this.backendUglifyCode(outDir, config.reservedArgumentsNamesUglify)
+          this.backendUglifyCode(outDir, config.reservedArgumentsNamesUglify, cliJsFile)
         };
         if (!productionModeButIncludePackageJsonDeps) {
           if (obscure || uglify) {
-            this.backendCompileToEs5(outDir);
+            this.backendCompileToEs5(outDir, cliJsFile);
           }
           if (obscure) {
-            this.backendObscureCode(outDir, config.reservedArgumentsNamesUglify);
+            this.backendObscureCode(outDir, config.reservedArgumentsNamesUglify, cliJsFile);
           }
         }
       }
@@ -881,9 +883,9 @@ export class ProjectIsomorphicLib
   //#endregion
 
   //#region private methods / include node_modules in compilation
-  private backendIncludeNodeModulesInCompilation(outDir: Models.dev.BuildDir, uglify: boolean) {
+  private backendIncludeNodeModulesInCompilation(outDir: Models.dev.BuildDir, uglify: boolean, mainCliJSFileName: string = 'index.js') {
     //#region @backend
-    this.run(`ncc build ${outDir}/index.js -o ${outDir}/temp/ncc ${uglify ? '-m' : ''}  --no-cache `).sync();
+    this.run(`ncc build ${outDir}/${mainCliJSFileName} -o ${outDir}/temp/ncc ${uglify ? '-m' : ''}  --no-cache `).sync();
     Helpers
       .filesFrom([this.location, outDir, 'lib'], true)
       .filter(f => f.endsWith('.js') || f.endsWith('.js.map'))
@@ -925,7 +927,7 @@ export class ProjectIsomorphicLib
   /**
    * TODO not working
    */
-  private backendCompileToEs5(outDir: Models.dev.BuildDir) {
+  private backendCompileToEs5(outDir: Models.dev.BuildDir, mainCliJSFileName = 'index.js') {
     return;
     //#region @backend
     if (!Helpers.exists(path.join(this.location, outDir, 'index.js'))) {
@@ -946,13 +948,13 @@ export class ProjectIsomorphicLib
   //#endregion
 
   //#region private methods / compile/uglify backend code
-  private backendUglifyCode(outDir: Models.dev.BuildDir, reservedNames: string[]) {
+  private backendUglifyCode(outDir: Models.dev.BuildDir, reservedNames: string[], mainCliJSFileName = 'index.js') {
     //#region @backendFunc
-    if (!Helpers.exists(path.join(this.location, outDir, 'index.js'))) {
-      Helpers.warn(`[uglifyCode] Nothing to uglify... no index.js in /${outDir}`)
+    if (!Helpers.exists(path.join(this.location, outDir, mainCliJSFileName))) {
+      Helpers.warn(`[uglifyCode] Nothing to uglify... no ${mainCliJSFileName} in /${outDir}`)
       return
     }
-    const command = `npm-run uglifyjs ${outDir}/index.js --output ${outDir}/index.js -b`
+    const command = `npm-run uglifyjs ${outDir}/${mainCliJSFileName} --output ${outDir}/${mainCliJSFileName} -b`
       + ` --mangle reserved=[${reservedNames.map(n => `'${n}'`).join(',')}]`
     // + ` --mangle-props reserved=[${reservedNames.join(',')}]` // it breakes code
 
@@ -969,14 +971,14 @@ export class ProjectIsomorphicLib
   //#endregion
 
   //#region private methods / compile/obscure backend code
-  private backendObscureCode(outDir: Models.dev.BuildDir, reservedNames: string[]) {
+  private backendObscureCode(outDir: Models.dev.BuildDir, reservedNames: string[], mainCliJSFileName = 'index.js') {
     //#region @backendFunc
-    if (!Helpers.exists(path.join(this.location, config.folder.bundle, 'index.js'))) {
-      Helpers.warn(`[obscureCode] Nothing to obscure... no index.js in bundle`)
+    if (!Helpers.exists(path.join(this.location, config.folder.bundle, mainCliJSFileName))) {
+      Helpers.warn(`[obscureCode] Nothing to obscure... no ${mainCliJSFileName} in bundle`)
       return
     }
-    const commnad = `npm-run javascript-obfuscator bundle/index.js `
-      + ` --output bundle/index.js`
+    const commnad = `npm-run javascript-obfuscator bundle/${mainCliJSFileName} `
+      + ` --output bundle/${mainCliJSFileName}`
       + ` --target node`
       + ` --string-array-rotate true`
       // + ` --stringArray true`

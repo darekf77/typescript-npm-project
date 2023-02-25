@@ -215,8 +215,8 @@ if (startSpinner) {
     //#region uknow dist or npm mode
     const fs = require('fs');
 
-    const pathToDistRun = path.join(__dirname, '../dist/index.js');
-    const pathToIndexRun = path.join(__dirname, '../index.js');
+    const pathToDistRun = path.join(__dirname, '../dist/cli.js');
+    const pathToIndexRun = path.join(__dirname, '../cli.js');
     const distExist = fs.existsSync(pathToDistRun);
 
     if (distExist) {
