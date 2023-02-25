@@ -885,7 +885,11 @@ export class ProjectIsomorphicLib
   //#region private methods / include node_modules in compilation
   private backendIncludeNodeModulesInCompilation(outDir: Models.dev.BuildDir, uglify: boolean, mainCliJSFileName: string = 'index.js') {
     //#region @backend
-    this.run(`ncc build ${outDir}/${mainCliJSFileName} -o ${outDir}/temp/ncc ${uglify ? '-m' : ''}  --no-cache `).sync();
+    const nccComand = `ncc build ${outDir}/${mainCliJSFileName} -o ${outDir}/temp/ncc ${uglify ? '-m' : ''}  --no-cache `;
+    console.log({
+      nccComand
+    })
+    this.run(nccComand).sync();
     Helpers
       .filesFrom([this.location, outDir, 'lib'], true)
       .filter(f => f.endsWith('.js') || f.endsWith('.js.map'))
