@@ -890,13 +890,15 @@ export class ProjectIsomorphicLib
     //#region QUICK_FIX
     const indexOrg = this.pathFor(`${outDir}/${config.file.index_js}`);
     const indexOrgBackup = this.pathFor(`${outDir}/${config.file.index_js}-backup`);
-    if (mainCliJSFileName !== config.file.index_js) {
+    const useBackupFile = (mainCliJSFileName !== config.file.index_js);
+    if (useBackupFile) {
       Helpers.copyFile(indexOrg, indexOrgBackup);
     }
     //#endregion
 
     const nccComand = `ncc build ${outDir}/${config.file.index_js} -o ${outDir}/temp/ncc ${uglify ? '-m' : ''}  --no-cache `;
     console.log({
+      useBackupFile,
       indexOrg,
       indexOrgBackup,
       nccComand
@@ -935,11 +937,11 @@ export class ProjectIsomorphicLib
     Helpers.removeFileIfExists(pjPath);
     Helpers.writeFile(pjPath, pj);
 
-    if (mainCliJSFileName !== config.file.index_js) {
+    if (useBackupFile) {
       Helpers.copyFile(indexOrg, mainCliJSFileName);
       Helpers.copyFile(indexOrgBackup, indexOrg);
     }
-    Helpers.removeIfExists(indexOrgBackup);
+    // Helpers.removeIfExists(indexOrgBackup);
 
     //#endregion
   }
