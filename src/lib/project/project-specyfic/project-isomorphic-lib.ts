@@ -905,11 +905,11 @@ export class ProjectIsomorphicLib
     //   nccComand
     // })
     this.run(nccComand).sync();
-    Helpers
-      .filesFrom([this.location, outDir, 'lib'], true)
-      .filter(f => f.endsWith('.js') || f.endsWith('.js.map'))
-      .forEach(f => Helpers.removeFileIfExists(f))
-      ;
+    // Helpers
+    //   .filesFrom([this.location, outDir, 'lib'], true)
+    //   .filter(f => f.endsWith('.js') || f.endsWith('.js.map'))
+    //   .forEach(f => Helpers.removeFileIfExists(f))
+    //   ;
 
     const baseBundleOrDist = crossPlatformPath(path.join(this.location, outDir));
     const nccBase = crossPlatformPath(path.join(this.location, outDir, 'temp', 'ncc'));
