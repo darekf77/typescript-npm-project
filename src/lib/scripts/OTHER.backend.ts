@@ -280,7 +280,7 @@ export function $PRINT_RELATIVES(folder) {
 
 //#region @notForNpm
 export function $MP3(args) {
-  Helpers.run('youtube-dl --extract-audio --audio-format mp3 ' + args,
+  Helpers.run('yt-dlp --verbose --extract-audio --audio-format mp3 ' + args,
     {
       output: true,
       cwd: crossPlatformPath(path.join(os.userInfo().homedir, 'Downloads'))
