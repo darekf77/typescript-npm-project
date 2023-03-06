@@ -66,7 +66,7 @@ export abstract class RouterProject {
    * Start server on top of static build
    * @param port
    */
-  public async start(this: Project, args?: string) {
+  public async startServer(this: Project, args?: string) {
     if (this.typeIs('unknow')) {
       return;
     }
@@ -80,7 +80,7 @@ export abstract class RouterProject {
 Generated workspace should be here: ${genLocationWOrkspace}
         `)
       }
-      await genWorkspace.start(args);
+      await genWorkspace.startServer(args);
       return;
     }
     if (this.isStandaloneProject) {

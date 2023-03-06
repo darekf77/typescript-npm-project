@@ -94,7 +94,9 @@ export class ProjectContainer
     }
     let { outDir, args } = buildOptions;
 
-    args = Helpers.cliTool.removeArgFromString(args);
+    args = Helpers.cliTool.removeArgFromString(args,
+      ['websql', 'serveApp', 'skipNodeModules', 'skipCopyToSelection', 'skipSmartContainerDistBundleInit', 'copyto', 'port']
+    );
     let client = Helpers.removeSlashAtEnd(_.first((args || '').split(' '))) as any;
     if (!client) {
       client = this.smartContainerBuildTarget?.name;

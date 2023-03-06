@@ -54,7 +54,7 @@ export class ProjectWorkspace
         });
       })
       .forEach(child => {
-        child.start(args)
+        child.startServer(args)
       });
     return undefined;
     //#endregion

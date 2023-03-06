@@ -477,7 +477,7 @@ export class ProjectIsomorphicLib
 
     const { codeCutRelease } = require('minimist')((args || '').split(' '));
 
-    const { obscure, uglify, nodts, includeNodeModules } = this.buildOptions;
+    const { obscure, uglify, nodts, includeNodeModules, serveApp } = this.buildOptions;
     const productionModeButIncludePackageJsonDeps = (obscure || uglify) && !includeNodeModules;
 
 
@@ -630,7 +630,13 @@ export class ProjectIsomorphicLib
               ...sharedOptions(),
             });
           }
-          this.showMesageWhenBuildLibDoneForSmartContainer(args, watch, this.isInRelaseBundle);
+          if (serveApp) {
+            const appBuildOpt = this.buildOptions.clone();
+            appBuildOpt.appBuild = true;
+            await this.buildSteps(appBuildOpt);
+          } else {
+            this.showMesageWhenBuildLibDoneForSmartContainer(args, watch, this.isInRelaseBundle);
+          }
         }
         //#endregion
       }

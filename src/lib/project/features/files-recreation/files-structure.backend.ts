@@ -79,7 +79,9 @@ export class FilesStructure extends FeatureForProject {
       options.initiator = this.project;
     }
     const { alreadyInitedPorjects, watch, watchOnly } = options;
-    let { skipNodeModules, websql, recrusive, env, struct, skipSmartContainerDistBundleInit }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
+    let {
+      skipNodeModules, websql, recrusive, env, struct, skipSmartContainerDistBundleInit
+    }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
     args = Helpers.cliTool.removeArgFromString(args);
 
     // THIS IS SLOW... BUT I CAN AFORD IT HERE

@@ -134,7 +134,7 @@ const $BUILD_BUNDLE_APP = (args) => (Project.Current as Project).buildProcess.st
 
 const $BUILD_APP_WATCH_PROD = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', args);
 const $START_APP = async (args) => {
-  await (Project.Current as Project).start(args);
+  await (Project.Current as Project).startServer(args);
 };
 
 const $BUILD_PROD = async (args) => {
@@ -266,7 +266,7 @@ const $SERVE = async (args) => {
       //#endregion
     }
     if (proj.typeIs('isomorphic-lib', 'docker')) {
-      await proj.start(args);
+      await proj.startServer(args);
     }
 
   } else {
@@ -290,14 +290,12 @@ const $SERVE = async (args) => {
 const $START = async (args) => {
   const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
 
-  if (proj.isStandaloneProject) {
-    await $SERVE(args);
-    return;
+  if (proj.isStandaloneProject || proj.isSmartContainer) {
+    args = `${args} --serveApp`;
+    await (Project.Current as Project)
+      .buildProcess
+      .startForLibFromArgs(false, true, 'dist', args);
   }
-  if (!proj.isWorkspace) {
-    Helpers.error(`Please use this command only on workspace level`, false, true);
-  }
-  await proj.start(args);
 };
 
 const $RUN = async (args) => {
