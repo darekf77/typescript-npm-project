@@ -450,7 +450,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       const filter = Helpers.filterDontCopy(this.sourceFolders, monitorDirForModule);
       this.removeSourceLinksFolders(pkgLocInDestNodeModulesForChild);
       Helpers.copy(monitorDirForModule, pkgLocInDestNodeModulesForChild, {
-        copySymlinksAsFiles: false,
+        copySymlinksAsFiles: (process.platform === 'win32'),
         filter,
       });
 
