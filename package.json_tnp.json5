@@ -227,7 +227,7 @@
         "tnp-ui": "13.1.27",
         "firedev-ui": "13.0.1",
         "tnp-core": '13.1.61',
-        "tnp-cli": '13.1.42',
+        "tnp-cli": '13.1.44',
         "tnp-tools": "0.0.58",
         "any-project-cli": "13.1.18",
         "@types/node": "10.12.30",

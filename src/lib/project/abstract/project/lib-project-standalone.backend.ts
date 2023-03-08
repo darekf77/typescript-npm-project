@@ -187,7 +187,7 @@ export class LibProjectStandalone extends LibPorjectBase {
     //#region @notForNpm
     const tnpProj = Project.Tnp as Project;
 
-    if (tnpProj) {
+    if (tnpProj && config.frameworkName === 'tnp') {
       tnpProj.packageJson.save('showing for trusted')
 
       let firedeProj: Project;
@@ -203,12 +203,15 @@ export class LibProjectStandalone extends LibPorjectBase {
       ) {
         [
           firedeProj,
+          tnpProj,
           coreCont,
         ].filter(f => !!f)
           .forEach(c => {
             c.smartNodeModules.updateFromReleaseBundle(realCurrentProj);
           });
       }
+
+
     }
     //#endregion
   }
