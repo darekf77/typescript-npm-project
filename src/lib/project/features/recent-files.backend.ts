@@ -76,7 +76,7 @@ export class RecentFilesForContainer extends FeatureForProject {
       return;
     }
     if (!this.project.isContainer) {
-      Helpers.error(`[tnp-recent-files] Project is not container... `, false, true);
+      Helpers.error(`[firedev-recent-files] Project is not container... `, false, true);
     }
     this.localRecentProjects.forEach(p => p.openInVscode());
     Helpers.info('Done')
@@ -89,7 +89,7 @@ export class RecentFilesForContainer extends FeatureForProject {
       return;
     }
     if (!this.project.isContainer) {
-      Helpers.error(`[tnp-recent-files] Project is not container... `, false, true);
+      Helpers.error(`[firedev-recent-files] Project is not container... `, false, true);
     }
     let recentOpenProjects = [];
     if (override) {

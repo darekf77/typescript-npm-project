@@ -338,7 +338,7 @@ export function stuberizeFrontendPackages(project: Project, packages?: string[])
 
   for (let index = 0; index < packagesNames.length; index++) {
     const packageName = packagesNames[index];
-    Helpers.info(`[tnp][node_modueles] Stuberization of package ${CLI.chalk.bold(packageName)}`);
+    Helpers.info(`[firedev][node_modueles] Stuberization of package ${CLI.chalk.bold(packageName)}`);
 
     const packageJsonPath = path.join(project.node_modules.path, packageName, config.file.package_json);
     const packageJsonInBrowser = path.join(project.node_modules.path, packageName, config.folder._browser, config.file.package_json);

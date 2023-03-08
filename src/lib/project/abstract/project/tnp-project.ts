@@ -109,7 +109,7 @@ export abstract class TnpProject {
 
       var p = crossPlatformPath(path.join(location, config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES))
       if (!fse.existsSync(p)) {
-        PackagesRecognition.fromProject(this as any).start(void 0, '[tnp-projct][getter isomorphic pacakges ]');
+        PackagesRecognition.fromProject(this as any).start(void 0, '[firedev-projct][getter isomorphic pacakges ]');
       }
       const f = Helpers.readJson(p);
       const arr = f[config.array.isomorphicPackages];

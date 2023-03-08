@@ -9,13 +9,13 @@ if (global.globalSystemToolMode) {
   /*
   Explanation of this:
 firedev
-[tnp][tmp-environment] PATH EXISIT: /Users/dfilipiak/projects/npm/firedev/node_modules/tnp/tmp-environment.json
-[tnp][tmp-environment] PATH NOT EXISIT: /Users/dfilipiak/projects/npm/firedev/node_modules/tmp-environment.json
-[tnp][tmp-environment] PATH EXISIT: /Users/dfilipiak/projects/npm/firedev/tmp-environment.json
-tnp
-[tnp][tmp-environment] PATH EXISIT: /Users/dfilipiak/projects/npm/tnp/dist/tmp-environment.json
-[tnp][tmp-environment] PATH EXISIT: /Users/dfilipiak/projects/npm/tnp/tmp-environment.json
-[tnp][tmp-environment] PATH NOT EXISIT: /Users/dfilipiak/projects/npm/tmp-environment.json
+[firedev][tmp-environment] PATH EXISIT: /Users/dfilipiak/projects/npm/firedev/node_modules/tnp/tmp-environment.json
+[firedev][tmp-environment] PATH NOT EXISIT: /Users/dfilipiak/projects/npm/firedev/node_modules/tmp-environment.json
+[firedev][tmp-environment] PATH EXISIT: /Users/dfilipiak/projects/npm/firedev/tmp-environment.json
+firedev
+[firedev][tmp-environment] PATH EXISIT: /Users/dfilipiak/projects/npm/tnp/dist/tmp-environment.json
+[firedev][tmp-environment] PATH EXISIT: /Users/dfilipiak/projects/npm/tnp/tmp-environment.json
+[firedev][tmp-environment] PATH NOT EXISIT: /Users/dfilipiak/projects/npm/tmp-environment.json
    */
   const configFileName = 'tmp-environment.json';
   const possiblePathes = [
@@ -38,21 +38,21 @@ tnp
     if (fse.existsSync(envPath)) {
       try {
         newENV = fse.readJSONSync(envPath);
-        Helpers.log(`[tnp][tmp-environment] accepted path: ${envPath}`)
+        Helpers.log(`[firedev][tmp-environment] accepted path: ${envPath}`)
         return true;
       } catch (er) {
-        Helpers.warn(`[tnp][tmp-environment] not able to read: ${envPath}`)
+        Helpers.warn(`[firedev][tmp-environment] not able to read: ${envPath}`)
       }
-      Helpers.info(`[tnp][tmp-environment] PATH EXISIT: ${envPath}`)
+      Helpers.info(`[firedev][tmp-environment] PATH EXISIT: ${envPath}`)
     } else {
-      Helpers.warn(`[tnp][tmp-environment] PATH NOT EXISIT: ${envPath}`)
+      Helpers.warn(`[firedev][tmp-environment] PATH NOT EXISIT: ${envPath}`)
     }
     return false;
   });
   global['ENV'] = newENV;
 }
 if (Object.keys(global['ENV']).length === 0) {
-  Helpers.warn(`[tnp][tmp-environment] ENVIRONMENT CONFIG IS NOT DEFINED/EMPTY`);
+  Helpers.warn(`[firedev][tmp-environment] ENVIRONMENT CONFIG IS NOT DEFINED/EMPTY`);
 }
 
 //#region imports

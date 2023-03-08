@@ -44,10 +44,10 @@ export abstract class SiteProject {
       basedOn = this.parent.packageJson.pathToBaseline;
     }
 
-    // log('[tnp] basedOn' + basedOn)
+    // log('[firedev] basedOn' + basedOn)
 
     const res = (basedOn && basedOn !== '');
-    // log(`[tnp] Project '${this.location}' is site: ${res}`)
+    // log(`[firedev] Project '${this.location}' is site: ${res}`)
     return !!res;
     //#endregion
   }
