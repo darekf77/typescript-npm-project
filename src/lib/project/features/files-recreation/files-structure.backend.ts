@@ -68,7 +68,7 @@ export class FilesStructure extends FeatureForProject {
     await this.init(args);
   }
 
-
+  static INITED_PROECT_SHOW_LOG = {};
   public async init(args: string, options?: InitOptions) {
     if (!args) {
       args = '';
@@ -148,7 +148,20 @@ export class FilesStructure extends FeatureForProject {
     }
 
     if (this.project.isWorkspace || this.project.isStandaloneProject) {
-      Helpers.info(`Initing project: ${chalk.bold(this.project.genericName)}`);
+
+      //#region TODO BIG QUICK_FIX
+      if (config.frameworkName === 'firedev') {
+        if (!FilesStructure.INITED_PROECT_SHOW_LOG[this.project.genericName]) { // TODO QUICK
+          Helpers.info(`Initing project: ${chalk.bold(this.project.genericName)}`);
+          FilesStructure.INITED_PROECT_SHOW_LOG[this.project.genericName] = true;
+        } else {
+          Helpers.log(`Initing project: ${chalk.bold(this.project.genericName)}`);
+        }
+      } else {
+        Helpers.info(`Initing project: ${chalk.bold(this.project.genericName)}`);
+      }
+      //#endregion
+
       Helpers.log(` (from locaiton: ${this.project.location})`);
       Helpers.log(`Init mode: ${websql ? '[WEBSQL]' : ''}`)
     }
