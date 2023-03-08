@@ -218,7 +218,7 @@
         // all isomorphic application config
         "tnp-config": '13.1.55',
         "tnp-models": "13.1.9",
-        "tnp-helpers": '13.1.16',
+        "tnp-helpers": '13.1.17',
         "tnp-db": '13.1.8',
         "firedev-typeorm": '13.1.12',
         "firedev-crud": "13.1.37",
