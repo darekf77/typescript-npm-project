@@ -50,6 +50,11 @@ export function executeCommand(command: string, project: Project) {
    ${project.location}
 
    `);
+
+  if (config.frameworkName === 'firedev' && project.isContainerCoreProject) {
+    Helpers.info('This may take a long time... more than 1GB to download from npm...')
+  }
+
   project.run(command, { output: (config.frameworkName === 'tnp'), biggerBuffer: true }).sync();
   Helpers.writeFile([project.node_modules.path, '.install-date'], moment(new Date()).format('L LTS'))
 }
@@ -128,7 +133,7 @@ export function prepareTempProject(project: Project, pkg: Models.npm.Package): P
     try {
       pkg.version = Helpers.commnadOutputAsString(`npm show ${pkg.name} version`);
     } catch (error) {
-      Helpers.log('pkg'+ JSON.stringify(pkg));
+      Helpers.log('pkg' + JSON.stringify(pkg));
       Helpers.error(`[${config.frameworkName}] `
         + `not able to install package... try again with exact version or check package name.`, false, true);
     }
