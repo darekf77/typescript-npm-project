@@ -50,43 +50,45 @@ async function $INIT_CORE() {
   process.exit(0)
 }
 
-function $UPDATE(args: string) {
-
-  if (config.frameworkName === 'firedev') {
-    Helpers.run('npm i -g firedev --force').sync();
-    const morphiPathUserInUserDir = config.morphiPathUserInUserDir;
-    try {
-      Helpers.run(`git reset --hard && git pull origin master`,
-        { cwd: morphiPathUserInUserDir }).sync()
-    } catch (error) {
-      Helpers.error(`[${config.frameworkName} Not ablt to pull origin of morphi: ${config.urlMorphi} in: ${morphiPathUserInUserDir}`, false, true);
+async function $AUTOUPDATE(args: string) {
+  if (await Helpers.questionYesNo(`Proceed with ${config.frameworkName} update ?`)) {
+    if (config.frameworkName === 'firedev') {
+      Helpers.run('npm i -g firedev --force').sync();
+      const morphiPathUserInUserDir = config.morphiPathUserInUserDir;
+      try {
+        Helpers.run(`git reset --hard && git pull origin master`,
+          { cwd: morphiPathUserInUserDir }).sync()
+      } catch (error) {
+        Helpers.error(`[${config.frameworkName} Not ablt to pull origin of morphi: ${config.urlMorphi} in: ${morphiPathUserInUserDir}`, false, true);
+      }
+      Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
     }
-    Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
-  }
-  if (config.frameworkName === 'tnp') {
-    Helpers.taskStarted('Removing old node_modules..');
-    const nm = (Project.Tnp as Project).node_modules.path;
-    const nm2 = (Project.Tnp as Project).pathFor(`tmp-${config.folder.node_modules}2`)
-    const nm1 = (Project.Tnp as Project).pathFor(`tmp-${config.folder.node_modules}1`)
+    if (config.frameworkName === 'tnp') {
+      Helpers.taskStarted('Removing old node_modules..');
+      const nm = (Project.Tnp as Project).node_modules.path;
+      const nm2 = (Project.Tnp as Project).pathFor(`tmp-${config.folder.node_modules}2`)
+      const nm1 = (Project.Tnp as Project).pathFor(`tmp-${config.folder.node_modules}1`)
 
-    Helpers.removeIfExists(nm2);
-    if (Helpers.exists(nm1)) {
-      Helpers.move(nm1, nm2);
+      Helpers.removeIfExists(nm2);
+      if (Helpers.exists(nm1)) {
+        Helpers.move(nm1, nm2);
+      }
+      Helpers.removeIfExists(nm1);
+      if (Helpers.exists(nm)) {
+        Helpers.move(nm, nm1);
+      }
+      Helpers.taskDone();
+
+      Helpers.taskStarted('Installing new version of firedev pacakges')
+      Project.Tnp.run(`npm i --force && npm-run tsc && ${config.frameworkName} dedupe`).sync();
+      Helpers.taskDone();
+      Helpers.taskStarted('Installing new versions smart container pacakges')
+      Project.by('container', (Project.Tnp as Project)._frameworkVersion).run(`${config.frameworkName} reinstall`).sync();
+      Helpers.taskDone();
+
+      Helpers.taskDone('AUTOUPDATE DONE');
     }
-    Helpers.removeIfExists(nm1);
-    if (Helpers.exists(nm)) {
-      Helpers.move(nm, nm1);
-    }
-    Helpers.taskDone();
-
-    Helpers.taskStarted('Installing new version of firedev pacakges')
-    Project.Tnp.run(`npm i --force && npm-run tsc && ${config.frameworkName} dedupe`).sync();
-    Helpers.taskDone();
-    Helpers.taskStarted('Installing new versions smart container pacakges')
-    Project.by('container', (Project.Tnp as Project)._frameworkVersion).run(`${config.frameworkName} reinstall`).sync();
-    Helpers.taskDone();
-
-    Helpers.taskDone('UPDATE DONE');
+    process.exit(0);
   }
 
 
@@ -111,7 +113,7 @@ function $UPDATE(args: string) {
 
 export default {
   $UPDATE_ISOMORPHIC: Helpers.CLIWRAP($UPDATE_ISOMORPHIC, '$UPDATE_ISOMORPHIC'),
-  $UPDATE: Helpers.CLIWRAP($UPDATE, '$UPDATE'),
+  $AUTOUPDATE: Helpers.CLIWRAP($AUTOUPDATE, '$AUTOUPDATE'),
   $INIT_CORE: Helpers.CLIWRAP($INIT_CORE, '$INIT_CORE'),
 };
 

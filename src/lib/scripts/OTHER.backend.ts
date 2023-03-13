@@ -6,7 +6,7 @@ import { CLASS } from 'typescript-class-helpers';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import chalk from 'chalk';
-import { path } from 'tnp-core'
+import { path, fse } from 'tnp-core'
 import { config } from 'tnp-config';
 // import * as nodemailer from 'nodemailer';
 
@@ -70,7 +70,14 @@ async function version() {
   // Helpers.sleep(5);
   // global.spinner?.stop();
   log.data('Hellleoeoeo')
-  Helpers.success((Project.Tnp as Project).version);
+  const tnp = (Project.Tnp as Project);
+  const firedev = Project.From([fse.realpathSync(path.dirname(tnp.location)), config.frameworkNames.firedev]);
+  Helpers.success(`
+
+Firedev: ${firedev?.version ? `v${firedev.version}` : '-'}
+Tnp: ${tnp?.version ? `v${tnp.version}` : '-'}
+
+  `);
   process.exit(0)
 }
 

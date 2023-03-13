@@ -1,5 +1,5 @@
 //#region @backend
-import { _, crossPlatformPath } from 'tnp-core';
+import { _, crossPlatformPath, path } from 'tnp-core';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { ProjectFactory } from './project-factory.backend';
@@ -69,9 +69,87 @@ export function $NEW_DEPENDENCY_SITE(args: string, exit = true) {
   ProjectFactory.Instance.workspaceSiteFromArgs(args, exit, cwd, false);
 }
 
+export async function $CONTAINER(args: string) {
+  const cwd = crossPlatformPath(process.cwd());
 
+  const proj = Project.From(cwd);
+
+  const linkedProjects = Helpers.foldersFrom(cwd)
+    .map(f => path.basename(f))
+    .filter(f => !f.startsWith('.'))
+    .filter(f => !f.startsWith('old'))
+    .filter(f => Helpers.checkIfNameAllowedForFiredevProj(f))
+    ;
+
+  if (Helpers.exists([cwd, config.file.package_json__tnp_json5]) && Helpers.exists([cwd, config.file.package_json__tnp_json])) {
+    Helpers.remove([cwd, config.file.package_json__tnp_json]);
+  }
+
+  if (Helpers.exists([cwd, config.file.package_json__tnp_json5])) {
+    Helpers.remove([cwd, config.file.package_json__tnp_json]);
+  }
+
+  const orgPj = Helpers.readJson([cwd, config.file.package_json]) as Models.npm.IPackageJSON;
+
+  const endAction = () => {
+    const gitIgnore = `
+
+    ${linkedProjects.map(l => `/${l}`).join('\n')}
+
+      `;
+    Helpers.writeFile([cwd, config.file._gitignore], gitIgnore);
+
+
+
+    if (!Helpers.git.isGitRoot(cwd)) {
+      Helpers.run('git init', { cwd }).sync()
+    }
+
+    Helpers.run(`${config.frameworkName} init`, { cwd }).sync();
+  }
+
+  if (orgPj?.tnp) {
+    if (await Helpers.questionYesNo(`
+
+    Deteced project:
+${linkedProjects.map(l => `- ${l}`).join('\n')}
+
+
+Would you like to update current project configuration?`)) {
+      const pf = {
+        name: path.basename(cwd),
+        version: orgPj.version,
+        [config.frameworkNames.tnp]: orgPj.tnp,
+      };
+      const tnp = (pf[config.frameworkNames.tnp] as Models.npm.TnpData);
+      tnp.type = 'container';
+      tnp.version = config.defaultFrameworkVersion;
+      tnp.linkedProjects = linkedProjects;
+      Helpers.writeFile([cwd, config.file.package_json], pf);
+      Helpers.remove([cwd, config.file.package_json__tnp_json]);
+      Helpers.remove([cwd, config.file.package_json__tnp_json5]);
+      endAction();
+    }
+  } else {
+    const pf = {
+      name: path.basename(cwd),
+      version: "0.0.0",
+      [config.frameworkNames.tnp]: {
+        version: config.defaultFrameworkVersion,
+        type: 'container',
+        linkedProjects,
+      } as Models.npm.TnpData,
+    };
+    Helpers.writeFile([cwd, config.file.package_json], pf);
+    endAction();
+  }
+
+  Helpers.info('Done');
+  process.exit(0)
+}
 
 export default {
+  $CONTAINER: Helpers.CLIWRAP($CONTAINER, '$CONTAINER'),
   REMOVE: Helpers.CLIWRAP(REMOVE, 'REMOVE'),
   RM: Helpers.CLIWRAP(RM, 'RM'),
   NEW: Helpers.CLIWRAP(NEW, 'NEW'),

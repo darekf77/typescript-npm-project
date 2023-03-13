@@ -11,7 +11,7 @@ import { config } from 'tnp-config';
 
 //#region dedupe packages
 export function dedupePackages(projectLocation: string, packagesNames?: string[], countOnly = false, warnings = true) {
-
+  Helpers.taskStarted('Fixing/removing duplicates from npm container')
   // console.log('(Project.Tnp as Project).packageJson.data.tnp.core.dependencies.dedupe;',(Project.Tnp as Project).packageJson.data.tnp.core.dependencies.dedupe)
   // console.log('packages to dedupe', packagesNames)
   // process.exit(0)
@@ -128,6 +128,8 @@ export function dedupePackages(projectLocation: string, packagesNames?: string[]
     }
 
   });
+
+  Helpers.taskDone('Fixing/removing duplicates from npm container')
 }
 //#endregion
 

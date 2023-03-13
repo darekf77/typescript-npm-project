@@ -152,13 +152,13 @@ export class FilesStructure extends FeatureForProject {
       //#region TODO BIG QUICK_FIX
       if (config.frameworkName === 'firedev') {
         if (!FilesStructure.INITED_PROECT_SHOW_LOG[this.project.genericName]) { // TODO QUICK
-          Helpers.info(`Initing project: ${chalk.bold(this.project.genericName)}`);
+          Helpers.taskStarted(`Initing project: ${chalk.bold(this.project.genericName)}`);
           FilesStructure.INITED_PROECT_SHOW_LOG[this.project.genericName] = true;
         } else {
           Helpers.log(`Initing project: ${chalk.bold(this.project.genericName)}`);
         }
       } else {
-        Helpers.info(`Initing project: ${chalk.bold(this.project.genericName)}`);
+        Helpers.taskStarted(`Initing project: ${chalk.bold(this.project.genericName)}`);
       }
       //#endregion
 

@@ -350,6 +350,11 @@ const $RELEASE_MAJOR = async (args: string) => {
   return await $RELEASE(args);
 }
 
+const $MAJOR = async (args: string) => {
+  args = (args || '') + ' --releaseType=major';
+  return await $RELEASE(args);
+}
+
 const $RELEASE_MINOR = async (args: string) => {
   args = (args || '') + ' --releaseType=minor';
   return await $RELEASE(args);
@@ -360,6 +365,10 @@ const $MAJOR_RELEASE = async (args: string) => {
 };
 
 const $MINOR_RELEASE = async (args: string) => {
+  return await $RELEASE_MINOR(args);
+};
+
+const $MINOR = async (args: string) => {
   return await $RELEASE_MINOR(args);
 };
 
@@ -459,6 +468,8 @@ export default {
   $RELEASE_MAJOR: Helpers.CLIWRAP($RELEASE_MAJOR, '$RELEASE_MAJOR'),
   $MAJOR_RELEASE: Helpers.CLIWRAP($MAJOR_RELEASE, '$MAJOR_RELEASE'),
   $RELEASE_MINOR: Helpers.CLIWRAP($RELEASE_MINOR, '$RELEASE_MINOR'),
+  $MINOR: Helpers.CLIWRAP($MINOR, '$MINOR'),
+  $MAJOR: Helpers.CLIWRAP($MAJOR, '$MAJOR'),
   $MINOR_RELEASE: Helpers.CLIWRAP($MINOR_RELEASE, '$MINOR_RELEASE'),
   $RELEASE_ALL: Helpers.CLIWRAP($RELEASE_ALL, '$RELEASE_ALL'),
   $RELEASE_OBSCURED: Helpers.CLIWRAP($RELEASE_OBSCURED, '$RELEASE_OBSCURED'),

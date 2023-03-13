@@ -217,30 +217,24 @@ export abstract class FolderProject {
     //#endregion
   }
 
+
   //#region @backend
   getFolders(this: Project) {
-    const notAllowed: RegExp[] = [
-      '^\.vscode$', '^node\_modules$',
-      ...Helpers.values(config.tempFolders).map(v => `^${v}$`),
-      '^e2e$', '^tmp.*', '^dist.*', '^tests$', '^module$', '^browser', 'bundle*',
-      '^components$', '\.git', '^bin$', '^custom$', '^linked\-repos$',
-    ].map(s => new RegExp(s))
-
     const isDirectory = source => fse.lstatSync(source).isDirectory()
     const getDirectories = source =>
       fse.readdirSync(source).map(name => path.join(source, name)).filter(isDirectory)
 
     let subdirectories = getDirectories(this.location)
       .filter(f => {
-        const folderNam = path.basename(f);
-        return (notAllowed.filter(p => p.test(folderNam)).length === 0);
+        const folderName = path.basename(f);
+        return Helpers.checkIfNameAllowedForFiredevProj(folderName);
       })
 
     if (this.isTnp && fse.existsSync(path.join(this.location, '../firedev-projects'))) {
       subdirectories = subdirectories.concat(getDirectories(path.join(this.location, '../firedev-projects'))
         .filter(f => {
-          const folderNam = path.basename(f);
-          return (notAllowed.filter(p => p.test(folderNam)).length === 0);
+          const folderName = path.basename(f);
+          return Helpers.checkIfNameAllowedForFiredevProj(folderName);
         }))
     }
     return subdirectories;

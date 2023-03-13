@@ -41,11 +41,11 @@ firedev
         Helpers.log(`[firedev][tmp-environment] accepted path: ${envPath}`)
         return true;
       } catch (er) {
-        Helpers.warn(`[firedev][tmp-environment] not able to read: ${envPath}`)
+        Helpers.log(`[firedev][tmp-environment] not able to read: ${envPath}`)
       }
-      Helpers.info(`[firedev][tmp-environment] PATH EXISIT: ${envPath}`)
+      Helpers.log(`[firedev][tmp-environment] PATH EXISIT: ${envPath}`)
     } else {
-      Helpers.warn(`[firedev][tmp-environment] PATH NOT EXISIT: ${envPath}`)
+      Helpers.log(`[firedev][tmp-environment] PATH NOT EXISIT: ${envPath}`)
     }
     return false;
   });

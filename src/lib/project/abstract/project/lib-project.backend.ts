@@ -374,6 +374,7 @@ export abstract class LibProject {
   }
 
   removeJsMapsFrom(absPathBundleFolder: string) {
+    return; // TODO not a good idea
     Helpers.filesFrom(absPathBundleFolder, true)
       .filter(f => f.endsWith('.js.map') || f.endsWith('.mjs.map'))
       .forEach(f => Helpers.removeFileIfExists(f));
