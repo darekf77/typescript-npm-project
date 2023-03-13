@@ -134,9 +134,6 @@ export class LibProjectSmartContainer extends LibPorjectBase {
       Building docs prevew - done
 
       `);
-      await this.lib.pushToGitRepo(newVersion, realCurrentProj)
-    }, async () => {
-      await this.lib.pushToGitRepo(newVersion, realCurrentProj)
     });
   }
 

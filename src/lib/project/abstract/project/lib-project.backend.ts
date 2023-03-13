@@ -129,7 +129,10 @@ export abstract class LibProject {
     let specyficProjectForBuild: Project;
 
 
-    this.bumpVersionForPath(realCurrentProj);
+    if (releaseOptions.releaseType === 'patch') {
+      this.bumpVersionForPathRelease(realCurrentProj);
+    }
+
 
     const newVersion = realCurrentProj.version;
 
@@ -140,6 +143,7 @@ export abstract class LibProject {
     this.checkIfReadyForNpm();
     //#endregion
 
+    //#region library pushing
     await Helpers.questionYesNo(shouldReleaseLibraryQuestionMessage, async () => {
 
       if (this.isStandaloneProject) {
@@ -199,19 +203,20 @@ export abstract class LibProject {
           prod,
         });
       }
-
-      Helpers.info('RELEASE DONE');
-      process.exit(0);
     });
+    //#endregion
 
-    if (this.isStandaloneProject) {
-      await this.standalone.buildDocs(prod, newVersion, realCurrentProj);
-    }
+    if (!global.tnpNonInteractive) {
+      if (this.isStandaloneProject) {
+        await this.standalone.buildDocs(prod, newVersion, realCurrentProj);
+      }
 
-    if (this.isSmartContainer) {
-      await this.smartcontainer.buildDocs(prod, newVersion, realCurrentProj);
+      if (this.isSmartContainer) {
+        await this.smartcontainer.buildDocs(prod, newVersion, realCurrentProj);
+      }
     }
-    Helpers.info('DOCS RELEASE DONE');
+    await this.pushToGitRepo(newVersion, realCurrentProj);
+    Helpers.info('RELEASE DONE');
     process.exit(0);
   }
   //#endregion
@@ -258,7 +263,7 @@ export abstract class LibProject {
           Helpers.remove(websqlFolder);
         }
 
-          Helpers.removeFolderIfExists(absolutePathReleaseProject);
+        Helpers.removeFolderIfExists(absolutePathReleaseProject);
         Helpers.mkdirp(absolutePathReleaseProject);
         this.copyManager.generateSourceCopyIn(absolutePathReleaseProject, {
           useTempLocation: true, // TODO not needed
@@ -315,7 +320,7 @@ export abstract class LibProject {
 
 
 
-    Helpers.info(`BUILD OPTION (${this.name}):
+    Helpers.logInfo(`BUILD OPTION (${this.name}):
     prod=${!!prod},
     obscure=${!!obscure},
     includeNodeModules=${!!includeNodeModules},
@@ -597,8 +602,9 @@ export abstract class LibProject {
 
 
   // methods / push to git repo
-  async pushToGitRepo(this: Project, newVersion: string, realCurrentProj: Project) {
-    await Helpers.questionYesNo('Push changes to git repo ?', async () => {
+  async pushToGitRepo(this: Project, newVersion: string, realCurrentProj: Project, pushWithoutAsking = false) {
+
+    const push = async () => {
       newVersion = await realCurrentProj.tagVersion(newVersion);
       const lastCommitHash = realCurrentProj.git.lastCommitHash();
       realCurrentProj.packageJson.setBuildHash(lastCommitHash);
@@ -608,7 +614,15 @@ export abstract class LibProject {
       Helpers.log(`Git branch: ${realCurrentProj.git.currentBranchName}`);
       realCurrentProj.git.pushCurrentBranch();
       Helpers.info('Pushing to git repository done.');
-    });
+    };
+
+    if (pushWithoutAsking) {
+      await push();
+    } else {
+      await Helpers.questionYesNo('Push changes to git repo ?', async () => {
+        await push();
+      });
+    }
   }
   //#endregion
 

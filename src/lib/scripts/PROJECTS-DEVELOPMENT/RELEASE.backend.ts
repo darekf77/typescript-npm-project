@@ -39,7 +39,8 @@ const $RELEASE = async (args: string) => {
     .find(k => k.startsWith('v') && Number(k.replace('v', '')) >= 3) || '';
 
   Helpers.log(`argsObj.automaticRelease: ${argsObj.automaticRelease} `
-    + `${specifiedVersion ? (' - only framework version = ' + specifiedVersion) : ''}`)
+    + `${specifiedVersion ? (' - only framework version = ' + specifiedVersion) : ''}`);
+
   const automaticRelease = !!argsObj.automaticRelease;
   if (automaticRelease) {
     global.tnpNonInteractive = true;
@@ -76,11 +77,11 @@ const $RELEASE = async (args: string) => {
   if (argsObj.releaseType === 'major') {
     const newVersion = proj.versionMajorPlusWithZeros;
     proj.packageJson.data.version = newVersion;
-    proj.packageJson.save(`Major version up`);
+    proj.packageJson.save(`${argsObj.releaseType} version up`);
   } else if (argsObj.releaseType === 'minor') {
     const newVersion = proj.versionMinorPlusWithZeros;
     proj.packageJson.data.version = newVersion;
-    proj.packageJson.save(`Minor version up`);
+    proj.packageJson.save(`${argsObj.releaseType} version up`);
   } else {
     // TODO path release !
   }
@@ -263,6 +264,7 @@ processing...
           child.run(`${config.frameworkName} release ${!!specifiedVersion ? specifiedVersion : ''}`
             + ` --automaticRelease=${resolved.length === 0}`
             + ` --tnpNonInteractive=${resolved.length === 0}`
+            + ` --releaseType=${argsObj.releaseType}`
             + ` ${global.hideLog ? '' : '-verbose'}`
             , { prefix: `[container ${chalk.bold(proj.name)}/${child.name} release]`, output: true }).sync();
           // await child.release(handleStandalone(child, {}), true);

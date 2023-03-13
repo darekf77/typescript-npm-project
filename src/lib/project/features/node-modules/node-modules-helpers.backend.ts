@@ -56,7 +56,7 @@ export function dedupePackages(projectLocation: string, packagesNames?: string[]
       warnings && Helpers.log(`Project with name ${f} not founded`);
       return
     }
-    Helpers.info(`Scanning for duplicates of current ${current.name}@${current.version} ....\n`)
+    Helpers.logInfo(`Scanning for duplicates of current ${current.name}@${current.version} ....\n`)
     const nodeMod = path.join(projectLocation, config.folder.node_modules);
     if (!fse.existsSync(nodeMod)) {
       Helpers.mkdirp(nodeMod);
@@ -85,7 +85,7 @@ export function dedupePackages(projectLocation: string, packagesNames?: string[]
         }
       });
       if (duplicates.length === 0) {
-        Helpers.info(`No dupicate of ${current.name} fouded.`);
+        Helpers.logInfo(`No dupicate of ${current.name} fouded.`);
       }
     } else {
       duplicates.forEach(duplicateRelativePath => {
@@ -110,19 +110,19 @@ export function dedupePackages(projectLocation: string, packagesNames?: string[]
           const r = rules[current.name];
           if (_.isArray(r.ommitParents) && (r.ommitParents.includes(parentName)
             || _.isObject(r.ommitParents.find(o => o.startsWith(parentName.replace('*', '')))))) {
-            Helpers.warn(`[excluded] Ommiting duplicate of `
+            Helpers.logWarn(`[excluded] Ommiting duplicate of `
               + `${parentLabel}${current.name}@${versionRem} inside ${CLI.chalk.bold(parentName)}`)
             return
           }
           if (_.isArray(r.onlyFor) && !r.onlyFor.includes(parentName)) {
-            Helpers.warn(`[not included] Ommiting duplicate of `
+            Helpers.logWarn(`[not included] Ommiting duplicate of `
               + `${parentLabel}${current.name}@${versionRem} inside ${CLI.chalk.bold(parentName)}`)
             return
           }
         }
 
         Helpers.remove(p, true)
-        Helpers.warn(`Duplicate of ${parentLabel}${current.name}@${versionRem}`
+        Helpers.logWarn(`Duplicate of ${parentLabel}${current.name}@${versionRem}`
           + ` removed from ${CLI.chalk.bold(parentName)}`)
       });
     }

@@ -280,7 +280,7 @@ export class NpmProject {
     this.packageJson.save(`[npm-project] updating version path`);
   }
 
-  bumpVersionForPath(proj: Project) {
+  bumpVersionForPathRelease(proj: Project) {
     let atLestVersion = proj.git.lastTagVersionName.trim().replace('v', '') || '0.0.0';
     if (semver.gt(proj.version, atLestVersion)) {
       atLestVersion = proj.version;

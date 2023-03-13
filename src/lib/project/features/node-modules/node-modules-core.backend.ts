@@ -25,7 +25,7 @@ export class NodeModulesCore extends FeatureForProject {
 
     const packages = _.isArray(packagesOrOptions) ? packagesOrOptions : packagesOrOptions?.packages;
     if (!_.isArray(packagesOrOptions) && packagesOrOptions?.reason) {
-      Helpers.info(`Reason to dedupe: ${packagesOrOptions?.reason}`)
+      Helpers.logInfo(`Reason to dedupe: ${packagesOrOptions?.reason}`)
     }
     const packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
       (Project.Tnp as Project).packageJson.data.tnp.core.dependencies.dedupe;

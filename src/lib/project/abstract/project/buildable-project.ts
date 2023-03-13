@@ -341,7 +341,7 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
       await this.buildSteps(buildOptions);
     }
 
-    Helpers.info(`[buildable-project] Build steps ended... ${buildOptions.watch ? 'files watch started...' : ''}`);
+    Helpers.info(`${buildOptions.watch ? 'files watch started...' : ''}`);
     Helpers.log(`[buildable-project] Build steps ended (project type: ${this._type}) ... `);
 
     if (!buildOptions.appBuild) {

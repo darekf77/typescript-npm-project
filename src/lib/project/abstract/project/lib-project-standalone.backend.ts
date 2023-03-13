@@ -101,9 +101,6 @@ export class LibProjectStandalone extends LibPorjectBase {
       Building docs prevew - done
 
       `);
-      await this.lib.pushToGitRepo(newVersion, realCurrentProj)
-    }, async () => {
-      await this.lib.pushToGitRepo(newVersion, realCurrentProj)
     });
   }
 
@@ -180,7 +177,6 @@ export class LibProjectStandalone extends LibPorjectBase {
     if ((this.lib.typeIs('isomorphic-lib') && this.lib.frameworkVersionAtLeast('v3')) && !global.tnpNonInteractive) {
       await this.buildDocs(prod, newVersion, realCurrentProj);
     }
-    await realCurrentProj.pushToGitRepo(newVersion, realCurrentProj);
   }
 
   updateTnpAndCoreContainers(realCurrentProj: Project) {
