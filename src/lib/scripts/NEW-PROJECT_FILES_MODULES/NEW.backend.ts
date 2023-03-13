@@ -77,8 +77,8 @@ export async function $CONTAINER(args: string) {
   const linkedProjects = Helpers.foldersFrom(cwd)
     .map(f => path.basename(f))
     .filter(f => !f.startsWith('.'))
-    .filter(f => !f.startsWith('old'))
     .filter(f => Helpers.checkIfNameAllowedForFiredevProj(f))
+    .filter(f => !!Project.From([cwd, f]))
     ;
 
   if (Helpers.exists([cwd, config.file.package_json__tnp_json5]) && Helpers.exists([cwd, config.file.package_json__tnp_json])) {
