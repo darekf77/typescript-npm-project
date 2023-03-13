@@ -263,14 +263,7 @@ ${remotes.map((r, i) => `${i + 1}. ${r.origin} ${r.url}`).join('\n')}
     }
     let uncommitedChanges = this.project.git.thereAreSomeUncommitedChange;
     if (uncommitedChanges) {
-      Helpers.warn(`
-
-
-    [WARNING]  Stashing uncommit changes... in ${this.project.genericName}
-
-
-      `);
-
+      Helpers.warn(`Stashing uncommit changes... in ${this.project.genericName}`);
       try {
         this.project.run(`git add --all .`).sync();
       } catch (error) { }
