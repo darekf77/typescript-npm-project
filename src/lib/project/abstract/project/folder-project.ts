@@ -246,11 +246,7 @@ export abstract class FolderProject {
     if (this.typeIs('unknow')) {
       return;
     }
-    Helpers.info(`
-
-    Cleaning project: ${this.genericName}
-
-    `);
+    Helpers.info(`Cleaning project: ${this.genericName}`);
     this.node_modules.remove();
     await this.reset(false)
   }

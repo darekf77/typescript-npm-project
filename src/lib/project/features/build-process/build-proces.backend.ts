@@ -241,8 +241,8 @@ inside generated projects...
     //#region report start building message
     // console.log('WEBSQL', buildOptions.websql)
 
-    log.taskStarted(`\n\n\t${chalk.bold('[build-process] Start of Building')} ${this.project.genericName} `
-      + `(${buildOptions.appBuild ? 'app' : 'lib'}) ${buildOptions.websql ? '[WEBSQL]' : ''}\n\n`);
+    log.taskStarted(`\n\t${chalk.bold('[build-process] Start of Building')} ${this.project.genericName} `
+      + `(${buildOptions.appBuild ? 'app' : 'lib'}) ${buildOptions.websql ? '[WEBSQL]' : ''}\n`);
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({ msg: `[build-process] Start of building ${this.project.genericName} ${buildOptions.websql ? '[WEBSQL]' : ''}` })
     }

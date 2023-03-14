@@ -7,6 +7,12 @@ type in chrome conole
 sendCommand(SecurityInterstitialCommandId.CMD_PROCEED)
 ```
 
+or type
+```
+thisisunsafe
+```
+
+
 ## vscode termianl big sur fix
 ```
 codesign --remove-signature /Applications/Visual\ Studio\ Code.app/Contents/Frameworks/Code\ Helper\ \(Renderer\).app

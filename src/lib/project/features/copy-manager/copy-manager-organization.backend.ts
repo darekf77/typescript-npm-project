@@ -1,7 +1,7 @@
 import { config } from "tnp-config";
 import { crossPlatformPath, glob, path, _ } from "tnp-core";
 import { BuildOptions } from "tnp-db";
-import { Helpers } from "tnp-helpers";
+import { Helpers, PREFIXES } from "tnp-helpers";
 import { Models } from "tnp-models";
 import { CLASS } from "typescript-class-helpers";
 import { Project } from "../../abstract/project/project";
@@ -135,6 +135,8 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   }
   //#endregion
 
+
+
   //#region initial fix for destination pacakge
   initalFixForDestination(destination: Project): void {
 
@@ -143,6 +145,8 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       config.folder.node_modules,
       this.rootPackageName
     );
+
+    this.createCopyForRestore(destPackageInNodeModules, destination);
 
     for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
       const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];

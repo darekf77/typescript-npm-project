@@ -101,7 +101,7 @@ export class SmartNodeModules extends FeatureForProject {
   //#endregion
 
   //#region resolve smart node_module path
-  private pathFor(packageName?: string) {
+  pathFor(packageName?: string) {
     if (!packageName) {
       packageName = this.project.name;
     }
@@ -261,7 +261,7 @@ export class SmartNodeModules extends FeatureForProject {
       });
       this.handlePackagesOverride();
     }
-    Helpers.success(`node_modules install done for ${this.project.genericName}`);
+    Helpers.logSuccess(`node_modules install done for ${this.project.genericName}`);
   }
   //#endregion
 

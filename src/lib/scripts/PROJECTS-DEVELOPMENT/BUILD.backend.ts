@@ -5,7 +5,7 @@ import { path } from 'tnp-core';
 import { Project } from '../../project';
 import type { ProjectDocker } from '../../project';
 import { config } from 'tnp-config';
-import { Helpers } from 'tnp-helpers';
+import { Helpers, PREFIXES } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 //#endregion
 
@@ -50,9 +50,9 @@ const $CLEAN_BUILD = async (args) => {
 const $BUILD_WATCH = async (args) => {
   let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
   if (proj.isSmartContainerChild) {
-    await BUILD_DIST_WATCH(args);
+    Helpers.error(`Smart container build only available from container level. `, false, true)
   } else {
-    if (proj.isStandaloneProject && proj.typeIsNot('vscode-ext')) {
+    if ((proj.isStandaloneProject || proj.isSmartContainer) && proj.typeIsNot('vscode-ext')) {
       // TODO skipCopyToSelection no loger ipmortant
       args = `${args} --skipCopyToSelection --copytoAll`;
     }
@@ -298,8 +298,135 @@ const $START = async (args) => {
   }
 };
 
+const $START_WATCH = async (args) => {
+  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  if (proj.isStandaloneProject || proj.isSmartContainer) {
+    if (proj.typeIsNot('vscode-ext')) {
+      // TODO skipCopyToSelection no loger ipmortant
+      args = `${args} --skipCopyToSelection --copytoAll`;
+    }
+    args = `${args} --serveApp`;
+    await (Project.Current as Project)
+      .buildProcess
+      .startForLibFromArgs(false, true, 'dist', args);
+  }
+};
+
+
+const $REVERT = async (args: string) => {
+  let availablePackages = {};
+
+  const restore = async (toRestore: string, isSmartContainer: boolean, packageName: string, ask = false) => {
+    const wasOriginaly = !_.isUndefined(Object.keys(availablePackages).find(key => key.startsWith(packageName)));
+
+    const restoreThings = async () => {
+      const orgPath = toRestore.replace(PREFIXES.RESTORE_NPM, '');
+      if (wasOriginaly) {
+        Helpers.removeFolderIfExists(orgPath);
+        Helpers.move(toRestore, orgPath);
+        if (isSmartContainer) {
+          Helpers.info(`Revert done.. now you are using globally npm version of packages from "${packageName}"`)
+        } else {
+          Helpers.info(`Revert done.. now you are using globally npm version of package "${packageName}"`)
+        }
+
+        Helpers.success(`DONE package${isSmartContainer ? 's from' : ''} ${packageName} reverted to original state in core container.`)
+      } else {
+        Helpers.removeFolderIfExists(orgPath);
+        Helpers.success(`DONE package${isSmartContainer ? 's from' : ''} ${packageName} removed from global container (since they don't belong to him).`)
+      }
+
+    };
+
+    if (ask) {
+      if (await Helpers.questionYesNo(`Are you sure about ${wasOriginaly ? 'reverting' : 'DELETING (revert not possible)'}`
+        + ` package ${isSmartContainer ? 's from' : ''} ${packageName} in global core container ?`)) {
+        await restoreThings();
+      }
+    } else {
+      await restoreThings();
+    }
+  }
+
+  const whenNothing = async (packageName: string, container: Project) => {
+
+    const packages = Helpers
+      .foldersFrom(container.smartNodeModules.path)
+      .filter(f => path.basename(f).startsWith(PREFIXES.RESTORE_NPM))
+      ;
+
+
+    if (packages.length > 0) {
+
+    }
+
+    Helpers.info(`Nothing to globally revert for package "${packageName}"`);
+
+    if (await Helpers.questionYesNo(`Would you like to see a list of packages that can be reverted ?`)) {
+      const choices = packages.map(c => {
+        return {
+          name: path.basename(c).replace(PREFIXES.RESTORE_NPM, ''),
+          value: c
+        }
+      })
+
+      const selected = await Helpers.multipleChoicesAsk('Choose packages to revert', choices);
+
+      for (let index = 0; index < selected.length; index++) {
+        const toRestore = selected[index];
+        const packageName = path.basename(toRestore).replace(PREFIXES.RESTORE_NPM, '');
+        await restore(toRestore, packageName.startsWith('@'), packageName);
+      }
+
+    }
+
+  };
+
+
+  const getPackagesFromContainer = (container: Project) => {
+    container.packageJson.showDeps('For reverting packages')
+    const pj = Helpers.readJson(container.packageJson.path) as Models.npm.IPackageJSON;
+    availablePackages = {
+      ...(pj?.dependencies || {}),
+      ...(pj?.devDependencies || {}),
+      ...(pj?.peerDependencies || {}),
+    };
+  }
+
+
+  if (args.trim() === '') {
+    const proj = Project.Current as Project;
+    const container = Project.by('container', proj._frameworkVersion) as Project;
+    getPackagesFromContainer(container);
+    const packageName = (proj.isSmartContainer ? '@' : '') + proj.name
+    const toRestore = container.smartNodeModules.pathFor(packageName);
+    if (Helpers.exists(toRestore)) {
+      await restore(toRestore, proj.isSmartContainer, packageName, true);
+    } else {
+      await whenNothing(packageName, container);
+    }
+  } else {
+    const projName = args.trim();
+    const container = Project.by('container', config.defaultFrameworkVersion) as Project;
+    getPackagesFromContainer(container);
+    const isSmartContainer = projName.startsWith('@');
+    const packageName = (isSmartContainer ? '@' : '') + projName
+    const toRestore = container.smartNodeModules.pathFor(packageName);
+    if (Helpers.exists(toRestore)) {
+      await restore(toRestore, isSmartContainer, packageName, true);
+    } else {
+      await whenNothing(packageName, container);
+    }
+
+  }
+
+  process.exit(0)
+};
+
+
+
 const $RUN = async (args) => {
-  await $START(args);
+
 };
 //#endregion
 
@@ -327,7 +454,9 @@ const $RECREATE = () => {
 
 const $BACKUP = async (args) => {
   const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as ProjectDocker;
-  await proj.saveToFile();
+  if (proj.isDocker) {
+    await proj.saveToFile();
+  }
   process.exit(0);
 };
 
@@ -394,11 +523,13 @@ export default {
   $START_APP: Helpers.CLIWRAP($START_APP, '$START_APP'),
   $BUILD_PROD: Helpers.CLIWRAP($BUILD_PROD, '$BUILD_PROD'),
   $START: Helpers.CLIWRAP($START, '$START'),
-  $RUN: Helpers.CLIWRAP($RUN, '$RUN'),
+  $START_WATCH: Helpers.CLIWRAP($START_WATCH, '$START_WATCH'),
+  // $RUN: Helpers.CLIWRAP($RUN, '$RUN'),
   $STOP: Helpers.CLIWRAP($STOP, '$STOP'),
   $STATIC_START: Helpers.CLIWRAP($STATIC_START, '$STATIC_START'),
   $SERVE: Helpers.CLIWRAP($SERVE, '$SERVE'),
   $INSTALL_LOCALLY: Helpers.CLIWRAP($INSTALL_LOCALLY, '$INSTALL_LOCALLY'),
   $BACKUP: Helpers.CLIWRAP($BACKUP, '$BACKUP'),
+  $REVERT: Helpers.CLIWRAP($REVERT, '$REVERT'),
   //#endregion
 };

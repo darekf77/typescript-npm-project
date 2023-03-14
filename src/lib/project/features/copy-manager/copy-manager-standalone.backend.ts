@@ -1,7 +1,7 @@
 import { config } from "tnp-config";
 import { crossPlatformPath, glob, path, _ } from "tnp-core";
 import { BuildOptions } from "tnp-db";
-import { Helpers } from "tnp-helpers";
+import { Helpers, PREFIXES } from "tnp-helpers";
 import { Models } from "tnp-models";
 import { CLASS } from "typescript-class-helpers";
 import { Project } from "../../abstract/project/project";
@@ -133,6 +133,33 @@ export class CopyManagerStandalone extends CopyManager {
   }
   //#endregion
 
+  //#region create copy to restore
+  createCopyForRestore(destPackageInNodeModules: string, destination: Project) {
+    if (destination.isCoreProject) {
+      destination.packageJson.showDeps('For creating copy to revert for package')
+      const pj = Helpers.readJson(destination.packageJson.path) as Models.npm.IPackageJSON;
+      const availablePackages = {
+        ...(pj?.dependencies || {}),
+        ...(pj?.devDependencies || {}),
+        ...(pj?.peerDependencies || {}),
+      };
+      const wasOriginaly = !_.isUndefined(Object
+        .keys(availablePackages)
+        .find(key => key.startsWith(path.basename(destPackageInNodeModules)))
+      );
+
+      const prefixed = crossPlatformPath([
+        path.dirname(destPackageInNodeModules),
+        PREFIXES.RESTORE_NPM,
+        path.basename(destPackageInNodeModules),
+      ]);
+      if (wasOriginaly && !Helpers.exists(prefixed)) {
+        Helpers.copy(destPackageInNodeModules, prefixed, { recursive: true, copySymlinksAsFiles: true })
+      }
+    }
+  }
+  //#endregion
+
   //#region initial fix for destination pacakge
   initalFixForDestination(destination: Project): void {
 
@@ -141,6 +168,8 @@ export class CopyManagerStandalone extends CopyManager {
       config.folder.node_modules,
       this.rootPackageName
     );
+
+    this.createCopyForRestore(destPackageInNodeModules, destination);
 
     for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
       const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
@@ -434,7 +463,7 @@ export class CopyManagerStandalone extends CopyManager {
         specyficFileRelativePath
       ));
       // Helpers.log(`Eqal content with temp proj: ${}`)
-      if(Helpers.exists(readyToCopyFileInLocalTempProj)) {
+      if (Helpers.exists(readyToCopyFileInLocalTempProj)) {
         Helpers.copyFile(readyToCopyFileInLocalTempProj, destinationFilePath);
       }
       return;
