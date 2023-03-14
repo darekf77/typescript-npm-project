@@ -3,7 +3,7 @@
 import { PackagesRecognition } from '../../features/package-recognition/packages-recognition';
 import { BuildOptions } from 'tnp-db';
 import * as inquirer from 'inquirer';
-import { path } from 'tnp-core';
+import { crossPlatformPath, path } from 'tnp-core';
 import chalk from 'chalk';
 //#endregion
 import { _ } from 'tnp-core';
@@ -126,11 +126,18 @@ export abstract class BuildableProject {
         });
 
       Helpers.log(`UPDATING ALSO container core ${this._frameworkVersion}...`)
-      independentProjects.push(containerCoreProj);
+
       const tmpSmartNodeModulesProj = Project.From(path.dirname(containerCoreProj.smartNodeModules.path)) as Project;
       if (tmpSmartNodeModulesProj) {
         independentProjects.push(tmpSmartNodeModulesProj);
       }
+
+      const packageName = this.isSmartContainer ? ('@' + this.name) : this.name;
+      Helpers.createSymLink(
+        crossPlatformPath([containerCoreProj.smartNodeModules.path, config.folder.node_modules, packageName]),
+        crossPlatformPath([containerCoreProj.node_modules.path, config.folder.node_modules, packageName]),
+        { continueWhenExistedFolderDoesntExists: true }
+      );
 
       // @ts-ignore
       this.buildOptions.copyto = [
