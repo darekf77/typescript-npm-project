@@ -1,4 +1,4 @@
-import { _ } from 'tnp-core';
+import { crossPlatformPath, _ } from 'tnp-core';
 import { path } from 'tnp-core'
 import chalk from 'chalk';
 import { FeatureForProject, Project } from '../abstract';
@@ -101,17 +101,17 @@ export class SmartNodeModules extends FeatureForProject {
   //#endregion
 
   //#region resolve smart node_module path
-  pathFor(packageName?: string) {
+  private pathFor(packageName?: string) { // TOOD THIS IS CONFUSING
     if (!packageName) {
       packageName = this.project.name;
     }
-    return path.join(
+    return crossPlatformPath(path.join(
       this.project.location,
       `${config.folder.tmp}-smart-${config.folder.node_modules}`,
       `for`,
       packageName,
       config.folder.node_modules,
-    );
+    ));
   }
   //#endregion
 

@@ -150,8 +150,7 @@ export class CopyManagerStandalone extends CopyManager {
 
       const prefixed = crossPlatformPath([
         path.dirname(destPackageInNodeModules),
-        PREFIXES.RESTORE_NPM,
-        path.basename(destPackageInNodeModules),
+        PREFIXES.RESTORE_NPM + path.basename(destPackageInNodeModules),
       ]);
       if (wasOriginaly && !Helpers.exists(prefixed)) {
         Helpers.copy(destPackageInNodeModules, prefixed, { recursive: true, copySymlinksAsFiles: true })

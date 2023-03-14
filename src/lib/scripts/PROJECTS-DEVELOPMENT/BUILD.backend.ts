@@ -314,108 +314,113 @@ const $START_WATCH = async (args) => {
 
 
 const $REVERT = async (args: string) => {
-  let availablePackages = {};
 
-  const restore = async (toRestore: string, isSmartContainer: boolean, packageName: string, ask = false) => {
-    const wasOriginaly = !_.isUndefined(Object.keys(availablePackages).find(key => key.startsWith(packageName)));
+  //#region delete global
+  const deleteGlobalPkg = async (prefixedPath: string, isSmartContainer: boolean, packageName: string, container: Project) => {
+    Helpers.info(`
+Package${isSmartContainer ? 's from' : ''} "${packageName}"
+${isSmartContainer ? 'were' : 'was'} not originally in global container.
+    `)
+    if (await Helpers.questionYesNo(`Would you like to remove this package from global container ?`)) {
+      const orgNormalPath = prefixedPath.replace(PREFIXES.RESTORE_NPM, '');
+      Helpers.removeFolderIfExists(orgNormalPath);
+      Helpers.success(`DONE package${isSmartContainer ? 's from' : ''} ${packageName} removed from global container (since they don't belong to him).`);
 
-    const restoreThings = async () => {
-      const orgPath = toRestore.replace(PREFIXES.RESTORE_NPM, '');
-      if (wasOriginaly) {
-        Helpers.removeFolderIfExists(orgPath);
-        Helpers.move(toRestore, orgPath);
-        if (isSmartContainer) {
-          Helpers.info(`Revert done.. now you are using globally npm version of packages from "${packageName}"`)
-        } else {
-          Helpers.info(`Revert done.. now you are using globally npm version of package "${packageName}"`)
-        }
+    }
+  }
+  //#endregion
 
-        Helpers.success(`DONE package${isSmartContainer ? 's from' : ''} ${packageName} reverted to original state in core container.`)
+  //#region restore
+  const restorePreviousGlobalPkg = async (prefixedPath: string, isSmartContainer: boolean, packageName: string, ask = false) => {
+
+    const restoreAction = async () => {
+      const orgNormalPath = prefixedPath.replace(PREFIXES.RESTORE_NPM, '');
+      Helpers.removeFolderIfExists(orgNormalPath);
+      Helpers.move(prefixedPath, orgNormalPath);
+      if (isSmartContainer) {
+        Helpers.info(`Revert done.. now you are using globally npm version of packages from "${packageName}"`)
       } else {
-        Helpers.removeFolderIfExists(orgPath);
-        Helpers.success(`DONE package${isSmartContainer ? 's from' : ''} ${packageName} removed from global container (since they don't belong to him).`)
+        Helpers.info(`Revert done.. now you are using globally npm version of package "${packageName}"`)
       }
 
+      Helpers.success(`DONE package${isSmartContainer ? 's from' : ''} ${packageName} reverted to original state in core container.`)
     };
 
     if (ask) {
-      if (await Helpers.questionYesNo(`Are you sure about ${wasOriginaly ? 'reverting' : 'DELETING (revert not possible)'}`
-        + ` package ${isSmartContainer ? 's from' : ''} ${packageName} in global core container ?`)) {
-        await restoreThings();
+      if (await Helpers.questionYesNo(`Are you sure about globally reverting  package${isSmartContainer ? 's from' : ''} ${packageName} ?`)) {
+        await restoreAction();
       }
     } else {
-      await restoreThings();
+      await restoreAction();
     }
   }
+  //#endregion
 
   const whenNothing = async (packageName: string, container: Project) => {
+
+    Helpers.info(`Nothing to globally revert for package "${packageName}"`);
 
     const packages = Helpers
       .foldersFrom(container.smartNodeModules.path)
       .filter(f => path.basename(f).startsWith(PREFIXES.RESTORE_NPM))
       ;
 
-
     if (packages.length > 0) {
+      if (await Helpers.questionYesNo(`Would you like to see a list of packages that can be reverted ?`)) {
+        const choices = packages.map(c => {
+          return {
+            name: path.basename(c).replace(PREFIXES.RESTORE_NPM, ''),
+            value: c
+          }
+        })
 
-    }
+        const selected = await Helpers.multipleChoicesAsk('Choose packages to revert', choices);
 
-    Helpers.info(`Nothing to globally revert for package "${packageName}"`);
-
-    if (await Helpers.questionYesNo(`Would you like to see a list of packages that can be reverted ?`)) {
-      const choices = packages.map(c => {
-        return {
-          name: path.basename(c).replace(PREFIXES.RESTORE_NPM, ''),
-          value: c
+        for (let index = 0; index < selected.length; index++) {
+          const toRestore = selected[index];
+          const packageName = path.basename(toRestore).replace(PREFIXES.RESTORE_NPM, '');
+          await restorePreviousGlobalPkg(toRestore, packageName.startsWith('@'), packageName);
         }
-      })
-
-      const selected = await Helpers.multipleChoicesAsk('Choose packages to revert', choices);
-
-      for (let index = 0; index < selected.length; index++) {
-        const toRestore = selected[index];
-        const packageName = path.basename(toRestore).replace(PREFIXES.RESTORE_NPM, '');
-        await restore(toRestore, packageName.startsWith('@'), packageName);
       }
-
     }
-
   };
 
 
-  const getPackagesFromContainer = (container: Project) => {
+  const getPackagesFromContainer = (container: Project, packageName) => {
     container.packageJson.showDeps('For reverting packages')
     const pj = Helpers.readJson(container.packageJson.path) as Models.npm.IPackageJSON;
-    availablePackages = {
+    const availablePackages = {
       ...(pj?.dependencies || {}),
       ...(pj?.devDependencies || {}),
       ...(pj?.peerDependencies || {}),
     };
+    const wasOriginaly = !_.isUndefined(Object.keys(availablePackages).find(key => key.startsWith(packageName)));
+    return wasOriginaly;
   }
 
+  const proj = Project.Current as Project;
+  const projName = (args.trim() === '') ? proj?.name : args.trim();
+  const container = Project.by('container', config.defaultFrameworkVersion) as Project;
+  if (container) {
 
-  if (args.trim() === '') {
-    const proj = Project.Current as Project;
-    const container = Project.by('container', proj._frameworkVersion) as Project;
-    getPackagesFromContainer(container);
-    const packageName = (proj.isSmartContainer ? '@' : '') + proj.name
-    const toRestore = container.smartNodeModules.pathFor(packageName);
-    if (Helpers.exists(toRestore)) {
-      await restore(toRestore, proj.isSmartContainer, packageName, true);
+    const isSmartContainer = (args.trim() === '') ? proj?.isSmartContainer : projName.startsWith('@');
+    const packageName = (isSmartContainer ? '@' : '') + projName;
+    const wasOriginaly = getPackagesFromContainer(container, packageName);
+    const prefixedPath = crossPlatformPath([container.smartNodeModules.path, (PREFIXES.RESTORE_NPM + packageName)]);
+    const orgNormalPath = prefixedPath.replace(PREFIXES.RESTORE_NPM, '');
+
+    if (wasOriginaly) {
+      if (Helpers.exists(prefixedPath)) {
+        await restorePreviousGlobalPkg(prefixedPath, isSmartContainer, packageName, true);
+      } else {
+        await whenNothing(packageName, container);
+      }
     } else {
-      await whenNothing(packageName, container);
-    }
-  } else {
-    const projName = args.trim();
-    const container = Project.by('container', config.defaultFrameworkVersion) as Project;
-    getPackagesFromContainer(container);
-    const isSmartContainer = projName.startsWith('@');
-    const packageName = (isSmartContainer ? '@' : '') + projName
-    const toRestore = container.smartNodeModules.pathFor(packageName);
-    if (Helpers.exists(toRestore)) {
-      await restore(toRestore, isSmartContainer, packageName, true);
-    } else {
-      await whenNothing(packageName, container);
+      if (Helpers.exists(orgNormalPath)) {
+        await deleteGlobalPkg(prefixedPath, isSmartContainer, packageName, container);
+      } else {
+        await whenNothing(packageName, container);
+      }
     }
 
   }
