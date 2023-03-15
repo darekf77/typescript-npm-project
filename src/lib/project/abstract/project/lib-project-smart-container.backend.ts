@@ -91,12 +91,12 @@ export class LibProjectSmartContainer extends LibPorjectBase {
 
     });
 
-    await this.buildDocs(prod, newVersion, realCurrentProj);
+    await this.buildDocs(prod);
 
   }
 
 
-  async buildDocs(prod: boolean, newVersion: string, realCurrentProj: Project) {
+  async buildDocs(prod: boolean) {
     // TODO
 
     await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {

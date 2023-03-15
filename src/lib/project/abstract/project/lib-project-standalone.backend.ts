@@ -65,7 +65,7 @@ export class LibProjectStandalone extends LibPorjectBase {
 
   }
 
-  async buildDocs(prod: boolean, newVersion: string, realCurrentProj: Project) {
+  async buildDocs(prod: boolean) {
     await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
 
       //#region questions
@@ -175,7 +175,7 @@ export class LibProjectStandalone extends LibPorjectBase {
     });
 
     if ((this.lib.typeIs('isomorphic-lib') && this.lib.frameworkVersionAtLeast('v3')) && !global.tnpNonInteractive) {
-      await this.buildDocs(prod, newVersion, realCurrentProj);
+      await this.buildDocs(prod);
     }
   }
 

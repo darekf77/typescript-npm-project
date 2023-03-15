@@ -134,8 +134,8 @@ export abstract class BuildableProject {
 
       const packageName = this.isSmartContainer ? ('@' + this.name) : this.name;
       Helpers.createSymLink(
-        crossPlatformPath([containerCoreProj.smartNodeModules.path, config.folder.node_modules, packageName]),
-        crossPlatformPath([containerCoreProj.node_modules.path, config.folder.node_modules, packageName]),
+        crossPlatformPath([containerCoreProj.smartNodeModules.path, packageName]),
+        crossPlatformPath([containerCoreProj.node_modules.path, packageName]),
         { continueWhenExistedFolderDoesntExists: true }
       );
 

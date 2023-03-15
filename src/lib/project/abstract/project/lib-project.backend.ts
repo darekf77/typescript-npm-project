@@ -111,7 +111,7 @@ export abstract class LibProject {
 
   public async release(this: Project, releaseOptions?: Models.dev.ReleaseOptions, automaticRelease = false) {
 
-    const { prod = false } = releaseOptions;
+    const { prod = false, shouldReleaseLibrary } = releaseOptions;
 
     if (await this.createTempProject(releaseOptions, automaticRelease)) {
       return;
@@ -128,23 +128,22 @@ export abstract class LibProject {
     const realCurrentProj = Project.From(realCurrentProjLocation) as Project;
     let specyficProjectForBuild: Project;
 
+    if (shouldReleaseLibrary) {
 
-    if (releaseOptions.releaseType === 'patch') {
-      this.bumpVersionForPathRelease(realCurrentProj);
-    }
+      if (releaseOptions.releaseType === 'patch') {
+        this.bumpVersionForPathRelease(realCurrentProj);
+      }
 
 
-    const newVersion = realCurrentProj.version;
+      var newVersion = realCurrentProj.version;
 
-    const shouldReleaseLibraryQuestionMessage = this.questionMessage(newVersion, realCurrentProj);
+      this.checkIfLogginInToNpm();
 
-    this.checkIfLogginInToNpm();
+      this.checkIfReadyForNpm();
+      //#endregion
 
-    this.checkIfReadyForNpm();
-    //#endregion
+      //#region library pushing
 
-    //#region library pushing
-    await Helpers.questionYesNo(shouldReleaseLibraryQuestionMessage, async () => {
 
       if (this.isStandaloneProject) {
         await this.standalone.bumpVersionInOtherProjects(newVersion, true)
@@ -203,19 +202,20 @@ export abstract class LibProject {
           prod,
         });
       }
-    });
+
+    }
     //#endregion
 
     if (!global.tnpNonInteractive) {
       if (this.isStandaloneProject) {
-        await this.standalone.buildDocs(prod, newVersion, realCurrentProj);
+        await this.standalone.buildDocs(prod);
       }
 
       if (this.isSmartContainer) {
-        await this.smartcontainer.buildDocs(prod, newVersion, realCurrentProj);
+        await this.smartcontainer.buildDocs(prod);
       }
     }
-    await this.pushToGitRepo(newVersion, realCurrentProj);
+    await this.pushToGitRepo(realCurrentProj, newVersion);
     Helpers.info('RELEASE DONE');
     process.exit(0);
   }
@@ -390,16 +390,6 @@ export abstract class LibProject {
     return tempProjName;
   }
 
-  private questionMessage(this: Project, newVersion: string, realCurrentProj: Project) {
-    // TODO detecting changes for children when start container
-    const message = this.isStandaloneProject ? `Release new version: ${newVersion} ?`
-      : `Release new versions for container packages:\n`
-      + `${realCurrentProj.children.map((c, index) => `\t${index + 1}. `
-        + `@${realCurrentProj.name}/${c.name} v${newVersion}`).join('\n')}\n?`;
-
-
-    return message;
-  }
 
   private createClientVersionAsCopyOfBrowser(this: Project) {
     //
@@ -552,9 +542,14 @@ export abstract class LibProject {
 
 
   // methods / commit
-  private commit(this: Project, newVer: string, message = 'new version') {
-    //
-    this.git.commit(`${message} ${newVer}`);
+  private commit(this: Project, newVer?: string, message = 'new version') {
+
+    if (newVer) {
+      this.git.commit(`${message} ${newVer}`);
+    } else {
+      this.git.commit('relese update')
+    }
+
 
   }
 
@@ -602,14 +597,19 @@ export abstract class LibProject {
 
 
   // methods / push to git repo
-  async pushToGitRepo(this: Project, newVersion: string, realCurrentProj: Project, pushWithoutAsking = false) {
+  async pushToGitRepo(this: Project, realCurrentProj: Project, newVersion?: string, pushWithoutAsking = false) {
 
     const push = async () => {
-      newVersion = await realCurrentProj.tagVersion(newVersion);
-      const lastCommitHash = realCurrentProj.git.lastCommitHash();
-      realCurrentProj.packageJson.setBuildHash(lastCommitHash);
-      realCurrentProj.packageJson.save('updating hash');
-      realCurrentProj.commit(newVersion, `build hash update`);
+      if (newVersion) {
+        newVersion = await realCurrentProj.tagVersion(newVersion);
+        const lastCommitHash = realCurrentProj.git.lastCommitHash();
+        realCurrentProj.packageJson.setBuildHash(lastCommitHash);
+        realCurrentProj.packageJson.save('updating hash');
+        realCurrentProj.commit(newVersion, `build hash update`);
+      } else {
+        realCurrentProj.commit();
+      }
+
       Helpers.log('Pushing to git repository... ')
       Helpers.log(`Git branch: ${realCurrentProj.git.currentBranchName}`);
       realCurrentProj.git.pushCurrentBranch();

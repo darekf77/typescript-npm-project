@@ -4,6 +4,7 @@
   overrided: {
     dependencies: {
       'firedev-ui': '13.0.1',
+      'edit-table': '3.3.1',
     },
     ignoreDepsPattern: [
       "bs4-breakpoint",

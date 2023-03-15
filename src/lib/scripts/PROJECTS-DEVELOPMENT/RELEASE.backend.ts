@@ -74,17 +74,41 @@ const $RELEASE = async (args: string) => {
     Helpers.removeFileIfExists(lastReleaseProjFilePath);
   }
 
-  if (argsObj.releaseType === 'major') {
-    const newVersion = proj.versionMajorPlusWithZeros;
-    proj.packageJson.data.version = newVersion;
-    proj.packageJson.save(`${argsObj.releaseType} version up`);
-  } else if (argsObj.releaseType === 'minor') {
-    const newVersion = proj.versionMinorPlusWithZeros;
-    proj.packageJson.data.version = newVersion;
-    proj.packageJson.save(`${argsObj.releaseType} version up`);
-  } else {
-    // TODO path release !
+  const shouldReleaseLibMessage = async () => {
+    let newVersion = proj.versionPatchedPlusOne;
+    if (argsObj.releaseType === 'major') {
+      newVersion = proj.versionMajorPlusWithZeros
+    } else if (argsObj.releaseType === 'minor') {
+      newVersion = proj.versionMinorPlusWithZeros;
+    }
+
+    // TODO detecting changes for children when start container
+    const message = proj.isStandaloneProject ? `Release new version: ${newVersion} ?`
+      : `Release new versions for container packages:\n`
+      + `${proj.children.map((c, index) => `\t${index + 1}. `
+        + `@${proj.name}/${c.name} v${newVersion}`).join('\n')}\n?`;
+
+
+
+    return await Helpers.questionYesNo(message);
   }
+
+  argsObj.shouldReleaseLibrary = await shouldReleaseLibMessage();
+
+  if(argsObj.shouldReleaseLibrary) {
+    if (argsObj.releaseType === 'major') {
+      const newVersion = proj.versionMajorPlusWithZeros;
+      proj.packageJson.data.version = newVersion;
+      proj.packageJson.save(`${argsObj.releaseType} version up`);
+    } else if (argsObj.releaseType === 'minor') {
+      const newVersion = proj.versionMinorPlusWithZeros;
+      proj.packageJson.data.version = newVersion;
+      proj.packageJson.save(`${argsObj.releaseType} version up`);
+    } else {
+      // TODO path release ! // TODO @LAST
+    }
+  }
+
 
   proj.packageJson.showDeps('Release');
   //#endregion
