@@ -392,7 +392,6 @@
             "@ngx-formly/material": "^3.1.0",
           },
           "ui-libs": {
-            'firedev-ui': '13.0.1',
             'edit-table': '4.0.0',
             'bootstrap': "4.3.1",
             "ngx-bootstrap": "^2.0.2",
