@@ -104,15 +104,20 @@ export class ProjectContainer
 
     const proxy = this.proxyProjFor(client, outDir);
     if (!proxy && this.isSmartContainer) {
-      const tmp = (c) => `${config.frameworkName} build:app:watch ${c} ${args}`;
+      const tmp = (c) => `${config.frameworkName} build:app:watch ${c}`;
       Helpers.error(`
 
       Please provide target for angular build:
 
-
 ${this.children.filter(c => c.typeIs('isomorphic-lib')).map(c => {
         return tmp(c.name);
       }).join('\n')}
+
+      or please update:
+      ...
+      linkedProjects: [ ... ]
+      ...
+      in you configuraiton and run: firedev init
 
 
       `, false, true);

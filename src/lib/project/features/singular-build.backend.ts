@@ -6,6 +6,7 @@ import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { VscodeProject } from '../abstract/project/vscode-project.backend';
 import { BrowserCodeCut } from '../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
+import { recreateApp } from './inside-structures/structs/inside-struct-helpers';
 
 /**
  * DEPRAECATED
@@ -26,7 +27,7 @@ export class SingularBuild extends FeatureForProject {
 
     const smartContainerTargetProjPath = SingularBuild.getProxyProj(parent, client.name, outFolder); // path.join(parent.location, outFolder, parent.name, client.name);
     Helpers.log(`dist project: ${smartContainerTargetProjPath}`);
-    if(!Helpers.exists(smartContainerTargetProjPath)) {
+    if (!Helpers.exists(smartContainerTargetProjPath)) {
       Helpers.mkdirp(smartContainerTargetProjPath);
     }
     const appRelatedFiles = BrowserCodeCut.extAllowedToReplace.map(ext => `app${ext}`);
@@ -46,8 +47,8 @@ export class SingularBuild extends FeatureForProject {
 
     //#endregion
 
-    //#region symlinks app/lib
-    (() => {
+     //#region symlinks app/lib
+     (() => {
       [
         'app',
         'lib',
@@ -134,6 +135,9 @@ export class SingularBuild extends FeatureForProject {
       const sourcesAppAFilesAbsPathes = appRelatedFiles.map(a => {
         return crossPlatformPath(path.join(client.location, config.folder.src, a));
       });
+
+      recreateApp(client);
+
 
       const copySourcesToDest = () => {
         for (let index = 0; index < sourcesAppAFilesAbsPathes.length; index++) {

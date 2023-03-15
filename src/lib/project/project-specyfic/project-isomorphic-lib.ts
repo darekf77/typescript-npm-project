@@ -173,8 +173,8 @@ export class ProjectIsomorphicLib
   projectSpecyficIgnoredFiles() {
     //#region @backendFunc
     return [
-      'src/entities.ts',
-      'src/controllers.ts'
+      // 'src/entities.ts',
+      // 'src/controllers.ts'
     ].concat(this.projectSpecyficFiles());
     //#endregion
   }

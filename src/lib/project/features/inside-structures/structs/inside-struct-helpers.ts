@@ -58,8 +58,6 @@ export function recreateApp(project: Project) {
     'index.ts',
   ));
 
-
-
   if (!Helpers.exists(appFile) && !Helpers.exists(appFolderWithIndex)) {
 
     const componentName = `${_.upperFirst(_.camelCase(project.name))}Component`;
