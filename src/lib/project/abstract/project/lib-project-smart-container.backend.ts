@@ -91,8 +91,6 @@ export class LibProjectSmartContainer extends LibPorjectBase {
 
     });
 
-    await this.buildDocs(prod);
-
   }
 
 

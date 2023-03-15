@@ -174,9 +174,6 @@ export class LibProjectStandalone extends LibPorjectBase {
       this.updateTnpAndCoreContainers(realCurrentProj);
     });
 
-    if ((this.lib.typeIs('isomorphic-lib') && this.lib.frameworkVersionAtLeast('v3')) && !global.tnpNonInteractive) {
-      await this.buildDocs(prod);
-    }
   }
 
   updateTnpAndCoreContainers(realCurrentProj: Project) {

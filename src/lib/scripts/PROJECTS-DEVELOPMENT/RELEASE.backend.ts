@@ -75,11 +75,13 @@ const $RELEASE = async (args: string) => {
   }
 
   const shouldReleaseLibMessage = async () => {
-    let newVersion = proj.versionPatchedPlusOne;
+    let newVersion;
     if (argsObj.releaseType === 'major') {
       newVersion = proj.versionMajorPlusWithZeros
     } else if (argsObj.releaseType === 'minor') {
       newVersion = proj.versionMinorPlusWithZeros;
+    } else if (argsObj.releaseType === 'patch') {
+      newVersion = proj.versionPatchedPlusOne;
     }
 
     // TODO detecting changes for children when start container
@@ -95,7 +97,7 @@ const $RELEASE = async (args: string) => {
 
   argsObj.shouldReleaseLibrary = await shouldReleaseLibMessage();
 
-  if(argsObj.shouldReleaseLibrary) {
+  if (argsObj.shouldReleaseLibrary) {
     if (argsObj.releaseType === 'major') {
       const newVersion = proj.versionMajorPlusWithZeros;
       proj.packageJson.data.version = newVersion;
@@ -104,8 +106,10 @@ const $RELEASE = async (args: string) => {
       const newVersion = proj.versionMinorPlusWithZeros;
       proj.packageJson.data.version = newVersion;
       proj.packageJson.save(`${argsObj.releaseType} version up`);
-    } else {
-      // TODO path release ! // TODO @LAST
+    } else if (argsObj.releaseType === 'patch') {
+      const newVersion = proj.versionPatchedPlusOne;
+      proj.packageJson.data.version = newVersion;
+      proj.packageJson.save(`${argsObj.releaseType} version up`);
     }
   }
 

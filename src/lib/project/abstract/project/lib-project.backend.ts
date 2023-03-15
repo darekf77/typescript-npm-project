@@ -130,10 +130,6 @@ export abstract class LibProject {
 
     if (shouldReleaseLibrary) {
 
-      if (releaseOptions.releaseType === 'patch') {
-        this.bumpVersionForPathRelease(realCurrentProj);
-      }
-
 
       var newVersion = realCurrentProj.version;
 
@@ -588,20 +584,16 @@ export abstract class LibProject {
 
 
 
-  // methods / tag version
-  private async tagVersion(this: Project, newVersion: string) {
-    //
-    return this.createNewVersionWithTagFor.pathRelease(`version v${newVersion}`).newVersion;
-
-  }
-
-
   // methods / push to git repo
   async pushToGitRepo(this: Project, realCurrentProj: Project, newVersion?: string, pushWithoutAsking = false) {
 
     const push = async () => {
       if (newVersion) {
-        newVersion = await realCurrentProj.tagVersion(newVersion);
+        const tagName = `v${newVersion}`;
+        const commitMessage = ('new version ' + newVersion);
+        realCurrentProj.run(`git tag -a ${tagName} `
+          + `-m "${commitMessage}"`,
+          { output: false }).sync();
         const lastCommitHash = realCurrentProj.git.lastCommitHash();
         realCurrentProj.packageJson.setBuildHash(lastCommitHash);
         realCurrentProj.packageJson.save('updating hash');

@@ -3,10 +3,10 @@
 
   overrided: {
     dependencies: {
-      'firedev-ui': '13.0.1',
-      'edit-table': '3.3.1',
+
     },
     ignoreDepsPattern: [
+      'edit-table',
       "bs4-breakpoint",
       "base-model-wrap",
       "http-socket-proxy-router",
@@ -392,7 +392,9 @@
             "@ngx-formly/material": "^3.1.0",
           },
           "ui-libs": {
-            bootstrap: "4.3.1",
+            'firedev-ui': '13.0.1',
+            'edit-table': '4.0.0',
+            'bootstrap': "4.3.1",
             "ngx-bootstrap": "^2.0.2",
           },
           icons: {
