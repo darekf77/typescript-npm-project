@@ -104,7 +104,10 @@ const BUILD_DIST_ALL = async (args) => {
 };
 
 const BUILD_BUNDLE = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(false, false, 'bundle', args);
+
 const BUILD_BUNDLE_PROD = (args) => (Project.Current as Project).buildProcess.startForLibFromArgs(true, false, 'bundle', args);
+
+const $BUILD_BUNDLE_APP_PROD = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(true, false, 'bundle', args);
 
 async function BUILD_LIB(args) {
   await BUILD_DIST(args);
@@ -518,6 +521,7 @@ export default {
   $BUILD_DIST_PROD: Helpers.CLIWRAP($BUILD_DIST_PROD, '$BUILD_DIST_PROD'),
   $BUILD_BUNDLE_WATCH: Helpers.CLIWRAP($BUILD_BUNDLE_WATCH, '$BUILD_BUNDLE_WATCH'),
   $BUILD_BUNDLE_PROD: Helpers.CLIWRAP($BUILD_BUNDLE_PROD, '$BUILD_BUNDLE_PROD'),
+  $BUILD_BUNDLE_APP_PROD: Helpers.CLIWRAP($BUILD_BUNDLE_APP_PROD, '$BUILD_BUNDLE_APP_PROD'),
   $BUILD_BUNDLE_PROD_WATCH: Helpers.CLIWRAP($BUILD_BUNDLE_PROD_WATCH, '$BUILD_BUNDLE_PROD_WATCH'),
   $BUILD_APP_PROD: Helpers.CLIWRAP($BUILD_APP_PROD, '$BUILD_APP_PROD'),
   $BUILD_APP: Helpers.CLIWRAP($BUILD_APP, '$BUILD_APP'),

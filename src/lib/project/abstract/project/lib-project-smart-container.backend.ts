@@ -123,7 +123,7 @@ export class LibProjectSmartContainer extends LibPorjectBase {
 
       const libBuildCOmmand = `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'} && `;
       await this.lib.run(`${libBuildCOmmand}`
-        + `${config.frameworkName} build:${config.folder.bundle}:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
+        + `${config.frameworkName} build:${config.folder.bundle}:app:${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
         + `${appBuildOptions.websql ? '--websql' : ''} ${global.hideLog ? '' : '-verbose'}`).sync();
 
 

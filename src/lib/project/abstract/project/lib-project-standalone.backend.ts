@@ -92,7 +92,7 @@ export class LibProjectStandalone extends LibPorjectBase {
 
       const libBuildCommand = `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'} && `
       await this.lib.run(`${libBuildCommand}`
-        + `${config.frameworkName} build:${config.folder.bundle}:app${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
+        + `${config.frameworkName} build:${config.folder.bundle}:app:${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
         + `${appBuildOptions.websql ? '--websql' : ''} ${global.hideLog ? '' : '-verbose'}`).sync();
 
 
