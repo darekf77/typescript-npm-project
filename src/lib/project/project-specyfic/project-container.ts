@@ -102,7 +102,22 @@ export class ProjectContainer
       client = this.smartContainerBuildTarget?.name;
     }
 
-    const proxy = this.proxyProjFor(client, outDir);
+    const proxyForTarget = this.proxyProjFor(this.smartContainerBuildTarget?.name, outDir);
+    if (!proxyForTarget) {
+      Helpers.error(`Please start lib build for smart container:
+     ${config.frameworkName} build:dist:watch
+     or
+     ${config.frameworkName} dev
+     or
+     ${config.frameworkName} build:watch # for global build
+
+      `, false, true)
+    }
+
+    let proxy = this.proxyProjFor(client, outDir);
+ // @LAST
+
+
     if (!proxy && this.isSmartContainer) {
       const tmp = (c) => `${config.frameworkName} build:app:watch ${c}`;
       Helpers.error(`

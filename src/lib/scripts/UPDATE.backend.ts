@@ -51,7 +51,7 @@ async function $INIT_CORE() {
 }
 
 async function $AUTOUPDATE(args: string) {
-  if (await Helpers.questionYesNo(`Proceed with ${config.frameworkName} update ?`)) {
+  if (await Helpers.questionYesNo(`Proceed with ${config.frameworkName} auto-update ?`)) {
     if (config.frameworkName === 'firedev') {
       Helpers.run('npm i -g firedev --force').sync();
       const morphiPathUserInUserDir = config.morphiPathUserInUserDir;
@@ -61,6 +61,8 @@ async function $AUTOUPDATE(args: string) {
       } catch (error) {
         Helpers.error(`[${config.frameworkName} Not ablt to pull origin of morphi: ${config.urlMorphi} in: ${morphiPathUserInUserDir}`, false, true);
       }
+      const container = Project.by('container', config.defaultFrameworkVersion);
+      container.run('firedev reinstall').sync();
       Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
     }
     if (config.frameworkName === 'tnp') {

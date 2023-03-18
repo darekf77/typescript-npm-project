@@ -237,7 +237,7 @@ export class CopyManagerStandalone extends CopyManager {
     this.sourceFolders.forEach(sourceFolder => {
       const toRemoveLink = crossPlatformPath(path.join(location, sourceFolder));
       if (Helpers.isSymlinkFileExitedOrUnexisted(toRemoveLink)) {
-        Helpers.removeFileIfExists(crossPlatformPath(path.join(location, sourceFolder)));
+        Helpers.remove(crossPlatformPath(path.join(location, sourceFolder)), true);
       }
     });
   }
