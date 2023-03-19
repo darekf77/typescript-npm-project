@@ -92,7 +92,7 @@ async function generate(project: Project, t: Models.npm.TargetProject) {
     }
   }
 
-  Helpers.log('UPDATING SHIT');
+  Helpers.log('UPDATING');
 
   [
     ...(_.isArray(t.links) ? t.links : []),

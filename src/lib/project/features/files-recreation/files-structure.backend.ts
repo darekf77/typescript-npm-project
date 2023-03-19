@@ -404,6 +404,9 @@ export class FilesStructure extends FeatureForProject {
   }
 
   public async clear(options?: { recrusive: boolean; }) {
+    if (this.project.isVscodeExtension) {
+      Helpers.remove(this.project.pathFor('out'), true)
+    }
     let { recrusive = false } = options || {};
     if (this.project.isSmartContainer) {
       recrusive = true;

@@ -524,7 +524,7 @@ ${this.project.isVscodeExtension ? '' : coreFiles}
 
     let defaultProjectProptotype: Project;
 
-    if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIsNot('isomorphic-lib')) {
+    if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIsNot('isomorphic-lib', 'vscode-ext')) {
       // nothing here
     } else {
       defaultProjectProptotype = Project.by<Project>(this.project._type, this.project._frameworkVersion) as Project;

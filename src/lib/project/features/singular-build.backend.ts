@@ -8,9 +8,6 @@ import { VscodeProject } from '../abstract/project/vscode-project.backend';
 import { BrowserCodeCut } from '../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
 import { recreateApp } from './inside-structures/structs/inside-struct-helpers';
 
-/**
- * DEPRAECATED
- */
 export class SingularBuild extends FeatureForProject {
 
   static getProxyProj(workspaceOrContainer: Project, client: string, outFolder: Models.dev.BuildDir = 'dist') {
@@ -19,7 +16,10 @@ export class SingularBuild extends FeatureForProject {
 
   watchers: chokidar.FSWatcher[] = [];
 
-  async createSingluarTargeProjFor(parent: Project, client: Project, outFolder: Models.dev.BuildDir, watch = false): Promise<Project> {
+  async createSingluarTargeProjFor(options: {
+    parent: Project, client: Project, outFolder: Models.dev.BuildDir, watch?: boolean; nonClient?: boolean,
+  }): Promise<Project> {
+    const { parent, client, outFolder, watch = false, nonClient = false } = options;
 
     const children = this.project.children
       .filter(c => (c.typeIs('isomorphic-lib')) && c.frameworkVersionAtLeast('v3'))
@@ -47,8 +47,8 @@ export class SingularBuild extends FeatureForProject {
 
     //#endregion
 
-     //#region symlinks app/lib
-     (() => {
+    //#region symlinks app/lib
+    (() => {
       [
         'app',
         'lib',
@@ -65,25 +65,42 @@ export class SingularBuild extends FeatureForProject {
     //#endregion
 
     //#region symlinks lib => libs
-    children.forEach(c => {
-      const source_lib = crossPlatformPath(path.join(c.location, config.folder.src, 'lib'));
-      const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, 'libs', c.name));
-      Helpers.createSymLink(source_lib, dest_lib);
-    });
+    if (nonClient) {
+
+    } else {
+      children.forEach(c => {
+        const source_lib = crossPlatformPath(path.join(c.location, config.folder.src, 'lib'));
+        const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, 'libs', c.name));
+        Helpers.createSymLink(source_lib, dest_lib);
+      });
+    }
+
+    //#endregion
+
+    //#region symlinks lib => libs
+    // children.forEach(c => {
+    //   const source_lib = crossPlatformPath(path.join(c.location, config.folder.src, 'app'));
+    //   const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, '_', c.name, 'app '));
+    //   Helpers.createSymLink(source_lib, dest_lib);
+    // });
     //#endregion
 
     //#region copy core asset files
-    (() => {
-      const corepro = Project.by('isomorphic-lib', client._frameworkVersion) as Project;
-      const coreAssetsPath = corepro.pathFor('app/src/assets');
-      const filesToCopy = Helpers.filesFrom(coreAssetsPath, true);
-      for (let index = 0; index < filesToCopy.length; index++) {
-        const fileAbsPath = crossPlatformPath(filesToCopy[index]);
-        const relativeFilePath = fileAbsPath.replace(`${coreAssetsPath}/`, '');
-        const destAbsPath = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, 'assets', relativeFilePath));
-        Helpers.copyFile(fileAbsPath, destAbsPath);
-      }
-    })();
+    if (nonClient) {
+
+    } else {
+      (() => {
+        const corepro = Project.by('isomorphic-lib', client._frameworkVersion) as Project;
+        const coreAssetsPath = corepro.pathFor('app/src/assets');
+        const filesToCopy = Helpers.filesFrom(coreAssetsPath, true);
+        for (let index = 0; index < filesToCopy.length; index++) {
+          const fileAbsPath = crossPlatformPath(filesToCopy[index]);
+          const relativeFilePath = fileAbsPath.replace(`${coreAssetsPath}/`, '');
+          const destAbsPath = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, 'assets', relativeFilePath));
+          Helpers.copyFile(fileAbsPath, destAbsPath);
+        }
+      })();
+    }
     //#endregion
 
     //#region handle assets watch/copy
@@ -185,9 +202,12 @@ export class SingularBuild extends FeatureForProject {
 
     let singularWatchProj = Project.From<Project>(smartContainerTargetProjPath);
     parent.node_modules.linkToProject(singularWatchProj);
-    await singularWatchProj.filesStructure.init(''); // THIS CAUSE NOT NICE SHIT
+    if (nonClient) {
 
-    VscodeProject.launchFroSmartContaienr(parent);
+    } else {
+      await singularWatchProj.filesStructure.init(''); // THIS CAUSE NOT NICE SHIT
+    }
+    // VscodeProject.launchFroSmartContaienr(parent);
 
     return singularWatchProj;
   }
@@ -239,7 +259,13 @@ export class SingularBuild extends FeatureForProject {
       this.project.packageJson.save('updating smart container target');
     }
 
-    const singularWatchProj = await this.createSingluarTargeProjFor(this.project, client, outDir, watch);
+    const nonClinetCildren = children.filter(f => f.name !== client?.name) || [];
+
+    const singularWatchProj = await this.createSingluarTargeProjFor({ parent: this.project, client, outFolder: outDir, watch });
+    for (let index = 0; index < nonClinetCildren.length; index++) {
+      const c = nonClinetCildren[index];
+      await this.createSingluarTargeProjFor({ parent: this.project, client: c, outFolder: outDir, watch: false, nonClient: true });
+    }
 
     Helpers.log(`[singular build] init structure ${!!singularWatchProj}`);
 

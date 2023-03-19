@@ -21,6 +21,10 @@ export class NpmPackagesBase extends NpmPackagesCore {
       return true;
     }
 
+    if (this.project.isVscodeExtension) {
+      return true;
+    }
+
     if (this.project.isTnp) {
       return false;
     }
@@ -46,9 +50,9 @@ export class NpmPackagesBase extends NpmPackagesCore {
     options = fixOptionsNpmInstall(options, this.project);
 
     const fullInstall = (options.npmPackages.length === 0);
-    if (fullInstall && this.project.isVscodeExtension && !this.project.isCoreProject) {
-      options.smoothInstall = true;
-    }
+    // if (fullInstall && this.project.isVscodeExtension && !this.project.isCoreProject) {
+    //   options.smoothInstall = true;
+    // }
     const { remove, npmPackages, smoothInstall } = options;
     // console.log(npmPackages)
     // process.exit(0)
