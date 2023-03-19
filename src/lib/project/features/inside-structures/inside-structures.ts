@@ -150,6 +150,13 @@ export class InsideStructures extends FeatureForProject {
 
             let to = fun2(opt);
             to = path.join(client.location, replacement(to));
+            if (!to || !from || (to === from)) {
+              continue;
+            }
+            // console.log({
+            //   from,
+            //   to
+            // })
             Helpers.remove(to);
             Helpers.createSymLink(from, to, { continueWhenExistedFolderDoesntExists: true });
           }

@@ -65,15 +65,42 @@ export class SingularBuild extends FeatureForProject {
     //#endregion
 
     //#region symlinks lib => libs
-    if (nonClient) {
 
-    } else {
-      children.forEach(c => {
+    children.forEach(c => {
+      (() => {
         const source_lib = crossPlatformPath(path.join(c.location, config.folder.src, 'lib'));
         const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, 'libs', c.name));
         Helpers.createSymLink(source_lib, dest_lib);
-      });
-    }
+      })();
+      if (!nonClient && c.name !== this.project.smartContainerBuildTarget.name) {
+        (() => {
+          const source_lib = crossPlatformPath(path.join(c.location, config.folder.src, 'app'));
+          const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, '-', c.name, 'app'));
+          Helpers.createSymLink(source_lib, dest_lib, { continueWhenExistedFolderDoesntExists: true });
+        })();
+        (() => {
+          const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, '-', c.name, 'index.ts'));
+          Helpers.writeFile(dest_lib, `export * from "./app";`);
+        })();
+
+        (() => {
+          const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, `../${c.name}`, outFolder, 'index.js'));
+          Helpers.writeFile(dest_lib, `var start = require("./compiled/-/${c.name}/app");
+          exports.default = start;`);
+        })();
+
+        for (let index = 0; index < appRelatedFiles.length; index++) {
+          const appFileName = appRelatedFiles[index];
+          (() => {
+            const source_lib = crossPlatformPath(path.join(c.location, config.folder.src, appFileName));
+            const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, '-', c.name, appFileName));
+            Helpers.createSymLink(source_lib, dest_lib, { continueWhenExistedFolderDoesntExists: true });
+          })();
+
+        }
+      }
+    });
+
 
     //#endregion
 
@@ -86,21 +113,19 @@ export class SingularBuild extends FeatureForProject {
     //#endregion
 
     //#region copy core asset files
-    if (nonClient) {
 
-    } else {
-      (() => {
-        const corepro = Project.by('isomorphic-lib', client._frameworkVersion) as Project;
-        const coreAssetsPath = corepro.pathFor('app/src/assets');
-        const filesToCopy = Helpers.filesFrom(coreAssetsPath, true);
-        for (let index = 0; index < filesToCopy.length; index++) {
-          const fileAbsPath = crossPlatformPath(filesToCopy[index]);
-          const relativeFilePath = fileAbsPath.replace(`${coreAssetsPath}/`, '');
-          const destAbsPath = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, 'assets', relativeFilePath));
-          Helpers.copyFile(fileAbsPath, destAbsPath);
-        }
-      })();
-    }
+    (() => {
+      const corepro = Project.by('isomorphic-lib', client._frameworkVersion) as Project;
+      const coreAssetsPath = corepro.pathFor('app/src/assets');
+      const filesToCopy = Helpers.filesFrom(coreAssetsPath, true);
+      for (let index = 0; index < filesToCopy.length; index++) {
+        const fileAbsPath = crossPlatformPath(filesToCopy[index]);
+        const relativeFilePath = fileAbsPath.replace(`${coreAssetsPath}/`, '');
+        const destAbsPath = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, 'assets', relativeFilePath));
+        Helpers.copyFile(fileAbsPath, destAbsPath);
+      }
+    })();
+
     //#endregion
 
     //#region handle assets watch/copy
@@ -202,11 +227,13 @@ export class SingularBuild extends FeatureForProject {
 
     let singularWatchProj = Project.From<Project>(smartContainerTargetProjPath);
     parent.node_modules.linkToProject(singularWatchProj);
+
+    await singularWatchProj.filesStructure.init(''); // THIS CAUSE NOT NICE SHIT
+
     if (nonClient) {
 
-    } else {
-      await singularWatchProj.filesStructure.init(''); // THIS CAUSE NOT NICE SHIT
     }
+
     // VscodeProject.launchFroSmartContaienr(parent);
 
     return singularWatchProj;
@@ -230,38 +257,32 @@ export class SingularBuild extends FeatureForProject {
       await c.filesStructure.init('');
     }
     args = Helpers.cliTool.removeArgFromString(args);
-    const clientFromArgs = Helpers.removeSlashAtEnd(_.first((args || '').split(' '))) as any;
-    let client: Project = children.find(f => f.name === _client || f.name === clientFromArgs);
 
-    const smartContainerBuildTarget = this.project.smartContainerBuildTarget;
+    let smartContainerBuildTarget = this.project.smartContainerBuildTarget;
 
-    if (!client && smartContainerBuildTarget) {
-      client = smartContainerBuildTarget;
-    }
 
-    if (!client) {
-      if (clientFromArgs) {
-        Helpers.error(`${clientFromArgs} hasn't been add into your container`, false, true)
-      } else {
-        Helpers.error(`
+    if (!smartContainerBuildTarget && children.length > 1) {
+      Helpers.error(`
 
-        Please specify client argument.. example:
-          ${config.frameworkName} build my-client-name // client needs to be smart container child
+    Please specify in your configuration:
+      ...
+        smartContainerBuildTarget: <name of main project>
+      ...
           `, false, true);
-      }
-
     }
 
     Helpers.log(`[singularbuildcontainer] children for build: \n\n${children.map(c => c.name)}\n\n`);
 
+
     if (!smartContainerBuildTarget) {
-      this.project.packageJson.data.tnp.smartContainerBuildTarget = client.name;
+      smartContainerBuildTarget = _.first(children);
+      this.project.packageJson.data.tnp.smartContainerBuildTarget = smartContainerBuildTarget.name;
       this.project.packageJson.save('updating smart container target');
     }
 
-    const nonClinetCildren = children.filter(f => f.name !== client?.name) || [];
+    const nonClinetCildren = children.filter(f => f.name !== smartContainerBuildTarget?.name) || [];
 
-    const singularWatchProj = await this.createSingluarTargeProjFor({ parent: this.project, client, outFolder: outDir, watch });
+    const singularWatchProj = await this.createSingluarTargeProjFor({ parent: this.project, client: smartContainerBuildTarget, outFolder: outDir, watch });
     for (let index = 0; index < nonClinetCildren.length; index++) {
       const c = nonClinetCildren[index];
       await this.createSingluarTargeProjFor({ parent: this.project, client: c, outFolder: outDir, watch: false, nonClient: true });

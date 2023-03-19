@@ -68,14 +68,87 @@ export class InsideStructAngular13App extends BaseInsideStruct {
       linksFuncs: [
         //#region what and where needs to linked
         [
-          ({ outFolder, client }) => {
+          (opt) => {
+            const { outFolder, projectName, client } = opt;
             if (project.isStandaloneProject) {
-              return `tmp-src-${outFolder}${this.websql ? '-websql' : ''}`;
+              const standalonePath = `tmp-src-${outFolder}${this.websql ? '-websql' : ''}`;
+              if (client.isSmartContainerTarget) {
+                const targetProj = client.smartContainerTargetParentContainer.smartContainerBuildTarget;
+                if (targetProj.name !== client.name) {
+                  // console.log(`${targetProj.name} vs ${client?.name}`)
+                  return `../${targetProj.name}/${standalonePath}/-/${client.name}`;
+                }
+              }
+              return standalonePath;
             }
             return `tmp-src-${outFolder}${this.websql ? '-websql' : ''}-browser-for-{{{client}}}`;
           },
-          ({ projectName }) => `app/src/app/${projectName}`,
+          (opt) => {
+            const { projectName, client } = opt;
+            const standalonePath = `app/src/app/${projectName}`;
+            if (client.isSmartContainerTarget) {
+              const targetProj = client.smartContainerTargetParentContainer.smartContainerBuildTarget;
+              if (targetProj.name !== client.name) {
+                return `${standalonePath}/app`;
+              }
+            }
+            return standalonePath
+          },
         ],
+        //#endregion
+
+        //#region link not containter target clients
+        [
+          (opt) => {
+            const { outFolder, projectName, client } = opt;
+            if (project.isStandaloneProject) {
+              const standalonePath = `tmp-src-${outFolder}${this.websql ? '-websql' : ''}`;
+              if (client.isSmartContainerTarget) {
+                const targetProj = client.smartContainerTargetParentContainer.smartContainerBuildTarget;
+                if (targetProj.name !== client.name) {
+                  // console.log(`assets  ${targetProj.name} vs ${client?.name}`)
+                  return `../${targetProj.name}/${standalonePath}/assets`;
+                }
+              }
+            }
+            return '';
+          },
+          (opt) => {
+            const { projectName, client } = opt;
+            if (client.isSmartContainerTarget) {
+              const targetProj = client.smartContainerTargetParentContainer.smartContainerBuildTarget;
+              if (targetProj.name !== client.name) {
+                return `app/src/assets`;
+              }
+            }
+            return '';
+          },
+        ], // @LAST asset wrongly created link
+        //#endregion
+
+        //#region link not containter target clients - whole dist or bundle
+        [
+          (opt) => {
+            const { projectName, client, outFolder } = opt;
+            if (client.isSmartContainerTarget) {
+              const targetProj = client.smartContainerTargetParentContainer.smartContainerBuildTarget;
+              if (targetProj.name !== client.name) {
+                return `../${targetProj.name}/${outFolder}`;
+              }
+            }
+            return '';
+          },
+          (opt) => {
+            const { projectName, client, outFolder } = opt;
+            if (client.isSmartContainerTarget) {
+              const targetProj = client.smartContainerTargetParentContainer.smartContainerBuildTarget;
+              if (targetProj.name !== client.name) {
+                return `${outFolder}/compiled`;
+              }
+            }
+            return '';
+          },
+        ]
         //#endregion
       ],
       endAction: (({ outFolder, projectName, client, watchBuild, replacement }) => {
@@ -212,6 +285,13 @@ ${appModuleFile}
 
         //#region link assets
         (() => {
+
+          if (client.isSmartContainerTarget) {
+            const targetProj = client.smartContainerTargetParentContainer.smartContainerBuildTarget;
+            if (targetProj.name !== client.name) {
+              return;
+            }
+          }
 
           const assetsSource = crossPlatformPath(path.join(
             project.location,

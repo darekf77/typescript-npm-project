@@ -144,29 +144,24 @@ inside generated projects...
 
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
 
-      if (this.project.node_modules.exist) {
-        log.data(`NODE MODULE EXISTS`)
-      } else {
-        await this.project.filesStructure.init(buildOptions.args);
+      if (!this.project.node_modules.exist) {
+        Helpers.error('Please start lib build first', false, true)
       }
 
-      if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
-        this.project.insideStructure.recrate(buildOptions.outDir as any, buildOptions.watch);
-      }
 
-      if (this.project.isSmartContainer) {
-        const childrenForINsideStruct = this.project.children.filter(c => c.typeIs('isomorphic-lib'));
-        const clientFromArgs = Helpers.removeSlashAtEnd(_.first((buildOptions.args || '').split(' '))) as any;
-        let client: Project = childrenForINsideStruct.find(f => f.name === clientFromArgs);
-        const smartContainerBuildTarget = this.project.smartContainerBuildTarget;
-        if (!client && smartContainerBuildTarget) {
-          client = smartContainerBuildTarget;
-        }
+      // if (this.project.isSmartContainer) {
+      //   const childrenForINsideStruct = this.project.children.filter(c => c.typeIs('isomorphic-lib'));
+      //   const clientFromArgs = Helpers.removeSlashAtEnd(_.first((buildOptions.args || '').split(' '))) as any;
+      //   let client: Project = childrenForINsideStruct.find(f => f.name === clientFromArgs);
+      //   const smartContainerBuildTarget = this.project.smartContainerBuildTarget;
+      //   if (!client && smartContainerBuildTarget) {
+      //     client = smartContainerBuildTarget;
+      //   }
 
-        if (client) {
-          await client.insideStructure.recrate(buildOptions.outDir, buildOptions.watch);
-        }
-      }
+      // if (client) {
+      //   await client.insideStructure.recrate(buildOptions.outDir, buildOptions.watch);
+      // }
+      // }
 
       if (buildOptions.watch) {
         let config = void 0;
