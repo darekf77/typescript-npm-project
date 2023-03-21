@@ -6,7 +6,7 @@ export abstract class LibPorjectBase {
   ) {
 
   }
-  abstract buildDocs(prod: boolean, newVersion: string, realCurrentProj: Project): Promise<any>;
+  abstract buildDocs(prod: boolean, newVersion: string, realCurrentProj: Project): Promise<boolean>;
   abstract publish(options: {
     realCurrentProj: Project,
     newVersion: string,
@@ -16,4 +16,14 @@ export abstract class LibPorjectBase {
   }): Promise<any>
 
   abstract preparePackage(smartContainer: Project, newVersion: string);
+
+  messages = {
+    productionMode: `Do you wanna build in production mode`,
+    docsBuildQuesions : `Do you wanna build docs for github preview`,
+    docsBuildDone: `
+
+    Building docs prevew - done
+
+    `
+}
 }

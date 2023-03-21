@@ -59,6 +59,13 @@ const $RELEASE = async (args: string) => {
     Helpers.info(`Smart container not supported yet...`);
     process.exit(0);
   }
+
+
+  if (!global.tnpNonInteractive) {
+    Helpers.clearConsole();
+  }
+
+
   /**
    * TODO this is not helpfull...
    */

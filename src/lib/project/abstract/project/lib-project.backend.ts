@@ -164,6 +164,7 @@ export abstract class LibProject {
         this.standalone.fixPackageJson(realCurrentProj)
       }
 
+
       if (!global.tnpNonInteractive) {
         await Helpers.questionYesNo(`Do you wanna check bundle folder before publishing ?`, async () => {
           if (this.isSmartContainer) { // TODO from local proj prepare bundle projects
@@ -202,15 +203,34 @@ export abstract class LibProject {
     }
     //#endregion
 
+    let appRelaseDone = false;
+
     if (!global.tnpNonInteractive) {
+      Helpers.clearConsole();
+
       if (this.isStandaloneProject) {
-        await this.standalone.buildDocs(prod);
+        appRelaseDone = await this.standalone.buildDocs(prod);
       }
 
       if (this.isSmartContainer) {
-        await this.smartcontainer.buildDocs(prod);
+        appRelaseDone = await this.smartcontainer.buildDocs(prod);
       }
     }
+    if (appRelaseDone) {
+      await Helpers.killProcessByPort(4000)
+      const commandHostLoclDocs = `firedev-http-server `
+        + `${this.isStandaloneProject ? this.name : this.smartContainerTargetParentContainer?.name} `
+        + ` -p 4000 --base-dir ${this.name}`;
+      const cwd = realCurrentProj.pathFor('docs')
+      console.log({
+        cwd, commandHostLoclDocs
+      })
+      Helpers.run(commandHostLoclDocs, { cwd }).asyncAsPromise()
+
+      Helpers.info(`Before pushing you can acces project${this.isStandaloneProject ? '' : 's'} `
+        + ` on http://localhost:4000/${this.name} `);
+    }
+
     await this.pushToGitRepo(realCurrentProj, newVersion);
     Helpers.info('RELEASE DONE');
     process.exit(0);

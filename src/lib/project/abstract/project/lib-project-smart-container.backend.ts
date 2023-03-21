@@ -94,12 +94,12 @@ export class LibProjectSmartContainer extends LibPorjectBase {
   }
 
 
-  async buildDocs(prod: boolean) {
+  async buildDocs(prod: boolean): Promise<boolean> {
     // TODO
 
-    const mainProjectName = this.project.name;
-    const smartContainerTargetParentContainer = this.project?.smartContainerTargetParentContainer;
-    const otherProjectNames = this.project?.smartContainerTargetParentContainer
+    const smartContainer = this.project;
+    const mainProjectName = smartContainer.smartContainerBuildTarget.name
+    const otherProjectNames = this.project
       .children
       .filter(c => c.name !== mainProjectName)
       .map(p => p.name)
@@ -109,10 +109,16 @@ export class LibProjectSmartContainer extends LibPorjectBase {
       ...otherProjectNames,
     ];
 
+    Helpers.info(`
+
+    Routes for project:
+\t\t/${mainProjectName}
+${otherProjectNames.map(p => `\t\t/${mainProjectName}/-/${p}`).join('\n')}
+
+    `);
 
 
-
-    await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
+    return await Helpers.questionYesNo(this.messages.docsBuildQuesions, async () => {
 
       const toBuildWebsql = await Helpers
         .consoleGui
@@ -124,7 +130,8 @@ export class LibProjectSmartContainer extends LibPorjectBase {
 
       allProjects = allProjects.filter(f => !toBuildWebsql.includes(f));
 
-      const toBuildNormally = await Helpers
+
+      const toBuildNormally = allProjects.length === 0 ? [] : await Helpers
         .consoleGui
         .multiselect('Which projects you want to build with normally', allProjects.map(p => {
           return {
@@ -132,16 +139,10 @@ export class LibProjectSmartContainer extends LibPorjectBase {
           };
         }));
 
-      console.log({
-        toBuildNormally,
-        toBuildWebsql,
-      });
-
-
       //#region questions
       let appBuildOptions = { docsAppInProdMode: prod, websql: false };
 
-      await Helpers.questionYesNo(`Do you wanna build in production mode`, () => {
+      await Helpers.questionYesNo(this.messages.productionMode, () => {
         appBuildOptions.docsAppInProdMode = true;
       }, () => {
         appBuildOptions.docsAppInProdMode = false;
@@ -160,17 +161,29 @@ export class LibProjectSmartContainer extends LibPorjectBase {
       `);
       //#endregion
 
-      const libBuildCOmmand = `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'} && `;
-      await this.project.run(`${libBuildCOmmand}`
-        + `${config.frameworkName} build:${config.folder.bundle}:app:${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
-        + `${appBuildOptions.websql ? '--websql' : ''} ${global.hideLog ? '' : '-verbose'}`).sync();
+      await (async () => {
+        const libBuildCOmmand = `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'}`;
+        await smartContainer.run(libBuildCOmmand).sync();
+      })();
+
+      for (let index = 0; index < toBuildNormally.length; index++) {
+        const projName = toBuildNormally[index];
+
+        await this.project.run(`${config.frameworkName} `
+          + `build:${config.folder.bundle}:app:${appBuildOptions.docsAppInProdMode ? 'prod' : ''} ${projName} `
+          + `           ${global.hideLog ? '' : '-verbose'}`).sync();
+      }
+
+      for (let index = 0; index < toBuildWebsql.length; index++) {
+        const projName = toBuildWebsql[index];
+
+        await this.project.run(`${config.frameworkName} `
+          + `build:${config.folder.bundle}:app:${appBuildOptions.docsAppInProdMode ? 'prod' : ''} ${projName} `
+          + ` --websql ${global.hideLog ? '' : '-verbose'}`).sync();
+      }
 
 
-      Helpers.log(`
-
-      Building docs prevew - done
-
-      `);
+      Helpers.log(this.messages.docsBuildDone);
     });
   }
 

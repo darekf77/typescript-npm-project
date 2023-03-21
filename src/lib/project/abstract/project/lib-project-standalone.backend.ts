@@ -65,13 +65,13 @@ export class LibProjectStandalone extends LibPorjectBase {
 
   }
 
-  async buildDocs(prod: boolean) {
-    await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
+  async buildDocs(prod: boolean): Promise<boolean> {
+    return await Helpers.questionYesNo(this.messages.docsBuildQuesions, async () => {
 
       //#region questions
       let appBuildOptions = { docsAppInProdMode: prod, websql: false };
 
-      await Helpers.questionYesNo(`Do you wanna build in production mode`, () => {
+      await Helpers.questionYesNo(this.messages.productionMode, () => {
         appBuildOptions.docsAppInProdMode = true;
       }, () => {
         appBuildOptions.docsAppInProdMode = false;
@@ -96,11 +96,7 @@ export class LibProjectStandalone extends LibPorjectBase {
         + `${appBuildOptions.websql ? '--websql' : ''} ${global.hideLog ? '' : '-verbose'}`).sync();
 
 
-      Helpers.log(`
-
-      Building docs prevew - done
-
-      `);
+      Helpers.log(this.messages.docsBuildDone);
     });
   }
 

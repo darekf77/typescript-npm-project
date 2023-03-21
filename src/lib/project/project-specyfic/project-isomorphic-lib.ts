@@ -248,6 +248,9 @@ export class ProjectIsomorphicLib
     let basename = ''
     if (this.isInRelaseBundle) {
       basename = `--base-href /${isSmartContainerTarget ? this.smartContainerTargetParentContainer.name : this.name}/`;
+      if (isSmartContainerTargetNonClient) {
+        basename = `--base-href /${isSmartContainerTarget ? this.smartContainerTargetParentContainer.name : this.name}/-/${this.name}/`;
+      }
     }
 
     //#endregion
@@ -783,7 +786,7 @@ export class ProjectIsomorphicLib
   //#region private methods / show message when build lib done for smart container
   private showMesageWhenBuildLibDoneForSmartContainer(args: string, watch: boolean, isInRelease: boolean) {
     if (isInRelease) {
-      Helpers.info('Release lib build done.');
+      Helpers.logInfo('Release lib build done... ');
       return;
     }
     const buildLibDone = `LIB BUILD DONE.. `;
