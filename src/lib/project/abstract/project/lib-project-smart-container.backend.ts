@@ -12,8 +12,8 @@ export class LibProjectSmartContainer extends LibPorjectBase {
   preparePackage(smartContainer: Project, newVersion: string) {
     const rootPackageName = `@${smartContainer.name}`;
     const base = path.join(
-      this.lib.location,
-      this.lib.getTempProjName('bundle'),
+      this.project.location,
+      this.project.getTempProjName('bundle'),
       config.folder.node_modules,
       rootPackageName,
     )
@@ -21,7 +21,7 @@ export class LibProjectSmartContainer extends LibPorjectBase {
       .foldersFrom(base)
       .forEach(absFolder => {
 
-        this.lib.removeJsMapsFrom(absFolder);
+        this.project.removeJsMapsFrom(absFolder);
 
         let proj = Project.From(absFolder) as Project;
         proj.packageJson.data.tnp.type = 'isomorphic-lib';
@@ -62,8 +62,8 @@ export class LibProjectSmartContainer extends LibPorjectBase {
     } = options;
 
     const base = path.join(
-      this.lib.location,
-      this.lib.getTempProjName('bundle'),
+      this.project.location,
+      this.project.getTempProjName('bundle'),
       config.folder.node_modules,
       rootPackageName,
     );
@@ -84,7 +84,7 @@ export class LibProjectSmartContainer extends LibPorjectBase {
             }).sync();
             successPublis = true;
           } catch (e) {
-            this.lib.removeTagAndCommit(automaticRelease)
+            this.project.removeTagAndCommit(automaticRelease)
           }
 
         });
@@ -97,7 +97,46 @@ export class LibProjectSmartContainer extends LibPorjectBase {
   async buildDocs(prod: boolean) {
     // TODO
 
+    const mainProjectName = this.project.name;
+    const smartContainerTargetParentContainer = this.project?.smartContainerTargetParentContainer;
+    const otherProjectNames = this.project?.smartContainerTargetParentContainer
+      .children
+      .filter(c => c.name !== mainProjectName)
+      .map(p => p.name)
+
+    let allProjects = [
+      mainProjectName,
+      ...otherProjectNames,
+    ];
+
+
+
+
     await Helpers.questionYesNo(`Do you wanna build docs for github preview`, async () => {
+
+      const toBuildWebsql = await Helpers
+        .consoleGui
+        .multiselect('Which project you want to build with WEBSQL mode', allProjects.map(p => {
+          return {
+            name: p, value: p
+          };
+        }))
+
+      allProjects = allProjects.filter(f => !toBuildWebsql.includes(f));
+
+      const toBuildNormally = await Helpers
+        .consoleGui
+        .multiselect('Which projects you want to build with normally', allProjects.map(p => {
+          return {
+            name: p, value: p
+          };
+        }));
+
+      console.log({
+        toBuildNormally,
+        toBuildWebsql,
+      });
+
 
       //#region questions
       let appBuildOptions = { docsAppInProdMode: prod, websql: false };
@@ -108,11 +147,11 @@ export class LibProjectSmartContainer extends LibPorjectBase {
         appBuildOptions.docsAppInProdMode = false;
       });
 
-      await Helpers.questionYesNo(`Do you wanna use websql mode ?`, () => {
-        appBuildOptions.websql = true;
-      }, () => {
-        appBuildOptions.websql = false;
-      });
+      // await Helpers.questionYesNo(`Do you wanna use websql mode ?`, () => {
+      //   appBuildOptions.websql = true;
+      // }, () => {
+      //   appBuildOptions.websql = false;
+      // });
 
       Helpers.log(`
 
@@ -122,7 +161,7 @@ export class LibProjectSmartContainer extends LibPorjectBase {
       //#endregion
 
       const libBuildCOmmand = `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'} && `;
-      await this.lib.run(`${libBuildCOmmand}`
+      await this.project.run(`${libBuildCOmmand}`
         + `${config.frameworkName} build:${config.folder.bundle}:app:${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
         + `${appBuildOptions.websql ? '--websql' : ''} ${global.hideLog ? '' : '-verbose'}`).sync();
 

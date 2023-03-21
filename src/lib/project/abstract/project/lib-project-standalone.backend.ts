@@ -11,11 +11,11 @@ export class LibProjectStandalone extends LibPorjectBase {
 
   preparePackage(smartContainer: Project, newVersion: string) {
     const base = path.join(
-      this.lib.location,
+      this.project.location,
       config.folder.bundle,
     );
 
-    this.lib.removeJsMapsFrom(base);
+    this.project.removeJsMapsFrom(base);
   }
 
   fixPackageJson(realCurrentProj: Project) {
@@ -30,22 +30,22 @@ export class LibProjectStandalone extends LibPorjectBase {
     //   Helpers.writeFile(pjPath, content);
     // });
 
-    this.lib.packageJson.showDeps(`after release show when ok`);
-    if (this.lib.packageJson.data.tnp.libReleaseOptions.includeNodeModules) {
+    this.project.packageJson.showDeps(`after release show when ok`);
+    if (this.project.packageJson.data.tnp.libReleaseOptions.includeNodeModules) {
       // this.lib.packageJson.clearForRelase('bundle');
     } else {
       //#region copy packagejson before relase (beacuse it may be link)
-      const packageJsonInBundlePath = path.join(this.lib.location, config.folder.bundle, config.file.package_json);
+      const packageJsonInBundlePath = path.join(this.project.location, config.folder.bundle, config.file.package_json);
       const orgPj = Helpers.readFile(packageJsonInBundlePath);
       Helpers.removeFileIfExists(packageJsonInBundlePath);
       Helpers.writeFile(packageJsonInBundlePath, orgPj);
       //#endregion
 
-      if (this.lib.packageJson.name === 'tnp') {  // TODO QUICK_FIX
-        Helpers.setValueToJSON(path.join(this.lib.location, config.folder.bundle, config.file.package_json), 'dependencies',
-          this.lib.TnpProject.packageJson.data.tnp.overrided.includeOnly.reduce((a, b) => {
+      if (this.project.packageJson.name === 'tnp') {  // TODO QUICK_FIX
+        Helpers.setValueToJSON(path.join(this.project.location, config.folder.bundle, config.file.package_json), 'dependencies',
+          this.project.TnpProject.packageJson.data.tnp.overrided.includeOnly.reduce((a, b) => {
             return _.merge(a, {
-              [b]: this.lib.TnpProject.packageJson.data.dependencies[b]
+              [b]: this.project.TnpProject.packageJson.data.dependencies[b]
             })
           }, {})
         );
@@ -91,7 +91,7 @@ export class LibProjectStandalone extends LibPorjectBase {
       //#endregion
 
       const libBuildCommand = `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'} && `
-      await this.lib.run(`${libBuildCommand}`
+      await this.project.run(`${libBuildCommand}`
         + `${config.frameworkName} build:${config.folder.bundle}:app:${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
         + `${appBuildOptions.websql ? '--websql' : ''} ${global.hideLog ? '' : '-verbose'}`).sync();
 
@@ -119,27 +119,27 @@ export class LibProjectStandalone extends LibPorjectBase {
       prod,
     } = options;
 
-    const cwd = path.join(this.lib.location, config.folder.bundle)
+    const cwd = path.join(this.project.location, config.folder.bundle)
     Helpers.info(`Publish cwd: ${cwd}`)
     await Helpers.questionYesNo(`Publish on npm version: ${newVersion} ?`, async () => {
 
       // publishing standalone
       try {
-        this.lib.run('npm publish', {
+        this.project.run('npm publish', {
           cwd,
           output: true
         }).sync();
       } catch (e) {
-        this.lib.removeTagAndCommit(automaticRelease)
+        this.project.removeTagAndCommit(automaticRelease)
       }
 
 
       // release additional packages names
-      const names = this.lib.packageJson.additionalNpmNames;
+      const names = this.project.packageJson.additionalNpmNames;
       for (let index = 0; index < names.length; index++) {
         const c = names[index];
-        const existedBundle = crossPlatformPath(path.join(this.lib.location, 'bundle'));
-        const additionBase = crossPlatformPath(path.resolve(path.join(this.lib.location, `../../../additional-bundle-${c}`)));
+        const existedBundle = crossPlatformPath(path.join(this.project.location, 'bundle'));
+        const additionBase = crossPlatformPath(path.resolve(path.join(this.project.location, `../../../additional-bundle-${c}`)));
         Helpers.mkdirp(additionBase);
         Helpers.copy(existedBundle, additionBase, {
           copySymlinksAsFiles: true,
@@ -184,15 +184,15 @@ export class LibProjectStandalone extends LibPorjectBase {
       tnpProj.packageJson.save('showing for trusted')
 
       let firedeProj: Project;
-      if (this.lib.packageJson.name === config.frameworkNames.tnp) {  // TODO QUICK_FIX
+      if (this.project.packageJson.name === config.frameworkNames.tnp) {  // TODO QUICK_FIX
         firedeProj = Project.From(path.join(path.dirname(realCurrentProj.location), config.frameworkNames.firedev))
       }
       const coreCont = Project.by('container', realCurrentProj._frameworkVersion) as Project;
 
-      const arrTrusted = tnpProj.packageJson.data.tnp.core.dependencies.trusted[this.lib._frameworkVersion];
+      const arrTrusted = tnpProj.packageJson.data.tnp.core.dependencies.trusted[this.project._frameworkVersion];
       if (
         (_.isString(arrTrusted) && (arrTrusted === '*')) ||
-        (_.isArray(arrTrusted) && arrTrusted.includes(this.lib.name))
+        (_.isArray(arrTrusted) && arrTrusted.includes(this.project.name))
       ) {
         [
           firedeProj,
@@ -219,17 +219,17 @@ export class LibProjectStandalone extends LibPorjectBase {
   async bumpVersionInOtherProjects(newVersion, onlyInThisProjectSubprojects = false) {
     if (onlyInThisProjectSubprojects) {
       // console.log('UPDATE VERSION !!!!!!!!!!!!!')
-      updateChildrenVersion(this.lib, newVersion, this.lib.name);
+      updateChildrenVersion(this.project, newVersion, this.project.name);
     } else {
-      if (this.lib.TnpProject.name === this.lib.name) {
-        Helpers.info(`Ommiting version bump ${this.lib.name} - for ${config.frameworkName} itself`)
-      } else if (this.lib.packageJson.hasDependency(this.lib.TnpProject.name)) {
-        Helpers.info(`Ommiting version bump ${this.lib.name} - has ${config.frameworkName} as dependency`)
+      if (this.project.TnpProject.name === this.project.name) {
+        Helpers.info(`Ommiting version bump ${this.project.name} - for ${config.frameworkName} itself`)
+      } else if (this.project.packageJson.hasDependency(this.project.TnpProject.name)) {
+        Helpers.info(`Ommiting version bump ${this.project.name} - has ${config.frameworkName} as dependency`)
       } else {
-        this.lib.TnpProject.packageJson.setDependencyAndSave({
-          name: this.lib.name,
+        this.project.TnpProject.packageJson.setDependencyAndSave({
+          name: this.project.name,
           version: newVersion,
-        }, `Bump new version "${newVersion}" of ${this.lib.name}`);
+        }, `Bump new version "${newVersion}" of ${this.project.name}`);
       }
     }
   }

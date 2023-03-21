@@ -2,7 +2,7 @@ import { Project } from "./project";
 
 export abstract class LibPorjectBase {
   constructor(
-    protected lib: Project
+    protected project: Project
   ) {
 
   }

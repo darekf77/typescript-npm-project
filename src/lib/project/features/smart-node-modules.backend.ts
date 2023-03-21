@@ -261,7 +261,7 @@ export class SmartNodeModules extends FeatureForProject {
       });
       this.handlePackagesOverride();
     }
-    Helpers.logSuccess(`node_modules install done for ${this.project.genericName}`);
+    Helpers.logSuccess(`npm packages install done for ${this.project.genericName}`);
   }
   //#endregion
 

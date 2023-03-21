@@ -119,6 +119,12 @@ export abstract class BaseProject {
   }
 
   // @ts-ignore
+  get isSmartContainerTargetNonClient(this: Project) {
+    const parent = this.smartContainerTargetParentContainer;
+    return parent?.isSmartContainer && parent.smartContainerBuildTarget?.name !== this.name;
+  }
+
+  // @ts-ignore
   get smartContainerTargetParentContainer(this: Project) {
     return Project.From(path.dirname(path.dirname(path.dirname(this.location)))) as Project;
   }

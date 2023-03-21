@@ -242,9 +242,12 @@ export class ProjectIsomorphicLib
 
     //#region prepare variables / baseHref
 
+    const isSmartContainerTarget = this.isSmartContainerTarget;
+    const isSmartContainerTargetNonClient = this.isSmartContainerTargetNonClient;
+
     let basename = ''
     if (this.isInRelaseBundle) {
-      basename = `--base-href /${this.isSmartContainerTarget ? this.smartContainerTargetParentContainer.name : this.name}/`;
+      basename = `--base-href /${isSmartContainerTarget ? this.smartContainerTargetParentContainer.name : this.name}/`;
     }
 
     //#endregion
@@ -259,18 +262,21 @@ export class ProjectIsomorphicLib
     const backeFromContainerTarget = `../../../`;
     let back = backAppTmpFolders;
     if (this.isInRelaseBundle) {
-      if (this.isSmartContainerTarget) {
+      if (isSmartContainerTarget) {
         back = `${backAppTmpFolders}${backeFromContainerTarget}${backeFromRelase}`;
       } else {
         back = `${backAppTmpFolders}${backeFromRelase}`;
       }
     } else {
-      if (this.isSmartContainerTarget) {
+      if (isSmartContainerTarget) {
         back = `${backAppTmpFolders}${backeFromContainerTarget}`;
       }
     }
 
-    const outDirApp = this.isInRelaseBundle ? config.folder.docs : `${outDir}-app${websql ? '-websql' : ''}`;
+    let outDirApp = this.isInRelaseBundle ? config.folder.docs : `${outDir}-app${websql ? '-websql' : ''}`;
+    if (isSmartContainerTargetNonClient) {
+      outDirApp = `${outDirApp}/-/${this.name}`;
+    }
 
     const outPutPathCommand = `--output-path ${back}${outDirApp} ${basename}`;
 
@@ -303,13 +309,13 @@ export class ProjectIsomorphicLib
 
     const isStandalone = (this.isStandaloneProject
       && !this.isWorkspaceChildProject
-      && !this.isSmartContainerTarget
+      && !isSmartContainerTarget
     );
     // console.log({ isStandalone, 'this.name': this.name });
 
     const buildOutDir = this.buildOptions.outDir;
     const parent = (!isStandalone
-      ? (this.isSmartContainerTarget ? this.smartContainerTargetParentContainer : this.parent)
+      ? (isSmartContainerTarget ? this.smartContainerTargetParentContainer : this.parent)
       : void 0
     );
 

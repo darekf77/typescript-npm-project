@@ -374,6 +374,11 @@ export abstract class LibProject {
 
   }
 
+  /**
+   * because of that
+   * In vscode there is a mess..
+   * TODO
+   */
   removeJsMapsFrom(absPathBundleFolder: string) {
     return; // TODO not a good idea
     Helpers.filesFrom(absPathBundleFolder, true)
