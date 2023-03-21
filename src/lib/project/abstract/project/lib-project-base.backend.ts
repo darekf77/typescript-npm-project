@@ -18,11 +18,11 @@ export abstract class LibPorjectBase {
   abstract preparePackage(smartContainer: Project, newVersion: string);
 
   messages = {
-    productionMode: `Do you wanna build in production mode`,
-    docsBuildQuesions : `Do you wanna build docs for github preview`,
+    productionMode: `Do you want build in production mode`,
+    docsBuildQuesions : `Do you wanna build /docs folder app for preview`,
     docsBuildDone: `
 
-    Building docs prevew - done
+    Building docs preview - done
 
     `
 }

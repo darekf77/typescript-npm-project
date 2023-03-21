@@ -206,7 +206,7 @@ export abstract class LibProject {
     let appRelaseDone = false;
 
     if (!global.tnpNonInteractive) {
-      Helpers.clearConsole();
+      // Helpers.clearConsole();
 
       if (this.isStandaloneProject) {
         appRelaseDone = await this.standalone.buildDocs(prod);
@@ -216,26 +216,53 @@ export abstract class LibProject {
         appRelaseDone = await this.smartcontainer.buildDocs(prod);
       }
     }
-    if (appRelaseDone) {
-      await Helpers.killProcessByPort(4000)
-      const commandHostLoclDocs = `firedev-http-server `
-        + `${this.isStandaloneProject ? this.name : this.smartContainerTargetParentContainer?.name} `
-        + ` -p 4000 --base-dir ${this.name}`;
-      const cwd = realCurrentProj.pathFor('docs')
-      console.log({
-        cwd, commandHostLoclDocs
-      })
-      Helpers.run(commandHostLoclDocs, { cwd }).asyncAsPromise()
 
-      Helpers.info(`Before pushing you can acces project${this.isStandaloneProject ? '' : 's'} `
-        + ` on http://localhost:4000/${this.name} `);
-    }
 
+
+    const defaultTestPort = 4000;
+    await this.infoBeforePublish(realCurrentProj, defaultTestPort);
     await this.pushToGitRepo(realCurrentProj, newVersion);
+    await Helpers.killProcessByPort(defaultTestPort)
     Helpers.info('RELEASE DONE');
     process.exit(0);
   }
   //#endregion
+
+  private async infoBeforePublish(this: Project, realCurrentProj: Project, defaultTestPort: Number) {
+    const originPath = `http://localhost:`;
+    const docsCwd = realCurrentProj.pathFor('docs');
+    if (Helpers.exists(docsCwd)) {
+      await Helpers.killProcessByPort(4000)
+      const commandHostLoclDocs = `firedev-http-server -s -p 4000 --base-dir ${this.name}`;
+
+      // console.log({
+      //   cwd, commandHostLoclDocs
+      // })
+      Helpers.run(commandHostLoclDocs, { cwd: docsCwd, output: false, silence: true }).async()
+      if (this.isStandaloneProject) {
+        Helpers.info(`Before pushing you can acces project here:
+
+- ${originPath}${defaultTestPort}/${this.name}
+
+`);
+      }
+      if (this.isSmartContainer) {
+        const smartContainer = this;
+        const mainProjectName = smartContainer.smartContainerBuildTarget.name
+        const otherProjectNames = smartContainer
+          .children
+          .filter(c => c.name !== mainProjectName)
+          .map(p => p.name);
+        Helpers.info(`Before pushing you can acces projects here:
+
+- ${originPath}${defaultTestPort}/${smartContainer.name}
+${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer.name}/-/${c}`).join('\n')}
+
+`);
+      }
+
+    }
+  }
 
   //#region  methods
   private async createTempProject(this: Project, releaseOptions?: Models.dev.ReleaseOptions, automaticRelease = false): Promise<boolean> {

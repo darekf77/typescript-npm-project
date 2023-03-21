@@ -92,14 +92,21 @@ const $RELEASE = async (args: string) => {
     }
 
     // TODO detecting changes for children when start container
-    const message = proj.isStandaloneProject ? `Release new version: ${newVersion} ?`
-      : `Release new versions for container packages:\n`
-      + `${proj.children.map((c, index) => `\t${index + 1}. `
-        + `@${proj.name}/${c.name} v${newVersion}`).join('\n')}\n?`;
+    if (proj.isStandaloneProject) {
+      const message = `Proceed with release of new version: ${newVersion} ?`;
+      return await Helpers.questionYesNo(message);
+    }
 
+    if (proj.isSmartContainer) {
+      Helpers.info(`Pacakges available for new version release:
 
+${proj.children.map((c) => ` - @${proj.name}/${c.name} v${newVersion}`).join('\n')}
+`);
+      const message = 'Proceed release ?';
 
-    return await Helpers.questionYesNo(message);
+      return await Helpers.questionYesNo(message);
+    }
+
   }
 
   argsObj.shouldReleaseLibrary = await shouldReleaseLibMessage();

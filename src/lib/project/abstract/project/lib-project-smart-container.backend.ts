@@ -1,3 +1,4 @@
+import { CLI } from "tnp-cli";
 import { config } from "tnp-config";
 import { crossPlatformPath, path } from "tnp-core";
 import { Helpers } from "tnp-helpers";
@@ -110,22 +111,31 @@ export class LibProjectSmartContainer extends LibPorjectBase {
     ];
 
     Helpers.info(`
-
-    Routes for project:
-\t\t/${mainProjectName}
-${otherProjectNames.map(p => `\t\t/${mainProjectName}/-/${p}`).join('\n')}
-
-    `);
+Smart container routes for project:
++ ${CLI.chalk.bold(mainProjectName)} => /${mainProjectName}
+${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${c}`).join('\n')}
+        `);
 
 
     return await Helpers.questionYesNo(this.messages.docsBuildQuesions, async () => {
 
+      const returnFun = (childName: string) => {
+        if (childName === mainProjectName) {
+          return {
+            name: childName, // + CLI.chalk.gray(`\t\t<url>/${mainProjectName}`),
+            value: childName,
+          };
+        }
+        return {
+          name: childName, // + CLI.chalk.gray(`\t\t<url>/${mainProjectName}/-/${childName}`),
+          value: childName,
+        };
+      }
+
       const toBuildWebsql = await Helpers
         .consoleGui
-        .multiselect('Which project you want to build with WEBSQL mode', allProjects.map(p => {
-          return {
-            name: p, value: p
-          };
+        .multiselect('Which project you want to build with WEBSQL mode', allProjects.map(childName => {
+          return returnFun(childName);
         }))
 
       allProjects = allProjects.filter(f => !toBuildWebsql.includes(f));
@@ -133,10 +143,8 @@ ${otherProjectNames.map(p => `\t\t/${mainProjectName}/-/${p}`).join('\n')}
 
       const toBuildNormally = allProjects.length === 0 ? [] : await Helpers
         .consoleGui
-        .multiselect('Which projects you want to build with normally', allProjects.map(p => {
-          return {
-            name: p, value: p
-          };
+        .multiselect('Which projects you want to build with normally', allProjects.map(childName => {
+          return returnFun(childName);
         }));
 
       //#region questions
