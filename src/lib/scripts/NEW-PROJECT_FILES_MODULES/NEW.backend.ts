@@ -6,6 +6,7 @@ import { ProjectFactory } from './project-factory.backend';
 import { ConfigModels } from 'tnp-config';
 import { Project } from '../../project';
 import { config } from 'tnp-config';
+import { MagicRenamer } from 'magic-renamer';
 
 export async function RM(args: string, exit = true) {
   const proj = (Project.Current as Project);
@@ -152,7 +153,19 @@ Would you like to update current project configuration?`)) {
   process.exit(0)
 }
 
+
+async function $COPY_AND_RENAME(args: string) {
+  // console.log(`>> ${args} <<`)
+  const cwd = process.cwd();
+  // @LAST CWD from arg is not working src\lib\helpers-cli-tool.backend.ts
+  const ins = MagicRenamer.Instance();
+  await ins.start(args, true);
+  process.exit(0);
+}
+
+
 export default {
+  $COPY_AND_RENAME: Helpers.CLIWRAP($COPY_AND_RENAME, '$COPY_AND_RENAME'),
   $UPDATE: Helpers.CLIWRAP($UPDATE, '$UPDATE'),
   REMOVE: Helpers.CLIWRAP(REMOVE, 'REMOVE'),
   RM: Helpers.CLIWRAP(RM, 'RM'),
