@@ -115,8 +115,6 @@ export class ProjectContainer
     }
 
     let proxy = this.proxyProjFor(client, outDir);
- // @LAST
-
 
     if (!proxy && this.isSmartContainer) {
       const tmp = (c) => `${config.frameworkName} build:app:watch ${c}`;

@@ -158,7 +158,7 @@ async function $COPY_AND_RENAME(args: string) {
   // console.log(`>> ${args} <<`)
   const cwd = process.cwd();
   // @LAST CWD from arg is not working src\lib\helpers-cli-tool.backend.ts
-  const ins = MagicRenamer.Instance();
+  const ins = MagicRenamer.Instance(cwd);
   await ins.start(args, true);
   process.exit(0);
 }

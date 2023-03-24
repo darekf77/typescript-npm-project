@@ -123,7 +123,7 @@ export class InsideStructAngular13App extends BaseInsideStruct {
             }
             return '';
           },
-        ], // @LAST asset wrongly created link
+        ],
         //#endregion
 
         //#region link not containter target clients - whole dist or bundle

@@ -946,7 +946,7 @@ export class ProjectIsomorphicLib
     Object.keys(pj.dependencies).forEach(name => {
       if (!['ora'].includes(name)) { // TODO QUICK FIX FOF TNP
         delete pj.dependencies[name];
-      } // @LAST
+      }
     })
     pj.peerDependencies = {};
     pj.devDependencies = {};
