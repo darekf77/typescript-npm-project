@@ -151,9 +151,9 @@ export class FilesStructure extends FeatureForProject {
 
       //#region TODO BIG QUICK_FIX
 
-      if (!FilesStructure.INITED_PROECT_SHOW_LOG[this.project.genericName]) { // TODO QUICK
+      if (!FilesStructure.INITED_PROECT_SHOW_LOG[this.project.name]) { // TODO QUICK
         Helpers.taskStarted(`Initing project: ${chalk.bold(this.project.genericName)}`);
-        FilesStructure.INITED_PROECT_SHOW_LOG[this.project.genericName] = true;
+        FilesStructure.INITED_PROECT_SHOW_LOG[this.project.name] = true;
       } else {
         Helpers.log(`Initing project: ${chalk.bold(this.project.genericName)}`);
       }
