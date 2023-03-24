@@ -9,7 +9,6 @@ import { _ } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
 import { config } from 'tnp-config';
-import { FilesRenaming } from '../../project/features/files-recreation/files-renaming.backend';
 
 
 
@@ -48,16 +47,6 @@ export async function $BRANDING(args: string, exit = true) {
 
   Helpers.info('DONE');
 
-  if (exit) {
-    process.exit(0);
-  }
-
-}
-
-
-export function $RENAMING(aa: string, exit = true) {
-
-  FilesRenaming.start(aa);
   if (exit) {
     process.exit(0);
   }
@@ -128,5 +117,4 @@ export function faviconsDesc() {
 
 export default {
   $BRANDING: Helpers.CLIWRAP($BRANDING, '$BRANDING'),
-  $RENAMING: Helpers.CLIWRAP($RENAMING, '$RENAMING'),
 }

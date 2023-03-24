@@ -161,10 +161,6 @@ export async function start(
     return arg;
   });
 
-  Helpers.log(`[start] accesing db..please wait`)
-
-  Helpers.log(`[start] instance access granted`)
-  // Helpers.log(argsv)
 
   //#region local libs run
   // if (Array.isArray(argsv) && argsv.length >= 3) {

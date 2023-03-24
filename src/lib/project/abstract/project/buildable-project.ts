@@ -139,6 +139,9 @@ export abstract class BuildableProject {
         { continueWhenExistedFolderDoesntExists: true }
       );
 
+      if (config.frameworkName === 'tnp' && this.name !== 'tnp') {
+        independentProjects.push(Project.Tnp as Project)
+      }
       // @ts-ignore
       this.buildOptions.copyto = [
         ...independentProjects,
@@ -338,6 +341,7 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
 
     if (!buildOptions.appBuild) {
       Helpers.info(`[info] Copy compiled project to ${buildOptions.copyto.length} projects... `);
+      Helpers.logInfo((buildOptions.copyto as Project[]).map(p => p.genericName).join(';'));
     }
 
     const { skipBuild = false } = require('minimist')(this.buildOptions.args.split(' '));
