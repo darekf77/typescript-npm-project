@@ -163,10 +163,36 @@ async function $COPY_AND_RENAME(args: string) {
   process.exit(0);
 }
 
+async function $GENERATE(args: string) {
+  const argsv = args.split(' ');
+  let [absPath, moduleName, entityName] = argsv;
+  if (!Helpers.exists(absPath)) {
+    Helpers.mkdirp(absPath);
+  }
+  if (!Helpers.isFolder(absPath)) {
+    absPath = crossPlatformPath(path.dirname(absPath));
+  }
+  entityName = decodeURIComponent(entityName);
+  const nearestProj = Project.nearestTo(process.cwd()) as Project;
+  const container = Project.by('container', nearestProj._frameworkVersion) as Project;
+  const myEntity = 'my-entity';
+  const exampleLocation = crossPlatformPath([container.location, 'gen-examples', moduleName, myEntity]);
+
+  const ins = MagicRenamer.Instance(exampleLocation);
+  const newEntityName = _.kebabCase(entityName);
+  const generatedCode = crossPlatformPath([container.location, 'gen-examples', moduleName, newEntityName]);
+  Helpers.removeFolderIfExists(generatedCode);
+  await ins.start(`${myEntity} -> ${newEntityName}`, true);
+  Helpers.move(generatedCode, crossPlatformPath(path.join(absPath, newEntityName)));
+  process.exit(0)
+}
+
+
 
 export default {
   $COPY_AND_RENAME: Helpers.CLIWRAP($COPY_AND_RENAME, '$COPY_AND_RENAME'),
   $UPDATE: Helpers.CLIWRAP($UPDATE, '$UPDATE'),
+  $GENERATE: Helpers.CLIWRAP($GENERATE, '$GENERATE'),
   REMOVE: Helpers.CLIWRAP(REMOVE, 'REMOVE'),
   RM: Helpers.CLIWRAP(RM, 'RM'),
   NEW: Helpers.CLIWRAP(NEW, 'NEW'),
