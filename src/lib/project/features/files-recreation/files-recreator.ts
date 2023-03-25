@@ -153,8 +153,8 @@ export class FilesRecreator extends FeatureForProject {
           )).concat( // common files for all project
             self.project.isCoreProject ? [] : self.commonFilesForAllProjects
           ).concat( // core files of projects types
-            self.project.isCoreProject ? [] : self.project.projectSpecyficFiles().filter(f => {
-              return !self.project.recreateIfNotExists().includes(f);
+            self.project.isCoreProject ? [] : self.project.projectSpecyficFiles().filter(relativeFilePath => {
+              return !self.project.recreateIfNotExists().includes(relativeFilePath);
             })
           ).concat( // core files of projects types
             !self.project.isCoreProject ? [] : [
@@ -546,35 +546,36 @@ ${this.project.isVscodeExtension ? '' : coreFiles}
     } else if (defaultProjectProptotype) {
       const projectSpecyficFilesLinked = this.project.projectSpecyficFilesLinked();
       const projectSpecyficFiles = this.project.projectSpecyficFiles();
-      projectSpecyficFiles.forEach(f => {
-        let from = path.join(defaultProjectProptotype.location, f);
+      projectSpecyficFiles.forEach(relativeFilePath => {
+        relativeFilePath = crossPlatformPath(relativeFilePath);
+        let from = crossPlatformPath(path.join(defaultProjectProptotype.location, relativeFilePath));
 
         if (!Helpers.exists(from)) {
 
-          const linked = defaultProjectProptotype.projectLinkedFiles().find(a => a.relativePath === f);
+          const linked = defaultProjectProptotype.projectLinkedFiles().find(a => a.relativePath === relativeFilePath);
           if (linked) {
             Helpers.warn(`[firedev]]FIXING LINKED projects`);
             Helpers.createSymLink(
               path.join(linked.sourceProject.location, linked.relativePath),
-              path.join(defaultProjectProptotype.location, f));
+              path.join(defaultProjectProptotype.location, relativeFilePath));
           } else if (defaultProjectProptotype.frameworkVersionAtLeast('v2')) {
             const core = Project.by<Project>(
               defaultProjectProptotype._type,
               defaultProjectProptotype.frameworkVersionMinusOne
             );
-            from = path.join(core.location, f);
+            from = crossPlatformPath(path.join(core.location, relativeFilePath));
           }
 
         }
 
-        const where = path.join(this.project.location, f);
+        const where = crossPlatformPath(path.join(this.project.location, relativeFilePath));
 
-        if (this.project.recreateIfNotExists().includes(f) && Helpers.exists(where)) {
+        if (this.project.recreateIfNotExists().includes(relativeFilePath) && Helpers.exists(where)) {
           return;
         }
 
         files.push({
-          linked: projectSpecyficFilesLinked.includes(f),
+          linked: projectSpecyficFilesLinked.includes(relativeFilePath),
           from,
           where,
         });
