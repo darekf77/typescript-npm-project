@@ -176,14 +176,32 @@ async function $GENERATE(args: string) {
   const nearestProj = Project.nearestTo(process.cwd()) as Project;
   const container = Project.by('container', nearestProj._frameworkVersion) as Project;
   const myEntity = 'my-entity';
+
+  const flatFlag = '_flat';
+  const flat = moduleName.includes(flatFlag);
+  moduleName = moduleName.replace(flatFlag, '');
+
   const exampleLocation = crossPlatformPath([container.location, 'gen-examples', moduleName, myEntity]);
 
   const ins = MagicRenamer.Instance(exampleLocation);
   const newEntityName = _.kebabCase(entityName);
-  const generatedCode = crossPlatformPath([container.location, 'gen-examples', moduleName, newEntityName]);
-  Helpers.removeFolderIfExists(generatedCode);
+  const generatedCodeAbsLoc = crossPlatformPath([container.location, 'gen-examples', moduleName, newEntityName]);
+  Helpers.removeFolderIfExists(generatedCodeAbsLoc);
+  let destination = crossPlatformPath(path.join(absPath, newEntityName));
   await ins.start(`${myEntity} -> ${newEntityName}`, true);
-  Helpers.move(generatedCode, crossPlatformPath(path.join(absPath, newEntityName)));
+  if (flat) {
+    destination = crossPlatformPath(path.dirname(destination));
+    const files = Helpers.filesFrom(generatedCodeAbsLoc, true);
+    for (let index = 0; index < files.length; index++) {
+      const fileAbsPath = files[index];
+      const relative = fileAbsPath.replace(generatedCodeAbsLoc, '');
+      const destFileAbsPath = crossPlatformPath([destination, relative]);
+      Helpers.copyFile(fileAbsPath, destFileAbsPath);
+    }
+    Helpers.remove(generatedCodeAbsLoc, true)
+  } else {
+    Helpers.move(generatedCodeAbsLoc, destination);
+  }
   process.exit(0)
 }
 
