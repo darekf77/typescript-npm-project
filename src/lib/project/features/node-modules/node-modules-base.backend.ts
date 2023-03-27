@@ -54,9 +54,9 @@ export class NodeModulesBase extends NodeModulesCore {
 
 
       const filtered = packagesToLinkOrCopy
-        .filter(f => path.basename(f) !== this.project.name && fse.existsSync(f));
+        .filter(f => fse.existsSync(f));
 
-      const ONLY_COPY_ALLOWED =[
+      const ONLY_COPY_ALLOWED = [
         'background-worker-process',
         'better-sqlite3',
       ];
