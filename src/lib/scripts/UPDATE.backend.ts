@@ -50,17 +50,29 @@ async function $INIT_CORE() {
   process.exit(0)
 }
 
+async function MORPHISYNC(args, noExit = false) {
+  const cwd = config.morphiPathUserInUserDir;
+  try {
+    Helpers.run(`git reset --hard && git pull origin master`,
+      { cwd }).sync()
+  } catch (error) {
+    Helpers.error(`[${config.frameworkName} Not ablt to pull origin of morphi: ${config.urlMorphi} in: ${cwd}`, false, true);
+  }
+  try {
+    Helpers.run('rimraf .vscode', { cwd }).sync();
+  } catch (error) { }
+  Helpers.info('firedev-framework (morphi) synced ok')
+  if (!noExit) {
+    process.exit(0);
+  }
+}
+
+
 async function $AUTOUPDATE(args: string) {
   if (await Helpers.questionYesNo(`Proceed with ${config.frameworkName} auto-update ?`)) {
     if (config.frameworkName === 'firedev') {
       Helpers.run('npm i -g firedev --force').sync();
-      const morphiPathUserInUserDir = config.morphiPathUserInUserDir;
-      try {
-        Helpers.run(`git reset --hard && git pull origin master`,
-          { cwd: morphiPathUserInUserDir }).sync()
-      } catch (error) {
-        Helpers.error(`[${config.frameworkName} Not ablt to pull origin of morphi: ${config.urlMorphi} in: ${morphiPathUserInUserDir}`, false, true);
-      }
+      await MORPHISYNC(args, true)
       const container = Project.by('container', config.defaultFrameworkVersion);
       container.run('firedev reinstall').sync();
       Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
@@ -117,5 +129,6 @@ export default {
   $UPDATE_ISOMORPHIC: Helpers.CLIWRAP($UPDATE_ISOMORPHIC, '$UPDATE_ISOMORPHIC'),
   $AUTOUPDATE: Helpers.CLIWRAP($AUTOUPDATE, '$AUTOUPDATE'),
   $INIT_CORE: Helpers.CLIWRAP($INIT_CORE, '$INIT_CORE'),
+  MORPHISYNC: Helpers.CLIWRAP(MORPHISYNC, 'MORPHISYNC'),
 };
 
