@@ -187,8 +187,8 @@ async function $GENERATE(args: string) {
   const newEntityName = _.kebabCase(entityName);
   const generatedCodeAbsLoc = crossPlatformPath([container.location, 'gen-examples', moduleName, newEntityName]);
   Helpers.removeFolderIfExists(generatedCodeAbsLoc);
-  let destination = crossPlatformPath([absPath, newEntityName]).replace(`'`, '');
-  await ins.start(`${myEntity} -> ${newEntityName}`, true);
+  let destination = crossPlatformPath([absPath, newEntityName]);
+  ins.start(`${myEntity} -> ${newEntityName}`, true);
   if (flat) {
     destination = crossPlatformPath(path.dirname(destination));
     const files = Helpers.filesFrom(generatedCodeAbsLoc, true);
