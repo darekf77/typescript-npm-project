@@ -65,7 +65,7 @@ export class LibProjectStandalone extends LibPorjectBase {
 
   }
 
-  async buildDocs(prod: boolean): Promise<boolean> {
+  async buildDocs(prod: boolean, realCurrentProj: Project): Promise<boolean> {
     return await Helpers.questionYesNo(this.messages.docsBuildQuesions, async () => {
 
       //#region questions
@@ -95,6 +95,9 @@ export class LibProjectStandalone extends LibPorjectBase {
         + `${config.frameworkName} build:${config.folder.bundle}:app:${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
         + `${appBuildOptions.websql ? '--websql' : ''} ${global.hideLog ? '' : '-verbose'}`).sync();
 
+      try {
+        realCurrentProj.run('git checkout docs/CNAME').sync();
+      } catch (error) { }
 
       Helpers.log(this.messages.docsBuildDone);
     });

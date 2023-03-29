@@ -209,11 +209,11 @@ export abstract class LibProject {
       // Helpers.clearConsole();
 
       if (this.isStandaloneProject) {
-        appRelaseDone = await this.standalone.buildDocs(prod);
+        appRelaseDone = await this.standalone.buildDocs(prod, realCurrentProj);
       }
 
       if (this.isSmartContainer) {
-        appRelaseDone = await this.smartcontainer.buildDocs(prod);
+        appRelaseDone = await this.smartcontainer.buildDocs(prod, realCurrentProj);
       }
     }
 
@@ -229,6 +229,10 @@ export abstract class LibProject {
   //#endregion
 
   private async infoBeforePublish(this: Project, realCurrentProj: Project, defaultTestPort: Number) {
+    if (this.env.config.useDomain) {
+      Helpers.info(`Cannot local preview.. using doamin: ${this.env.config.domain}`)
+      return;
+    }
     const originPath = `http://localhost:`;
     const docsCwd = realCurrentProj.pathFor('docs');
     if (Helpers.exists(docsCwd)) {

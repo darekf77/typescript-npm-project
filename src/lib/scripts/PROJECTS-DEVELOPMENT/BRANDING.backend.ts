@@ -37,12 +37,12 @@ export async function $BRANDING(args: string, exit = true) {
   Helpers.log('Generation favicons...');
   Helpers.writeFile(path.join(proj.location, pathes.favicondesc), faviconsDesc());
   Helpers.mkdirp(path.join(proj.location, 'src/assets/favicons'));
-  proj.run(`real-favicon generate ${pathes.favicondesc} tmp-faviconout.json src/assets/favicons`).sync();
+  proj.run(`npx real-favicon generate ${pathes.favicondesc} tmp-faviconout.json src/assets/favicons`).sync();
   Helpers.copyFile(path.join(proj.location, 'src/assets/favicons/favicon.ico'), path.join(proj.location, 'src/favicon.ico'));
 
   Helpers.log('Generation pwa icons...');
 
-  proj.run(`ngx-pwa-icons --icon ./${config.pathes.logoPng}`, { output: false }).sync();
+  proj.run(`npx ngx-pwa-icons --icon ./${config.pathes.logoPng}`, { output: false }).sync();
   // proj.run(` pwa-asset-generator ./${config.pathes.logoSvg} -f --icon-only `, { output: false }).sync();
 
   Helpers.info('DONE');
@@ -55,7 +55,7 @@ export async function $BRANDING(args: string, exit = true) {
 
 export function faviconsDesc() {
   return {
-    "masterPicture": config.pathes.logoSvg,
+    "masterPicture": config.pathes.logoPng,
     "iconsPath": "/",
     "design": {
       "ios": {

@@ -95,7 +95,7 @@ export class LibProjectSmartContainer extends LibPorjectBase {
   }
 
 
-  async buildDocs(prod: boolean): Promise<boolean> {
+  async buildDocs(prod: boolean,realCurrentProj: Project): Promise<boolean> {
     // TODO
 
     const smartContainer = this.project;
@@ -189,6 +189,10 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
           + `build:${config.folder.bundle}:app:${appBuildOptions.docsAppInProdMode ? 'prod' : ''} ${projName} `
           + ` --websql ${global.hideLog ? '' : '-verbose'}`).sync();
       }
+
+      try {
+        realCurrentProj.run('git checkout docs/CNAME').sync();
+      } catch (error) { }
 
 
       Helpers.log(this.messages.docsBuildDone);

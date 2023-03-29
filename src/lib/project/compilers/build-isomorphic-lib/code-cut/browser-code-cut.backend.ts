@@ -505,7 +505,13 @@ export class BrowserCodeCut {
       ? this.project.smartContainerTargetParentContainer.name
       : this.project.name;
 
-    const basename = this.isInRelaseBundle ? `/${pathname}/` : '/';
+
+
+    let basename = this.isInRelaseBundle ? `/${pathname}/` : '/';
+
+    if (this.project.env.config.useDomain) {
+      basename = '';
+    }
 
     if (this.project.isSmartContainerTarget) {
       const parent = this.project.smartContainerTargetParentContainer;

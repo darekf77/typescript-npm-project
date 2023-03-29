@@ -247,9 +247,11 @@ export class ProjectIsomorphicLib
 
     let basename = ''
     if (this.isInRelaseBundle) {
-      basename = `--base-href /${isSmartContainerTarget ? this.smartContainerTargetParentContainer.name : this.name}/`;
-      if (isSmartContainerTargetNonClient) {
-        basename = `--base-href /${isSmartContainerTarget ? this.smartContainerTargetParentContainer.name : this.name}/-/${this.name}/`;
+      if(!this.env.config.useDomain) {
+        basename = `--base-href /${isSmartContainerTarget ? this.smartContainerTargetParentContainer.name : this.name}/`;
+        if (isSmartContainerTargetNonClient) {
+          basename = `--base-href /${isSmartContainerTarget ? this.smartContainerTargetParentContainer.name : this.name}/-/${this.name}/`;
+        }
       }
     }
 

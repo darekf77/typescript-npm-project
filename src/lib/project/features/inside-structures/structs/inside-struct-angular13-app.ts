@@ -275,11 +275,41 @@ ${appModuleFile}
             `/${(this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name)}`
             : '';
 
-          mainTsFile = mainTsFile.replace(
-            '<<<TO_REPLACE_BASENAME>>>',
-            basename,
-          );
+          const projForName = project.isSmartContainerTarget ? project.smartContainerTargetParentContainer : project;
+
+          if(projForName.env.config.useDomain) {
+            mainTsFile = mainTsFile.replace(
+              '<<<TO_REPLACE_BASENAME>>>',
+              '',
+            );
+          } else {
+            mainTsFile = mainTsFile.replace(
+              '<<<TO_REPLACE_BASENAME>>>',
+              basename,
+            );
+          }
+
           Helpers.writeFile(mainFilePath, mainTsFile);
+        })();
+        //#endregion
+
+
+        //#region replace favicon.ico
+        (() => {
+          const faviconPathDest = crossPlatformPath([
+            project.location,
+            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+            `/src/favicon.ico`
+          ]);
+
+          const source = crossPlatformPath([
+            project.location,
+            `/src/assets/favicon.ico`
+          ]);
+
+          if (Helpers.exists(source)) {
+            Helpers.copyFile(source, faviconPathDest);
+          }
         })();
         //#endregion
 
@@ -381,7 +411,12 @@ ${appModuleFile}
 
             const projForName = this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer : this.project;
 
-            manifestJson.start_url = `https://${remoteUsername}.github.io/${projForName.name}/`
+            if (projForName.env.config.useDomain) {
+              manifestJson.start_url = `https://${projForName.env.config.domain}/`
+            } else {
+              manifestJson.start_url = `https://${remoteUsername}.github.io/${projForName.name}/`
+            }
+
           }
 
 
