@@ -1,5 +1,5 @@
 import { config } from "tnp-config";
-import { path } from "tnp-core";
+import { crossPlatformPath, path } from "tnp-core";
 import { Helpers } from "tnp-helpers";
 import { Models } from "tnp-models";
 import { CopyMangerHelpers } from "./copy-manager-helpers.backend";
@@ -74,7 +74,7 @@ export class TypescriptDtsFixer {
 
       const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
       Helpers.log('Fixing .d.ts. files start...');
-      const sourceBrowser = path.join(absPathFolderLocationWithBrowserAdnWebsql, currentBrowserFolder);
+      const sourceBrowser =  crossPlatformPath(path.join(absPathFolderLocationWithBrowserAdnWebsql, currentBrowserFolder));
       this.processFolder(sourceBrowser, currentBrowserFolder)
       Helpers.log('Fixing .d.ts. files done.');
     }

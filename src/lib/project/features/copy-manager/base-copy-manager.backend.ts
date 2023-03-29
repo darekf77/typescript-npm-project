@@ -173,7 +173,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
 
     //#region handle additional package.json markings
     if (this.project.isContainerWorkspaceRelated || this.project.isVscodeExtension || options.forceCopyPackageJSON) {
-      const packageJsonLocation = path.join(destinationLocation, config.file.package_json);
+      const packageJsonLocation = crossPlatformPath(path.join(destinationLocation, config.file.package_json));
       // console.log(`packageJsonLocation: ${ packageJsonLocation } `)
       // console.log('packageJson', packageJson)
       fse.writeJsonSync(packageJsonLocation, packageJson, {
@@ -225,19 +225,19 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
 
       childs.forEach(c => {
         // console.log('GENERATING CHILD ' + c.genericName)
-        c.copyManager.generateSourceCopyIn(path.join(destinationLocation, c.name), options);
+        c.copyManager.generateSourceCopyIn(crossPlatformPath(path.join(destinationLocation, c.name)), options);
 
       });
       if (this.project.isSmartContainer) {
         childs.forEach(c => {
-          let generatedVer = Project.From(path.join(destinationLocation, c.name)) as Project;
+          let generatedVer = Project.From(crossPlatformPath(path.join(destinationLocation, c.name))) as Project;
           generatedVer.packageJson.data.tnp = {
             type: 'isomorphic-lib',
             version: "v3",
           } as any;
           generatedVer.packageJson.save('saving proper child version');
           Project.unload(generatedVer);
-          generatedVer = Project.From(path.join(destinationLocation, c.name));
+          generatedVer = Project.From(crossPlatformPath(path.join(destinationLocation, c.name)));
         });
       }
     }

@@ -140,17 +140,17 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   //#region initial fix for destination pacakge
   initalFixForDestination(destination: Project): void {
 
-    const destPackageInNodeModules = path.join(
+    const destPackageInNodeModules = crossPlatformPath(path.join(
       destination.location,
       config.folder.node_modules,
       this.rootPackageName
-    );
+    ));
 
     this.createCopyForRestore(destPackageInNodeModules, destination);
 
     for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
       const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
-      const destPackageInNodeModulesBrowser = path.join(destPackageInNodeModules, currentBrowserFolder);
+      const destPackageInNodeModulesBrowser = crossPlatformPath(path.join(destPackageInNodeModules, currentBrowserFolder));
 
       Helpers.remove(destPackageInNodeModulesBrowser);
       const children = this.children;
@@ -160,16 +160,16 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         if (!child) {
           // debugger
         }
-        const childDestPackageInNodeModules = path.join(
+        const childDestPackageInNodeModules = crossPlatformPath(path.join(
           destPackageInNodeModules,
           CopyMangerHelpers.childPureName(child)
-        );
+        ));
 
-        const childDestPackageInNodeModulesBrowser = path.join(
+        const childDestPackageInNodeModulesBrowser = crossPlatformPath(path.join(
           destPackageInNodeModules,
           CopyMangerHelpers.childPureName(child),
           currentBrowserFolder,
-        );
+        ));
 
         if (Helpers.isSymlinkFileExitedOrUnexisted(childDestPackageInNodeModules)) {
           Helpers.removeFileIfExists(childDestPackageInNodeModules);
@@ -286,7 +286,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
    * example: '@angular/core'
    */
   childPackageName(child: Project) {
-    return path.join(this.rootPackageName, child.name);
+    return crossPlatformPath(path.join(this.rootPackageName, child.name));
   }
   //#endregion
 
@@ -295,7 +295,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
    * example: '@angular/core/(browser|websql)'
    */
   rootPackageNameForChildBrowser(child: Project, currentBrowserFolder: Models.dev.BuildDirBrowser) {
-    return path.join(this.childPackageName(child), currentBrowserFolder);
+    return crossPlatformPath(path.join(this.childPackageName(child), currentBrowserFolder));
   }
   //#endregion
 
@@ -312,7 +312,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
 
     if (child.name === this.targetProjName) { // target is in lib.... -> no need for target also being in libs
       const monitorDirForModuleBrowser = isTempLocalProj //
-        ? path.join(this.monitoredOutDir, currentBrowserFolder, config.folder.lib)
+        ? crossPlatformPath(path.join(this.monitoredOutDir, currentBrowserFolder, config.folder.lib))
         : this.localTempProj.node_modules.pathFor(rootPackageNameForChildBrowser);
 
       if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist|bundle)
@@ -321,7 +321,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       this.writeSpecyficForChildDtsFiles(destination, rootPackageNameForChildBrowser, monitorDirForModuleBrowser);
     } else {
       const monitorDirForModuleBrowser = isTempLocalProj //
-        ? path.join(this.monitoredOutDir, currentBrowserFolder, config.folder.libs, child.name)
+        ? crossPlatformPath(path.join(this.monitoredOutDir, currentBrowserFolder, config.folder.libs, child.name))
         : this.localTempProj.node_modules.pathFor(rootPackageNameForChildBrowser);
 
       if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist|bundle)
@@ -440,9 +440,9 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
 
     for (let index = 0; index < this.children.length; index++) {
       const child = this.children[index];
-      const rootPackageNameForChild = path.join(this.rootPackageName, child.name);
+      const rootPackageNameForChild = crossPlatformPath(path.join(this.rootPackageName, child.name));
       const monitorDirForModule = isTempLocalProj //
-        ? path.join(this.monitoredOutDir, config.folder.libs, child.name)
+        ? crossPlatformPath(path.join(this.monitoredOutDir, config.folder.libs, child.name))
         : this.localTempProj.node_modules.pathFor(rootPackageNameForChild);
 
       // if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist|bundle)
@@ -656,7 +656,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     }
 
     specyficFileRelativePath = specyficFileRelativePath.replace(`${config.folder.libs}/${childName}/`, '');
-    const rootPackageNameForChild = path.join(this.rootPackageName, child.name);
+    const rootPackageNameForChild =  crossPlatformPath(path.join(this.rootPackageName, child.name));
 
     Helpers.log(`Handle single file: ${specyficFileRelativePath} for ${rootPackageNameForChild}`)
 

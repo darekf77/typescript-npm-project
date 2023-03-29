@@ -101,20 +101,20 @@ export class CopyMangerOrganizationAngularFiles {
       const rootPackageNameForChildBrowser = this.rootPackageNameForChildBrowser(child, currentBrowserFolder);
       const relativePath = specyficFileRelativePath.split('/').splice(3).join('/');
       const absSourcePath = isTempLocalProj
-        ? path.join(this.monitoredOutDir, specyficFileRelativePath)
-        : path.join(
+        ? crossPlatformPath(path.join(this.monitoredOutDir, specyficFileRelativePath))
+        : crossPlatformPath(path.join(
           this.localTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
           relativePath,
-        );
+        ));
 
       let content = Helpers.readFile(absSourcePath);
       if (isTempLocalProj && relativePath.endsWith('.d.ts')) {
         content = this.dtsFixer.forContent(content, currentBrowserFolder);
       }
-      const detinationFilePath = path.join(
+      const detinationFilePath = crossPlatformPath(path.join(
         destination.node_modules.pathFor(rootPackageNameForChildBrowser),
         relativePath,
-      );
+      ));
       Helpers.writeFile(detinationFilePath, content);
     } else {
       // console.log('should be something here?')
@@ -149,10 +149,10 @@ export class CopyMangerOrganizationAngularFiles {
       const rootPackageNameForChildBrowser = this.manager
         .rootPackageNameForChildBrowser(child, currentBrowserFolder);
 
-      const childBrowserOrWebsqlDestAbsPath = path.join(
+      const childBrowserOrWebsqlDestAbsPath = crossPlatformPath(path.join(
         destinationOrLocalTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
         angularCompilationFolder
-      );
+      ));
 
       const path_InMonitoredLocation = crossPlatformPath(path.join(
         this.monitoredOutDir,
@@ -218,10 +218,10 @@ export class CopyMangerOrganizationAngularFiles {
 
   //#region api / fix angular package.json
   fixPackageJson(child: Project, destination: Project, currentBrowserFolder?: Models.dev.BuildDirBrowser) {
-    const childPackageName = path.join(this.rootPackageName, child.name);
+    const childPackageName = crossPlatformPath(path.join(this.rootPackageName, child.name));
 
     if (currentBrowserFolder) {
-      const rootPackageNameForChildBrowser = path.join(childPackageName, currentBrowserFolder);
+      const rootPackageNameForChildBrowser = crossPlatformPath(path.join(childPackageName, currentBrowserFolder));
       const location = destination.node_modules.pathFor(rootPackageNameForChildBrowser);
       const childName = child.name;
       const pj = {
@@ -272,8 +272,8 @@ export class CopyMangerOrganizationAngularFiles {
   //#region api / fix build releate files
   fixBuildRelatedFiles(child: Project, destination: Project, currentBrowserFolder: Models.dev.BuildDirBrowser) {
 
-    const childPackageName = path.join(this.rootPackageName, child.name);
-    const rootPackageNameForChildBrowser = path.join(childPackageName, currentBrowserFolder);
+    const childPackageName = crossPlatformPath(path.join(this.rootPackageName, child.name));
+    const rootPackageNameForChildBrowser = crossPlatformPath(path.join(childPackageName, currentBrowserFolder));
     const location = destination.node_modules.pathFor(rootPackageNameForChildBrowser);
 
     //#region <child-name>.d.ts
@@ -384,27 +384,27 @@ export * from './${config.file.public_api}';
     const rootPackageNameForChildBrowser = this.manager
       .rootPackageNameForChildBrowser(child, currentBrowserFolder);
 
-    const sourceMjsFile = path.join(
+    const sourceMjsFile = crossPlatformPath(path.join(
       sourceBrowserOrWerbsqlFolderAbsPath,
       `${this.targetProjName}.mjs${isMap ? '.map' : ''}`,
-    );
+    ));
 
-    const destinationLocationMjsFileDest = path.join(
+    const destinationLocationMjsFileDest = crossPlatformPath(path.join(
       destinationTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
       angularCompilationFolder,
       `${child.name}.mjs${isMap ? '.map' : ''}`,
-    );
+    ));
 
 
     Helpers.copyFile(sourceMjsFile, destinationLocationMjsFileDest);
 
 
     if ((child.name !== this.targetProjName)) {
-      const destinationLocationMjsFileDestTargeFileToRemove = path.join(
+      const destinationLocationMjsFileDestTargeFileToRemove = crossPlatformPath(path.join(
         destinationTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
         angularCompilationFolder,
         `${this.targetProjName}.mjs${isMap ? '.map' : ''}`,
-      );
+      ));
       Helpers.removeFileIfExists(destinationLocationMjsFileDestTargeFileToRemove);
     }
 

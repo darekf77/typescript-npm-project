@@ -162,17 +162,17 @@ export class CopyManagerStandalone extends CopyManager {
   //#region initial fix for destination pacakge
   initalFixForDestination(destination: Project): void {
 
-    const destPackageInNodeModules = path.join(
+    const destPackageInNodeModules = crossPlatformPath(path.join(
       destination.location,
       config.folder.node_modules,
       this.rootPackageName
-    );
+    ));
 
     this.createCopyForRestore(destPackageInNodeModules, destination);
 
     for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
       const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
-      const destPackageInNodeModulesBrowser = path.join(destPackageInNodeModules, currentBrowserFolder);
+      const destPackageInNodeModulesBrowser = crossPlatformPath(path.join(destPackageInNodeModules, currentBrowserFolder));
 
 
       if (Helpers.isSymlinkFileExitedOrUnexisted(destPackageInNodeModules)) {
@@ -593,10 +593,10 @@ export class CopyManagerStandalone extends CopyManager {
   ) {
 
     //#region mpa fix for CLI
-    const monitoredOutDirFileToReplaceBack = path.join(
+    const monitoredOutDirFileToReplaceBack = crossPlatformPath(path.join(
       this.monitoredOutDir,
       specyficFileRelativePath,
-    );
+    ));
 
     // console.log('SHOULD FIX CLI', {
     //   monitoredOutDirFileToReplaceBack
