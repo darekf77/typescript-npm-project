@@ -262,6 +262,24 @@ ${appModuleFile}
 
         //#region replace app.component.html
         (() => {
+          const indexHtmlFilePath = path.join(
+            project.location,
+            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+            `/src/index.html`
+          );
+
+          let indexHtmlFile = Helpers.readFile(indexHtmlFilePath);
+
+          indexHtmlFile = indexHtmlFile.replace(
+            '<title>App</title>',
+            `<title>${_.startCase(this.project.name)}</title>`
+          );
+          Helpers.writeFile(indexHtmlFilePath, indexHtmlFile);
+        })();
+        //#endregion
+
+        //#region replace app.component.html
+        (() => {
           const mainFilePath = path.join(
             project.location,
             replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
@@ -277,7 +295,7 @@ ${appModuleFile}
 
           const projForName = project.isSmartContainerTarget ? project.smartContainerTargetParentContainer : project;
 
-          if(projForName.env.config.useDomain) {
+          if (projForName.env.config.useDomain) {
             mainTsFile = mainTsFile.replace(
               '<<<TO_REPLACE_BASENAME>>>',
               '',

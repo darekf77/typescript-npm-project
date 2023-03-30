@@ -351,7 +351,7 @@ export class ProjectIsomorphicLib
       // const ngBuildCmd = // TODO LOAD NVME HERE
       const ngBuildCmd = `npm-run ng build `
         + `${aot ? '--aot=true' : ''} `
-        + `${prod ? '--prod' : ''} `
+        + `${prod ? '--configuration production' : ''} `
         + `${watch ? '--watch' : ''}`
         + `${outPutPathCommand} `
 
