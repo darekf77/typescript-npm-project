@@ -244,7 +244,7 @@ export class EnvironmentConfig
       EnvironmentConfig.configs[configPath] = res;
       return res;
     } else {
-      global.globalSystemToolMode && Helpers.warn(`confg doesnt exist: ${configPath}`)
+      global.globalSystemToolMode && Helpers.logWarn(`confg doesnt exist: ${configPath}`)
       return EnvironmentConfig.configs[configPath]
     }
     //#endregion

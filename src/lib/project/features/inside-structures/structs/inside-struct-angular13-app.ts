@@ -295,7 +295,7 @@ ${appModuleFile}
 
           const projForName = project.isSmartContainerTarget ? project.smartContainerTargetParentContainer : project;
 
-          if (projForName.env.config.useDomain) {
+          if (projForName.env.config?.useDomain) {
             mainTsFile = mainTsFile.replace(
               '<<<TO_REPLACE_BASENAME>>>',
               '',
@@ -429,7 +429,7 @@ ${appModuleFile}
 
             const projForName = this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer : this.project;
 
-            if (projForName.env.config.useDomain) {
+            if (projForName.env.config?.useDomain) {
               manifestJson.start_url = `https://${projForName.env.config.domain}/`
             } else {
               manifestJson.start_url = `https://${remoteUsername}.github.io/${projForName.name}/`
