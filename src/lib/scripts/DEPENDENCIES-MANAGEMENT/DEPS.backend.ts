@@ -76,7 +76,12 @@ export async function $INSTALL(args, smooth = false, exit = true) {
       c.npmPackages.installFromArgs(args, smooth);
     }
   } else {
-    proj.npmPackages.installFromArgs(args, smooth);
+    if (proj.isStandaloneProject) {
+      proj.npmPackages.installFromArgs(args, true);
+    } else {
+      proj.npmPackages.installFromArgs(args, smooth);
+    }
+
   }
   if (exit) {
     process.exit(0);
