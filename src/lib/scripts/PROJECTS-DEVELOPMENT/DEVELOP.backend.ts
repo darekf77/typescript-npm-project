@@ -169,7 +169,19 @@ const $KILLALLNODE = () => {
     return;
   }
   Helpers.run(`fkill -f node`).sync();
+  process.exit(0);
 }
+
+
+const $KILLALLCODE = () => {
+  if (process.platform === 'win32') {
+    Helpers.run(`taskkill /f /im code.exe`).sync();
+    return;
+  }
+  Helpers.run(`fkill -f code`).sync();
+  process.exit(0);
+}
+
 
 //#endregion
 
@@ -351,6 +363,7 @@ export default {
   $KILL_ON_PORT: Helpers.CLIWRAP($KILL_ON_PORT, '$KILL_ON_PORT'),
   $KILLONPORT: Helpers.CLIWRAP($KILLONPORT, '$KILLONPORT'),
   $KILLALLNODE: Helpers.CLIWRAP($KILLALLNODE, '$KILLALLNODE'),
+  $KILLALLCODE: Helpers.CLIWRAP($KILLALLCODE, '$KILLALLCODE'),
   CHOKI: Helpers.CLIWRAP(CHOKI, 'CHOKI'),
   NOT: Helpers.CLIWRAP(NOT, 'NOT'),
   $FORK: Helpers.CLIWRAP($FORK, '$FORK'),
