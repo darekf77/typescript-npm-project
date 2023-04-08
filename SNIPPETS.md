@@ -327,3 +327,9 @@ $(document).ready(function() {
   </body>
 </html>
 ```
+
+
+```
+"preinstall": " chalk red bold ERROR: && echo Use: && chalk red bold \"firedev install\" && echo instead && chalk gray bold \"npm install\" && exit 1",
+"preinstall": "echo \"ERROR:  Use \"firedev install\" instead \"npm install\" \" && exit 1",
+```
