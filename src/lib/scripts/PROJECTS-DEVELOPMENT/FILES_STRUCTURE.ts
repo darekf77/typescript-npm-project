@@ -23,18 +23,34 @@ async function askForWhenEmpty(): Promise<Project> {
   if (yesNewProj) {
     const response = await Helpers.autocompleteAsk<ConfigModels.LibType>(`Choose type of project`, [
       { name: 'Container', value: 'container' },
-      { name: 'Workspace', value: 'workspace' },
       { name: 'Isomorphic Lib', value: 'isomorphic-lib' },
-      { name: 'Angular Lib', value: 'angular-lib' }
     ]);
-    Helpers.writeFile([crossPlatformPath(process.cwd()), config.file.package_json], {
-      name: crossPlatformPath(path.basename(crossPlatformPath(process.cwd()))),
-      version: '0.0.0',
-      tnp: {
-        type: response,
-        version: config.defaultFrameworkVersion,
-      }
-    });
+    let smart = false;
+    let monorepo = false;
+    if (response === 'container') {
+      smart = await Helpers.consoleGui.question.yesNo('Do you wanna use smart container for organization project ?');
+      monorepo = await Helpers.consoleGui.question.yesNo('Do you want your container to be monorepo ?');
+      Helpers.writeFile([crossPlatformPath(process.cwd()), config.file.package_json], {
+        name: crossPlatformPath(path.basename(crossPlatformPath(process.cwd()))),
+        version: '0.0.0',
+        tnp: {
+          type: response,
+          monorepo,
+          smart,
+          version: config.defaultFrameworkVersion,
+        }
+      });
+    } else {
+      Helpers.writeFile([crossPlatformPath(process.cwd()), config.file.package_json], {
+        name: crossPlatformPath(path.basename(crossPlatformPath(process.cwd()))),
+        version: '0.0.0',
+        tnp: {
+          type: response,
+          version: config.defaultFrameworkVersion,
+        }
+      });
+    }
+
     proj = Project.From(crossPlatformPath(process.cwd())) as Project;
     return proj;
   }
