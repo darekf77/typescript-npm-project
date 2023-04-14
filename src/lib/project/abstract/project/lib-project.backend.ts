@@ -1,5 +1,5 @@
 //#region imports
-import { BuildOptions, BuildProcess } from '../../features';
+import { BuildOptions, BuildProcess, EnvironmentConfig } from '../../features';
 import { crossPlatformPath, fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import { glob } from 'tnp-core';
@@ -321,7 +321,21 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
           regenerateProjectChilds: this.isSmartContainer,
         });
 
-        this.packageJson.linkTo(absolutePathReleaseProject, true);
+        this.packageJson.linkTo(absolutePathReleaseProject);
+        if (this.isStandaloneProject) {
+          (this.env as any as EnvironmentConfig).coptyTo(absolutePathReleaseProject)
+        }
+
+        if (this.isSmartContainer) {
+          const children = this.children;
+          for (let index = 0; index < children.length; index++) {
+            const child = children[index];
+            (child.env as any as EnvironmentConfig).coptyTo(crossPlatformPath([absolutePathReleaseProject, child.name]))
+          }
+
+        }
+
+
 
         const generatedProject = Project.From(absolutePathReleaseProject) as Project;
         this.allResources.forEach(relPathResource => {

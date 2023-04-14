@@ -105,9 +105,12 @@ import { CLASS } from 'typescript-class-helpers';
 
   }
   //#endregion
-} as any)
+} as any) // @ts-ignore
 export class Project extends $Project<Project>
 {
+  //#region @backend
+  env?: EnvironmentConfig;
+  //#endregion
   browser: any;
   location: string;
 

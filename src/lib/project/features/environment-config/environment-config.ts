@@ -11,6 +11,7 @@ import {
   standaloneConfigBy
 } from './environment-config-helpers';
 import { FeatureForProject } from '../../abstract';
+
 //#endregion
 
 import { Helpers } from 'tnp-helpers';
@@ -31,6 +32,11 @@ export class EnvironmentConfig
   extends FeatureForProject
 //#endregion
 {
+  coptyTo(destination: string) {
+    const source = path.join(this.project.location, config.file.environment_js);
+    const dest = path.join(destination, config.file.environment_js);
+    Helpers.copyFile(source, dest);
+  }
 
   browser: IEnvironmentConfig;
   //#region @backend

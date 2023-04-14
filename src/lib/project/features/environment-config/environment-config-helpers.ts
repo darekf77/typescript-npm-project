@@ -326,6 +326,8 @@ var { config } = ${configPathRequire};
 config = {
 
   domain: '${proj.name}.example.domain.com',
+  useDomain: false,
+  title: '${_.startCase(proj.name)}',
   ${workspacePart}
 
 }
