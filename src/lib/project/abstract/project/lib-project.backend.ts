@@ -647,9 +647,13 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       if (newVersion) {
         const tagName = `v${newVersion}`;
         const commitMessage = ('new version ' + newVersion);
-        realCurrentProj.run(`git tag -a ${tagName} `
-          + `-m "${commitMessage}"`,
-          { output: false }).sync();
+        try {
+          realCurrentProj.run(`git tag -a ${tagName} `
+            + `-m "${commitMessage}"`,
+            { output: false }).sync();
+        } catch (error) {
+          Helpers.error(`Not able to tag project`, false, true);
+        }
         const lastCommitHash = realCurrentProj.git.lastCommitHash();
         realCurrentProj.packageJson.setBuildHash(lastCommitHash);
         realCurrentProj.packageJson.save('updating hash');
