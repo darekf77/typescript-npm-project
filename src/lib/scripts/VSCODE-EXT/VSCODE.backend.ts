@@ -213,7 +213,10 @@ function $VSCODE_GLOBAL() {
     "security.workspace.trust.banner": "never",
     "telemetry.enableTelemetry": false,
     "security.workspace.trust.enabled": false,
+    "terminal.integrated.enableMultiLinePasteWarning": false,
     "git.detectSubmodules": false,
+    "editor.wordBasedSuggestionswordBasedSuggestions": false,
+    "git.openRepositoryInParentFolders": "never",
   };
   const settingspathWindows = path.join(crossPlatformPath(os.userInfo().homedir), 'AppData/Roaming/Code/User/settings.json');
   const settingspathLinux = path.join(crossPlatformPath(os.userInfo().homedir), '.config/Code/User/settings.json');

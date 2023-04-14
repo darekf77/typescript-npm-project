@@ -268,7 +268,7 @@ export class SingularBuild extends FeatureForProject {
       ...
         smartContainerBuildTarget: <name of main project>
       ...
-          `, false, true);
+          `, false, false);
     }
 
     Helpers.log(`[singularbuildcontainer] children for build: \n\n${children.map(c => c.name)}\n\n`);
