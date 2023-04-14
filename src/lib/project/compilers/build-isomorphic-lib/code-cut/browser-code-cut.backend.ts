@@ -509,7 +509,7 @@ export class BrowserCodeCut {
 
     let basename = this.isInRelaseBundle ? `/${pathname}/` : '/';
 
-    if (this.project.env.config.useDomain) {
+    if (this.project.env.config?.useDomain) {
       basename = '';
     }
 

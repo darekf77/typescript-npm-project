@@ -234,7 +234,7 @@ export class SingularBuild extends FeatureForProject {
 
     }
 
-    // VscodeProject.launchFroSmartContaienr(parent);
+    VscodeProject.launchFroSmartContaienr(parent);
 
     return singularWatchProj;
   }

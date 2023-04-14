@@ -229,7 +229,7 @@ export abstract class LibProject {
   //#endregion
 
   private async infoBeforePublish(this: Project, realCurrentProj: Project, defaultTestPort: Number) {
-    if (this.env.config.useDomain) {
+    if (this.env.config?.useDomain) {
       Helpers.info(`Cannot local preview.. using doamin: ${this.env.config.domain}`)
       return;
     }

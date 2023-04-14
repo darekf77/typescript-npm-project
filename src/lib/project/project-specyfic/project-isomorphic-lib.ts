@@ -247,7 +247,7 @@ export class ProjectIsomorphicLib
 
     let basename = ''
     if (this.isInRelaseBundle) {
-      if(!this.env.config.useDomain) {
+      if(!this.env.config?.useDomain) {
         basename = `--base-href /${isSmartContainerTarget ? this.smartContainerTargetParentContainer.name : this.name}/`;
         if (isSmartContainerTargetNonClient) {
           basename = `--base-href /${isSmartContainerTarget ? this.smartContainerTargetParentContainer.name : this.name}/-/${this.name}/`;

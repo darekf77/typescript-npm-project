@@ -61,6 +61,16 @@ export class ProjectContainer
 
   async buildLib() { }
 
+  // filesTemplates() {
+  //   if (this.isSmartContainer) {
+  //     return [
+  //       '.vscode/launch.json.filetemplate',
+  //     ];
+  //   }
+
+  //   return [];
+  // }
+
   startOnCommand() {
     //#region @backendFunc
     return 'echo "no container support jet"';
