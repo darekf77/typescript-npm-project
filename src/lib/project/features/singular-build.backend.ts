@@ -262,7 +262,7 @@ export class SingularBuild extends FeatureForProject {
 
 
     if (!smartContainerBuildTarget && children.length > 1) {
-      Helpers.error(`
+      Helpers.logError(`
 
     Please specify in your configuration:
       ...

@@ -330,7 +330,7 @@
           "node-cli-test": "0.0.2",
           "reflect-metadata": "^0.1.10",
           "ts-loader": "^2.3.1",
-          "typescript-class-helpers": '13.1.14',
+          "typescript-class-helpers": '13.1.15',
           tslib: "2.2.0",
           "ts-node": "^7.0.1",
           typescript: "4.1.5",
@@ -405,7 +405,7 @@
           },
           essentials: {
             "element-resize-detector": "1.1.15",
-            "static-columns": "13.1.29",
+            "static-columns": '13.1.31',
             "bs4-breakpoint": '13.0.33',
             "ngx-breadcrumbs": "0.0.3",
             "ngx-editor": "^3.3.0",

@@ -169,6 +169,7 @@ async function $GENERATE(args: string) {
   if (!Helpers.exists(absPath)) {
     Helpers.mkdirp(absPath);
   }
+  const absFilePath = crossPlatformPath(absPath);
   if (!Helpers.isFolder(absPath)) {
     absPath = crossPlatformPath(path.dirname(absPath));
   }
@@ -177,30 +178,96 @@ async function $GENERATE(args: string) {
   const container = Project.by('container', nearestProj._frameworkVersion) as Project;
   const myEntity = 'my-entity';
 
-  const flatFlag = '_flat';
-  const flat = moduleName.includes(flatFlag);
-  moduleName = moduleName.replace(flatFlag, '');
+  const flags = {
+    flat: '_flat',
+    custom: '_custom',
+  }
+
+  const isFlat = moduleName.includes(flags.flat);
+  moduleName = moduleName.replace(flags.flat, '');
+
+  const isCustom = moduleName.includes(flags.custom);
+  moduleName = moduleName.replace(flags.custom, '');
 
   const exampleLocation = crossPlatformPath([container.location, 'gen-examples', moduleName, myEntity]);
 
-  const ins = MagicRenamer.Instance(exampleLocation);
+
   const newEntityName = _.kebabCase(entityName);
   const generatedCodeAbsLoc = crossPlatformPath([container.location, 'gen-examples', moduleName, newEntityName]);
   Helpers.removeFolderIfExists(generatedCodeAbsLoc);
   let destination = crossPlatformPath([absPath, newEntityName]);
-  ins.start(`${myEntity} -> ${newEntityName}`, true);
-  if (flat) {
+  if (isFlat) {
     destination = crossPlatformPath(path.dirname(destination));
-    const files = Helpers.filesFrom(generatedCodeAbsLoc, true);
-    for (let index = 0; index < files.length; index++) {
-      const fileAbsPath = crossPlatformPath(files[index]);
-      const relative = fileAbsPath.replace(generatedCodeAbsLoc + '/', '');
-      const destFileAbsPath = crossPlatformPath([destination, relative]);
-      Helpers.copyFile(fileAbsPath, destFileAbsPath);
+  }
+
+  if (isCustom) {
+    if (moduleName === 'generated-index-exports') {
+      const allowedFilesExt = ['.ts', '.tsx'];
+      const frontendFiles = [
+        '.component.ts',
+        '.container.ts',
+        '.directive.ts',
+        '.pipe.ts',
+        '.module.ts',
+        '.service.ts',
+        '.actions.ts',
+        '.effects.ts',
+        '.reducers.ts',
+        '.selectors.ts',
+      ]
+      const backendFiles = ['.backend.ts']
+      const folders = [
+        ...Helpers.foldersFrom(absPath).map(f => path.basename(f)),
+        ...Helpers.filesFrom(absPath, false).map(f => path.basename(f)),
+      ]
+        .filter(f => !['index.ts'].includes(f))
+        .filter(f => !f.startsWith('.'))
+        .filter(f => !f.startsWith('_'))
+        .filter(f => !f.endsWith('.routes.ts'))
+        .filter(f => (path.extname(f) === '') || !_.isUndefined(allowedFilesExt.find(a => f.endsWith(a))))
+        ;
+      Helpers.writeFile(
+        crossPlatformPath([absPath, config.file.index_ts]),
+        folders.map(f => {
+          if (!_.isUndefined(frontendFiles.find(bigExt => f.endsWith(bigExt)))) {
+            return `//#region @${'brow' + 'ser'}\n`
+              + `export * from './${f.replace(path.extname(f), '')}';`
+              + `\n//${'#end' + 'region'}`
+          }
+          if (!_.isUndefined(backendFiles.find(bigExt => f.endsWith(bigExt)))) {
+            return `//#region @${'back' + 'end'}\n`
+              + `export * from './${f.replace(path.extname(f), '')}';`
+              + `\n//${'#end' + 'region'}`
+          }
+          return `export * from './${f.replace(path.extname(f), '')}';`
+        }).join('\n') + '\n'
+      );
     }
-    Helpers.remove(generatedCodeAbsLoc, true)
+    if (moduleName === 'wrap-with-browser-regions') {
+      if (!Helpers.isFolder(absFilePath)) {
+        const content = Helpers.readFile(absFilePath);
+        Helpers.writeFile(absFilePath,
+          `//#region @${'brow' + 'ser'}\n`
+          + content
+          + `\n//${'#end' + 'region'}\n`
+        );
+      }
+    }
   } else {
-    Helpers.move(generatedCodeAbsLoc, destination);
+    const ins = MagicRenamer.Instance(exampleLocation);
+    ins.start(`${myEntity} -> ${newEntityName}`, true);
+    if (isFlat) {
+      const files = Helpers.filesFrom(generatedCodeAbsLoc, true);
+      for (let index = 0; index < files.length; index++) {
+        const fileAbsPath = crossPlatformPath(files[index]);
+        const relative = fileAbsPath.replace(generatedCodeAbsLoc + '/', '');
+        const destFileAbsPath = crossPlatformPath([destination, relative]);
+        Helpers.copyFile(fileAbsPath, destFileAbsPath);
+      }
+      Helpers.remove(generatedCodeAbsLoc, true)
+    } else {
+      Helpers.move(generatedCodeAbsLoc, destination);
+    }
   }
   process.exit(0)
 }
