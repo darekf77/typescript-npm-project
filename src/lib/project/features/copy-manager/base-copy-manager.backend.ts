@@ -88,6 +88,10 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   }
   //#endregion
 
+  get projectWithBuild() {
+    return this.project.isStandaloneProject ? this.project : this.project.smartContainerBuildTarget;
+  }
+
   //#region getters / isomorphic pacakges
   get isomorphicPackages() {
     const isomorphicPackages = [
@@ -252,7 +256,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   async asyncAction(event: IncCompiler.Change) {
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
     // console.log('async event '+ absoluteFilePath)
-    SourceMappingUrl.fixContent(absoluteFilePath);
+    SourceMappingUrl.fixContent(absoluteFilePath, this.projectWithBuild);
 
     const outDir = this.outDir;
     const specyficFileRelativePath = absoluteFilePath.replace(this.monitoredOutDir + '/', '');

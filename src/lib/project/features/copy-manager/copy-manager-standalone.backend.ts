@@ -57,7 +57,7 @@ export class CopyManagerStandalone extends CopyManager {
 
     for (let index = 0; index < files.length; index++) {
       const fileAbsPath = files[index];
-      SourceMappingUrl.fixContent(fileAbsPath);
+      SourceMappingUrl.fixContent(fileAbsPath, this.projectWithBuild);
     }
     this.dtsFixer = TypescriptDtsFixer.for(this.isomorphicPackages);
 

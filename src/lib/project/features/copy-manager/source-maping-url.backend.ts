@@ -1,10 +1,17 @@
 import { crossPlatformPath, path, _ } from "tnp-core";
 import { Helpers } from "tnp-helpers";
+import { Project } from "../../abstract/project/project";
 
 export class SourceMappingUrl {
   public static readonly SOURCEMAPDES = '//# sourceMappingURL='
 
+
+  get isInRelaseBundle() {
+    return this.projectWithBuild.location.includes('tmp-bundle-release/bundle');
+  };
+
   static fixContent(absFilePath: string,
+    projectWithBuild: Project,
     // content?: string
   ) {
     absFilePath = crossPlatformPath(absFilePath);
@@ -15,7 +22,7 @@ export class SourceMappingUrl {
     ) {
       return;
     }
-    return (new SourceMappingUrl(absFilePath
+    return (new SourceMappingUrl(absFilePath, projectWithBuild
       // , content
     )).process();
   }
@@ -25,6 +32,7 @@ export class SourceMappingUrl {
   private readonly mappingLineIndex: number;
   private constructor(
     private absFilePath: string,
+    private projectWithBuild: Project,
     // private passedContent?: string
   ) {
     // console.log(`Fixging ${absFilePath}`, 1)
@@ -43,7 +51,9 @@ export class SourceMappingUrl {
 
   process(): string {
     if (this.mappingLineIndex !== -1) {
-      this.contentLines[this.mappingLineIndex] = `${SourceMappingUrl.SOURCEMAPDES}${path.basename(this.absFilePath)}.map`;
+      if (this.isInRelaseBundle || (process.platform !== 'win32')) { // TODO links on windows sucks d
+        this.contentLines[this.mappingLineIndex] = `${SourceMappingUrl.SOURCEMAPDES}${path.basename(this.absFilePath)}.map`;
+      }
     }
     const fixedContent = this.contentLines.join('\n');
     if (fixedContent !== this.content) {
