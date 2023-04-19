@@ -37,7 +37,7 @@ function SHOW_LOOP_MESSAGES(c = 0 as any, maximum = Infinity, errExit = false, t
   }
   if (c === maximum) {
     if (throwErr) {
-      new Error('Custom error!')
+      throw new Error('Custom error!')
     }
     if (errExit) {
       process.exit(1)
