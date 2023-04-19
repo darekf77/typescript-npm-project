@@ -44,6 +44,7 @@ function SHOW_LOOP_MESSAGES(c = 0 as any, maximum = Infinity, errExit = false, t
     }
     process.exit(0)
   }
+  console.log(`counter: ${c}`)
   PROGRESS_DATA.log({ msg: `counter: ${c}`, value: c * 7 })
   setTimeout(() => {
     SHOW_LOOP_MESSAGES(++c, maximum, errExit, throwErr)
