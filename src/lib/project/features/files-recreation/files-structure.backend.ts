@@ -110,23 +110,6 @@ export class FilesStructure extends FeatureForProject {
 
     await this.project.linkedRepos.update(struct);
 
-    if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
-      if (env) {
-        Helpers.log(`ENVIRONMENT: ${chalk.bold(env)} inited for ${this.project.genericName}`)
-      } else {
-        if (this.project.isGenerated) {
-          args += `${args} --env=static`;
-          Helpers.log(`ENVIRONMENT(for local static build): "${chalk.bold('static')}"`
-            + ` initing for ${this.project.genericName}`)
-        } else {
-          args += `${args} --env=local`;
-          Helpers.log(`ENVIRONMENT(for local watch development): "${chalk.bold('local')}"`
-            + ` initing for ${this.project.genericName}`)
-        }
-      }
-    }
-
-
     Helpers.log(`[init] adding project is not exists...done(${this.project.genericName})  `)
 
     if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {
@@ -298,29 +281,6 @@ export class FilesStructure extends FeatureForProject {
       await this.project.singluarBuild.init(watch, false, 'bundle', args, client);
       //#endregion
     }
-
-
-    if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
-
-      if (this.project.isSiteInStrictMode && !this.project.isDocker) {
-        if (watch) {
-          await this.project.join.startAndWatch(this.taskNames.joinMerge, {
-            watchOnly, afterInitCallBack: async () => {
-              await this.project.compilerCache.setUpdatoDate.join();
-            }
-          })
-        } else {
-          await this.project.join.start(this.taskNames.joinMerge);
-        }
-      }
-
-      await (this.project.env as any as EnvironmentConfig).init(args);
-      this.project.filesTemplatesBuilder.rebuild();
-    }
-    if (this.project.isWorkspace) {
-      this.project.recreateCodeWorkspace();
-    }
-
 
     this.project.quickFixes.missingSourceFolders();
 

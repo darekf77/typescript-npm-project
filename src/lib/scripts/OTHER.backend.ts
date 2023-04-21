@@ -18,10 +18,7 @@ const log = Log.create(path.basename(__filename))
 declare const ENV: any;
 // console.log('hello')
 
-function $CONFIGS() {
-  Helpers.log((Project.Current as Project).env.configsFromJs.map(c => c.domain).join('\n'));
-  process.exit(0)
-}
+function $CONFIGS() { }
 
 function CHECK_ENV() {
   Helpers.checkEnvironment(config.required);

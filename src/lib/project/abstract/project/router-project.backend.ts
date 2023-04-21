@@ -93,16 +93,6 @@ Generated workspace should be here: ${genLocationWOrkspace}
         Helpers.error(`Project instance ended with error ${err} `, false, true);
       }
     }
-    if (this.isWorkspaceChildProject) {
-      await (this.env as any as EnvironmentConfig).init(args, true)
-      this.filesTemplatesBuilder.rebuild(true)
-      Helpers.log(`Killing proces on port ${this.getDefaultPort()}`);
-      await Helpers.killProcessByPort(this.getDefaultPort())
-      Helpers.log(`Project: ${this.name} is running on port ${this.getDefaultPort()}`);
-      const command = this.startOnCommand(args);
-      this.run(command).async();
-    }
-
   }
   //#endregion
 

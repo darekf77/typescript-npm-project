@@ -261,6 +261,8 @@ export class CopyMangerOrganizationAngularFiles {
       for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
         const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
         // TODO @LAST
+        // - check if workspace package install possible in non-firedev project
+        // - should be ./ ?
         pj[`.${currentBrowserFolder}`] = `./${currentBrowserFolder}`;
         // pj[`${exportsKey}${currentBrowserFolder}`] =
       }

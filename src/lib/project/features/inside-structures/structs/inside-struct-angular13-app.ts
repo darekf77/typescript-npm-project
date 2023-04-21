@@ -394,8 +394,13 @@ ${appModuleFile}
             }[];
           } = Helpers.readJson(manifestJsonPath, {}, true);
 
-          manifestJson.name = _.startCase(project.name);
-          manifestJson.short_name = project.name;
+          const projectTargetOrStandalone = this.project;
+
+          manifestJson.name = projectTargetOrStandalone.env.config?.pwa?.name
+            ? projectTargetOrStandalone.env.config.pwa.name : _.startCase(project.name);
+
+          manifestJson.short_name = projectTargetOrStandalone.env.config?.pwa?.short_name
+          ? projectTargetOrStandalone.env.config.pwa.short_name : project.name;
 
           const assetsPath = crossPlatformPath(path.join(
             project.location,
@@ -422,23 +427,14 @@ ${appModuleFile}
             }
           });
 
-          const origin = project.git.originURL;
-          if (origin.search('github.com') !== -1) {
-            const remoteUsername = _.first(Helpers.arrays.second(origin
-              .replace('https://', '')
-              .replace('http://', '')
-              .split('/')).split(':'))
-
-            const projForName = this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer : this.project;
-
-            if (projForName.env.config?.useDomain) {
-              manifestJson.start_url = `https://${projForName.env.config.domain}/`
-            } else {
-              manifestJson.start_url = `https://${remoteUsername}.github.io/${projForName.name}/`
-            }
-
+          if (projectTargetOrStandalone.env.config?.pwa?.start_url) {
+            manifestJson.start_url = (projectTargetOrStandalone.env.config as any).pwa.start_url;
+          } else if (projectTargetOrStandalone.env.config?.useDomain) {
+            manifestJson.start_url = `https://${projectTargetOrStandalone.env.config.domain}/`
+          } else {
+            const smartContainerOrStandalone = this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer : this.project;
+            manifestJson.start_url = `/${smartContainerOrStandalone.name}/` // perfect for github.io OR when subdomain myproject.com/docs/
           }
-
 
           Helpers.writeJson(manifestJsonPath, manifestJson);
 

@@ -11,7 +11,6 @@ import { Models } from 'tnp-models';
 import { config, ConfigModels } from 'tnp-config';
 import { Helpers, Condition } from 'tnp-helpers';
 import { PROGRESS_DATA } from 'tnp-models';
-import { handleProjectsPorts } from '../environment-config/environment-config-helpers';
 import { EnvironmentConfig } from '../environment-config';
 import { Log } from 'ng2-logger';
 
@@ -148,57 +147,11 @@ inside generated projects...
         Helpers.error('Please start lib build first', false, true)
       }
 
-
-      // if (this.project.isSmartContainer) {
-      //   const childrenForINsideStruct = this.project.children.filter(c => c.typeIs('isomorphic-lib'));
-      //   const clientFromArgs = Helpers.removeSlashAtEnd(_.first((buildOptions.args || '').split(' '))) as any;
-      //   let client: Project = childrenForINsideStruct.find(f => f.name === clientFromArgs);
-      //   const smartContainerBuildTarget = this.project.smartContainerBuildTarget;
-      //   if (!client && smartContainerBuildTarget) {
-      //     client = smartContainerBuildTarget;
-      //   }
-
-      // if (client) {
-      //   await client.insideStructure.recrate(buildOptions.outDir, buildOptions.watch);
-      // }
-      // }
-
-      if (buildOptions.watch) {
-        let config = void 0;
-        while (true) {
-          if (this.project.isWorkspace) {
-            if (this.project.env.config) {
-              config = this.project.env.config.workspace.workspace;
-            }
-          } else if (this.project.isWorkspaceChildProject) {
-            if (this.project.env.config) {
-              config = this.project.env.config.workspace.projects.find(({ name }) => name === this.project.name);
-              if (!config) {
-                Helpers.error(`Please include this project (${this.project.genericName}) in your environment*.js.`,
-                  false, true)
-              }
-            }
-          } else {
-            break;
-          }
-          if (config) {
-            break;
-          } else {
-            await this.project.filesStructure.init(buildOptions.args);
-          }
-        }
-        if (this.project.isWorkspace || this.project.isWorkspaceChildProject) {
-          await handleProjectsPorts(this.project, config, false);
-        }
-      }
-
     } else {
       if (buildOptions.watch) {
         log.data('is lib build watch')
-        if (this.project.isWorkspace) {
-          log.data(`Removing on purpose tmp-environment.json from wokspace, before init`);
-          Helpers.remove(path.join(this.project.location, config.file.tnpEnvironment_json));
-        }
+
+        // TODO @LAST BRANDING
         await this.project.filesStructure.init(buildOptions.args, { watch: true, watchOnly: buildOptions.watchOnly });
       } else {
         await this.project.filesStructure.init(buildOptions.args);
@@ -208,7 +161,6 @@ inside generated projects...
 
     //#region update environment data for "childs"
     if (this.project.isStandaloneProject || this.project.isWorkspaceChildProject) {
-      await (this.project.env as any as EnvironmentConfig).updateData();
       if (this.project.typeIs('angular-lib')) {
         this.project.filesTemplatesBuilder.rebuildFile('src/index.html.filetemplate');
       }
