@@ -41,6 +41,7 @@
         "eg2.tslint",
         "redhat.vscode-xml",
         "rssowl.copy-relative-path-posix",
-        "ms-vscode.live-server"
+        "ms-vscode.live-server",
+        "saber2pr.file-git-history"
     ]
 }
