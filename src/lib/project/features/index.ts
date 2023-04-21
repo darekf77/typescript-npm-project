@@ -1,4 +1,5 @@
 //#region @backend
+export * from './branding.backend';
 export * from './build-process';
 export * from './files-recreation';
 export * from './node-modules';

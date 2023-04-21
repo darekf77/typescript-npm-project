@@ -35,6 +35,7 @@ import {
   GitActions,
   WebpackBackendCompilation,
   LinkedRepos,
+  Branding,
 } from '../../features';
 import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
@@ -183,6 +184,7 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('singluarBuild', SingularBuild);
       this.defineProperty<Project>('webpackBackendBuild', WebpackBackendCompilation);
       this.defineProperty<Project>('linkedRepos', LinkedRepos);
+      this.defineProperty<Project>('branding', Branding);
       this.libProjectInit();
     }
 

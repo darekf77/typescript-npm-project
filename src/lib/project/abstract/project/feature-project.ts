@@ -7,7 +7,7 @@ import {
   FilesStructure, FilesTemplatesBuilder, BuildProcess,
   WorkspaceSymlinks, NodeModules, FilesRecreator, FilesFactory,
   QuickFixes, NpmPackages, ProxyRouter, TargetProject, GitActions,
-  SmartNodeModules, RecentFilesForContainer,LinkedRepos
+  SmartNodeModules, RecentFilesForContainer, LinkedRepos, Branding
 } from '../../features';
 
 import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator } from '../../compilers';
@@ -20,6 +20,7 @@ import { SingularBuild } from '../../features/singular-build.backend';
 import { WebpackBackendCompilation } from '../../features/webpack-backend-compilation.backend';
 //#endregion
 import { _ } from 'tnp-core';
+
 
 export abstract class FeatureProject {
 
@@ -57,6 +58,10 @@ export abstract class FeatureProject {
 
   //#region @backend
   public gitActions: GitActions;
+  //#endregion
+
+  //#region @backend
+  public branding: Branding;
   //#endregion
 
   //#region @backend

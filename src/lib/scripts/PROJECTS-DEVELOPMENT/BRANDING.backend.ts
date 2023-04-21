@@ -1,26 +1,20 @@
-import chalk from 'chalk';
-import { path } from 'tnp-core'
-import { fse } from 'tnp-core'
-import { glob } from 'tnp-core';
-// import * as favicons from 'favicons';
-import { _ } from 'tnp-core';
-// import * as sharp from 'sharp';
-// import { png2svg } from 'svg-png-converter';
-
-import { Helpers } from 'tnp-helpers';
-import { Project } from '../../project';
-import { config } from 'tnp-config';
-
-
+import { config } from "tnp-config";
+import { Helpers } from "tnp-helpers";
+import { Project } from "../../project/abstract/project";
 
 export async function $BRANDING(args: string, exit = true) {
 
-  const proj = (Project.Current as Project);
+  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
 
-
-
-
-  Helpers.info('DONE');
+  if (proj.isStandaloneProject || proj.isSmartContainerChild || proj.isSmartContainerTarget) {
+    await proj.branding.start();
+    Helpers.info('DONE');
+  } else {
+    Helpers.error(`Please specify child project name for branding process:
+    ${config.frameworkName} branding my-container-child
+    ${config.frameworkName} branding # inside standalone project
+    `, false, true)
+  }
 
   if (exit) {
     process.exit(0);
@@ -28,68 +22,11 @@ export async function $BRANDING(args: string, exit = true) {
 
 }
 
-export function faviconsDesc() {
-  return {
-    "masterPicture": config.pathes.logoPng,
-    "iconsPath": "/",
-    "design": {
-      "ios": {
-        "pictureAspect": "noChange",
-        "assets": {
-          "ios6AndPriorIcons": false,
-          "ios7AndLaterIcons": false,
-          "precomposedIcons": false,
-          "declareOnlyDefaultIcon": true
-        }
-      },
-      "desktopBrowser": {},
-      "windows": {
-        "pictureAspect": "noChange",
-        "backgroundColor": "#da532c",
-        "onConflict": "override",
-        "assets": {
-          "windows80Ie10Tile": false,
-          "windows10Ie11EdgeTiles": {
-            "small": false,
-            "medium": true,
-            "big": false,
-            "rectangle": false
-          }
-        }
-      },
-      "androidChrome": {
-        "pictureAspect": "backgroundAndMargin",
-        "margin": "17%",
-        "backgroundColor": "#ffffff",
-        "themeColor": "#ffffff",
-        "manifest": {
-          "display": "standalone",
-          "orientation": "notSet",
-          "onConflict": "override",
-          "declared": true
-        },
-        "assets": {
-          "legacyIcon": false,
-          "lowResolutionIcons": false
-        }
-      },
-      "safariPinnedTab": {
-        "pictureAspect": "silhouette",
-        "themeColor": "#5bbad5"
-      }
-    },
-    "settings": {
-      "scalingAlgorithm": "Mitchell",
-      "errorOnImageTooSmall": false,
-      "readmeFile": false,
-      "htmlCodeFile": false,
-      "usePathAsIs": false
-    }
-  }
-
+async function $BRAND(args) {
+  await $BRANDING(args)
 }
-
 
 export default {
   $BRANDING: Helpers.CLIWRAP($BRANDING, '$BRANDING'),
+  $BRAND: Helpers.CLIWRAP($BRAND, '$BRAND'),
 }
