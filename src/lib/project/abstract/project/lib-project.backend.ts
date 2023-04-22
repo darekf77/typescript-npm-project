@@ -109,9 +109,9 @@ export abstract class LibProject {
 
   //#region  api / release
 
-  public async release(this: Project, releaseOptions?: Models.dev.ReleaseOptions, automaticRelease = false, automaticReleaseDocs = false) {
+  public async release(this: Project, releaseOptions?: Models.dev.ReleaseOptions) {
 
-    const { prod = false, shouldReleaseLibrary } = releaseOptions;
+    const { prod = false, shouldReleaseLibrary, automaticReleaseDocs, automaticRelease } = releaseOptions;
 
     if (await this.createTempProject(releaseOptions, automaticRelease)) {
       return;
@@ -224,7 +224,7 @@ export abstract class LibProject {
       await this.infoBeforePublish(realCurrentProj, defaultTestPort);
     }
 
-    await this.pushToGitRepo(realCurrentProj, newVersion);
+    await this.pushToGitRepo(realCurrentProj, newVersion, automaticReleaseDocs);
     if (!automaticReleaseDocs) {
       await Helpers.killProcessByPort(defaultTestPort)
     }
@@ -361,7 +361,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         const vscodeFolder = path.join(generatedProject.location, config.folder._vscode);
         Helpers.removeFolderIfExists(vscodeFolder);
         await generatedProject.insideStructure.recrate('bundle')
-        await generatedProject.release(releaseOptions, automaticRelease);
+        await generatedProject.release(releaseOptions);
         return true;
       }
     }

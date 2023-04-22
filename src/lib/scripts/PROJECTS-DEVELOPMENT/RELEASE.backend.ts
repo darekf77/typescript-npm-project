@@ -1,5 +1,5 @@
 import { config } from 'tnp-config';
-import { chalk, path, _ } from 'tnp-core';
+import { chalk, crossPlatformPath, path, _ } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { Project } from '../../project/abstract/project';
@@ -59,6 +59,18 @@ const $RELEASE = async (args: string) => {
   // const autoRelease = !!argsObj.auto;
 
   const proj = Project.Current as Project;
+
+  if (automaticReleaseDocs && !proj.docsAppBuild.configExists) {
+    Helpers.error(`To use command:  ${config.frameworkName} automatic:release:docs
+    you have to build manulally your app first....
+
+    Try:
+    ${config.frameworkName} relase # by building docs app, you will save configuration for automatic build
+
+
+
+    `, false, true)
+  }
 
   if (proj.isSmartContainerChild) {
     Helpers.info(`Smart container not supported yet...`);
@@ -390,7 +402,7 @@ processing...
       if (!proj.node_modules.exist) {
         proj.npmPackages.installFromArgs('');
       }
-      await proj.release(handleStandaloneOrSmartContainer(proj, argsObj), automaticRelease);
+      await proj.release(handleStandaloneOrSmartContainer(proj, argsObj));
       process.exit(0);
     }
     //#endregion

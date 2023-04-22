@@ -11,7 +11,8 @@ import { Models } from 'tnp-models';
 
 
 const htmlBasename = 'html-pwa.html';
-const subPath = [config.folder.src, config.folder.assets, config.folder.generated, 'pwa']
+const generatedPwa = [config.folder.generated, 'pwa']
+const subPath = [config.folder.src, config.folder.assets, ...generatedPwa]
 
 export class Branding extends FeatureForProject {
 
@@ -64,8 +65,8 @@ export class Branding extends FeatureForProject {
 
     const configuration = {
       path: `${proj.isSmartContainerChild ?
-        `/${['assets', 'assets-for', proj.parent.name + '--' + proj.name].join('/')}`
-        : `/${['assets', 'assets-for', proj.name].join('/')}`
+        `/${['assets', 'assets-for', proj.parent.name + '--' + proj.name, ...generatedPwa].join('/')}`
+        : `/${['assets', 'assets-for', proj.name, ...generatedPwa].join('/')}`
         }`, // Path for overriding default icons path. `string`
       appName: null, // Your application's name. `string`
       appShortName: null, // Your application's short_name. `string`. Optional. If not set, appName will be used

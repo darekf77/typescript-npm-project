@@ -218,7 +218,7 @@
       ],
       common: {
         // all isomorphic application config
-        "tnp-config": '13.1.65',
+        "tnp-config": '13.1.66',
         "tnp-models": '13.1.18',
         "tnp-helpers": '13.1.26',
         "tnp-db": '13.1.16',
@@ -406,7 +406,7 @@
           },
           essentials: {
             "element-resize-detector": "1.1.15",
-            "static-columns": '13.1.31',
+            "static-columns": '13.3.2',
             "bs4-breakpoint": '13.0.33',
             "ngx-breadcrumbs": "0.0.3",
             "ngx-editor": "^3.3.0",
