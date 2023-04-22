@@ -109,7 +109,7 @@ export abstract class LibProject {
 
   //#region  api / release
 
-  public async release(this: Project, releaseOptions?: Models.dev.ReleaseOptions, automaticRelease = false) {
+  public async release(this: Project, releaseOptions?: Models.dev.ReleaseOptions, automaticRelease = false, automaticReleaseDocs = false) {
 
     const { prod = false, shouldReleaseLibrary } = releaseOptions;
 
@@ -128,7 +128,7 @@ export abstract class LibProject {
     const realCurrentProj = Project.From(realCurrentProjLocation) as Project;
     let specyficProjectForBuild: Project;
 
-    if (shouldReleaseLibrary) {
+    if (shouldReleaseLibrary && !automaticReleaseDocs) {
 
 
       var newVersion = realCurrentProj.version;
@@ -205,24 +205,29 @@ export abstract class LibProject {
 
     let appRelaseDone = false;
 
-    if (!global.tnpNonInteractive) {
+    if (!global.tnpNonInteractive || automaticReleaseDocs) {
       // Helpers.clearConsole();
 
       if (this.isStandaloneProject) {
-        appRelaseDone = await this.standalone.buildDocs(prod, realCurrentProj);
+        appRelaseDone = await this.standalone.buildDocs(prod, realCurrentProj, automaticReleaseDocs);
       }
 
       if (this.isSmartContainer) {
-        appRelaseDone = await this.smartcontainer.buildDocs(prod, realCurrentProj);
+        appRelaseDone = await this.smartcontainer.buildDocs(prod, realCurrentProj, automaticReleaseDocs);
       }
     }
 
 
 
     const defaultTestPort = 4000;
-    await this.infoBeforePublish(realCurrentProj, defaultTestPort);
+    if (!automaticReleaseDocs) {
+      await this.infoBeforePublish(realCurrentProj, defaultTestPort);
+    }
+
     await this.pushToGitRepo(realCurrentProj, newVersion);
-    await Helpers.killProcessByPort(defaultTestPort)
+    if (!automaticReleaseDocs) {
+      await Helpers.killProcessByPort(defaultTestPort)
+    }
     Helpers.info('RELEASE DONE');
     process.exit(0);
   }

@@ -45,6 +45,11 @@ const $RELEASE = async (args: string) => {
   if (automaticRelease) {
     global.tnpNonInteractive = true;
   }
+
+  const automaticReleaseDocs = !!argsObj.automaticReleaseDocs;
+  if (automaticReleaseDocs) {
+    global.tnpNonInteractive = true;
+  }
   // Helpers.log(`ARGS RELEASE
 
   // ${Helpers.stringify(argsObj)}
@@ -82,6 +87,9 @@ const $RELEASE = async (args: string) => {
   }
 
   const shouldReleaseLibMessage = async () => {
+    if (automaticReleaseDocs) {
+      return false;
+    }
     let newVersion;
     if (argsObj.releaseType === 'major') {
       newVersion = proj.versionMajorPlusWithZeros
@@ -305,6 +313,7 @@ processing...
         try {
           child.run(`${config.frameworkName} release ${!!specifiedVersion ? specifiedVersion : ''}`
             + ` --automaticRelease=${resolved.length === 0}`
+            + ` --automaticReleaseDocs=${resolved.length === 0}`
             + ` --tnpNonInteractive=${resolved.length === 0}`
             + ` --releaseType=${argsObj.releaseType}`
             + ` ${global.hideLog ? '' : '-verbose'}`
@@ -503,10 +512,16 @@ const $AUTO_RELEASE = async (args) => {
   await $RELEASE(args + ' ' + auto);
 };
 
+const $AUTO_RELEASE_DOCS = async (args) => {
+  const auto = `--automaticReleaseDocs`
+  await $RELEASE(args + ' ' + auto);
+};
+
 export default {
   SET_MINOR_VER: Helpers.CLIWRAP(SET_MINOR_VER, 'SET_MINOR_VER'),
   SET_MAJOR_VER: Helpers.CLIWRAP(SET_MAJOR_VER, 'SET_MAJOR_VER'),
   $AUTO_RELEASE: Helpers.CLIWRAP($AUTO_RELEASE, '$AUTO_RELEASE'),
+  $AUTO_RELEASE_DOCS: Helpers.CLIWRAP($AUTO_RELEASE_DOCS, '$AUTO_RELEASE_DOCS'),
   $RELEASE: Helpers.CLIWRAP($RELEASE, '$RELEASE'),
   $RELEASE_TRUSTED: Helpers.CLIWRAP($RELEASE_TRUSTED, '$RELEASE_TRUSTED'),
   $RELEASE_MAJOR: Helpers.CLIWRAP($RELEASE_MAJOR, '$RELEASE_MAJOR'),

@@ -1,12 +1,13 @@
 import { Project } from "./project";
 
 export abstract class LibPorjectBase {
+
   constructor(
     protected project: Project
   ) {
 
   }
-  abstract buildDocs(prod: boolean, realCurrentProj: Project): Promise<boolean>;
+  abstract buildDocs(prod: boolean, realCurrentProj: Project, automaticReleaseDocs: boolean): Promise<boolean>;
   abstract publish(options: {
     realCurrentProj: Project,
     newVersion: string,

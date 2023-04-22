@@ -36,6 +36,7 @@ import {
   WebpackBackendCompilation,
   LinkedRepos,
   Branding,
+  DocsAppBuildConfig,
 } from '../../features';
 import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
@@ -185,6 +186,7 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('webpackBackendBuild', WebpackBackendCompilation);
       this.defineProperty<Project>('linkedRepos', LinkedRepos);
       this.defineProperty<Project>('branding', Branding);
+      this.defineProperty<Project>('docsAppBuild', DocsAppBuildConfig);
       this.libProjectInit();
     }
 

@@ -7,7 +7,7 @@ import {
   FilesStructure, FilesTemplatesBuilder, BuildProcess,
   WorkspaceSymlinks, NodeModules, FilesRecreator, FilesFactory,
   QuickFixes, NpmPackages, ProxyRouter, TargetProject, GitActions,
-  SmartNodeModules, RecentFilesForContainer, LinkedRepos, Branding
+  SmartNodeModules, RecentFilesForContainer, LinkedRepos, Branding, DocsAppBuildConfig
 } from '../../features';
 
 import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator } from '../../compilers';
@@ -38,6 +38,10 @@ export abstract class FeatureProject {
 
   //#region @backend
   public filesTemplatesBuilder: FilesTemplatesBuilder;
+  //#endregion
+
+  //#region @backend
+  public docsAppBuild: DocsAppBuildConfig;
   //#endregion
 
   //#region @backend

@@ -3,6 +3,7 @@ import { config } from "tnp-config";
 import { crossPlatformPath, path, _ } from "tnp-core";
 import { Helpers } from "tnp-helpers";
 import { Models } from "tnp-models";
+import { AppBuildConfig } from "../../features/docs-app-build-config.backend";
 import { LibPorjectBase } from "./lib-project-base.backend";
 import { Project } from "./project";
 
@@ -65,23 +66,42 @@ export class LibProjectStandalone extends LibPorjectBase {
 
   }
 
-  async buildDocs(prod: boolean, realCurrentProj: Project): Promise<boolean> {
+  async buildDocs(prod: boolean, realCurrentProj: Project, automaticReleaseDocs: boolean): Promise<boolean> {
     return await Helpers.questionYesNo(this.messages.docsBuildQuesions, async () => {
-
+      const mainProjectName = realCurrentProj.name;
       //#region questions
       let appBuildOptions = { docsAppInProdMode: prod, websql: false };
 
-      await Helpers.questionYesNo(this.messages.productionMode, () => {
-        appBuildOptions.docsAppInProdMode = true;
-      }, () => {
-        appBuildOptions.docsAppInProdMode = false;
-      });
+      if (automaticReleaseDocs) {
+        appBuildOptions = {
+          docsAppInProdMode: realCurrentProj.docsAppBuild.config.prod,
+          websql: realCurrentProj.docsAppBuild.config.websql,
+        }
+      }
 
-      await Helpers.questionYesNo(`Do you wanna use websql mode ?`, () => {
-        appBuildOptions.websql = true;
-      }, () => {
-        appBuildOptions.websql = false;
-      });
+      if (!automaticReleaseDocs) {
+        await Helpers.questionYesNo(this.messages.productionMode, () => {
+          appBuildOptions.docsAppInProdMode = true;
+        }, () => {
+          appBuildOptions.docsAppInProdMode = false;
+        });
+
+
+        await Helpers.questionYesNo(`Do you wanna use websql mode ?`, () => {
+          appBuildOptions.websql = true;
+        }, () => {
+          appBuildOptions.websql = false;
+        });
+      }
+
+      const cfg: AppBuildConfig = {
+        build: true,
+        prod: appBuildOptions.docsAppInProdMode,
+        websql: appBuildOptions.websql,
+        projName: mainProjectName,
+      };
+
+      realCurrentProj.docsAppBuild.save(cfg);
 
       Helpers.log(`
 

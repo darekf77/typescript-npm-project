@@ -391,6 +391,10 @@ ${appModuleFile}
 
           const projectTargetOrStandalone = this.project;
 
+          const projectStandaloneOrContainer = projectTargetOrStandalone.isSmartContainerTarget
+            ? projectTargetOrStandalone?.smartContainerTargetParentContainer : this.project;
+            // TODO @LAST
+
           manifestJson.name = projectTargetOrStandalone.env.config?.pwa?.name
             ? projectTargetOrStandalone.env.config.pwa.name : _.startCase(project.name);
 
@@ -436,6 +440,15 @@ ${appModuleFile}
             //#endregion
           }
 
+          // const basename = this.isInRelaseBundle ?
+          //   `${(this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name)}/`
+          //   : '';
+
+          manifestJson.icons = manifestJson.icons.map(c => {
+            c.src = c.src.replace(/^\//, '');
+            return c;
+          });
+
           if (projectTargetOrStandalone.env.config?.pwa?.start_url) {
             manifestJson.start_url = (projectTargetOrStandalone.env.config as any).pwa.start_url;
           } else if (projectTargetOrStandalone.env.config?.useDomain) {
@@ -446,7 +459,7 @@ ${appModuleFile}
           }
 
           Helpers.writeJson(manifestJsonPath, manifestJson);
-          Helpers.writeFile(indexHtmlPath,indexHtml);
+          Helpers.writeFile(indexHtmlPath, indexHtml);
 
         })();
         //#endregion

@@ -4,6 +4,7 @@ import { crossPlatformPath, path } from "tnp-core";
 import { Helpers } from "tnp-helpers";
 import { Models } from "tnp-models";
 import { CLASS } from "typescript-class-helpers";
+import { AppBuildConfig } from "../../features/docs-app-build-config.backend";
 import { LibPorjectBase } from "./lib-project-base.backend";
 import type { LibProject } from "./lib-project.backend";
 import { Project } from "./project";
@@ -95,7 +96,7 @@ export class LibProjectSmartContainer extends LibPorjectBase {
   }
 
 
-  async buildDocs(prod: boolean,realCurrentProj: Project): Promise<boolean> {
+  async buildDocs(prod: boolean, realCurrentProj: Project, automaticReleaseDocs: boolean): Promise<boolean> {
     // TODO
 
     const smartContainer = this.project;
@@ -132,20 +133,41 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
         };
       }
 
-      const toBuildWebsql = await Helpers
+
+      const toBuildWebsqlCFG = [
+        ...((realCurrentProj.docsAppBuild.config.build && realCurrentProj.docsAppBuild.config.websql) ? [mainProjectName] : []),
+        ...(realCurrentProj.docsAppBuild.config.children.map(c => {
+          if (c.build && c.websql) {
+            return c.projName;
+          }
+        }).filter(f => !!f)),
+      ];
+
+      const toBuildNormallyCFG = [
+        ...((realCurrentProj.docsAppBuild.config.build && !realCurrentProj.docsAppBuild.config.websql) ? [mainProjectName] : []),
+        ...(realCurrentProj.docsAppBuild.config.children.map(c => {
+          if (c.build && !c.websql) {
+            return c.projName;
+          }
+        }).filter(f => !!f)),
+      ];
+
+
+
+      const toBuildWebsql = automaticReleaseDocs ? toBuildWebsqlCFG : (await Helpers
         .consoleGui
         .multiselect('Which project you want to build with WEBSQL mode', allProjects.map(childName => {
           return returnFun(childName);
-        }))
+        })))
 
       allProjects = allProjects.filter(f => !toBuildWebsql.includes(f));
 
 
-      const toBuildNormally = allProjects.length === 0 ? [] : await Helpers
+      const toBuildNormally = automaticReleaseDocs ? toBuildNormallyCFG : (allProjects.length === 0 ? [] : (await Helpers
         .consoleGui
         .multiselect('Which projects you want to build with normally', allProjects.map(childName => {
           return returnFun(childName);
-        }));
+        }))));
 
       //#region questions
       let appBuildOptions = { docsAppInProdMode: prod, websql: false };
@@ -155,6 +177,38 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
       }, () => {
         appBuildOptions.docsAppInProdMode = false;
       });
+
+      if (automaticReleaseDocs) {
+        appBuildOptions.docsAppInProdMode = realCurrentProj.docsAppBuild.config.prod;
+        appBuildOptions.websql = realCurrentProj.docsAppBuild.config.websql;
+      }
+
+      const cfg: AppBuildConfig = {
+        build: ([...toBuildWebsql, ...toBuildNormally].includes(mainProjectName)),
+        prod: appBuildOptions.docsAppInProdMode,
+        websql: toBuildWebsql.includes(mainProjectName),
+        projName: mainProjectName,
+        children: [
+          ...toBuildWebsql.filter(c => c !== mainProjectName).map(c => {
+            return {
+              build: true,
+              prod: appBuildOptions.docsAppInProdMode,
+              websql: true,
+              projName: c,
+            }
+          }),
+          ...toBuildNormally.filter(c => c !== mainProjectName).map(c => {
+            return {
+              build: true,
+              prod: appBuildOptions.docsAppInProdMode,
+              websql: false,
+              projName: c,
+            }
+          })
+        ]
+      };
+
+      realCurrentProj.docsAppBuild.save(cfg)
 
       // await Helpers.questionYesNo(`Do you wanna use websql mode ?`, () => {
       //   appBuildOptions.websql = true;
