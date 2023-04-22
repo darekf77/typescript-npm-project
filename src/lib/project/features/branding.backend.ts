@@ -7,6 +7,7 @@ import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project/abstract/project/project';
 import { config } from 'tnp-config';
 import { FeatureForProject } from '../abstract/feature-for-project';
+import { Models } from 'tnp-models';
 
 
 const htmlBasename = 'html-pwa.html';
@@ -20,7 +21,28 @@ export class Branding extends FeatureForProject {
     return dest;
   }
 
-  async start(force = false) {
+  get exist() {
+    return Helpers.exists([this.path, htmlBasename]);
+  }
+
+  get htmlIndexRepaceTag() {
+    const toReplace = '<!-- BRANDING_GENERATED_MANIFEST -->>';
+    return toReplace;
+  }
+
+  get htmlLinesToAdd(): string[] {
+    return Helpers.readFile([this.path, htmlBasename]).split('\n');
+  }
+
+  get iconsToAdd(): Models.pwa.ManifestIcon[] {
+    const manifeast = Helpers.readJson([this.path, config.file.manifest_webmanifest]) as Models.pwa.Manifest;
+    return manifeast.icons;
+  }
+
+  async apply(force = false) {
+    if (this.project.typeIsNot('isomorphic-lib')) {
+      return;
+    }
     const proj = this.project;
 
     const sourceLogoPng = crossPlatformPath([proj.location, config.file.logo_png]);
@@ -42,8 +64,8 @@ export class Branding extends FeatureForProject {
 
     const configuration = {
       path: `${proj.isSmartContainerChild ?
-        `/${proj.name}/${subPath.join('/')}`
-        : `/${subPath.join('/')}`
+        `/${['assets', 'assets-for', proj.parent.name + '--' + proj.name].join('/')}`
+        : `/${['assets', 'assets-for', proj.name].join('/')}`
         }`, // Path for overriding default icons path. `string`
       appName: null, // Your application's name. `string`
       appShortName: null, // Your application's short_name. `string`. Optional. If not set, appName will be used
@@ -93,7 +115,7 @@ export class Branding extends FeatureForProject {
       //   },
       //   // more shortcuts objects
       // ],
-    }
+    };
 
     try {
       const response = await favicons.favicons(sourceLogoPng, configuration);

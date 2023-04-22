@@ -80,7 +80,7 @@ export class FilesStructure extends FeatureForProject {
     }
     const { alreadyInitedPorjects, watch, watchOnly } = options;
     let {
-      skipNodeModules, websql, recrusive, env, struct, skipSmartContainerDistBundleInit
+      skipNodeModules, websql, recrusive, env, struct, skipSmartContainerDistBundleInit, branding
     }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
     args = Helpers.cliTool.removeArgFromString(args);
 
@@ -230,6 +230,10 @@ export class FilesStructure extends FeatureForProject {
       }
       await (this.project.env as any as EnvironmentConfig).init(args);
       this.project.filesTemplatesBuilder.rebuild();
+    }
+
+    if (this.project.isStandaloneProject || this.project.isSmartContainerChild) {
+      await this.project.branding.apply(!!branding);
     }
 
     //#region handle node modules instalation

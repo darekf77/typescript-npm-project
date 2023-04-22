@@ -7,7 +7,7 @@ export async function $BRANDING(args: string, exit = true) {
   const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
 
   if (proj.isStandaloneProject || proj.isSmartContainerChild || proj.isSmartContainerTarget) {
-    await proj.branding.start();
+    await proj.branding.apply(true);
     Helpers.info('DONE');
   } else {
     Helpers.error(`Please specify child project name for branding process:

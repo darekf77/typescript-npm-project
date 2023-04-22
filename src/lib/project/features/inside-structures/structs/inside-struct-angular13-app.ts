@@ -367,7 +367,7 @@ ${appModuleFile}
         })();
         //#endregion
 
-        //#region rebuild manifest
+        //#region rebuild manifest + index.html
         (() => {
 
           const manifestJsonPath = crossPlatformPath(path.join(
@@ -378,21 +378,16 @@ ${appModuleFile}
             `/src/manifest.webmanifest`
           ));
 
-          const manifestJson: {
-            "name": string;//  "app",
-            "short_name": string;//  "app",
-            "theme_color": string;// "#1976d2",
-            "background_color": string;//  "#fafafa",
-            "display": "standalone",
-            "scope": string;// "./",
-            "start_url": string;//  "start_url": "./", => "start_url" "https://darekf77.github.io/bs4-breakpoint/"
-            icons: {
-              "src": string; // "assets/icons/icon-96x96.png",
-              "sizes": string; // "96x96",
-              "type": string; // "image/png",
-              "purpose": string; // "maskable any"
-            }[];
-          } = Helpers.readJson(manifestJsonPath, {}, true);
+          const indexHtmlPath = crossPlatformPath(path.join(
+            project.location
+            ,
+            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+            ,
+            `/src/index.html`
+          ));
+
+          const manifestJson: Models.pwa.Manifest = Helpers.readJson(manifestJsonPath, {}, true);
+          let indexHtml = Helpers.readFile(indexHtmlPath);
 
           const projectTargetOrStandalone = this.project;
 
@@ -400,7 +395,7 @@ ${appModuleFile}
             ? projectTargetOrStandalone.env.config.pwa.name : _.startCase(project.name);
 
           manifestJson.short_name = projectTargetOrStandalone.env.config?.pwa?.short_name
-          ? projectTargetOrStandalone.env.config.pwa.short_name : project.name;
+            ? projectTargetOrStandalone.env.config.pwa.short_name : project.name;
 
           const assetsPath = crossPlatformPath(path.join(
             project.location,
@@ -408,24 +403,38 @@ ${appModuleFile}
             config.folder.assets
           ));
 
-          const iconsPath = crossPlatformPath(path.join(
-            assetsPath,
-            'icons'
-          ));
 
-          const iconsFilesPathes = Helpers.filesFrom(iconsPath).filter(f => {
-            // @ts-ignore
-            return Models.other.ImageFileExtensionArr.includes(path.extname(f as any).replace('.', ''));
-          }); // glob.sync(`${iconsPath}/**/*.(png|jpeg|svg)`);
 
-          manifestJson.icons = iconsFilesPathes.map(f => {
-            return {
-              src: f.replace(`${path.dirname(assetsPath)}/`, ''),
-              sizes: _.last(path.basename(f).replace(path.extname(f), '').split('-')),
-              type: `image/${path.extname(f).replace('.', '')}`,
-              purpose: "maskable any"
-            }
-          });
+          if (projectTargetOrStandalone.branding.exist) {
+            //#region apply pwa generated icons
+            manifestJson.icons = projectTargetOrStandalone.branding.iconsToAdd;
+            //#endregion
+            indexHtml = indexHtml.replace(
+              projectTargetOrStandalone.branding.htmlIndexRepaceTag,
+              projectTargetOrStandalone.branding.htmlLinesToAdd.join('\n')
+            );
+          } else {
+            //#region apply default icons
+            const iconsPath = crossPlatformPath(path.join(
+              assetsPath,
+              'icons'
+            ));
+
+            const iconsFilesPathes = Helpers.filesFrom(iconsPath).filter(f => {
+              // @ts-ignore
+              return Models.other.ImageFileExtensionArr.includes(path.extname(f as any).replace('.', ''));
+            }); // glob.sync(`${iconsPath}/**/*.(png|jpeg|svg)`);
+
+            manifestJson.icons = iconsFilesPathes.map(f => {
+              return {
+                src: f.replace(`${path.dirname(assetsPath)}/`, ''),
+                sizes: _.last(path.basename(f).replace(path.extname(f), '').split('-')),
+                type: `image/${path.extname(f).replace('.', '')}`,
+                purpose: "maskable any"
+              }
+            });
+            //#endregion
+          }
 
           if (projectTargetOrStandalone.env.config?.pwa?.start_url) {
             manifestJson.start_url = (projectTargetOrStandalone.env.config as any).pwa.start_url;
@@ -437,6 +446,7 @@ ${appModuleFile}
           }
 
           Helpers.writeJson(manifestJsonPath, manifestJson);
+          Helpers.writeFile(indexHtmlPath,indexHtml);
 
         })();
         //#endregion

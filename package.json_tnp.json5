@@ -218,9 +218,9 @@
       ],
       common: {
         // all isomorphic application config
-        "tnp-config": '13.1.64',
+        "tnp-config": '13.1.65',
         "tnp-models": '13.1.17',
-        "tnp-helpers": '13.1.25',
+        "tnp-helpers": '13.1.26',
         "tnp-db": '13.1.16',
         "firedev-typeorm": '13.1.18',
         "firedev-crud": '13.1.43',
@@ -228,7 +228,7 @@
         "firedev-crud-deamon": '13.1.33',
         "tnp-ui": "13.1.27",
         "firedev-ui": '13.1.8',
-        "tnp-core": '13.2.7',
+        "tnp-core": '13.2.8',
         "tnp-cli": '13.1.50',
         "tnp-tools": "0.0.58",
         "any-project-cli": '13.1.23',
