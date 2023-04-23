@@ -60,7 +60,7 @@ const $RELEASE = async (args: string) => {
 
   const proj = Project.Current as Project;
 
-  if (automaticReleaseDocs && !proj.docsAppBuild.configExists) {
+  if (!automaticRelease && automaticReleaseDocs && !proj.docsAppBuild.configExists) {
     Helpers.error(`To use command:  ${config.frameworkName} automatic:release:docs
     you have to build manulally your app first....
 
@@ -325,7 +325,6 @@ processing...
         try {
           child.run(`${config.frameworkName} release ${!!specifiedVersion ? specifiedVersion : ''}`
             + ` --automaticRelease=${resolved.length === 0}`
-            + ` --automaticReleaseDocs=${resolved.length === 0}`
             + ` --tnpNonInteractive=${resolved.length === 0}`
             + ` --releaseType=${argsObj.releaseType}`
             + ` ${global.hideLog ? '' : '-verbose'}`
