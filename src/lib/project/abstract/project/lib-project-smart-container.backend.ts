@@ -154,7 +154,7 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
 
 
 
-      const toBuildWebsql = automaticReleaseDocs ? toBuildWebsqlCFG : (await Helpers
+      let toBuildWebsql = automaticReleaseDocs ? toBuildWebsqlCFG : (await Helpers
         .consoleGui
         .multiselect('Which project you want to build with WEBSQL mode', allProjects.map(childName => {
           return returnFun(childName);
@@ -163,7 +163,7 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
       allProjects = allProjects.filter(f => !toBuildWebsql.includes(f));
 
 
-      const toBuildNormally = automaticReleaseDocs ? toBuildNormallyCFG : (allProjects.length === 0 ? [] : (await Helpers
+      let toBuildNormally = automaticReleaseDocs ? toBuildNormallyCFG : (allProjects.length === 0 ? [] : (await Helpers
         .consoleGui
         .multiselect('Which projects you want to build with normally', allProjects.map(childName => {
           return returnFun(childName);
@@ -223,25 +223,37 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
       `);
       //#endregion
 
-      await (async () => {
+      (() => {
         const libBuildCOmmand = `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'}`;
-        await smartContainer.run(libBuildCOmmand).sync();
+        smartContainer.run(libBuildCOmmand).sync();
       })();
+
+
+      const cmd = async (childProjName: string, productinoBuild: boolean, websqlBuild: boolean) => {
+        this.project.run(`${config.frameworkName} `
+          + `build:${config.folder.bundle}:app:${productinoBuild ? 'prod' : ''} ${childProjName} `
+          + `  ${websqlBuild ? '--websql' : ''}         ${global.hideLog ? '' : '-verbose'}`).sync();
+      }
+
+      if (toBuildNormally.includes(mainProjectName)) {
+        cmd(mainProjectName, appBuildOptions.docsAppInProdMode, appBuildOptions.websql);;
+      }
+
+      if (toBuildWebsql.includes(mainProjectName)) {
+        cmd(mainProjectName, appBuildOptions.docsAppInProdMode, appBuildOptions.websql);;
+      }
+
+      toBuildNormally = toBuildNormally.filter(f => f !== mainProjectName);
+      toBuildWebsql = toBuildWebsql.filter(f => f !== mainProjectName);
 
       for (let index = 0; index < toBuildNormally.length; index++) {
         const projName = toBuildNormally[index];
-
-        await this.project.run(`${config.frameworkName} `
-          + `build:${config.folder.bundle}:app:${appBuildOptions.docsAppInProdMode ? 'prod' : ''} ${projName} `
-          + `           ${global.hideLog ? '' : '-verbose'}`).sync();
+        cmd(projName, appBuildOptions.docsAppInProdMode, false);;
       }
 
       for (let index = 0; index < toBuildWebsql.length; index++) {
         const projName = toBuildWebsql[index];
-
-        await this.project.run(`${config.frameworkName} `
-          + `build:${config.folder.bundle}:app:${appBuildOptions.docsAppInProdMode ? 'prod' : ''} ${projName} `
-          + ` --websql ${global.hideLog ? '' : '-verbose'}`).sync();
+        cmd(projName, appBuildOptions.docsAppInProdMode, true);;
       }
 
       try {

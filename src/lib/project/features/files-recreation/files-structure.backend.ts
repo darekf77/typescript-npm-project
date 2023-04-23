@@ -110,6 +110,8 @@ export class FilesStructure extends FeatureForProject {
 
     await this.project.linkedRepos.update(struct);
 
+
+
     Helpers.log(`[init] adding project is not exists...done(${this.project.genericName})  `)
 
     if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {
@@ -120,6 +122,11 @@ export class FilesStructure extends FeatureForProject {
     }
 
     this.project.quickFixes.missingSourceFolders();
+
+    if (this.project.isStandaloneProject || this.project.isSmartContainerChild) {
+      await this.project.branding.apply(!!branding);
+    }
+
     this.project.quickFixes.linkSourceOfItselfToNodeModules();
     this.project.quickFixes.missingAngularLibFiles();
     if (this.project.isWorkspace || this.project.isTnp) { // TODO make it for standalone
@@ -232,9 +239,7 @@ export class FilesStructure extends FeatureForProject {
       this.project.filesTemplatesBuilder.rebuild();
     }
 
-    if (this.project.isStandaloneProject || this.project.isSmartContainerChild) {
-      await this.project.branding.apply(!!branding);
-    }
+
 
     //#region handle node modules instalation
     if (!this.project.isDocker) {

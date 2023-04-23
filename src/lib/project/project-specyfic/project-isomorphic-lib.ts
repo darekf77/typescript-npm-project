@@ -425,6 +425,9 @@ export class ProjectIsomorphicLib
     showInfoAngular();
 
     await proj.execute(command, {
+      resolvePromiseMsg: {
+        stdout: 'Compiled successfully'
+      },
       //#region command execute params
       exitOnError: true,
       exitOnErrorCallback: async (code) => {

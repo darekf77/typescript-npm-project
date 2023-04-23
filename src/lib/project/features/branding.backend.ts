@@ -27,7 +27,7 @@ export class Branding extends FeatureForProject {
   }
 
   get htmlIndexRepaceTag() {
-    const toReplace = '<!-- BRANDING_GENERATED_MANIFEST -->>';
+    const toReplace = '<!-- BRANDING_GENERATED_MANIFEST -->';
     return toReplace;
   }
 
@@ -63,11 +63,14 @@ export class Branding extends FeatureForProject {
       return;
     }
 
+    let pathIcons = `/${['assets', 'assets-for', proj.name, ...generatedPwa].join('/')}`;
+    if (proj.isSmartContainerChild || proj.isSmartContainerTarget) {
+      const parent = proj.isSmartContainerChild ? proj.parent : proj.smartContainerTargetParentContainer;
+      pathIcons = `/${['assets', 'assets-for', parent.name + '--' + proj.name, ...generatedPwa].join('/')}`;
+    }
+
     const configuration = {
-      path: `${proj.isSmartContainerChild ?
-        `/${['assets', 'assets-for', proj.parent.name + '--' + proj.name, ...generatedPwa].join('/')}`
-        : `/${['assets', 'assets-for', proj.name, ...generatedPwa].join('/')}`
-        }`, // Path for overriding default icons path. `string`
+      path: pathIcons, // Path for overriding default icons path. `string`
       appName: null, // Your application's name. `string`
       appShortName: null, // Your application's short_name. `string`. Optional. If not set, appName will be used
       appDescription: null, // Your application's description. `string`

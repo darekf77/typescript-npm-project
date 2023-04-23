@@ -151,7 +151,7 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         ]
         //#endregion
       ],
-      endAction: (({ outFolder, projectName, client, watchBuild, replacement }) => {
+      endAction: (async ({ outFolder, projectName, client, watchBuild, replacement }) => {
         //#region action after recreating/updating inside strcut
 
         //#region replace app.module.ts
@@ -368,7 +368,7 @@ ${appModuleFile}
         //#endregion
 
         //#region rebuild manifest + index.html
-        (() => {
+        await (async () => {
 
           const manifestJsonPath = crossPlatformPath(path.join(
             project.location
@@ -385,15 +385,19 @@ ${appModuleFile}
             ,
             `/src/index.html`
           ));
+          const projectTargetOrStandalone = this.project;
+
+          await projectTargetOrStandalone.branding.apply()
+
 
           const manifestJson: Models.pwa.Manifest = Helpers.readJson(manifestJsonPath, {}, true);
           let indexHtml = Helpers.readFile(indexHtmlPath);
 
-          const projectTargetOrStandalone = this.project;
 
-          const projectStandaloneOrContainer = projectTargetOrStandalone.isSmartContainerTarget
-            ? projectTargetOrStandalone?.smartContainerTargetParentContainer : this.project;
-            // TODO @LAST
+
+          // const projectStandaloneOrContainer = projectTargetOrStandalone.isSmartContainerTarget
+          //   ? projectTargetOrStandalone?.smartContainerTargetParentContainer : this.project;
+          //   // TODO @LAST
 
           manifestJson.name = projectTargetOrStandalone.env.config?.pwa?.name
             ? projectTargetOrStandalone.env.config.pwa.name : _.startCase(project.name);
@@ -407,16 +411,19 @@ ${appModuleFile}
             config.folder.assets
           ));
 
-
-
           if (projectTargetOrStandalone.branding.exist) {
             //#region apply pwa generated icons
             manifestJson.icons = projectTargetOrStandalone.branding.iconsToAdd;
             //#endregion
+            indexHtml = indexHtml.replace(`<link rel="icon" type="image/x-icon" href="favicon.ico">`, '')
             indexHtml = indexHtml.replace(
               projectTargetOrStandalone.branding.htmlIndexRepaceTag,
               projectTargetOrStandalone.branding.htmlLinesToAdd.join('\n')
             );
+            indexHtml = indexHtml.replace(
+              `<link rel="icon" type="image/x-icon" href="/`,
+              `<link rel="icon" type="image/x-icon" href="`
+            )
           } else {
             //#region apply default icons
             const iconsPath = crossPlatformPath(path.join(

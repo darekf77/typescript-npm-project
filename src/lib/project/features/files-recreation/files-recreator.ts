@@ -594,6 +594,7 @@ ${this.project.isVscodeExtension ? '' : coreFiles}
   }
 
   commonFiles() {
+
     const wokrspace = Project.by<Project>('workspace', this.project._frameworkVersion);
 
     const files = this.commonFilesForAllProjects;
