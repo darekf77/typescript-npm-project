@@ -1,7 +1,9 @@
 
 import { crossPlatformPath, path } from 'tnp-core'
 import { fse } from 'tnp-core'
+//#region @notForNpm
 import * as favicons from 'favicons';
+//#endregion
 import { _ } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project/abstract/project/project';
@@ -13,10 +15,11 @@ import { Models } from 'tnp-models';
 const htmlBasename = 'html-pwa.html';
 const generatedPwa = [config.folder.generated, 'pwa']
 const subPath = [config.folder.src, config.folder.assets, ...generatedPwa]
+//#endregion
 
 export class Branding extends FeatureForProject {
 
-  get path() {
+  private get path() {
     const proj = this.project;
     const dest = crossPlatformPath([proj.location, ...subPath]);
     return dest;
@@ -122,6 +125,8 @@ export class Branding extends FeatureForProject {
       // ],
     };
 
+    // TODO @LAST QUICK_FIX for sharp
+    //#region @notForNpm
     try {
       const response = await favicons.favicons(sourceLogoPng, configuration);
 
@@ -150,6 +155,7 @@ export class Branding extends FeatureForProject {
     } catch (error) {
       console.log(error.message); // Error description e.g. "An unknown error has occurred"
     }
+    //#endregion
 
     Helpers.taskDone(`Project ${proj.genericName} branding ended`);
   }

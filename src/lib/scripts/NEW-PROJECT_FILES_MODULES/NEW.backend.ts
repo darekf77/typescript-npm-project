@@ -203,6 +203,7 @@ async function $GENERATE(args: string) {
     if (moduleName === 'generated-index-exports') {
       const allowedFilesExt = ['.ts', '.tsx'];
       const frontendFiles = [
+        '.browser.ts',
         '.component.ts',
         '.container.ts',
         '.directive.ts',
