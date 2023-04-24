@@ -58,6 +58,7 @@ export class Branding extends FeatureForProject {
 
     const dest = this.path;
 
+    // @LAST don't generate branding automatically
     if (Helpers.exists(crossPlatformPath([dest, htmlBasename])) && !force) {
       Helpers.logInfo(`Branding already generated for ${proj.genericName}.`)
       return;
