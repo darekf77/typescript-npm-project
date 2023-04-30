@@ -114,10 +114,12 @@ export class QuickFixes extends FeatureForProject {
         ]);
 
         Helpers.writeFile(shared_folder_info, `
-          THIS FILE IS GENERATED.
-          Assets from this folder can be used in npm package "${this.project.npmPackageNameAndVersion}"
-          created from this project.
+THIS FILE IS GENERATED. THIS FILE IS GENERATED. THIS FILE IS GENERATED.
 
+Assets from this folder can be used in npm package "${this.project.npmPackageNameAndVersion}"
+created from this project.
+
+THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
           `.trimLeft())
 
       })();

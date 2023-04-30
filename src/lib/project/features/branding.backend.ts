@@ -20,7 +20,10 @@ const subPath = [config.folder.src, config.folder.assets, ...generatedPwa]
 export class Branding extends FeatureForProject {
 
   private get path() {
-    const proj = this.project;
+    let proj = this.project;
+    if (proj.isSmartContainerTarget) {
+      proj = proj.smartContainerTargetParentContainer.children.find(c => c.name == proj.name);
+    };
     const dest = crossPlatformPath([proj.location, ...subPath]);
     return dest;
   }
