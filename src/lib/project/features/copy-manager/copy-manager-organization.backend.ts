@@ -21,6 +21,9 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
    */
   get targetProjName() {
     const target = _.first((this.args || '').split(' ')).replace('/', '')
+    if (target?.startsWith('--')) {
+      return;
+    }
     return target;
   }
   //#endregion
@@ -111,12 +114,28 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   }
   //#endregion
 
+
+  get monitoredOutDirSharedAssets(): string[] {
+    const assetsFolders = this.project.children.map(c => {
+      const monitorDir: string = crossPlatformPath([
+        c.location,
+        config.folder.src,
+        config.folder.assets,
+        config.folder.shared,
+      ]);
+      return monitorDir;
+    })
+
+    return assetsFolders;
+  }
+
+
   //#region get chhildren
   getChildren(): Project[] {
     return [
       this.project.children.find(c => c.name === this.targetProjName),
       ...this.project.children.filter(c => c.name !== this.targetProjName),
-    ];
+    ].filter(f => !!f)
   }
   //#endregion
 
@@ -157,9 +176,9 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
 
       for (let index = 0; index < children.length; index++) {
         const child = children[index];
-        if (!child) {
-          // debugger
-        }
+        // if (!child) {
+        //   debugger
+        // }
         const childDestPackageInNodeModules = crossPlatformPath(path.join(
           destPackageInNodeModules,
           CopyMangerHelpers.childPureName(child)
@@ -656,7 +675,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     }
 
     specyficFileRelativePath = specyficFileRelativePath.replace(`${config.folder.libs}/${childName}/`, '');
-    const rootPackageNameForChild =  crossPlatformPath(path.join(this.rootPackageName, child.name));
+    const rootPackageNameForChild = crossPlatformPath(path.join(this.rootPackageName, child.name));
 
     Helpers.log(`Handle single file: ${specyficFileRelativePath} for ${rootPackageNameForChild}`)
 
@@ -753,18 +772,44 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   }
   //#endregion
 
+  handleCopyOfAssetFile(absoluteAssetFilePath: string, destination: Project) {
+    const monitoredOutDirSharedAssets = this.monitoredOutDirSharedAssets;
+    for (let index = 0; index < monitoredOutDirSharedAssets.length; index++) {
+      const folderAssetsShareAbsPath = monitoredOutDirSharedAssets[index];
+      if (absoluteAssetFilePath.startsWith(folderAssetsShareAbsPath)) {
+        const relativePath = absoluteAssetFilePath.replace(`${folderAssetsShareAbsPath}/`, '');
+
+        const childName = absoluteAssetFilePath
+          .replace(`${this.project.location}/`, '')
+          .replace(`/${config.folder.src}/${config.folder.assets}/${config.folder.shared}/${relativePath}`, '');
+
+        const dest = destination.node_modules.pathFor(`${this.rootPackageName}/${childName}/${config.folder.assets}/${config.folder.shared}/${relativePath}`);
+
+        Helpers.remove(dest, true);
+        if (Helpers.exists(absoluteAssetFilePath)) {
+          Helpers.copyFile(absoluteAssetFilePath, dest);
+        }
+
+      }
+    }
+  }
+
   handleCopyOfSingleFile(
     destination: Project,
     isTempLocalProj: boolean,
     specyficFileRelativePath: string,
     wasRecrusive = false
   ): void {
-    specyficFileRelativePath = specyficFileRelativePath.replace(/^\//, '');
+    specyficFileRelativePath = crossPlatformPath(specyficFileRelativePath).replace(/^\//, '');
     if (this.notAllowedFiles.includes(specyficFileRelativePath)) {
       return;
     }
 
-    if (specyficFileRelativePath.startsWith(config.folder.libs)) {
+    if (
+      specyficFileRelativePath.startsWith(config.folder.libs)
+      ||
+      specyficFileRelativePath.startsWith([config.folder.assets, config.folder.shared].join('/'))
+    ) {
       this.handleCopyOfSingleFileForChildFromLibs(
         specyficFileRelativePath,
         destination,

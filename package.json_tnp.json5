@@ -3,7 +3,10 @@
 
   overrided: {
     dependencies: {
-
+      // favicons generator! - has node gyp dep ->
+      // TOOD replace sharp with jimp to remove node-gyp
+      // or generate icons with jimp directly
+      favicons: '~7.1.2',
     },
     ignoreDepsPattern: [
       'edit-table',
@@ -227,7 +230,7 @@
         "firedev-ports": '13.1.39',
         "firedev-crud-deamon": '13.1.35',
         "tnp-ui": "13.1.27",
-        "firedev-ui": '13.1.8',
+        "firedev-ui": '13.1.18',
         "tnp-core": '13.2.12',
         "tnp-cli": '13.1.54',
         "tnp-tools": "0.0.58",
@@ -245,7 +248,7 @@
         // isomorphic http requests
         axios: "^0.17.1",
         "ng-talkback": "13.1.19",
-        "magic-renamer": '13.1.26',
+        "magic-renamer": '13.1.37',
         "vpn-split": "13.1.23",
         "node-cli-tester": "13.1.19",
         strings: {

@@ -127,7 +127,6 @@ export class FilesStructure extends FeatureForProject {
       await this.project.branding.apply(!!branding);
     }
 
-    this.project.quickFixes.linkSourceOfItselfToNodeModules();
     this.project.quickFixes.missingAngularLibFiles();
     if (this.project.isWorkspace || this.project.isTnp) { // TODO make it for standalone
       this.project.quickFixes.overritenBadNpmPackages();

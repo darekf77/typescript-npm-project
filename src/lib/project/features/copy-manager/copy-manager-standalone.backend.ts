@@ -92,13 +92,15 @@ export class CopyManagerStandalone extends CopyManager {
   //#region init watching
   initWatching() {
     const monitoredOutDir = this.monitoredOutDir;
+    const monitoredOutDirSharedAssets = this.monitoredOutDirSharedAssets;
 
     this.initOptions({
       folderPath: [
-        monitoredOutDir
+        monitoredOutDir,
+        ...monitoredOutDirSharedAssets,
       ],
       folderPathContentCheck: [
-        monitoredOutDir
+        monitoredOutDir,
       ]
     });
   }
@@ -130,6 +132,11 @@ export class CopyManagerStandalone extends CopyManager {
   get monitoredOutDir(): string {
     const monitorDir: string = crossPlatformPath(path.join(this.project.location, this.outDir));
     return monitorDir;
+  }
+
+  get monitoredOutDirSharedAssets(): string[] {
+    const monitorDir: string = crossPlatformPath(path.join(this.project.location, config.folder.src, config.folder.assets, config.folder.shared));
+    return [monitorDir];
   }
   //#endregion
 
@@ -242,6 +249,23 @@ export class CopyManagerStandalone extends CopyManager {
     });
   }
   //#endregion
+
+  copySharedAssets(destination: Project, isTempLocalProj: boolean) {
+    const monitoredOutDirSharedAssets = this.monitoredOutDirSharedAssets;
+    for (let index = 0; index < monitoredOutDirSharedAssets.length; index++) {
+      const sharedAssetsPath = monitoredOutDirSharedAssets[index];
+      const dest = destination.node_modules.pathFor(`${this.project.isStandaloneProject
+        ? this.rootPackageName
+        : `${this.rootPackageName}/${path.basename(path.dirname(path.dirname(path.dirname(sharedAssetsPath))))}`
+        }/${config.folder.assets}/${config.folder.shared}`);
+
+      Helpers.copy(sharedAssetsPath, dest, {
+        copySymlinksAsFiles: true,
+        overwrite: true,
+        recursive: true,
+      });
+    }
+  }
 
   //#region copy compiled sources and declarations
   copyCompiledSourcesAndDeclarations(destination: Project, isTempLocalProj: boolean) {
@@ -435,6 +459,21 @@ export class CopyManagerStandalone extends CopyManager {
     }
   }
   //#endregion
+
+  handleCopyOfAssetFile(absoluteAssetFilePath: string, destination: Project) {
+    const monitoredOutDirSharedAssets = this.monitoredOutDirSharedAssets;
+    for (let index = 0; index < monitoredOutDirSharedAssets.length; index++) {
+      const folderAssetsShareAbsPath = monitoredOutDirSharedAssets[index];
+      if (absoluteAssetFilePath.startsWith(folderAssetsShareAbsPath)) {
+        const relativePath = absoluteAssetFilePath.replace(`${folderAssetsShareAbsPath}/`, '')
+        const dest = destination.node_modules.pathFor(`${this.rootPackageName}/${config.folder.assets}/${config.folder.shared}/${relativePath}`);
+        Helpers.remove(dest, true);
+        if (Helpers.exists(absoluteAssetFilePath)) {
+          Helpers.copyFile(absoluteAssetFilePath, dest);
+        }
+      }
+    }
+  }
 
   //#region handle copy of single file
   handleCopyOfSingleFile(destination: Project, isTempLocalProj: boolean, specyficFileRelativePath: string, wasRecrusive = false): void {

@@ -26,6 +26,10 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   protected readonly nodts: boolean;
   protected readonly renameDestinationFolder?: string;
 
+  get customCompilerName() {
+    return `Copyto manager compilation`;
+  }
+
   protected readonly notAllowedFiles = [
     '.DS_Store',
     config.file.index_d_ts,
@@ -259,7 +263,14 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     SourceMappingUrl.fixContent(absoluteFilePath, this.projectWithBuild);
 
     const outDir = this.outDir;
-    const specyficFileRelativePath = absoluteFilePath.replace(this.monitoredOutDir + '/', '');
+    let specyficFileRelativePath: string;
+    let absoluteAssetFilePath: string;
+    if (absoluteFilePath.startsWith(this.monitoredOutDir)) {
+      specyficFileRelativePath = absoluteFilePath.replace(this.monitoredOutDir + '/', '');
+    } else {
+      absoluteAssetFilePath = absoluteFilePath;
+    }
+
 
     Helpers.log(`ASYNC ACTION
     absoluteFilePath: ${absoluteFilePath}
@@ -271,6 +282,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       const projectToCopy = projectToCopyTo[index];
       this._copyBuildedDistributionTo(projectToCopy,
         {
+          absoluteAssetFilePath,
           specyficFileRelativePath: event && specyficFileRelativePath,
           outDir: outDir as any,
           event
@@ -281,7 +293,9 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   //#endregion
 
   //#region sync action
-  async syncAction(files: string[]) {
+  async syncAction(
+    // files: string[]
+  ) {
     Helpers.log('SYNC ACTION');
     const outDir = this.outDir;
 
@@ -293,7 +307,6 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       this._copyBuildedDistributionTo(projectToCopy,
         {
           outDir: outDir as any,
-          files
         }
       );
       log.data('copy done...')
@@ -314,19 +327,15 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   protected _copyBuildedDistributionTo(
     destination: Project,
     options?: {
+      absoluteAssetFilePath?: string,
       specyficFileRelativePath?: string,
       outDir?: Models.dev.BuildDir,
       event?: any,
-      /**
-       * sync action
-       * all files - abs pathes
-       */
-      files?: string[]
     }
   ) {
 
     //#region init & prepare parameters
-    const { specyficFileRelativePath = void 0, outDir, event, files } = options || {};
+    const { specyficFileRelativePath = void 0, absoluteAssetFilePath = void 0, outDir, event } = options || {};
 
     // if (!specyficFileRelativePath) {
     //   debugger
@@ -353,16 +362,22 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     // }
     //#endregion
 
-    if (specyficFileRelativePath && allFolderLinksExists) {
-      //#region handle single file
-      this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePath);
-      //#endregion
+    if ((specyficFileRelativePath || absoluteAssetFilePath) && allFolderLinksExists) {
+      if (absoluteAssetFilePath) {
+        this.handleCopyOfAssetFile(absoluteAssetFilePath, destination);
+      } else {
+        //#region handle single file
+        this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePath);
+        //#endregion
+      }
+
     } else {
       //#region handle all files
       log.data('copying all files')
       this.copyCompiledSourcesAndDeclarations(destination, isTempLocalProj);
       log.d('copying surce maps')
       this.copySourceMaps(destination, isTempLocalProj);
+      this.copySharedAssets(destination, isTempLocalProj);
 
       if (this.watch || isTempLocalProj) {
         log.data('addiing links')
@@ -424,10 +439,12 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   abstract addSourceSymlinks(destination: Project);
   abstract removeSourceSymlinks(destination: Project);
   abstract handleCopyOfSingleFile(destination: Project, isTempLocalProj: boolean, specyficFileRelativePath: string);
+  abstract handleCopyOfAssetFile(absoluteAssetFilePath: string, destination: Project);
   /**
    * fix d.ts files in angular build - problem with require() in d.ts with wrong name
    */
   abstract copyCompiledSourcesAndDeclarations(destination: Project, isTempLocalProj: boolean);
+  abstract copySharedAssets(destination: Project, isTempLocalProj: boolean);
   abstract linksForPackageAreOk(destination: Project): boolean;
   abstract updateBackendFullDtsFiles(destinationOrBundleOrDist: Project | string): void;
 

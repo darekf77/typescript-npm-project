@@ -138,14 +138,14 @@ export class LibProjectStandalone extends LibPorjectBase {
       prod,
     } = options;
 
-    const cwd = path.join(this.project.location, config.folder.bundle)
-    Helpers.info(`Publish cwd: ${cwd}`)
+    const existedBundle = crossPlatformPath([this.project.location, this.project.getTempProjName('bundle'), config.folder.node_modules, realCurrentProj.name]);
+    Helpers.info(`Publish cwd: ${existedBundle}`)
     await Helpers.questionYesNo(`Publish on npm version: ${newVersion} ?`, async () => {
 
       // publishing standalone
       try {
         this.project.run('npm publish', {
-          cwd,
+          cwd: existedBundle,
           output: true
         }).sync();
       } catch (e) {
@@ -157,7 +157,6 @@ export class LibProjectStandalone extends LibPorjectBase {
       const names = this.project.packageJson.additionalNpmNames;
       for (let index = 0; index < names.length; index++) {
         const c = names[index];
-        const existedBundle = crossPlatformPath(path.join(this.project.location, 'bundle'));
         const additionBase = crossPlatformPath(path.resolve(path.join(this.project.location, `../../../additional-bundle-${c}`)));
         Helpers.mkdirp(additionBase);
         Helpers.copy(existedBundle, additionBase, {

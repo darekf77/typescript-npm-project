@@ -90,7 +90,12 @@ export abstract class TnpProject {
   }
 
   //#region @backend
-  // @ts-ignore
+
+  /**
+   * array of isomorphic pacakges
+   * example:
+   * ['firedev', '@something/child', 'morphi' ]
+   */ // @ts-ignore
   get isomorphicPackages(this: Project): string[] {
     const isomorphicPackagesArr = [];
 

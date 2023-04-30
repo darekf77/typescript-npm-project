@@ -75,6 +75,10 @@ export class CodeCut {
       relativePathToFile,
     ));
 
+    // if (absSourceFromSrc.endsWith('/file.ts')) {
+    //   debugger
+    // }
+
     if (!BrowserCodeCut.extAllowedToReplace.includes(path.extname(relativePathToFile))) {
 
       return (new BrowserCodeCut(

@@ -208,6 +208,26 @@ ${appModuleFile}
         })();
         //#endregion
 
+        //#region replace app.module.ts
+        (() => {
+          const appComponentFilePath = path.join(
+            project.location,
+            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+            `/src/app/app.module.ts`
+          );
+
+
+          let appModuleFile = Helpers.readFile(appComponentFilePath);
+
+          appModuleFile = appModuleFile.replace(
+            `import { FiredevAdminModeConfigurationModule } from 'firedev-ui';`,
+            `import { FiredevAdminModeConfigurationModule } from 'firedev-ui/${this.websql ? config.folder.websql : config.folder.browser}';`,
+          );
+
+          Helpers.writeFile(appComponentFilePath, appModuleFile);
+        })();
+        //#endregion
+
         //#region replace main.ts websql things
         (() => {
           const appMainFilePath = path.join(
@@ -387,13 +407,8 @@ ${appModuleFile}
           ));
           const projectTargetOrStandalone = this.project;
 
-          await projectTargetOrStandalone.branding.apply()
-
-
           const manifestJson: Models.pwa.Manifest = Helpers.readJson(manifestJsonPath, {}, true);
           let indexHtml = Helpers.readFile(indexHtmlPath);
-
-
 
           // const projectStandaloneOrContainer = projectTargetOrStandalone.isSmartContainerTarget
           //   ? projectTargetOrStandalone?.smartContainerTargetParentContainer : this.project;

@@ -57,14 +57,18 @@ export class Branding extends FeatureForProject {
       Helpers.copyFile(coreLogoPath, sourceLogoPng);
     }
 
-    Helpers.taskStarted(`Project ${proj.genericName} branding started`);
+    Helpers.log(`Project ${proj.genericName} branding started`);
 
     const dest = this.path;
 
     // @LAST don't generate branding automatically
-    if (Helpers.exists(crossPlatformPath([dest, htmlBasename])) && !force) {
+    if (Helpers.exists(crossPlatformPath([dest, htmlBasename]))) {
       Helpers.logInfo(`Branding already generated for ${proj.genericName}.`)
       return;
+    } else {
+      if (!force) {
+        return;
+      }
     }
 
     let pathIcons = `/${['assets', 'assets-for', proj.name, ...generatedPwa].join('/')}`;
@@ -157,7 +161,7 @@ export class Branding extends FeatureForProject {
     }
     //#endregion
 
-    Helpers.taskDone(`Project ${proj.genericName} branding ended`);
+    Helpers.log(`Project ${proj.genericName} branding ended`);
   }
 
 }

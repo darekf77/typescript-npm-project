@@ -95,32 +95,35 @@ export class QuickFixes extends FeatureForProject {
     Helpers.taskStarted(`[quick fixes] missing angular lib fles start`, true);
     if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
 
-      const indexTs = crossPlatformPath(path.join(this.project.location, config.folder.src, 'lib/index.ts'));
-      if (!Helpers.exists(indexTs)) {
-        Helpers.writeFile(indexTs, `
-        export function helloWorldFrom${_.upperFirst(_.camelCase(this.project.name))}() { }
-        `.trimLeft())
-      }
-
-    } else {
-      if (this.project.typeIs('angular-lib')) {
-        const indexTs = path.join(this.project.location, config.folder.components, 'index.ts');
+      (() => {
+        const indexTs = crossPlatformPath(path.join(this.project.location, config.folder.src, 'lib/index.ts'));
         if (!Helpers.exists(indexTs)) {
           Helpers.writeFile(indexTs, `
-          export * from './${config.file.public_api}';
-          `.trimLeft())
-
-        }
-
-        const pubilcApiLoc = path.join(this.project.location, config.folder.components, config.file.public_api_ts);
-        if (!Helpers.exists(pubilcApiLoc)) {
-          Helpers.writeFile(pubilcApiLoc, `
           export function helloWorldFrom${_.upperFirst(_.camelCase(this.project.name))}() { }
           `.trimLeft())
         }
-      }
-    }
+      })();
 
+      (() => {
+        const shared_folder_info = crossPlatformPath([
+          this.project.location,
+          config.folder.src,
+          config.folder.assets,
+          config.folder.shared,
+          'shared_folder_info.txt',
+        ]);
+
+        Helpers.writeFile(shared_folder_info, `
+          THIS FILE IS GENERATED.
+          Assets from this folder can be used in npm package "${this.project.npmPackageNameAndVersion}"
+          created from this project.
+
+          `.trimLeft())
+
+      })();
+
+
+    }
 
     Helpers.taskDone(`[quick fixes] missing angular lib fles end`)
   }
@@ -223,91 +226,6 @@ export default _default;
     })
   }
 
-  public linkSourceOfItselfToNodeModules() {
-    // if (this.project.isStandaloneProject && this.project.frameworkVersionAtLeast('v3')) {
-    //   // (() => { // TODO this cannot be done with direct ts-compilation
-    //   //   const source = crossPlatformPath(path.join(this.project.location, config.folder.dist, config.folder.browser));
-    //   //   const dest = crossPlatformPath(path.join(this.project.location, config.folder.dist, 'lib', config.folder.browser));
-    //   //   Helpers.removeIfExists(dest);
-    //   //   if (!Helpers.exists(path.dirname(dest))) {
-    //   //     Helpers.mkdirp(dest);
-    //   //   }
-    //   //   Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
-    //   // })();
-
-    //   (() => {
-    //     const source = crossPlatformPath(path.join(this.project.location, config.folder.dist));
-    //     const dest = crossPlatformPath(path.join(this.project.location, config.folder.node_modules, this.project.name));
-    //     Helpers.removeIfExists(dest);
-    //     Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
-    //   })();
-
-    //   return;
-    // }
-
-    return;
-    // if (!this.project.isStandaloneProject) {
-    //   return;
-    // }
-    // if (process.platform === 'win32') { // TODO QUICKFIX
-    //   Helpers.warn(`[linkSourceOfItselfToNodeModules] [win32] functionality disabled`)
-    //   return;
-    // }
-    // const pathToSelf = crossPlatformPath(path.join(this.project.location, config.folder.node_modules, this.project.name));
-    // const pathToSrc = crossPlatformPath(path.join(this.project.location, this.project.typeIs('angular-lib') ? config.folder.components : config.folder.src));
-    // Helpers.removeIfExists(pathToSelf);
-    // glob.sync(`${pathToSrc}/**/*.*`)
-    //   .filter(f => !Helpers.isFolder(f))
-    //   .map(f => crossPlatformPath(f))
-    //   .forEach(f => {
-    //     const relative = f.replace(`${pathToSrc}/`, '');
-    //     const from = f;
-    //     const to1 = path.join(pathToSelf, relative);
-    //     const to2 = path.join(pathToSelf, config.folder.browser, relative)
-    //     try {
-    //       Helpers.createSymLink(f, to1, { continueWhenExistedFolderDoesntExists: true });
-    //       Helpers.createSymLink(f, to2, { continueWhenExistedFolderDoesntExists: true });
-    //     } catch (error) {
-    //       Helpers.warn(`[${config.frameworkName}][linkSourceOfItselfToNodeModules]
-    //       Not able to link "${from}"
-    //       to:
-    //       ${to1}
-    //       and
-    //       ${to2}
-    //       `)
-    //     }
-
-    //   });
-  }
-
-  // removeAppFolder() {
-    // if (this.project.typeIsNot('isomorphic-lib') && this.project.frameworkVersionAtLeast('v3')) {
-    //   return;
-    // }
-
-    // const appFolder = crossPlatformPath(path.join(
-    //   this.project.location,
-    //   config.folder.src,
-    //   'app',
-    // ))
-
-    // const appFolderWithIndex = crossPlatformPath(path.join(
-    //   appFolder,
-    //   'index.ts',
-    // ));
-
-    // if (!Helpers.exists(appFolderWithIndex)) {
-
-    //   const arrEmp = [
-    //     ...Helpers.filesFrom(appFolder, true),
-    //     ...Helpers.linksToFolderFrom(appFolder),
-    //     ...Helpers.foldersFrom(appFolder),
-    //   ];
-    //   if (arrEmp.length === 0) {
-    //     Helpers.remove(appFolder, true);
-    //   }
-    // }
-  // }
 
   public missingSourceFolders() { /// QUCIK_FIX make it more generic
     if (this.project.frameworkVersionEquals('v1')) {

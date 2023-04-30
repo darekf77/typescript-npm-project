@@ -172,8 +172,15 @@ const PATH = () => {
 };
 
 const COPY_RESOURCES = () => {
-  (Project.Current as Project).checkIfReadyForNpm();
-  (Project.Current as Project).bundleResources();
+  const proj = (Project.Current as Project);
+  proj.checkIfReadyForNpm();
+  if (proj.isStandaloneProject) {
+    const bundleFolder = path.join(proj.location, config.folder.bundle);
+    proj.bundleResources(bundleFolder);
+  } else {
+    // TODO
+  }
+
   process.exit(0)
 }
 

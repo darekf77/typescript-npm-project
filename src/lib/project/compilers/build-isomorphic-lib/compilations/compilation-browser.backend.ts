@@ -124,17 +124,28 @@ export class BroswerCompilation extends BackendCompilation {
       for (let index = 0; index < filesToCopy.length; index++) {
         const fileAbsPath = crossPlatformPath(filesToCopy[index]);
         const relativeFilePath = fileAbsPath.replace(`${coreAssetsPath}/`, '');
-        const destAbsPath = crossPlatformPath(path.join(
+        const destAbsPath = crossPlatformPath([
           this.absPathTmpSrcDistBundleFolder,
-          'assets',
+          config.folder.assets,
           relativeFilePath,
-        ));
+        ]);
         Helpers.copyFile(fileAbsPath, destAbsPath);
+        // if (relativeFilePath.startsWith(`${config.folder.shared}/`)) {
+        //   const arr = [
+        //     crossPlatformPath([this.cwd, config.folder.dist]),
+        //     crossPlatformPath([this.cwd, config.folder.bundle]),
+        //   ];
+        //   for (let index = 0; index < arr.length; index++) {
+        //     const absPathDest = crossPlatformPath([arr[index], config.folder.assets, relativeFilePath]);
+        //     Helpers.copyFile(fileAbsPath, absPathDest);
+        //   }
+        // }
       }
     }
     //#endregion
 
     this.codecut.files(relativePathesToProcess);
+    this.project.assetsManager.copyExternalAssets(this.buildOptions?.outDir, this.buildOptions?.websql);
     await this.compile();
   }
   //#endregion

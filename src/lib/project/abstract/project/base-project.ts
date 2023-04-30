@@ -10,6 +10,18 @@ import { config } from 'tnp-config';
 
 export abstract class BaseProject {
 
+  // @ts-ignore
+  public get npmPackageName(this: Project): string {
+    if (this.isSmartContainerChild) {
+      return `@${this.parent.name}/${this.name}`;
+    }
+    return `${this.name}`;
+  }
+
+  // @ts-ignore
+  public get npmPackageNameAndVersion(this: Project): string {
+    return `${this.npmPackageName}@${this.version}`;
+  }
 
   // @ts-ignore
   public get genericName(this: Project): string {

@@ -184,31 +184,31 @@ export class ProjectAngularLib
   }
 
   async buildLib() {
-    //#region @backendFunc
-    const { outDir, ngbuildonly, watch } = this.buildOptions;
-    this.beforeLibBuild(outDir);
-    if (ngbuildonly) {
-      // await this.buildAngulazrVer(watch);
-    } else {
-      const incrementalBuildProcess = new IncrementalBuildProcess(this, this.buildOptions);
+    // //#region @backendFunc
+    // const { outDir, ngbuildonly, watch } = this.buildOptions;
+    // // this.copyEssentialFilesTo(outDir);
+    // if (ngbuildonly) {
+    //   // await this.buildAngulazrVer(watch);
+    // } else {
+    //   const incrementalBuildProcess = new IncrementalBuildProcess(this, this.buildOptions);
 
-      if (this.buildOptions.watch) {
-        await incrementalBuildProcess.startAndWatch(`isomorphic ${this._type} compilation (watch mode)`,
-          {
-            watchOnly: this.buildOptions.watchOnly,
-            afterInitCallBack: async () => {
-              await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
-            }
-          });
-      } else {
-        await incrementalBuildProcess.start(`isomorphic ${this._type} compilation`);
-        // if (outDir === 'bundle') {
+    //   if (this.buildOptions.watch) {
+    //     await incrementalBuildProcess.startAndWatch(`isomorphic ${this._type} compilation (watch mode)`,
+    //       {
+    //         watchOnly: this.buildOptions.watchOnly,
+    //         afterInitCallBack: async () => {
+    //           await this.compilerCache.setUpdatoDate.incrementalBuildProcess();
+    //         }
+    //       });
+    //   } else {
+    //     await incrementalBuildProcess.start(`isomorphic ${this._type} compilation`);
+    //     // if (outDir === 'bundle') {
 
-        //   this.buildAngularVer();
-        // }
-      }
-    }
-    //#endregion
+    //     //   this.buildAngularVer();
+    //     // }
+    //   }
+    // }
+    // //#endregion
   }
 
   async buildSteps(buildOptions?: BuildOptions) {

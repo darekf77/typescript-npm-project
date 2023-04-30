@@ -150,7 +150,7 @@ export abstract class LibProject {
       this.packageJson.data.version = newVersion;
       this.packageJson.save('show for release')
 
-      specyficProjectForBuild = await this.relaseBuild(newVersion, releaseOptions);
+      specyficProjectForBuild = await this.relaseBuild(newVersion, realCurrentProj, releaseOptions);
 
       if (this.isSmartContainer) {
         specyficProjectForBuild.smartcontainer.preparePackage(this, newVersion);
@@ -164,19 +164,29 @@ export abstract class LibProject {
         this.standalone.fixPackageJson(realCurrentProj)
       }
 
+      if (this.isStandaloneProject) {
+        const bundleForPublishPath = crossPlatformPath([
+          specyficProjectForBuild.location,
+          this.getTempProjName('bundle'),
+          config.folder.node_modules,
+          this.name
+        ]);
+
+        Helpers.remove(`${bundleForPublishPath}/app*`); // QUICK_FIX
+        const pjPath = crossPlatformPath([
+          bundleForPublishPath,
+          config.file.package_json,
+        ]);
+
+        const pj = Helpers.readJson(pjPath)
+        Helpers.removeFileIfExists(pjPath);
+        Helpers.writeJson(pjPath, pj)// QUICK_FIX
+      }
 
       if (!global.tnpNonInteractive) {
         await Helpers.questionYesNo(`Do you wanna check bundle folder before publishing ?`, async () => {
-          if (this.isSmartContainer) { // TODO from local proj prepare bundle projects
-            specyficProjectForBuild.run(`code ${this.getTempProjName('bundle')}/${config.folder.node_modules}/@${this.name}`).sync();
-            Helpers.pressKeyAndContinue(`Check your compiled code and press any key ...`)
-          }
-
-          if (this.isStandaloneProject) {
-            specyficProjectForBuild.run(`code ${config.folder.bundle}/`).sync();
-            Helpers.pressKeyAndContinue(`Check your compiled code and press any key...`)
-          }
-
+          specyficProjectForBuild.run(`code ${this.getTempProjName('bundle')}/${config.folder.node_modules}`).sync();
+          Helpers.pressKeyAndContinue(`Check your compiled code and press any key ...`)
         });
 
       }
@@ -203,29 +213,31 @@ export abstract class LibProject {
     }
     //#endregion
 
-    let appRelaseDone = false;
+
 
     if (!global.tnpNonInteractive || automaticReleaseDocs) {
       // Helpers.clearConsole();
 
       if (this.isStandaloneProject) {
-        appRelaseDone = await this.standalone.buildDocs(prod, realCurrentProj, automaticReleaseDocs);
+        await this.standalone.buildDocs(prod, realCurrentProj, automaticReleaseDocs);
       }
 
       if (this.isSmartContainer) {
-        appRelaseDone = await this.smartcontainer.buildDocs(prod, realCurrentProj, automaticReleaseDocs);
+        await this.smartcontainer.buildDocs(prod, realCurrentProj, automaticReleaseDocs);
       }
     }
 
 
+    const docsCwd = realCurrentProj.pathFor('docs');
 
     const defaultTestPort = 4000;
-    if (!automaticReleaseDocs) {
+    if (!automaticReleaseDocs && Helpers.exists(docsCwd)) {
       await this.infoBeforePublish(realCurrentProj, defaultTestPort);
+
     }
 
     await this.pushToGitRepo(realCurrentProj, newVersion, automaticReleaseDocs);
-    if (!automaticReleaseDocs) {
+    if (!automaticReleaseDocs && Helpers.exists(docsCwd)) {
       await Helpers.killProcessByPort(defaultTestPort)
     }
     Helpers.info('RELEASE DONE');
@@ -240,37 +252,39 @@ export abstract class LibProject {
     }
     const originPath = `http://localhost:`;
     const docsCwd = realCurrentProj.pathFor('docs');
-    if (Helpers.exists(docsCwd)) {
-      await Helpers.killProcessByPort(4000)
-      const commandHostLoclDocs = `firedev-http-server -s -p 4000 --base-dir ${this.name}`;
+    if (!Helpers.exists(docsCwd)) {
+      return;
+    }
+    await Helpers.killProcessByPort(4000)
+    const commandHostLoclDocs = `firedev-http-server -s -p 4000 --base-dir ${this.name}`;
 
-      // console.log({
-      //   cwd, commandHostLoclDocs
-      // })
-      Helpers.run(commandHostLoclDocs, { cwd: docsCwd, output: false, silence: true }).async()
-      if (this.isStandaloneProject) {
-        Helpers.info(`Before pushing you can acces project here:
+    // console.log({
+    //   cwd, commandHostLoclDocs
+    // })
+    Helpers.run(commandHostLoclDocs, { cwd: docsCwd, output: false, silence: true }).async()
+    if (this.isStandaloneProject) {
+      Helpers.info(`Before pushing you can acces project here:
 
 - ${originPath}${defaultTestPort}/${this.name}
 
 `);
-      }
-      if (this.isSmartContainer) {
-        const smartContainer = this;
-        const mainProjectName = smartContainer.smartContainerBuildTarget.name
-        const otherProjectNames = smartContainer
-          .children
-          .filter(c => c.name !== mainProjectName)
-          .map(p => p.name);
-        Helpers.info(`Before pushing you can acces projects here:
+    }
+    if (this.isSmartContainer) {
+      const smartContainer = this;
+      const mainProjectName = smartContainer.smartContainerBuildTarget.name
+      const otherProjectNames = smartContainer
+        .children
+        .filter(c => c.name !== mainProjectName)
+        .map(p => p.name);
+      Helpers.info(`Before pushing you can acces projects here:
 
 - ${originPath}${defaultTestPort}/${smartContainer.name}
 ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer.name}/-/${c}`).join('\n')}
 
 `);
-      }
-
     }
+
+
   }
 
   //#region  methods
@@ -340,15 +354,13 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
         }
 
-
-
         const generatedProject = Project.From(absolutePathReleaseProject) as Project;
         this.allResources.forEach(relPathResource => {
           const source = path.join(this.location, relPathResource);
           const dest = path.join(absolutePathReleaseProject, relPathResource);
           if (Helpers.exists(source)) {
             if (Helpers.isFolder(source)) {
-              Helpers.copy(source, dest);
+              Helpers.copy(source, dest, { recursive: true });
             } else {
               Helpers.copyFile(source, dest);
             }
@@ -369,7 +381,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
 
 
-  async relaseBuild(this: Project, newVersion: string, releaseOptions: Models.dev.ReleaseOptions,) {
+  async relaseBuild(this: Project, newVersion: string, realCurrentProj: Project, releaseOptions: Models.dev.ReleaseOptions,) {
     const { prod, obscure, includeNodeModules, nodts, uglify, args } = releaseOptions;
 
     this.run(`${config.frameworkName} init ${this.isStandaloneProject ? '' : this.smartContainerBuildTarget.name}`).sync();
@@ -408,13 +420,46 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     // Helpers.move(browserBundle, websqlBundleTemp);
     // Helpers.move(browserBundleTemp, browserBundle);
 
+    const bundles = [
+      crossPlatformPath([specyficProjectForBuild.location, config.folder.bundle]),
+      crossPlatformPath([specyficProjectForBuild.location, specyficProjectForBuild.getTempProjName('bundle'), config.folder.node_modules, realCurrentProj.name]),
+    ];
+
     if (!specyficProjectForBuild.isCommandLineToolOnly) {
-      specyficProjectForBuild.createClientVersionAsCopyOfBrowser();
+      for (let index = 0; index < bundles.length; index++) {
+        const bundleFolder = bundles[index];
+        specyficProjectForBuild.createClientVersionAsCopyOfBrowser(bundleFolder);
+      }
     }
 
-    specyficProjectForBuild.compileBrowserES5version();
+    for (let index = 0; index < bundles.length; index++) {
+      const bundleFolder = bundles[index];
+      specyficProjectForBuild.compileBrowserES5version(bundleFolder);
+    }
 
-    specyficProjectForBuild.bundleResources()
+    if (realCurrentProj.isStandaloneProject) {
+      for (let index = 0; index < bundles.length; index++) {
+        const bundleFolder = bundles[index];
+        specyficProjectForBuild.bundleResources(bundleFolder);
+      }
+      specyficProjectForBuild.copyEssentialFilesTo(bundles, 'bundle');
+    } else if (realCurrentProj.isSmartContainer) {
+      const rootPackageName = `@${this.name}`;
+      const base = path.join(
+        specyficProjectForBuild.location,
+        specyficProjectForBuild.getTempProjName('bundle'),
+        config.folder.node_modules,
+        rootPackageName,
+      );
+      const childrenPackages = Helpers.foldersFrom(base).map(f => path.basename(f))
+      for (let index = 0; index < childrenPackages.length; index++) {
+        const childName = childrenPackages[index];
+        const child = Project.From([realCurrentProj.location, childName]) as Project;
+        const bundleFolder = path.join(base, childName);
+        child.bundleResources(bundleFolder);
+      }
+    }
+
     this.commit(newVersion);
     return specyficProjectForBuild;
   }
@@ -424,24 +469,24 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     Helpers.log(`[buildLib] callend buildLib not implemented`)
   }
 
-  protected beforeLibBuild(this: Project, outDir: Models.dev.BuildDir) {
+  protected copyEssentialFilesTo(this: Project, destinations: string[], outDir: Models.dev.BuildDir) {
     //
-    this.copyWhenExist('bin', outDir);
-    this.linkWhenExist(config.file.package_json, outDir);
+    this.copyWhenExist('bin', destinations);
+    this.linkWhenExist(config.file.package_json, destinations);
     config.packageJsonSplit.forEach(c => {
-      this.copyWhenExist(c, outDir);
+      this.copyWhenExist(c, destinations);
     });
-    this.copyWhenExist('.npmrc', outDir);
-    this.copyWhenExist('.npmignore', outDir);
-    this.copyWhenExist('.gitignore', outDir);
+    this.copyWhenExist('.npmrc', destinations);
+    this.copyWhenExist('.npmignore', destinations);
+    this.copyWhenExist('.gitignore', destinations);
     if (this.typeIs('isomorphic-lib')) {
-      this.copyWhenExist(config.file.tnpEnvironment_json, outDir);
+      this.copyWhenExist(config.file.tnpEnvironment_json, destinations);
     }
     if (outDir === 'bundle') {
-      this.linkWhenExist(config.folder.node_modules, outDir);
-      this.linkWhenExist('package.json', path.join(outDir, config.folder.client));
+      this.copyWhenExist(config.file.package_json, destinations);
+      this.linkWhenExist(config.folder.node_modules, destinations);
+      this.copyWhenExist('package.json', destinations.map(d => crossPlatformPath([d, config.folder.client])));
     }
-
   }
 
   /**
@@ -462,12 +507,13 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   }
 
 
-  private createClientVersionAsCopyOfBrowser(this: Project) {
+  private createClientVersionAsCopyOfBrowser(this: Project, bundleFolder: string) {
     //
-    const bundleFolder = path.join(this.location, config.folder.bundle);
+
     const browser = path.join(bundleFolder, config.folder.browser)
     const client = path.join(bundleFolder, config.folder.client)
     if (fse.existsSync(browser)) {
+      Helpers.remove(client)
       Helpers.tryCopyFrom(browser, client);
     } else {
       Helpers.warn(`Browser forlder not generated.. replacing with dummy files: browser.js, client.js`,
@@ -479,14 +525,17 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
   }
 
-  public bundleResources(this: Project) {
+  public bundleResources(this: Project, bundleFolder: string) {
     //
     this.checkIfReadyForNpm()
-    const bundleFolder = path.join(this.location, config.folder.bundle);
+
     if (!fse.existsSync(bundleFolder)) {
       fse.mkdirSync(bundleFolder);
     }
-    [].concat(this.resources).forEach(res => {
+    [].concat([
+      ...this.resources,
+      ...(this.isSmartContainerChild ? [config.file.package_json__tnp_json5] : []),
+    ]).forEach(res => { // @LAST copy resource to org build and copy shared assets
       const file = path.join(this.location, res);
       const dest = path.join(bundleFolder, res);
       if (!fse.existsSync(file)) {
@@ -569,44 +618,45 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
 
   // methods / copy when exists
-  protected copyWhenExist(this: Project, source: string, outDir: string) {
-    //
-    const basename = source;
-    source = path.join(this.location, source);
-    const dest = path.join(this.location, outDir, basename);
-    if (Helpers.exists(source)) {
-      if (Helpers.isFolder(source)) {
-        Helpers.tryCopyFrom(source, dest);
-      } else {
-        Helpers.copyFile(source, dest);
-        if (path.basename(source) === config.file.tnpEnvironment_json) {
-          Helpers.setValueToJSON(dest, 'currentProjectLocation', void 0);
+  protected copyWhenExist(this: Project, relativePath: string, destinations: string[]) {
+
+    const absPath = crossPlatformPath([this.location, relativePath]);
+
+    for (let index = 0; index < destinations.length; index++) {
+      const dest = crossPlatformPath([destinations[index], relativePath]);
+      if (Helpers.exists(absPath)) {
+        if (Helpers.isFolder(absPath)) {
+          Helpers.remove(dest, true)
+          Helpers.copy(absPath, dest, { recursive: true });
+        } else {
+          Helpers.copyFile(absPath, dest);
+          if (path.basename(absPath) === config.file.tnpEnvironment_json) {
+            Helpers.setValueToJSON(dest, 'currentProjectLocation', void 0);
+          }
         }
+      } else {
+        Helpers.log(`[isomorphic-lib][copyWhenExist] not exists: ${absPath}`);
       }
-    } else {
-      Helpers.log(`[isomorphic-lib][copyWhenExist] not exists: ${source}`);
     }
+
 
   }
 
+  protected linkWhenExist(this: Project, relativePath: string, destinations: string[]) {
 
-  // methods / link when exists
-  protected linkWhenExist(this: Project, source: string, outLInk: string) {
-    //
-    const basename = source;
-    source = path.join(this.location, source);
-    outLInk = path.join(this.location, outLInk, basename);
+    let absPath = path.join(this.location, relativePath);
 
-
-    if (Helpers.exists(source)) {
-      if (Helpers.isExistedSymlink(source)) {
-        source = Helpers.pathFromLink(source);
-      }
-      if (Helpers.exists(source)) {
-        Helpers.createSymLink(source, outLInk)
-      }
+    if (Helpers.exists(absPath) && Helpers.isExistedSymlink(absPath)) {
+      absPath = Helpers.pathFromLink(absPath);
     }
 
+    for (let index = 0; index < destinations.length; index++) {
+      const dest = crossPlatformPath([destinations[index], relativePath]);
+      if (Helpers.exists(absPath)) {
+        Helpers.remove(dest, true);
+        Helpers.createSymLink(absPath, dest)
+      }
+    }
   }
 
 
@@ -626,7 +676,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
 
   // methods / compile es5
-  private compileBrowserES5version(this: Project) {
+  private compileBrowserES5version(this: Project, pathBundle: string) {
     //
     // TODO fix this for angular-lib
     if (this.frameworkVersionAtLeast('v3')) {
@@ -637,7 +687,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       return;
     }
 
-    const pathBundle = path.join(this.location, config.folder.bundle);
+
     const cwdBrowser = path.join(pathBundle, config.folder.browser);
     const cwdClient = path.join(pathBundle, config.folder.client);
     const pathBabelRc = path.join(cwdBrowser, config.file._babelrc);

@@ -37,6 +37,7 @@ import {
   LinkedRepos,
   Branding,
   DocsAppBuildConfig,
+  AssetsManager,
 } from '../../features';
 import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
@@ -187,6 +188,7 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('linkedRepos', LinkedRepos);
       this.defineProperty<Project>('branding', Branding);
       this.defineProperty<Project>('docsAppBuild', DocsAppBuildConfig);
+      this.defineProperty<Project>('assetsManager', AssetsManager);
       this.libProjectInit();
     }
 

@@ -247,7 +247,7 @@ export class ProjectIsomorphicLib
 
     let basename = ''
     if (this.isInRelaseBundle) {
-      if(!this.env.config?.useDomain) {
+      if (!this.env.config?.useDomain) {
         basename = `--base-href /${isSmartContainerTarget ? this.smartContainerTargetParentContainer.name : this.name}/`;
         if (isSmartContainerTargetNonClient) {
           basename = `--base-href /${isSmartContainerTarget ? this.smartContainerTargetParentContainer.name : this.name}/-/${this.name}/`;
@@ -487,7 +487,7 @@ export class ProjectIsomorphicLib
 
     // Helpers.info(`[buildLib] start of building ${websql ? '[WEBSQL]' : ''}`);
     Helpers.log(`[buildLib] start of building...`);
-    this.beforeLibBuild(outDir);
+    this.copyEssentialFilesTo([crossPlatformPath([this.pathFor(outDir)])], outDir);
 
     const { codeCutRelease } = require('minimist')((args || '').split(' '));
 
@@ -1065,7 +1065,11 @@ export class ProjectIsomorphicLib
     const releaseSrcLocation = crossPlatformPath(path.join(this.location, config.folder.src));
     const releaseSrcLocationOrg = crossPlatformPath(path.join(this.location, this.tmpSrcBundleFolder));
     Helpers.removeFolderIfExists(releaseSrcLocationOrg);
-    Helpers.copy(releaseSrcLocation, releaseSrcLocationOrg, { copySymlinksAsFiles: true, recursive: true });
+    Helpers.copy(releaseSrcLocation, releaseSrcLocationOrg, {
+      copySymlinksAsFiles: true,
+      copySymlinksAsFilesDeleteUnexistedLinksFromSourceFirst: true,
+      recursive: true,
+    });
     Helpers.removeFolderIfExists(releaseSrcLocation);
     Helpers.copy(releaseSrcLocationOrg, releaseSrcLocation);
 

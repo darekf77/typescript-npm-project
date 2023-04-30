@@ -10,6 +10,13 @@ import { config } from 'tnp-config';
 import { BrowserCodeCut } from '../../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
 import type { Project } from '../../abstract/project/project';
 
+const notAllowedAsPacakge = [
+  config.folder.browser,
+  config.folder.websql,
+  config.folder.assets,
+];
+
+
 export class PackagesRecognition {
 
   static FILE_NAME_ISOMORPHIC_PACKAGES = config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES;
@@ -124,13 +131,33 @@ export class PackagesRecognition {
     }
     const node_modules = crossPlatformPath(path.join(this.cwd, config.folder.node_modules));
 
-    const linksToFolders = Helpers.linksToFolderFrom(node_modules);
+    const linksToFolders = [
+      ...Helpers.linksToFolderFrom(node_modules).reduce((a, b) => {
+        if (path.basename(b).startsWith('@')) {
+          const foldersFromB = Helpers.foldersFrom(fse.realpathSync(b))
+            .filter(f => !notAllowedAsPacakge.includes(path.basename(f)))
+            .filter(f => Helpers.exists([path.dirname(f), config.file.index_d_ts])) // QUICK_FIX @angular/animation
+            .map(f => {
+              return `${path.basename(b)}/${path.basename(f)}`;
+            });
+          return [
+            ...a,
+            ...foldersFromB,
+          ]
+        }
+        return [
+          ...a,
+          b
+        ]
+      }, []),
+    ];
 
     let folders = [
       ...Helpers.foldersFrom(node_modules).reduce((a, b) => {
         if (path.basename(b).startsWith('@')) {
           const foldersFromB = Helpers.foldersFrom(b)
-            .filter(f => ![config.folder.browser].includes(path.basename(f)))
+            .filter(f => !notAllowedAsPacakge.includes(path.basename(f)))
+            .filter(f => Helpers.exists([path.dirname(f), config.file.index_d_ts])) // QUICK_FIX @angular/animation
             .map(f => {
               return `${path.basename(b)}/${path.basename(f)}`;
             });
