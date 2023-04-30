@@ -76,6 +76,9 @@ export class BrowserCodeCut {
   };
   //#endregion
 
+  readonly isAssetsFile: boolean = false;
+
+
   //#region constructor
   constructor(
     /**
@@ -96,6 +99,20 @@ export class BrowserCodeCut {
     this.absPathTmpSrcDistBundleFolder = crossPlatformPath(absPathTmpSrcDistBundleFolder);
     this.absFileSourcePathBrowserOrWebsql = crossPlatformPath(absFileSourcePathBrowserOrWebsql);
     this.absSourcePathFromSrc = crossPlatformPath(absSourcePathFromSrc);
+
+    // console.log('absSourcePathFromSrc:', absSourcePathFromSrc)
+    // if (absSourcePathFromSrc.endsWith('/file.ts')) {
+    //   debugger
+    // }
+
+    if (project.isStandaloneProject) {
+      if (absSourcePathFromSrc
+        .replace(crossPlatformPath([project.location, config.folder.src]), '')
+        .startsWith('/assets/')
+      ) {
+        this.isAssetsFile = true;
+      }
+    }
 
     this.relativePath = crossPlatformPath(this.absFileSourcePathBrowserOrWebsql)
       .replace(`${this.absPathTmpSrcDistBundleFolder}/`, '')
@@ -166,7 +183,11 @@ export class BrowserCodeCut {
   //#endregion
 
   //#region methods / save normal file
-  private saveNormalFile(isTsFile: boolean, endOfBrowserOrWebsqlCode: string) {
+  private saveNormalFile(isTsFile: boolean, endOfBrowserOrWebsqlCode?: string) {
+    if (this.isAssetsFile) {
+      this.absFileSourcePathBrowserOrWebsql = this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsql);
+      // console.log(`ASSETE: ${this.absFileSourcePathBrowserOrWebsql}`)
+    }
     if (!fse.existsSync(path.dirname(this.absFileSourcePathBrowserOrWebsql))) {
       fse.mkdirpSync(path.dirname(this.absFileSourcePathBrowserOrWebsql));
     }
@@ -186,6 +207,9 @@ export class BrowserCodeCut {
 
   //#region methods / flat typescript import export
   public FLATTypescriptImportExport(usage: ConfigModels.TsUsage) {
+    if (this.isAssetsFile) {
+      return this;
+    }
     if (!this.relativePath.endsWith('.ts')) {
       return this;
     }
@@ -427,6 +451,9 @@ export class BrowserCodeCut {
     // if (debug) {
     //   debugger
     // }
+    if (this.isAssetsFile) {
+      return this;
+    }
     if (!this.relativePath.endsWith('.ts')) {
       return this;
     }
@@ -458,6 +485,9 @@ export class BrowserCodeCut {
 
   //#region methods / replace regions from js require
   REPLACERegionsFromJSrequire() {
+    if (this.isAssetsFile) {
+      return this;
+    }
     if (!this.relativePath.endsWith('.ts')) {
       return this;
     }
@@ -480,6 +510,9 @@ export class BrowserCodeCut {
 
   //#region methods / replace regions for isomorphic lib
   REPLACERegionsForIsomorphicLib(options: Models.dev.ReplaceOptionsExtended) {
+    if (this.isAssetsFile) {
+      return this;
+    }
     options = _.clone(options);
     // Helpers.log(`[REPLACERegionsForIsomorphicLib] options.replacements ${this.absoluteFilePath}`)
     const ext = path.extname(this.relativePath);
@@ -562,6 +595,10 @@ export class BrowserCodeCut {
 
   //#region methods /  save
   save() {
+    if (this.isAssetsFile) {
+      this.saveNormalFile(false)
+      return
+    }
     // Helpers.log(`saving ismoprhic file: ${this.absoluteFilePath}`, 1)
     const isFromLibs = (_.first(this.relativePath.split('/')) === config.folder.libs);
     const module = isFromLibs ? _.first(this.relativePath.split('/').slice(1)) : this.project.name; // taget
@@ -610,8 +647,11 @@ export class BrowserCodeCut {
     absFilePath: string,
   ) {
     if (!absFilePath.endsWith('.ts')) {
+      // console.log(`NOT_FIXING: ${absFilePath}`)
       return content;
     }
+
+    // console.log(`FIXING: ${absFilePath}`)
 
     const howMuchBack = (this.relativePath.split('/').length - 1);
     const additionalSmartPckages = this.additionalSmartPckages;
