@@ -30,6 +30,8 @@ export class QuickFixes extends FeatureForProject {
       if (realCurrentProj.name === 'tnp') {
         pj.devDependencies = {};
         pj.dependencies = {}; // tnp is not going to be use in any other project
+      } else {
+        pj.devDependencies = {};
       }
       Helpers.removeFileIfExists(pjPath);
       Helpers.writeJson(pjPath, pj)// QUICK_FIX
