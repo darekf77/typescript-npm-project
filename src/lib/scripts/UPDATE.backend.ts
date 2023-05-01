@@ -93,7 +93,7 @@ async function $AUTOUPDATE(args: string) {
       }
       Helpers.taskDone();
 
-      Helpers.taskStarted('Installing new version of firedev pacakges')
+      Helpers.taskStarted(`Installing new version of ${config.frameworkName} pacakges`)
       Project.Tnp.run(`npm i --force && npm-run tsc && ${config.frameworkName} dedupe`).sync();
       Helpers.taskDone();
       Helpers.taskStarted('Installing new versions smart container pacakges')

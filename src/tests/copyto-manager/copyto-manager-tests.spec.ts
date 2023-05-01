@@ -55,14 +55,14 @@ describe(wrap.describe(`${config.frameworkName} / copyto manager`), async () => 
 
         const outDir = 'dist';
 
-        dummy1.copyManager.init(BuildOptions.fromJson({
+        dummy1.copyManager.init(BuildOptions.fromJson({ // @ts-ignore
           copyto: [mainProject],
           args: '',
           watch: false,
           outDir
         }));
-
-        const localCopyToProjPath = dummy1.copyManager.localTempProjPath(outDir)
+        // @ts-ignore
+        const localCopyToProjPath = dummy1.copyManager.localTempProjPath(outDir)// @ts-ignore
         await dummy1.copyManager.syncAction([]);
 
         expect(Helpers.exists(localCopyToProjPath)).to.be.true;
@@ -106,13 +106,13 @@ describe(wrap.describe(`${config.frameworkName} / copyto manager`), async () => 
         // dummy1.run(`${config.frameworkName} bd --copyto ../${mainProjName}`).sync();
         // dummy1.run(`${config.frameworkName} bd`).sync();
 
-        dummy1.copyManager.init(BuildOptions.fromJson({
+        dummy1.copyManager.init(BuildOptions.fromJson({// @ts-ignore
           copyto: [mainProject],
           args: '',
           watch: true,
           outDir
         }));
-
+        // @ts-ignore
         await dummy1.copyManager.syncAction([]);
 
 
@@ -183,14 +183,14 @@ describe(wrap.describe(`${config.frameworkName} / copyto manager`), async () => 
 
         const outDir = 'dist';
 
-        dummyContainer.copyManager.init(BuildOptions.fromJson({
+        dummyContainer.copyManager.init(BuildOptions.fromJson({// @ts-ignore
           copyto: [mainProject],
           args: '',
           watch: false,
           outDir
         }));
-
-        const localCopyToProjPath = dummyContainer.copyManager.localTempProjPath(outDir)
+        // @ts-ignore
+        const localCopyToProjPath = dummyContainer.copyManager.localTempProjPath(outDir)// @ts-ignore
         await dummyContainer.copyManager.syncAction([]);
 
         expect(Helpers.exists(localCopyToProjPath)).to.be.true;
