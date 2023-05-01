@@ -28,7 +28,7 @@ export class QuickFixes extends FeatureForProject {
 
       const pj = Helpers.readJson(pjPath) as Models.npm.IPackageJSON;
       if (realCurrentProj.name === 'tnp') {
-        pj.devDependencies = _.merge(pj.devDependencies, pj.dependencies)
+        pj.devDependencies = {};
         pj.dependencies = {}; // tnp is not going to be use in any other project
       }
       Helpers.removeFileIfExists(pjPath);
