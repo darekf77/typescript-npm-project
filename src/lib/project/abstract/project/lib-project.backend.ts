@@ -165,22 +165,11 @@ export abstract class LibProject {
       }
 
       if (this.isStandaloneProject) {
-        const bundleForPublishPath = crossPlatformPath([
-          specyficProjectForBuild.location,
-          this.getTempProjName('bundle'),
-          config.folder.node_modules,
-          this.name
-        ]);
-
-        Helpers.remove(`${bundleForPublishPath}/app*`); // QUICK_FIX
-        const pjPath = crossPlatformPath([
-          bundleForPublishPath,
-          config.file.package_json,
-        ]);
-
-        const pj = Helpers.readJson(pjPath)
-        Helpers.removeFileIfExists(pjPath);
-        Helpers.writeJson(pjPath, pj)// QUICK_FIX
+        realCurrentProj.quickFixes.updateStanaloneProjectBeforePublishing(
+          this,
+          realCurrentProj,
+          specyficProjectForBuild,
+        );
       }
 
       if (!global.tnpNonInteractive) {

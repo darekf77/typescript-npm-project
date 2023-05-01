@@ -10,6 +10,31 @@ import { Models } from 'tnp-models';
 
 export class QuickFixes extends FeatureForProject {
 
+  updateStanaloneProjectBeforePublishing(project: Project, realCurrentProj: Project, specyficProjectForBuild: Project) {
+    if (project.isStandaloneProject) {
+      const bundleForPublishPath = crossPlatformPath([
+        specyficProjectForBuild.location,
+        project.getTempProjName('bundle'),
+        config.folder.node_modules,
+        project.name
+      ]);
+
+      Helpers.remove(`${bundleForPublishPath}/app*`); // QUICK_FIX
+      Helpers.remove(`${bundleForPublishPath}/tests*`); // QUICK_FIX
+      const pjPath = crossPlatformPath([
+        bundleForPublishPath,
+        config.file.package_json,
+      ]);
+
+      const pj = Helpers.readJson(pjPath) as Models.npm.IPackageJSON;
+      if (realCurrentProj.name === 'tnp') {
+        pj.dependencies = {}; // tnp is not going to be use in any other project
+      }
+      Helpers.removeFileIfExists(pjPath);
+      Helpers.writeJson(pjPath, pj)// QUICK_FIX
+    }
+  }
+
   updateTsconfigsInTmpSrcBrowserFolders() {
     if (this.project.typeIs('angular-lib', 'isomorphic-lib')) {
       const tsconfigBrowserPath = path.join(this.project.location, 'tsconfig.browser.json');
