@@ -14,7 +14,7 @@ export interface AppBuildConfig {
 
 export class DocsAppBuildConfig extends FeatureForProject {
   private get configFileName() {
-    return 'docs-app-build-config.json';
+    return 'docs-app-build-config.json5';
   }
 
   private get path() {
