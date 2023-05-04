@@ -153,6 +153,9 @@ export class BroswerCompilation extends BackendCompilation {
   //#region methods / async action
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
+    if (!this.codecut) { // TODO QUICK - but I thin it make sense => there is not backedn compilation for websql
+      return;
+    }
 
     if (!this.buildOptions.websql) { // TODO QUICK_FIX QUICK_DIRTY_FIX
       const websqlInstance = BroswerCompilation.instances[String(!this.buildOptions.websql)];
