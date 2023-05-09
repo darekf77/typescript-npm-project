@@ -10,6 +10,7 @@ import { ProjectFactory } from '../../../scripts/NEW-PROJECT_FILES_MODULES';
 import { PROGRESS_DATA } from 'tnp-models';
 import { Models } from 'tnp-models';
 import { EnvironmentConfig } from '../environment-config';
+import { argsToClear } from '../../../constants';
 
 export type CleanType = 'all' | 'only_static_generated';
 export type InitOptions = {
@@ -82,7 +83,7 @@ export class FilesStructure extends FeatureForProject {
     let {
       skipNodeModules, websql, recrusive, env, struct, skipSmartContainerDistBundleInit, branding
     }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
-    args = Helpers.cliTool.removeArgFromString(args);
+    args = Helpers.cliTool.removeArgFromString(args, argsToClear);
 
     // THIS IS SLOW... BUT I CAN AFORD IT HERE
     if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {

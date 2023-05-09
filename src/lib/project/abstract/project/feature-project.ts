@@ -10,7 +10,7 @@ import {
   SmartNodeModules, RecentFilesForContainer, LinkedRepos, Branding, DocsAppBuildConfig, AssetsManager
 } from '../../features';
 
-import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator } from '../../compilers';
+import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator, AssetsFileListGenerator } from '../../compilers';
 import { CompilerCache } from '../../features/compiler-cache.backend';
 import { CopyManager } from '../../features/copy-manager';
 import { IncrementalBuildProcess } from '../../compilers/build-isomorphic-lib/compilations/incremental-build-process.backend';
@@ -102,6 +102,10 @@ export abstract class FeatureProject {
 
   //#region @backend
   public frameworkFileGenerator: FrameworkFilesGenerator;
+  //#endregion
+
+  //#region @backend
+  public assetsFileListGenerator: AssetsFileListGenerator;
   //#endregion
 
   //#region @backend

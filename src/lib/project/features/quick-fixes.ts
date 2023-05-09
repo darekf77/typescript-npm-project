@@ -7,6 +7,7 @@ import { FeatureForProject, Project } from '../abstract';
 import { Helpers } from 'tnp-helpers';
 import { config, ConfigModels } from 'tnp-config';
 import { Models } from 'tnp-models';
+import { folder_shared_folder_info } from '../../constants';
 
 export class QuickFixes extends FeatureForProject {
 
@@ -138,7 +139,7 @@ export class QuickFixes extends FeatureForProject {
           config.folder.src,
           config.folder.assets,
           config.folder.shared,
-          'shared_folder_info.txt',
+          folder_shared_folder_info,
         ]);
 
         Helpers.writeFile(shared_folder_info, `

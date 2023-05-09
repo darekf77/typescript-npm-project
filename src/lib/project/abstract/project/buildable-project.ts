@@ -13,6 +13,7 @@ import { Helpers, Project as $Project } from 'tnp-helpers';
 import { CopyManager } from '../../features/copy-manager';
 import { CopyManagerStandalone } from '../../features/copy-manager/copy-manager-standalone.backend';
 import { CopyManagerOrganization } from '../../features/copy-manager/copy-manager-organization.backend';
+import { argsToClear } from '../../../constants';
 //#endregion
 
 export abstract class BuildableProject {
@@ -350,6 +351,39 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
     } else {
       // console.log('before build steps')
       await this.buildSteps(buildOptions);
+      if (buildOptions.appBuild) {
+
+        let client: string;
+        if (this.isSmartContainer) {
+          let args = buildOptions.args;
+          args = Helpers.cliTool.removeArgFromString(args, argsToClear);
+          client = Helpers.removeSlashAtEnd(_.first((args || '').split(' '))) as any;
+          const smartContainerBuildTarget = (
+            this.isSmartContainerChild
+              ? this.parent.smartContainerBuildTarget
+              : (this.isSmartContainer ? this.smartContainerBuildTarget : void 0)
+          )
+
+          if (!client && smartContainerBuildTarget) {
+            client = smartContainerBuildTarget.name;
+          }
+          if (!client) {
+            const fisrtChild = _.first(this.isSmartContainer ? this.children : this.parent?.children);
+            if (fisrtChild) {
+              client = fisrtChild.name;
+            }
+          }
+        }
+
+        if (this.isSmartContainer || (this.isStandaloneProject && !this.isSmartContainerTarget)) {
+          if (buildOptions.watch) {
+            await this.assetsFileListGenerator.startAndWatch(client, buildOptions.outDir, buildOptions.websql);
+          } else {
+            await this.assetsFileListGenerator.start(client, buildOptions.outDir, buildOptions.websql);
+          }
+        }
+
+      }
     }
 
     Helpers.info(`${buildOptions.watch ? 'files watch started...' : ''}`);

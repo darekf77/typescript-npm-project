@@ -16,6 +16,7 @@ import { Models } from 'tnp-models';
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
 import { CLI } from 'tnp-cli';
+import { argsToClear } from '../../constants';
 //#endregion
 
 //#region consts
@@ -810,7 +811,7 @@ export class ProjectIsomorphicLib
 
     if (this.isSmartContainerTarget) {
       const parent = this.smartContainerTargetParentContainer;
-      args = Helpers.cliTool.removeArgFromString(args);
+      args = Helpers.cliTool.removeArgFromString(args, argsToClear);
       const target = (crossPlatformPath(_.first(args.split(' '))) || '').replace('/', '');
 
       Helpers.taskDone(`${CLI.chalk.underline(`

@@ -39,7 +39,7 @@ import {
   DocsAppBuildConfig,
   AssetsManager,
 } from '../../features';
-import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin } from '../../compilers';
+import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin, AssetsFileListGenerator } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
 import { DbProcessProject } from './db-process-project.backend';
 import { DependencyProject } from './dependency-project.backend';
@@ -189,6 +189,7 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('branding', Branding);
       this.defineProperty<Project>('docsAppBuild', DocsAppBuildConfig);
       this.defineProperty<Project>('assetsManager', AssetsManager);
+      this.defineProperty<Project>('assetsFileListGenerator', AssetsFileListGenerator);
       this.libProjectInit();
     }
 

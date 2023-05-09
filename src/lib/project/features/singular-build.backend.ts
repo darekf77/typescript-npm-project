@@ -7,6 +7,7 @@ import { Models } from 'tnp-models';
 import { VscodeProject } from '../abstract/project/vscode-project.backend';
 import { BrowserCodeCut } from '../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
 import { recreateApp } from './inside-structures/structs/inside-struct-helpers';
+import { argsToClear } from '../../constants';
 
 export class SingularBuild extends FeatureForProject {
 
@@ -254,7 +255,7 @@ export class SingularBuild extends FeatureForProject {
       const c = children[index];
       await c.filesStructure.init('');
     }
-    args = Helpers.cliTool.removeArgFromString(args);
+    args = Helpers.cliTool.removeArgFromString(args, argsToClear);
 
     let smartContainerBuildTarget = this.project.smartContainerBuildTarget;
 

@@ -299,6 +299,16 @@ export function $MP3(args) {
   process.exit(0)
 }
 
+export function $MP4(args) {
+  // yt-dlp --print filename -o "%(uploader)s-%(upload_date)s-%(title)s.%(ext)s"
+  Helpers.run('yt-dlp --verbose  -S "res:1080,fps" -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" ' + args,
+    {
+      output: true,
+      cwd: crossPlatformPath(path.join(os.userInfo().homedir, 'Downloads'))
+    }).sync();
+  process.exit(0)
+}
+
 export function $BREW(args) {
   const isM1MacOS = os.cpus()[0].model.includes('Apple M1');
   if (process.platform === 'darwin') {
@@ -317,6 +327,7 @@ export default {
   //#region @notForNpm
   $BREW: Helpers.CLIWRAP($BREW, '$BREW'),
   $MP3: Helpers.CLIWRAP($MP3, '$MP3'),
+  $MP4: Helpers.CLIWRAP($MP4, '$MP4'),
   //#endregion
   $PRINT_RELATIVES: Helpers.CLIWRAP($PRINT_RELATIVES, '$PRINT_RELATIVES'),
   $OUTPUT_TEST_ASCII: Helpers.CLIWRAP($OUTPUT_TEST_ASCII, '$OUTPUT_TEST_ASCII'),

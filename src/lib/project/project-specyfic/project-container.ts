@@ -11,6 +11,7 @@ import { CLASS } from 'typescript-class-helpers';
 import type { ProjectIsomorphicLib } from './project-isomorphic-lib';
 import { Models } from 'tnp-models';
 import { config } from 'tnp-config';
+import { argsToClear } from '../../constants';
 
 //#region @backend
 @CLASS.NAME('ProjectContainer')
@@ -104,9 +105,7 @@ export class ProjectContainer
     }
     let { outDir, args } = buildOptions;
 
-    args = Helpers.cliTool.removeArgFromString(args,
-      ['websql', 'serveApp', 'skipNodeModules', 'skipCopyToSelection', 'skipSmartContainerDistBundleInit', 'copyto', 'port']
-    );
+    args = Helpers.cliTool.removeArgFromString(args, argsToClear);
     let client = Helpers.removeSlashAtEnd(_.first((args || '').split(' '))) as any;
     if (!client) {
       client = this.smartContainerBuildTarget?.name;
