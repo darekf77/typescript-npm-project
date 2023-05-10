@@ -225,6 +225,11 @@ function $LAST_TAG() {
   process.exit(0)
 }
 
+
+async function $LIST_TAGS() {
+  (Project.Current as Project).git.lastTagHash
+}
+
 export default {
   $PUSH_TAG: Helpers.CLIWRAP($PUSH_TAG, '$PUSH_TAG'),
   $GIT_CHECK_TAG_EXISTS: Helpers.CLIWRAP($GIT_CHECK_TAG_EXISTS, '$GIT_CHECK_TAG_EXISTS'),

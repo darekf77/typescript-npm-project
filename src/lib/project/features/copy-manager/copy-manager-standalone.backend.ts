@@ -4,6 +4,7 @@ import { BuildOptions } from "tnp-db";
 import { Helpers, PREFIXES } from "tnp-helpers";
 import { Models } from "tnp-models";
 import { CLASS } from "typescript-class-helpers";
+import { argsToClear } from "../../../constants";
 import { Project } from "../../abstract/project/project";
 import { CopyMangerHelpers } from "./copy-manager-helpers.backend";
 import { CopyManager } from "./copy-manager.backend";
@@ -30,7 +31,7 @@ export class CopyManagerStandalone extends CopyManager {
     // @ts-ignore
     this.args = buildOptions.args;
     // @ts-ignore
-    this.args = Helpers.cliTool.removeArgFromString(this.args);
+    this.args = Helpers.cliTool.removeArgFromString(this.args, argsToClear);
     // @ts-ignore
     this.watch = !!buildOptions.watch;
     // @ts-ignore

@@ -53,7 +53,7 @@ async function $INIT_CORE() {
 async function MORPHISYNC(args, noExit = false) {
   const cwd = config.morphiPathUserInUserDir;
   try {
-    Helpers.run(`git reset --hard && git pull origin master`,
+    Helpers.run(`git reset --hard && git fetch && git pull origin master`,
       { cwd }).sync()
   } catch (error) {
     Helpers.error(`[${config.frameworkName} Not ablt to pull origin of morphi: ${config.urlMorphi} in: ${cwd}`, false, true);
