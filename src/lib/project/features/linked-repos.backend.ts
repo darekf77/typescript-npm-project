@@ -61,7 +61,7 @@ export class LinkedRepos extends FeatureForProject {
                 //   Helpers.run('git reset --hard HEAD~5', { cwd: dest }).sync();
                 // }
               } else { // TODO
-                Helpers.git.pullCurrentBranch(destLinkedRepos, true);
+                await Helpers.git.pullCurrentBranch(destLinkedRepos, true);
               }
             } else {
               Helpers.git.clone({

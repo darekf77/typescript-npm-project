@@ -117,6 +117,22 @@ export class Project extends $Project<Project>
   browser: any;
   location: string;
 
+  //#region @backend
+  static angularMajorVersionForCurrentCli(): number {
+    const tnp = (Project.Tnp as Project);
+    const angularFrameworkVersion = Number(_.first(tnp.version.replace('v', '').split('.')));
+    return angularFrameworkVersion;
+  }
+  //#endregion
+
+  //#region @backend
+  static morphiTagToCheckoutForCurrentCliVersion(cwd: string): string {
+    const ngVer = Project.angularMajorVersionForCurrentCli();
+    const lastTagForVer = (Project.From(cwd) as Project).git.lastTagNameForMajorVersion(ngVer);
+    return lastTagForVer;
+  }
+  //#endregion
+
   // @ts-ignore
   get info(this: Project) {
     if (Morphi.IsBrowser) {
@@ -126,7 +142,6 @@ export class Project extends $Project<Project>
     return `(${this._type}) ${this.genericName} `;
     //#endregion
   }
-
 
   get TnpProject() {
     return Project.Tnp as Project;

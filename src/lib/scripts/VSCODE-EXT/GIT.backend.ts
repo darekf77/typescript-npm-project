@@ -226,11 +226,18 @@ function $LAST_TAG() {
 }
 
 
-async function $LIST_TAGS() {
-  (Project.Current as Project).git.lastTagHash
+async function INFO_ANGULAR_VERS_TAGS() {
+  const ngVer = Project.angularMajorVersionForCurrentCli();
+  const lastTagForVer = (Project.Current as Project).git.lastTagNameForMajorVersion(ngVer);
+  console.log({
+    ngVer,
+    lastTagForVer
+  })
+  process.exit(0)
 }
 
 export default {
+  INFO_ANGULAR_VERS_TAGS: Helpers.CLIWRAP(INFO_ANGULAR_VERS_TAGS, 'INFO_ANGULAR_VERS_TAGS'),
   $PUSH_TAG: Helpers.CLIWRAP($PUSH_TAG, '$PUSH_TAG'),
   $GIT_CHECK_TAG_EXISTS: Helpers.CLIWRAP($GIT_CHECK_TAG_EXISTS, '$GIT_CHECK_TAG_EXISTS'),
   $GIT_LAST_TAG_HASH: Helpers.CLIWRAP($GIT_LAST_TAG_HASH, '$GIT_LAST_TAG_HASH'),

@@ -52,16 +52,34 @@ async function $INIT_CORE() {
 
 async function MORPHISYNC(args, noExit = false) {
   const cwd = config.morphiPathUserInUserDir;
+  Helpers.info(`Fetching git data...`);
   try {
-    Helpers.run(`git reset --hard && git fetch && git pull origin master`,
-      { cwd }).sync()
+    Helpers.run(`git reset --hard && git fetch`, { cwd, output: false }).sync();
   } catch (error) {
     Helpers.error(`[${config.frameworkName} Not ablt to pull origin of morphi: ${config.urlMorphi} in: ${cwd}`, false, true);
   }
+  const tagToCheckout = Project.morphiTagToCheckoutForCurrentCliVersion(cwd);
+  const currentBranch = Helpers.git.currentBranchName(cwd);
+  Helpers.taskStarted(`Checking out lastest tag ${tagToCheckout} for firedev framework...`);
+  if (currentBranch !== tagToCheckout) {
+    try {
+      Helpers.run(`git checkout ${tagToCheckout}`, { cwd }).sync()
+    } catch (error) {
+      console.log(error)
+      Helpers.warn(`[${config.frameworkName} Not ablt to checkout latest tag of firedev framework (moprhi project) : ${config.urlMorphi} in: ${cwd}`, false);
+    }
+  }
+  try {
+    Helpers.run(`git pull origin ${tagToCheckout}`, { cwd }).sync()
+  } catch (error) {
+    console.log(error)
+    Helpers.warn(`[${config.frameworkName} Not ablt to pull latest tag of firedev framework (moprhi project) : ${config.urlMorphi} in: ${cwd}`, false);
+  }
+
   try {
     Helpers.run('rimraf .vscode', { cwd }).sync();
   } catch (error) { }
-  Helpers.info('firedev-framework (morphi) synced ok')
+  Helpers.success('firedev-framework synced ok')
   if (!noExit) {
     process.exit(0);
   }
@@ -123,12 +141,21 @@ async function $AUTOUPDATE(args: string) {
   process.exit(0);
 }
 
+export async function SYNC(args) {
+  await MORPHISYNC(args);
+}
 
+export async function BRANCH_NAME(args) {
+  console.log(`current branch name: "${Helpers.git.currentBranchName(process.cwd())}"`);
+  process.exit(0)
+}
 
 export default {
   $UPDATE_ISOMORPHIC: Helpers.CLIWRAP($UPDATE_ISOMORPHIC, '$UPDATE_ISOMORPHIC'),
   $AUTOUPDATE: Helpers.CLIWRAP($AUTOUPDATE, '$AUTOUPDATE'),
   $INIT_CORE: Helpers.CLIWRAP($INIT_CORE, '$INIT_CORE'),
   MORPHISYNC: Helpers.CLIWRAP(MORPHISYNC, 'MORPHISYNC'),
+  SYNC: Helpers.CLIWRAP(SYNC, 'SYNC'),
+  BRANCH_NAME: Helpers.CLIWRAP(BRANCH_NAME, 'BRANCH_NAME'),
 };
 
