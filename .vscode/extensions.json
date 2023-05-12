@@ -41,6 +41,7 @@
         "redhat.vscode-xml",
         "rssowl.copy-relative-path-posix",
         "ms-vscode.live-server",
-        "saber2pr.file-git-history"
+        "saber2pr.file-git-history",
+        "wenfangdu.snippet-generator"
     ]
 }
