@@ -88,6 +88,11 @@ const BUILD_APP_WATCH = (args) => (Project.Current as Project).buildProcess.star
 
 const $APP = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', args);
 
+const $WEBSQL = (args) => {
+  args += ' --websql';
+  return (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', args);
+}
+
 const BUILD_NG = (args) => {
   args += ' --ngbuildonly';
   return (Project.Current as Project).buildProcess.startForLibFromArgs(false, false, 'dist', args);
@@ -520,6 +525,7 @@ export default {
   BLW: Helpers.CLIWRAP(BLW, 'BLW'),
   BUILD_APP_WATCH: Helpers.CLIWRAP(BUILD_APP_WATCH, 'BUILD_APP_WATCH'),
   $APP: Helpers.CLIWRAP($APP, '$APP'),
+  $WEBSQL: Helpers.CLIWRAP($WEBSQL, '$WEBSQL'),
   $BAW: Helpers.CLIWRAP($BAW, '$BAW'),
   $BUILD_DIST_PROD: Helpers.CLIWRAP($BUILD_DIST_PROD, '$BUILD_DIST_PROD'),
   $BUILD_BUNDLE_WATCH: Helpers.CLIWRAP($BUILD_BUNDLE_WATCH, '$BUILD_BUNDLE_WATCH'),

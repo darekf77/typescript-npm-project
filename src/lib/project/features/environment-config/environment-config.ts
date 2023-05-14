@@ -42,6 +42,7 @@ export class EnvironmentConfig
         date: this.project.git.lastCommitDate(),
         hash: this.project.git.lastCommitHash(),
         options: {
+          isWebsqlBuild: this.project.buildOptions.websql,
           isWatchBuild: this.project.buildOptions.watch,
           outDir: this.project.buildOptions.outDir,
         }
