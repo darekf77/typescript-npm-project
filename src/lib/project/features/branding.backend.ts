@@ -2,7 +2,7 @@
 import { crossPlatformPath, path } from 'tnp-core'
 import { fse } from 'tnp-core'
 //#region @notForNpm
-import * as favicons from 'favicons';
+// import * as favicons from 'favicons';
 //#endregion
 import { _ } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
@@ -135,6 +135,7 @@ export class Branding extends FeatureForProject {
     // TODO @LAST QUICK_FIX for sharp
     //#region @notForNpm
     try {
+      // @ts-ignore
       const response = await favicons.favicons(sourceLogoPng, configuration);
 
       // console.log(response.images); // Array of { name: string, contents: <buffer> }

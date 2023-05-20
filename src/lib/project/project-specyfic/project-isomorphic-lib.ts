@@ -16,7 +16,7 @@ import { Models } from 'tnp-models';
 import { BuildOptions } from 'tnp-db';
 import { CLASS } from 'typescript-class-helpers';
 import { CLI } from 'tnp-cli';
-import { argsToClear } from '../../constants';
+import { argsToClear, DEFAULT_PORT } from '../../constants';
 //#endregion
 
 //#region consts
@@ -309,9 +309,15 @@ export class ProjectIsomorphicLib
     if (_.isNumber(argsAdditionalParams.port)) {
       port = argsAdditionalParams.port;
     }
-    if (_.isNumber(port)) {
-      await Helpers.killProcessByPort(port);
+    if (!_.isNumber(port) || !port) {
+      if (websql) {
+        port = DEFAULT_PORT.WEBSQL_APP_BUILD_LOCALHOST;
+      } else {
+        port = DEFAULT_PORT.APP_BUILD_LOCALHOST;
+      }
     }
+
+    await Helpers.killProcessByPort(port);
 
     const isStandalone = (this.isStandaloneProject
       && !this.isWorkspaceChildProject
