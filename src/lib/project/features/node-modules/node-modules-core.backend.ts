@@ -7,7 +7,7 @@ import { Project } from '../../abstract';
 import { Helpers } from 'tnp-helpers';
 import { FeatureForProject } from '../../abstract';
 import {
-  dedupePackages, nodeModulesExists, addDependenceis, stuberizeFrontendPackages, nodeModulesHasOnlyLinks
+  dedupePackages, nodeModulesExists, nodeModulesHasOnlyLinks
 } from './node-modules-helpers.backend';
 //#endregion
 
