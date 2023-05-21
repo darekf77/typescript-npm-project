@@ -158,8 +158,6 @@
           "background-worker-process",
           "firedev-crud-deamon",
           "tnp-db",
-          "ng4-icons",
-          "ng4-modal",
           "firedev-storage",
           "tnp-ui",
           "firedev-ui",
@@ -262,9 +260,6 @@
           q: "^1.5.1",
           // "wait.for": "0.6.6"
         },
-        multithread: {
-          "task.js": "^0.1.5",
-        },
         date: {
           dateformat: "^3.0.3",
           "@types/dateformat": "^1.0.1",
@@ -316,7 +311,7 @@
           "incremental-compiler": '13.1.23',
           open: "7.2.1",
           // "sharp": "0.23.3", - > proble with dependncies
-          "@types/sharp": "0.23.1",
+          // "@types/sharp": "0.23.1",
         },
         sockets: {
           "@types/socket.io-client": "^1.4.32",
@@ -380,7 +375,7 @@
           // "electron": "11.0.3",
           // "electron-builder": "22.9.1",
           // "electron-reload": "1.5.0",
-          "conventional-changelog-cli": "2.1.1",
+          // "conventional-changelog-cli": "2.1.1",
           "wait-on": "5.0.1",
           // "webdriver-manager": "12.1.7",
           // "spectron": "13.0.0"
@@ -389,49 +384,13 @@
           "@1": "angular-client",
         },
         "angular-client": {
-          "ngx-formly": {
-            "@ngx-formly/bootstrap": "^4.6.3",
-            "@ngx-formly/core": "^3.1.0",
-            "@ngx-formly/ionic": "^4.6.3",
-            "@ngx-formly/material": "^3.1.0",
-          },
-          "ui-libs": {
-            'edit-table': '13.1.0',
-            'bootstrap': "4.3.1",
-            "ngx-bootstrap": "^2.0.2",
-          },
-          icons: {
-            "button-dropdown": "1.0.45",
-            "@iconify/react": "1.1.3",
-            "@mdi/js": "5.8.55",
-            "font-awesome": "^4.7.0",
-            "material-design-icons": "3.0.1",
-          },
           essentials: {
-            "element-resize-detector": "1.1.15",
             "static-columns": '13.3.5',
             "bs4-breakpoint": '13.0.33',
-            "ngx-breadcrumbs": "0.0.3",
-            "ngx-editor": "^3.3.0",
-            "ngx-moment": "^3.0.1",
-            "ngx-pipes": "^2.1.7",
-            "ngx-wig": "^1.2.7",
             "ngx-store": "2.1.0",
             "firedev-storage": '13.2.32',
             "node-localstorage": "2.1.6",
-            "ng2-file-upload": "^1.3.0",
-            "ngx-toastr": "^8",
             hammerjs: "^2.0.8",
-            "@ngx-loading-bar/core": "^2.2.0",
-            "@ngx-loading-bar/http": "^2.2.0",
-            "@ngx-loading-bar/router": "^2.2.0",
-            "@ngx-translate/core": "^9.1.1",
-            "@ngx-translate/http-loader": "^2.0.1",
-            "@swimlane/ngx-datatable": "^13.0.0",
-            "angular-tree-component": "^7.0.0",
-            "ng-modal-lib": "0.0.6",
-            "ng4-modal": "13.1.23",
-            "ng4-icons": "13.1.21",
           },
           "build-tools": {
             concurrently: "^3.5.1",
@@ -552,11 +511,8 @@
             compression: "1.7.4",
             hostile: "~1.3.3",
           },
-          validators: {
-            validator: "^9.2.0",
-          },
           authentication: {
-            fbgraph: "^1.4.1",
+            // fbgraph: "^1.4.1",
             "@types/oauth2orize": "^1.8.0",
             "@types/password-hash": "^1.2.19",
             bcryptjs: "2.4.3",
