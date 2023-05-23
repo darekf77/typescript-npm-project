@@ -1,9 +1,8 @@
 
+//#region imports
 import { crossPlatformPath, path } from 'tnp-core'
 import { fse } from 'tnp-core'
-//#region @notForNpm
-// import * as favicons from 'favicons';
-//#endregion
+
 import { _ } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project/abstract/project/project';
@@ -64,7 +63,6 @@ export class Branding extends FeatureForProject {
 
     const dest = this.path;
 
-    // @LAST don't generate branding automatically
     if (Helpers.exists(crossPlatformPath([dest, htmlBasename]))) {
       Helpers.logInfo(`Branding already generated for ${proj.genericName}.`)
       return;
@@ -132,10 +130,11 @@ export class Branding extends FeatureForProject {
       // ],
     };
 
-    // TODO @LAST QUICK_FIX for sharp
+    // TODO implement for sharp for firedev branding
     //#region @notForNpm
     try {
       // @ts-ignore
+      const favicons = require('favicons');
       const response = await favicons.favicons(sourceLogoPng, configuration);
 
       // console.log(response.images); // Array of { name: string, contents: <buffer> }

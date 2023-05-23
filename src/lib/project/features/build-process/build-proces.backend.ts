@@ -150,8 +150,6 @@ inside generated projects...
     } else {
       if (buildOptions.watch) {
         log.data('is lib build watch')
-
-        // TODO @LAST BRANDING
         await this.project.filesStructure.init(buildOptions.args, { watch: true, watchOnly: buildOptions.watchOnly });
       } else {
         await this.project.filesStructure.init(buildOptions.args);

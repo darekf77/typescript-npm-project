@@ -415,10 +415,6 @@ ${appModuleFile}
           const manifestJson: Models.pwa.Manifest = Helpers.readJson(manifestJsonPath, {}, true);
           let indexHtml = Helpers.readFile(indexHtmlPath);
 
-          // const projectStandaloneOrContainer = projectTargetOrStandalone.isSmartContainerTarget
-          //   ? projectTargetOrStandalone?.smartContainerTargetParentContainer : this.project;
-          //   // TODO @LAST
-
           manifestJson.name = projectTargetOrStandalone.env.config?.pwa?.name
             ? projectTargetOrStandalone.env.config.pwa.name : _.startCase(project.name);
 
