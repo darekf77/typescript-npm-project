@@ -204,6 +204,11 @@ ${appModuleFile}
             `import { Morphi } from 'morphi/${this.websql ? config.folder.websql : config.folder.browser}';`,
           );
 
+          appComponentFile = appComponentFile.replace(
+            `import start from './---projectname---/app';`,
+            `import start from './${this.project.name}/app';`,
+          );
+
           Helpers.writeFile(appComponentFilePath, appComponentFile);
         })();
         //#endregion

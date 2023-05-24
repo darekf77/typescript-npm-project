@@ -223,7 +223,7 @@
         "tnp-models": '13.1.24',
         "tnp-helpers": '13.1.32',
         "tnp-db": '13.1.19',
-        "firedev-typeorm": '13.1.25',
+        "firedev-typeorm": '13.1.26',
         "firedev-crud": '13.1.47',
         "firedev-ports": '13.1.41',
         "firedev-crud-deamon": '13.1.37',
