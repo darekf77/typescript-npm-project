@@ -58,9 +58,14 @@ export class AssetsFileListGenerator extends FeatureForProject {
     this.outFolder = outFolder;
     this.websql = websql;
     const files = Helpers.filesFrom(this.assetsFolder, true).filter(f => !this.shoudBeIgnore(f))
-    const srcPath = this.srcPath;
+    const assetsSrcFolder = this.srcPath;
+    // console.log({
+    //   files,
+    //   assetsSrcFolder,
+    // })
+
     this.detectedFiles = files.map(f => {
-      const relative = f.replace(srcPath, '');
+      const relative = f.replace(assetsSrcFolder, '');
       return relative;
     }).filter(f => this.allowedOnList(f))
     this.update()

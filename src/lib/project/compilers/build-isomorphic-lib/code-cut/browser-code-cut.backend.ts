@@ -151,6 +151,11 @@ export class BrowserCodeCut {
       Helpers.removeIfExists(this.replaceAssetsPath(this.absoluteBackendDestFilePath));
     } else {
       // this is needed for json in src/lib or something
+      const realAbsSourcePathFromSrc = fse.realpathSync(this.absSourcePathFromSrc);
+      if (!Helpers.exists(realAbsSourcePathFromSrc) || Helpers.isFolder(realAbsSourcePathFromSrc)) {
+        return;
+      }
+
       Helpers.copyFile(this.absSourcePathFromSrc, this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsql));
       // final straight copy to tmp-source-folder
       Helpers.copyFile(this.absSourcePathFromSrc, this.replaceAssetsPath(this.absoluteBackendDestFilePath));

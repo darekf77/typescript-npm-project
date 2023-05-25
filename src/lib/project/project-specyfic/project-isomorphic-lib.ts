@@ -182,7 +182,7 @@ export class ProjectIsomorphicLib
   //#endregion
 
   //#region methods / build steps
-  async buildSteps(buildOptions?: BuildOptions) {
+  async buildSteps(buildOptions?: BuildOptions, libBuildDone?: () => void) {
     //#region @backendFunc
     this.buildOptions = buildOptions;
     const { prod, watch, outDir, onlyWatchNoBuild, appBuild, args, forClient = [], baseHref, websql } = buildOptions;
@@ -191,7 +191,7 @@ export class ProjectIsomorphicLib
       if (appBuild) {
         await this.buildApp(outDir, watch, forClient as any, buildOptions.args, baseHref, prod, websql);
       } else {
-        await this.buildLib();
+        await this.buildLib(libBuildDone);
       }
     }
 
@@ -482,7 +482,7 @@ export class ProjectIsomorphicLib
   //#endregion
 
   //#region api / build lib
-  async buildLib() {
+  async buildLib(libBuildDone?: () => void) {
     //#region @backend
 
     //#region preparing variables
@@ -651,6 +651,15 @@ export class ProjectIsomorphicLib
               ...sharedOptions(),
             });
           }
+
+          // console.log({
+          //   libBuildDone,
+          //   serveApp,
+          // })
+          if (libBuildDone) {
+            await Helpers.runSyncOrAsync(libBuildDone);
+          }
+
           if (serveApp) {
             const appBuildOpt = this.buildOptions.clone();
             appBuildOpt.appBuild = true;

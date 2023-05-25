@@ -88,7 +88,7 @@ export abstract class BuildableProject {
   //#endregion
 
   //#region @backend
-  protected async buildSteps(buildOptions?: BuildOptions) {
+  protected async buildSteps(buildOptions?: BuildOptions, libBuildDone?: () => void) {
     // should be abstract
   }
   //#endregion
@@ -346,43 +346,61 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
     }
 
     const { skipBuild = false } = require('minimist')(this.buildOptions.args.split(' '));
+    // console.log({
+    //   skipBuild
+    // })
+
+    //#region build assets file
+    const buildAssetsFile = async () => {
+      // console.log('after build steps');
+      let client: string;
+      if (this.isSmartContainer) {
+        let args = buildOptions.args;
+        args = Helpers.cliTool.removeArgFromString(args, argsToClear);
+        client = Helpers.removeSlashAtEnd(_.first((args || '').split(' '))) as any;
+        const smartContainerBuildTarget = (
+          this.isSmartContainerChild
+            ? this.parent.smartContainerBuildTarget
+            : (this.isSmartContainer ? this.smartContainerBuildTarget : void 0)
+        )
+
+        if (!client && smartContainerBuildTarget) {
+          client = smartContainerBuildTarget.name;
+        }
+        if (!client) {
+          const fisrtChild = _.first(this.isSmartContainer ? this.children : this.parent?.children);
+          if (fisrtChild) {
+            client = fisrtChild.name;
+          }
+        }
+      }
+      const shouldGenerateAssetsList = this.isSmartContainer || (this.isStandaloneProject && !this.isSmartContainerTarget);
+      // console.log({ shouldGenerateAssetsList })
+      if (shouldGenerateAssetsList) {
+        if (buildOptions.watch) {
+          await this.assetsFileListGenerator.startAndWatch(client, buildOptions.outDir, buildOptions.websql);
+        } else {
+          await this.assetsFileListGenerator.start(client, buildOptions.outDir, buildOptions.websql);
+        }
+      }
+    };
+    //#endregion
+
     if (skipBuild) {
       Helpers.log(`[buildable-project] Skip build for ${this.genericName}`);
     } else {
       // console.log('before build steps')
-      await this.buildSteps(buildOptions);
-      if (buildOptions.appBuild) {
-
-        let client: string;
-        if (this.isSmartContainer) {
-          let args = buildOptions.args;
-          args = Helpers.cliTool.removeArgFromString(args, argsToClear);
-          client = Helpers.removeSlashAtEnd(_.first((args || '').split(' '))) as any;
-          const smartContainerBuildTarget = (
-            this.isSmartContainerChild
-              ? this.parent.smartContainerBuildTarget
-              : (this.isSmartContainer ? this.smartContainerBuildTarget : void 0)
-          )
-
-          if (!client && smartContainerBuildTarget) {
-            client = smartContainerBuildTarget.name;
+      if (buildOptions.serveApp) {
+        await this.buildSteps(buildOptions, async () => {
+          if (buildOptions.appBuild || buildOptions.serveApp) {
+            await buildAssetsFile()
           }
-          if (!client) {
-            const fisrtChild = _.first(this.isSmartContainer ? this.children : this.parent?.children);
-            if (fisrtChild) {
-              client = fisrtChild.name;
-            }
-          }
+        });
+      } else {
+        await this.buildSteps(buildOptions);
+        if (buildOptions.appBuild || buildOptions.serveApp) {
+          await buildAssetsFile()
         }
-
-        if (this.isSmartContainer || (this.isStandaloneProject && !this.isSmartContainerTarget)) {
-          if (buildOptions.watch) {
-            await this.assetsFileListGenerator.startAndWatch(client, buildOptions.outDir, buildOptions.websql);
-          } else {
-            await this.assetsFileListGenerator.start(client, buildOptions.outDir, buildOptions.websql);
-          }
-        }
-
       }
     }
 

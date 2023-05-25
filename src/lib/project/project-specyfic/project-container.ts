@@ -98,7 +98,7 @@ export class ProjectContainer
     return Project.From(SingularBuild.getProxyProj(this, client, outFolder)) as any
   }
 
-  async buildSteps(buildOptions?: BuildOptions) {
+  async buildSteps(buildOptions?: BuildOptions, libBuildDone?: () => void) {
     //#region @backend
     if (!fse.existsSync(this.location)) {
       return;
@@ -144,7 +144,7 @@ ${this.children.filter(c => c.typeIs('isomorphic-lib')).map(c => {
 
       `, false, true);
     }
-    await proxy.buildSteps(buildOptions);
+    await proxy.buildSteps(buildOptions, libBuildDone);
 
     //#endregion
   }
