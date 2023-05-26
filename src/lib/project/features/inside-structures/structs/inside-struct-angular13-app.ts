@@ -8,6 +8,7 @@ import { InsideStruct } from '../inside-struct';
 import { BaseInsideStruct } from './base-inside-struct';
 import { recreateApp } from './inside-struct-helpers';
 import { config } from 'tnp-config';
+import { getLoader } from './loaders/loaders';
 
 @CLASS.NAME('InsideStructAngular13App')
 export class InsideStructAngular13App extends BaseInsideStruct {
@@ -289,6 +290,97 @@ ${appModuleFile}
           Helpers.writeFile(appModuleFilePath, appHtmlFile);
         })();
         //#endregion
+
+        //#region LOADERS/ BACKGROUNDS REPLACEMENT
+        (() => {
+          const projectTargetOrStandalone = this.project;
+
+          // if(projectTargetOrStandalone.name === 'main') {
+          //   console.log({
+          //     loading: JSON.stringify(projectTargetOrStandalone?.env.config?.loading),
+          //   })
+          // }
+
+          (() => {
+            const appModuleHtmlPath = path.join(
+              project.location,
+              replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+              `/src/app/app.component.html`
+            );
+
+            let appHtmlFile = Helpers.readFile(appModuleHtmlPath);
+
+
+            const loaderToReplace = getLoader(
+              (projectTargetOrStandalone.env.config?.loading?.afterAngularBootstrap?.loader?.name) as any
+              , projectTargetOrStandalone.env.config?.loading?.afterAngularBootstrap?.loader?.color,
+              false
+            )
+
+            appHtmlFile = appHtmlFile.replace(
+              '<!-- <<<TO_REPLACE_LOADER>>> -->',
+              loaderToReplace,
+            );
+
+            // console.log({
+            //   proj: projectTargetOrStandalone.name,
+            //   loaderToReplace: loaderToReplace?.slice(-200),
+            //   appHtmlFile: appHtmlFile?.slice(-200),
+            // })
+
+            Helpers.writeFile(appModuleHtmlPath, appHtmlFile);
+          })();
+
+          (() => {
+            const appModuleFilePath = path.join(
+              project.location,
+              replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+              `/src/app/app.component.ts`
+            );
+
+            let appScssFile = Helpers.readFile(appModuleFilePath);
+
+            const bgColor = projectTargetOrStandalone.env.config?.loading?.afterAngularBootstrap?.background;
+            if (bgColor) {
+              appScssFile = appScssFile.replace(
+                'FIREDEV_TO_REPLACE_COLOR',
+                bgColor,
+              );
+            }
+            Helpers.writeFile(appModuleFilePath, appScssFile);
+          })();
+
+          (() => {
+            const appModuleFilePath = path.join(
+              project.location,
+              replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+              `/src/index.html`
+            );
+
+            let indexHtmlFile = Helpers.readFile(appModuleFilePath);
+
+            indexHtmlFile = indexHtmlFile.replace(
+              '<!-- <<<TO_REPLACE_LOADER>>> -->',
+              getLoader((projectTargetOrStandalone.env.config?.loading?.preAngularBootstrap?.loader?.name) as any,
+                projectTargetOrStandalone.env.config?.loading?.preAngularBootstrap?.loader?.color,
+
+                true)
+            );
+
+            const bgColor = projectTargetOrStandalone.env.config?.loading?.preAngularBootstrap?.background;
+            const bgColorStyle = bgColor ? `style="background-color: ${bgColor};"` : '';
+            indexHtmlFile = indexHtmlFile.replace(
+              'FIREDEV_TO_REPLACE_COLOR',
+              bgColorStyle,
+            );
+
+            Helpers.writeFile(appModuleFilePath, indexHtmlFile);
+          })();
+
+
+        })();
+        //#endregion
+
 
         //#region replace app.component.html
         (() => {
