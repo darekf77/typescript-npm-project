@@ -27,8 +27,14 @@ export class NodeModulesCore extends FeatureForProject {
     if (!_.isArray(packagesOrOptions) && packagesOrOptions?.reason) {
       Helpers.logInfo(`Reason to dedupe: ${packagesOrOptions?.reason}`)
     }
+    const tnpProj = Project.Tnp as Project;
+    const arrTrusted = tnpProj.packageJson.data.tnp.core.dependencies.trusted[this.project._frameworkVersion];
     const packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
-      (Project.Tnp as Project).packageJson.data.tnp.core.dependencies.dedupe;
+     Helpers.arrays.uniqArray([
+      ...(tnpProj).packageJson.data.tnp.core.dependencies.dedupe,
+      ...arrTrusted,
+     ])
+
 
     // if (this.project.frameworkVersionAtLeast('v3')) { // TODO QUICK_FIX REMOVE_THIS
     //   const onlyDedpupeForV3 = [
