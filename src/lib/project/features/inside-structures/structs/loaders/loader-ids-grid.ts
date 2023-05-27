@@ -1,3 +1,4 @@
+import { ID_LOADER_PRE_BOOTSTRAP, PRE_LOADER_NG_IF_INITED } from "../inside-struct-constants";
 
 export function idsGrid(color = 'black', preloader = false) {
   return `
@@ -72,7 +73,7 @@ export function idsGrid(color = 'black', preloader = false) {
 
 </style>
 
-<div ${preloader ? ' id="firedevpreloadertoremove"' : '*ngIf="!inited"'}  class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+<div ${preloader ? ID_LOADER_PRE_BOOTSTRAP : PRE_LOADER_NG_IF_INITED}  class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 
   `
 }

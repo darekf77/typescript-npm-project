@@ -8,8 +8,70 @@ import {
 } from 'tnp-core';
 
 import { Helpers } from 'tnp-helpers';
+import { Models } from 'tnp-models';
 import { EXPORT_TEMPLATE } from '../../../../templates';
 import { Project } from '../../../abstract/project/project';
+
+export function resolveBrowserPathToAssetFrom(projectTargetOrStandalone: Project, absolutePath: string, outFolder: Models.dev.BuildDir, websql: boolean) {
+  let resultBrowserPath = '';
+  if (projectTargetOrStandalone.isSmartContainerTarget) {
+    // `tmp-src-${outFolder}${websql ? '-websql' : ''}/assets/assets-for/${projectTargetOrStandalone.name + '--' + projectTargetOrStandalone.parent.name}/`
+    const relatievPath = absolutePath.replace(
+      `${projectTargetOrStandalone?.smartContainerTargetParentContainer.location}/`,
+      ''
+    );
+    const client = _.first(relatievPath.split('/'));
+    resultBrowserPath = `/${relatievPath.split('/').slice(1).join('/')}`;
+    resultBrowserPath = resultBrowserPath.replace(
+      `/${config.folder.src}/${config.folder.assets}/`,
+      `/${config.folder.assets}/${config.folder.assets}-for/${projectTargetOrStandalone.smartContainerTargetParentContainer.name + '--' + client}/`,
+    );
+  } else {
+    // `tmp-src-${outFolder}${websql ? '-websql' : ''}/assets/assets-for/${projectTargetOrStandalone.name}/`
+    const relatievPath = absolutePath.replace(
+      `${crossPlatformPath(projectTargetOrStandalone.location)}/`,
+      ''
+    );
+    resultBrowserPath = `/${relatievPath}`;
+    resultBrowserPath = resultBrowserPath.replace(
+      `/${config.folder.src}/${config.folder.assets}/`,
+      `/${config.folder.assets}/${config.folder.assets}-for/${projectTargetOrStandalone.name}/`
+    );
+  }
+
+  return resultBrowserPath;
+}
+
+export function resolvePathToAsset(projectTargetOrStandalone: Project, relativePath: string, outFolder: Models.dev.BuildDir, websql: boolean) {
+  const loaderRelativePath = relativePath.replace(/^\.\//, '').replace(/^\//, '');
+  let absPathToAsset = '';
+  let browserPath = ''
+
+  if (projectTargetOrStandalone.isSmartContainerTarget) { // stratego for smart container target project
+    absPathToAsset = crossPlatformPath([projectTargetOrStandalone.smartContainerTargetParentContainer.location, loaderRelativePath]);
+    if (!Helpers.exists(absPathToAsset)) {
+      absPathToAsset = absPathToAsset.replace(
+        loaderRelativePath,
+        `${projectTargetOrStandalone.name}/${loaderRelativePath}`
+      )
+    }
+  } else { // stratego for normal standalone project
+    absPathToAsset = crossPlatformPath([projectTargetOrStandalone.location, loaderRelativePath]);
+    if (!Helpers.exists(absPathToAsset)) {
+      absPathToAsset = absPathToAsset.replace(
+        `${projectTargetOrStandalone.name}/${loaderRelativePath}`,
+        loaderRelativePath,
+      )
+    }
+  }
+  browserPath = resolveBrowserPathToAssetFrom(projectTargetOrStandalone, absPathToAsset, outFolder, websql);
+
+  // console.log({
+  //   pathToAsset: absPathToAsset,
+  //   browserPath,
+  // })
+  return browserPath;
+}
 
 export function recreateIndex(project: Project) {
   (() => {

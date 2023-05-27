@@ -1,8 +1,9 @@
 import { ConfigModels } from 'tnp-config';
+import { Models } from 'tnp-models';
 import { Project } from '../../abstract/project/project';
 
 export type Opt = {
-  outFolder?: ConfigModels.OutFolder;
+  outFolder?: Models.dev.BuildDir;
   projectName?: string;
   projectLocation?: string;
   client?: Project;

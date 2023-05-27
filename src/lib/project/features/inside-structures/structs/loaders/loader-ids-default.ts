@@ -1,5 +1,6 @@
+import { ID_LOADER_PRE_BOOTSTRAP, PRE_LOADER_NG_IF_INITED } from "../inside-struct-constants";
 
-export function idsDefault(color = '#8d8d8d', preloader =false) {
+export function idsDefault(color = '#8d8d8d', preloader = false) {
   return `
 <style>
   .lds-default {
@@ -89,7 +90,7 @@ export function idsDefault(color = '#8d8d8d', preloader =false) {
   }
 </style>
 
-<div ${preloader ? ' id="firedevpreloadertoremove"' : '*ngIf="!inited"'}  class="lds-default"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+<div ${preloader ? ID_LOADER_PRE_BOOTSTRAP : PRE_LOADER_NG_IF_INITED}  class="lds-default"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 
   `
 }

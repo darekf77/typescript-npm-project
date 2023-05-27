@@ -1,3 +1,4 @@
+import { ID_LOADER_PRE_BOOTSTRAP, PRE_LOADER_NG_IF_INITED } from "../inside-struct-constants";
 
 export function idsEllipsis(color = '#8d8d8d', preloader = false) {
   return `
@@ -62,7 +63,7 @@ export function idsEllipsis(color = '#8d8d8d', preloader = false) {
   }
 </style>
 
-<div ${preloader ? ' id="firedevpreloadertoremove"' : '*ngIf="!inited"'}  class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+<div ${preloader ? ID_LOADER_PRE_BOOTSTRAP : PRE_LOADER_NG_IF_INITED}  class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
 
   `
 }

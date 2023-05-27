@@ -6,9 +6,11 @@ import { Helpers } from 'tnp-helpers';
 import { Project } from '../../../abstract/project/project';
 import { InsideStruct } from '../inside-struct';
 import { BaseInsideStruct } from './base-inside-struct';
-import { recreateApp } from './inside-struct-helpers';
+import { recreateApp, resolvePathToAsset } from './inside-struct-helpers';
 import { config } from 'tnp-config';
 import { getLoader } from './loaders/loaders';
+import { ID_LOADER_PRE_BOOTSTRAP, PRE_LOADER_NG_IF_INITED } from './inside-struct-constants';
+import { imageLoader } from './loaders/image-loader';
 
 @CLASS.NAME('InsideStructAngular13App')
 export class InsideStructAngular13App extends BaseInsideStruct {
@@ -291,7 +293,7 @@ ${appModuleFile}
         })();
         //#endregion
 
-        //#region LOADERS/ BACKGROUNDS REPLACEMENT
+        //#region LOADERS & BACKGROUNDS REPLACEMENT
         (() => {
           const projectTargetOrStandalone = this.project;
 
@@ -301,6 +303,7 @@ ${appModuleFile}
           //   })
           // }
 
+          //#region LOADERS & BACKGROUNDS REPLACEMENT / replace app.component.html loader
           (() => {
             const appModuleHtmlPath = path.join(
               project.location,
@@ -310,27 +313,28 @@ ${appModuleFile}
 
             let appHtmlFile = Helpers.readFile(appModuleHtmlPath);
 
+            const loaderData = projectTargetOrStandalone.env.config?.loading?.afterAngularBootstrap?.loader;
+            const loaderIsImage = _.isString(loaderData);
 
-            const loaderToReplace = getLoader(
-              (projectTargetOrStandalone.env.config?.loading?.afterAngularBootstrap?.loader?.name) as any
-              , projectTargetOrStandalone.env.config?.loading?.afterAngularBootstrap?.loader?.color,
-              false
-            )
-
-            appHtmlFile = appHtmlFile.replace(
-              '<!-- <<<TO_REPLACE_LOADER>>> -->',
-              loaderToReplace,
-            );
-
-            // console.log({
-            //   proj: projectTargetOrStandalone.name,
-            //   loaderToReplace: loaderToReplace?.slice(-200),
-            //   appHtmlFile: appHtmlFile?.slice(-200),
-            // })
+            if (loaderIsImage) {
+              const pathToAsset = resolvePathToAsset(projectTargetOrStandalone, loaderData, outFolder, websql);
+              appHtmlFile = appHtmlFile.replace(
+                '<!-- <<<TO_REPLACE_LOADER>>> -->',
+                imageLoader(pathToAsset, false),
+              );
+            } else {
+              const loaderToReplace = getLoader((loaderData?.name) as any, loaderData?.color, false)
+              appHtmlFile = appHtmlFile.replace(
+                '<!-- <<<TO_REPLACE_LOADER>>> -->',
+                loaderToReplace,
+              );
+            }
 
             Helpers.writeFile(appModuleHtmlPath, appHtmlFile);
           })();
+          //#endregion
 
+          //#region LOADERS & BACKGROUNDS REPLACEMENT / replace app.component.ts body  background color
           (() => {
             const appModuleFilePath = path.join(
               project.location,
@@ -349,7 +353,9 @@ ${appModuleFile}
             }
             Helpers.writeFile(appModuleFilePath, appScssFile);
           })();
+          //#endregion
 
+          //#region LOADERS & BACKGROUNDS REPLACEMENT / replace index.html body background color & loader
           (() => {
             const appModuleFilePath = path.join(
               project.location,
@@ -359,13 +365,22 @@ ${appModuleFile}
 
             let indexHtmlFile = Helpers.readFile(appModuleFilePath);
 
-            indexHtmlFile = indexHtmlFile.replace(
-              '<!-- <<<TO_REPLACE_LOADER>>> -->',
-              getLoader((projectTargetOrStandalone.env.config?.loading?.preAngularBootstrap?.loader?.name) as any,
-                projectTargetOrStandalone.env.config?.loading?.preAngularBootstrap?.loader?.color,
+            const loaderData = projectTargetOrStandalone.env.config?.loading?.preAngularBootstrap?.loader;
+            const loaderIsImage = _.isString(loaderData);
 
-                true)
-            );
+            if (loaderIsImage) {
+              const pathToAsset = resolvePathToAsset(projectTargetOrStandalone, loaderData, outFolder, websql);
+              indexHtmlFile = indexHtmlFile.replace(
+                '<!-- <<<TO_REPLACE_LOADER>>> -->',
+                imageLoader(pathToAsset, true),
+              );
+            } else {
+              const loaderToReplace = getLoader((loaderData?.name) as any, loaderData?.color, true);
+              indexHtmlFile = indexHtmlFile.replace(
+                '<!-- <<<TO_REPLACE_LOADER>>> -->',
+                loaderToReplace,
+              );
+            }
 
             const bgColor = projectTargetOrStandalone.env.config?.loading?.preAngularBootstrap?.background;
             const bgColorStyle = bgColor ? `style="background-color: ${bgColor};"` : '';
@@ -376,11 +391,11 @@ ${appModuleFile}
 
             Helpers.writeFile(appModuleFilePath, indexHtmlFile);
           })();
+          //#endregion
 
 
         })();
         //#endregion
-
 
         //#region replace app.component.html
         (() => {
@@ -434,7 +449,6 @@ ${appModuleFile}
           Helpers.writeFile(mainFilePath, mainTsFile);
         })();
         //#endregion
-
 
         //#region replace favicon.ico
         (() => {

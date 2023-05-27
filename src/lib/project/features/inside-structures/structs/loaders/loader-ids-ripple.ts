@@ -1,3 +1,4 @@
+import { ID_LOADER_PRE_BOOTSTRAP, PRE_LOADER_NG_IF_INITED } from "../inside-struct-constants";
 
 export function idsRipple(color = 'blue', preloader = false) {
   return `
@@ -53,7 +54,7 @@ export function idsRipple(color = 'blue', preloader = false) {
   }
 </style>
 
-<div ${preloader ? ' id="firedevpreloadertoremove"' : '*ngIf="!inited"'}  class="lds-ripple"><div></div><div></div></div>
+<div ${preloader ? ID_LOADER_PRE_BOOTSTRAP : PRE_LOADER_NG_IF_INITED}  class="lds-ripple"><div></div><div></div></div>
 
   `
 }
