@@ -87,43 +87,41 @@ async function MORPHISYNC(args, noExit = false) {
 
 
 async function $AUTOUPDATE(args: string) {
-  if (await Helpers.questionYesNo(`Proceed with ${config.frameworkName} auto-update ?`)) {
-    if (config.frameworkName === 'firedev') {
+
+  if (config.frameworkName === 'firedev') {
+    if (await Helpers.questionYesNo(`Proceed with ${config.frameworkName} auto-update ?`)) {
       Helpers.run('npm i -g firedev --force').sync();
       await MORPHISYNC(args, true)
       const container = Project.by('container', config.defaultFrameworkVersion);
       container.run('firedev reinstall').sync();
       Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
     }
-    if (config.frameworkName === 'tnp') {
-      Helpers.taskStarted('Removing old node_modules..');
-      const nm = (Project.Tnp as Project).node_modules.path;
-      const nm2 = (Project.Tnp as Project).pathFor(`tmp-${config.folder.node_modules}2`)
-      const nm1 = (Project.Tnp as Project).pathFor(`tmp-${config.folder.node_modules}1`)
-
-      Helpers.removeIfExists(nm2);
-      if (Helpers.exists(nm1)) {
-        Helpers.move(nm1, nm2);
-      }
-      Helpers.removeIfExists(nm1);
-      if (Helpers.exists(nm)) {
-        Helpers.move(nm, nm1);
-      }
-      Helpers.taskDone();
-
-      Helpers.taskStarted(`Installing new version of ${config.frameworkName} pacakges`)
-      Project.Tnp.run(`npm i --force && npm-run tsc && ${config.frameworkName} dedupe`).sync();
-      Helpers.taskDone();
-      Helpers.taskStarted('Installing new versions smart container pacakges')
-      Project.by('container', (Project.Tnp as Project)._frameworkVersion).run(`${config.frameworkName} reinstall`).sync();
-      Helpers.taskDone();
-
-      Helpers.taskDone('AUTOUPDATE DONE');
-    }
-    process.exit(0);
   }
+  if (config.frameworkName === 'tnp') {
+    Helpers.taskStarted('Removing old node_modules..');
+    const nm = (Project.Tnp as Project).node_modules.path;
+    const nm2 = (Project.Tnp as Project).pathFor(`tmp-${config.folder.node_modules}2`)
+    const nm1 = (Project.Tnp as Project).pathFor(`tmp-${config.folder.node_modules}1`)
 
+    Helpers.removeIfExists(nm2);
+    if (Helpers.exists(nm1)) {
+      Helpers.move(nm1, nm2);
+    }
+    Helpers.removeIfExists(nm1);
+    if (Helpers.exists(nm)) {
+      Helpers.move(nm, nm1);
+    }
+    Helpers.taskDone();
 
+    Helpers.taskStarted(`Installing new version of ${config.frameworkName} pacakges`)
+    Project.Tnp.run(`npm i --force && npm-run tsc && ${config.frameworkName} dedupe`).sync();
+    Helpers.taskDone();
+    Helpers.taskStarted('Installing new versions smart container pacakges')
+    Project.by('container', (Project.Tnp as Project)._frameworkVersion).run(`${config.frameworkName} reinstall`).sync();
+    Helpers.taskDone();
+
+    Helpers.taskDone('AUTOUPDATE DONE');
+  }
   // const file = path.basename(args.trim());
   // function processing() {
   //   Helpers.info(`processing file...`);
@@ -137,7 +135,7 @@ async function $AUTOUPDATE(args: string) {
   //     Helpers.error(`Not recognized file for update`, false, true);
   //     break;
   // }
-  Helpers.info(`Update of ${config.frameworkName} name done.`);
+  Helpers.info(`${config.frameworkName} - AUTOUPDATE  DONE`);
   process.exit(0);
 }
 
