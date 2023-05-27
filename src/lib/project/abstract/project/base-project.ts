@@ -36,14 +36,27 @@ export abstract class BaseProject {
     if (!_.isNil(this.cache['genericName'])) {
       this.cache['genericName'];
     }
+
     let result = [
       (this.isWorkspace && this.isGenerated) ? `${(this.origin && this.origin.parent) ?
         this.origin.parent.name : ' - no origin - '}` : ''
     ];
-    result = result.concat(this.findParentsNames(this));
+    if (this.isSmartContainerTarget) {
+      // result = [
+      //   this.smartContainerTargetParentContainer.name,
+      //   this.name,
+      // ]
+      result = result.concat(this.findParentsNames(this.smartContainerTargetParentContainer));
+    } else {
+      result = result.concat(this.findParentsNames(this));
+    }
+
     if (this.isGenerated) {
       result.push(`((${chalk.bold('GENERATED')}))${this.name}`)
     } else {
+      if (this.isSmartContainerTarget) {
+        result.push(this.smartContainerTargetParentContainer.name);
+      }
       result.push(this.name);
     }
     const res = result.filter(f => !!f).join('/').trim()
@@ -133,7 +146,7 @@ export abstract class BaseProject {
   // @ts-ignore
   get isSmartContainerTargetNonClient(this: Project) {
     const parent = this.smartContainerTargetParentContainer;
-    return parent?.isSmartContainer && parent.smartContainerBuildTarget?.name !== this.name;
+    return !!(parent?.isSmartContainer && parent.smartContainerBuildTarget?.name !== this.name);
   }
 
   // @ts-ignore
@@ -157,7 +170,7 @@ export abstract class BaseProject {
 
   // @ts-ignore
   get isSmartContainerChild(this: Project) {
-    return this.parent?.isSmartContainer;
+    return !!this.parent?.isSmartContainer;
   }
 
   // @ts-ignore

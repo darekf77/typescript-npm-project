@@ -73,7 +73,7 @@ export class AssetsFileListGenerator extends FeatureForProject {
 
   update() {
     const assetsListFilePath = crossPlatformPath([this.assetsFolder, this.filename])
-    Helpers.logInfo(`SAVING ASSETS LIST INTO: ${assetsListFilePath}`)
+    Helpers.logInfo(`\nSAVING ASSETS LIST INTO: ${assetsListFilePath}`)
     Helpers.writeJson(assetsListFilePath, this.detectedFiles);
   }
 

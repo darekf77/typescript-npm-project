@@ -224,43 +224,49 @@ const CHOKI = () => {
 
 //#region info / check
 export async function $INFO(args: string) {
-  if (args?.trim() !== '') {
-    if (!path.isAbsolute(args)) {
-      args = path.join(process.cwd(), args);
-    }
-    const exists = Helpers.exists(args);
-    const isFolder = Helpers.isFolder(args);
-    const isFile = !isFolder;
-    const isExistedSymlink = Helpers.isExistedSymlink(args);
-    const isUnexistedLink = Helpers.isUnexistedLink(args);
-    const size = Helpers.size(args);
-    Helpers.info(`
-    path: ${args}
-    cross platforma path: ${crossPlatformPath(args)}
-    exists: ${exists}
-    isFolder: ${isFolder}
-    isFile: ${isFile}
-    isExistedSymlink: ${isExistedSymlink}
-    isUnexistedLink: ${isUnexistedLink}
-    size: ${size} bytes
+  // if (args?.trim() !== '') {
+  //   if (!path.isAbsolute(args)) {
+  //     args = path.join(process.cwd(), args);
+  //   }
+  //   const exists = Helpers.exists(args);
+  //   const isFolder = Helpers.isFolder(args);
+  //   const isFile = !isFolder;
+  //   const isExistedSymlink = Helpers.isExistedSymlink(args);
+  //   const isUnexistedLink = Helpers.isUnexistedLink(args);
+  //   const size = Helpers.size(args);
+  //   Helpers.info(`
+  //   path: ${args}
+  //   cross platforma path: ${crossPlatformPath(args)}
+  //   exists: ${exists}
+  //   isFolder: ${isFolder}
+  //   isFile: ${isFile}
+  //   isExistedSymlink: ${isExistedSymlink}
+  //   isUnexistedLink: ${isUnexistedLink}
+  //   size: ${size} bytes
 
-    `)
-  } else {
-    const proj = Project.Current as Project;
-    // console.clear()
-    console.info(`
+  //   `)
+  // } else {
+  let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  // console.clear()
+  console.info(`
 
     name: ${proj.name}
     version: ${proj.version}
     private: ${proj.isPrivate}
     monorepo: ${proj.isMonorepo}
-    isSmartContainer: ${proj.isSmartContainer}
-    last npm version: ${proj.lastNpmVersion}
-    frameworkVersion: ${proj._frameworkVersion}
-    genericName: ${proj.genericName}
+
     isStandaloneProject: ${proj.isStandaloneProject}
     isGenerated: ${proj.isGenerated}
     isCoreProject: ${proj.isCoreProject}
+    isSmartContainer: ${proj.isSmartContainer}
+    isSmartContainerChild: ${proj.isSmartContainerChild}
+    isSmartContainerTarget: ${proj.isSmartContainerTarget}
+    isSmartContainerTargetNonClient: ${proj.isSmartContainerTargetNonClient}
+
+    genericName: ${proj.genericName}
+
+    last npm version: ${proj.lastNpmVersion}
+    frameworkVersion: ${proj._frameworkVersion}
     type: ${proj._type}
     parent name: ${proj.parent && proj.parent.name}
     grandpa name: ${proj.grandpa && proj.grandpa.name}
@@ -268,8 +274,10 @@ export async function $INFO(args: string) {
     git branch name: ${proj.git.currentBranchName}
     git commits number: ${proj.git.countComits()}
 
+    location: ${proj.location}
+
     `)
-  }
+  // }
 
   process.exit(0)
 }

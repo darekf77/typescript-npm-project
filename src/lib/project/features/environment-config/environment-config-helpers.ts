@@ -9,6 +9,7 @@ import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { Project } from '../../abstract';
 import { config as schemaConfig } from './example-environment-config';
+import { walk } from 'lodash-walk-object';
 
 //#region handle error
 export function handleError(workspaceConfig: Models.env.EnvConfig, fileContent: string, pathToConfig: string) {
@@ -102,6 +103,7 @@ module.exports = exports = { config };
 export function saveConfigWorkspca(project: Project, projectConfig: Models.env.EnvConfig) {
 
   projectConfig.currentProjectName = project.name;
+  projectConfig.currentProjectGenericName = project.genericName;
   projectConfig.currentProjectLaunchConfiguration = project.getTemlateOfLaunchJSON(projectConfig);
   projectConfig.currentProjectTasksConfiguration = project.getTemlateOfTasksJSON(projectConfig);
   projectConfig.currentProjectType = project._type;
@@ -177,10 +179,19 @@ export function saveConfigWorkspca(project: Project, projectConfig: Models.env.E
   projectConfig.currentLibProjectSourceFolder = currentLibProjectSourceFolder;
 
   const tmpEnvironmentPath = path.join(project.location, config.file.tnpEnvironment_json)
+  const tmpEnvironmentPathBrowser = path.join(project.location, 'tmp-environment-for-browser.json')
 
   if (project.isStandaloneProject) {
 
     Helpers.writeJson(tmpEnvironmentPath, projectConfig);
+    const clonedConfig = _.cloneDeep(projectConfig);
+    // console.log(JSON.stringify(clonedConfig))
+    walk.Object(clonedConfig, (val, path, newValue) => {
+      if (_.last(path.split('.')).startsWith('$')) {
+        newValue(null);
+      }
+    })
+    Helpers.writeJson(tmpEnvironmentPathBrowser, clonedConfig);
     Helpers.log(`config saved in standalone project ${chalk.bold(project.genericName)} ${tmpEnvironmentPath}`);
 
   }
