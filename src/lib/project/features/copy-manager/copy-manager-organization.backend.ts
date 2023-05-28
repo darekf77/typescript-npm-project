@@ -773,9 +773,10 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   //#endregion
 
   handleCopyOfAssetFile(absoluteAssetFilePath: string, destination: Project) {
+    absoluteAssetFilePath = crossPlatformPath(absoluteAssetFilePath);
     const monitoredOutDirSharedAssets = this.monitoredOutDirSharedAssets;
     for (let index = 0; index < monitoredOutDirSharedAssets.length; index++) {
-      const folderAssetsShareAbsPath = monitoredOutDirSharedAssets[index];
+      const folderAssetsShareAbsPath = crossPlatformPath(monitoredOutDirSharedAssets[index]);
       if (absoluteAssetFilePath.startsWith(folderAssetsShareAbsPath)) {
         const relativePath = absoluteAssetFilePath.replace(`${folderAssetsShareAbsPath}/`, '');
 
