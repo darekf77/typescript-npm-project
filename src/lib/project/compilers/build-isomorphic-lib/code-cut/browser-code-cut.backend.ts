@@ -35,6 +35,7 @@ export class BrowserCodeCut {
 
   //#region fields & getters
   private rawContentForBrowser: string;
+  private rawContentForAPPONLYBrowser: string;
   private rawContentBackend: string;
   /**
   * ex. path/to/file-somewhere.ts or assets/something/here
@@ -77,7 +78,7 @@ export class BrowserCodeCut {
   //#endregion
 
   readonly isAssetsFile: boolean = false;
-
+  protected absFileSourcePathBrowserOrWebsqlAPPONLY: string;
 
   //#region constructor
   constructor(
@@ -96,8 +97,14 @@ export class BrowserCodeCut {
     private project?: Project,
     private buildOptions?: BuildOptions,
   ) {
+
     this.absPathTmpSrcDistBundleFolder = crossPlatformPath(absPathTmpSrcDistBundleFolder);
     this.absFileSourcePathBrowserOrWebsql = crossPlatformPath(absFileSourcePathBrowserOrWebsql);
+    this.absFileSourcePathBrowserOrWebsqlAPPONLY = this.absFileSourcePathBrowserOrWebsql.replace(
+      `tmp-src-${buildOptions.outDir}${buildOptions.websql ? '-websql' : ''}`,
+      `tmp-src-app-${buildOptions.outDir}${buildOptions.websql ? '-websql' : ''}`
+    ); // for slighted modifed app bundle
+
     this.absSourcePathFromSrc = crossPlatformPath(absSourcePathFromSrc);
 
     // console.log('absSourcePathFromSrc:', absSourcePathFromSrc)
@@ -134,6 +141,7 @@ export class BrowserCodeCut {
   //#region methods / init
   init() {
     this.rawContentForBrowser = Helpers.readFile(this.absSourcePathFromSrc, void 0, true) || '';
+    this.rawContentForAPPONLYBrowser = this.rawContentForBrowser; // TODO not needed ?
     this.rawContentBackend = this.rawContentForBrowser; // at the beginning those are normal files from src
     return this;
   }
@@ -148,6 +156,7 @@ export class BrowserCodeCut {
   initAndSave(remove = false) {
     if (remove) {
       Helpers.removeIfExists(this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsql));
+      Helpers.removeIfExists(this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsqlAPPONLY));
       Helpers.removeIfExists(this.replaceAssetsPath(this.absoluteBackendDestFilePath));
     } else {
       // this is needed for json in src/lib or something
@@ -157,6 +166,7 @@ export class BrowserCodeCut {
       }
 
       Helpers.copyFile(this.absSourcePathFromSrc, this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsql));
+      Helpers.copyFile(this.absSourcePathFromSrc, this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsqlAPPONLY));
       // final straight copy to tmp-source-folder
       Helpers.copyFile(this.absSourcePathFromSrc, this.replaceAssetsPath(this.absoluteBackendDestFilePath));
     }
@@ -169,6 +179,9 @@ export class BrowserCodeCut {
     if (!fse.existsSync(path.dirname(this.absFileSourcePathBrowserOrWebsql))) { // write empty instead unlink
       fse.mkdirpSync(path.dirname(this.absFileSourcePathBrowserOrWebsql));
     }
+    if (!fse.existsSync(path.dirname(this.absFileSourcePathBrowserOrWebsqlAPPONLY))) { // write empty instead unlink
+      fse.mkdirpSync(path.dirname(this.absFileSourcePathBrowserOrWebsqlAPPONLY));
+    }
     if (isTsFile) {
       fse.writeFileSync(
         this.absFileSourcePathBrowserOrWebsql,
@@ -178,9 +191,21 @@ export class BrowserCodeCut {
         } mode */`,
         'utf8'
       );
+      fse.writeFileSync(
+        this.absFileSourcePathBrowserOrWebsqlAPPONLY,
+        `/* files for browser${this.isWebsqlMode
+          ? '-websql' + endOfBrowserOrWebsqlCode
+          : '' + endOfBrowserOrWebsqlCode
+        } mode */`,
+        'utf8'
+      );
     } else {
       fse.writeFileSync(
         this.absFileSourcePathBrowserOrWebsql, ``,
+        'utf8'
+      );
+      fse.writeFileSync(
+        this.absFileSourcePathBrowserOrWebsqlAPPONLY, ``,
         'utf8'
       );
     }
@@ -193,17 +218,35 @@ export class BrowserCodeCut {
       this.absFileSourcePathBrowserOrWebsql = this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsql);
       // console.log(`ASSETE: ${this.absFileSourcePathBrowserOrWebsql}`)
     }
+    if (this.isAssetsFile) {
+      this.absFileSourcePathBrowserOrWebsqlAPPONLY = this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsqlAPPONLY);
+      // console.log(`ASSETE: ${this.absFileSourcePathBrowserOrWebsql}`)
+    }
     if (!fse.existsSync(path.dirname(this.absFileSourcePathBrowserOrWebsql))) {
       fse.mkdirpSync(path.dirname(this.absFileSourcePathBrowserOrWebsql));
     }
+    if (!fse.existsSync(path.dirname(this.absFileSourcePathBrowserOrWebsqlAPPONLY))) {
+      fse.mkdirpSync(path.dirname(this.absFileSourcePathBrowserOrWebsqlAPPONLY));
+    }
+
+    this.processAssetsLinksForApp();
+
     if (isTsFile) {
       fse.writeFileSync(this.absFileSourcePathBrowserOrWebsql,
         this.fixComments(this.rawContentForBrowser, endOfBrowserOrWebsqlCode),
         'utf8'
       );
+      fse.writeFileSync(this.absFileSourcePathBrowserOrWebsqlAPPONLY,
+        this.fixComments(this.rawContentForAPPONLYBrowser, endOfBrowserOrWebsqlCode),
+        'utf8'
+      );
     } else {
       fse.writeFileSync(this.absFileSourcePathBrowserOrWebsql,
         this.rawContentForBrowser,
+        'utf8'
+      );
+      fse.writeFileSync(this.absFileSourcePathBrowserOrWebsqlAPPONLY,
+        this.rawContentForAPPONLYBrowser,
         'utf8'
       );
     }
@@ -525,6 +568,7 @@ export class BrowserCodeCut {
     if (BrowserCodeCut.extAllowedToReplace.includes(ext)) {
       const orgContent = this.rawContentForBrowser;
       this.rawContentForBrowser = RegionRemover.from(this.relativePath, orgContent, options.replacements, this.project).output;
+
       if ((this.project.isStandaloneProject || this.project.isSmartContainer) && !this.isWebsqlMode) {
 
         const regionsToRemove = ['@bro' + 'wser', '@web' + 'sqlOnly'];
@@ -539,28 +583,7 @@ export class BrowserCodeCut {
       }
     }
 
-    const pathname = this.project.isSmartContainerTarget
-      ? this.project.smartContainerTargetParentContainer.name
-      : this.project.name;
 
-
-
-    const forAppRelaseBuild = (this.buildOptions?.args?.search('--forAppRelaseBuild') !== -1)
-
-
-    let basename = this.isInRelaseBundle ? `/${pathname}/` : '/';
-    // if (this.project.env.config?.useDomain) {
-    //   basename = '/';
-    // }
-    // if (!forAppRelaseBuild) {
-    //   basename = '/'
-    // }
-
-    // let basename = ''
-
-    const howMuchBack = (this.relativePath.split('/').length - 1);
-    const back = forAppRelaseBuild ? ((howMuchBack === 0) ? './' : _.times(howMuchBack).map(() => '../').join('')) : '';
-    // console.log(`${this.relativePath}  => ${back}`)
     if (this.project.isSmartContainerTarget) {
       const parent = this.project.smartContainerTargetParentContainer;
       parent.children
@@ -569,61 +592,109 @@ export class BrowserCodeCut {
           if (true) {
             const from = `${c.name}/src/assets/`;
             const to = `assets/assets-for/${parent.name + '--' + c.name}/`;
-            // this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
+            this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
             this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
-          }
-          if (forAppRelaseBuild) {
-            if (true) {
-              const from = `src="/assets/assets-for/${parent.name + '--' + c.name}/`;
-              const to = `src="${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${parent.name + '--' + c.name}/`;
-              this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
-            }
-            if (true) {
-              const from = `[src]="'/assets/assets-for/${parent.name + '--' + c.name}/`;
-              const to = `[src]="'${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${parent.name + '--' + c.name}/`;
-              this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
-            }
-            if (true) {
-              const from = ` url('/assets/assets-for/${parent.name + '--' + c.name}/`;
-              const to = `url('${back}assets/assets-for/${parent.name + '--' + c.name}/`;
-              this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
-            }
           }
         })
     } else if (this.project.isStandaloneProject) {
       [this.project]
         .filter(f => f.typeIs('isomorphic-lib'))
         .forEach(c => {
-          if (true) {
-            const from = `src/assets/`;
-            const to = `assets/assets-for/${c.name}/`;
-            // this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
-            this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
-          }
-          if (forAppRelaseBuild) {
-            if (true) {
-              const from = `src="/assets/assets-for/${c.name}/`;
-              const to = `src="${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${c.name}/`;
-              this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
-            }
-            if (true) {
-              const from = `[src]="/assets/assets-for/${c.name}/`;
-              const to = `[src]="'${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${c.name}/`;
-              this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
-            }
-            if (true) {
-              const from = `url('/assets/assets-for/${c.name}/`;
-              const to = `url('${back}assets/assets-for/${c.name}/`;
-              this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
-            }
-
-          }
+          const from = `src/assets/`;
+          const to = `assets/assets-for/${c.name}/`;
+          this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
+          this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
         });
     }
 
     return this;
   }
   //#endregion
+
+  processAssetsLinksForApp() {
+    this.rawContentForAPPONLYBrowser = this.rawContentForBrowser;
+
+    const pathname = this.project.isSmartContainerTarget
+      ? this.project.smartContainerTargetParentContainer.name
+      : this.project.name;
+
+    // const forAppRelaseBuild = (this.buildOptions?.args?.search('--forAppRelaseBuild') !== -1)
+
+
+    let basename = this.isInRelaseBundle ? `/${pathname}/` : '/';
+    if (this.project.env.config?.useDomain) {
+      basename = '/';
+    }
+    // if (!forAppRelaseBuild) {
+    //   basename = '/'
+    // }
+
+    // let basename = ''
+
+
+    // const howMuchBack = (this.relativePath.split('/').length - 1);
+    // const back = forAppRelaseBuild ? ((howMuchBack === 0) ? './' : _.times(howMuchBack).map(() => '../').join('')) : '';
+
+    // console.log(`${this.relativePath}  => ${back}`)
+
+    if (this.project.isSmartContainerTarget) {
+      const parent = this.project.smartContainerTargetParentContainer;
+      parent.children
+        .filter(f => f.typeIs('isomorphic-lib'))
+        .map(c => {
+          if (true) {
+            const from = `assets/assets-for/${parent.name + '--' + c.name}/`;
+            const to = `assets/assets-for/${parent.name + '--' + c.name}/`;
+            this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), `/${to}`);
+            this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), `/${to}`);
+          }
+
+          if (true) {
+            const from = `src="/assets/assets-for/${parent.name + '--' + c.name}/`;
+            const to = `src="${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${parent.name + '--' + c.name}/`;
+            this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          }
+          if (true) {
+            const from = `[src]="'/assets/assets-for/${parent.name + '--' + c.name}/`;
+            const to = `[src]="'${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${parent.name + '--' + c.name}/`;
+            this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          }
+          if (true) {
+            const from = ` url('/assets/assets-for/${parent.name + '--' + c.name}/`;
+            const to = `url('${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${parent.name + '--' + c.name}/`;
+            this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          }
+
+        })
+    } else if (this.project.isStandaloneProject) {
+      [this.project]
+        .filter(f => f.typeIs('isomorphic-lib'))
+        .forEach(c => {
+          if (true) {
+            const from = `assets/assets-for/${c.name}/`;
+            const to = `assets/assets-for/${c.name}/`;
+            this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), `/${to}`);
+            this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), `/${to}`);
+          }
+
+          if (true) {
+            const from = `src="/assets/assets-for/${c.name}/`;
+            const to = `src="${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${c.name}/`;
+            this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          }
+          if (true) {
+            const from = `[src]="/assets/assets-for/${c.name}/`;
+            const to = `[src]="'${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${c.name}/`;
+            this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          }
+          if (true) {
+            const from = `url('/assets/assets-for/${c.name}/`;
+            const to = `url('${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${c.name}/`;
+            this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          }
+        });
+    }
+  }
 
   //#region methods / fix comments
   private fixComments(s: string, endComment?: string) {
