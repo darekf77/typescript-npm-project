@@ -87,7 +87,7 @@ export class EnvironmentConfig
   /**
    * Can be accesed only after env.prepare()
    */
-  public get config(): Models.env.EnvConfig {
+  public get config(): any{
     //#region @backend
     const configPath = crossPlatformPath([this.project.location, config.file.tnpEnvironment_json]);
     return Helpers.readJson(configPath)

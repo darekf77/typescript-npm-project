@@ -103,13 +103,15 @@ async function $AUTOUPDATE(args: string) {
     const nm2 = (Project.Tnp as Project).pathFor(`tmp-${config.folder.node_modules}2`)
     const nm1 = (Project.Tnp as Project).pathFor(`tmp-${config.folder.node_modules}1`)
 
-    Helpers.removeIfExists(nm2);
-    if (Helpers.exists(nm1)) {
-      Helpers.move(nm1, nm2);
-    }
-    Helpers.removeIfExists(nm1);
-    if (Helpers.exists(nm)) {
-      Helpers.move(nm, nm1);
+    if (process.platform !== 'win32') {
+      Helpers.removeIfExists(nm2);
+      if (Helpers.exists(nm1)) {
+        Helpers.move(nm1, nm2);
+      }
+      Helpers.removeIfExists(nm1);
+      if (Helpers.exists(nm)) {
+        Helpers.move(nm, nm1);
+      }
     }
     Helpers.taskDone();
 
