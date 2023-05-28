@@ -213,6 +213,24 @@ export * from './lib';
 `.trimLeft();
             }
 
+            (() => {
+              const assetDummySourceForLib = path.join(
+                projectLocation,
+                `tmp-src-${outFolder}${this.websql ? '-websql' : ''}`,
+                config.folder.assets,
+              );
+
+              const assetDummyDestForLib = path.join(
+                projectLocation,
+                this.project.isStandaloneProject
+                  ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
+                `projects/${projectName}/src/${config.folder.assets}`
+              );
+
+              Helpers.remove(assetDummyDestForLib);
+              Helpers.createSymLink(assetDummySourceForLib, assetDummyDestForLib, { continueWhenExistedFolderDoesntExists: true });
+            })();
+
             for (let index = 0; index < otherChildren.length; index++) {
               const child = otherChildren[index];
 

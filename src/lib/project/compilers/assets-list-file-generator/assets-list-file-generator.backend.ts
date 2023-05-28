@@ -74,7 +74,7 @@ export class AssetsFileListGenerator extends FeatureForProject {
   update() {
     const assetsListFilePath = crossPlatformPath([this.assetsFolder, this.filename])
     Helpers.logInfo(`\nSAVING ASSETS LIST INTO: ${assetsListFilePath}`)
-    Helpers.writeJson(assetsListFilePath, this.detectedFiles);
+    Helpers.writeJson(assetsListFilePath, this.detectedFiles.map(f => f.slice(1)));
   }
 
   updateDebounce = _.debounce(() => {

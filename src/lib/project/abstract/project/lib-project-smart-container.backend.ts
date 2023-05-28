@@ -96,7 +96,7 @@ export class LibProjectSmartContainer extends LibPorjectBase {
   }
 
 
-  async buildDocs(prod: boolean, realCurrentProj: Project, automaticReleaseDocs: boolean): Promise<boolean> {
+  async buildDocs(prod: boolean, realCurrentProj: Project, automaticReleaseDocs: boolean, libBuildCallback: (websql: boolean, prod: boolean) => any): Promise<boolean> {
     // TODO
 
     const smartContainer = this.project;
@@ -218,42 +218,58 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
 
       Helpers.log(`
 
-      Building docs prevew - start
+      Building /docs folder preview app - start
 
       `);
       //#endregion
 
-      (() => {
-        const libBuildCOmmand = `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'}`;
-        smartContainer.run(libBuildCOmmand).sync();
-      })();
+      await Helpers.runSyncOrAsync(libBuildCallback);
+
+      // (() => {
+      //   const libBuildCOmmand = `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'}`;
+      //   smartContainer.run(libBuildCOmmand).sync();
+      // })();
 
 
-      const cmd = async (childProjName: string, productinoBuild: boolean, websqlBuild: boolean) => {
+      const cmd = (childProjName: string, productinoBuild: boolean, websqlBuild: boolean, isMainTarget = false) => {
         this.project.run(`${config.frameworkName} `
           + `build:${config.folder.bundle}:app:${productinoBuild ? 'prod' : ''} ${childProjName} `
           + `  ${websqlBuild ? '--websql' : ''}         ${global.hideLog ? '' : '-verbose'}`).sync();
+
+        const assetsListPathSourceMain = crossPlatformPath([
+          crossPlatformPath(path.resolve(path.join(this.project.location, '..'))),
+          realCurrentProj.name,
+          config.folder.bundle,
+          realCurrentProj.name,
+          childProjName,
+          `tmp-apps-for-${config.folder.bundle}${websqlBuild ? '-websql' : ''}`,
+          childProjName,
+          config.folder.src,
+          config.folder.assets,
+          realCurrentProj.assetsFileListGenerator.filename,
+        ])
+        const assetsListPathDestMain = crossPlatformPath([
+          realCurrentProj.location,
+          config.folder.docs,
+          ...(isMainTarget ? [] : ['-' + childProjName]),
+          config.folder.assets,
+          realCurrentProj.assetsFileListGenerator.filename,
+        ]);
+        // console.log({
+        //   assetsListPathSourceMain,
+        //   assetsListPathDestMain,
+        // })
+        Helpers.copyFile(assetsListPathSourceMain, assetsListPathDestMain);
       }
 
-      if (toBuildNormally.includes(mainProjectName)) {
-        cmd(mainProjectName, appBuildOptions.docsAppInProdMode, appBuildOptions.websql);;
-      }
+      cmd(cfg.projName, cfg.prod, cfg.websql, true);
 
-      if (toBuildWebsql.includes(mainProjectName)) {
-        cmd(mainProjectName, appBuildOptions.docsAppInProdMode, appBuildOptions.websql);;
-      }
 
-      toBuildNormally = toBuildNormally.filter(f => f !== mainProjectName);
-      toBuildWebsql = toBuildWebsql.filter(f => f !== mainProjectName);
 
-      for (let index = 0; index < toBuildNormally.length; index++) {
-        const projName = toBuildNormally[index];
-        cmd(projName, appBuildOptions.docsAppInProdMode, false);;
-      }
-
-      for (let index = 0; index < toBuildWebsql.length; index++) {
-        const projName = toBuildWebsql[index];
-        cmd(projName, appBuildOptions.docsAppInProdMode, true);;
+      const children = cfg.children || [];
+      for (let index = 0; index < children.length; index++) {
+        const { websql, prod, projName } = children[index];
+        cmd(projName, prod, websql);
       }
 
       try {

@@ -7,7 +7,7 @@ export abstract class LibPorjectBase {
   ) {
 
   }
-  abstract buildDocs(prod: boolean, realCurrentProj: Project, automaticReleaseDocs: boolean): Promise<boolean>;
+  abstract buildDocs(prod: boolean, realCurrentProj: Project, automaticReleaseDocs: boolean, libBuildCallback: (websql: boolean, prod: boolean) => any): Promise<boolean>;
   abstract publish(options: {
     realCurrentProj: Project,
     newVersion: string,

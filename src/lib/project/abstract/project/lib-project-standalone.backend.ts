@@ -66,7 +66,7 @@ export class LibProjectStandalone extends LibPorjectBase {
 
   }
 
-  async buildDocs(prod: boolean, realCurrentProj: Project, automaticReleaseDocs: boolean): Promise<boolean> {
+  async buildDocs(prod: boolean, realCurrentProj: Project, automaticReleaseDocs: boolean, libBuildCallback: (websql: boolean, prod: boolean) => any): Promise<boolean> {
     return await Helpers.questionYesNo(this.messages.docsBuildQuesions, async () => {
       const mainProjectName = realCurrentProj.name;
       //#region questions
@@ -105,12 +105,14 @@ export class LibProjectStandalone extends LibPorjectBase {
 
       Helpers.log(`
 
-      Building docs prevew - start
+      Building /docs folder preview app - start
 
       `);
       //#endregion
 
-      const libBuildCommand = `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'} && `
+      await Helpers.runSyncOrAsync(libBuildCallback);
+
+      const libBuildCommand = ''; // `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'} && `
       await this.project.run(`${libBuildCommand}`
         + `${config.frameworkName} build:${config.folder.bundle}:app:${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
         + `${appBuildOptions.websql ? '--websql' : ''} ${global.hideLog ? '' : '-verbose'}`).sync();

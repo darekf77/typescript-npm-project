@@ -208,6 +208,11 @@ ${appModuleFile}
           );
 
           appComponentFile = appComponentFile.replace(
+            `import { FiredevFileController, FiredevFile, FiredevFileCss } from 'firedev-ui';`,
+            `import { FiredevFileController, FiredevFile, FiredevFileCss } from 'firedev-ui/${this.websql ? config.folder.websql : config.folder.browser}';`,
+          );
+
+          appComponentFile = appComponentFile.replace(
             `import start from './---projectname---/app';`,
             `import start from './${this.project.name}/app';`,
           );
@@ -296,6 +301,9 @@ ${appModuleFile}
         //#region LOADERS & BACKGROUNDS REPLACEMENT
         (() => {
           const projectTargetOrStandalone = this.project;
+          const basename = this.isInRelaseBundle ?
+            `/${(this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name)}`
+            : '';
 
           // if(projectTargetOrStandalone.name === 'main') {
           //   console.log({
@@ -317,7 +325,7 @@ ${appModuleFile}
             const loaderIsImage = _.isString(loaderData);
 
             if (loaderIsImage) {
-              const pathToAsset = resolvePathToAsset(projectTargetOrStandalone, loaderData, outFolder, websql);
+              const pathToAsset = basename + resolvePathToAsset(projectTargetOrStandalone, loaderData, outFolder, websql);
               appHtmlFile = appHtmlFile.replace(
                 '<!-- <<<TO_REPLACE_LOADER>>> -->',
                 imageLoader(pathToAsset, false),
@@ -369,7 +377,7 @@ ${appModuleFile}
             const loaderIsImage = _.isString(loaderData);
 
             if (loaderIsImage) {
-              const pathToAsset = resolvePathToAsset(projectTargetOrStandalone, loaderData, outFolder, websql);
+              const pathToAsset = basename + resolvePathToAsset(projectTargetOrStandalone, loaderData, outFolder, websql);
               indexHtmlFile = indexHtmlFile.replace(
                 '<!-- <<<TO_REPLACE_LOADER>>> -->',
                 imageLoader(pathToAsset, true),
@@ -427,7 +435,6 @@ ${appModuleFile}
 
           let mainTsFile = Helpers.readFile(mainFilePath);
 
-
           const basename = this.isInRelaseBundle ?
             `/${(this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name)}`
             : '';
@@ -447,6 +454,38 @@ ${appModuleFile}
           }
 
           Helpers.writeFile(mainFilePath, mainTsFile);
+        })();
+        //#endregion
+
+        //#region replace style.scss
+        (() => {
+          const stylesFilePath = path.join(
+            project.location,
+            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+            `/src/styles.scss`
+          );
+
+          let stylesScssFile = Helpers.readFile(stylesFilePath);
+
+          const basename = this.isInRelaseBundle ?
+            `/${(this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name)}`
+            : '';
+
+          const projForName = project.isSmartContainerTarget ? project.smartContainerTargetParentContainer : project;
+
+          if (projForName.env.config?.useDomain) {
+            stylesScssFile = stylesScssFile.replace(
+              '<<<TO_REPLACE_BASENAME>>>',
+              '',
+            );
+          } else {
+            stylesScssFile = stylesScssFile.replace(
+              '<<<TO_REPLACE_BASENAME>>>',
+              basename,
+            );
+          }
+
+          Helpers.writeFile(stylesFilePath, stylesScssFile);
         })();
         //#endregion
 

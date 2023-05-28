@@ -77,6 +77,10 @@ export class ProjectIsomorphicLib
     return this.location.includes('tmp-bundle-release/bundle');
   };
 
+  get forAppRelaseBuild() {
+    return (this.buildOptions?.args?.trim()?.search('--forAppRelaseBuild') !== -1)
+  };
+
   //#endregion
 
   //#region methods
@@ -317,7 +321,10 @@ export class ProjectIsomorphicLib
       }
     }
 
-    await Helpers.killProcessByPort(port);
+    if (watch) {
+      await Helpers.killProcessByPort(port);
+    }
+
 
     const isStandalone = (this.isStandaloneProject
       && !this.isWorkspaceChildProject
@@ -806,6 +813,10 @@ export class ProjectIsomorphicLib
 
   //#region private methods / show message when build lib done for smart container
   private showMesageWhenBuildLibDoneForSmartContainer(args: string, watch: boolean, isInRelease: boolean) {
+    if (this.forAppRelaseBuild) {
+      Helpers.logInfo('Lib build for app done...  starting app build');
+      return;
+    }
     if (isInRelease) {
       Helpers.logInfo('Release lib build done... ');
       return;

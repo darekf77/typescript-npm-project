@@ -14,6 +14,7 @@ import { Log } from 'ng2-logger';
 import { LibProjectStandalone } from './lib-project-standalone.backend';
 import { LibProjectSmartContainer } from './lib-project-smart-container.backend';
 import { LibProjectVscodeExt } from './lib-project-vscode-ext';
+import { DEFAULT_PORT } from '../../../constants';
 const log = Log.create(path.basename(__filename))
 //#endregion
 
@@ -150,7 +151,7 @@ export abstract class LibProject {
       this.packageJson.data.version = newVersion;
       this.packageJson.save('show for release')
 
-      specyficProjectForBuild = await this.relaseBuild(newVersion, realCurrentProj, releaseOptions);
+      specyficProjectForBuild = await this.relaseBuild(newVersion, realCurrentProj, releaseOptions, false);
 
       if (this.isSmartContainer) {
         specyficProjectForBuild.smartcontainer.preparePackage(this, newVersion);
@@ -208,26 +209,30 @@ export abstract class LibProject {
       // Helpers.clearConsole();
 
       if (this.isStandaloneProject) {
-        await this.standalone.buildDocs(prod, realCurrentProj, automaticReleaseDocs);
+        await this.standalone.buildDocs(prod, realCurrentProj, automaticReleaseDocs, async () => {
+          specyficProjectForBuild = await this.relaseBuild(newVersion, realCurrentProj, releaseOptions, true);
+        });
       }
 
       if (this.isSmartContainer) {
-        await this.smartcontainer.buildDocs(prod, realCurrentProj, automaticReleaseDocs);
+        await this.smartcontainer.buildDocs(prod, realCurrentProj, automaticReleaseDocs, async () => {
+          specyficProjectForBuild = await this.relaseBuild(newVersion, realCurrentProj, releaseOptions, true);
+        });
       }
     }
 
 
     const docsCwd = realCurrentProj.pathFor('docs');
 
-    const defaultTestPort = 4000;
+
     if (!automaticReleaseDocs && Helpers.exists(docsCwd)) {
-      await this.infoBeforePublish(realCurrentProj, defaultTestPort);
+      await this.infoBeforePublish(realCurrentProj, DEFAULT_PORT.BUNDLE_SERVER_DOCS);
 
     }
 
     await this.pushToGitRepo(realCurrentProj, newVersion, automaticReleaseDocs);
     if (!automaticReleaseDocs && Helpers.exists(docsCwd)) {
-      await Helpers.killProcessByPort(defaultTestPort)
+      await Helpers.killProcessByPort(DEFAULT_PORT.BUNDLE_SERVER_DOCS)
     }
     Helpers.info('RELEASE DONE');
     process.exit(0);
@@ -244,8 +249,8 @@ export abstract class LibProject {
     if (!Helpers.exists(docsCwd)) {
       return;
     }
-    await Helpers.killProcessByPort(4000)
-    const commandHostLoclDocs = `firedev-http-server -s -p 4000 --base-dir ${this.name}`;
+    await Helpers.killProcessByPort(DEFAULT_PORT.BUNDLE_SERVER_DOCS)
+    const commandHostLoclDocs = `firedev-http-server -s -p ${DEFAULT_PORT.BUNDLE_SERVER_DOCS} --base-dir ${this.name}`;
 
     // console.log({
     //   cwd, commandHostLoclDocs
@@ -370,7 +375,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
 
 
-  async relaseBuild(this: Project, newVersion: string, realCurrentProj: Project, releaseOptions: Models.dev.ReleaseOptions,) {
+  async relaseBuild(this: Project, newVersion: string, realCurrentProj: Project, releaseOptions: Models.dev.ReleaseOptions, forAppRelaseBuild: boolean) {
     const { prod, obscure, includeNodeModules, nodts, uglify, args } = releaseOptions;
 
     this.run(`${config.frameworkName} init ${this.isStandaloneProject ? '' : this.smartContainerBuildTarget.name}`).sync();
@@ -402,7 +407,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       nodts,
       uglify,
       outDir: config.folder.bundle as 'bundle',
-      args: args + ' --codeCutRelease'
+      args: args + ` ${!forAppRelaseBuild ? '--codeCutRelease' : ''} ${forAppRelaseBuild ? '--forAppRelaseBuild' : ''}`
     }, this) as any);
 
 
@@ -449,7 +454,10 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       }
     }
 
-    this.commit(newVersion);
+    if(!forAppRelaseBuild) {
+      this.commit(newVersion);
+    }
+
     return specyficProjectForBuild;
   }
 
@@ -505,7 +513,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       Helpers.remove(client)
       Helpers.tryCopyFrom(browser, client);
     } else {
-      Helpers.warn(`Browser forlder not generated.. replacing with dummy files: browser.js, client.js`,
+      Helpers.warn(`Browser folder not generated.. replacing with dummy files: browser.js, client.js`,
         false);
       const msg = `console.log('${this.genericName} only for backend') `;
       Helpers.writeFile(`${browser}.js`, msg);

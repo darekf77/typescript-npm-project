@@ -545,30 +545,79 @@ export class BrowserCodeCut {
 
 
 
+    const forAppRelaseBuild = (this.buildOptions?.args?.search('--forAppRelaseBuild') !== -1)
+
+
     let basename = this.isInRelaseBundle ? `/${pathname}/` : '/';
+    // if (this.project.env.config?.useDomain) {
+    //   basename = '/';
+    // }
+    // if (!forAppRelaseBuild) {
+    //   basename = '/'
+    // }
 
-    if (this.project.env.config?.useDomain) {
-      basename = '';
-    }
+    // let basename = ''
 
+    const howMuchBack = (this.relativePath.split('/').length - 1);
+    const back = forAppRelaseBuild ? ((howMuchBack === 0) ? './' : _.times(howMuchBack).map(() => '../').join('')) : '';
+    // console.log(`${this.relativePath}  => ${back}`)
     if (this.project.isSmartContainerTarget) {
       const parent = this.project.smartContainerTargetParentContainer;
       parent.children
         .filter(f => f.typeIs('isomorphic-lib'))
-        .forEach(c => {
-          const from = `${c.name}/src/assets/`;
-          const to = `${basename}assets/assets-for/${parent.name + '--' + c.name}/`;
-          this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
-          this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
-        });
+        .map(c => {
+          if (true) {
+            const from = `${c.name}/src/assets/`;
+            const to = `assets/assets-for/${parent.name + '--' + c.name}/`;
+            // this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
+            this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          }
+          if (forAppRelaseBuild) {
+            if (true) {
+              const from = `src="/assets/assets-for/${parent.name + '--' + c.name}/`;
+              const to = `src="${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${parent.name + '--' + c.name}/`;
+              this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+            }
+            if (true) {
+              const from = `[src]="'/assets/assets-for/${parent.name + '--' + c.name}/`;
+              const to = `[src]="'${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${parent.name + '--' + c.name}/`;
+              this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+            }
+            if (true) {
+              const from = ` url('/assets/assets-for/${parent.name + '--' + c.name}/`;
+              const to = `url('${back}assets/assets-for/${parent.name + '--' + c.name}/`;
+              this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+            }
+          }
+        })
     } else if (this.project.isStandaloneProject) {
       [this.project]
         .filter(f => f.typeIs('isomorphic-lib'))
         .forEach(c => {
-          const from = `src/assets/`;
-          const to = `${basename}assets/assets-for/${c.name}/`;
-          this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
-          this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          if (true) {
+            const from = `src/assets/`;
+            const to = `assets/assets-for/${c.name}/`;
+            // this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
+            this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          }
+          if (forAppRelaseBuild) {
+            if (true) {
+              const from = `src="/assets/assets-for/${c.name}/`;
+              const to = `src="${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${c.name}/`;
+              this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+            }
+            if (true) {
+              const from = `[src]="/assets/assets-for/${c.name}/`;
+              const to = `[src]="'${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${c.name}/`;
+              this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+            }
+            if (true) {
+              const from = `url('/assets/assets-for/${c.name}/`;
+              const to = `url('${back}assets/assets-for/${c.name}/`;
+              this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+            }
+
+          }
         });
     }
 
