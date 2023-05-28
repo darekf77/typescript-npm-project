@@ -235,7 +235,7 @@
         "tnp-tools": "0.0.58",
         "any-project-cli": '13.1.26',
         "@types/node": "10.12.30",
-        morphi: '13.2.8',
+        morphi: '13.2.9',
         gulp: "^3.9.1",
         "ng2-logger": '13.1.23',
         "ng2-rest": '13.2.7',
