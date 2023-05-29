@@ -52,7 +52,7 @@ async function $INIT_CORE() {
 
 async function MORPHISYNC(args, noExit = false) {
   const cwd = config.morphiPathUserInUserDir;
-  Helpers.info(`Fetching git data... KRUWA`);
+  Helpers.info(`Fetching git data... `);
   try {
     Helpers.run(`git reset --hard && git clean -df && git fetch`, { cwd, output: false }).sync();
   } catch (error) {
