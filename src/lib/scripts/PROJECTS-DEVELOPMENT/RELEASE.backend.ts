@@ -122,7 +122,7 @@ const $RELEASE = async (args: string) => {
 
 ${proj.children.map((c) => ` - @${proj.name}/${c.name} v${newVersion}`).join('\n')}
 `);
-      const message = 'Proceed release ?';
+      const message = 'Proceed with lib release ?';
 
       return await Helpers.questionYesNo(message);
     }

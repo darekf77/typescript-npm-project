@@ -390,7 +390,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     //   await this.npmPackages.installProcess(`release procedure`)
     // }
 
-
+    const allArgs = args + ` ${!forAppRelaseBuild ? '--codeCutRelease' : ''} ${forAppRelaseBuild ? '--forAppRelaseBuild' : ''}`
 
     Helpers.logInfo(`BUILD OPTION (${this.name}):
     prod=${!!prod},
@@ -398,6 +398,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     includeNodeModules=${!!includeNodeModules},
     nodts=${!!nodts},
     uglify=${!!uglify}
+    allArgs: ${allArgs}
     `)
 
     await this.build(BuildProcess.prepareOptionsBuildProcess({
@@ -407,7 +408,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       nodts,
       uglify,
       outDir: config.folder.bundle as 'bundle',
-      args: args + ` ${!forAppRelaseBuild ? '--codeCutRelease' : ''} ${forAppRelaseBuild ? '--forAppRelaseBuild' : ''}`
+      args: allArgs,
     }, this) as any);
 
 
@@ -513,7 +514,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       Helpers.remove(client)
       Helpers.tryCopyFrom(browser, client);
     } else {
-      Helpers.warn(`Browser folder not generated.. replacing with dummy files: browser.js, client.js`,
+      Helpers.logWarn(`Browser folder not generated.. replacing with dummy files: browser.js, client.js`,
         false);
       const msg = `console.log('${this.genericName} only for backend') `;
       Helpers.writeFile(`${browser}.js`, msg);
@@ -552,7 +553,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         fse.copyFileSync(file, dest);
       }
     })
-    Helpers.info(`Resources copied to release folder: ${config.folder.bundle}`);
+    Helpers.logInfo(`Resources copied to release folder: ${config.folder.bundle}`);
 
   }
 

@@ -232,9 +232,15 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
 
 
       const cmd = (childProjName: string, productinoBuild: boolean, websqlBuild: boolean, isMainTarget = false) => {
-        this.project.run(`${config.frameworkName} `
-          + `build:${config.folder.bundle}:app:${productinoBuild ? 'prod' : ''} ${childProjName} `
-          + `  ${websqlBuild ? '--websql' : ''}         ${global.hideLog ? '' : '-verbose'}`).sync();
+        const commandToBuildDOcs = `${config.frameworkName} `
+        + `build:${config.folder.bundle}:app:${productinoBuild ? 'prod' : ''} ${childProjName} `
+        + `  ${websqlBuild ? '--websql' : ''}         ${global.hideLog ? '' : '-verbose'}`
+
+        // console.log({
+        //   commandToBuildDOcs
+        // })
+
+        this.project.run(commandToBuildDOcs).sync();
 
         const assetsListPathSourceMain = crossPlatformPath([
           crossPlatformPath(path.resolve(path.join(this.project.location, '..'))),

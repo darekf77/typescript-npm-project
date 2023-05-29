@@ -611,6 +611,7 @@ export class BrowserCodeCut {
   }
   //#endregion
 
+  //#region methods / processing asset link for app
   processAssetsLinksForApp() {
     this.rawContentForAPPONLYBrowser = this.rawContentForBrowser;
 
@@ -621,10 +622,18 @@ export class BrowserCodeCut {
     // const forAppRelaseBuild = (this.buildOptions?.args?.search('--forAppRelaseBuild') !== -1)
 
 
-    let basename = this.isInRelaseBundle ? `/${pathname}/` : '/';
+    let basenameWithSlash = this.isInRelaseBundle ? `/${pathname}/` : '/';
     if (this.project.env.config?.useDomain) {
-      basename = '/';
+      basenameWithSlash = '/';
     }
+
+    basenameWithSlash = basenameWithSlash.endsWith('/') ? basenameWithSlash : (basenameWithSlash + '/');
+
+    console.log({
+      basename: basenameWithSlash, isInRelaseBundle: this.isInRelaseBundle, pathname,
+      // config: this.project.env.config,
+      'this.project.isSmartContainerTarget': this.project.isSmartContainerTarget
+    })
     // if (!forAppRelaseBuild) {
     //   basename = '/'
     // }
@@ -651,17 +660,33 @@ export class BrowserCodeCut {
 
           if (true) {
             const from = `src="/assets/assets-for/${parent.name + '--' + c.name}/`;
-            const to = `src="${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${parent.name + '--' + c.name}/`;
+            const to = `src="${basenameWithSlash}assets/assets-for/${parent.name + '--' + c.name}/`;
             this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
           }
           if (true) {
             const from = `[src]="'/assets/assets-for/${parent.name + '--' + c.name}/`;
-            const to = `[src]="'${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${parent.name + '--' + c.name}/`;
+            const to = `[src]="'${basenameWithSlash}assets/assets-for/${parent.name + '--' + c.name}/`;
             this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
           }
           if (true) {
-            const from = ` url('/assets/assets-for/${parent.name + '--' + c.name}/`;
-            const to = `url('${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${parent.name + '--' + c.name}/`;
+            const from = `href="/assets/assets-for/${parent.name + '--' + c.name}/`;
+            const to = `href="${basenameWithSlash}assets/assets-for/${parent.name + '--' + c.name}/`;
+            this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          }
+          if (true) {
+            const from = `[href]="'/assets/assets-for/${parent.name + '--' + c.name}/`;
+            const to = `[href]="'${basenameWithSlash}assets/assets-for/${parent.name + '--' + c.name}/`;
+            this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          }
+          if (true) {
+            const from = `url('/assets/assets-for/${parent.name + '--' + c.name}/`;
+            const to = `url('${basenameWithSlash}assets/assets-for/${parent.name + '--' + c.name}/`;
+            this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          }
+
+          if (true) {
+            const from = `url("/assets/assets-for/${parent.name + '--' + c.name}/`;
+            const to = `url("${basenameWithSlash}assets/assets-for/${parent.name + '--' + c.name}/`;
             this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
           }
 
@@ -677,24 +702,55 @@ export class BrowserCodeCut {
             this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), `/${to}`);
           }
 
+          // const a = [
+          //   {
+          //     from: `src="/assets/assets-for/${c.name}/`,
+          //     to: `src="${basenameWithSlash}assets/assets-for/${c.name}/`,
+          //   },
+          //   {
+          //     from: `[src]="/assets/assets-for/${c.name}/`,
+          //     to: `[src]="'${basenameWithSlash}assets/assets-for/${c.name}/`,
+          //   },
+          //   {
+          //     from = `href="/assets/assets-for/${c.name}/`;
+          //     const to = `href="${basenameWithSlash}assets/assets-for/${c.name}/`;
+          //   }
+          // ]
+
           if (true) {
             const from = `src="/assets/assets-for/${c.name}/`;
-            const to = `src="${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${c.name}/`;
+            const to = `src="${basenameWithSlash}assets/assets-for/${c.name}/`;
             this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
           }
           if (true) {
             const from = `[src]="/assets/assets-for/${c.name}/`;
-            const to = `[src]="'${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${c.name}/`;
+            const to = `[src]="'${basenameWithSlash}assets/assets-for/${c.name}/`;
+            this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          }
+          if (true) {
+            const from = `href="/assets/assets-for/${c.name}/`;
+            const to = `href="${basenameWithSlash}assets/assets-for/${c.name}/`;
+            this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          }
+          if (true) {
+            const from = `[href]="/assets/assets-for/${c.name}/`;
+            const to = `[href]="'${basenameWithSlash}assets/assets-for/${c.name}/`;
             this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
           }
           if (true) {
             const from = `url('/assets/assets-for/${c.name}/`;
-            const to = `url('${basename}${basename.endsWith('/') ? '' : '/'}assets/assets-for/${c.name}/`;
+            const to = `url('${basenameWithSlash}assets/assets-for/${c.name}/`;
+            this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          }
+          if (true) {
+            const from = `url("/assets/assets-for/${c.name}/`;
+            const to = `url("${basenameWithSlash}assets/assets-for/${c.name}/`;
             this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
           }
         });
     }
   }
+  //#endregion
 
   //#region methods / fix comments
   private fixComments(s: string, endComment?: string) {
