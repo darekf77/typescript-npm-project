@@ -1,3 +1,4 @@
+//#region imports
 import { chokidar, crossPlatformPath, _ } from 'tnp-core';
 import { path } from 'tnp-core'
 import { FeatureForProject, Project } from '../abstract';
@@ -8,12 +9,15 @@ import { VscodeProject } from '../abstract/project/vscode-project.backend';
 import { BrowserCodeCut } from '../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
 import { recreateApp } from './inside-structures/structs/inside-struct-helpers';
 import { argsToClear } from '../../constants';
+//#endregion
 
 export class SingularBuild extends FeatureForProject {
 
+  //#region static / methods / get proxy project location
   static getProxyProj(workspaceOrContainer: Project, client: string, outFolder: Models.dev.BuildDir = 'dist') {
-    return path.join(workspaceOrContainer.location, outFolder, workspaceOrContainer.name, client);
+    return  crossPlatformPath([workspaceOrContainer.location, outFolder, workspaceOrContainer.name, client]);
   }
+  //#endregion
 
   watchers: chokidar.FSWatcher[] = [];
 

@@ -21,6 +21,10 @@ export class NpmPackagesBase extends NpmPackagesCore {
       return true;
     }
 
+    if (this.project.isSmartContainerChild) {
+      return true;
+    }
+
     if (this.project.isVscodeExtension) {
       return true;
     }
@@ -41,6 +45,11 @@ export class NpmPackagesBase extends NpmPackagesCore {
       return;
     }
 
+    if (this.project.isDocker) {
+      Helpers.log(`No need for package installation for docker project`)
+      return;
+    }
+
     if (!global.globalSystemToolMode) {
       return;
     }
@@ -50,10 +59,8 @@ export class NpmPackagesBase extends NpmPackagesCore {
     options = fixOptionsNpmInstall(options, this.project);
 
     const fullInstall = (options.npmPackages.length === 0);
-    // if (fullInstall && this.project.isVscodeExtension && !this.project.isCoreProject) {
-    //   options.smoothInstall = true;
-    // }
-    const { remove, npmPackages, smoothInstall } = options;
+
+    const { remove, npmPackages } = options;
     // console.log(npmPackages)
     // process.exit(0)
 
@@ -62,12 +69,14 @@ export class NpmPackagesBase extends NpmPackagesCore {
     }
 
     if (remove) {
+      //#region remove
       Helpers.log(`Package [${npmPackages.map(p => p.name + (p.version ? `@${p.version}` : ''))
         .join(',')
         }] remove for ${chalk.bold(this.project.genericName)} ${triggeredMsg} `);
       npmPackages.forEach(p => {
         this.project.packageJson.removeDependencyAndSave(p, `package ${p && p.name} instalation`);
       });
+      //#endregion
     } else {
       if (fullInstall) {
         Helpers.log(`Packages full installation for ${this.project.genericName}`)
@@ -102,9 +111,6 @@ export class NpmPackagesBase extends NpmPackagesCore {
 
       this.project.packageJson.showDeps(`${this.project._type} instalation before full insall [${triggeredMsg}]`);
 
-      if (this.project.isWorkspace && smoothInstall === false) {
-        this.project.workspaceSymlinks.remove(triggeredMsg)
-      }
 
       const installAllowed = (
         !this.project.isContainer
@@ -114,31 +120,28 @@ export class NpmPackagesBase extends NpmPackagesCore {
       );
 
       if (installAllowed) {
-        if (!smoothInstall
-          && this.useSmartInstall
-          && !options.smartInstallPreparing
-        ) {
+        if (this.useSmartInstall && !options.smartInstallPreparing) {
           this.project.smartNodeModules.install(remove ? 'uninstall' : 'install', ...npmPackages);
         } else {
           if (fullInstall) {
-            this.actualNpmProcess({ reason: triggeredMsg, smoothInstall })
+            this.actualNpmProcess({ reason: triggeredMsg })
           } else {
             npmPackages.forEach(pkg => {
-              this.actualNpmProcess({ pkg, reason: triggeredMsg, remove, smoothInstall });
+              this.actualNpmProcess({ pkg, reason: triggeredMsg, remove });
             });
           }
         }
       } else {
-        Helpers.log(`Dont install node_modules - project is container`)
+        Helpers.log(`Project is not allowed to have node_modules installed`)
       }
 
-      if (this.project.isWorkspace && smoothInstall === false) {
+      if (this.project.isWorkspace) {
         this.project.workspaceSymlinks.add(triggeredMsg)
       }
       if (this.project.isContainerChild && this.project.isWorkspace) {
         this.project.packageJson.hideDeps(`${this.project._type} hide deps for container child [${triggeredMsg}]`);
       }
-      if ((this.project.isWorkspace || this.project.isStandaloneProject) && smoothInstall === false) {
+      if ((this.project.isWorkspace || this.project.isStandaloneProject)) {
         if (!this.project.node_modules.isLink) {
           if (!this.project.node_modules.itIsSmartInstalation) {
             this.project.node_modules.dedupe();

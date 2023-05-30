@@ -59,117 +59,6 @@ export function executeCommand(command: string, project: Project) {
   Helpers.writeFile([project.node_modules.path, '.install-date'], moment(new Date()).format('L LTS'))
 }
 
-
-export function copyMainProjectDependencies(projects: { mainProjectExisted: Project, mainProjectInTemp: Project; },
-  tmpProject: Project, project: Project, pkg: Models.npm.Package) {
-
-  const { mainProjectInTemp, mainProjectExisted } = projects;
-  // if (!mainProjectExisted) {
-  //   debugger;
-  // }
-  const alreadyChecked = [];
-  function copyOtherProcess(parent: Project) {
-    const otherDepsInTemp: Project[] = parent
-      .allPackageJsonDeps(tmpProject.location)
-      .filter(f => !alreadyChecked.includes(f));
-
-    if (otherDepsInTemp.length === 0) {
-      return;
-    }
-    otherDepsInTemp
-      .filter(otherDependenyInTemp => {
-        return fse.existsSync(path.join(tmpProject.node_modules.path, otherDependenyInTemp.name))
-      })
-      .forEach(otherDependenyInTemp => {
-
-        const existedPkgPath = path.join(project.node_modules.path, otherDependenyInTemp.name)
-        const existedOtherDependency = Project.From<Project>(existedPkgPath);
-        if (existedOtherDependency) {
-          if (existedOtherDependency.version === otherDependenyInTemp.version) {
-            Helpers.log(`[smoothInstallPrepare] nothing to do for same dependency version ${otherDependenyInTemp.name}`);
-          } else {
-            if (parent.packageJson.checDepenciesAreSatisfyBy(existedOtherDependency)) {
-              Helpers.log(`[smoothInstallPrepare] nothing to do dependency is satisfy ${otherDependenyInTemp.name}`);
-            } else {
-              const diff = `${existedOtherDependency.version} != ${otherDependenyInTemp.version}`;
-              Helpers.warn(`[smoothInstallPrepare] "${parent.name}/${chalk.bold(otherDependenyInTemp.name)}" version not satisfy ${diff}`)
-              const dest = path.join(project.node_modules.path, mainProjectExisted.name,
-                config.folder.node_modules, otherDependenyInTemp.name);
-
-              if (fse.existsSync(dest)) {
-                Helpers.warn(`[smoothInstallPrepare] "${parent.name}/${chalk.bold(otherDependenyInTemp.name)}" nested already exists in neste folder`);
-              } else {
-                Helpers.mkdirp(dest);
-                Helpers.warn(`[smoothInstallPrepare] "${parent.name}/${chalk.bold(otherDependenyInTemp.name)}" please copy manualy to nested folder`);
-                // tryCopyFrom(otherDependenyInTemp.location, dest); // @TODO
-              }
-            }
-          }
-        } else {
-          Helpers.log(`[smoothInstallPrepare] copy new package ${otherDependenyInTemp.name}`);
-          Helpers.tryCopyFrom(otherDependenyInTemp.location, existedPkgPath);
-        }
-      });
-    otherDepsInTemp.forEach(p => {
-      alreadyChecked.push(p);
-      copyOtherProcess(p);
-    });
-  }
-  copyOtherProcess(mainProjectInTemp);
-}
-
-export function copyMainProject(tmpProject: Project, project: Project, pkg: Models.npm.Package) {
-  const mainProjectInTemp = Project.From<Project>(path.join(tmpProject.node_modules.path, pkg.name));
-  const mainProjectExistedPath = path.join(project.node_modules.path, pkg.name)
-  Helpers.removeFolderIfExists(mainProjectExistedPath);
-  Helpers.copy(mainProjectInTemp.location, mainProjectExistedPath);
-  Helpers.log(`[smoothInstallPrepare] main package copy ${mainProjectInTemp.name}`);
-  const mainProjectExisted = Project.From<Project>(mainProjectExistedPath);
-  return { mainProjectExisted, mainProjectInTemp };
-}
-
-export function prepareTempProject(project: Project, pkg: Models.npm.Package): Project {
-  if (!pkg.version) {
-    try {
-      pkg.version = Helpers.commnadOutputAsString(`npm show ${pkg.name} version`);
-    } catch (error) {
-      Helpers.log('pkg' + JSON.stringify(pkg));
-      Helpers.error(`[${config.frameworkName}] `
-        + `not able to install package... try again with exact version or check package name.`, false, true);
-    }
-  }
-
-  Helpers.info(`
-
-      Packge ${pkg.name}@${pkg.version} will be installed..
-
-      `)
-
-  const pathPart = `${config.folder.tmp}-${config.folder.node_modules}-installation-of`;
-  const tmpFolder = path.join(project.location, `${pathPart}-${pkg.name.replace('/', '-')}-${_.snakeCase(pkg.version)}`);
-
-  Helpers.remove(`${path.join(project.location, pathPart)}*`);
-  Helpers.mkdirp(tmpFolder);
-  project.packageJson.copyTo(tmpFolder);
-  const tmpProject = Project.From<Project>(tmpFolder);
-  tmpProject.packageJson.setNamFromContainingFolder();
-  tmpProject.packageJson.hideDeps(`smooth instalation`);
-  tmpProject.packageJson.data.dependencies = {
-    [pkg.name]: pkg.version
-  };
-  tmpProject.packageJson.data.devDependencies = {};
-  tmpProject.packageJson.save('smooth install')
-  const command = prepareCommand(pkg, false, false, project);
-  try {
-    executeCommand(command, tmpProject);
-  } catch (error) {
-    Helpers.error(`[${config.frameworkName}] `
-      + `not able to install package... try again with exact version or check package name.`, false, true);
-  }
-  return tmpProject;
-}
-
-
 export function prepareCommand(pkg: Models.npm.Package, remove: boolean, useYarn: boolean, project: Project) {
   const install = (remove ? 'uninstall' : 'install');
   let command = '';
@@ -209,9 +98,6 @@ export function fixOptions(options?: Models.npm.ActualNpmInstallOptions): Models
   if (_.isUndefined(options.remove)) {
     options.remove = false;
   }
-  if (_.isUndefined(options.smoothInstall)) {
-    options.smoothInstall = false;
-  }
   if (_.isUndefined(options.pkg)) {
     options.pkg = void 0;
   }
@@ -233,9 +119,6 @@ export function fixOptionsNpmInstall(options: Models.npm.NpmInstallOptions,
   }
   if (_.isUndefined(options.remove)) {
     options.remove = false;
-  }
-  if (_.isUndefined(options.smoothInstall)) {
-    options.smoothInstall = false;
   }
   return options;
 }

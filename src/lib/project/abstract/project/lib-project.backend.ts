@@ -538,7 +538,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       const dest = path.join(bundleFolder, res);
       if (!fse.existsSync(file)) {
         Helpers.error(`[${config.frameworkName}][lib-project] Resource file: ${chalk.bold(path.basename(file))} does not `
-          + `exist in "${this.genericName}"  (package.json > tnp.resources[])
+          + `exist in "${this.genericName}"  (package.json > resources[])
         `, false, true)
       }
       if (fse.lstatSync(file).isDirectory()) {

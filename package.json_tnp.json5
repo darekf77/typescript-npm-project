@@ -8,6 +8,11 @@
       // or generate icons with jimp directly
       favicons: '~7.1.2',
     },
+    npmFixes: [
+       'json5-writer',
+       'lowdb',
+       'misc-utils-of-mine-generic',
+    ],
     ignoreDepsPattern: [
       'edit-table',
       "bs4-breakpoint",

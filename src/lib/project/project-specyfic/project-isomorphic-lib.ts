@@ -564,6 +564,9 @@ export class ProjectIsomorphicLib
         },
         outputLineReplace: (line: string) => {
           if (isStandalone) {
+            if(line.startsWith('WARNING: postcss-url')) {
+              return ' --- [firedev] IGNORED WARN ---- ';
+            }
             return line.replace(
               `projects/${this.name}/src/`,
               `./src/`
@@ -577,7 +580,7 @@ export class ProjectIsomorphicLib
 
     //#region prepare variables / command
     // const command = `${loadNvm} && ${this.npmRunNg} build ${this.name} ${watch ? '--watch' : ''}`;
-    const command = `${this.npmRunNg} build ${this.name} ${watch ? '--watch' : ''}`;
+    const commandForLibraryBuild = `${this.npmRunNg} build ${this.name} ${watch ? '--watch' : ''}`;
     //#endregion
 
     //#region prepare variables / angular info
@@ -589,7 +592,7 @@ export class ProjectIsomorphicLib
 
       `);
 
-      Helpers.log(` command: ${command}`);
+      Helpers.log(` command: ${commandForLibraryBuild}`);
     };
     //#endregion
 
@@ -645,13 +648,13 @@ export class ProjectIsomorphicLib
             if (this.isSmartContainerTarget) { // TODO QUICK_FIX this should be in init/struct
               PackagesRecognition.fromProject(this).start(true, 'before startling lib proxy project');
             }
-            await proxyProject.execute(command, {
+            await proxyProject.execute(commandForLibraryBuild, {
               resolvePromiseMsg: {
                 stdout: 'Compilation complete. Watching for file changes'
               },
               ...sharedOptions(),
             });
-            await proxyProjectWebsql.execute(command, {
+            await proxyProjectWebsql.execute(commandForLibraryBuild, {
               resolvePromiseMsg: {
                 stdout: 'Compilation complete. Watching for file changes'
               },
@@ -731,16 +734,16 @@ export class ProjectIsomorphicLib
 
         try {
           showInfoAngular()
-          await proxyProject.execute(command, {
+          await proxyProject.execute(commandForLibraryBuild, {
             ...sharedOptions()
           })
-          await proxyProjectWebsql.execute(command, {
+          await proxyProjectWebsql.execute(commandForLibraryBuild, {
             ...sharedOptions()
           })
         } catch (e) {
           Helpers.log(e)
           Helpers.error(`
-          Command failed: ${command}
+          Command failed: ${commandForLibraryBuild}
 
           Not able to build project: ${this.genericName}`, false, true)
         }
@@ -753,17 +756,17 @@ export class ProjectIsomorphicLib
 
         try {
           showInfoAngular();
-          await proxyProject.execute(command, {
+          await proxyProject.execute(commandForLibraryBuild, {
             ...sharedOptions(),
           });
-          await proxyProjectWebsql.execute(command, {
+          await proxyProjectWebsql.execute(commandForLibraryBuild, {
             ...sharedOptions(),
           });
           this.showMesageWhenBuildLibDoneForSmartContainer(args, watch, this.isInRelaseBundle);
         } catch (e) {
           Helpers.log(e)
           Helpers.error(`
-          Command failed: ${command}
+          Command failed: ${commandForLibraryBuild}
 
           Not able to build project: ${this.genericName}`, false, true)
         }

@@ -266,78 +266,12 @@ export default _default;
     if (!fse.existsSync(this.project.location)) {
       return;
     }
-    if (this.project.isWorkspace ||
-      this.project.isWorkspaceChildProject ||
-      this.project.isStandaloneProject) {
-
+    if (this.project.isStandaloneProject && !this.project.isSmartContainerTarget) {
       const srcFolder = path.join(this.project.location, config.folder.src);
-      if (this.project.isWorkspace) {
-        // Helpers.removeFolderIfExists(srcFolder);
-      } else {
-        if (!fse.existsSync(srcFolder)) {
-          if (this.project.typeIs('angular-lib')) {
-            const coreProj = Project.by('angular-lib', this.project._frameworkVersion) as Project;
-            const coreSrcLocaion = path.join(coreProj.location, config.folder.src);
-            Helpers.copy(coreSrcLocaion, srcFolder, { recursive: true, overwrite: true });
-          } else {
-            Helpers.mkdirp(srcFolder);
-          }
-        }
-        // log('SRC folder recreated')
-      }
-      const componentsFolder = path.join(this.project.location, config.folder.components);
 
-      if (this.project.typeIs(...(config.projectTypes.with.componetsAsSrc as ConfigModels.LibType[])) && !fse.existsSync(componentsFolder)) {
-        // log('COMPONENTS folder recreated');
-        Helpers.mkdirp(componentsFolder);
+      if (!fse.existsSync(srcFolder)) {
+        Helpers.mkdirp(srcFolder);
       }
-
-      // TODO why would I do that ?
-      // const browserStandaloneFolder = path.join(this.project.location, config.folder.browser);
-      // if (this.project.type === 'angular-lib' && this.project.isStandaloneProject
-      //   && !fse.existsSync(browserStandaloneFolder)) {
-      //   // log('BROWSER folder recreated');
-      //   fse.symlinkSync(this.project.location, browserStandaloneFolder);
-      // }
-
-      const customFolder = path.join(this.project.location, config.folder.custom);
-      if (this.project.isSiteInStrictMode && !fse.existsSync(customFolder)) {
-        // log('CUSTOM folder recreated');
-        Helpers.mkdirp(customFolder);
-      }
-      if (this.project.isSiteInDependencyMode) {
-        Helpers.removeFolderIfExists(customFolder);
-      }
-
-      const nodeModulesFolder = path.join(this.project.location, config.folder.node_modules);
-      if (this.project.isWorkspace && !fse.existsSync(nodeModulesFolder)) {
-        // log('NODE_MODULES folder recreated');
-        Helpers.mkdirp(nodeModulesFolder)
-      }
-      if (this.project.isWorkspaceChildProject && !fse.existsSync(nodeModulesFolder)) {
-        const paretnFolderOfNodeModules = path.join(this.project.parent.location, config.folder.node_modules);
-        if (!fse.existsSync(paretnFolderOfNodeModules)) {
-          // log('NODE_MODULES (parent) folder recreated');
-          Helpers.mkdirp(paretnFolderOfNodeModules)
-        }
-        // log('NODE_MODULES folder link to child recreated');
-        Helpers.createSymLink(paretnFolderOfNodeModules, nodeModulesFolder);
-      }
-
-      if (this.project.isSite) {
-        if (this.project.isWorkspace) {
-          const baselineFolderInNodeModule = path.join(
-            this.project.location,
-            config.folder.node_modules,
-            this.project.baseline.name
-          );
-          if (!fse.existsSync(baselineFolderInNodeModule)) {
-            // log('BASELINE folder in NODE_MODUELS recreated');
-            Helpers.createSymLink(this.project.baseline.location, baselineFolderInNodeModule);
-          }
-        }
-      }
-
     }
     Helpers.taskDone(`[quick fixes] missing source folder end`)
   }

@@ -371,6 +371,11 @@ function consistencyFixes(
     content[tnpProperty].overrided.ignoreDepsPattern = ['*'];
     additionalSaveRequired = true;
   }
+  if (!_.isArray(content[tnpProperty].overrided['npmFixes'])) {
+    content[tnpProperty].overrided['npmFixes'] = [];
+    additionalSaveRequired = true;
+  }
+
   if (_.isUndefined(content[tnpProperty].overrided.includeAsDev)) {
     content[tnpProperty].overrided.includeAsDev = [];
     additionalSaveRequired = true;

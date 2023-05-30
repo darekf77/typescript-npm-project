@@ -12,11 +12,14 @@ export type PackageType = Pick<Models.npm.Package, 'name' | 'version'>;
 
 export class SmartNodeModules extends FeatureForProject {
   updateFromReleaseBundle(destination: Project) {
-    const source = crossPlatformPath([destination.location,
+    const source = crossPlatformPath([
+      destination.location,
       'tmp-bundle-release',
       'bundle',
-      'project', destination.name,
-      `tmp-local-copyto-proj-${config.folder.bundle}/${config.folder.node_modules}/${destination.name}`]);
+      'project',
+      destination.name,
+      `tmp-local-copyto-proj-${config.folder.bundle}/${config.folder.node_modules}/${destination.name}`,
+    ]);
 
     if (destination.npmPackages.useSmartInstall) {
       (() => {
@@ -133,8 +136,17 @@ export class SmartNodeModules extends FeatureForProject {
 
   //#region packages to override after smart node_modules instalation
   private get toOverride(): OverridePacakge {
-    return this.project.packageJson.data?.tnp?.overrided?.dependencies || {};
+    const depsToOverride = (this.project.packageJson.data?.tnp?.overrided?.dependencies || {});
+    const keys = Object.keys(depsToOverride);
+    for (let index = 0; index < keys.length; index++) {
+      const key = keys[index];
+      if (key.startsWith('-')) {
+        Helpers.error(`[${config.frameworkName}] Incorrect dependency to override "${chalk.bold(key)}@${depsToOverride[key]}"`, false, true);
+      }
+    }
+    return depsToOverride;
   }
+
   private handlePackagesOverride() {
     const toOverride = this.toOverride;
 
@@ -146,93 +158,72 @@ export class SmartNodeModules extends FeatureForProject {
         Helpers.removeFolderIfExists(additonalFolderToRemove);
       });
 
-    // Helpers.log('OVERRRIDE', _.keys(toOverride).join('/'))
+    // Helpers.log('OVERRRIDE' + _.keys(toOverride).join('/'))
     _.keys(toOverride).map(packageName => {
 
       //#region excepion for local firedev
-      const locationLocalTnp = path.join(this.project.location, '..', 'tnp');
-      // TODO put this into QUICK_FIX
-      if (packageName === 'tnp' && this.project.name === 'firedev' && !!Project.From(locationLocalTnp)) {
-        const tnpProj = Project.From(locationLocalTnp) as Project;
-        tnpProj.copyManager.init({ // TODO INCLUDE WEBSQL
-          watch: false,
-          args: '',
-          outDir: 'dist',
-          websql: false,
-        } as any)
-        tnpProj.copyManager.copyBuildedDistributionTo(this.project);
-        tnpProj.copyManager.init({ // TODO INCLUDE WEBSQL
-          watch: false,
-          args: '',
-          outDir: 'dist',
-          websql: true,
-        } as any)
-        tnpProj.copyManager.copyBuildedDistributionTo(this.project);
-        Helpers.info(`[${config.frameworkName}] tnp was update from local version in ${locationLocalTnp}`);
+
+      const packageVersion = toOverride[packageName];
+      if (packageVersion === null) {
+        this.project.node_modules.remove(packageName);
       } else {
-        const packageVersion = toOverride[packageName];
-        if (packageVersion === null) {
-          this.project.node_modules.remove(packageName);
-        } else {
-          //#region dedupe from temp before adding to actual node_modules
-          const tempProj = this.project.smartNodeModules.getAndCreateTempProjForPackage({
-            name: packageName,
-            version: packageVersion
+        //#region dedupe from temp before adding to actual node_modules
+        const tempProj = this.project.smartNodeModules.getAndCreateTempProjForPackage({
+          name: packageName,
+          version: packageVersion
+        });
+        tempProj.npmPackages.installFromArgs('');
+        const Tnp = (Project.Tnp as Project);
+        const toDedupe = Tnp.packageJson.data.tnp.core.dependencies.dedupe;
+        toDedupe
+          .filter(dedupePkgName => {
+            // Helpers.log(`dedupePkgName: ${dedupePkgName}`)
+            return _.isString(dedupePkgName) && !_.keys(toOverride).includes(dedupePkgName)
+          })
+          .forEach(dedupePkgName => {
+            const existedVersionInMainNodeModules = this.project.npmPackages.package(dedupePkgName).version;
+            if (
+              tempProj.npmPackages.package(dedupePkgName).exists &&
+              tempProj.npmPackages.package(dedupePkgName).isNotSatisfyBy(existedVersionInMainNodeModules)
+            ) {
+              const verrrr = tempProj.npmPackages.package(dedupePkgName);
+              Helpers.warn(`[override package][dedupe "${packageName}"] ${chalk.bold(dedupePkgName)}@${verrrr?.version} won't be satisfy`
+                + ` in this repository by version "${existedVersionInMainNodeModules}"`);
+            }
           });
-          tempProj.npmPackages.installFromArgs('');
-          const Tnp = (Project.Tnp as Project);
-          const toDedupe = Tnp.packageJson.data.tnp.core.dependencies.dedupe;
-          toDedupe
-            .filter(dedupePkgName => {
-              // Helpers.log(`dedupePkgName: ${dedupePkgName}`)
-              return _.isString(dedupePkgName) && !_.keys(toOverride).includes(dedupePkgName)
-            })
-            .forEach(dedupePkgName => {
-              const existedVersionInMainNodeModules = this.project.npmPackages.package(dedupePkgName).version;
-              if (
-                tempProj.npmPackages.package(dedupePkgName).exists &&
-                tempProj.npmPackages.package(dedupePkgName).isNotSatisfyBy(existedVersionInMainNodeModules)
-              ) {
-                const verrrr = tempProj.npmPackages.package(dedupePkgName);
-                Helpers.warn(`[override package][dedupe "${packageName}"] ${chalk.bold(dedupePkgName)}@${verrrr?.version} won't be satisfy`
-                  + ` in this repository by version "${existedVersionInMainNodeModules}"`);
+        tempProj.node_modules.dedupe(toDedupe);
+        //#endregion
+        //#region link to main repo
+        const overrideFrom = tempProj.npmPackages.package(packageName).location;
+        const overrideDest = this.project.npmPackages.package(packageName).location;
+        // console.log(`overrideFrom: ${overrideFrom}`)
+        // console.log(`overrideDest: ${overrideDest}`)
+        Helpers.removeIfExists(overrideDest);
+        if (Helpers.exists(overrideFrom)) { // TODO quick fix
+          Helpers.createSymLink(overrideFrom, overrideDest); // TODO something is causing loop
+
+          Helpers.foldersFrom(tempProj.node_modules.path)
+            .filter(depName => path.basename(depName) !== packageName)
+            .forEach(depName => {
+              depName = path.basename(depName);
+              const verrr = tempProj.npmPackages.package(depName).version;
+              const fromProj = tempProj.npmPackages.package(depName);
+              const destProj = this.project.npmPackages.package(depName);
+              if (Helpers.exists(destProj.location)) {
+                if (fromProj.isNotSatisfyBy(destProj.version)) {
+                  Helpers.warn(`[override package][link "${packageName}"] ${chalk.bold(depName)}@${verrr} won't be satisfy`
+                    + ` in this repository by version "${destProj.version}"`);
+                } else {
+                  Helpers.log(`[override package][link "${packageName}"] copying new package ${chalk.bold(depName)} to main node_modules`)
+                }
+              } else {
+                Helpers.createSymLink(fromProj.location, destProj.location);
               }
             });
-          tempProj.node_modules.dedupe(toDedupe);
-          //#endregion
-          //#region link to main repo
-          const overrideFrom = tempProj.npmPackages.package(packageName).location;
-          const overrideDest = this.project.npmPackages.package(packageName).location;
-          // console.log(`overrideFrom: ${overrideFrom}`)
-          // console.log(`overrideDest: ${overrideDest}`)
-          Helpers.removeIfExists(overrideDest);
-          if (Helpers.exists(overrideFrom)) { // TODO quick fix
-            Helpers.createSymLink(overrideFrom, overrideDest); // TODO something is causing loop
-
-            Helpers.foldersFrom(tempProj.node_modules.path)
-              .filter(depName => path.basename(depName) !== packageName)
-              .forEach(depName => {
-                depName = path.basename(depName);
-                const verrr = tempProj.npmPackages.package(depName).version;
-                const fromProj = tempProj.npmPackages.package(depName);
-                const destProj = this.project.npmPackages.package(depName);
-                if (Helpers.exists(destProj.location)) {
-                  if (fromProj.isNotSatisfyBy(destProj.version)) {
-                    Helpers.warn(`[override package][link "${packageName}"] ${chalk.bold(depName)}@${verrr} won't be satisfy`
-                      + ` in this repository by version "${destProj.version}"`);
-                  } else {
-                    Helpers.log(`[override package][link "${packageName}"] copying new package ${chalk.bold(depName)} to main node_modules`)
-                  }
-                } else {
-                  Helpers.createSymLink(fromProj.location, destProj.location);
-                }
-              });
-          }
-
-          //#endregion
         }
-      }
 
+        //#endregion
+      }
     });
   }
   //#endregion
@@ -328,7 +319,7 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
   // }
 
   if (!smartTempContainerCorePackagesProj.node_modules.exist || reinstallForceSmartNodeModules) {
-    smartTempContainerCorePackagesProj.npmPackages.installFromArgs('', false, true);
+    smartTempContainerCorePackagesProj.npmPackages.installFromArgs('', true);
     smartTempContainerCorePackagesProj.node_modules.dedupe({ reason: 'smart temp container dedeupe' }); // TODO QUICK FIX
   }
 

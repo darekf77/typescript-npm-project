@@ -11,14 +11,12 @@ import { config } from 'tnp-config';
 import * as semver from 'semver';
 import { PackagesRecognition } from '../package-recognition/packages-recognition';
 import {
-  executeCommand, fixOptions, prepareCommand, prepareTempProject,
-  copyMainProject, copyMainProjectDependencies
+  executeCommand, fixOptions, prepareCommand
 } from './npm-packages-helpers.backend';
 import { CLASS } from 'typescript-class-helpers';
 //#endregion
 
 export class NpmPackagesCore extends FeatureForProject {
-
 
   global(globalPackageName: string, packageOnly = false) {
     const ProjectClass = CLASS.getBy('Project') as typeof Project;
@@ -65,57 +63,23 @@ export class NpmPackagesCore extends FeatureForProject {
     if (this.project.isDocker) {
       return;
     }
-    const ProjectClass = CLASS.getBy('Project') as typeof Project;
-
-    const { generatLockFiles, useYarn, pkg, reason, remove, smoothInstall } = fixOptions(options);
+    const { generatLockFiles, useYarn, pkg, reason, remove } = fixOptions(options);
     const yarnLockPath = path.join(this.project.location, config.file.yarn_lock);
     const yarnLockExisits = fse.existsSync(yarnLockPath);
     const command: string = prepareCommand(pkg, remove, useYarn, this.project);
     Helpers.log(`
 
-    [actualNpmProcess][${smoothInstall ? 'smooth' : 'normal'}] npm instalation...
+    [actualNpmProcess] npm instalation...
 
     `)
     if (remove) {
       executeCommand(command, this.project);
     } else {
-      if (global.testMode) {
-        Helpers.log(`Test mode: normal instalation`)
-        if (pkg) {
-          (ProjectClass.Tnp as Project).node_modules.copy(pkg).to(this.project);
-        } else {
-          this.project.node_modules.copyFrom(ProjectClass.Tnp as Project, { triggerMsg: `Test mode instalaltion` });
-        }
-      } else {
-        if (smoothInstall) {
-          if (pkg) {
-            this.smoothInstallPrepare(pkg);
-          } else if (this.project.isStandaloneProject && !this.project.isTnp) {
-            if (this.project.node_modules.exist && !this.project.node_modules.isLink && !global.tnpNonInteractive) {
-              Helpers.pressKeyAndContinue(`
-              [smooth-npm-installation]
-              You are going to remove node_modules folder from ${this.project.node_modules.path}
-
-              Press any key to continue.. `);
-            }
-            Helpers.removeFolderIfExists(this.project.node_modules.path);
-            const workspaceForVersion = (ProjectClass.by(this.project._type, this.project._frameworkVersion) as Project).parent;
-            if (!workspaceForVersion.node_modules.exist) {
-              workspaceForVersion.run(`${config.frameworkName} init`).sync();
-            }
-            workspaceForVersion.node_modules.linkToProject(this.project)
-          } else {
-            Helpers.error(`Smooth install not supported here: ${this.project.location}`, false, true);
-          }
-        } else {
-          try {
-            executeCommand(command, this.project);
-          } catch (err) {
-            Helpers.error(err, true, true);
-            Helpers.error(`Error during npm instalation`, false, true);
-          }
-
-        }
+      try {
+        executeCommand(command, this.project);
+      } catch (err) {
+        Helpers.error(err, true, true);
+        Helpers.error(`Error during npm instalation`, false, true);
       }
     }
 
@@ -138,22 +102,5 @@ export class NpmPackagesCore extends FeatureForProject {
     }
   }
 
-
-  private smoothInstallPrepare(pkg: Models.npm.Package) {
-    Helpers.log(pkg)
-
-    const tmpProject = prepareTempProject(this.project, pkg);
-    const { mainProjectExisted, mainProjectInTemp } = copyMainProject(tmpProject, this.project, pkg);
-    if (!mainProjectExisted) {
-      Helpers.error(`Something went wrong...mainProjectExisted `);
-    }
-    if (!mainProjectInTemp) {
-      Helpers.error(`Something went wrong... mainProjectInTemp`);
-    }
-    copyMainProjectDependencies({
-      mainProjectExisted, mainProjectInTemp
-    }, tmpProject, this.project, pkg)
-    tmpProject.removeItself();
-  }
 
 }

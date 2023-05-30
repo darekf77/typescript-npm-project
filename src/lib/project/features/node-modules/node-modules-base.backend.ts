@@ -31,7 +31,7 @@ export class NodeModulesBase extends NodeModulesCore {
   public async copyFrom(source: Project, options: { triggerMsg: string; useDirectlySmartNodeModules?: boolean; }) {
     const { triggerMsg, useDirectlySmartNodeModules } = options || {};
 
-    Helpers.log(`[node_modules] Copy instalation of npm packages from ` +
+    Helpers.logInfo(`[node_modules] Copy instalation of npm packages from ` +
       `${CLI.chalk.bold(source.genericName)} to ${CLI.chalk.bold(this.project.genericName)} ${triggerMsg}`);
 
     if (source.smartNodeModules.exists) {
@@ -46,9 +46,9 @@ export class NodeModulesBase extends NodeModulesCore {
         ...[path.join(source.node_modules.path, '.install-date')],
       ];
 
-      Helpers.log(`
+      Helpers.logInfo(`
 
-      UPDATING node_moduels packages from smart installation ${packagesToLinkOrCopy.length}
+      UPDATING node_moduels from global container (${packagesToLinkOrCopy.length} packages)
 
       `);
 
@@ -109,8 +109,6 @@ export class NodeModulesBase extends NodeModulesCore {
           }
         }
       });
-
-
 
       return;
     }

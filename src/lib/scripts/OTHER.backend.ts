@@ -66,7 +66,7 @@ async function version() {
   // Helpers.info('waiting next time!!. ..');
   // Helpers.sleep(5);
   // global.spinner?.stop();
-  log.data('Hellleoeoeo')
+  // log.data('Hellleoeoeo')
   const tnp = (Project.Tnp as Project);
   const firedev = Project.From([fse.realpathSync(path.dirname(tnp.location)), config.frameworkNames.firedev]);
   Helpers.success(`

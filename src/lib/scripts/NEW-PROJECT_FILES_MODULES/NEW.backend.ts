@@ -193,13 +193,14 @@ async function $GENERATE(args: string) {
 
   const newEntityName = _.kebabCase(entityName);
   const generatedCodeAbsLoc = crossPlatformPath([container.location, 'gen-examples', moduleName, newEntityName]);
-  Helpers.removeFolderIfExists(generatedCodeAbsLoc);
+  Helpers.remove(generatedCodeAbsLoc, true);
   let destination = crossPlatformPath([absPath, newEntityName]);
   if (isFlat) {
     destination = crossPlatformPath(path.dirname(destination));
   }
 
   if (isCustom) {
+    //#region handle custom cases
     if (moduleName === 'generated-index-exports') {
       const allowedFilesExt = ['.ts', '.tsx'];
       const frontendFiles = [
@@ -253,6 +254,7 @@ async function $GENERATE(args: string) {
         );
       }
     }
+    //#endregion
   } else {
     const ins = MagicRenamer.Instance(exampleLocation);
     ins.start(`${myEntity} -> ${newEntityName}`, true);
@@ -269,6 +271,7 @@ async function $GENERATE(args: string) {
       Helpers.move(generatedCodeAbsLoc, destination);
     }
   }
+  console.info('GENERATION DONE')
   process.exit(0)
 }
 

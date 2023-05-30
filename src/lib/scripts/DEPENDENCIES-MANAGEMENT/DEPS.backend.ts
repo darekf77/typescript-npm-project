@@ -66,22 +66,17 @@ function copyToHandleArgs(args: string) {
 //#endregion
 
 //#region install / uninstall npm pacakges
-export async function $INSTALL(args, smooth = false, exit = true) {
+export async function $INSTALL(args, exit = true) {
   const proj = Project.Current as Project;
 
   if (proj.isContainer && !proj.isContainerCoreProject) {
     const children = proj.children.filter(c => c.npmPackages.useSmartInstall);
     for (let i = 0; i < children.length; i++) {
       const c = children[i];
-      c.npmPackages.installFromArgs(args, smooth);
+      c.npmPackages.installFromArgs(args);
     }
   } else {
-    if (proj.isStandaloneProject) {
-      proj.npmPackages.installFromArgs(args, true);
-    } else {
-      proj.npmPackages.installFromArgs(args, smooth);
-    }
-
+    proj.npmPackages.installFromArgs(args);
   }
   if (exit) {
     process.exit(0);
@@ -158,7 +153,8 @@ const $REINSTALL = async (args) => {
     }
   } else if (proj.isStandaloneProject && proj.npmPackages.useSmartInstall) {
     proj.node_modules.remove();
-    proj.smartNodeModules.remove(); proj.run(`${config.frameworkName} install`).sync();
+    proj.smartNodeModules.remove();
+    proj.run(`${config.frameworkName} install`).sync();
     Helpers.info(`Reinstal done for core standalone project`);
   } else {
     Helpers.error(`[${config.frameworkName}] This project does not support reinsall.

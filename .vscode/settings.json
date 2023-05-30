@@ -8,7 +8,6 @@
     "json5-writer": true,
     "lowdb": true,
     "misc-utils-of-mine-generic": true,
-    "solutions": true,
     "*.sh": true,
     "*.xlsx": true,
     "scripts": true,

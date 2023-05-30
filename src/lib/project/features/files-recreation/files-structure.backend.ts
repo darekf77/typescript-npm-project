@@ -239,28 +239,15 @@ export class FilesStructure extends FeatureForProject {
       this.project.filesTemplatesBuilder.rebuild();
     }
 
-
-
+    if (!this.project.node_modules.exist) {
+      await this.project.npmPackages.installProcess(`initialize procedure of ${this.project.name} `);
+    }
+    this.project.packageJson.showDeps(`Show new deps for ${this.project._frameworkVersion} `);
     //#region handle node modules instalation
     if (!this.project.isDocker) {
-      if (!this.project.node_modules.exist) {
-        if (skipNodeModules) {
-          if (!fse.existsSync(path.join(this.project.location, config.folder.node_modules))) {
-            Helpers.mkdirp(path.join(this.project.location, config.folder.node_modules));
-          }
-        } else {
-          await this.project.npmPackages.installProcess(`initialize procedure of ${this.project.name} `);
-        }
-      } else {
-        if (this.project.isStandaloneProject && this.project.frameworkVersionAtLeast('v2')) {
-          this.project.packageJson.showDeps(`Show new deps for ${this.project._frameworkVersion} `);
-        }
-      }
-
       if (this.project.isContainerCoreProject && this.project.frameworkVersionEquals('v1')) {
         this.project.quickFixes.overritenBadNpmPackages();
       }
-
     }
 
     //#endregion
