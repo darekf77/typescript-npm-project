@@ -91,6 +91,10 @@ export class PackageJsonCore {
     return 'v1' as any;
   }
 
+  get generateChangelog(): boolean {
+    return !!(this.data.tnp as any)?.generateChangelog;
+  }
+
   get smartContainerBuildTarget(): string {
     const res = this.data.tnp ? this.data.tnp.smartContainerBuildTarget : undefined;
     return res ? res : void 0;

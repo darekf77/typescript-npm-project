@@ -8,6 +8,7 @@ import { config } from 'tnp-config';
 import { Models, PROGRESS_DATA } from 'tnp-models';
 import { os } from 'tnp-core';
 import { FeatureForProject, Project } from '../abstract';
+import * as dateformat from 'dateformat';
 //#endregion
 
 // const USE_HTTPS_INSTEAD_SSH = !os.hostname().endsWith('.local'); // TODO
@@ -147,6 +148,7 @@ ${shouldBeProjectArr.map((p, index) => `- ${index + 1}. ${p}`).join('\n')}
   }
   //#endregion
 
+  //#region pusha all
   public async pushAll(commitMessage?: string, force = false) {
     let remotes: { origin: string; url: string; }[] = [];
     try {
@@ -177,6 +179,39 @@ ${remotes.map((r, i) => `${i + 1}. ${r.origin} ${r.url}`).join('\n')}
     }
     process.exit()
   }
+  //#endregion
+
+  async containerChangeLog(proj: Project, children: Project[]) {
+    if (!this.project.isContainer || !this.project.generateChangelog) {
+      return;
+    }
+    const withContent = [] as Project[];
+    Helpers.actionWrapper(() => {
+      for (let index = 0; index < children.length; index++) {
+        const child = children[index];
+        const content = Helpers.commnadOutputAsString(`diff2html  --output=stdout`, child.location, { showWholeCommandNotOnlyLastLine: true });
+        if (content) {
+          withContent.push(child)
+          Helpers.writeFile([proj.location, '_changelog', `${child.name}.html`], content);
+        } else {
+          Helpers.writeFile([proj.location, '_changelog', `${child.name}.html`], ' - NOTHING HAS CHANGED - ');
+        }
+      }
+    }, 'generating project changes summary...')
+
+
+    const filePath = crossPlatformPath([proj.location, 'LAST_CHANGES.html'])
+    Helpers.writeFile(filePath, `
+
+LAST PUSH CHANGES ${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}
+
+${withContent.map(c => {
+      return `<h2><a href="./_changelog/${c.name}.html">${c.name}</a></h2>`
+    }).join('\n')}
+
+    `);
+    return filePath;
+  }
 
   //#region push
   public async push(commitMessage?: string, force = false, origin = 'origin') {
@@ -196,13 +231,15 @@ ${remotes.map((r, i) => `${i + 1}. ${r.origin} ${r.url}`).join('\n')}
       ...this.project.linkedRepos.all,
     ];
 
+    await this.containerChangeLog(this.project, this.project.children);
+
     for (let index = 0; index < childrenToPush.length; index++) {
       const childProj = childrenToPush[index];
       await childProj.gitActions.push(commitMessage, force, origin);
     }
 
 
-    //#region update containers package.json
+
     if ( // TODO QUICK_FIX
       (config.frameworkName === 'tnp')
       && (this.project.name === 'morphi')
@@ -315,6 +352,7 @@ ${remotes.map((r, i) => `${i + 1}. ${r.origin} ${r.url}`).join('\n')}
 
 }
 
+//#region fix remote
 function fixRemote(project: Project, useSSh = false) {
   const originUrl = project.git.originURL;
   const provider = _.first(originUrl.match(/([a-z0-9]+\.)+(com|org|pl|io)/));// TODO make it more universal
@@ -329,3 +367,4 @@ function fixRemote(project: Project, useSSh = false) {
   }
 
 }
+//#endregion

@@ -18,6 +18,16 @@ export abstract class TnpProject {
     //#endregion
   }
 
+   // @ts-ignore
+   public get generateChangelog(this: Project) {
+    //#region @backendFunc
+    return this.packageJson.generateChangelog;
+    //#endregion
+  }
+
+
+
+
   // @ts-ignore
   public get frameworkVersionMinusOne(this: Project): ConfigModels.FrameworkVersion {
     //#region @backendFunc

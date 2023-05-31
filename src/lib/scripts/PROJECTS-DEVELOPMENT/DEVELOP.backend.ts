@@ -8,6 +8,7 @@ import { config } from 'tnp-config';
 import { chokidar } from 'tnp-core';
 import { notify } from 'node-notifier';
 import { CLASS } from 'typescript-class-helpers';
+import * as open from 'open';
 import chalk from 'chalk';
 import { URL } from 'url';
 //#endregion
@@ -164,11 +165,16 @@ const $KILLONPORT = async (args: string) => {
 }
 
 const $KILLALLNODE = () => {
-  if (process.platform === 'win32') {
-    Helpers.run(`taskkill /f /im node.exe`).sync();
-    return;
+  try {
+    if (process.platform === 'win32') {
+      Helpers.run(`taskkill /f /im node.exe`, { output: false, silence: true }).sync();
+    } else {
+      Helpers.run(`fkill -f node`, { output: false, silence: true }).sync();
+    }
+  } catch (error) {
+    Helpers.error(`[${config.frameworkName}] not able to kill all node processes`)
   }
-  Helpers.run(`fkill -f node`).sync();
+  Helpers.info('DONE KILL ALL NODE PROCESSES')
   process.exit(0);
 }
 
@@ -358,8 +364,17 @@ function $WATCHERS() {
   process.exit(0)
 }
 
+export async function $DIFF() {
+
+  const proj = Project.Current as Project;
+  const changesFilePath = await proj.gitActions.containerChangeLog( proj, proj.children);
+  await open(changesFilePath)
+  process.exit(0);
+}
+
 export default {
   //#region export default
+  $DIFF: Helpers.CLIWRAP($DIFF, '$DIFF'),
   $WATCHERS: Helpers.CLIWRAP($WATCHERS, '$WATCHERS'),
   $TARGET_PROJ_UPDATE: Helpers.CLIWRAP($TARGET_PROJ_UPDATE, '$TARGET_PROJ_UPDATE'),
   $INFO: Helpers.CLIWRAP($INFO, '$INFO'),
