@@ -9,6 +9,7 @@ import { Models, PROGRESS_DATA } from 'tnp-models';
 import { os } from 'tnp-core';
 import { FeatureForProject, Project } from '../abstract';
 import * as dateformat from 'dateformat';
+import { html2md } from './html-to-md';
 //#endregion
 
 // const USE_HTTPS_INSTEAD_SSH = !os.hostname().endsWith('.local'); // TODO
@@ -182,6 +183,7 @@ ${remotes.map((r, i) => `${i + 1}. ${r.origin} ${r.url}`).join('\n')}
   //#endregion
 
   async containerChangeLog(proj: Project, children: Project[]) {
+    const folderName = `docs`;
     if (!this.project.isContainer || !this.project.generateChangelog) {
       return;
     }
@@ -189,27 +191,27 @@ ${remotes.map((r, i) => `${i + 1}. ${r.origin} ${r.url}`).join('\n')}
     Helpers.actionWrapper(() => {
       for (let index = 0; index < children.length; index++) {
         const child = children[index];
-        const content = Helpers.commnadOutputAsString(`diff2html  --output=stdout`, child.location, { showWholeCommandNotOnlyLastLine: true });
+        const content = (Helpers.commnadOutputAsString(`diff2html  --output=stdout`, child.location, { showWholeCommandNotOnlyLastLine: true }));
         if (content) {
           withContent.push(child)
-          Helpers.writeFile([proj.location, '_changelog', `${child.name}.html`], content);
+          Helpers.writeFile([proj.location, folderName, `${child.name}.html`], content);
         } else {
-          Helpers.writeFile([proj.location, '_changelog', `${child.name}.html`], ' - NOTHING HAS CHANGED - ');
+          Helpers.writeFile([proj.location, folderName, `${child.name}.html`], ' - NOTHING HAS CHANGED - ');
         }
       }
     }, 'generating project changes summary...')
 
 
-    const filePath = crossPlatformPath([proj.location, 'LAST_CHANGES.html'])
-    Helpers.writeFile(filePath, `
+    const filePath = crossPlatformPath([proj.location, folderName, 'index.html'])
+    Helpers.writeFile(filePath, (`
 
 LAST PUSH CHANGES ${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}
 
 ${withContent.map(c => {
-      return `<h2><a href="./_changelog/${c.name}.html">${c.name}</a></h2>`
+      return `<h2><a href="./${c.name}.html">${c.name}</a></h2>`
     }).join('\n')}
 
-    `);
+    `));
     return filePath;
   }
 
