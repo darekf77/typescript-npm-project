@@ -278,6 +278,8 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       }
     }
 
+    content = this.sourceMapContentFix(content, isBrowser, absFilePath);
+
     return content;
   }
   //#endregion

@@ -236,9 +236,45 @@ export class CopyManagerStandalone extends CopyManager {
       }
     }
 
+    content = this.sourceMapContentFix(content, isBrowser, absFilePath);
+
     return content;
   }
   //#endregion
+
+  sourceMapContentFix(content: string, isBrowser: boolean, absFilePath: string) {
+    /**
+         * QUICK_FIX backend debugging on window
+         * (still third party debug does not work)
+         */
+    if (process.platform === 'win32' && !isBrowser) {
+      const json = JSON.parse(content);
+      if (json) {
+        json.sources = (json.sources || []).map((p: string) => {
+          const localProjFolderName = `tmp-local-copyto-proj-${this.outDir}/${config.folder.node_modules}/${this.rootPackageName}`;
+          let dirnameAbs = crossPlatformPath(path.dirname(absFilePath))
+          if (dirnameAbs.includes(localProjFolderName)) {
+            dirnameAbs = dirnameAbs
+              .replace(
+                `/${this.project.name}/${localProjFolderName}`,
+                `/${this.project.name}/`
+              )
+          }
+
+          const resolved = crossPlatformPath(path.resolve(dirnameAbs, p.startsWith('./') ? p.replace('./', '') : p));
+          // const resolved = crossPlatformPath(path.resolve(p));
+          // console.log({
+          //   resolved,
+          //   dirnameAbs,
+          //   p
+          // });
+          return resolved;
+        })
+      }
+      content = JSON.stringify(json);
+    }
+    return content;
+  }
 
   //#region remove source folder links
   removeSourceLinksFolders(location: string) {
