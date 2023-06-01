@@ -105,7 +105,7 @@ export class InsideStructAngular13App extends BaseInsideStruct {
           (opt) => {
             const { outFolder, projectName, client } = opt;
             if (project.isStandaloneProject) {
-              const standalonePath = `tmp-src-app-${outFolder}${this.websql ? '-websql' : ''}`;
+              const standalonePath = `tmp-src-${outFolder}${this.websql ? '-websql' : ''}`;
               if (client.isSmartContainerTarget) {
                 const targetProj = client.smartContainerTargetParentContainer.smartContainerBuildTarget;
                 if (targetProj.name !== client.name) {

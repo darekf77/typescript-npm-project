@@ -178,6 +178,10 @@ const $KILLALLNODE = () => {
   process.exit(0);
 }
 
+const $KILLNODE = () => {
+  $KILLALLNODE()
+}
+
 
 const $KILLALLCODE = () => {
   if (process.platform === 'win32') {
@@ -188,6 +192,9 @@ const $KILLALLCODE = () => {
   process.exit(0);
 }
 
+const $KILLCODE = () => {
+  $KILLALLCODE()
+}
 
 //#endregion
 
@@ -367,7 +374,7 @@ function $WATCHERS() {
 export async function $DIFF() {
 
   const proj = Project.Current as Project;
-  const changesFilePath = await proj.gitActions.containerChangeLog( proj, proj.children);
+  const changesFilePath = await proj.gitActions.containerChangeLog(proj, proj.children);
   await open(changesFilePath)
   process.exit(0);
 }
@@ -386,7 +393,9 @@ export default {
   $KILL_ON_PORT: Helpers.CLIWRAP($KILL_ON_PORT, '$KILL_ON_PORT'),
   $KILLONPORT: Helpers.CLIWRAP($KILLONPORT, '$KILLONPORT'),
   $KILLALLNODE: Helpers.CLIWRAP($KILLALLNODE, '$KILLALLNODE'),
+  $KILLNODE: Helpers.CLIWRAP($KILLNODE, '$KILLNODE'),
   $KILLALLCODE: Helpers.CLIWRAP($KILLALLCODE, '$KILLALLCODE'),
+  $KILLCODE: Helpers.CLIWRAP($KILLCODE, '$KILLCODE'),
   CHOKI: Helpers.CLIWRAP(CHOKI, 'CHOKI'),
   NOT: Helpers.CLIWRAP(NOT, 'NOT'),
   $FORK: Helpers.CLIWRAP($FORK, '$FORK'),

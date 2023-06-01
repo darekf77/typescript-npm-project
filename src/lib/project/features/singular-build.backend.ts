@@ -86,7 +86,11 @@ export class SingularBuild extends FeatureForProject {
         })();
         (() => {
           const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, '-', c.name, 'index.ts'));
-          Helpers.writeFile(dest_lib, `export * from "./app";`);
+          Helpers.writeFile(dest_lib,
+`export * from "./app";
+import def from './app';
+export default def;
+`);
         })();
 
         (() => {

@@ -137,7 +137,8 @@ ${'//#reg' + 'ion'} @${'bro' + 'wser'}
 
     @Component({
       selector: 'app-${project.name}',
-      template: 'hello from ${project.name}'
+      template: 'hello from ${project.name}',
+      styles: [\` body { margin: 0px !important; } \`],
     })
     export class ${componentName} implements OnInit {
       constructor() { }
