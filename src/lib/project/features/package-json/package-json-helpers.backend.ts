@@ -363,22 +363,22 @@ function filterDevDepOnly(project: Project, deps: Models.npm.DependenciesFromPac
 
 function filterDepOnly(project: Project, deps: Models.npm.DependenciesFromPackageJsonStyle) {
   const devDeps = (Project.Tnp as Project).packageJson.data.tnp.core.dependencies.asDevDependencies;
-  let onlyAsDevAllowed = (project.packageJson.data.tnp
-    && project.packageJson.data.tnp.overrided
-    && project.packageJson.data.tnp.overrided.includeAsDev) || [];
+  let onlyAsDevAllowed = (project.packageJson.data.tnp.overrided.includeAsDev) || [];
 
   // log('d2evDeps', devDeps)
+  if(onlyAsDevAllowed !== '*') {
+    if (!_.isArray(onlyAsDevAllowed)) {
+      onlyAsDevAllowed = [];
+    }
 
-  if (!_.isArray(onlyAsDevAllowed)) {
-    onlyAsDevAllowed = [];
+    Object.keys(deps).forEach(name => {
+      if (devDeps.includes(name) || onlyAsDevAllowed.includes(name) ||
+        (onlyAsDevAllowed as any[]).filter(f => (new RegExp(f)).test(name)).length > 0) {
+        deps[name] = undefined;
+      }
+    });
   }
 
-  Object.keys(deps).forEach(name => {
-    if (devDeps.includes(name) || onlyAsDevAllowed.includes(name) ||
-      (onlyAsDevAllowed as any[]).filter(f => (new RegExp(f)).test(name)).length > 0) {
-      deps[name] = undefined;
-    }
-  });
   return deps;
 }
 //#endregion
