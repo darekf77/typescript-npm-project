@@ -564,7 +564,7 @@ export class ProjectIsomorphicLib
         },
         outputLineReplace: (line: string) => {
           if (isStandalone) {
-            if(line.startsWith('WARNING: postcss-url')) {
+            if (line.startsWith('WARNING: postcss-url')) {
               return ' --- [firedev] IGNORED WARN ---- ';
             }
             return line.replace(
@@ -1105,7 +1105,7 @@ export class ProjectIsomorphicLib
 
     const filesForModyficaiton = glob.sync(`${releaseSrcLocation}/**/*`);
     filesForModyficaiton
-      .filter(absolutePath => !Helpers.isFolder(absolutePath))
+      .filter(absolutePath => !Helpers.isFolder(absolutePath) && ['.ts', '.js', '.scss', '.html'].includes(path.extname(absolutePath)))
       .forEach(absolutePath => {
         // console.log({
         //   absolutePath

@@ -390,7 +390,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     //   await this.npmPackages.installProcess(`release procedure`)
     // }
 
-    const allArgs = args + ` ${!forAppRelaseBuild ? '--codeCutRelease' : ''} ${forAppRelaseBuild ? '--forAppRelaseBuild' : ''}`
+    const allArgs = args + ` ${!forAppRelaseBuild ? '--codeCutRelease=true' : ''} ${forAppRelaseBuild ? '--forAppRelaseBuild=true' : ''}`
 
     Helpers.logInfo(`BUILD OPTION (${this.name}):
     prod=${!!prod},
