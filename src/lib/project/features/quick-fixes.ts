@@ -122,12 +122,15 @@ export class QuickFixes extends FeatureForProject {
 
   public removeTnpFromItself() {
     //#region @backend
-    const folderToDelete = crossPlatformPath([
-      crossPlatformPath(fse.realpathSync(path.join(this.project.location, config.folder.node_modules))),
-      'tnp',
-    ]);
-    if (config.frameworkName === 'tnp' && this.project.name === 'tnp' && this.project.isInRelaseBundle) {
-      Helpers.remove(folderToDelete);
+    const nodeMOdules = crossPlatformPath(path.join(this.project.location, config.folder.node_modules));
+    if(Helpers.exists(nodeMOdules)) {
+      const folderToDelete = crossPlatformPath([
+        crossPlatformPath(fse.realpathSync(nodeMOdules)),
+        'tnp',
+      ]);
+      if (config.frameworkName === 'tnp' && this.project.name === 'tnp' && this.project.isInRelaseBundle) {
+        Helpers.remove(folderToDelete);
+      }
     }
     //#endregion
   }
