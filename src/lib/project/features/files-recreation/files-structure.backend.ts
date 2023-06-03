@@ -249,8 +249,9 @@ export class FilesStructure extends FeatureForProject {
         this.project.quickFixes.overritenBadNpmPackages();
       }
     }
-
     //#endregion
+
+    this.project.quickFixes.missingAngularLibFiles();
 
     let client = Helpers.removeSlashAtEnd(_.first((args || '').split(' '))) as any;
     const smartContainerBuildTarget = (

@@ -1,6 +1,6 @@
 //#region @backend
 import { path, _ } from 'tnp-core'
-import { fse } from 'tnp-core'
+import { fse, rimraf } from 'tnp-core'
 import { glob, crossPlatformPath } from 'tnp-core';
 import chalk from 'chalk';
 import { FeatureForProject, Project } from '../abstract';
@@ -118,6 +118,14 @@ export class QuickFixes extends FeatureForProject {
         Helpers.removeFileIfExists(oldFile)
       }
     }
+  }
+
+  public removeTnpFromItself() {
+    //#region @backend
+    if (this.project.isTnp) {
+      rimraf.sync(crossPlatformPath([this.project.location, config.folder.node_modules, 'tnp']))
+    }
+    //#endregion
   }
 
   public missingAngularLibFiles() {
