@@ -122,8 +122,12 @@ export class QuickFixes extends FeatureForProject {
 
   public removeTnpFromItself() {
     //#region @backend
+    const folderToDelete = crossPlatformPath([
+      crossPlatformPath(fse.realpathSync(path.join(this.project.location, config.folder.node_modules))),
+      'tnp',
+    ]);
     if (config.frameworkName === 'tnp' && this.project.isTnp) {
-      rimraf.sync(crossPlatformPath([this.project.location, config.folder.node_modules, 'tnp']))
+      Helpers.remove(folderToDelete);
     }
     //#endregion
   }
