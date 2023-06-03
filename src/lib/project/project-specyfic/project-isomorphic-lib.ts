@@ -1107,9 +1107,9 @@ export class ProjectIsomorphicLib
     filesForModyficaiton
       .filter(absolutePath => !Helpers.isFolder(absolutePath) && ['.ts', '.js', '.scss', '.html'].includes(path.extname(absolutePath)))
       .forEach(absolutePath => {
-        // console.log({
-        //   absolutePath
-        // })
+        console.log({
+          absolutePath
+        })
         let rawContent = Helpers.readFile(absolutePath);
         rawContent = RegionRemover.from(absolutePath, rawContent, ['@notFor' + 'Npm'], this.project).output;
         // rawContent = this.replaceRegionsWith(rawContent, ['@notFor'+'Npm']);
