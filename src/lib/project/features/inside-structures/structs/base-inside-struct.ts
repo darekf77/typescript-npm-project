@@ -7,8 +7,4 @@ export class BaseInsideStruct {
 
   }
 
-  get isInRelaseBundle() {
-    return this.project.location.includes('tmp-bundle-release/bundle');
-  };
-
 }

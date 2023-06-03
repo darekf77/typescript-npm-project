@@ -65,6 +65,11 @@ export abstract class LibProject {
 
   }
 
+  // @ts-ignore
+  get isInRelaseBundle(this: Project) {
+    return this.location.includes('tmp-bundle-release/bundle');
+  };
+
 
   // angular core app files
   get angularCoreAppFiles() {

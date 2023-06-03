@@ -72,9 +72,6 @@ export class BrowserCodeCut {
     return additionalSmartPckages;
   }
 
-  get isInRelaseBundle() {
-    return this.project.location.includes('tmp-bundle-release/bundle');
-  };
   //#endregion
 
   readonly isAssetsFile: boolean = false;
@@ -625,7 +622,7 @@ export class BrowserCodeCut {
     // const forAppRelaseBuild = (this.buildOptions?.args?.search('--forAppRelaseBuild') !== -1)
 
 
-    let basenameWithSlash = this.isInRelaseBundle ? `/${pathname}/` : '/';
+    let basenameWithSlash = this.project.isInRelaseBundle ? `/${pathname}/` : '/';
     if (this.project.env.config?.useDomain) {
       basenameWithSlash = '/';
     }

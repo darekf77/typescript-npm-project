@@ -73,10 +73,6 @@ export class ProjectIsomorphicLib
     ]
   }
 
-  get isInRelaseBundle() {
-    return this.location.includes('tmp-bundle-release/bundle');
-  };
-
   get forAppRelaseBuild() {
     return (this.buildOptions?.args?.trim()?.search('--forAppRelaseBuild') !== -1)
   };

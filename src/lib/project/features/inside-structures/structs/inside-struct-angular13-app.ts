@@ -301,7 +301,7 @@ ${appModuleFile}
         //#region LOADERS & BACKGROUNDS REPLACEMENT
         (() => {
           const projectTargetOrStandalone = this.project;
-          const basename = this.isInRelaseBundle ?
+          const basename = this.project.isInRelaseBundle ?
             `/${(this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name)}`
             : '';
 
@@ -435,7 +435,7 @@ ${appModuleFile}
 
           let mainTsFile = Helpers.readFile(mainFilePath);
 
-          const basename = this.isInRelaseBundle ?
+          const basename = this.project.isInRelaseBundle ?
             `/${(this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name)}`
             : '';
 
@@ -467,7 +467,7 @@ ${appModuleFile}
 
           let stylesScssFile = Helpers.readFile(stylesFilePath);
 
-          const basename = this.isInRelaseBundle ?
+          const basename = this.project.isInRelaseBundle ?
             `/${(this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name)}`
             : '';
 

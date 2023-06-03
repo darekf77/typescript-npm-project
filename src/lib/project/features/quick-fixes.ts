@@ -126,7 +126,7 @@ export class QuickFixes extends FeatureForProject {
       crossPlatformPath(fse.realpathSync(path.join(this.project.location, config.folder.node_modules))),
       'tnp',
     ]);
-    if (config.frameworkName === 'tnp' && this.project.isTnp) {
+    if (config.frameworkName === 'tnp' && this.project.name === 'tnp' && this.project.isInRelaseBundle) {
       Helpers.remove(folderToDelete);
     }
     //#endregion

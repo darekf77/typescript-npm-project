@@ -5,11 +5,6 @@ import { Project } from "../../abstract/project/project";
 export class SourceMappingUrl {
   public static readonly SOURCEMAPDES = '//# sourceMappingURL='
 
-
-  get isInRelaseBundle() {
-    return this.projectWithBuild.location.includes('tmp-bundle-release/bundle');
-  };
-
   static fixContent(absFilePath: string,
     projectWithBuild: Project,
     // content?: string
@@ -51,7 +46,7 @@ export class SourceMappingUrl {
 
   process(): string {
     if (this.mappingLineIndex !== -1) {
-      if (this.isInRelaseBundle || (process.platform !== 'win32')) { // TODO links on windows sucks d
+      if (this.projectWithBuild.isInRelaseBundle || (process.platform !== 'win32')) { // TODO links on windows sucks d
         this.contentLines[this.mappingLineIndex] = `${SourceMappingUrl.SOURCEMAPDES}${path.basename(this.absFilePath)}.map`;
       }
     }
