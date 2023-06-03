@@ -122,7 +122,7 @@ export class QuickFixes extends FeatureForProject {
 
   public removeTnpFromItself() {
     //#region @backend
-    if (this.project.isTnp) {
+    if (config.frameworkName === 'tnp' && this.project.isTnp) {
       rimraf.sync(crossPlatformPath([this.project.location, config.folder.node_modules, 'tnp']))
     }
     //#endregion

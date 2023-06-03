@@ -251,7 +251,7 @@ export class FilesStructure extends FeatureForProject {
     }
     //#endregion
 
-    this.project.quickFixes.missingAngularLibFiles();
+    this.project.quickFixes.removeTnpFromItself();
 
     let client = Helpers.removeSlashAtEnd(_.first((args || '').split(' '))) as any;
     const smartContainerBuildTarget = (
