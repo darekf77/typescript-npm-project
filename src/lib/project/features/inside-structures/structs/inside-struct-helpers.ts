@@ -131,38 +131,38 @@ export function recreateApp(project: Project) {
 ${'//#reg' + 'ion'} ${'@not' + 'ForNpm'}
 
 ${'//#reg' + 'ion'} @${'bro' + 'wser'}
-    import { NgModule } from '@angular/core';
-    import { Component, OnInit } from '@angular/core';
+import { NgModule } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 
-    @Component({
-      selector: 'app-${project.name}',
-      template: 'hello from ${project.name}',
-      styles: [\` body { margin: 0px !important; } \`],
-    })
-    export class ${componentName} implements OnInit {
-      constructor() { }
+@Component({
+  selector: 'app-${project.name}',
+  template: 'hello from ${project.name}',
+  styles: [\` body { margin: 0px !important; } \`],
+})
+export class ${componentName} implements OnInit {
+  constructor() { }
 
-      ngOnInit() { }
-    }
+  ngOnInit() { }
+}
 
-    @NgModule({
-      imports: [],
-      exports: [${componentName}],
-      declarations: [${componentName}],
-      providers: [],
-    })
-    export class ${moduleName} { }
-    //#endregion
+@NgModule({
+  imports: [],
+  exports: [${componentName}],
+  declarations: [${componentName}],
+  providers: [],
+})
+export class ${moduleName} { }
+//#endregion
 
-    //${'#reg' + 'ion'} ${'@bac' + 'kend'}
-    async function start(port: number) {
-      console.log('hello world from backend');
-    }
 
-    export default start;
+async function start(port: number) {
+  console.log('hello world from backend');
+}
 
-${'//#end' + 'region'}
+export default start;
+
+
 
 ${'//#end' + 'region'}
 
