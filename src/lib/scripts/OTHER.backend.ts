@@ -206,11 +206,11 @@ async function $AA() {
 // function CROP(args: string) {
 //   const argv = args.split(' ');
 //   const replacements = [
-//     ['@backendFunc', `return (void 0);`],
-//     '@backend' as any,
-//     '@notForNpm',
-//     ['@cutCodeIfTrue', codeCuttFn(true)],
-//     ['@cutCodeIfFalse', codeCuttFn(false)]
+//     ['@backe'+'ndFunc', `return (void 0);`],
+//     '@back'+'end' as any,
+//     '@notF'+'orNpm',
+//     ['@cutCod'+'eIfTrue', codeCuttFn(true)],
+//     ['@cutCode'+'IfFalse', codeCuttFn(false)]
 //   ] as Models.dev.Replacement[];
 //   let filePath = _.first(argv);
 //   if (!path.isAbsolute(filePath)) {
