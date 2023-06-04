@@ -232,7 +232,7 @@
         "firedev-ports": '13.1.44',
         "firedev-crud-deamon": '13.1.39',
         "tnp-ui": "13.1.27",
-        "firedev-ui": '13.2.8',
+        "firedev-ui": '13.2.9',
         "tnp-core": '13.2.19',
         "tnp-cli": '13.1.59',
         "tnp-tools": "0.0.58",
@@ -389,7 +389,7 @@
         },
         "angular-client": {
           essentials: {
-            "static-columns": '13.3.6',
+            "static-columns": '13.3.8',
             "bs4-breakpoint": '13.0.33',
             "ngx-store": "2.1.0",
             "firedev-storage": '13.2.36',

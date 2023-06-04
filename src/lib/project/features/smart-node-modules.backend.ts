@@ -154,8 +154,14 @@ export class SmartNodeModules extends FeatureForProject {
     Helpers.foldersFrom(mainSmartNodeModulesFolder)
       .filter(f => path.basename(f) !== this.project.name)
       .forEach(f => {
-        const additonalFolderToRemove = path.join(this.project.smartNodeModules.pathFor(path.basename(f)))
-        Helpers.removeFolderIfExists(additonalFolderToRemove);
+        if (path.dirname(f).startsWith('@')) {
+          const orgPackage = `@${crossPlatformPath([path.basename(path.dirname(f)), path.basename(f)])}`;
+          const additonalFolderToRemove = path.join(this.project.smartNodeModules.pathFor(orgPackage))
+          Helpers.removeFolderIfExists(additonalFolderToRemove);
+        } else {
+          const additonalFolderToRemove = path.join(this.project.smartNodeModules.pathFor(path.basename(f)))
+          Helpers.removeFolderIfExists(additonalFolderToRemove);
+        }
       });
 
     // Helpers.log('OVERRRIDE' + _.keys(toOverride).join('/'))
@@ -211,8 +217,12 @@ export class SmartNodeModules extends FeatureForProject {
               const destProj = this.project.npmPackages.package(depName);
               if (Helpers.exists(destProj.location)) {
                 if (fromProj.isNotSatisfyBy(destProj.version)) {
-                  Helpers.warn(`[override package][link "${packageName}"] ${chalk.bold(depName)}@${verrr} won't be satisfy`
-                    + ` in this repository by version "${destProj.version}"`);
+                  Helpers.warn(`
+
+                  [override package][link "${packageName}"] ${chalk.bold(depName)}@${verrr} won't be satisfy`
+                    + ` in this repository by version "${destProj.version}"
+
+                    `);
                 } else {
                   Helpers.log(`[override package][link "${packageName}"] copying new package ${chalk.bold(depName)} to main node_modules`)
                 }

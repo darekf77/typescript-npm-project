@@ -193,7 +193,7 @@ export class PackagesRecognition {
       ...folders,
       ...local,
       ...Object.values(config.frameworkNames),
-    ].filter(f => f.startsWith(PREFIXES.RESTORE_NPM));
+    ].filter(f => !f.startsWith(PREFIXES.RESTORE_NPM));
     this.updateCurrentIsomorphicJsonSearchResults()
   }
 

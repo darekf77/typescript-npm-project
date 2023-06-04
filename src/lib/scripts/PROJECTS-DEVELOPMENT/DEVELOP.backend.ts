@@ -379,9 +379,30 @@ export async function $DIFF() {
   process.exit(0);
 }
 
+
+export async function $SHOW_OVERRIDE() {
+
+  const proj = Project.Current as Project;
+
+  const children = proj.children;
+
+  for (let index = 0; index < children.length; index++) {
+    const child = children[index] as Project;
+    const override = child.packageJson.data.tnp?.overrided?.dependencies
+    console.log(`
+    ${child.genericName} OVERRIDE ${_.keys(override).length}
+${_.keys(override).length > 0 ? _.keys(override).map((key, index) => `-${key}:${override[key]}\n`) : ''}`);
+  }
+
+  process.exit(0);
+}
+
+
+
 export default {
   //#region export default
   $DIFF: Helpers.CLIWRAP($DIFF, '$DIFF'),
+  $SHOW_OVERRIDE: Helpers.CLIWRAP($SHOW_OVERRIDE, '$SHOW_OVERRIDE'),
   $WATCHERS: Helpers.CLIWRAP($WATCHERS, '$WATCHERS'),
   $TARGET_PROJ_UPDATE: Helpers.CLIWRAP($TARGET_PROJ_UPDATE, '$TARGET_PROJ_UPDATE'),
   $INFO: Helpers.CLIWRAP($INFO, '$INFO'),
