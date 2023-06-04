@@ -325,15 +325,14 @@ export class CopyManagerStandalone extends CopyManager {
       filter,
     });
 
-    if (this.watch) {
-      this.replaceIndexDtsForEntryPorjIndex(pkgLocInDestNodeModules);
-    }
+
     //#endregion
   }
   //#endregion
 
   //#region replace d.ts files in destination after copy
-  replaceIndexDtsForEntryPorjIndex(location: string) {
+  replaceIndexDtsForEntryPorjIndex(destination: Project) {
+    const location = destination.node_modules.pathFor( this.rootPackageName);
     Helpers.writeFile(path.join( // override dts to easly debugging
       location,
       config.file.index_d_ts,
@@ -555,7 +554,7 @@ export class CopyManagerStandalone extends CopyManager {
         `/${this.outDir}/${specyficFileRelativePath}`,
         `/${this.outDir}-nocutsrc/${specyficFileRelativePath}`,
       );
-      if(!Helpers.exists(absOrgFilePathInDistOrBundle)) {
+      if (!Helpers.exists(absOrgFilePathInDistOrBundle)) {
         Helpers.logWarn(`[copyto] New path does not exists: ${absOrgFilePathInDistOrBundle}`)
       }
     }

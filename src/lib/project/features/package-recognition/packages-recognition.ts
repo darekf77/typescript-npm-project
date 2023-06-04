@@ -5,7 +5,7 @@ import {
   fse,
   crossPlatformPath,
 } from 'tnp-core';
-import { Helpers } from 'tnp-helpers';
+import { Helpers, PREFIXES } from 'tnp-helpers';
 import { config } from 'tnp-config';
 import { BrowserCodeCut } from '../../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
 import type { Project } from '../../abstract/project/project';
@@ -193,7 +193,7 @@ export class PackagesRecognition {
       ...folders,
       ...local,
       ...Object.values(config.frameworkNames),
-    ];
+    ].filter(f => f.startsWith(PREFIXES.RESTORE_NPM));
     this.updateCurrentIsomorphicJsonSearchResults()
   }
 

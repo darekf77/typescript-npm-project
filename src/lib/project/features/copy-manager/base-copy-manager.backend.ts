@@ -12,6 +12,8 @@ import { IncCompiler } from 'incremental-compiler';
 import { Log } from 'ng2-logger';
 import { SourceMappingUrl } from './source-maping-url.backend';
 
+const REPLACE_INDEX_D_TS_IN_DEST_WHEN_WATCH = false;
+
 const log = Log.create(_.startCase(path.basename(__filename)));
 //#endregion
 
@@ -372,6 +374,9 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
         //#region handle single file
 
         this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePath);
+        if (REPLACE_INDEX_D_TS_IN_DEST_WHEN_WATCH && this.watch && specyficFileRelativePath.endsWith('/index.d.ts')) { // TODO could be limited more
+          this.replaceIndexDtsForEntryPorjIndex(destination);
+        }
         //#endregion
       }
 
@@ -380,6 +385,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       //#region handle all files
       log.data('copying all files')
       this.copyCompiledSourcesAndDeclarations(destination, isTempLocalProj);
+
       log.d('copying surce maps')
       this.copySourceMaps(destination, isTempLocalProj);
       this.copySharedAssets(destination, isTempLocalProj);
@@ -397,6 +403,10 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
           this.updateBackendFullDtsFiles(this.monitoredOutDir);
         }
         this.updateBackendFullDtsFiles(destination);
+      }
+
+      if (REPLACE_INDEX_D_TS_IN_DEST_WHEN_WATCH && this.watch) {
+        this.replaceIndexDtsForEntryPorjIndex(destination);
       }
 
       // TODO not working werid tsc issue with browser/index
@@ -447,6 +457,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   abstract removeSourceSymlinks(destination: Project);
   abstract handleCopyOfSingleFile(destination: Project, isTempLocalProj: boolean, specyficFileRelativePath: string);
   abstract handleCopyOfAssetFile(absoluteAssetFilePath: string, destination: Project);
+  abstract replaceIndexDtsForEntryPorjIndex(destination: Project);
   /**
    * fix d.ts files in angular build - problem with require() in d.ts with wrong name
    */

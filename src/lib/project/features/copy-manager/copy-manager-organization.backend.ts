@@ -452,6 +452,21 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   }
   //#endregion
 
+  //#region replace d.ts files in destination after copy
+  replaceIndexDtsForEntryPorjIndex(destination: Project) {
+    const children = this.getChildren();
+    for (let index = 0; index < children.length; index++) {
+      const child = children[index];
+      const rootPackageNameForChild = crossPlatformPath(path.join(this.rootPackageName, child.name));
+      const location = destination.node_modules.pathFor(rootPackageNameForChild);
+      Helpers.writeFile(path.join( // override dts to easly debugging
+        location,
+        config.file.index_d_ts,
+      ), `export * from './${config.folder.src}';\n`);
+    }
+  }
+  //#endregion
+
   //#region copy compiled sources and declarations
   copyCompiledSourcesAndDeclarations(destination: Project, isTempLocalProj: boolean) {
 
@@ -478,12 +493,6 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         copySymlinksAsFiles: (process.platform === 'win32'),
         filter,
       });
-
-
-      if (this.watch) {
-        this.replaceIndexDtsForEntryPorjIndex(pkgLocInDestNodeModulesForChild);
-      }
-
       //#endregion
 
     }
@@ -708,7 +717,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         `/${this.targetProjName}/${this.outDir}/${orgSpecyficFileRelativePath}`,
         `/${this.targetProjName}/${this.outDir}-nocutsrc/${orgSpecyficFileRelativePath}`,
       );
-      if(!Helpers.exists(absOrgFilePathInDistOrBundle)) {
+      if (!Helpers.exists(absOrgFilePathInDistOrBundle)) {
         Helpers.logWarn(`[copyto] New path does not exists: ${absOrgFilePathInDistOrBundle}`)
       }
     }
