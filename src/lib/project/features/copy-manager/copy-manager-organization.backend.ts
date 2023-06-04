@@ -663,7 +663,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       this.targetProj.location,
       this.outDir,
     ))
-    const absOrgFilePathInDistOrBundle = crossPlatformPath(path.normalize(path.join(
+    let absOrgFilePathInDistOrBundle = crossPlatformPath(path.normalize(path.join(
       distOrBundleLocation,
       orgSpecyficFileRelativePath
     )));
@@ -703,6 +703,15 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       return;
     }
 
+    if (destinationFilePath.endsWith('d.ts')) {
+      absOrgFilePathInDistOrBundle = absOrgFilePathInDistOrBundle.replace(
+        `/${this.targetProjName}/${this.outDir}/${orgSpecyficFileRelativePath}`,
+        `/${this.targetProjName}/${this.outDir}-nocutsrc/${orgSpecyficFileRelativePath}`,
+      );
+      if(!Helpers.exists(absOrgFilePathInDistOrBundle)) {
+        Helpers.logWarn(`[copyto] New path does not exists: ${absOrgFilePathInDistOrBundle}`)
+      }
+    }
     // this.fixDtsImportsWithWronPackageName(absOrgFilePathInDistOrBundle, destinationFilePath)
 
     const isBackendMapsFile = destinationFilePath.endsWith('.js.map');
@@ -867,7 +876,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         relativePath,
       ));
       // if (Helpers.exists(dest)) {
-      //   console.log(dest)
+      // console.log(dest)
       Helpers.copyFile(source, dest);
       // }
     }

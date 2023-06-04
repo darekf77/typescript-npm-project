@@ -370,11 +370,13 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
         this.handleCopyOfAssetFile(absoluteAssetFilePath, destination);
       } else {
         //#region handle single file
+
         this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePath);
         //#endregion
       }
 
     } else {
+
       //#region handle all files
       log.data('copying all files')
       this.copyCompiledSourcesAndDeclarations(destination, isTempLocalProj);
@@ -390,8 +392,10 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
         this.removeSourceSymlinks(destination)
       }
 
-      if (!this.watch && !this.nodts) {
-        this.updateBackendFullDtsFiles(this.monitoredOutDir);
+      if (!this.nodts) {
+        if (!this.watch) {
+          this.updateBackendFullDtsFiles(this.monitoredOutDir);
+        }
         this.updateBackendFullDtsFiles(destination);
       }
 

@@ -480,7 +480,7 @@ export class CopyManagerStandalone extends CopyManager {
 
   //#region fix d.ts import with wrong package names
   fixDtsImportsWithWronPackageName(absOrgFilePathInDistOrBundle: string, destinationFilePath: string) {
-    if (path.basename(absOrgFilePathInDistOrBundle).endsWith('.d.ts')) {
+    if (absOrgFilePathInDistOrBundle.endsWith('.d.ts')) {
       const contentToWriteInDestination = (Helpers.readFile(absOrgFilePathInDistOrBundle) || '');
       for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
         const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
@@ -544,11 +544,21 @@ export class CopyManagerStandalone extends CopyManager {
       return;
     }
 
-    const absOrgFilePathInDistOrBundle = crossPlatformPath(path.normalize(path.join(
+    let absOrgFilePathInDistOrBundle = crossPlatformPath(path.normalize(path.join(
       this.project.location,
       this.outDir,
       specyficFileRelativePath
     )));
+
+    if (destinationFilePath.endsWith('d.ts')) {
+      absOrgFilePathInDistOrBundle = absOrgFilePathInDistOrBundle.replace(
+        `/${this.outDir}/${specyficFileRelativePath}`,
+        `/${this.outDir}-nocutsrc/${specyficFileRelativePath}`,
+      );
+      if(!Helpers.exists(absOrgFilePathInDistOrBundle)) {
+        Helpers.logWarn(`[copyto] New path does not exists: ${absOrgFilePathInDistOrBundle}`)
+      }
+    }
 
     this.fixDtsImportsWithWronPackageName(absOrgFilePathInDistOrBundle, destinationFilePath)
 
