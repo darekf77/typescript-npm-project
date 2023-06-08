@@ -1,4 +1,4 @@
-import { _ } from 'tnp-core';
+import { crossPlatformPath, _ } from 'tnp-core';
 import { path } from 'tnp-core'
 import { fse } from 'tnp-core'
 
@@ -8,6 +8,7 @@ import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project/abstract/project/project';
 import { CLI } from 'tnp-cli';
+import { notAllowedProjectNames } from '../../constants';
 
 //#region site option
 export type NewSiteOptions = {
@@ -232,29 +233,46 @@ export class ProjectFactory {
   }
   //#endregion
 
-  private async initContainersAndApps(cwd: string, containersAndProj: string[], version: ConfigModels.FrameworkVersion) {
-    const hasContainers = (containersAndProj.length > 1);
-    const projName = hasContainers ? _.last(containersAndProj) : _.first(containersAndProj);
-    if (projName === 'app') {
+  private addRemoteToStandalone(appProj: Project) {
+    if (appProj.isStandaloneProject && !appProj.isSmartContainerChild) {
+      const lastContainer = appProj.parent;
+      const ADDRESS_GITHUB_SSH_PARENT = lastContainer?.git?.originURL;
+      const newRemote = ADDRESS_GITHUB_SSH_PARENT?.replace(`${lastContainer.name}.git`, `${appProj.name}.git`);
+      if (newRemote) {
+        appProj.run('git remote add origin ' + newRemote).sync();
+      }
+      appProj.run('git add --all . && git commit -m "first"').sync();
+    }
+  }
+
+  //#region init containers
+  private async initContainersAndApps(cwd: string, nameFromArgs: string, version: ConfigModels.FrameworkVersion) {
+
+    const containersAndProjFromArgName = !nameFromArgs.includes('/') ? nameFromArgs.replace('\\', '/').split('/') : [];
+    const hasContainersFromArgs = (containersAndProjFromArgName.length > 1);
+    const projName = hasContainersFromArgs ? _.last(containersAndProjFromArgName) : _.first(containersAndProjFromArgName);
+    if (notAllowedProjectNames.includes(projName)) {
       Helpers.error(`
 
-      Name ${CLI.chalk.bold('app')} is not allowed for container child.
+      Name ${CLI.chalk.bold(projName)} is not allowed.
 
-      Use different name: ${CLI.chalk.bold(containersAndProj.join('/').replace('app', 'my-app-or-something-else'))}
+      Use different name: ${CLI.chalk.bold(containersAndProjFromArgName.join('/').replace('app', 'my-app-or-something-else'))}
 
-      `,false,true);
+      `, false, true);
     }
+
     let firstContainer: Project;
     let lastContainer: Project;
     let lastIsBrandNew = false;
     let lastSmart = false;
+
     const grandpa = Project.From(cwd) as Project;
     const containers: Project[] = [
       ...((grandpa && grandpa.isContainer) ? [grandpa] : []),
     ];
 
-    if (hasContainers) {
-      const foldersToRecreate = _.cloneDeep(containersAndProj).slice(0, containersAndProj.length - 1);
+    if (hasContainersFromArgs) {
+      const foldersToRecreate = _.cloneDeep(containersAndProjFromArgName).slice(0, containersAndProjFromArgName.length - 1);
       let tmpCwd = cwd;
       let parentContainer = Project.From(cwd) as Project;
       let currentContainer: Project;
@@ -340,8 +358,11 @@ export class ProjectFactory {
 
     let appProj: Project;
 
-    const appLocation = lastContainer ? path.join(lastContainer?.location, projName) : path.join(cwd, projName);
-    const packageJsonPath = path.join(appLocation, config.file.package_json);
+    const appLocation = lastContainer
+      ? crossPlatformPath([lastContainer?.location, projName])
+      : crossPlatformPath([cwd, projName]);
+    const packageJsonPath = crossPlatformPath([appLocation, config.file.package_json]);
+
     Helpers.writeJson(packageJsonPath, {
       name: path.basename(projName),
       version: '0.0.0',
@@ -352,6 +373,9 @@ export class ProjectFactory {
       }
     } as Models.npm.IPackageJSON);
     appProj = (Project.From(appLocation) as Project);
+    if (!hasContainersFromArgs) {
+      lastContainer = appProj.parent;
+    }
     if (lastContainer && lastContainer.isContainer && !lastContainer.isMonorepo) {
 
       try {
@@ -399,18 +423,26 @@ export class ProjectFactory {
     //   await grandpa.filesStructure.init(grandpa.isSmartContainer ? appProj.name : '')
     // }
 
-    appProj.recreate.vscode.settings.hideOrShowFilesInVscode(false);
+    appProj.recreate.vscode.settings.hideOrShowFilesInVscode(true);
+
+    if (appProj.git.isGitRoot) {
+      try {
+        this.addRemoteToStandalone(appProj);
+      } catch (error) {
+      }
+    }
+
+
 
     return { containers, firstContainer, lastContainer, lastIsBrandNew, appProj };
   }
+  //#endregion
 
+  //#region create container or standalone
   public async createContainersOrStandalone(options: NewSiteOptions) {
     let { name: nameFromArgs, cwd } = this.fixOptions_create(options);
     const version = config.defaultFrameworkVersion;
-
-
-    const containersAndProj = nameFromArgs.replace('\\', '/').split('/');
-    const { appProj, containers, lastContainer, lastIsBrandNew } = await this.initContainersAndApps(cwd, containersAndProj, version);
+    const { appProj, containers, lastContainer, lastIsBrandNew } = await this.initContainersAndApps(cwd, nameFromArgs, version);
 
     if (appProj.isSmartContainerChild) {
       Helpers.writeFile([appProj.location, 'README.md'], `
@@ -447,6 +479,7 @@ export class ProjectFactory {
 
     Helpers.info(`DONE CREATING ${nameFromArgs}`);
   }
+  //#endregion
 
 
   //#region create workspace or standalone

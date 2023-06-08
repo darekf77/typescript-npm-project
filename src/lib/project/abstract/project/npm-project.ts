@@ -141,7 +141,7 @@ export class NpmProject {
   }
 
   // @ts-ignore
-  get shouldBeOmmited(this: Project) {
+  get shouldBeOmmitedInRelease(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.omitInRelease;
     }

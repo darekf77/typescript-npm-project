@@ -157,7 +157,7 @@ export class ${moduleName} { }
 
 
 async function start(port: number) {
-  console.log('hello world from backend');
+  console.log('hello world');
 }
 
 export default start;

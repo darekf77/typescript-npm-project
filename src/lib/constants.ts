@@ -8,3 +8,11 @@ export const DEFAULT_PORT = {
   WEBSQL_APP_BUILD_LOCALHOST: 4201,
   SERVER_LOCALHOST: 4199,
 }
+
+export const notAllowedProjectNames = [
+  'app',
+  'apps',
+  'libs',
+  'lib',
+  '_',
+]
