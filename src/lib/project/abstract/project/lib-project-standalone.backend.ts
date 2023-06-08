@@ -216,7 +216,11 @@ export class LibProjectStandalone extends LibPorjectBase {
       ) {
         [
           // firedeProj,
-          ...(realCurrentProj.name === 'tnp' ? [] : [tnpProj]),
+          ...(
+            ((realCurrentProj.name === 'tnp') || realCurrentProj._frameworkVersion !== tnpProj._frameworkVersion)
+              ? []
+              : [tnpProj]
+          ),
           coreCont,
         ].filter(f => !!f)
           .forEach(c => {

@@ -549,13 +549,17 @@ export class CopyManagerStandalone extends CopyManager {
       specyficFileRelativePath
     )));
 
+    // TODO QUICK_FIOX DISTINC WHEN IT COM FROM BROWSER
+    // and do not allow
     if (destinationFilePath.endsWith('d.ts')) {
-      absOrgFilePathInDistOrBundle = absOrgFilePathInDistOrBundle.replace(
+      const newAbsOrgFilePathInDistOrBundle = absOrgFilePathInDistOrBundle.replace(
         `/${this.outDir}/${specyficFileRelativePath}`,
         `/${this.outDir}-nocutsrc/${specyficFileRelativePath}`,
       );
-      if (!Helpers.exists(absOrgFilePathInDistOrBundle)) {
-        Helpers.logWarn(`[copyto] New path does not exists: ${absOrgFilePathInDistOrBundle}`)
+      if (!Helpers.exists(newAbsOrgFilePathInDistOrBundle)) {
+        Helpers.logWarn(`[copyto] New path does not exists or in browser | websql: ${newAbsOrgFilePathInDistOrBundle}`)
+      } else {
+        absOrgFilePathInDistOrBundle = newAbsOrgFilePathInDistOrBundle;
       }
     }
 

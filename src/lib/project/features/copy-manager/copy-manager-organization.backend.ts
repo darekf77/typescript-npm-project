@@ -712,13 +712,17 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       return;
     }
 
+    // TODO QUICK_FIOX DISTINC WHEN IT COM FROM BROWSER
+    // and do not allow
     if (destinationFilePath.endsWith('d.ts')) {
-      absOrgFilePathInDistOrBundle = absOrgFilePathInDistOrBundle.replace(
+      const newAbsOrgFilePathInDistOrBundle = absOrgFilePathInDistOrBundle.replace(
         `/${this.targetProjName}/${this.outDir}/${orgSpecyficFileRelativePath}`,
         `/${this.targetProjName}/${this.outDir}-nocutsrc/${orgSpecyficFileRelativePath}`,
       );
-      if (!Helpers.exists(absOrgFilePathInDistOrBundle)) {
-        Helpers.logWarn(`[copyto] New path does not exists: ${absOrgFilePathInDistOrBundle}`)
+      if (!Helpers.exists(newAbsOrgFilePathInDistOrBundle)) {
+        Helpers.logWarn(`[copyto] New path does not exists or in browser | websql: ${newAbsOrgFilePathInDistOrBundle}`)
+      } else {
+        absOrgFilePathInDistOrBundle = newAbsOrgFilePathInDistOrBundle;
       }
     }
     // this.fixDtsImportsWithWronPackageName(absOrgFilePathInDistOrBundle, destinationFilePath)

@@ -40,7 +40,7 @@ export abstract class BuildableProject {
   }
 
   // @ts-ignore
-  get trusted(this: Project) {
+  get trusted(this: Project): string[] {
     const projTnp = Project.Tnp as Project;
     PackagesRecognition.fromProject(projTnp, true).start();
     projTnp.availableIsomorphicPackagesInNodeModules;
