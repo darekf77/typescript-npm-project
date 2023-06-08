@@ -270,7 +270,7 @@
         "firedev-ports": '16.0.46',
         "firedev-crud-deamon": '16.0.41',
         "tnp-ui": "13.1.27",
-        "firedev-ui": '16.0.1',
+        "firedev-ui": '16.0.2',
         "tnp-core": '16.0.6',
         "tnp-cli": '16.0.3',
         "tnp-tools": "0.0.58",
@@ -427,10 +427,10 @@
         },
         "angular-client": {
           essentials: {
-            "static-columns": '16.0.1',
+            "static-columns": '16.0.2',
             "bs4-breakpoint": '13.0.33',
             "ngx-store": "2.1.0",
-            "firedev-storage": '13.2.37',
+            "firedev-storage": '16.0.38',
             "node-localstorage": "2.1.6",
             hammerjs: "^2.0.8",
           },
