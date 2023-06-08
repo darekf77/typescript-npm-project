@@ -56,6 +56,16 @@ export abstract class BuildableProject {
   }
   //#endregion
 
+  // @ts-ignore
+  get trustedMaxMajorVersion(this: Project): number | undefined {
+    const projTnp = Project.Tnp as Project;
+    const currentProjVersion = this._frameworkVersion;
+    const maxMajor = projTnp.packageJson['trustedMaxMajor'] || {};
+    const value = maxMajor[currentProjVersion];
+    return value;
+  }
+  //#endregion
+
   //#endregion
 
   //#region @backend

@@ -366,7 +366,7 @@ function filterDepOnly(project: Project, deps: Models.npm.DependenciesFromPackag
   let onlyAsDevAllowed = (project.packageJson.data.tnp.overrided.includeAsDev) || [];
 
   // log('d2evDeps', devDeps)
-  if(onlyAsDevAllowed !== '*') {
+  if (onlyAsDevAllowed !== '*') {
     if (!_.isArray(onlyAsDevAllowed)) {
       onlyAsDevAllowed = [];
     }
@@ -751,6 +751,41 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     project.packageJson.data.dependencies['webpack'] = '3.10.0'
     project.packageJson.data.dependencies['ts-loader'] = '9.3.1'
     project.packageJson.data.devDependencies = {}
+  }
+
+  // TODO SUPER QUICK_FIX
+  if (project.isContainerCoreProject && project.frameworkVersionAtLeast('v3') && config.frameworkName === 'tnp') {
+    const max = project.trustedMaxMajorVersion;
+    if (max) {
+      all.forEach(trustedDepKey => {
+
+        const depValueVersion = project.packageJson.data.dependencies[trustedDepKey];
+        const devDepValueVersion = project.packageJson.data.devDependencies[trustedDepKey];
+        console.log({
+          depValueVersion,
+          devDepValueVersion,
+        })
+
+        if (depValueVersion) {
+          const major = Number(_.first(depValueVersion.replace('~', '').replace('^', '').split('.')))
+          if (major > max) {
+            const projFromDep = Project.From([Project.Tnp.location, '..', trustedDepKey]) as Project;
+            const overrideOldVersion = `~${projFromDep.git.lastTagNameForMajorVersion(max)?.replace('v', '')}`
+            project.packageJson.data.dependencies[trustedDepKey] = overrideOldVersion;
+          }
+        }
+        if (devDepValueVersion && !trusted.includes(trustedDepKey)) {
+          const major = Number(_.first(devDepValueVersion.replace('~', '').replace('^', '')))
+          if (major > max) {
+            const projFromDep = Project.From([Project.Tnp.location, '..', trustedDepKey]) as Project;
+            const overrideOldversion = `~${projFromDep.git.lastTagNameForMajorVersion(max)?.replace('v', '')}`;
+            project.packageJson.data.devDependencies[trustedDepKey] = overrideOldversion
+          }
+        }
+
+      });
+    }
+
   }
 
 }

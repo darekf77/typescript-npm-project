@@ -140,6 +140,9 @@
         "@ngx-formly/ionic",
         "@ngx-formly/material",
       ],
+      trustedMaxMajor: {
+        v3: 13,
+      },
       trusted: {
         v1: "*",
         v2: "*",
@@ -170,9 +173,9 @@
           "tnp-helpers",
           "tnp-models",
           "typescript-class-helpers",
+          "static-columns",
 
           // additional
-          "static-columns",
           "typeorm",
           "ng-talkback",
           "record-replay-req-res-scenario",
@@ -206,9 +209,9 @@
           "tnp-helpers",
           "tnp-models",
           "typescript-class-helpers",
+          "static-columns",
 
           // additional
-          "static-columns",
           "typeorm",
           "ng-talkback",
           "record-replay-req-res-scenario",
@@ -258,7 +261,7 @@
       ],
       common: {
         // all isomorphic application config
-        "tnp-config": '13.1.76',
+        "tnp-config": '16.0.1',
         "tnp-models": '13.1.28',
         "tnp-helpers": '13.1.39',
         "tnp-db": '13.1.22',
@@ -268,7 +271,7 @@
         "firedev-crud-deamon": '13.1.40',
         "tnp-ui": "13.1.27",
         "firedev-ui": '16.0.1',
-        "tnp-core": '13.2.20',
+        "tnp-core": '16.0.4',
         "tnp-cli": '13.1.60',
         "tnp-tools": "0.0.58",
         "any-project-cli": '13.1.28',

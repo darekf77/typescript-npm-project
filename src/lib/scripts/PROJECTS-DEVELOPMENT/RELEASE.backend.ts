@@ -208,8 +208,6 @@ ${proj.children.map((c) => ` - @${proj.name}/${c.name} v${newVersion}`).join('\n
 
       if (!shouldRelease) {
 
-
-        // Helpers.pressKeyAndContinue();
         // child.git.commit();
         // await child.git.pushCurrentBranch();
 
@@ -270,7 +268,7 @@ processing...
         // to relase
         // ${depsOfResolved.map((d, i) => i + '.' + d.name).join('\n')}
         // `)
-        // Helpers.pressKeyAndContinue()
+
       }
 
       if (startFromLast) {
@@ -290,7 +288,7 @@ processing...
       //   ${depsOfResolved.map((d, i) => i + '.' + d.name).join('\n')}
       //   `)
       // Helpers.info(`exitBecouseNotInResolved (${child.name}) : ${exitBecouseNotInResolved}`)
-      // Helpers.pressKeyAndContinue()
+
       if (exitBecouseNotInResolved) {
         continue;
       }
@@ -300,7 +298,7 @@ processing...
 
 
 
-      const init = async () => {
+      const tryReleaseProject = async () => {
         while (true) {
           try {
             if (child.npmPackages.useSmartInstall) {
@@ -310,19 +308,17 @@ processing...
             child.run(`${config.frameworkName} init`
               + ` --tnpNonInteractive=true ${global.hideLog ? '' : '-verbose'}`,
               { prefix: `[container ${chalk.bold(proj.name)} release]`, output: true }).sync();
+
             break;
           } catch (error) {
-            Helpers.pressKeyAndContinue(`Please fix your project ${chalk.bold(child.name)} and try again..`);
+            Helpers.pressKeyAndContinue(`Not able to INIT your project ${chalk.bold(child.genericName)} pressa any keyt to try again..`);
           }
         }
       };
 
 
-      // Helpers.pressKeyAndContinue(`press any key`);
-
-
       while (true) {
-        await init();
+        await tryReleaseProject();
         try {
           child.run(`${config.frameworkName} release ${!!specifiedVersion ? specifiedVersion : ''}`
             + ` --automaticRelease=${resolved.length === 0}`
@@ -331,14 +327,12 @@ processing...
             + ` ${global.hideLog ? '' : '-verbose'}`
             , { prefix: `[container ${chalk.bold(proj.name)}/${child.name} release]`, output: true }).sync();
           // await child.release(handleStandalone(child, {}), true);
-          // Helpers.pressKeyAndContinue(`Release done`);
+
           break;
         } catch (error) {
-          Helpers.pressKeyAndContinue(`Please fix your project ${chalk.bold(child.name)} and try again..`);
+          Helpers.pressKeyAndContinue(`Not able to RELEASE your project ${chalk.bold(child.genericName)} pressa any keyt to try again..`);
         }
       }
-
-      // Helpers.pressKeyAndContinue(`Press any key to release ${chalk.bold(child.genericName)}`);
 
     }
 

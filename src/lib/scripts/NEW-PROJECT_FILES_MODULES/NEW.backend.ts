@@ -175,6 +175,9 @@ async function $GENERATE(args: string) {
   }
   entityName = decodeURIComponent(entityName);
   const nearestProj = Project.nearestTo(process.cwd()) as Project;
+  // console.log({
+  //   nearestProj: nearestProj?.location
+  // })
   const container = Project.by('container', nearestProj._frameworkVersion) as Project;
   const myEntity = 'my-entity';
 

@@ -55,30 +55,42 @@ async function MORPHISYNC(args, noExit = false) {
   } catch (error) {
     Helpers.error(`[${config.frameworkName} Not ablt to pull origin of morphi: ${config.urlMorphi} in: ${cwd}`, false, true);
   }
+
   try {
-    Helpers.run(`git checkout master && git pull origin master`, { cwd, output: false }).sync();
-    console.log('DONE PULLING MASTER')
+    Helpers.run(`git checkout master`, { cwd, output: false }).sync();
+    Helpers.log('DONE CHECKINGOUT MASTER')
   } catch (error) {
-    console.log(error)
+    Helpers.log(error)
     Helpers.error(`[${config.frameworkName} Not ablt to checkout master branch for :${config.urlMorphi} in: ${cwd}`, false, true);
   }
-  const tagToCheckout = Project.morphiTagToCheckoutForCurrentCliVersion(cwd);
-  const currentBranch = Helpers.git.currentBranchName(cwd);
-  Helpers.taskStarted(`Checking out lastest tag ${tagToCheckout} for firedev framework...`);
-  if (currentBranch !== tagToCheckout) {
-    try {
-      Helpers.run(`git reset --hard && git clean -df && git checkout ${tagToCheckout}`, { cwd }).sync()
-    } catch (error) {
-      console.log(error)
-      Helpers.warn(`[${config.frameworkName} Not ablt to checkout latest tag of firedev framework (moprhi project) : ${config.urlMorphi} in: ${cwd}`, false);
-    }
-  }
+
   try {
-    Helpers.run(`git pull origin ${tagToCheckout}`, { cwd }).sync()
+    Helpers.run(`git pull origin master`, { cwd, output: false }).sync();
+    Helpers.log('DONE PULLING MASTER')
   } catch (error) {
-    console.log(error)
-    Helpers.warn(`[${config.frameworkName} Not ablt to pull latest tag of firedev framework (moprhi project) : ${config.urlMorphi} in: ${cwd}`, false);
+    Helpers.log(error)
+    Helpers.error(`[${config.frameworkName} Not ablt to checkout master branch for :${config.urlMorphi} in: ${cwd}`, false, true);
   }
+
+
+  // TODO @LAST SPLIT TO SEPARATED CONTAINERS
+  // const tagToCheckout = Project.morphiTagToCheckoutForCurrentCliVersion(cwd);
+  // const currentBranch = Helpers.git.currentBranchName(cwd);
+  // Helpers.taskStarted(`Checking out lastest tag ${tagToCheckout} for firedev framework...`);
+  // if (currentBranch !== tagToCheckout) {
+  //   try {
+  //     Helpers.run(`git reset --hard && git clean -df && git checkout ${tagToCheckout}`, { cwd }).sync()
+  //   } catch (error) {
+  //     console.log(error)
+  //     Helpers.warn(`[${config.frameworkName} Not ablt to checkout latest tag of firedev framework (moprhi project) : ${config.urlMorphi} in: ${cwd}`, false);
+  //   }
+  // }
+  // try {
+  //   Helpers.run(`git pull origin ${tagToCheckout}`, { cwd }).sync()
+  // } catch (error) {
+  //   console.log(error)
+  //   Helpers.warn(`[${config.frameworkName} Not ablt to pull latest tag of firedev framework (moprhi project) : ${config.urlMorphi} in: ${cwd}`, false);
+  // }
 
   try {
     Helpers.run('rimraf .vscode', { cwd }).sync();
