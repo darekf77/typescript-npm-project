@@ -37,6 +37,19 @@ export class NpmProject {
   }
 
   /**
+   * Version from package.json
+   */
+  // @ts-ignore
+  get majorVersion(this: Project): number {
+    if (Helpers.isBrowser) {
+      return this.browser.majorVersion;
+    }
+    //#region @backend
+    return Number(_.first((this.packageJson?.version || '').split('.')));
+    //#endregion
+  }
+
+  /**
    * {
    *  version: "<major>.<minor>.<path>"
    * }
@@ -121,6 +134,16 @@ export class NpmProject {
     } else {
       await this.setNewVersion(newMajorVer);
     }
+  }
+
+  async setFramworkVersion(this: Project, frameworkVersionArg: ConfigModels.FrameworkVersion) {
+    if (this.typeIs('unknow')) {
+      return '';
+    }
+
+    // @ts-ignore
+    this.packageJson.data.tnp.version = frameworkVersionArg;
+    this.packageJson.save('updating framework version')
   }
 
   async setNewVersion(this: Project, version: string) {
@@ -473,7 +496,7 @@ export class NpmProject {
       return false;
     }
 
-    if(this.isSmartContainer) {
+    if (this.isSmartContainer) {
       return true;
     }
 

@@ -410,7 +410,7 @@ ${isSmartContainer ? 'were' : 'was'} not originally in global container.
 
   const proj = Project.Current as Project;
   const projName = (args.trim() === '') ? proj?.name : args.trim();
-  const container = Project.by('container', config.defaultFrameworkVersion) as Project;
+  const container = Project.by('container', proj._frameworkVersion) as Project;
   if (container) {
 
     const isSmartContainer = (args.trim() === '') ? proj?.isSmartContainer : projName.startsWith('@');

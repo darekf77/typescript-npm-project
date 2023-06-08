@@ -54,7 +54,7 @@ export class Branding extends FeatureForProject {
     const sourceLogoPng = crossPlatformPath([proj.location, config.file.logo_png]);
 
     if (!Helpers.exists(sourceLogoPng)) {
-      const coreLogoProj = Project.by('isomorphic-lib', config.defaultFrameworkVersion);
+      const coreLogoProj = Project.by('isomorphic-lib', this.project._frameworkVersion);
       const coreLogoPath = crossPlatformPath([coreLogoProj.location, config.file.logo_png]);
       Helpers.copyFile(coreLogoPath, sourceLogoPng);
     }

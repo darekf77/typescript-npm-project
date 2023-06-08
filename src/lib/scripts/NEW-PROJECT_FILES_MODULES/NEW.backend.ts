@@ -55,25 +55,26 @@ export async function NEW(args: string, exit = true) {
   await ProjectFactory.Instance.containerStandaloneFromArgs(args, exit, cwd)
   // }
 }
-export function NEW_SITE(args: string, exit = true) {
-  const cwd = crossPlatformPath(process.cwd());
-  ProjectFactory.Instance.workspaceSiteFromArgs(args, exit, cwd, true);
-}
 
-export function $NEW_STRICT_SITE(args: string, exit = true) {
-  const cwd = crossPlatformPath(process.cwd());
-  ProjectFactory.Instance.workspaceSiteFromArgs(args, exit, cwd, true);
-}
+// export function NEW_SITE(args: string, exit = true) {
+//   const cwd = crossPlatformPath(process.cwd());
+//   ProjectFactory.Instance.workspaceSiteFromArgs(args, exit, cwd, true);
+// }
 
-export function $NEW_DEPENDENCY_SITE(args: string, exit = true) {
-  const cwd = crossPlatformPath(process.cwd());
-  ProjectFactory.Instance.workspaceSiteFromArgs(args, exit, cwd, false);
-}
+// export function $NEW_STRICT_SITE(args: string, exit = true) {
+//   const cwd = crossPlatformPath(process.cwd());
+//   ProjectFactory.Instance.workspaceSiteFromArgs(args, exit, cwd, true);
+// }
+
+// export function $NEW_DEPENDENCY_SITE(args: string, exit = true) {
+//   const cwd = crossPlatformPath(process.cwd());
+//   ProjectFactory.Instance.workspaceSiteFromArgs(args, exit, cwd, false);
+// }
 
 export async function $UPDATE(args: string) {
   const cwd = crossPlatformPath(process.cwd());
 
-  const proj = Project.From(cwd);
+  const proj = Project.From(cwd) as Project;
 
   if (proj.isContainer) {
 
@@ -126,7 +127,7 @@ Would you like to update current project configuration?`)) {
         };
         const tnp = (pf[config.frameworkNames.tnp] as Models.npm.TnpData);
         tnp.type = 'container';
-        tnp.version = config.defaultFrameworkVersion;
+        tnp.version = proj._frameworkVersion;
         tnp.linkedProjects = linkedProjects;
         Helpers.writeFile([cwd, config.file.package_json], pf);
         Helpers.remove([cwd, config.file.package_json__tnp_json]);
@@ -138,7 +139,7 @@ Would you like to update current project configuration?`)) {
         name: path.basename(cwd),
         version: "0.0.0",
         [config.frameworkNames.tnp]: {
-          version: config.defaultFrameworkVersion,
+          version: proj._frameworkVersion,
           type: 'container',
           linkedProjects,
         } as Models.npm.TnpData,
@@ -284,9 +285,9 @@ export default {
   REMOVE: Helpers.CLIWRAP(REMOVE, 'REMOVE'),
   RM: Helpers.CLIWRAP(RM, 'RM'),
   NEW: Helpers.CLIWRAP(NEW, 'NEW'),
-  NEW_SITE: Helpers.CLIWRAP(NEW_SITE, 'NEW_SITE'),
-  $NEW_STRICT_SITE: Helpers.CLIWRAP($NEW_STRICT_SITE, '$NEW_STRICT_SITE'),
-  $NEW_DEPENDENCY_SITE: Helpers.CLIWRAP($NEW_DEPENDENCY_SITE, '$NEW_DEPENDENCY_SITE'),
+  // NEW_SITE: Helpers.CLIWRAP(NEW_SITE, 'NEW_SITE'),
+  // $NEW_STRICT_SITE: Helpers.CLIWRAP($NEW_STRICT_SITE, '$NEW_STRICT_SITE'),
+  // $NEW_DEPENDENCY_SITE: Helpers.CLIWRAP($NEW_DEPENDENCY_SITE, '$NEW_DEPENDENCY_SITE'),
 };
 
 //#endregion

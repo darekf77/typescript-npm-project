@@ -19,9 +19,6 @@ async function $INIT_CORE() {
 
   (config.coreProjectVersions as ConfigModels.FrameworkVersion[]).forEach(v => {
     let corePorjectsTypes: ConfigModels.LibType[] = ['isomorphic-lib'];
-    if ((['v3', 'v1'] as ConfigModels.FrameworkVersion[]).includes(v)) {
-      corePorjectsTypes = ['isomorphic-lib'];
-    }
     const projects = corePorjectsTypes.map(t => Project.by(t, v));
     allCoreProject = [
       ...projects,
@@ -99,9 +96,14 @@ async function $AUTOUPDATE(args: string) {
     if (await Helpers.questionYesNo(`Proceed with ${config.frameworkName} auto-update ?`)) {
       Helpers.run('npm i -g firedev --force').sync();
       await MORPHISYNC(args, true)
-      const container = Project.by('container', config.defaultFrameworkVersion);
-      container.run('firedev reinstall').sync();
-      Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
+      const arrActive = config.activeFramewrokVersions;
+      for (let index = 0; index < arrActive.length; index++) {
+        const defaultFrameworkVersionForSpecyficContainer = arrActive[index];
+        Helpers.info(`Installing new versions of packages for global container-${defaultFrameworkVersionForSpecyficContainer}`)
+        const container = Project.by('container', defaultFrameworkVersionForSpecyficContainer);
+        container.run('firedev reinstall').sync();
+        Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
+      }
     }
   }
   if (config.frameworkName === 'tnp') {
@@ -125,11 +127,18 @@ async function $AUTOUPDATE(args: string) {
     Helpers.taskStarted(`Installing new version of ${config.frameworkName} pacakges`)
     Project.Tnp.run(`npm i --force && npm-run tsc && ${config.frameworkName} dedupe`).sync();
     Helpers.taskDone();
-    Helpers.taskStarted('Installing new versions smart container pacakges')
-    Project.by('container', (Project.Tnp as Project)._frameworkVersion).run(`${config.frameworkName} reinstall`).sync();
-    Helpers.taskDone();
 
-    Helpers.taskDone('AUTOUPDATE DONE');
+
+    const arrActive = config.activeFramewrokVersions;
+    for (let index = 0; index < arrActive.length; index++) {
+      const defaultFrameworkVersionForSpecyficContainer = arrActive[index];
+      Helpers.taskStarted(`Installing new versions smart container ${defaultFrameworkVersionForSpecyficContainer} pacakges`)
+      const container = Project.by('container', defaultFrameworkVersionForSpecyficContainer);
+      container.run(`${config.frameworkName}  reinstall`).sync();
+
+      Helpers.taskDone();
+    }
+    Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
   }
   // const file = path.basename(args.trim());
   // function processing() {

@@ -1,4 +1,4 @@
-import { config } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config';
 import { chalk, crossPlatformPath, path, _ } from 'tnp-core';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
@@ -462,24 +462,47 @@ const SET_MINOR_VER = async (args: string) => {
 }
 
 const SET_MAJOR_VER = async (args: string) => {
-  const argsObj: { trusted } = require('minimist')(args.split(' '));
+  let objArgs: { trusted, frameworkVersion } = require('minimist')(args.split(' '));
   let children = (Project.Current.children as Project[]);
+  args = Helpers.cliTool.removeArgFromString(args, ['trusted', 'frameworkVersion'])
+  const frameworkVersion = objArgs?.frameworkVersion?.replace('v', '');
 
-  // if (argsObj.trusted) {
-  args = args.replace('--trusted', '')
-  args = args.replace('true', '')
-  const all = (Project.Current as Project).trustedAllPossible;
-  // console.log({
-  //   all
-  // })
-  children = children.filter(c => all.includes(c.name));
+  const majorVersionToSet = Number(args.trim().replace('v', ''));
+  if (frameworkVersion) {
+    if (!(await Helpers.questionYesNo(`Proceed with setting major version v${majorVersionToSet} and`
+      + ` framework version v${frameworkVersion} for all ${children.length} packages ?`))) {
+      process.exit(0)
+    }
+  } else {
+    if (!(await Helpers.questionYesNo(`Proceed with setting major version v${majorVersionToSet} for all ${children.length} packages ?`))) {
+      process.exit(0)
+    }
+  }
+
+  // const all = (Project.Current as Project).trustedAllPossible;
+  // // console.log({
+  // //   all
+  // // })
+  // children = children.filter(c => all.includes(c.name));
   // }
 
   for (let index = 0; index < children.length; index++) {
     const child = children[index] as Project;
-    Helpers.taskStarted(`Updating version for ${child.name}@${child.packageJson.data.version} ... `);
-    await child.setMajorVersion(Number(args.trim()));
-    Helpers.taskDone();
+    if (_.isString(frameworkVersion)) {
+      if (child._frameworkVersion === `v${frameworkVersion}`) {
+        Helpers.info(`[${child.name}] Framwork version v${frameworkVersion} alread set.`);
+      } else {
+        Helpers.info(`[${child.name}] Updating framework version for ${child._frameworkVersion} => v${frameworkVersion} ... `);
+        await child.setFramworkVersion(`v${majorVersionToSet}` as ConfigModels.FrameworkVersion);
+      }
+    }
+    if (child.majorVersion === majorVersionToSet) {
+      Helpers.info(`[${child.name}] Major version ${majorVersionToSet} alread set.`);
+    } else {
+      Helpers.info(`[${child.name}] Updating version for ${child.name}@${child.packageJson.data.version} => ${majorVersionToSet} ... `);
+      await child.setMajorVersion(majorVersionToSet);
+    }
+    // Helpers.taskDone();
   }
   process.exit(0)
 }

@@ -27,7 +27,7 @@ export class LibProjectSmartContainer extends LibPorjectBase {
 
         let proj = Project.From(absFolder) as Project;
         proj.packageJson.data.tnp.type = 'isomorphic-lib';
-        proj.packageJson.data.tnp.version = config.defaultFrameworkVersion;
+        proj.packageJson.data.tnp.version = smartContainer._frameworkVersion;
         proj.packageJson.save('updating version for publish');
         Project.unload(proj);
         proj = Project.From(absFolder) as Project;
@@ -233,8 +233,8 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
 
       const cmd = (childProjName: string, productinoBuild: boolean, websqlBuild: boolean, isMainTarget = false) => {
         const commandToBuildDOcs = `${config.frameworkName} `
-        + `build:${config.folder.bundle}:app:${productinoBuild ? 'prod' : ''} ${childProjName} `
-        + `  ${websqlBuild ? '--websql' : ''}         ${global.hideLog ? '' : '-verbose'}`
+          + `build:${config.folder.bundle}:app:${productinoBuild ? 'prod' : ''} ${childProjName} `
+          + `  ${websqlBuild ? '--websql' : ''}         ${global.hideLog ? '' : '-verbose'}`
 
         // console.log({
         //   commandToBuildDOcs

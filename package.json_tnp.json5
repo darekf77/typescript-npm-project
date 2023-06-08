@@ -54,7 +54,7 @@
   },
 
   type: "isomorphic-lib",
-  version: "v3",
+  version: "v4",
 
   "libs-with-issues": {
     "ts-sinon": "1.0.12",

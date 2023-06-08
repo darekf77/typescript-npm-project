@@ -216,7 +216,7 @@ function createDummyProj(location: string, projName: string): Project {
     version: '0.0.0',
     tnp: {
       type: 'isomorphic-lib',
-      version: config.defaultFrameworkVersion
+      version: config.defaultFrameworkVersion // OK
     }
   });
 
@@ -233,7 +233,7 @@ function createDummyContainer(location: string, projName: string): Project {
     tnp: {
       type: 'container',
       smart: true,
-      version: config.defaultFrameworkVersion
+      version: config.defaultFrameworkVersion // OK
     }
   });
 

@@ -242,7 +242,7 @@ ${withContent.map(c => {
 
 
 
-    if ( // TODO QUICK_FIX
+    if ( // TODO QUICK_FIX @LAST remove this somehow
       (config.frameworkName === 'tnp')
       && (this.project.name === 'morphi')
     ) {

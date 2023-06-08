@@ -21,23 +21,23 @@ async function askForWhenEmpty(): Promise<Project> {
   let proj: Project;
   const yesNewProj = await Helpers.questionYesNo(`Do you wanna init project in this folder ?`);
   if (yesNewProj) {
-    const response = await Helpers.autocompleteAsk<ConfigModels.LibType>(`Choose type of project`, [
+    const responseProjectType = await Helpers.autocompleteAsk<ConfigModels.LibType>(`Choose type of project`, [
       { name: 'Container', value: 'container' },
       { name: 'Isomorphic Lib', value: 'isomorphic-lib' },
     ]);
     let smart = false;
     let monorepo = false;
-    if (response === 'container') {
+    if (responseProjectType === 'container') {
       smart = await Helpers.consoleGui.question.yesNo('Do you wanna use smart container for organization project ?');
       monorepo = await Helpers.consoleGui.question.yesNo('Do you want your container to be monorepo ?');
       Helpers.writeFile([crossPlatformPath(process.cwd()), config.file.package_json], {
         name: crossPlatformPath(path.basename(crossPlatformPath(process.cwd()))),
         version: '0.0.0',
         tnp: {
-          type: response,
+          type: responseProjectType,
           monorepo,
           smart,
-          version: config.defaultFrameworkVersion,
+          version: config.defaultFrameworkVersion, // OK
         }
       });
     } else {
@@ -45,8 +45,8 @@ async function askForWhenEmpty(): Promise<Project> {
         name: crossPlatformPath(path.basename(crossPlatformPath(process.cwd()))),
         version: '0.0.0',
         tnp: {
-          type: response,
-          version: config.defaultFrameworkVersion,
+          type: responseProjectType,
+          version: config.defaultFrameworkVersion, // OK
         }
       });
     }
