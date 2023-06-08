@@ -43,7 +43,10 @@ export function resolvePacakgesFromArgs(args: string[]): Models.npm.Package[] {
 }
 
 
-export function executeCommand(command: string, project: Project) {
+export function executeCommand(command: string, project: Project, resetPackageJsonFromGit = false) {
+  // if (resetPackageJsonFromGit) { // TODO @LAST super quick fix
+  //   command = `git checkout ${config.file.package_json} && ${command}`;
+  // }
   Helpers.info(`
 
    ${command} in folder:

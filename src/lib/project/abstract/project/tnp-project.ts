@@ -18,8 +18,8 @@ export abstract class TnpProject {
     //#endregion
   }
 
-   // @ts-ignore
-   public get generateChangelog(this: Project) {
+  // @ts-ignore
+  public get generateChangelog(this: Project) {
     //#region @backendFunc
     return this.packageJson.generateChangelog;
     //#endregion
@@ -49,6 +49,12 @@ export abstract class TnpProject {
     const ver = Number(_.isString(version) && version.replace('v', ''));
     const curr = Number(_.isString(this._frameworkVersion) && this._frameworkVersion.replace('v', ''))
     return !isNaN(ver) && !isNaN(curr) && (curr >= ver);
+  }
+
+  public frameworkVersionLessThan(this: Project, version: ConfigModels.FrameworkVersion) {
+    const ver = Number(_.isString(version) && version.replace('v', ''));
+    const curr = Number(_.isString(this._frameworkVersion) && this._frameworkVersion.replace('v', ''))
+    return !isNaN(ver) && !isNaN(curr) && (curr < ver);
   }
   //#endregion
 

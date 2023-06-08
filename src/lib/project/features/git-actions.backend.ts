@@ -246,31 +246,28 @@ ${withContent.map(c => {
       (config.frameworkName === 'tnp')
       && (this.project.name === 'morphi')
     ) {
-      config.coreProjectVersions
+      [config.defaultFrameworkVersion]
         .map(v => {
           return { v, c: Project.by('container', v as any) };
         })
         .filter(({ c }) => !!c)
         .forEach(({ v, c }) => {
           (c as Project).packageJson.save('Updating morphi container');
-          const morphiEqivalentPath = path.join(this.project.location, 'projects', `container${(v === 'v1') ? '' : `-${v}`}`);
-          [
-            config.file.package_json,
-            config.file.package_json__tnp_json,
-          ].forEach(pj => {
-            // const pathPjOrg = path.join(c.location, pj);
-            const pproj = Project.From(c.location) as Project;
-            if (pproj) {
-              let currentContent = pproj.packageJson.data;
-
-              if (pj === config.file.package_json__tnp_json) {
-                currentContent = pproj.packageJson.data.tnp as any;
-              }
-              const destPathPj = path.join(morphiEqivalentPath, pj);
-              Helpers.writeJson(destPathPj, currentContent);
-
-            }
-          });
+          // const morphiProjectContainerPath = path.join(this.project.location, 'projects', `container${(v === 'v1') ? '' : `-${v}`}`);
+          // [
+          //   config.file.package_json,
+          // ].forEach(pj => {
+          //   // const pathPjOrg = path.join(c.location, pj);
+          //   const pproj = Project.From(c.location) as Project;
+          //   if (pproj) {
+          //     let currentContent = pproj.packageJson.data;
+          //     // if (pj === config.file.package_json__tnp_json) {
+          //     //   currentContent = pproj.packageJson.data.tnp as any;
+          //     // }
+          //     const destPathPj = path.join(morphiProjectContainerPath, pj);
+          //     Helpers.writeJson(destPathPj, currentContent);
+          //   }
+          // });
         });
     }
 

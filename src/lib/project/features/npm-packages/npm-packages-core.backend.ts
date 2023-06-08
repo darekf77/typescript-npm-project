@@ -71,12 +71,18 @@ export class NpmPackagesCore extends FeatureForProject {
 
     [actualNpmProcess] npm instalation...
 
-    `)
+    `);
+
+    const resetPackageJsonFromGit = (config.frameworkName === 'firedev'
+      && this.project.isContainerCoreProject
+      && this.project.frameworkVersionLessThan(config.defaultFrameworkVersion)
+    );
+
     if (remove) {
-      executeCommand(command, this.project);
+      executeCommand(command, this.project, resetPackageJsonFromGit);
     } else {
       try {
-        executeCommand(command, this.project);
+        executeCommand(command, this.project, resetPackageJsonFromGit);
       } catch (err) {
         Helpers.error(err, true, true);
         Helpers.error(`Error during npm instalation`, false, true);
