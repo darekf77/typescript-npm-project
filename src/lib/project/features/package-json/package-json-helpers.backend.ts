@@ -703,7 +703,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
         if ((project._frameworkVersion === config.defaultFrameworkVersion)) {
           project.packageJson.data.dependencies['firedev'] = saveTnpFiredevVer;
         } else {
-          // TODO QUICK FIX
+          // TODO QUICK FIX @LAST
           const firedevVer = Helpers.getValueFromJSON(project.packageJson.path, `dependencies.firedev`, '');
           const firedevVerCurr = _.first(firedevVer
             .replace('~', '')
