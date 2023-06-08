@@ -141,6 +141,16 @@ export class NpmProject {
   }
 
   // @ts-ignore
+  get shouldBeOmmited(this: Project) {
+    if (Helpers.isBrowser) {
+      return this.browser.omitInRelease;
+    }
+    //#region @backend
+    return !!this.packageJson['omitInRelease'];
+    //#endregion
+  }
+
+  // @ts-ignore
   get lastNpmVersion(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.lastNpmVersion;

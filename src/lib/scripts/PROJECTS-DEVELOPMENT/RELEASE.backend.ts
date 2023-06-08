@@ -192,6 +192,7 @@ ${proj.children.map((c) => ` - @${proj.name}/${c.name} v${newVersion}`).join('\n
         (!child.isSmartContainer && !child.isSmartContainerChild)
         && (argsObj.trusted ? allTrusted.includes(child.name) : true)
         && versionIsOk
+        && !child.shouldBeOmmited
         // && !child.isPrivate
         && !child.targetProjects.exists
         && (!sameHashes || forceReleaseAll)
