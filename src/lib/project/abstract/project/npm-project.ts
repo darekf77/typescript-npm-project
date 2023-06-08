@@ -37,7 +37,7 @@ export class NpmProject {
   }
 
   /**
-   * Version from package.json
+   * Major Version from package.json
    */
   // @ts-ignore
   get majorVersion(this: Project): number {
@@ -46,6 +46,20 @@ export class NpmProject {
     }
     //#region @backend
     return Number(_.first((this.packageJson?.version || '').split('.')));
+    //#endregion
+  }
+
+  /**
+   * Minor Version from package.json
+   */
+  // @ts-ignore
+  get minorVersion(this: Project): number {
+    if (Helpers.isBrowser) {
+      return this.browser.majorVersion;
+    }
+    //#region @backend
+    const [__, minor] = ((this.packageJson?.version || '').split('.') || [void 0, void 0])
+    return Number(minor);
     //#endregion
   }
 
@@ -65,7 +79,7 @@ export class NpmProject {
    *  version:"3.4.4"
    * }
    */
-  async setMinorVersion(this: Project, minorVersionToSet: number) {
+  async setMinorVersion(this: Project, minorVersionToSet: number, force = false) {
     if (this.typeIs('unknow')) {
       return '';
     }
@@ -83,7 +97,7 @@ export class NpmProject {
     const currentMinorVersion = Number(ver[1]);
     const newVer = [ver[0], minorVersionToSet, ver[2]].join('.');
 
-    if (minorVersionToSet <= currentMinorVersion) {
+    if (minorVersionToSet <= currentMinorVersion && !force) {
       Helpers.warn(`Ommiting... Trying to set same or lower minor version for project: ${this.genericName}
         ${this.version} => v${newVer}
       `)

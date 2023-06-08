@@ -311,7 +311,7 @@ processing...
 
             break;
           } catch (error) {
-            Helpers.pressKeyAndContinue(`Not able to INIT your project ${chalk.bold(child.genericName)} pressa any keyt to try again..`);
+            Helpers.pressKeyAndContinue(`Not able to INIT your project ${chalk.bold(child.genericName)} pressa any key to try again..`);
           }
         }
       };
@@ -435,21 +435,19 @@ const $MINOR = async (args: string) => {
 const SET_MINOR_VER = async (args: string) => {
   const argsObj: { trusted } = require('minimist')(args.split(' '));
   let children = (Project.Current.children as Project[]);
+  args = Helpers.cliTool.removeArgFromString(args, ['trusted', 'frameworkVersion'])
 
-  // if (argsObj.trusted) {
-  args = args.replace('--trusted', '')
-  args = args.replace('true', '')
-  const all = (Project.Current as Project).trustedAllPossible;
-  // console.log({
-  //   all
-  // })
-  children = children.filter(c => all.includes(c.name));
-  // }
+  const minorVersionToSet = Number(args.trim().replace('v', ''));
 
   for (let index = 0; index < children.length; index++) {
     const child = children[index] as Project;
-    Helpers.taskStarted(`Updating version for ${child.name}@${child.packageJson.data.version} ... `);
-    await child.setMinorVersion(Number(args.trim()));
+    if (child.minorVersion === minorVersionToSet) {
+      Helpers.info(`[${child.name}] Minor version ${minorVersionToSet} alread set.`);
+    } else {
+      Helpers.info(`[${child.name}] Updating minor version for ${child.name}@${child.packageJson.data.version} => ${minorVersionToSet} ... `);
+      await child.setMinorVersion(minorVersionToSet, true);
+    }
+
     Helpers.taskDone();
   }
   process.exit(0)
@@ -487,7 +485,7 @@ const SET_MAJOR_VER = async (args: string) => {
         Helpers.info(`[${child.name}] Framwork version v${frameworkVersion} alread set.`);
       } else {
         Helpers.info(`[${child.name}] Updating framework version for ${child._frameworkVersion} => v${frameworkVersion} ... `);
-        await child.setFramworkVersion(`v${majorVersionToSet}` as ConfigModels.FrameworkVersion);
+        await child.setFramworkVersion(`v${frameworkVersion}` as ConfigModels.FrameworkVersion);
       }
     }
     if (child.majorVersion === majorVersionToSet) {
@@ -500,6 +498,8 @@ const SET_MAJOR_VER = async (args: string) => {
   }
   process.exit(0)
 }
+
+
 
 
 function handleStandaloneOrSmartContainer(proj: Project, argsObj: any) {
