@@ -700,7 +700,21 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       const saveTnpFiredevVer = `^${_.first(Project.Tnp.version.split('.'))}`;
       // project.packageJson.data.dependencies['tnp'] = saveTnpFiredevVer;
       if (project.isContainerCoreProject) {
-        project.packageJson.data.dependencies['firedev'] = saveTnpFiredevVer;
+        if ((project._frameworkVersion === config.defaultFrameworkVersion)) {
+          project.packageJson.data.dependencies['firedev'] = saveTnpFiredevVer;
+        } else {
+          // TODO QUICK FIX
+          const firedevVer = Helpers.getValueFromJSON(project.packageJson.path, `dependencies.firedev`, '');
+          const firedevVerCurr = _.first(firedevVer
+            .replace('~', '')
+            .replace('^', '')
+            .split('.')
+          );
+
+          project.packageJson.data.dependencies['firedev'] = `~${project.git.lastTagNameForMajorVersion(`v${firedevVerCurr}`)
+            .replace('v', '')}`;
+        }
+
       } else {
         // project.packageJson.data.devDependencies['firedev'] = saveTnpFiredevVer;
       }
