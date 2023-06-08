@@ -761,10 +761,10 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
 
         const depValueVersion = project.packageJson.data.dependencies[trustedDepKey];
         const devDepValueVersion = project.packageJson.data.devDependencies[trustedDepKey];
-        console.log({
-          depValueVersion,
-          devDepValueVersion,
-        })
+        // console.log({
+        //   depValueVersion,
+        //   devDepValueVersion,
+        // })
 
         if (depValueVersion) {
           const major = Number(_.first(depValueVersion.replace('~', '').replace('^', '').split('.')))
