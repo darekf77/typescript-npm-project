@@ -10,9 +10,8 @@ import { Helpers } from 'tnp-helpers';;
 export namespace CopyMangerHelpers {
 
   export const angularBrowserComiplationFolders = {
-    esm2020: 'esm2020',
-    fesm2015: 'fesm2015',
-    fesm2020: 'fesm2020',
+    esm2022: 'esm2022',
+    fesm2022: 'fesm2022',
   };
 
   export const angularBrowserComiplationFoldersArr = Object.values(

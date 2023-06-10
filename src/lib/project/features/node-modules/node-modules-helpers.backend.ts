@@ -252,8 +252,10 @@ const notAllowedFolderToCopy = [
   'bundles',
   'esm5',
   'esm2015',
+  'fesm2022',
   'fesm5',
   'fesm2015',
+  'fesm2022',
   'dist',
   'bundle'
 ];

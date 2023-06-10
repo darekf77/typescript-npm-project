@@ -54,16 +54,12 @@ export class CopyMangerOrganizationAngularFiles {
   *
   * For handling files:
   *
-  *  "websql/esm2020/lib/index.mjs"
-  *  "browser/esm2020/lib/index.mjs"
-  *  "browser/fesm2020/<targetProjName>.mjs.map"
-  *  "browser/fesm2020/<targetProjName>.mjs"
-  *  "websql/fesm2020/<targetProjName>.mjs.map"
-  *  "websql/fesm2020/<targetProjName>.mjs"
-  *  "websql/fesm2015/<targetProjName>.mjs.map"
-  *  "websql/fesm2015/<targetProjName>.mjs"
-  *  "browser/fesm2015/<targetProjName>.mjs.map"
-  *  "browser/fesm2015/<targetProjName>.mjs"
+  *  "websql/esm2022/lib/index.mjs"
+  *  "browser/esm2022/lib/index.mjs"
+  *  "browser/fesm2022/<targetProjName>.mjs.map"
+  *  "browser/fesm2022/<targetProjName>.mjs"
+  *  "websql/fesm2022/<targetProjName>.mjs.map"
+  *  "websql/fesm2022/<targetProjName>.mjs"
   *  "websql/package.json"
   *  "browser/package.json"
   *
@@ -139,7 +135,7 @@ export class CopyMangerOrganizationAngularFiles {
       specyficFileRelativePathForBrowserModule: void 0 as string
     };
 
-    const isEsm2020 = (angularCompilationFolder === CopyMangerHelpers.angularBrowserComiplationFolders.esm2020);
+    const isEsm202w = (angularCompilationFolder === CopyMangerHelpers.angularBrowserComiplationFolders.esm2022);
 
     const children = this.children;
     for (let index = 0; index < children.length; index++) {
@@ -181,10 +177,10 @@ export class CopyMangerOrganizationAngularFiles {
           destinationOrLocalTempProj,
           {
             isMap: false,
-            useModuleSpliter: !isEsm2020,// esm has embeded maps
+            useModuleSpliter: !isEsm202w,// esm has embeded maps
           }
         );
-        if (isEsm2020) {
+        if (isEsm202w) {
           this.fixNotNeededFilesInESMforChildLocalTempProj(
             child,
             angularCompilationFolder,
@@ -227,11 +223,7 @@ export class CopyMangerOrganizationAngularFiles {
       const pj = {
         "name": rootPackageNameForChildBrowser,
         "version": "0.0.0",
-        "module": `fesm2015/${childName}.mjs`,
-        "es2020": `fesm2020/${childName}.mjs`,
-        "esm2020": `esm2020/${childName}.mjs`,
-        "fesm2020": `fesm2020/${childName}.mjs`,
-        "fesm2015": `fesm2015/${childName}.mjs`,
+        "module": `fesm2022/${childName}.mjs`,
         "typings": `${childName}.d.ts`,
         "exports": {
           "./package.json": {
@@ -239,11 +231,9 @@ export class CopyMangerOrganizationAngularFiles {
           },
           ".": {
             "types": `./${childName}.d.ts`,
-            "esm2020": `./esm2020/${childName}.mjs`,
-            "es2020": `./fesm2020/${childName}.mjs`,
-            "es2015": `./fesm2015/${childName}.mjs`,
-            "node": `./fesm2015/${childName}.mjs`,
-            "default": `./fesm2020/${childName}.mjs`
+            "esm2022": `./esm2022/${childName}.mjs`,
+            "esm": `./esm2022/${childName}.mjs`,
+            "default": `./fesm2022/${childName}.mjs`,
           }
         },
         "sideEffects": false
@@ -362,7 +352,7 @@ export * from './${config.file.public_api}';
   };
   //#endregion
 
-  //#region private metods / fix for module files in fesm2015 or fesm2022 (ONLY when tmp-local-proj)
+  //#region private metods / fix for module files in fesm2022 or fesm2022 (ONLY when tmp-local-proj)
   /**
    * only for tmp-local-proj as destination
    *
