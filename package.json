@@ -550,7 +550,7 @@
     "private": false
   },
   "name": "tnp",
-  "version": "16.0.10",
+  "version": "16.0.11",
   "bin": {
     "tnp": "bin/tnp",
     "tnp-debug": "bin/tnp-debug",

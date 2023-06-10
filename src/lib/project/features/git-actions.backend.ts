@@ -245,7 +245,7 @@ ${withContent.map(c => {
     if (this.project.name === 'morphi' || this.project.name === 'firedev-framework') {
       config.activeFramewrokVersions
         .forEach((frameworkVersion) => {
-          console.log(`Active Framework: ${frameworkVersion}`)
+          // console.log(`Active Framework: ${frameworkVersion}`)
           const morphiProjectContainerPath = path.join(this.project.location, 'projects', `container${(frameworkVersion === 'v1') ? '' : `-${frameworkVersion}`}`);
           const containerCoreForVersion = Project.From(morphiProjectContainerPath) as Project;
           if (containerCoreForVersion) {
