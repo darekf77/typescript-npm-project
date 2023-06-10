@@ -1,5 +1,5 @@
 //#region imports
-import { _ } from 'tnp-core';
+import { crossPlatformPath, os, _ } from 'tnp-core';
 import * as JSON5 from 'json5';
 import chalk from 'chalk';
 import * as semver from 'semver';
@@ -8,7 +8,13 @@ import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config, ConfigModels } from 'tnp-config';
 
-const versionForTags = [];
+const versionForTagsPath = crossPlatformPath([os.homedir(), `.firedev`, `morphi/tmp-versions-cache`,])
+
+const versionForTags = Helpers.readJson(versionForTagsPath, {});
+// console.log([
+//   versionForTagsPath,
+//   versionForTags
+// ])
 
 //#endregion
 
@@ -663,12 +669,31 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
 
   const maxVersionForAngular = project.trustedMaxMajorVersion;
   const lastVerFun = (pkgNameToCheckVer) => {
-    Helpers.log(`\nGetting last version of ${pkgNameToCheckVer}`)
-    try {
-      const checkFor = `${pkgNameToCheckVer}@${maxVersionForAngular}`;
+    const checkFor = `${pkgNameToCheckVer}@${maxVersionForAngular}`;
+    if (versionForTags[checkFor]) {
+      return versionForTags[checkFor];
+    }
+    process.stdout.write('.');
+    // Helpers.info(`\nGetting last version of ${pkgNameToCheckVer}`)
+    if (config.frameworkName === 'tnp') {
       if (!versionForTags[checkFor]) {
+        // Helpers.info(`\nnot in cache from git tag ${pkgNameToCheckVer}`)
+        let projFromDep = Project.From([Project.Tnp.location, '..', pkgNameToCheckVer]) as Project;
+        if (projFromDep) {
+          versionForTags[checkFor] = `~${projFromDep.git.lastTagNameForMajorVersion(maxVersionForAngular)?.replace('v', '')}`;
+          Helpers.writeJson(versionForTagsPath, versionForTags);
+        }
+      }
+      if (versionForTags[checkFor]) {
+        return versionForTags[checkFor];
+      }
+    }
+    try {
+      if (!versionForTags[checkFor]) {
+        // Helpers.info(`\nnot in cache from npm ${pkgNameToCheckVer}`)
         const lastVer = _.last(JSON.parse(Helpers.run(`npm view ${checkFor}  version --json`, { output: false, }).sync().toString()));
         versionForTags[checkFor] = `~${lastVer}`;
+        Helpers.writeJson(versionForTagsPath, versionForTags);
       }
       return versionForTags[checkFor];
     } catch (error) {
@@ -768,18 +793,15 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     if (_.isNumber(maxVersionForAngular) && (maxVersionForAngular !== Number.POSITIVE_INFINITY)) {
       Helpers.log(`\nRebuilding old global container...`);
       allTrusted.forEach(trustedDepKey => {
-        process.stdout.write('.');
+
         const depValueVersion = project.packageJson.data.dependencies[trustedDepKey];
         const devDepValueVersion = project.packageJson.data.devDependencies[trustedDepKey];
         // console.log({
         //   depValueVersion,
         //   devDepValueVersion,
         // })
-        let projFromDep = Project.From([Project.Tnp.location, '..', trustedDepKey]) as Project;
 
-        const lastKnownVersion = ((config.frameworkName === 'tnp') && !!projFromDep)
-          ? `~${projFromDep.git.lastTagNameForMajorVersion(maxVersionForAngular)?.replace('v', '')}`
-          : lastVerFun(trustedDepKey)
+        const lastKnownVersion = lastVerFun(trustedDepKey);
 
         if (depValueVersion) {
           const major = Number(_.first(depValueVersion.replace('~', '').replace('^', '').split('.')))
