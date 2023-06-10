@@ -53,7 +53,7 @@ async function MORPHISYNC(args, noExit = false) {
   try {
     Helpers.run(`git reset --hard && git clean -df && git fetch`, { cwd, output: false }).sync();
   } catch (error) {
-    Helpers.error(`[${config.frameworkName} Not ablt to pull origin of morphi: ${config.urlMorphi} in: ${cwd}`, false, true);
+    Helpers.error(`[${config.frameworkName} Not ablt to reset origin of morphi: ${config.urlMorphi} in: ${cwd}`, false, true);
   }
 
   try {
@@ -65,7 +65,7 @@ async function MORPHISYNC(args, noExit = false) {
   }
 
   try {
-    Helpers.run(`git pull origin master`, { cwd, output: false }).sync();
+    Helpers.run(`git pull --tags origin master`, { cwd, output: false }).sync();
     Helpers.log('DONE PULLING MASTER')
   } catch (error) {
     Helpers.log(error)

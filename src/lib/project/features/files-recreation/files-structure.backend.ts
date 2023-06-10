@@ -18,6 +18,7 @@ export type InitOptions = {
   watchOnly?: boolean;
   alreadyInitedPorjects?: Project[];
   initiator?: Project;
+  struct?: boolean;
   // initiator: Project;
 }
 
@@ -99,6 +100,9 @@ export class FilesStructure extends FeatureForProject {
 
     if (struct) {
       skipNodeModules = true;
+      if (_.isUndefined(options.struct)) {
+        options.struct = true;
+      }
     }
 
     if (options.initiator.location === this.project.location && this.project.isWorkspace && options.watch) {
@@ -123,6 +127,16 @@ export class FilesStructure extends FeatureForProject {
     }
 
     this.project.quickFixes.missingSourceFolders();
+
+    if (this.project.isSmartContainer) {
+      const children = this.project.children;
+      for (let index = 0; index < children.length; index++) {
+        const child = children[index];
+        if (child._frameworkVersion !== this.project._frameworkVersion) {
+          await child.setFramworkVersion(this.project._frameworkVersion);
+        }
+      }
+    }
 
     if (this.project.isStandaloneProject || this.project.isSmartContainerChild) {
       await this.project.branding.apply(!!branding);
@@ -174,8 +188,9 @@ export class FilesStructure extends FeatureForProject {
         for (let index = 0; index < containerChildren.length; index++) {
           const containerChild = containerChildren[index];
           await containerChild.filesStructure.init(args, options);
-          for (let indexChild = 0; indexChild < containerChild.children.length; indexChild++) {
-            const workspaceChild = containerChild.children[indexChild];
+          const containerChildChildren = containerChild.children;
+          for (let indexChild = 0; indexChild < containerChildChildren.length; indexChild++) {
+            const workspaceChild = containerChildChildren[indexChild];
             await workspaceChild.filesStructure.init(args, options)
           }
         }
@@ -185,37 +200,7 @@ export class FilesStructure extends FeatureForProject {
     //#endregion
 
 
-    //#region recretate forsite
-
-    // if (this.project.isWorkspace && this.project.isSiteInStrictMode) {
-    //   const recreated = this.recreateSiteChildren();
-    //   for (let index = 0; index < recreated.length; index++) {
-    //     const newChild = recreated[index];
-    //     await newChild.filesStructure.init(args, options);
-    //   }
-    // }
-    if (this.project.isWorkspace && recrusive) {
-      const workspaceChildren = this.project.children;
-      for (let index = 0; index < workspaceChildren.length; index++) {
-        const workspaceChild = workspaceChildren[index];
-        await workspaceChild.filesStructure.init(args, options);
-      }
-    }
-
-    //#endregion
-
-    // if (this.project.isSiteInStrictMode) {
-    //   await this.project.baseline.filesStructure.init(args, options);
-    // }
-
-    if (this.project.isWorkspaceChildProject) {
-      await this.project.parent.filesStructure.init(args, options);
-    }
-
     //#region report progress initing project
-    if (this.project.isWorkspaceChildProject) {
-      Helpers.info(`Initing project(workspace child): ${chalk.bold(this.project.genericName)} `);
-    }
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({ msg: `Initing project: "${this.project.genericName}" started` });
     }
@@ -239,8 +224,8 @@ export class FilesStructure extends FeatureForProject {
       this.project.filesTemplatesBuilder.rebuild();
     }
 
-    if (!this.project.node_modules.exist) {
-      await this.project.npmPackages.installProcess(`initialize procedure of ${this.project.name} `);
+    if (!this.project.node_modules.exist && !skipNodeModules) {
+      await this.project.npmPackages.installProcess(`inti procedure of ${this.project.name} `);
     }
     this.project.packageJson.showDeps(`Show new deps for ${this.project._frameworkVersion} `);
     //#region handle node modules instalation
