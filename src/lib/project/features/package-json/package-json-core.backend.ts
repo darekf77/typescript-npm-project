@@ -397,10 +397,10 @@ export class PackageJsonCore {
 
 
 
-    if (tnpSaved) {
-      delete data.tnp; // TODO testing // COMMNENT
-      // delete data['overrided']; // TODO testing // COMMNENT
-    }
+    // if (tnpSaved) {
+    //   delete data.tnp; // TODO testing // COMMNENT
+    //   // delete data['overrided']; // TODO testing // COMMNENT
+    // }
 
     Helpers.log(`Split done..`, 2);
     if (removeFromPj) {

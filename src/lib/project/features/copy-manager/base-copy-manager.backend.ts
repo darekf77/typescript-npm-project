@@ -244,10 +244,8 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       if (this.project.isSmartContainer) {
         childs.forEach(c => {
           let generatedVer = Project.From(crossPlatformPath(path.join(destinationLocation, c.name))) as Project;
-          generatedVer.packageJson.data.tnp = {
-            type: 'isomorphic-lib',
-            version: "v3",
-          } as any;
+          generatedVer.packageJson.data.tnp.type = 'isomorphic-lib';
+          generatedVer.packageJson.data.tnp.version = this.project._frameworkVersion;
           generatedVer.packageJson.save('saving proper child version');
           Project.unload(generatedVer);
           generatedVer = Project.From(crossPlatformPath(path.join(destinationLocation, c.name)));

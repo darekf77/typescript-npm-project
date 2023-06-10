@@ -16,7 +16,7 @@ function clenIgnored(project: Project, deps: Object, overrided = {}) {
     const patterns = project.packageJson.data.tnp.overrided.ignoreDepsPattern;
     patterns.forEach(p => {
       Object.keys(deps).forEach(depName => {
-        Helpers.log(`check patter: ${p} agains ${depName}`, 2);
+        Helpers.log(`checking patter: ${p} agains ${depName}`, 2);
         const patternRegex = (new RegExp(Helpers.escapeStringForRegEx(p)));
         if (patternRegex.test(depName) && !overrided[depName]) {
           delete deps[depName];
