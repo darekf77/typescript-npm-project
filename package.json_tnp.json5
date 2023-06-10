@@ -143,6 +143,7 @@
       trustedMaxMajor: {
         v2: 13,
         v3: 13,
+        v4: 16,
       },
       additionalTrusted: [
         "ng-talkback",

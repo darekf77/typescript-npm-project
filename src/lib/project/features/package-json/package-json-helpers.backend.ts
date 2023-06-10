@@ -775,10 +775,9 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
         //   depValueVersion,
         //   devDepValueVersion,
         // })
-        const projFromDep = Project.From([Project.Tnp.location, '..', trustedDepKey]) as Project;
+        let projFromDep = Project.From([Project.Tnp.location, '..', trustedDepKey]) as Project;
 
-
-        const lastKnownVersion = (config.frameworkName === 'tnp')
+        const lastKnownVersion = ((config.frameworkName === 'tnp') && !!projFromDep)
           ? `~${projFromDep.git.lastTagNameForMajorVersion(max)?.replace('v', '')}`
           : lastVerFun(trustedDepKey)
 

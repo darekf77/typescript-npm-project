@@ -133,7 +133,8 @@
         ],
         "trustedMaxMajor": {
           "v2": 13,
-          "v3": 13
+          "v3": 13,
+          "v4": 16
         },
         "additionalTrusted": [
           "ng-talkback",
@@ -550,7 +551,7 @@
     "private": false
   },
   "name": "tnp",
-  "version": "16.0.8",
+  "version": "16.0.9",
   "bin": {
     "tnp": "bin/tnp",
     "tnp-debug": "bin/tnp-debug",
