@@ -30,10 +30,10 @@ export class NodeModulesCore extends FeatureForProject {
     const tnpProj = Project.Tnp as Project;
     const arrTrusted = tnpProj.packageJson.data.tnp.core.dependencies.trusted[this.project._frameworkVersion];
     const packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
-     Helpers.arrays.uniqArray([
-      ...(tnpProj).packageJson.data.tnp.core.dependencies.dedupe,
-      ...arrTrusted,
-     ])
+      Helpers.arrays.uniqArray([
+        ...(tnpProj).packageJson.data.tnp.core.dependencies.dedupe,
+        ...arrTrusted,
+      ])
 
 
     // if (this.project.frameworkVersionAtLeast('v3')) { // TODO QUICK_FIX REMOVE_THIS
@@ -99,11 +99,11 @@ export class NodeModulesCore extends FeatureForProject {
     if (!path.isAbsolute(target)) {
       Helpers.error(`[linkTo] taget path is not absolute "${target}"`)
     }
-    if (!this.project.node_modules.exist && !this.project.isWorkspace) { // TODO QUICK_FIX make it async install
+    if (!this.project.node_modules.exist) { // TODO QUICK_FIX make it async install
       this.project.run(`${config.frameworkName} install`).sync();
     }
     Helpers.remove(path.join(target, config.folder.node_modules));
-    Helpers.createSymLink(this.path, target)
+    Helpers.createSymLink(this.path, target, { continueWhenExistedFolderDoesntExists: true })
   };
 
   /**
