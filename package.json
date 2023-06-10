@@ -133,8 +133,7 @@
         ],
         "trustedMaxMajor": {
           "v2": 13,
-          "v3": 13,
-          "v4": 16
+          "v3": 13
         },
         "additionalTrusted": [
           "ng-talkback",
@@ -245,7 +244,7 @@
           "vscode"
         ],
         "common": {
-          "tnp-config": "16.0.6",
+          "tnp-config": "16.0.8",
           "tnp-models": "16.0.32",
           "tnp-helpers": "16.0.5",
           "tnp-db": "16.0.26",
@@ -551,7 +550,7 @@
     "private": false
   },
   "name": "tnp",
-  "version": "16.0.9",
+  "version": "16.0.10",
   "bin": {
     "tnp": "bin/tnp",
     "tnp-debug": "bin/tnp-debug",
@@ -784,7 +783,7 @@
     "task.js": "0.1.5",
     "threads": "1.7.0",
     "tnp-cli": "~16.0.5",
-    "tnp-config": "~16.0.6",
+    "tnp-config": "~16.0.8",
     "tnp-core": "~16.0.9",
     "tnp-db": "~16.0.26",
     "tnp-helpers": "~16.0.5",

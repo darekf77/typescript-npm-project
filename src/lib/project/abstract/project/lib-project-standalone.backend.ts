@@ -202,7 +202,7 @@ export class LibProjectStandalone extends LibPorjectBase {
 
     const updateLocalTnpProjectWithOwnNodeModules = (config.frameworkName === 'tnp')
       && (realCurrentProj.name !== 'tnp')
-      && (realCurrentProj._frameworkVersion !== tnpProj._frameworkVersion);
+      && (realCurrentProj._frameworkVersion === tnpProj._frameworkVersion);
 
 
     const coreCont = Project.by('container', realCurrentProj._frameworkVersion) as Project;

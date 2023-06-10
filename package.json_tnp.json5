@@ -143,7 +143,6 @@
       trustedMaxMajor: {
         v2: 13,
         v3: 13,
-        v4: 16,
       },
       additionalTrusted: [
         "ng-talkback",
@@ -255,7 +254,7 @@
       ],
       common: {
         // all isomorphic application config
-        "tnp-config": '16.0.6',
+        "tnp-config": '16.0.8',
         "tnp-models": '16.0.32',
         "tnp-helpers": '16.0.5',
         "tnp-db": '16.0.26',

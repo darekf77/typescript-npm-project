@@ -661,11 +661,11 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     }
   }
 
-  const max = project.trustedMaxMajorVersion;
+  const maxVersionForAngular = project.trustedMaxMajorVersion;
   const lastVerFun = (pkgNameToCheckVer) => {
-    Helpers.logInfo(`Getting last version of ${pkgNameToCheckVer}`)
+    Helpers.log(`\nGetting last version of ${pkgNameToCheckVer}`)
     try {
-      const checkFor = `${pkgNameToCheckVer}@${max}`;
+      const checkFor = `${pkgNameToCheckVer}@${maxVersionForAngular}`;
       if (!versionForTags[checkFor]) {
         const lastVer = _.last(JSON.parse(Helpers.run(`npm view ${checkFor}  version --json`, { output: false, }).sync().toString()));
         versionForTags[checkFor] = `~${lastVer}`;
@@ -765,8 +765,8 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   // TODO SUPER QUICK_FIX
   if (project.isContainerCoreProject && project.frameworkVersionAtLeast('v3') && project.frameworkVersionLessThan(config.defaultFrameworkVersion)) {
 
-    if (max) {
-      Helpers.log(`Rebuilding old global container...`);
+    if (_.isNumber(maxVersionForAngular) && (maxVersionForAngular !== Number.POSITIVE_INFINITY)) {
+      Helpers.log(`\nRebuilding old global container...`);
       allTrusted.forEach(trustedDepKey => {
         process.stdout.write('.');
         const depValueVersion = project.packageJson.data.dependencies[trustedDepKey];
@@ -778,19 +778,19 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
         let projFromDep = Project.From([Project.Tnp.location, '..', trustedDepKey]) as Project;
 
         const lastKnownVersion = ((config.frameworkName === 'tnp') && !!projFromDep)
-          ? `~${projFromDep.git.lastTagNameForMajorVersion(max)?.replace('v', '')}`
+          ? `~${projFromDep.git.lastTagNameForMajorVersion(maxVersionForAngular)?.replace('v', '')}`
           : lastVerFun(trustedDepKey)
 
         if (depValueVersion) {
           const major = Number(_.first(depValueVersion.replace('~', '').replace('^', '').split('.')))
-          if (major > max) {
+          if (major > maxVersionForAngular) {
             const overrideOldVersion = lastKnownVersion
             project.packageJson.data.dependencies[trustedDepKey] = overrideOldVersion;
           }
         }
         if (devDepValueVersion) {
           const major = Number(_.first(devDepValueVersion.replace('~', '').replace('^', '')))
-          if (major > max) {
+          if (major > maxVersionForAngular) {
             const overrideOldversion = lastKnownVersion;
             project.packageJson.data.devDependencies[trustedDepKey] = overrideOldversion
           }
