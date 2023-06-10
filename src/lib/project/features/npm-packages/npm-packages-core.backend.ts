@@ -80,8 +80,10 @@ export class NpmPackagesCore extends FeatureForProject {
       try {
         executeCommand(command, this.project);
       } catch (err) {
-        Helpers.error(err, true, true);
-        Helpers.error(`Error during npm instalation`, false, true);
+        if(config.frameworkName === 'tnp') {
+          console.log(err)
+        }
+        Helpers.error(`[${config.frameworkName}] Error during npm install... try manual installation`, false, true);
       }
     }
 
