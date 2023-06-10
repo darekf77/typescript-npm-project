@@ -38,8 +38,8 @@ const $RELEASE = async (args: string) => {
     .split(' ')
     .find(k => k.startsWith('v') && Number(k.replace('v', '')) >= 3) || '';
 
-  Helpers.log(`argsObj.automaticRelease: ${argsObj.automaticRelease} `
-    + `${specifiedVersion ? (' - only framework version = ' + specifiedVersion) : ''}`);
+
+
 
   const automaticRelease = !!argsObj.automaticRelease;
   if (automaticRelease) {
@@ -176,7 +176,7 @@ ${proj.children.map((c) => ` - @${proj.name}/${c.name} v${newVersion}`).join('\n
 
     const depsOnlyToPush = [];
 
-    const allTrusted = (Project.Current as Project).trustedAllPossible;
+    const allTrusted = (Project.Current as Project).trusted;
 
     //#region filter children
     for (let index = 0; index < deps.length; index++) {
