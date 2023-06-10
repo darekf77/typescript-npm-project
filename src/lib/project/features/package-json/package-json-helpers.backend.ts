@@ -772,11 +772,13 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
         //   depValueVersion,
         //   devDepValueVersion,
         // })
+        const projFromDep = (config.frameworkName === 'tnp')
+          ? Project.From([Project.Tnp.location, '..', trustedDepKey]) as Project
+          : Project.From([Project.by('container', project._frameworkVersion,).location, '../..']) as Project;
 
         if (depValueVersion) {
           const major = Number(_.first(depValueVersion.replace('~', '').replace('^', '').split('.')))
           if (major > max) {
-            const projFromDep = Project.From([Project.Tnp.location, '..', trustedDepKey]) as Project;
             const overrideOldVersion = `~${projFromDep.git.lastTagNameForMajorVersion(max)?.replace('v', '')}`
             project.packageJson.data.dependencies[trustedDepKey] = overrideOldVersion;
           }
@@ -784,7 +786,6 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
         if (devDepValueVersion) {
           const major = Number(_.first(devDepValueVersion.replace('~', '').replace('^', '')))
           if (major > max) {
-            const projFromDep = Project.From([Project.Tnp.location, '..', trustedDepKey]) as Project;
             const overrideOldversion = `~${projFromDep.git.lastTagNameForMajorVersion(max)?.replace('v', '')}`;
             project.packageJson.data.devDependencies[trustedDepKey] = overrideOldversion
           }
