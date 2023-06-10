@@ -200,36 +200,28 @@ export class LibProjectStandalone extends LibPorjectBase {
     //#region @notForNpm
     const tnpProj = Project.Tnp as Project;
 
-    if (tnpProj && config.frameworkName === 'tnp') {
-      // tnpProj.packageJson.save('showing for trusted')
-
-      // let firedeProj: Project;
-      // if (this.project.packageJson.name === config.frameworkNames.tnp) {  // TODO QUICK_FIX
-      //   firedeProj = Project.From(path.join(path.dirname(realCurrentProj.location), config.frameworkNames.firedev))
-      // }
-      const coreCont = Project.by('container', realCurrentProj._frameworkVersion) as Project;
-
-      const arrTrusted = tnpProj.packageJson.data.tnp.core.dependencies.trusted[this.project._frameworkVersion];
-      if (
-        (_.isString(arrTrusted) && (arrTrusted === '*')) ||
-        (_.isArray(arrTrusted) && arrTrusted.includes(this.project.name))
-      ) {
-        [
-          // firedeProj,
-          ...(
-            ((realCurrentProj.name === 'tnp') || realCurrentProj._frameworkVersion !== tnpProj._frameworkVersion)
-              ? []
-              : [tnpProj]
-          ),
-          coreCont,
-        ].filter(f => !!f)
-          .forEach(c => {
-            c.smartNodeModules.updateFromReleaseBundle(realCurrentProj);
-          });
-      }
+    const updateLocalTnpProjectWithOwnNodeModules = (config.frameworkName === 'tnp')
+      && (realCurrentProj.name !== 'tnp')
+      && (realCurrentProj._frameworkVersion !== tnpProj._frameworkVersion);
 
 
+    const coreCont = Project.by('container', realCurrentProj._frameworkVersion) as Project;
+
+    const arrTrusted = tnpProj.packageJson.data.tnp.core.dependencies.trusted[this.project._frameworkVersion];
+    if (
+      (_.isString(arrTrusted) && (arrTrusted === '*')) ||
+      (_.isArray(arrTrusted) && arrTrusted.includes(this.project.name))
+    ) {
+      [
+        ...(updateLocalTnpProjectWithOwnNodeModules ? [tnpProj] : []),
+        coreCont,
+      ].filter(f => !!f)
+        .forEach(c => {
+          c.smartNodeModules.updateFromReleaseBundle(realCurrentProj);
+        });
     }
+
+
     //#endregion
   }
 

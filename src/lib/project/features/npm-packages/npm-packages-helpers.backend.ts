@@ -43,10 +43,8 @@ export function resolvePacakgesFromArgs(args: string[]): Models.npm.Package[] {
 }
 
 
-export function executeCommand(command: string, project: Project, resetPackageJsonFromGit = false) {
-  // if (resetPackageJsonFromGit) { // TODO @LAST super quick fix
-  //   command = `git checkout ${config.file.package_json} && ${command}`;
-  // }
+export function executeCommand(command: string, project: Project) {
+
   Helpers.info(`
 
    ${command} in folder:
@@ -55,7 +53,7 @@ export function executeCommand(command: string, project: Project, resetPackageJs
    `);
 
   if (config.frameworkName === 'firedev' && project.isContainerCoreProject) {
-    Helpers.info('This may take a long time... more than 1GB to download from npm...')
+    Helpers.info('This may take a long time... more than 1GB to download from npm AAAA...')
   }
 
   project.run(command, { output: (config.frameworkName === 'tnp'), biggerBuffer: true }).sync();

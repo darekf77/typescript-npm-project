@@ -241,33 +241,18 @@ ${withContent.map(c => {
     }
 
 
-
-    if ( // TODO QUICK_FIX @LAST remove this somehow
-      (config.frameworkName === 'tnp')
-      && (this.project.name === 'morphi')
-    ) {
-      [config.defaultFrameworkVersion]
-        .map(v => {
-          return { v, c: Project.by('container', v as any) };
-        })
-        .filter(({ c }) => !!c)
-        .forEach(({ v, c }) => {
-          (c as Project).packageJson.save('Updating morphi container');
-          // const morphiProjectContainerPath = path.join(this.project.location, 'projects', `container${(v === 'v1') ? '' : `-${v}`}`);
-          // [
-          //   config.file.package_json,
-          // ].forEach(pj => {
-          //   // const pathPjOrg = path.join(c.location, pj);
-          //   const pproj = Project.From(c.location) as Project;
-          //   if (pproj) {
-          //     let currentContent = pproj.packageJson.data;
-          //     // if (pj === config.file.package_json__tnp_json) {
-          //     //   currentContent = pproj.packageJson.data.tnp as any;
-          //     // }
-          //     const destPathPj = path.join(morphiProjectContainerPath, pj);
-          //     Helpers.writeJson(destPathPj, currentContent);
-          //   }
-          // });
+    // TODO QUIKC_FIX update container when pushing
+    if (this.project.name === 'morphi' || this.project.name === 'firedev-framework') {
+      config.activeFramewrokVersions
+        .forEach((frameworkVersion) => {
+          const morphiProjectContainerPath = path.join(this.project.location, 'projects', `container${(frameworkVersion === 'v1') ? '' : `-${frameworkVersion}`}`);
+          const containerCoreForVersion = Project.From(morphiProjectContainerPath) as Project;
+          if (containerCoreForVersion) {
+            Helpers.info(`[${config.frameworkName}] updating on push global containers iin ${this.project.name}`)
+            containerCoreForVersion.packageJson.save('Updating morphi container');
+          } else {
+            Helpers.warn(`[firedev][hotfix] Not able to find container for framework version ${frameworkVersion}`);
+          }
         });
     }
 

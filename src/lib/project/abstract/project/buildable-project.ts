@@ -33,36 +33,64 @@ export abstract class BuildableProject {
     }
   }
 
-  get trustedAllPossible() {
-    const projTnp = Project.Tnp as Project;
-    PackagesRecognition.fromProject(projTnp, true).start();
-    return projTnp.availableIsomorphicPackagesInNodeModules;
-  }
-
   // @ts-ignore
   get trusted(this: Project): string[] {
     const projTnp = Project.Tnp as Project;
-    PackagesRecognition.fromProject(projTnp, true).start();
-    projTnp.availableIsomorphicPackagesInNodeModules;
-    const currentProjVersion = this._frameworkVersion;
-    const value = projTnp.packageJson.trusted[currentProjVersion];
-    if (value === '*') {
-      return projTnp.availableIsomorphicPackagesInNodeModules;
+
+    let trusted = [];
+    if (config.frameworkName === 'tnp') {
+      const value = Helpers.readValueFromJson(crossPlatformPath([
+        projTnp.location,
+        config.file.package_json__tnp_json5, // TODO replace with firedev.json5 in future
+      ]), `core.dependencies.trusted.${this._frameworkVersion}`);
+      if (value === '*') {
+        return [];
+      }
+      trusted = value;
     }
-    if (Array.isArray(value)) {
-      return value;
+
+    if (config.frameworkName === 'firedev') {
+      const value = Helpers.readValueFromJson(crossPlatformPath([
+        projTnp.location,
+        config.file.tnpEnvironment_json,
+      ]), `packageJSON.tnp.core.dependencies.trusted.${this._frameworkVersion}`);
+      if (value === '*') {
+        return [];
+      }
+      trusted = value;
     }
-    return [];
+
+    if (!Array.isArray(trusted)) {
+      return [];
+    }
+    return [
+      ...trusted
+    ];
   }
-  //#endregion
 
   // @ts-ignore
   get trustedMaxMajorVersion(this: Project): number | undefined {
     const projTnp = Project.Tnp as Project;
-    const currentProjVersion = this._frameworkVersion;
-    const maxMajor = projTnp.packageJson['trustedMaxMajor'] || {};
-    const value = maxMajor[currentProjVersion];
-    return value;
+
+    let trustedValue: number;
+    if (config.frameworkName === 'tnp') {
+      const value = Helpers.readValueFromJson(crossPlatformPath([
+        projTnp.location,
+        config.file.package_json__tnp_json5, // TODO replace with firedev.json5 in future
+      ]), `core.dependencies.trustedMaxMajor.${this._frameworkVersion}`);
+      trustedValue = value;
+    }
+
+    if (config.frameworkName === 'firedev') {
+      const file = crossPlatformPath([
+        projTnp.location,
+        config.file.tnpEnvironment_json,
+      ]);
+      const value = Helpers.readValueFromJson(file, `packageJSON.tnp.core.dependencies.trustedMaxMajor.${this._frameworkVersion}`);
+      trustedValue = value;
+    }
+    trustedValue = Number(trustedValue);
+    return (_.isNumber(trustedValue) && !isNaN(trustedValue)) ? trustedValue : Number.POSITIVE_INFINITY;
   }
   //#endregion
 
@@ -122,49 +150,40 @@ export abstract class BuildableProject {
 
   //#region @backend
   private async selectAllProjectCopyto(this: Project) {
-    if (this.parent?.isContainer) {
+    const containerCoreProj = Project.by('container', this._frameworkVersion) as Project;
+    const tempCoreContainerPathForSmartNodeModules = crossPlatformPath(path.dirname(containerCoreProj.smartNodeModules.path));
 
-      const containerCoreProj = Project.by('container', this._frameworkVersion) as Project;
+    const independentProjects = [];
 
-      // const projsChain = this.parent.projectsInOrderForChainBuild([]);
-      const projsChain = this.parent.children;
+    Helpers.log(`[${config.frameworkName}][copytoall] UPDATING ALSO container core ${this._frameworkVersion}...`)
 
-
-      const independentProjects = projsChain
-        .filter(parentChild => {
-          return (parentChild.name !== this.parent.name)
-            && (parentChild.typeIs('isomorphic-lib') && (parentChild.name === 'tnp'))
-        });
-
-      Helpers.log(`UPDATING ALSO container core ${this._frameworkVersion}...`)
-
-      const tmpSmartNodeModulesProj = Project.From(path.dirname(containerCoreProj.smartNodeModules.path)) as Project;
-      if (tmpSmartNodeModulesProj) {
-        independentProjects.push(tmpSmartNodeModulesProj);
-      }
-
-      const packageName = this.isSmartContainer ? ('@' + this.name) : this.name;
-      Helpers.createSymLink(
-        crossPlatformPath([containerCoreProj.smartNodeModules.path, packageName]),
-        crossPlatformPath([containerCoreProj.node_modules.path, packageName]),
-        { continueWhenExistedFolderDoesntExists: true }
-      );
-
-      if (config.frameworkName === 'tnp' && this.name !== 'tnp') {
-        independentProjects.push(Project.Tnp as Project)
-      }
-      // @ts-ignore
-      this.buildOptions.copyto = [
-        ...independentProjects,
-        ...this.buildOptions.copyto
-      ]
+    const tmpSmartNodeModulesProj = Project.From(tempCoreContainerPathForSmartNodeModules) as Project;
+    if (tmpSmartNodeModulesProj) {
+      Helpers.log(`${config.frameworkName}][copytoall] UPDATING smart node_modules for container core ${this._frameworkVersion}...`)
+      independentProjects.push(tmpSmartNodeModulesProj);
     } else {
-
-      // @ts-ignore
-      this.buildOptions.copyto = [
-        ...this.buildOptions.copyto
-      ]
+      Helpers.logWarn(`${config.frameworkName}][copytoall] Not able to find smart node_modules`
+        + ` by path:\n${tempCoreContainerPathForSmartNodeModules}`)
     }
+
+    const packageName = this.isSmartContainer ? ('@' + this.name) : this.name;
+    Helpers.createSymLink(
+      crossPlatformPath([containerCoreProj.smartNodeModules.path, packageName]),
+      crossPlatformPath([containerCoreProj.node_modules.path, packageName]),
+      { continueWhenExistedFolderDoesntExists: true }
+    );
+
+    if (config.frameworkName === 'tnp' && this.name !== 'tnp') {
+      // tnp in tnp is not being used at all
+      independentProjects.push(Project.Tnp as Project)
+    }
+
+    // @ts-ignore
+    this.buildOptions.copyto = [
+      ...independentProjects,
+      ...this.buildOptions.copyto
+    ]
+
   }
   //#endregion
 

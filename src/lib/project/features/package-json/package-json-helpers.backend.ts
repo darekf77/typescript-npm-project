@@ -450,6 +450,8 @@ function travelObject(obj: Object, out: Object, parent: Object, updateFn?: (obj:
 function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveOptions) {
   const { newDeps, toOverride, action, reasonToHidePackages, reasonToShowPackages } = options;
 
+  const allTrusted = project.trusted;
+
   let recrateInPackageJson = (action === 'save' || action === 'show');
   if (project.isTnp) {
     recrateInPackageJson = true;
@@ -572,10 +574,10 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       project.packageJson.data.dependencies = dependencies;
     }
     //#region  install latest version of package
-    const isomorphicPackages = (Project.Tnp as Project).availableIsomorphicPackagesInNodeModules;
+
     // TODO firedev should be handled here
     Object.keys(project.packageJson.data.devDependencies)
-      .filter(key => isomorphicPackages.includes(key))
+      .filter(key => allTrusted.includes(key))
       .forEach(packageIsomorphicName => {
         const v = project.packageJson.data.devDependencies[packageIsomorphicName];
         if (!v?.startsWith('~') && !v?.startsWith('^')) {
@@ -584,7 +586,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       });
 
     Object.keys(project.packageJson.data.dependencies)
-      .filter(key => isomorphicPackages.includes(key))
+      .filter(key => allTrusted.includes(key))
       .forEach(packageIsomorphicName => {
         const v = project.packageJson.data.dependencies[packageIsomorphicName];
         if (!v?.startsWith('~') && !v?.startsWith('^')) {
@@ -744,22 +746,6 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     });
 
 
-  const all = project.trustedAllPossible;
-  const trusted = project.trusted;
-
-  all.forEach(trustedDep => {
-
-    const dep = project.packageJson.data.dependencies[trustedDep];
-    const devDep = project.packageJson.data.devDependencies[trustedDep];
-    if (dep && !trusted.includes(trustedDep)) {
-      delete project.packageJson.data.dependencies[trustedDep];
-    }
-    if (devDep && !trusted.includes(trustedDep)) {
-      delete project.packageJson.data.devDependencies[trustedDep];
-    }
-
-  });
-
   if (project.isContainerCoreProject && project.frameworkVersionEquals('v1')) {
     project.packageJson.data.dependencies = {};
     project.packageJson.data.dependencies['webpack'] = '3.10.0'
@@ -767,11 +753,18 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     project.packageJson.data.devDependencies = {}
   }
 
+  const max = project.trustedMaxMajorVersion;
+  // console.log({
+  //   max,
+  //   all: allTrusted,
+  //   isCoreContainer: project.isContainerCoreProject
+  // })
+
   // TODO SUPER QUICK_FIX
-  if (project.isContainerCoreProject && project.frameworkVersionAtLeast('v3') && config.frameworkName === 'tnp') {
-    const max = project.trustedMaxMajorVersion;
+  if (project.isContainerCoreProject && project.frameworkVersionAtLeast('v3')) {
+
     if (max) {
-      all.forEach(trustedDepKey => {
+      allTrusted.forEach(trustedDepKey => {
 
         const depValueVersion = project.packageJson.data.dependencies[trustedDepKey];
         const devDepValueVersion = project.packageJson.data.devDependencies[trustedDepKey];
@@ -788,7 +781,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
             project.packageJson.data.dependencies[trustedDepKey] = overrideOldVersion;
           }
         }
-        if (devDepValueVersion && !trusted.includes(trustedDepKey)) {
+        if (devDepValueVersion) {
           const major = Number(_.first(devDepValueVersion.replace('~', '').replace('^', '')))
           if (major > max) {
             const projFromDep = Project.From([Project.Tnp.location, '..', trustedDepKey]) as Project;

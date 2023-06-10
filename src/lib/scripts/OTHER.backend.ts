@@ -152,17 +152,15 @@ async function $VERSIONS() {
 }
 
 
-async function $VERSIONS_TRUSED() {
-  let children = (Project.Current.children as Project[]);
+async function $TRUSTED() {
+  const all = (Project.Current as Project).trusted;
+  console.log(all.join('\n'))
+  process.exit(0)
+}
 
-  const all = (Project.Current as Project).trustedAllPossible;
-  children = children.filter(c => all.includes(c.name));
-
-  for (let index = 0; index < children.length; index++) {
-    const child = children[index] as Project;
-    Helpers.info(`${index + 1}. ${child.name}@${child.packageJson.data.version}`);
-  }
-
+async function $TRUSTED_MAX() {
+  const all = (Project.Current as Project).trustedMaxMajorVersion;
+  console.log(all);
   process.exit(0)
 }
 
@@ -350,7 +348,8 @@ export default {
   $ASSETS: Helpers.CLIWRAP($ASSETS, '$ASSETS'),
   $VERSION: Helpers.CLIWRAP($VERSION, '$VERSION'),
   $VERSIONS: Helpers.CLIWRAP($VERSIONS, '$VERSIONS'),
-  $VERSIONS_TRUSTED: Helpers.CLIWRAP($VERSIONS_TRUSED, '$VERSIONS_TRUSTED'),
+  $TRUSTED: Helpers.CLIWRAP($TRUSTED, '$TRUSTED'),
+  $TRUSTED_MAX: Helpers.CLIWRAP($TRUSTED_MAX, '$TRUSTED_MAX'),
   PATH: Helpers.CLIWRAP(PATH, 'PATH'),
   COPY_RESOURCES: Helpers.CLIWRAP(COPY_RESOURCES, 'COPY_RESOURCES'),
   $CHECK_ENV: Helpers.CLIWRAP($CHECK_ENV, '$CHECK_ENV'),

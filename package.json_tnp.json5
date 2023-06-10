@@ -427,7 +427,6 @@
         "angular-client": {
           essentials: {
             "static-columns": '16.0.3',
-            "bs4-breakpoint": '13.0.33',
             "ngx-store": "2.1.0",
             "firedev-storage": '16.0.39',
             "node-localstorage": "2.1.6",

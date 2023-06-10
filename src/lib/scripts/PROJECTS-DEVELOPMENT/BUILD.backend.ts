@@ -60,6 +60,19 @@ const $BUILD_WATCH = async (args) => {
   }
 };
 
+const $BUILD_UP = async (args) => {
+  let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  if (proj.isSmartContainerChild) {
+    Helpers.error(`Smart container build only available from container level. `, false, true)
+  } else {
+    if ((proj.isStandaloneProject || proj.isSmartContainer) && proj.typeIsNot('vscode-ext')) {
+      // TODO skipCopyToSelection no loger ipmortant
+      args = `${args} --skipCopyToSelection --copytoAll`;
+    }
+    await proj.buildProcess.startForLibFromArgs(false, false, 'dist', args);
+  }
+};
+
 //#region BUILD / DEFAULT
 async function $DEFAULT_BUILD(args) {
   const project = (Project.Current as Project);
@@ -501,6 +514,7 @@ const $STOP = async (args) => {
 export default {
   //#region export default
   DEV: Helpers.CLIWRAP(DEV, 'DEV'),
+  $BUILD_UP: Helpers.CLIWRAP($BUILD_UP, '$BUILD_UP'),
   BUILD_NG: Helpers.CLIWRAP(BUILD_NG, 'BUILD_NG'),
   BUILD_NG_WATCH: Helpers.CLIWRAP(BUILD_NG_WATCH, 'BUILD_NG_WATCH'),
   $RECREATE: Helpers.CLIWRAP($RECREATE, '$RECREATE'),

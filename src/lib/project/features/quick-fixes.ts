@@ -123,12 +123,13 @@ export class QuickFixes extends FeatureForProject {
   public removeTnpFromItself() {
     //#region @backend
     const nodeMOdules = crossPlatformPath(path.join(this.project.location, config.folder.node_modules));
-    if(Helpers.exists(nodeMOdules)) {
+    if (Helpers.exists(nodeMOdules)) {
       const folderToDelete = crossPlatformPath([
         crossPlatformPath(fse.realpathSync(nodeMOdules)),
         'tnp',
       ]);
-      if (config.frameworkName === 'tnp' && this.project.name === 'tnp' && this.project.isInRelaseBundle) {
+      // TODO only tnp can release tnp (for @vercel/ncc builder)
+      if ((config.frameworkName === 'tnp') && (this.project.name === 'tnp') && this.project.isInRelaseBundle) {
         Helpers.remove(folderToDelete);
       }
     }
