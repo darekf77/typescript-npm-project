@@ -53,7 +53,7 @@ export function executeCommand(command: string, project: Project) {
    `);
 
   if (config.frameworkName === 'firedev' && project.isContainerCoreProject) {
-    Helpers.info('This may take a long time... more than 1GB to download from npm AAAA...')
+    Helpers.info('This may take a long time... more than 1GB to download from npm...')
   }
 
   project.run(command, { output: (config.frameworkName === 'tnp'), biggerBuffer: true }).sync();
