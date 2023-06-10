@@ -62,6 +62,8 @@ export class BackendCompilation extends IncCompiler.Base {
   //#endregion
 
   //#region methods
+
+  //#region methods / compile
   async compile(watch = false) {
 
     const ProjectClass = CLASS.getBy('Project') as typeof Project;
@@ -69,23 +71,18 @@ export class BackendCompilation extends IncCompiler.Base {
     const currentProject = ProjectClass.From<Project>(this.cwd);
     const generatedDeclarations = !currentProject.isWorkspaceChildProject;
 
-    const hideErrorsForBackend = currentProject.typeIs('angular-lib')
-      && this.absPathTmpSrcDistBundleFolder.endsWith(config.folder.components);
 
     await this.libCompilation
       ({
-        cwd: this.absPathTmpSrcDistBundleFolder,
-        websql: this.websql,
+        cwd: this.cwd,
         watch,
-        outDir: (`../${this.outFolder}` as any),
+        outDir: this.outFolder as any,
         generateDeclarations: generatedDeclarations,
-        hideErrors: hideErrorsForBackend,
-        locationOfMainProject: this.srcFolder,
-        buildType: this.outFolder as any
       });
   }
+  //#endregion
 
-
+  //#region methods / sync action
   async syncAction(filesPathes: string[]) {
     const outDistPath = crossPlatformPath(path.join(this.cwd, this.outFolder));
     // Helpers.System.Operations.tryRemoveDir(outDistPath)
@@ -94,17 +91,16 @@ export class BackendCompilation extends IncCompiler.Base {
     }
     await this.compile(this.isWatchBuild);
   }
+  //#endregion
 
+  //#region methods / lib compilation
   async libCompilation({
     cwd,
-    websql = false, // TODO ? hmmm this is not needed here
     watch = false,
     outDir,
     generateDeclarations = false,
     tsExe = 'npm-run tsc',
     diagnostics = false,
-    hideErrors = false,
-    isBrowserBuild,
   }: Models.dev.TscCompileOptions) {
     if (!this.isEnableCompilation) {
       Helpers.log(`Compilation disabled for ${_.startCase(BackendCompilation.name)}`)
@@ -113,15 +109,7 @@ export class BackendCompilation extends IncCompiler.Base {
     // let id = BackendCompilation.counter++;
     const ProjectClass = CLASS.getBy('Project') as typeof Project;
     const project = ProjectClass.nearestTo(cwd) as Project;
-    const buildOutDir = _.last(outDir.split('/')) as Models.dev.BuildDir;
 
-    if (hideErrors) {
-      diagnostics = false;
-      generateDeclarations = false;
-    }
-    // console.log(`starting search for project in: ${cwd}`)
-
-    // console.log(`Project form ${cwd}: ${project?.location}`)
 
     const paramsNoWatch = [
       outDir ? ` --outDir ${outDir} ` : '',
@@ -137,11 +125,9 @@ export class BackendCompilation extends IncCompiler.Base {
       // hideErrors ? ' --skipLibCheck true --noEmit true ' : '',
     ];
 
-
-
     let cmd = (specificTsconfig?: string) => {
       let commandJs, commandMaps, commandJsOrganizationInitial, commandDts;
-      const nocutsrcFolder = `${project.location}/${buildOutDir}-nocutsrc`;
+      const nocutsrcFolder = `${project.location}/${outDir}-nocutsrc`;
       // commandJs = `${tsExe} -d false  --mapRoot ${nocutsrc} ${params.join(' ')} `
       //   + (specificTsconfig ? `--project ${specificTsconfig}` : '');
 
@@ -153,7 +139,7 @@ export class BackendCompilation extends IncCompiler.Base {
 
       // commandDts = `${tsExe} --emitDeclarationOnly  ${params.join(' ')}`;
       params[1] = ` --outDir ${nocutsrcFolder}`;
-      commandMaps = `${tsExe} ${params.join(' ')} `;
+      commandMaps = `${tsExe} ${params.join(' ').replace('--noEmitOnError true', '--noEmitOnError false')} `;
       return {
         commandJs, commandMaps, commandJsOrganizationInitial,
         // commandDts
@@ -162,107 +148,50 @@ export class BackendCompilation extends IncCompiler.Base {
 
     let tscCommands = {} as {
       commandJs: string; commandJsOrganizationInitial: string, commandMaps: string;
-      // commandDts: string;
     };
 
-    if (isBrowserBuild) {
-      tscCommands = cmd() // DEPRACATED
+    const tsconfigBackendPath = crossPlatformPath(
+      project.path(`tsconfig.backend.${outDir}.json`).absolute.normal
+    );
+    tscCommands = cmd(tsconfigBackendPath)
+
+    if (global['useWebpackBackendBuild']) {
+      // project.webpackBackendBuild.run({ // TODO
+      //   buildType: 'lib',
+      //   outDir: buildOutDir as any,
+      //   watch,
+      //   // uglify,
+      // })
     } else {
-      const tsconfigBackendPath = crossPlatformPath(
-        project.path(`tsconfig.backend.${buildOutDir}.json`).absolute.normal
-      );
-      tscCommands = cmd(tsconfigBackendPath)
+      await this.buildStandardLibVer({
+        watch, ...tscCommands, generateDeclarations, cwd, project, outDir,
+      });
     }
-
-    // console.log(tscCommands)
-
-    // console.log(`
-
-    // STARTING BUILD TYPE (${id}): ${isBrowserBuild ? 'browser' : 'backend'}
-
-    // `,{
-    //   cwd,
-    //   watch,
-    //   outDir,
-    //   project: project.location,
-    //   locationOfMainProject,
-    //   buildType,
-    //   generateDeclarations,
-    //   commandDts,
-    //   commandJsAndMaps
-    // })
-
-
-    // Helpers.log(`(${this.compilerName}) Execute first command :
-
-    // ${commandJsAndMaps}
-
-    // # inside: ${cwd}`)
-
-    if (isBrowserBuild) {
-      if (project.frameworkVersionAtLeast('v3')) {
-        // nothing here for for now
-      } else {
-        await this.buildStandardLibVer({
-          watch, ...tscCommands, generateDeclarations, cwd, project, buildOutDir, websql
-        });
-      }
-    } else {
-
-      if (global['useWebpackBackendBuild']) {
-        // project.webpackBackendBuild.run({
-        //   buildType: 'lib',
-        //   outDir: buildOutDir as any,
-        //   watch,
-        //   // uglify,
-        // })
-      } else {
-        await this.buildStandardLibVer({
-          watch, ...tscCommands, generateDeclarations, cwd, project, buildOutDir, websql
-        });
-      }
-    }
-
-    // console.log(`
-
-    // DONE BUILD TYPE (${id}): ${isBrowserBuild ? 'browser' : 'backend'}
-
-    // `)
-
   }
+
+  //#endregion
 
   protected async buildStandardLibVer(options: {
     watch: boolean;
     commandJs: string;
     commandMaps: string;
     commandJsOrganizationInitial: string,
-    websql: boolean;
-    // commandDts: string,
     generateDeclarations: boolean,
     cwd: string;
     project: Project;
-    buildOutDir: Models.dev.BuildDir | 'browser',
+    outDir: Models.dev.BuildDir;
   }) {
 
-
-    const { watch, generateDeclarations,
-      //  commandDts,
+    let {
       commandJs,
       commandMaps,
-      commandJsOrganizationInitial,
       cwd,
       project,
-      buildOutDir,
-      websql
+      outDir,
     } = options;
 
     const isStandalone = (!project.isSmartContainerTarget && !project.isWorkspace && !project.isSmartContainerChild);
     const parent = !isStandalone ? (project.parent || project.smartContainerTargetParentContainer) : void 0;
-
-    // if (path.basename(cwd) === config.folder.src) { // TODO QUICK_FIX
-    //   // @ts-ignore
-    //   cwd = path.dirname(cwd);
-    // }
 
     Helpers.info(`
 
@@ -276,10 +205,10 @@ Starting backend typescirpt build....
       }
       const beforeModule = crossPlatformPath(path.join(
         parent.location,
-        buildOutDir,
+        outDir,
         parent.name,
         project.name,
-        `tmp-source-${buildOutDir}/libs`
+        `tmp-source-${outDir}/libs`
       ));
 
       if (line.search(beforeModule)) {
@@ -297,25 +226,9 @@ Starting backend typescirpt build....
           }
         }
       }
-
-
-
       return line;
     }
 
-    // REMOVE NOT NEEDE fix ,ts should do the job
-    // if (!isStandalone && parent) {
-    //   try {
-    //     Helpers.run(commandJsOrganizationInitial, { cwd }).sync()
-    //   } catch (error) { }
-    //   console.log({
-    //     project,
-    //     parent
-    //   })
-    // }
-    // console.log({ isStandalone, buildOutDir })
-    //#region normal js build
-    // if (watch) {
     await Helpers.execute(commandJs, cwd,
       {
         exitOnError: true,
@@ -326,7 +239,7 @@ Starting backend typescirpt build....
         outputLineReplace: (line: string) => {
           if (isStandalone) {
             return additionalReplace(line.replace(
-              `../tmp-source-${buildOutDir}/`,
+              `../tmp-source-${outDir}/`,
               `./src/`
             ));
           } else {
@@ -338,15 +251,15 @@ Starting backend typescirpt build....
                 `./src/libs/${moduleName}/`,
                 `./${moduleName}/src/lib/`,
               ));
-            } else if (line.startsWith(`../tmp-source-${buildOutDir}/libs/`)) {
+            } else if (line.startsWith(`../tmp-source-${outDir}/libs/`)) {
               const [__, ___, ____, moduleName] = line.split('/');
               return additionalReplace(line.replace(
-                `../tmp-source-${buildOutDir}/libs/${moduleName}/`,
+                `../tmp-source-${outDir}/libs/${moduleName}/`,
                 `./${moduleName}/src/lib/`,
               ));
-            } else if (line.startsWith(`../tmp-source-${buildOutDir}/`)) {
+            } else if (line.startsWith(`../tmp-source-${outDir}/`)) {
               return additionalReplace(line.replace(
-                `../tmp-source-${buildOutDir}/`,
+                `../tmp-source-${outDir}/`,
                 `./${project.name}/src/`,
               ));
 
@@ -363,7 +276,7 @@ Starting backend typescirpt build....
         }
       });
 
-    Helpers.log(`* Typescirpt compilation first part done (${buildOutDir} build). ${websql ? '[WEBSQL]' : ''} `)
+    Helpers.log(`* Typescirpt compilation first part done (${outDir} build)`)
 
     await Helpers.execute(commandMaps, cwd,
       {
@@ -375,42 +288,7 @@ Starting backend typescirpt build....
           stdout: ['Watching for file changes.']
         }
       });
-    Helpers.log(`* Typescirpt compilation second part done (${buildOutDir}  build).  ${websql ? '[WEBSQL]' : ''} `)
-    // if (generateDeclarations) {
-    //   Helpers.log(`(${this.compilerName}) Execute second command : ${commandDts}    # inside: ${cwd}`)
-    //   await Helpers.logProc2(child_process.exec(commandDts, { cwd }), ['Watching for file changes.']);
-    // }
-    // } else {
-    //   try {
-    //     child_process.execSync(commandJs, {
-    //       cwd,
-    //       stdio: [0, 1, 2]
-    //     });
-    //   } catch (e) {
-    //     Helpers.error(`[${config.frameworkName}] Compilation error (1): ${e}`, false, true);
-    //   }
-
-    //   try {
-    //     child_process.execSync(commandMaps, {
-    //       cwd,
-    //       stdio: [0, 1, 2]
-    //     });
-    //   } catch (e) {
-    //     Helpers.error(`[${config.frameworkName}] Compilation error (1): ${e}`, false, true);
-    //   }
-
-    // if (generateDeclarations) {
-    //   Helpers.log(`(${this.compilerName}) Execute second command : ${commandDts}    # inside: ${cwd}`)
-    //   try {
-    //     child_process.execSync(commandDts, {
-    //       cwd,
-    //       stdio: [0, 1, 2]
-    //     })
-    //   } catch (e) {
-    //     Helpers.error(`[${config.frameworkName}] Compilation error (2): ${e}`, false, true);
-    //   }
-    // }
-    // }
+    Helpers.log(`* Typescirpt compilation second part done (${outDir}  build). `)
     //#endregion
   }
   //#endregion

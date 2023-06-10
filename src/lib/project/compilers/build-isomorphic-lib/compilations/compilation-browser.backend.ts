@@ -146,7 +146,6 @@ export class BroswerCompilation extends BackendCompilation {
 
     this.codecut.files(relativePathesToProcess);
     this.project.assetsManager.copyExternalAssets(this.buildOptions?.outDir, this.buildOptions?.websql);
-    await this.compile();
   }
   //#endregion
 
@@ -212,33 +211,6 @@ export class BroswerCompilation extends BackendCompilation {
         }
 
       }
-    }
-  }
-  //#endregion
-
-  //#region methods / compile
-  async compile(watch: boolean = false) {
-    try {
-      await this.libCompilation({
-        websql: this.websql,
-        cwd: this.absPathTmpSrcDistBundleFolder,
-        watch,
-        outDir: (`../${this.backendOutFolder}/${this.outFolder}` as any),
-        generateDeclarations: true,
-        locationOfMainProject: this.cwd,
-        isBrowserBuild: true,
-        buildType: this.backendOutFolder as any
-      });
-    } catch (e) {
-      console.log(e);
-      // console.log(require('callsite-record')({
-      //   forError: e
-      // }).renderSync({
-      //   // stackFilter(frame) {
-      //   //   return !frame.getFileName().includes('node_modules');
-      //   // }
-      // }))
-      Helpers.error(`Browser compilation fail`, false, true);
     }
   }
   //#endregion
