@@ -554,7 +554,7 @@
     "private": false
   },
   "name": "tnp",
-  "version": "16.0.6",
+  "version": "16.0.7",
   "bin": {
     "tnp": "bin/tnp",
     "tnp-debug": "bin/tnp-debug",
