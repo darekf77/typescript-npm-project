@@ -146,7 +146,7 @@ export class SourceModForWorkspaceChilds extends SourceModForStandaloneProjects 
       ].map(c => Helpers.escapeStringForRegEx(c)).join('|');
       const regexSource = `(\\"|\\')${Helpers.escapeStringForRegEx(baselineName)}\\/${libs}\\/${sourceFolders}`;
       const regex = new RegExp(regexSource, 'g');
-      let libsDetected = input.match(regex);
+      let libsDetected = input.match(regex); // @ts-ignore
       libsDetected = (libsDetected ? (libsDetected
         .map(part => {
           part = part.slice(1);
