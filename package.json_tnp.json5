@@ -141,6 +141,7 @@
         "@ngx-formly/material",
       ],
       trustedMaxMajor: {
+        v2: 13,
         v3: 13,
       },
       trusted: {

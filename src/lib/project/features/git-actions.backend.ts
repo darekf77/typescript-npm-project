@@ -245,10 +245,11 @@ ${withContent.map(c => {
     if (this.project.name === 'morphi' || this.project.name === 'firedev-framework') {
       config.activeFramewrokVersions
         .forEach((frameworkVersion) => {
+
           const morphiProjectContainerPath = path.join(this.project.location, 'projects', `container${(frameworkVersion === 'v1') ? '' : `-${frameworkVersion}`}`);
           const containerCoreForVersion = Project.From(morphiProjectContainerPath) as Project;
           if (containerCoreForVersion) {
-            Helpers.info(`[${config.frameworkName}] updating on push global containers iin ${this.project.name}`)
+            Helpers.info(`[${config.frameworkName}] updating on push global container${(frameworkVersion === 'v1') ? '' : `-${frameworkVersion}`} in ${this.project.name}`)
             containerCoreForVersion.packageJson.save('Updating morphi container');
           } else {
             Helpers.warn(`[firedev][hotfix] Not able to find container for framework version ${frameworkVersion}`);
