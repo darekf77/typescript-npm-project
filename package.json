@@ -135,6 +135,12 @@
           "v2": 13,
           "v3": 13
         },
+        "additionalTrusted": [
+          "ng-talkback",
+          "record-replay-req-res-scenario",
+          "vpn-split",
+          "node-cli-tester"
+        ],
         "trusted": {
           "v1": "*",
           "v2": "*",
@@ -165,12 +171,7 @@
             "tnp-helpers",
             "tnp-models",
             "typescript-class-helpers",
-            "static-columns",
-            "typeorm",
-            "ng-talkback",
-            "record-replay-req-res-scenario",
-            "vpn-split",
-            "node-cli-tester"
+            "static-columns"
           ],
           "v4": [
             "any-project-cli",
@@ -199,12 +200,7 @@
             "tnp-helpers",
             "tnp-models",
             "typescript-class-helpers",
-            "static-columns",
-            "typeorm",
-            "ng-talkback",
-            "record-replay-req-res-scenario",
-            "vpn-split",
-            "node-cli-tester"
+            "static-columns"
           ]
         },
         "dedupe-for-testing": [

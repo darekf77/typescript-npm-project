@@ -397,10 +397,66 @@ ${_.keys(override).length > 0 ? _.keys(override).map((key, index) => `-${key}:${
   process.exit(0);
 }
 
+export async function $REMOVE_BAD_TAG(args: string) {
+  //#region @notForNpm
+  const proj = Project.Current as Project;
+  const trusted = proj.trusted.filter(f => {
+    return ![
+      "typeorm",
+      "ng-talkback",
+      "record-replay-req-res-scenario",
+      "vpn-split",
+      "node-cli-tester",
+    ].includes(f);
+  })
+  const max = Number(args.trim());
+  for (let index = 0; index < trusted.length; index++) {
+    const name = trusted[index];
 
+    const child = Project.From([proj.location, name]) as Project;
+
+
+    // const command = `git log --all --grep='build hash update ${tag.replace('v', '')}'`;
+
+    while (true) {
+      let tag = child.git.lastTagNameForMajorVersion(max)?.replace('v', '');
+      console.info(`
+
+    CHECKIGN CHILD: ${name}, TAG: ${tag}`)
+
+      if (!tag) {
+        Helpers.warn(`CHILD: ${child.name} NO TAG ${tag}`);
+        Helpers.pressKeyAndContinue();
+      }
+      try {
+        const cmd = `npm view ${child.name}@${tag.replace('v', '')}  version`;
+        console.log({ cmd })
+        child.run(cmd, { output: true }).sync();
+        Helpers.info(`CHILD: ${child.name} IS OK, last ver/tag ${tag}`);
+        break;
+      } catch (error) {
+        const [majorProper, minorProper] = tag.replace('v', '').split('.');
+        const proper = _.last(JSON.parse(child.run(`npm view ${child.name}@${majorProper}.${minorProper}  version --json`, { output: false, }).sync().toString()));
+        Helpers.warn(`CHILD: ${child.name} NOT OK,
+
+        last ver/tag ${tag}
+
+        OK VERSION IS ${proper}
+
+        `);
+        Helpers.pressKeyAndContinue(`Press any key to delete bad tag and check again.`);
+        child.run(`git tag -d v${tag} && git push origin :refs/tags/v${tag}`, { output: true }).sync();
+      }
+    }
+
+  }
+  //#endregion
+  process.exit(0)
+}
 
 export default {
   //#region export default
+  $REMOVE_BAD_TAG: Helpers.CLIWRAP($REMOVE_BAD_TAG, '$REMOVE_BAD_TAG'),
   $DIFF: Helpers.CLIWRAP($DIFF, '$DIFF'),
   $SHOW_OVERRIDE: Helpers.CLIWRAP($SHOW_OVERRIDE, '$SHOW_OVERRIDE'),
   $WATCHERS: Helpers.CLIWRAP($WATCHERS, '$WATCHERS'),

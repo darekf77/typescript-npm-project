@@ -8,6 +8,8 @@ import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config, ConfigModels } from 'tnp-config';
 
+const versionForTags = [];
+
 //#endregion
 
 //#region clean ignored
@@ -577,7 +579,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
 
     // TODO firedev should be handled here
     Object.keys(project.packageJson.data.devDependencies)
-      .filter(key => allTrusted.includes(key))
+      .filter(key => allTrusted.includes(key) || key === 'typeorm')
       .forEach(packageIsomorphicName => {
         const v = project.packageJson.data.devDependencies[packageIsomorphicName];
         if (!v?.startsWith('~') && !v?.startsWith('^')) {
@@ -586,7 +588,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
       });
 
     Object.keys(project.packageJson.data.dependencies)
-      .filter(key => allTrusted.includes(key))
+      .filter(key => allTrusted.includes(key) || key === 'typeorm')
       .forEach(packageIsomorphicName => {
         const v = project.packageJson.data.dependencies[packageIsomorphicName];
         if (!v?.startsWith('~') && !v?.startsWith('^')) {
@@ -659,6 +661,21 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     }
   }
 
+  const max = project.trustedMaxMajorVersion;
+  const lastVerFun = (pkgNameToCheckVer) => {
+    Helpers.logInfo(`Getting last version of ${pkgNameToCheckVer}`)
+    try {
+      const checkFor = `${pkgNameToCheckVer}@${max}`;
+      if (!versionForTags[checkFor]) {
+        const lastVer = _.last(JSON.parse(Helpers.run(`npm view ${checkFor}  version --json`, { output: false, }).sync().toString()));
+        versionForTags[checkFor] = `~${lastVer}`;
+      }
+      return versionForTags[checkFor];
+    } catch (error) {
+      Helpers.error(`[firedev] Not able to get last versio of package: ${pkgNameToCheckVer}`, false, true);
+    }
+  };
+
 
   if (project.isContainerCoreProject) { // TODO TESTING
     //#region handle container core bulk deps instatlation for all other packages
@@ -698,27 +715,12 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
         }
       });
 
-    if (project.frameworkVersionAtLeast('v3')) {
+    if (project.frameworkVersionAtLeast('v3') && project.isContainerCoreProject) {
       const saveTnpFiredevVer = `^${_.first(Project.Tnp.version.split('.'))}`;
-      // project.packageJson.data.dependencies['tnp'] = saveTnpFiredevVer;
-      if (project.isContainerCoreProject) {
-        if ((project._frameworkVersion === config.defaultFrameworkVersion)) {
-          project.packageJson.data.dependencies['firedev'] = saveTnpFiredevVer;
-        } else {
-          // TODO QUICK FIX @LAST
-          const firedevVer = Helpers.getValueFromJSON(project.packageJson.path, `dependencies.firedev`, '');
-          const firedevVerCurr = _.first(firedevVer
-            .replace('~', '')
-            .replace('^', '')
-            .split('.')
-          );
-
-          project.packageJson.data.dependencies['firedev'] = `~${project.git.lastTagNameForMajorVersion(`v${firedevVerCurr}`)
-            .replace('v', '')}`;
-        }
-
+      if ((project._frameworkVersion === config.defaultFrameworkVersion)) {
+        project.packageJson.data.dependencies['firedev'] = saveTnpFiredevVer;
       } else {
-        // project.packageJson.data.devDependencies['firedev'] = saveTnpFiredevVer;
+        project.packageJson.data.dependencies['firedev'] = lastVerFun('firedev');
       }
     }
 
@@ -753,7 +755,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     project.packageJson.data.devDependencies = {}
   }
 
-  const max = project.trustedMaxMajorVersion;
+
   // console.log({
   //   max,
   //   all: allTrusted,
@@ -761,32 +763,36 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   // })
 
   // TODO SUPER QUICK_FIX
-  if (project.isContainerCoreProject && project.frameworkVersionAtLeast('v3')) {
+  if (project.isContainerCoreProject && project.frameworkVersionAtLeast('v3') && project.frameworkVersionLessThan(config.defaultFrameworkVersion)) {
 
     if (max) {
+      Helpers.log(`Rebuilding old global container...`);
       allTrusted.forEach(trustedDepKey => {
-
+        process.stdout.write('.');
         const depValueVersion = project.packageJson.data.dependencies[trustedDepKey];
         const devDepValueVersion = project.packageJson.data.devDependencies[trustedDepKey];
         // console.log({
         //   depValueVersion,
         //   devDepValueVersion,
         // })
-        const projFromDep = (config.frameworkName === 'tnp')
-          ? Project.From([Project.Tnp.location, '..', trustedDepKey]) as Project
-          : Project.From([Project.by('container', project._frameworkVersion,).location, '../..']) as Project;
+        const projFromDep = Project.From([Project.Tnp.location, '..', trustedDepKey]) as Project;
+
+
+        const lastKnownVersion = (config.frameworkName === 'tnp')
+          ? `~${projFromDep.git.lastTagNameForMajorVersion(max)?.replace('v', '')}`
+          : lastVerFun(trustedDepKey)
 
         if (depValueVersion) {
           const major = Number(_.first(depValueVersion.replace('~', '').replace('^', '').split('.')))
           if (major > max) {
-            const overrideOldVersion = `~${projFromDep.git.lastTagNameForMajorVersion(max)?.replace('v', '')}`
+            const overrideOldVersion = lastKnownVersion
             project.packageJson.data.dependencies[trustedDepKey] = overrideOldVersion;
           }
         }
         if (devDepValueVersion) {
           const major = Number(_.first(devDepValueVersion.replace('~', '').replace('^', '')))
           if (major > max) {
-            const overrideOldversion = `~${projFromDep.git.lastTagNameForMajorVersion(max)?.replace('v', '')}`;
+            const overrideOldversion = lastKnownVersion;
             project.packageJson.data.devDependencies[trustedDepKey] = overrideOldversion
           }
         }

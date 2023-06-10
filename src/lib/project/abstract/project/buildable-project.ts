@@ -64,7 +64,8 @@ export abstract class BuildableProject {
       return [];
     }
     return [
-      ...trusted
+      ...trusted,
+      ...this.additionalTrustedPackages,
     ];
   }
 
@@ -91,6 +92,39 @@ export abstract class BuildableProject {
     }
     trustedValue = Number(trustedValue);
     return (_.isNumber(trustedValue) && !isNaN(trustedValue)) ? trustedValue : Number.POSITIVE_INFINITY;
+  }
+  //#endregion
+
+  /**
+   * for navi-cli etc.
+   */
+  // @ts-ignore
+  get additionalTrustedPackages(this: Project): string[] {
+    const projTnp = Project.Tnp as Project;
+
+    let trustedValue = [];
+    if (config.frameworkName === 'tnp') {
+      const value = Helpers.readValueFromJson(crossPlatformPath([
+        projTnp.location,
+        config.file.package_json__tnp_json5, // TODO replace with firedev.json5 in future
+      ]), `core.dependencies.additionalTrusted`);
+      trustedValue = value;
+    }
+
+    if (config.frameworkName === 'firedev') {
+      const file = crossPlatformPath([
+        projTnp.location,
+        config.file.tnpEnvironment_json,
+      ]);
+      const value = Helpers.readValueFromJson(file, `packageJSON.tnp.core.dependencies.additionalTrusted`);
+      trustedValue = value;
+    }
+
+    const additionalTrusted = Array.isArray(trustedValue) ? trustedValue : [];
+    // console.log({
+    //   additionalTrusted
+    // })
+    return additionalTrusted;
   }
   //#endregion
 
