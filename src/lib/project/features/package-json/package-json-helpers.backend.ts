@@ -8,9 +8,7 @@ import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config, ConfigModels } from 'tnp-config';
 
-const versionForTagsPath = crossPlatformPath([os.homedir(), `.firedev`, `morphi/tmp-versions-cache`,])
 
-const versionForTags = Helpers.readJson(versionForTagsPath, {});
 // console.log([
 //   versionForTagsPath,
 //   versionForTags
@@ -668,26 +666,16 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   }
 
   const maxVersionForAngular = project.trustedMaxMajorVersion;
+
+  const versionForTagsPath = crossPlatformPath([Project.by('container', project._frameworkVersion).location, `../../versions-cache.json`,])
+  const versionForTags = Helpers.readJson(versionForTagsPath, {});
+
   const lastVerFun = (pkgNameToCheckVer) => {
     const checkFor = `${pkgNameToCheckVer}@${maxVersionForAngular}`;
     if (versionForTags[checkFor]) {
       return versionForTags[checkFor];
     }
     process.stdout.write('.');
-    // Helpers.info(`\nGetting last version of ${pkgNameToCheckVer}`)
-    if (config.frameworkName === 'tnp') {
-      if (!versionForTags[checkFor]) {
-        // Helpers.info(`\nnot in cache from git tag ${pkgNameToCheckVer}`)
-        let projFromDep = Project.From([Project.Tnp.location, '..', pkgNameToCheckVer]) as Project;
-        if (projFromDep) {
-          versionForTags[checkFor] = `~${projFromDep.git.lastTagNameForMajorVersion(maxVersionForAngular)?.replace('v', '')}`;
-          Helpers.writeJson(versionForTagsPath, versionForTags);
-        }
-      }
-      if (versionForTags[checkFor]) {
-        return versionForTags[checkFor];
-      }
-    }
     try {
       if (!versionForTags[checkFor]) {
         // Helpers.info(`\nnot in cache from npm ${pkgNameToCheckVer}`)
