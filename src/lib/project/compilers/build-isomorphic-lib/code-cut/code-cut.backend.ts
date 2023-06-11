@@ -7,6 +7,7 @@ import { Models } from "tnp-models";
 import type { Project } from "../../../abstract/project/project";
 import type { BroswerCompilation } from "../compilations/compilation-browser.backend";
 import { BrowserCodeCut } from "./browser-code-cut.backend";
+import { extAllowedToReplace } from "../../../../constants";
 //#endregion
 
 export class CodeCut {
@@ -79,7 +80,7 @@ export class CodeCut {
     //   debugger
     // }
 
-    if (!BrowserCodeCut.extAllowedToReplace.includes(path.extname(relativePathToFile))) {
+    if (!extAllowedToReplace.includes(path.extname(relativePathToFile))) {
 
       return (new BrowserCodeCut(
         absSourceFromSrc,

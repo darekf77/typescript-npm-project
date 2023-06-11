@@ -13,6 +13,7 @@ import type { Project } from '../../../abstract/project/project';
 import { BuildOptions } from 'tnp-db';
 import { RegionRemover } from 'isomorphic-region-loader';
 import { MjsModule } from '../../../features/copy-manager/bundle-mjs-fesm-module-spliter.backend';
+import { extAllowedToReplace } from '../../../../constants';
 //#endregion
 
 //#region consts
@@ -44,19 +45,7 @@ export class BrowserCodeCut {
   private readonly relativePath: string;
   private readonly isWebsqlMode: boolean;
   private readonly absoluteBackendDestFilePath: string;
-  public static readonly extForStyles = [
-    'scss',
-    'css',
-    'less',
-    'sass',
-  ].map(ext => `.${ext}`);
-  public static readonly extAllowedToReplace = [
-    ...BrowserCodeCut.extForStyles,
-    ...[
-      'html',
-      'ts',
-    ].map(ext => `.${ext}`),
-  ];
+
 
   get isEmptyBrowserFile() {
     return this.rawContentForBrowser.replace(/\s/g, '').trim() === '';
@@ -562,7 +551,7 @@ export class BrowserCodeCut {
     // Helpers.log(`[REPLACERegionsForIsomorphicLib] options.replacements ${this.absoluteFilePath}`)
     const ext = path.extname(this.relativePath);
     // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
-    if (BrowserCodeCut.extAllowedToReplace.includes(ext)) {
+    if (extAllowedToReplace.includes(ext)) {
       const orgContent = this.rawContentForBrowser;
       this.rawContentForBrowser = RegionRemover.from(this.relativePath, orgContent, options.replacements, this.project).output;
 

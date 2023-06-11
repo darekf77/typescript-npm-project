@@ -720,7 +720,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         `/${this.targetProjName}/${this.outDir}-nocutsrc/${orgSpecyficFileRelativePath}`,
       );
       if (!Helpers.exists(newAbsOrgFilePathInDistOrBundle)) {
-        Helpers.logWarn(`[copyto] New path does not exists or in browser | websql: ${newAbsOrgFilePathInDistOrBundle}`)
+        Helpers.log(`[copyto] New path does not exists or in browser | websql: ${newAbsOrgFilePathInDistOrBundle}`)
       } else {
         absOrgFilePathInDistOrBundle = newAbsOrgFilePathInDistOrBundle;
       }

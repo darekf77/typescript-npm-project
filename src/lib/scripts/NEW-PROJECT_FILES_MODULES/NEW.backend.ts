@@ -7,6 +7,7 @@ import { ConfigModels } from 'tnp-config';
 import { Project } from '../../project';
 import { config } from 'tnp-config';
 import { MagicRenamer } from 'magic-renamer';
+import { frontendFiles } from '../../constants';
 
 export async function RM(args: string, exit = true) {
   const proj = (Project.Current as Project);
@@ -207,19 +208,7 @@ async function $GENERATE(args: string) {
     //#region handle custom cases
     if (moduleName === 'generated-index-exports') {
       const allowedFilesExt = ['.ts', '.tsx'];
-      const frontendFiles = [
-        '.browser.ts',
-        '.component.ts',
-        '.container.ts',
-        '.directive.ts',
-        '.pipe.ts',
-        '.module.ts',
-        '.service.ts',
-        '.actions.ts',
-        '.effects.ts',
-        '.reducers.ts',
-        '.selectors.ts',
-      ]
+
       const backendFiles = ['.backend.ts']
       const folders = [
         ...Helpers.foldersFrom(absPath).map(f => path.basename(f)),

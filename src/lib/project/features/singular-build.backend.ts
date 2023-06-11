@@ -8,7 +8,7 @@ import { Models } from 'tnp-models';
 import { VscodeProject } from '../abstract/project/vscode-project.backend';
 import { BrowserCodeCut } from '../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
 import { recreateApp } from './inside-structures/structs/inside-struct-helpers';
-import { argsToClear } from '../../constants';
+import { appRelatedFiles, argsToClear, extAllowedToReplace } from '../../constants';
 //#endregion
 
 export class SingularBuild extends FeatureForProject {
@@ -35,7 +35,6 @@ export class SingularBuild extends FeatureForProject {
     if (!Helpers.exists(smartContainerTargetProjPath)) {
       Helpers.mkdirp(smartContainerTargetProjPath);
     }
-    const appRelatedFiles = BrowserCodeCut.extAllowedToReplace.map(ext => `app${ext}`);
 
     //#region symlinks package.json, tmp-environemnt
     (() => {
