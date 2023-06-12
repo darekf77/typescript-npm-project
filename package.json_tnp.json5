@@ -419,7 +419,7 @@
         },
         "angular-client": {
           essentials: {
-            "static-columns": '16.0.4',
+            "static-columns": '16.0.5',
             "ngx-store": "2.1.0",
             "firedev-storage": '16.0.40',
             "node-localstorage": "2.1.6",

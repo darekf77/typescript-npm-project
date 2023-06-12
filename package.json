@@ -399,7 +399,7 @@
           },
           "angular-client": {
             "essentials": {
-              "static-columns": "16.0.4",
+              "static-columns": "16.0.5",
               "ngx-store": "2.1.0",
               "firedev-storage": "16.0.40",
               "node-localstorage": "2.1.6",
@@ -775,7 +775,7 @@
     "socket.io": "2.4.1",
     "sort-package-json": "1.11.0",
     "sql.js": "1.8.0",
-    "static-columns": "~16.0.4",
+    "static-columns": "~16.0.5",
     "string-similarity": "4.0.2",
     "sudo-block": "3.0.0",
     "sweetalert2": "11.7.12",
