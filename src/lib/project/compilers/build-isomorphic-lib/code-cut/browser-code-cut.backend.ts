@@ -35,6 +35,9 @@ export class BrowserCodeCut {
   //#endregion
 
   //#region fields & getters
+
+  readonly isAssetsFile: boolean = false;
+  protected absFileSourcePathBrowserOrWebsqlAPPONLY: string;
   private rawContentForBrowser: string;
   private rawContentForAPPONLYBrowser: string;
   private rawContentBackend: string;
@@ -62,9 +65,6 @@ export class BrowserCodeCut {
   }
 
   //#endregion
-
-  readonly isAssetsFile: boolean = false;
-  protected absFileSourcePathBrowserOrWebsqlAPPONLY: string;
 
   //#region constructor
   constructor(
@@ -114,6 +114,8 @@ export class BrowserCodeCut {
       this.absPathTmpSrcDistBundleFolder.replace('tmp-src', 'tmp-source'),
       this.relativePath, // .replace('-websql', '') // backend is ONE
     ));
+
+    // console.log('RELATIVE ', this.relativePath)
 
     this.isWebsqlMode = (
       this.relativePath.startsWith(`tmp-src-${config.folder.dist}-${config.folder.websql}`)
@@ -169,14 +171,16 @@ export class BrowserCodeCut {
       fse.mkdirpSync(path.dirname(this.absFileSourcePathBrowserOrWebsqlAPPONLY));
     }
     if (isTsFile) {
-      fse.writeFileSync(
-        this.absFileSourcePathBrowserOrWebsql,
-        `/* files for browser${this.isWebsqlMode
-          ? '-websql' + endOfBrowserOrWebsqlCode
-          : '' + endOfBrowserOrWebsqlCode
-        } mode */`,
-        'utf8'
-      );
+      if (!this.relativePath.startsWith('app/')) {
+        fse.writeFileSync(
+          this.absFileSourcePathBrowserOrWebsql,
+          `/* files for browser${this.isWebsqlMode
+            ? '-websql' + endOfBrowserOrWebsqlCode
+            : '' + endOfBrowserOrWebsqlCode
+          } mode */`,
+          'utf8'
+        );
+      }
       fse.writeFileSync(
         this.absFileSourcePathBrowserOrWebsqlAPPONLY,
         `/* files for browser${this.isWebsqlMode
@@ -186,10 +190,12 @@ export class BrowserCodeCut {
         'utf8'
       );
     } else {
-      fse.writeFileSync(
-        this.absFileSourcePathBrowserOrWebsql, ``,
-        'utf8'
-      );
+      if (!this.relativePath.startsWith('app/')) {
+        fse.writeFileSync(
+          this.absFileSourcePathBrowserOrWebsql, ``,
+          'utf8'
+        );
+      }
       fse.writeFileSync(
         this.absFileSourcePathBrowserOrWebsqlAPPONLY, ``,
         'utf8'
@@ -218,19 +224,23 @@ export class BrowserCodeCut {
     this.processAssetsLinksForApp();
 
     if (isTsFile) {
-      fse.writeFileSync(this.absFileSourcePathBrowserOrWebsql,
-        this.fixComments(this.rawContentForBrowser, endOfBrowserOrWebsqlCode),
-        'utf8'
-      );
+      if (!this.relativePath.startsWith('app/')) {
+        fse.writeFileSync(this.absFileSourcePathBrowserOrWebsql,
+          this.fixComments(this.rawContentForBrowser, endOfBrowserOrWebsqlCode),
+          'utf8'
+        );
+      }
       fse.writeFileSync(this.absFileSourcePathBrowserOrWebsqlAPPONLY,
         this.fixComments(this.rawContentForAPPONLYBrowser, endOfBrowserOrWebsqlCode),
         'utf8'
       );
     } else {
-      fse.writeFileSync(this.absFileSourcePathBrowserOrWebsql,
-        this.rawContentForBrowser,
-        'utf8'
-      );
+      if (!this.relativePath.startsWith('app/')) {
+        fse.writeFileSync(this.absFileSourcePathBrowserOrWebsql,
+          this.rawContentForBrowser,
+          'utf8'
+        );
+      }
       fse.writeFileSync(this.absFileSourcePathBrowserOrWebsqlAPPONLY,
         this.rawContentForAPPONLYBrowser,
         'utf8'
@@ -754,7 +764,7 @@ declare module "*.json" {
   }
   //#endregion
 
-  //#region methods /  save
+  //#region methods / save
   save() {
     if (this.isAssetsFile) {
       this.saveNormalFile(false)
