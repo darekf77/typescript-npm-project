@@ -121,6 +121,27 @@ export class LibProjectStandalone extends LibPorjectBase {
         realCurrentProj.run('git checkout docs/CNAME').sync();
       } catch (error) { }
 
+      const assetsListPathSourceMain = crossPlatformPath([
+        realCurrentProj.location,
+        `tmp-bundle-release/${config.folder.bundle}/project/${realCurrentProj.name}`,
+        `tmp-apps-for-${config.folder.bundle}${appBuildOptions.websql ? '-websql' : ''}`,
+        realCurrentProj.name,
+        config.folder.src,
+        config.folder.assets,
+        realCurrentProj.assetsFileListGenerator.filename,
+      ])
+      const assetsListPathDestMain = crossPlatformPath([
+        realCurrentProj.location,
+        config.folder.docs,
+        config.folder.assets,
+        realCurrentProj.assetsFileListGenerator.filename,
+      ]);
+      console.log({
+        assetsListPathSourceMain,
+        assetsListPathDestMain,
+      })
+      Helpers.copyFile(assetsListPathSourceMain, assetsListPathDestMain);
+
       Helpers.log(this.messages.docsBuildDone);
     });
   }
