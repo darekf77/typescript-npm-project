@@ -136,10 +136,10 @@ export class LibProjectStandalone extends LibPorjectBase {
         config.folder.assets,
         realCurrentProj.assetsFileListGenerator.filename,
       ]);
-      console.log({
-        assetsListPathSourceMain,
-        assetsListPathDestMain,
-      })
+      // console.log({
+      //   assetsListPathSourceMain,
+      //   assetsListPathDestMain,
+      // })
       Helpers.copyFile(assetsListPathSourceMain, assetsListPathDestMain);
 
       Helpers.log(this.messages.docsBuildDone);
