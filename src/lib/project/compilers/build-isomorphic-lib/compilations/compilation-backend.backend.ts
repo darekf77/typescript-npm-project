@@ -1,5 +1,6 @@
 //#region imports
 import { IncCompiler } from "incremental-compiler";
+import { CLI } from "tnp-cli";
 import { config, ConfigModels } from "tnp-config";
 import { crossPlatformPath, fse, path, _ } from "tnp-core";
 import { Helpers } from "tnp-helpers";
@@ -290,6 +291,19 @@ Starting backend typescirpt build....
       });
     Helpers.log(`* Typescirpt compilation second part done (${outDir}  build). `)
     //#endregion
+    // console.log(Helpers.terminalLine());
+    Helpers.info(`
+
+
+
+
+    ${CLI.chalk.bold('YOU CAN ATTACH YOUR BACKEND CODE DEBUGGER NOW')}
+
+
+
+
+    `);
+    // console.log(Helpers.terminalLine());
   }
   //#endregion
 
