@@ -189,6 +189,7 @@ export class BackendCompilation extends IncCompiler.Base {
       cwd,
       project,
       outDir,
+      watch,
     } = options;
 
     const isStandalone = (!project.isSmartContainerTarget && !project.isWorkspace && !project.isSmartContainerChild);
@@ -291,8 +292,9 @@ Starting backend typescirpt build....
       });
     Helpers.log(`* Typescirpt compilation second part done (${outDir}  build). `)
     //#endregion
-    // console.log(Helpers.terminalLine());
-    Helpers.info(`
+    if (!watch) {
+      // console.log(Helpers.terminalLine());
+      Helpers.info(`
 
 
 
@@ -303,7 +305,9 @@ Starting backend typescirpt build....
 
 
     `);
-    // console.log(Helpers.terminalLine());
+      // console.log(Helpers.terminalLine());
+    }
+
   }
   //#endregion
 
