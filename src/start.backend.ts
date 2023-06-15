@@ -151,14 +151,15 @@ export async function start(
   config.frameworkName = frameworkName;
 
   argsv = handleSpecialArgs(argsv);
-  argsv = argsv.map((arg, i) => {
-    const biggerRep = config.argsReplacements[arg];
-    const minus = argsv[i - 1];
-    if (biggerRep && minus && !minus.startsWith('-')) {
-      return biggerRep;
+  const commandArgIndex = 2;
+  const commandArg = argsv[commandArgIndex];
+  if (commandArg && !commandArg.startsWith('-')) {
+    const longerCommandVersion = config.argsReplacements[commandArg];
+    if(longerCommandVersion) {
+      argsv[commandArgIndex] = longerCommandVersion;
     }
-    return arg;
-  });
+
+  }
 
 
   //#region local libs run

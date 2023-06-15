@@ -124,9 +124,12 @@ export class ProjectFactory {
       const ADDRESS_GITHUB_SSH_PARENT = lastContainer?.git?.originURL;
       const newRemote = ADDRESS_GITHUB_SSH_PARENT?.replace(`${lastContainer.name}.git`, `${appProj.name}.git`);
       if (newRemote) {
-        appProj.run('git remote add origin ' + newRemote).sync();
+        try {
+          appProj.run('git remote add origin ' + newRemote, { output: false, silence: true }).sync();
+          appProj.run('git add --all . && git commit -m "first"', { output: false, silence: true }).sync();
+        } catch (error) { }
       }
-      appProj.run('git add --all . && git commit -m "first"').sync();
+
     }
   }
   //#endregion
