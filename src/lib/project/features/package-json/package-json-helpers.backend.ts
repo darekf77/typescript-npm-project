@@ -636,8 +636,8 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
         project.packageJson.data.devDependencies = {};
       }
       if (project.isVscodeExtension) {
-        project.packageJson.data.devDependencies['vscode'] = project.packageJson.data.dependencies['vscode'];
-        delete project.packageJson.data.dependencies['vscode'];
+        project.packageJson.data.devDependencies = project.packageJson.data.dependencies;
+        project.packageJson.data.dependencies = {};
       }
     }
   }
