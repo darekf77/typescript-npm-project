@@ -255,7 +255,7 @@
       common: {
         // all isomorphic application config
         "tnp-config": '16.0.8',
-        "tnp-models": '16.0.33',
+        "tnp-models": '16.0.34',
         "tnp-helpers": '16.0.5',
         "tnp-db": '16.0.26',
         "firedev-typeorm": '16.0.37',
@@ -263,7 +263,7 @@
         "firedev-ports": '16.0.48',
         "firedev-crud-deamon": '16.0.43',
         "firedev-ui": '16.0.7',
-        "tnp-core": '16.0.9',
+        "tnp-core": '16.0.10',
         "tnp-cli": '16.0.5',
         "tnp-tools": "0.0.58",
         "any-project-cli": '16.0.31',

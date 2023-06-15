@@ -292,14 +292,15 @@ Starting backend typescirpt build....
       });
     Helpers.log(`* Typescirpt compilation second part done (${outDir}  build). `)
     //#endregion
-    if (!watch) {
+    if (watch) {
       // console.log(Helpers.terminalLine());
       Helpers.info(`
 
 
 
 
-    ${CLI.chalk.bold('YOU CAN ATTACH YOUR BACKEND CODE DEBUGGER NOW')}
+    ${CLI.chalk.bold('YOU CAN ATTACH YOUR BACKEND/NODEJS CODE DEBUGGER NOW')}
+
 
 
 

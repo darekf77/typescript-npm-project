@@ -133,16 +133,48 @@ export class ProjectFactory {
 
   //#region init containers
   private async initContainersAndApps(cwd: string, nameFromArgs: string, version: ConfigModels.FrameworkVersion) {
+    nameFromArgs = nameFromArgs.replace('./', '')
+    nameFromArgs = nameFromArgs.replace('.\\', '')
+    nameFromArgs = nameFromArgs.replace(/\/$/, '')
+    nameFromArgs = nameFromArgs.replace(/\\$/, '')
+    nameFromArgs = nameFromArgs.replace(/\\$/g, '/')
 
-    const containersAndProjFromArgName = !nameFromArgs.includes('/') ? nameFromArgs.replace('\\', '/').split('/') : [];
-    const hasContainersFromArgs = (containersAndProjFromArgName.length > 1);
-    const projName = hasContainersFromArgs ? _.last(containersAndProjFromArgName) : _.first(containersAndProjFromArgName);
-    if (notAllowedProjectNames.includes(projName)) {
+    /**
+     * examples:
+     * my-app
+     * my-org/my-app
+     * my-big-org/my-smaller-org/my-app
+     * ..
+     */
+    const allProjectFromArgs = nameFromArgs.includes('/') ? nameFromArgs.split('/') : [nameFromArgs];
+
+    const hasAutoCreateNormalContainersFromArgs = (allProjectFromArgs.length > 2);
+    const hasAtLeastOneContainersFromArgs = (allProjectFromArgs.length > 1);
+
+    // app OR org/app
+    const standaloneOrOrgWithStanalonePathName = crossPlatformPath([
+      path.basename(path.dirname(allProjectFromArgs.join('/'))),
+      path.basename(allProjectFromArgs.join('/'))
+    ]);
+
+    // additional auto created normal containers
+    const autoCreateNormalContainersPathName = ((hasAutoCreateNormalContainersFromArgs)
+      ? (allProjectFromArgs.join('/').replace(standaloneOrOrgWithStanalonePathName, ''))
+      : '').replace(/\/$/, '');
+
+    const lastProjectFromArgName = (allProjectFromArgs.length > 0)
+      ? _.last(allProjectFromArgs) // last org proj
+      : _.first(allProjectFromArgs); // standalone proj
+
+    const notAllowedNameForApp = notAllowedProjectNames.find(a => a === lastProjectFromArgName);
+    if (!!notAllowedNameForApp) {
       Helpers.error(`
 
-      Name ${CLI.chalk.bold(projName)} is not allowed.
+      Name ${CLI.chalk.bold(notAllowedNameForApp)} is not allowed.
 
-      Use different name: ${CLI.chalk.bold(containersAndProjFromArgName.join('/').replace('app', 'my-app-or-something-else'))}
+      Use different name: ${CLI.chalk.bold(crossPlatformPath(
+        path.dirname(allProjectFromArgs.join('/'))).replace(notAllowedNameForApp, 'my-app-or-something-else')
+      )}
 
       `, false, true);
     }
@@ -157,8 +189,8 @@ export class ProjectFactory {
       ...((grandpa && grandpa.isContainer) ? [grandpa] : []),
     ];
 
-    if (hasContainersFromArgs) {
-      const foldersToRecreate = _.cloneDeep(containersAndProjFromArgName).slice(0, containersAndProjFromArgName.length - 1);
+    if (hasAtLeastOneContainersFromArgs) {
+      const foldersToRecreate = _.cloneDeep(allProjectFromArgs).slice(0, allProjectFromArgs.length - 1);
       let tmpCwd = cwd;
       let parentContainer = Project.From(cwd) as Project;
       let currentContainer: Project;
@@ -181,12 +213,30 @@ export class ProjectFactory {
         let monorepo = false;
         if (!Helpers.exists(packageJsonPath)) {
           if (isLastContainer && isBrandNew && (!parentContainer || !parentContainer.isSmartContainer)) {
-            const displayName = (`${grandpa ? `${grandpa.name}/` : ''}${foldersToRecreate.join('/')}${foldersToRecreate.length > 1 ? '/' : ''}`
-              + `${CLI.chalk.red(CLI.chalk.italic(path.basename(currentContainerPath)))}/${projName}`)
 
-            smart = await Helpers.questionYesNo(`Do you want container ${displayName} to be 'smart' container ?`)
-            monorepo = await Helpers.questionYesNo(`Do you want container ${displayName} be monorepo ?`)
+            const displayNameForLastContainerBeforeApp = (hasAtLeastOneContainersFromArgs ?
+              (CLI.chalk.italic(`${autoCreateNormalContainersPathName ? autoCreateNormalContainersPathName + '/' : ''}`)
+                + `${CLI.chalk.italic.red(path.basename(path.dirname(standaloneOrOrgWithStanalonePathName)))}`
+                + CLI.chalk.italic(`/${lastProjectFromArgName}`))
+              : CLI.chalk.italic(standaloneOrOrgWithStanalonePathName)
+            )
+
+            Helpers.info(`
+
+${CLI.chalk.bold('SMART CONTAINERS')} - can be used to publish npm organization packages ex. @org/package-name
+${CLI.chalk.bold('NORMAL CONTAINERS')} - are just a wrapper for other project for easy
+git pull/push or children packages release. Normal container can wrap "standalone" or "smart container" projects.
+
+            `)
+
+
+            smart = await Helpers.questionYesNo(`Do you want container ${displayNameForLastContainerBeforeApp} to be 'smart' container ?`)
+            monorepo = await Helpers.questionYesNo(`Do you want container ${displayNameForLastContainerBeforeApp} be monorepo ?`)
           }
+          const smartContainerBuildTarget = (hasAtLeastOneContainersFromArgs
+            && (path.basename(currentContainerPath) === _.first(lastProjectFromArgName.split('/'))))
+            ? lastProjectFromArgName : void 0;
+
           Helpers.writeJson(packageJsonPath, {
             name: path.basename(currentContainerPath),
             version: '0.0.0',
@@ -195,7 +245,7 @@ export class ProjectFactory {
               version,
               type: 'container',
               monorepo,
-              smartContainerBuildTarget: projName
+              smartContainerBuildTarget
             }
           } as Models.npm.IPackageJSON);
         }
@@ -206,7 +256,7 @@ export class ProjectFactory {
         currentContainer = (Project.From(currentContainerPath) as Project);
         containers.push(currentContainer);
 
-        if (parentContainer.isContainer) {
+        if (parentContainer?.isContainer) {
           parentContainer.packageJson.linkedProjects.push(path.basename(currentContainer.location));
           parentContainer.packageJson.data.tnp.linkedProjects = Helpers
             .arrays
@@ -245,12 +295,12 @@ export class ProjectFactory {
     let appProj: Project;
 
     const appLocation = lastContainer
-      ? crossPlatformPath([lastContainer?.location, projName])
-      : crossPlatformPath([cwd, projName]);
+      ? crossPlatformPath([lastContainer?.location, lastProjectFromArgName])
+      : crossPlatformPath([cwd, lastProjectFromArgName]);
     const packageJsonPath = crossPlatformPath([appLocation, config.file.package_json]);
 
     Helpers.writeJson(packageJsonPath, {
-      name: path.basename(projName),
+      name: path.basename(lastProjectFromArgName),
       version: '0.0.0',
       private: true,
       tnp: {
@@ -259,7 +309,7 @@ export class ProjectFactory {
       }
     } as Models.npm.IPackageJSON);
     appProj = (Project.From(appLocation) as Project);
-    if (!hasContainersFromArgs) {
+    if (!hasAtLeastOneContainersFromArgs) {
       lastContainer = appProj.parent;
     }
     if (lastContainer && lastContainer.isContainer && !lastContainer.isMonorepo) {
@@ -292,13 +342,13 @@ export class ProjectFactory {
     }
 
     if (lastContainer) {
-      lastContainer.packageJson.linkedProjects.push(path.basename(projName));
+      lastContainer.packageJson.linkedProjects.push(path.basename(lastProjectFromArgName));
       lastContainer.packageJson.data.tnp.linkedProjects = Helpers
         .arrays
         .uniqArray(lastContainer.packageJson.linkedProjects)
         .sort()
 
-      lastContainer.parent.packageJson.save(`updating container: ${CLI.chalk.bold(lastContainer.name)} linked projects for ${projName}"`);
+      lastContainer.parent?.packageJson.save(`updating container: ${CLI.chalk.bold(lastContainer.name)} linked projects for ${lastProjectFromArgName}"`);
     }
 
     // if (lastContainer && lastContainer.isContainer && lastContainer.location !== grandpa.location) {
@@ -320,14 +370,20 @@ export class ProjectFactory {
 
 
 
-    return { containers, firstContainer, lastContainer, lastIsBrandNew, appProj };
+    return {
+      containers, firstContainer, lastContainer,
+      lastIsBrandNew, appProj, containersAndProjFromArgName: allProjectFromArgs,
+      preOrgs: autoCreateNormalContainersPathName
+    };
   }
   //#endregion
 
   //#region create container or standalone
   public async createContainersOrStandalone(options: NewSiteOptions) {
     let { name: nameFromArgs, cwd, version } = this.fixOptions_create(options);
-    const { appProj, containers, lastContainer, lastIsBrandNew } = await this.initContainersAndApps(cwd, nameFromArgs, version);
+    const { appProj, containers, lastContainer,
+      lastIsBrandNew,
+    } = await this.initContainersAndApps(cwd, nameFromArgs, version);
 
     if (appProj.isSmartContainerChild) {
       Helpers.writeFile([appProj.location, 'README.md'], `
@@ -363,6 +419,17 @@ export class ProjectFactory {
     }
 
     Helpers.info(`DONE CREATING ${nameFromArgs}`);
+    //     Helpers.info(`
+
+    //     DONE CREATING ${containersAndProjFromArgName.join('/')}
+
+    // ${CLI.chalk.green('To start developing firedev\'s backend/frontend apps/libs execute command:')}
+
+    // cd ${preOrgs + '/' + (cleanDisplaName.includes('/') ? _.first(cleanDisplaName.split('/')) : cleanDisplaName)
+    //       } && firedev start ${_.last(containersAndProjFromArgName)} --websql
+
+
+    //     `);
   }
   //#endregion
 

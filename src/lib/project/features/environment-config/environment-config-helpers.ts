@@ -55,8 +55,8 @@ export async function standaloneConfigBy(standaloneProject: Project): Promise<Mo
 
   if (!fse.existsSync(`${pathToProjectEnvironment}.js`)) {
 
-    Helpers.info(`Standalone project ${standaloneProject.location}
-      ...without environment.js config... creating new... `);
+    Helpers.info(`Standalone project ${standaloneProject.location}`);
+    Helpers.logInfo(`...without environment.js config...creating new... `);
 
     Helpers.writeFile(`${pathToProjectEnvironment}.js`, createExampleConfigFor(standaloneProject));
 
@@ -82,20 +82,20 @@ function createExampleConfigFor(proj: Project) {
 
   return `
 const path = require('path')
-var { config } = ${configPathRequire};
+    var { config } = ${configPathRequire};
 
-config = {
+    config = {
 
-  domain: '${proj.name}.example.domain.com',
-  useDomain: false,
-  title: '${_.startCase(proj.name)}',
-  pwa: {
-    // start_url: ''
-  }
+      domain: '${proj.name}.example.domain.com',
+      useDomain: false,
+      title: '${_.startCase(proj.name)}',
+      pwa: {
+        // start_url: ''
+      }
 
-}
-module.exports = exports = { config };
-  `;
+    }
+    module.exports = exports = { config };
+    `;
 }
 //#endregion
 
@@ -113,6 +113,8 @@ export function saveConfigWorkspca(project: Project, projectConfig: Models.env.E
   projectConfig.currentProjectIsDependencySite = project.isSiteInDependencyMode;
   projectConfig.currentProjectIsStatic = project.isGenerated;
   projectConfig.isStandaloneProject = project.isStandaloneProject;
+  projectConfig.isSmartContainerTargetProject = project.isSmartContainerTarget;
+
   projectConfig.frameworks = project.frameworks;
 
   let libs = Helpers.linksToFoldersFrom(path.join(project.location, config.folder.src, 'libs'));
@@ -134,7 +136,7 @@ export function saveConfigWorkspca(project: Project, projectConfig: Models.env.E
         if (isSmartWorkspaceChild) {
           const pathRelative = path.join(path.basename(b), config.folder.src, 'lib');
           return _.merge(a, {
-            [`@${parent.name}/${path.basename(b)}`]: [`../${pathRelative}`],
+            [`@${parent.name} /${path.basename(b)}`]: [`../${pathRelative}`],
             [`@${parent.name}/${path.basename(b)}/*`]: [`../${pathRelative}/*`],
           })
         } else {
