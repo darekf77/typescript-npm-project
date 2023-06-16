@@ -200,7 +200,8 @@
             "tnp-helpers",
             "tnp-models",
             "typescript-class-helpers",
-            "static-columns"
+            "static-columns",
+            "firedev-type-sql"
           ]
         },
         "dedupe-for-testing": [

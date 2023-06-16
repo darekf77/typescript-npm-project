@@ -1,5 +1,5 @@
 //#region @backend
-import { fse } from 'tnp-core'
+import { crossPlatformPath, fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import * as JSON5 from 'json5';
 import { glob } from 'tnp-core';
@@ -11,61 +11,48 @@ import { FeatureCompilerForProject } from '../../abstract';
 import { IncCompiler } from 'incremental-compiler';
 import { ControllersGenerator } from './controllers-generator.backend';
 
+
 export function optionsFrameworkFileGen(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
   let folderPath: string | string[] = void 0;
-  if (project.isWorkspaceChildProject && project.isGeneratingControllerEntities) {
-    folderPath = path.join(project.location, config.folder.src);
+  const mainPath = crossPlatformPath([config.folder.src, config.folder.lib])
+  if (project.isStandaloneProject) {
+    folderPath = crossPlatformPath([project.location, mainPath]);
+  }
+  if (project.isSmartContainer) {
+    folderPath = [];
+    const children = project.children.filter(c => c.typeIs('isomorphic-lib'));
+    for (let index = 0; index < children.length; index++) {
+      const child = children[index];
+      folderPath.push(crossPlatformPath([project.location, child.name, mainPath]))
+    }
   }
   const options: IncCompiler.Models.BaseClientCompilerOptions = {
     folderPath,
-    notifyOnFileUnlink: true
+    notifyOnFileUnlink: true,
+    allowedOnlyFileExt: ['.ts'],
   };
   return options;
 }
 
 @IncCompiler.Class({ className: 'FrameworkFilesGenerator' })
-export class FrameworkFilesGenerator extends ControllersGenerator {
+export class FrameworkFilesGenerator extends FeatureCompilerForProject {
+
+  constructor(public project: Project) {
+    super(project, optionsFrameworkFileGen(project));
+  }
 
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
-    if (event.eventName !== 'unlinkDir') {
-      if (!this.notAllowedToWachFiles.includes(path.basename(event.fileAbsolutePath))) {
-        await this.syncAction()
-      }
-    }
+    // if (event.eventName !== 'unlinkDir') {
+    //   console.log(`unlink dir :${event}`)
+    // } else {
+    //   console.log(`action ${event.eventName} for file :`, event.fileAbsolutePath)
+    // }
   }
 
-  async syncAction() {
-    if (this.project.isGeneratingControllerEntities) {
-      const isSiteInStrictMode = this.project.isSiteInStrictMode;
-      let cwd = path.join(this.project.location, config.folder.src);
-      this.generateEntityTs(cwd);
-      this.generateControllersTs(cwd);
-      if (isSiteInStrictMode) {
-        cwd = path.join(this.project.location, config.folder.custom, config.folder.src);
-        this.generateEntityTs(cwd, true);
-        this.generateControllersTs(cwd, true);
-      }
-    } else {
-
-    }
+  async syncAction(files: string[]) {
+    // console.log(`sync action: absolute files pathes `, files)
   }
-
-  async start(taskName?: string, afterInitCallBack?: () => void) {
-    if (this.project.isSiteInStrictMode) {
-      await this.project.baseline.frameworkFileGenerator.start(taskName);
-    }
-    return super.start(taskName, afterInitCallBack);
-  }
-
-  async startAndWatch(taskName?: string, options?: IncCompiler.Models.StartAndWatchOptions) {
-    const { watchOnly } = options || {};
-    if (this.project.isSiteInStrictMode) {
-      await this.project.baseline.frameworkFileGenerator.startAndWatch(taskName, { watchOnly });
-    }
-    return super.startAndWatch(taskName, options);
-  }
-
 
 }
 
