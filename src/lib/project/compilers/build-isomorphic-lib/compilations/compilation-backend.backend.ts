@@ -265,6 +265,13 @@ Starting backend typescirpt build....
                 `./${project.name}/src/`,
               ));
 
+            } else if (line.startsWith(`tmp-source-${outDir}/libs/`)) {
+              const [__, ___, moduleName] = line.split('/');
+              return additionalReplace(line.replace(
+                `tmp-source-${outDir}/libs/${moduleName}/`,
+                `./${moduleName}/src/lib/`,
+              ));
+
             } else {
               return additionalReplace(line.replace(
                 `./src/`,
