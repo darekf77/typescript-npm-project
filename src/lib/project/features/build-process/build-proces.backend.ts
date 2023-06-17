@@ -114,6 +114,14 @@ inside generated projects...
 
   private async build(buildOptions: BuildOptions, allowedLibs: ConfigModels.LibType[], exit = true) {
 
+    if (this.project.frameworkVersionLessThan('v4')) {
+      Helpers.error(`Please upgrade firedev framework version to to at least v4
+
+      ${config.file.package_json__tnp_json} => tnp.version => should be at least 4
+
+      `, false, true);
+    }
+
     log.data(`
 
     BUILD PID: ${process.pid}
