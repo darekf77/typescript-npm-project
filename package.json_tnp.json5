@@ -259,7 +259,7 @@
         "tnp-models": '16.0.35',
         "tnp-helpers": '16.0.6',
         "tnp-db": '16.0.26',
-        "firedev-type-sql": '16.0.0',
+        "firedev-type-sql": '16.0.1',
         "firedev-typeorm": '16.0.37',
         "firedev-crud": '16.0.53',
         "firedev-ports": '16.0.48',
