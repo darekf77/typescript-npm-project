@@ -153,10 +153,14 @@ export class BrowserCodeCut {
         return;
       }
 
-      Helpers.copyFile(this.absSourcePathFromSrc, this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsql));
-      Helpers.copyFile(this.absSourcePathFromSrc, this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsqlAPPONLY));
-      // final straight copy to tmp-source-folder
-      Helpers.copyFile(this.absSourcePathFromSrc, this.replaceAssetsPath(this.absoluteBackendDestFilePath));
+      try {
+        Helpers.copyFile(this.absSourcePathFromSrc, this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsql));
+        Helpers.copyFile(this.absSourcePathFromSrc, this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsqlAPPONLY));
+        // final straight copy to tmp-source-folder
+        Helpers.copyFile(this.absSourcePathFromSrc, this.replaceAssetsPath(this.absoluteBackendDestFilePath));
+      } catch (error) {
+        Helpers.warn(`[firedev][browser-code-cut] file not found ${this.absSourcePathFromSrc}`)
+      }
     }
 
   }
