@@ -725,7 +725,8 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         absOrgFilePathInDistOrBundle = newAbsOrgFilePathInDistOrBundle;
       }
     }
-    // this.fixDtsImportsWithWronPackageName(absOrgFilePathInDistOrBundle, destinationFilePath)
+
+    this.fixDtsImportsWithWronPackageName(absOrgFilePathInDistOrBundle, destinationFilePath)
 
     const isBackendMapsFile = destinationFilePath.endsWith('.js.map');
     const isBrowserMapsFile = destinationFilePath.endsWith('.mjs.map');
@@ -888,6 +889,9 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
           ))),
         relativePath,
       ));
+      // console.log({
+      //   source, dest
+      // })
       // if (Helpers.exists(dest)) {
       // console.log(dest)
       Helpers.copyFile(source, dest);

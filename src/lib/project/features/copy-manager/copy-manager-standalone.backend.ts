@@ -332,7 +332,7 @@ export class CopyManagerStandalone extends CopyManager {
 
   //#region replace d.ts files in destination after copy
   replaceIndexDtsForEntryPorjIndex(destination: Project) {
-    const location = destination.node_modules.pathFor( this.rootPackageName);
+    const location = destination.node_modules.pathFor(this.rootPackageName);
     Helpers.writeFile(path.join( // override dts to easly debugging
       location,
       config.file.index_d_ts,
@@ -563,6 +563,7 @@ export class CopyManagerStandalone extends CopyManager {
       }
     }
 
+
     this.fixDtsImportsWithWronPackageName(absOrgFilePathInDistOrBundle, destinationFilePath)
 
 
@@ -619,6 +620,18 @@ export class CopyManagerStandalone extends CopyManager {
       }
     })();
 
+    (() => {
+      const specyficFileRelativePathBackendMap = specyficFileRelativePath.replace('.js', '.d.ts');
+      const possibleBackendMapFile = crossPlatformPath(path.normalize(path.join(
+        this.monitoredOutDir,
+        specyficFileRelativePathBackendMap,
+      )));
+
+      if (Helpers.exists(possibleBackendMapFile)) {
+        this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePathBackendMap, true);
+      }
+    })();
+
 
     for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
       const browserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
@@ -632,6 +645,7 @@ export class CopyManagerStandalone extends CopyManager {
         this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePathBrowserMap, true);
       }
     }
+
   }
   //#endregion
 

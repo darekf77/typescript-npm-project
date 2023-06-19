@@ -397,10 +397,8 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       }
 
       if (!this.nodts) {
-        if (!this.watch) {
-          this.updateBackendFullDtsFiles(this.monitoredOutDir);
-        }
         this.updateBackendFullDtsFiles(destination);
+        this.updateBackendFullDtsFiles(this.monitoredOutDir);
       }
 
       if (REPLACE_INDEX_D_TS_IN_DEST_WHEN_WATCH && this.watch) {
