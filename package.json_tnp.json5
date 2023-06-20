@@ -270,7 +270,7 @@
         "tnp-tools": "0.0.58",
         "any-project-cli": '16.0.31',
         "@types/node": "10.12.30",
-        morphi: '16.0.5',
+        morphi: '16.0.6',
         gulp: "^3.9.1",
         "ng2-logger": '16.0.4',
         "ng2-rest": '16.0.12',
