@@ -74,7 +74,7 @@ const $TEST = async (args: string) => {
 
 const $TEST_DEBUG = async (args: string) => {
   await (Project.Current as Project).filesStructure.init(args);
-  await (Project.Current as Project).tests.start(args.trim().split(' '), false, true)
+  await (Project.Current as Project).tests.start(args.trim().split(' '), true)
   process.exit(0)
 }
 

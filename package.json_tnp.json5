@@ -132,6 +132,9 @@
         "@ngx-formly/material",
         "sql.js",
         "axios",
+        "mocha",
+        "jest",
+        "chai"
       ],
       neverAsLink: [],
       stubForBackend: [

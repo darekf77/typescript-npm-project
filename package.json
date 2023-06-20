@@ -122,7 +122,10 @@
           "@ngx-formly/ionic",
           "@ngx-formly/material",
           "sql.js",
-          "axios"
+          "axios",
+          "mocha",
+          "jest",
+          "chai"
         ],
         "neverAsLink": [],
         "stubForBackend": [
@@ -694,6 +697,7 @@
     "http-proxy": "1.16.2",
     "http-proxy-middleware": "0.19.1",
     "http-server": "0.11.1",
+    "image-focus": "1.2.1",
     "immutable": "4.3.0",
     "incremental-compiler": "~16.0.30",
     "inquirer": "7.3.3",
