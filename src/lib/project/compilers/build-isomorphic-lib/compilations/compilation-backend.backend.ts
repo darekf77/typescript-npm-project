@@ -240,6 +240,13 @@ Starting backend typescirpt build....
         },
         outputLineReplace: (line: string) => {
           if (isStandalone) {
+            if (line.startsWith(`tmp-source-${outDir}/`)) {
+              return additionalReplace(line.replace(
+                `tmp-source-${outDir}/`,
+                `./src/`,
+              ));
+            }
+
             return additionalReplace(line.replace(
               `../tmp-source-${outDir}/`,
               `./src/`
