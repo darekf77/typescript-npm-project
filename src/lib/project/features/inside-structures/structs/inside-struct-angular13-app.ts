@@ -666,7 +666,6 @@ ${appModuleFile}
         })();
         //#endregion
 
-        recreateApp(project);
 
         //#region add proper pathes to tsconfig
         (() => {

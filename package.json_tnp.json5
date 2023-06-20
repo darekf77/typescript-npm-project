@@ -285,7 +285,7 @@
         // isomorphic http requests
         axios: "^0.17.1",
         "ng-talkback": '16.0.1',
-        "magic-renamer": '16.0.45',
+        "magic-renamer": '16.0.46',
         "vpn-split": '16.0.1',
         "node-cli-tester": '16.0.2',
         strings: {
