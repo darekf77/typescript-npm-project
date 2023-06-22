@@ -258,7 +258,7 @@
       ],
       common: {
         // all isomorphic application config
-        "tnp-config": '16.0.8',
+        "tnp-config": '16.0.10',
         "tnp-models": '16.0.35',
         "tnp-helpers": '16.0.7',
         "tnp-db": '16.0.26',

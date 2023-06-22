@@ -55,7 +55,6 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
         'lib/package-lock.json',
         'lib/package.json',
         'lib/tsconfig.app.json',
-        'lib/tsconfig.doc.json',
         'lib/tsconfig.json',
         'lib/tsconfig.spec.json',
         'lib/projects/my-lib/src',
