@@ -109,7 +109,8 @@ export class BroswerCompilation extends BackendCompilation {
     Helpers.mkdirp(tmpSource);
 
     this.initCodeCut();
-    this.copyTsConfig();
+    this.project.quickFixes.recreateTempSourceNecessaryFiles('dist');
+    this.project.quickFixes.recreateTempSourceNecessaryFiles('bundle');
 
     const filesBase = crossPlatformPath(path.join(this.cwd, this.srcFolder))
     const relativePathesToProcess = absFilesFromSrc.map(absFilePath => {
@@ -178,39 +179,39 @@ export class BroswerCompilation extends BackendCompilation {
       Helpers.removeFolderIfExists(destinationFilePath);
       Helpers.removeFolderIfExists(destinationFileBackendPath);
     } else {
-      if (this.isNotASpecFileCondition(absoluteFilePath)) {
-        if (event.eventName === 'unlink') {
-          if (relativeFilePath.startsWith(`${config.folder.assets}/`)) {
-            this.codecut.files([relativeFilePath], true);
-          } else {
-            Helpers.removeFileIfExists(destinationFilePath);
-            Helpers.removeFileIfExists(destinationFileBackendPath);
-          }
+
+      if (event.eventName === 'unlink') {
+        if (relativeFilePath.startsWith(`${config.folder.assets}/`)) {
+          this.codecut.files([relativeFilePath], true);
         } else {
-          if (fse.existsSync(absoluteFilePath)) {
-            //#region mkdirp basedir
-            if (!fse.existsSync(path.dirname(destinationFilePath))) {
-              fse.mkdirpSync(path.dirname(destinationFilePath));
-            }
-            if (!fse.existsSync(path.dirname(destinationFileBackendPath))) {
-              fse.mkdirpSync(path.dirname(destinationFileBackendPath));
-            }
-            //#endregion
-
-            //#region remove deist if directory
-            if (fse.existsSync(destinationFilePath) && fse.lstatSync(destinationFilePath).isDirectory()) {
-              fse.removeSync(destinationFilePath);
-            }
-            if (fse.existsSync(destinationFileBackendPath) && fse.lstatSync(destinationFileBackendPath).isDirectory()) {
-              fse.removeSync(destinationFileBackendPath);
-            }
-            //#endregion
-
-            this.codecut.files([relativeFilePath]);
-          }
+          Helpers.removeFileIfExists(destinationFilePath);
+          Helpers.removeFileIfExists(destinationFileBackendPath);
         }
+      } else {
+        if (fse.existsSync(absoluteFilePath)) {
+          //#region mkdirp basedir
+          if (!fse.existsSync(path.dirname(destinationFilePath))) {
+            fse.mkdirpSync(path.dirname(destinationFilePath));
+          }
+          if (!fse.existsSync(path.dirname(destinationFileBackendPath))) {
+            fse.mkdirpSync(path.dirname(destinationFileBackendPath));
+          }
+          //#endregion
 
+          //#region remove deist if directory
+          if (fse.existsSync(destinationFilePath) && fse.lstatSync(destinationFilePath).isDirectory()) {
+            fse.removeSync(destinationFilePath);
+          }
+          if (fse.existsSync(destinationFileBackendPath) && fse.lstatSync(destinationFileBackendPath).isDirectory()) {
+            fse.removeSync(destinationFileBackendPath);
+          }
+          //#endregion
+
+          this.codecut.files([relativeFilePath]);
+        }
       }
+
+
     }
   }
   //#endregion
@@ -269,18 +270,17 @@ export class BroswerCompilation extends BackendCompilation {
   //#endregion
 
 
-  private copyTsConfig() {
-    //#region copy tsconfig
-    const source = crossPlatformPath(path.join(this.cwd, this.tsConfigBrowserName));
-    const dest = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, this.tsConfigName));
-    Helpers.copyFile(source, dest);
-    //#endregion
-  }
+  // private copyTsConfig() {
+  //   //#region copy tsconfig
+  //   // const source = crossPlatformPath(path.join(this.cwd, this.tsConfigBrowserName));
+  //   // const dest = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, this.tsConfigName));
+  //   // Helpers.copyFile(source, dest);
+  //   // const ProjectClass = CLASS.getBy('Project') as typeof Project;
+  //   // const proj = ProjectClass.From(this.cwd) as Project;
+  //   this.project.quickFixes.updateTsconfigsInTmpSrcBrowserFolders();
+  //   //#endregion
+  // }
 
-
-  public isNotASpecFileCondition(absoluteFilePath: string) {
-    return !absoluteFilePath.endsWith('.spec.ts')
-  }
 
   public isNotFromAssets(absoluteFilePath: string, base: string) {
     absoluteFilePath = crossPlatformPath(absoluteFilePath);

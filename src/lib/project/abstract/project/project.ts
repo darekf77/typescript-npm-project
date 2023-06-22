@@ -30,7 +30,9 @@ import { SiteProject } from './site-project.backend';
 import {
   PackageJSON, QuickFixes, StaticBuild, WorkspaceSymlinks,
   NpmPackages, NodeModules, FilesRecreator, FilesFactory,
-  FilesTemplatesBuilder, TestRunner, EnvironmentConfig,
+  FilesTemplatesBuilder,
+  MochaTestRunner, JestTestRunner, CypressTestRunner,
+  EnvironmentConfig,
   ProxyRouter, FilesStructure, BuildProcess, TargetProject,
   GitActions,
   WebpackBackendCompilation,
@@ -38,6 +40,7 @@ import {
   Branding,
   DocsAppBuildConfig,
   AssetsManager,
+
 } from '../../features';
 import { SourceModifier, FrameworkFilesGenerator, BaselineSiteJoin, AssetsFileListGenerator } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
@@ -184,7 +187,12 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('frameworkFileGenerator', FrameworkFilesGenerator);
       this.defineProperty<Project>('filesTemplatesBuilder', FilesTemplatesBuilder);
       this.defineProperty<Project>('join', BaselineSiteJoin);
-      this.defineProperty<Project>('tests', TestRunner);
+      // console.log({
+      //   MochaTestRunner, JestTestRunner, CypressTestRunner,
+      // })
+      this.defineProperty<Project>('tests', MochaTestRunner);
+      this.defineProperty<Project>('testsJest', JestTestRunner);
+      this.defineProperty<Project>('testsCypress', CypressTestRunner);
       Project.projects.push(this);
       this.__defaultPort = Project.DefaultPortByType(this._type);
       this.defineProperty<Project>('env', EnvironmentConfig);

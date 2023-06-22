@@ -472,24 +472,24 @@ export class FilesStructure extends FeatureForProject {
                 "browserTarget": "sassy-project:build"
               }
             },
-            "test": {
-              "builder": "@angular-devkit/build-angular:karma",
-              "options": {
-                "main": "src/test.ts",
-                "polyfills": "src/polyfills.ts",
-                "tsConfig": "tsconfig.spec.json",
-                "karmaConfig": "karma.conf.js",
-                "inlineStyleLanguage": "scss",
-                "assets": [
-                  "src/favicon.ico",
-                  "src/assets"
-                ],
-                "styles": [
-                  "src/styles.scss"
-                ],
-                "scripts": []
-              }
-            }
+            // "test": {
+            //   "builder": "@angular-devkit/build-angular:karma",
+            //   "options": {
+            //     "main": "src/test.ts",
+            //     "polyfills": "src/polyfills.ts",
+            //     "tsConfig": "tsconfig.spec.json",
+            //     "karmaConfig": "karma.conf.js",
+            //     "inlineStyleLanguage": "scss",
+            //     "assets": [
+            //       "src/favicon.ico",
+            //       "src/assets"
+            //     ],
+            //     "styles": [
+            //       "src/styles.scss"
+            //     ],
+            //     "scripts": []
+            //   }
+            // }
           }
         }
       },

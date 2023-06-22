@@ -1,3 +1,6 @@
+import { config } from "tnp-config";
+import { Models } from "tnp-models";
+
 export const argsToClear = [
   'websql',
   'serveApp',
@@ -28,6 +31,7 @@ export const extAllowedToReplace = [
   ].map(ext => `.${ext}`),
 ];
 
+
 export const frontendFiles = [
   '.browser.ts',
   '.component.ts',
@@ -36,11 +40,23 @@ export const frontendFiles = [
   '.pipe.ts',
   '.module.ts',
   '.service.ts',
+  '.store.ts',
   '.actions.ts',
   '.effects.ts',
   '.reducers.ts',
   '.selectors.ts',
 ]
+
+export const frontEndOnly = [
+  '.spec.ts',
+  '.e2e.ts',
+  '.e2e-spec.ts',
+  '.html',
+  ...extForStyles,
+  // ...frontendFiles, // TODO @LAST in next version of firedev
+  // '.test.ts',
+]
+
 
 export const appRelatedFiles = [
   ...extAllowedToReplace.map(ext => `app${ext}`),
@@ -64,3 +80,9 @@ export const notAllowedProjectNames = [
   'lib',
   '_',
 ]
+
+
+
+export function tempSourceFolder(outDir: Models.dev.BuildDir, appForLib: boolean, websql: boolean) {
+  return `tmp-src-${appForLib ? 'app-' : ''}${outDir}${websql ? '-websql' : ''}`
+}

@@ -4,6 +4,7 @@ import { Helpers } from 'tnp-helpers';
 import { Project } from '../../project';
 import { PROGRESS_DATA } from 'tnp-models';
 import { config } from 'tnp-config';
+import { TestTypeFiredev, TestTypeFiredevArr } from '../../models';
 
 
 function SHOW_LOOP(c = 0 as any, maximum = Infinity, errExit = false) {
@@ -56,26 +57,110 @@ function $PROCESS_CWD() {
   process.exit(0)
 }
 
+
+
+async function testSelectors(watch: boolean, debug: boolean, args: string) {
+  const proj = Project.Current as Project;
+  if (!proj.isStandaloneProject || proj.typeIsNot('isomorphic-lib')) {
+    Helpers.error(`[${config.frameworkName}] tests for organization in progress `, false, true);
+  }
+
+  const [possibleTest] = args.split(' ');
+  const testType = TestTypeFiredevArr.includes(possibleTest as any) ? possibleTest : void 0;
+  const res = testType ? testType
+    : await Helpers.consoleGui.select<TestTypeFiredev>(`What do you want to test ? ${watch ? '(single run)' : ''}`, [
+      { name: 'Mocha (backend tests from /src/tests/**/*.test.ts)', value: 'mocha' },
+      { name: 'Jest (angular unit/integration tests from /src/**/*.spec.ts )   ', value: 'jest' },
+      { name: 'Cypress (e2e tests from /src/app//**/*.e2e.ts )', value: 'cypress' },
+    ]);
+  if (testType) {
+    args = args.split(' ').slice(1).join(' ');
+  }
+
+  if (res === 'mocha') {
+    await mochaTests(watch, debug, args);
+  } else if (res === 'jest') {
+    await jestTests(watch, debug, args);
+  } else if (res === 'cypress') {
+    await cypressTests(watch, debug, args);
+  } else {
+    process.exit(0)
+  }
+}
+
+async function mochaTests(watch: boolean, debug: boolean, args: string) {
+  const proj = (Project.Current as Project);
+  await proj.filesStructure.init(args);
+  if (watch) {
+    await (Project.Current as Project).tests.startAndWatch(args.trim().split(' '), debug)
+  } else {
+    await (Project.Current as Project).tests.start(args.trim().split(' '), debug)
+  }
+  if (!watch) {
+    process.exit(0)
+  }
+}
+
+
+async function jestTests(watch: boolean, debug: boolean, args: string) {
+  const proj = (Project.Current as Project);
+  await proj.filesStructure.init(args);
+  if (watch) {
+    await proj.testsJest.startAndWatch(debug, args.trim())
+  } else {
+    await proj.testsJest.start(debug, args.trim())
+  }
+  if (!watch) {
+    process.exit(0)
+  }
+}
+
+
+async function cypressTests(watch: boolean, debug: boolean, args: string) {
+  const proj = (Project.Current as Project);
+  await proj.filesStructure.init(args);
+  if (watch) {
+    await proj.testsCypress.startAndWatch(args.trim().split(' '), debug)
+  } else {
+    await proj.testsCypress.start(args.trim().split(' '), debug)
+  }
+  if (!watch) {
+    process.exit(0)
+  }
+}
+
+
 const $TEST_WATCH = async (args: string) => {
-  await (Project.Current as Project).filesStructure.init(args);
-  await (Project.Current as Project).tests.startAndWatch(args.trim().split(' '))
+  await testSelectors(true, false, args);
 }
 
 const $TEST_WATCH_DEBUG = async (args: string) => {
-  await (Project.Current as Project).filesStructure.init(args);
-  await (Project.Current as Project).tests.startAndWatch(args.trim().split(' '), true)
+  await testSelectors(true, true, args);
 }
 
 const $TEST = async (args: string) => {
-  await (Project.Current as Project).filesStructure.init(args);
-  await (Project.Current as Project).tests.start(args.trim().split(' '))
-  process.exit(0)
+  await testSelectors(false, false, args);
 }
 
 const $TEST_DEBUG = async (args: string) => {
-  await (Project.Current as Project).filesStructure.init(args);
-  await (Project.Current as Project).tests.start(args.trim().split(' '), true)
-  process.exit(0)
+  await testSelectors(false, true, args);
+}
+
+
+const $MOCHA_WATCH = async (args: string) => {
+  await mochaTests(true, false, args);
+}
+
+const $MOCHA_WATCH_DEBUG = async (args: string) => {
+  await mochaTests(true, true, args);
+}
+
+const $MOCHA = async (args: string) => {
+  await mochaTests(false, false, args);
+}
+
+const $MOCHA_DEBUG = async (args: string) => {
+  await mochaTests(false, true, args);
 }
 
 
@@ -162,6 +247,10 @@ export default {
   $SHOW_RANDOM_HAMSTERS: Helpers.CLIWRAP($SHOW_RANDOM_HAMSTERS, '$SHOW_RANDOM_HAMSTERS'),
   $SHOW_RANDOM_HAMSTERS_TYPES: Helpers.CLIWRAP($SHOW_RANDOM_HAMSTERS_TYPES, '$SHOW_RANDOM_HAMSTERS_TYPES'),
   $PROCESS_CWD: Helpers.CLIWRAP($PROCESS_CWD, '$PROCESS_CWD'),
+  $MOCHA_WATCH: Helpers.CLIWRAP($MOCHA_WATCH, '$MOCHA_WATCH'),
+  $MOCHA_WATCH_DEBUG: Helpers.CLIWRAP($MOCHA_WATCH_DEBUG, '$MOCHA_WATCH_DEBUG'),
+  $MOCHA: Helpers.CLIWRAP($MOCHA, '$MOCHA'),
+  $MOCHA_DEBUG: Helpers.CLIWRAP($MOCHA_DEBUG, '$MOCHA_DEBUG'),
   $TEST_WATCH: Helpers.CLIWRAP($TEST_WATCH, '$TEST_WATCH'),
   $TEST_WATCH_DEBUG: Helpers.CLIWRAP($TEST_WATCH_DEBUG, '$TEST_WATCH_DEBUG'),
   $TEST: Helpers.CLIWRAP($TEST, '$TEST'),

@@ -36,7 +36,8 @@ export class FilesTemplatesBuilder extends FeatureForProject {
       this.processFile(filePath, fileContent, env, _, soft);
       // Helpers.log(`Processed DONE for ${f}`);
     }
-    this.project.quickFixes.updateTsconfigsInTmpSrcBrowserFolders();
+    this.project.quickFixes.recreateTempSourceNecessaryFiles('dist');
+    this.project.quickFixes.recreateTempSourceNecessaryFiles('bundle'); // TODO refactor init
   }
 
   rebuildFile(filetemplateRelativePath, soft = false) {

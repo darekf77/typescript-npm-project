@@ -13,7 +13,7 @@ import type { Project } from '../../../abstract/project/project';
 import { BuildOptions } from 'tnp-db';
 import { RegionRemover } from 'isomorphic-region-loader';
 import { MjsModule } from '../../../features/copy-manager/bundle-mjs-fesm-module-spliter.backend';
-import { extAllowedToReplace } from '../../../../constants';
+import { extAllowedToReplace, frontEndOnly } from '../../../../constants';
 //#endregion
 
 //#region consts
@@ -791,8 +791,15 @@ declare module "*.json" {
       const isEmptyModuleBackendFile = this.isEmptyModuleBackendFile;
 
       const absoluteBackendDestFilePath = this.absoluteBackendDestFilePath;
+
       if (!fse.existsSync(path.dirname(absoluteBackendDestFilePath))) {
         fse.mkdirpSync(path.dirname(absoluteBackendDestFilePath));
+      }
+      const isFrontendFile = !_.isUndefined(frontEndOnly.find(f => absoluteBackendDestFilePath.endsWith(f)));
+
+      if (isFrontendFile) {
+        // console.log(`Ommiting for backend: ${absoluteBackendDestFilePath} `)
+        return;
       }
 
 

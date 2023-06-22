@@ -29,7 +29,7 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         //#region releative pathes from core project
         'app/src/app/app.component.html',
         'app/src/app/app.component.scss',
-        'app/src/app/app.component.spec.ts',
+        // 'app/src/app/app.component.spec.ts', -> something better needed
         'app/src/app/app.component.ts',
         'app/src/app/app.module.ts',
         'app/src/environments/environment.prod.ts',
@@ -41,7 +41,9 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         'app/src/main.ts',
         'app/src/polyfills.ts',
         'app/src/styles.scss',
-        'app/src/test.ts',
+        'app/src/jestGlobalMocks.ts',
+        'app/src/setupJest.ts',
+        // 'app/src/test.ts',  // node needed for jest test - (but the don' work wit symlinks)
         'app/src/manifest.webmanifest',
         'app/ngsw-config.json',
         'app/.browserslistrc',
@@ -49,6 +51,7 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         'app/.gitignore',
         // 'app/README.md',
         'app/angular.json',
+        'app/jest.config.js',
         'app/karma.conf.js',
         'app/package-lock.json',
         'app/package.json',

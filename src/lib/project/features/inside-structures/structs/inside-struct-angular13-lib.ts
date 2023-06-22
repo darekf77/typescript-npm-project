@@ -33,7 +33,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
         //#region files to copy from core isomorphic lib
         'lib/src/app/app.component.html',
         'lib/src/app/app.component.scss',
-        'lib/src/app/app.component.spec.ts',
+        // 'lib/src/app/app.component.spec.ts', // not working -> something better needed
         'lib/src/app/app.component.ts',
         'lib/src/app/app.module.ts',
         'lib/src/environments/environment.prod.ts',
@@ -45,7 +45,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
         'lib/src/main.ts',
         'lib/src/polyfills.ts',
         'lib/src/styles.scss',
-        'lib/src/test.ts',
+        // 'lib/src/test.ts', // node needed for jest test - (but the don' work wit symlinks)
         'lib/.browserslistrc',
         'lib/.editorconfig',
         'lib/.gitignore',
@@ -55,6 +55,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
         'lib/package-lock.json',
         'lib/package.json',
         'lib/tsconfig.app.json',
+        'lib/tsconfig.doc.json',
         'lib/tsconfig.json',
         'lib/tsconfig.spec.json',
         'lib/projects/my-lib/src',

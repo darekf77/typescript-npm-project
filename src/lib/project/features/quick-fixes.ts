@@ -7,7 +7,7 @@ import { FeatureForProject, Project } from '../abstract';
 import { Helpers } from 'tnp-helpers';
 import { config, ConfigModels } from 'tnp-config';
 import { Models } from 'tnp-models';
-import { folder_shared_folder_info } from '../../constants';
+import { folder_shared_folder_info, tempSourceFolder } from '../../constants';
 
 export class QuickFixes extends FeatureForProject {
 
@@ -39,68 +39,145 @@ export class QuickFixes extends FeatureForProject {
     }
   }
 
-  updateTsconfigsInTmpSrcBrowserFolders() {
-    if (this.project.typeIs('angular-lib', 'isomorphic-lib')) {
+  recreateTempSourceNecessaryFiles(outDir: Models.dev.BuildDir) {
+    // if (this.project.typeIs('isomorphic-lib')) {
+
+    (() => {
       const tsconfigBrowserPath = path.join(this.project.location, 'tsconfig.browser.json');
-      const tempDirs = fse.readdirSync(this.project.location).filter(dir => dir.startsWith('tmp-src-'));
+      const tempDirs = [
+        tempSourceFolder(outDir, true, true),
+        tempSourceFolder(outDir, false, false),
+        tempSourceFolder(outDir, true, false),
+        tempSourceFolder(outDir, false, true),
+      ]
       tempDirs.forEach(dirName => {
+        // console.log(`
+
+        //   REBUILDING: ${dirName}
+
+        //   `)
         const dest = path.join(this.project.location, dirName, 'tsconfig.json');
         Helpers.copyFile(tsconfigBrowserPath, dest);
-      })
 
-      const componentsFolder = path.join(this.project.location, config.folder.components)
-      if (fse.existsSync(componentsFolder)) {
-        // TODO join isomorphic part with tsconfig.isomorphic.json
-        Helpers.writeFile(path.join(componentsFolder, config.file.tsconfig_json), {
-          "compileOnSave": true,
+
+        Helpers.writeJson(crossPlatformPath([this.project.location, dirName, 'tsconfig.spec.json']), {
+          "extends": "./tsconfig.json",
           "compilerOptions": {
-            "declaration": true,
-            "experimentalDecorators": true,
-            "emitDecoratorMetadata": true,
-            "allowSyntheticDefaultImports": true,
-            'importHelpers': true,
-            "moduleResolution": "node",
-            "module": "commonjs",
-            "skipLibCheck": true,
-            "sourceMap": true,
-            "target": "es5",
-            "lib": [
-              "es2015",
-              "es2015.promise",
-              "es2015.generator",
-              "es2015.collection",
-              "es2015.core",
-              "es2015.reflect",
-              "es2016",
-              "dom"
-            ],
+            "outDir": "./out-tsc/spec",
             "types": [
+              "jest",
               "node"
-            ],
+            ]
           },
-          "include": [
-            "./**/*"
+          "files": [
+            "src/polyfills.ts"
           ],
-          "exclude": [
-            "node_modules",
-            "preview",
-            "projects",
-            "docs",
-            "dist",
-            "bundle",
-            "example",
-            "examples",
-            "browser",
-            "module",
-            "tmp-src",
-            "src/tests",
-            "src/**/*.spec.ts",
-            "tmp-site-src",
-            "tmp-tests-context"
+          "include": [
+            "lib/**/*.spec.ts",
+            "lib/**/*.d.ts",
+            "app/**/*.spec.ts",
+            "app/**/*.d.ts"
           ]
-        })
-      }
-    }
+        });
+
+        Helpers.writeFile(crossPlatformPath([this.project.location, dirName, 'jest.config.js']), `
+module.exports = {
+preset: "jest-preset-angular",
+setupFilesAfterEnv: ["<rootDir>/setupJest.ts"],
+reporters: ["default", "jest-junit"],
+};`.trim() + '\n');
+
+        Helpers.writeFile(crossPlatformPath([this.project.location, dirName, 'setupJest.ts']), `
+import 'jest-preset-angular/setup-jest';
+import './jestGlobalMocks';
+`.trim() + '\n');
+
+        Helpers.writeFile(crossPlatformPath([this.project.location, dirName, 'jestGlobalMocks.ts']), `
+Object.defineProperty(window, 'CSS', {value: null});
+Object.defineProperty(document, 'doctype', {
+  value: '<!DOCTYPE html>'
+});
+Object.defineProperty(window, 'getComputedStyle', {
+  value: () => {
+    return {
+      display: 'none',
+      appearance: ['-webkit-appearance']
+    };
+  }
+});
+/**
+ * ISSUE: https://github.com/angular/material2/issues/7101
+ * Workaround for JSDOM missing transform property
+ */
+Object.defineProperty(document.body.style, 'transform', {
+  value: () => {
+    return {
+      enumerable: true,
+      configurable: true,
+    };
+  },
+});
+`.trim() + '\n');
+
+
+      })
+    })();
+
+
+
+    // const componentsFolder = path.join(this.project.location, config.folder.components)
+    // if (fse.existsSync(componentsFolder)) {
+    //   // TODO join isomorphic part with tsconfig.isomorphic.json
+    //   Helpers.writeFile(path.join(componentsFolder, config.file.tsconfig_json), {
+    //     "compileOnSave": true,
+    //     "compilerOptions": {
+    //       "declaration": true,
+    //       "experimentalDecorators": true,
+    //       "emitDecoratorMetadata": true,
+    //       "allowSyntheticDefaultImports": true,
+    //       'importHelpers': true,
+    //       "moduleResolution": "node",
+    //       "module": "commonjs",
+    //       "skipLibCheck": true,
+    //       "sourceMap": true,
+    //       "target": "es5",
+    //       "lib": [
+    //         "es2015",
+    //         "es2015.promise",
+    //         "es2015.generator",
+    //         "es2015.collection",
+    //         "es2015.core",
+    //         "es2015.reflect",
+    //         "es2016",
+    //         "dom"
+    //       ],
+    //       "types": [
+    //         "node"
+    //       ],
+    //     },
+    //     "include": [
+    //       "./**/*"
+    //     ],
+    //     "exclude": [
+    //       "node_modules",
+    //       "preview",
+    //       "projects",
+    //       "docs",
+    //       "dist",
+    //       "bundle",
+    //       "example",
+    //       "examples",
+    //       "browser",
+    //       "module",
+    //       "tmp-src",
+    //       "src/tests",
+    //       "src/**/*.spec.ts",
+    //       "tmp-site-src",
+    //       "tmp-tests-context"
+    //     ]
+    //   })
+    // }
+    // }
   }
 
 
@@ -165,6 +242,48 @@ Assets from this folder are being shipped with this npm package (${this.project.
 created from this project.
 
 THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
+          `.trimLeft())
+
+      })();
+
+      (() => {
+        const shared_folder_info = crossPlatformPath([
+          this.project.location,
+          config.folder.src,
+          'tests',
+          'mocha-tests-info.md',
+        ]);
+
+        Helpers.writeFile(shared_folder_info, `
+THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
+
+# Purpose of this folder
+Put your backend **mocha** tests (with .spec extension) in this folder.
+
+# How to test your isomorphic backend ?
+\`\`\`
+firedev mocha
+firedev mocha:watch
+firedev mocha:debug # and start "attach" VSCode debugger
+firedev mocha:watch:debug # and start "attach" VSCode debugger
+\`\`\`
+
+# Example
+example.test.ts
+\`\`\`ts
+import { describe, before, it } from 'mocha'
+import { expect } from 'chai';
+
+describe('Set name for function or class', () => {
+
+  it('should keep normal function name ', () => {
+    expect(1).to.be.eq(Number(1));
+  })
+});
+\`\`\`
+
+THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
+
           `.trimLeft())
 
       })();

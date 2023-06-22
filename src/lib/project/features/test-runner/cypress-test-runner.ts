@@ -1,18 +1,17 @@
 //#region @backend
 import { _ } from 'tnp-core';
 import { path } from 'tnp-core'
-import { FeatureForProject } from '../abstract';
+import { FeatureForProject } from '../../abstract';
 import { chokidar } from 'tnp-core';
 import { child_process } from 'tnp-core';
 //#endregion
 
 import { config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
+import { CLASS } from 'typescript-class-helpers';
 
-export type TestType = 'unit' | 'integration' | 'e2e';
-
-
-export class TestRunner
+@CLASS.NAME('CypressTestRunner')
+export class CypressTestRunner
   //#region @backend
   extends FeatureForProject
 //#endregion
@@ -23,8 +22,8 @@ export class TestRunner
     files = files.map(f => path.basename(f));
     // console.log('files',files)
     const useFiles = (_.isArray(files) && files.length > 0);
-    const ext = (files.length > 1 || (!_.first(files).endsWith('.spec.ts'))) ? '*.spec.ts' : ''
-    const res = `${useFiles ? `src/tests/**/*${files.length === 1 ? `${_.first(files)}` : `(${files.join('|')})`}${ext}` : 'src/**/*.spec.ts'}`
+    const ext = (files.length > 1 || (!_.first(files).endsWith('.test.ts'))) ? '*.test.ts' : ''
+    const res = `${useFiles ? `src/tests/**/*${files.length === 1 ? `${_.first(files)}` : `(${files.join('|')})`}${ext}` : 'src/**/*.test.ts'}`
     return res;
   }
 

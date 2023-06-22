@@ -3,11 +3,13 @@ import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import chalk from 'chalk';
 import {
-  StaticBuild, TestRunner,
+  StaticBuild, MochaTestRunner,
   FilesStructure, FilesTemplatesBuilder, BuildProcess,
   WorkspaceSymlinks, NodeModules, FilesRecreator, FilesFactory,
   QuickFixes, NpmPackages, ProxyRouter, TargetProject, GitActions,
-  SmartNodeModules, RecentFilesForContainer, LinkedRepos, Branding, DocsAppBuildConfig, AssetsManager
+  SmartNodeModules, RecentFilesForContainer, LinkedRepos, Branding, DocsAppBuildConfig, AssetsManager,
+  JestTestRunner,
+  CypressTestRunner
 } from '../../features';
 
 import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator, AssetsFileListGenerator } from '../../compilers';
@@ -25,7 +27,9 @@ import { _ } from 'tnp-core';
 export abstract class FeatureProject {
 
   //#region @backend
-  public tests: TestRunner;
+  public tests: MochaTestRunner;
+  public testsJest: JestTestRunner;
+  public testsCypress: CypressTestRunner;
   //#endregion
 
   //#region @backend
