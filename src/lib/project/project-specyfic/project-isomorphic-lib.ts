@@ -563,10 +563,25 @@ export class ProjectIsomorphicLib
             if (line.startsWith('WARNING: postcss-url')) {
               return ' --- [firedev] IGNORED WARN ---- ';
             }
-            return line.replace(
+
+            line = line.replace(
               `projects/${this.name}/src/`,
               `./src/`
             );
+
+            if (line.search(`/src/libs/`) !== -1) {
+              const [__, ___, ____, moduleName] = line.split('/');
+              console.log({
+                moduleName,
+                standalone: 'inlib'
+              })
+              return line.replace(
+                `/src/libs/${moduleName}/`,
+                `/${moduleName}/src/lib/`,
+              );
+            }
+
+            return line;
           }
           return line;
         },

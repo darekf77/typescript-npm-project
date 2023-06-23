@@ -164,6 +164,24 @@ const $MOCHA_DEBUG = async (args: string) => {
 }
 
 
+const $JEST_WATCH = async (args: string) => {
+  await jestTests(true, false, args);
+}
+
+const $JEST_WATCH_DEBUG = async (args: string) => {
+  await jestTests(true, true, args);
+}
+
+const $JEST = async (args: string) => {
+  await jestTests(false, false, args);
+}
+
+const $JEST_DEBUG = async (args: string) => {
+  await jestTests(false, true, args);
+}
+
+
+
 const $READLAST = async (args) => {
   // global.tnpShowProgress = true;
   const argsObj: { lines: number; file: string } = require('minimist')(args.split(' '));
@@ -251,6 +269,10 @@ export default {
   $MOCHA_WATCH_DEBUG: Helpers.CLIWRAP($MOCHA_WATCH_DEBUG, '$MOCHA_WATCH_DEBUG'),
   $MOCHA: Helpers.CLIWRAP($MOCHA, '$MOCHA'),
   $MOCHA_DEBUG: Helpers.CLIWRAP($MOCHA_DEBUG, '$MOCHA_DEBUG'),
+  $JEST_WATCH: Helpers.CLIWRAP($JEST_WATCH, '$JEST_WATCH'),
+  $JEST_WATCH_DEBUG: Helpers.CLIWRAP($JEST_WATCH_DEBUG, '$JEST_WATCH_DEBUG'),
+  $JEST: Helpers.CLIWRAP($JEST, '$JEST'),
+  $JEST_DEBUG: Helpers.CLIWRAP($JEST_DEBUG, '$JEST_DEBUG'),
   $TEST_WATCH: Helpers.CLIWRAP($TEST_WATCH, '$TEST_WATCH'),
   $TEST_WATCH_DEBUG: Helpers.CLIWRAP($TEST_WATCH_DEBUG, '$TEST_WATCH_DEBUG'),
   $TEST: Helpers.CLIWRAP($TEST, '$TEST'),
