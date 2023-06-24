@@ -16,6 +16,7 @@ export * from './recent-files.backend';
 export * from './webpack-backend-compilation.backend';
 export * from './linked-repos.backend';
 export * from './assets-manager.backend';
+export * from './test-runner';
 //#endregion
 export * from './environment-config';
 export * from './package-json';
