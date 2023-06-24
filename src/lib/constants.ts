@@ -53,7 +53,7 @@ export const frontEndOnly = [
   '.e2e-spec.ts',
   '.html',
   ...extForStyles,
-  // ...frontendFiles, // TODO @LAST in next version of firedev
+  ...frontendFiles,
   // '.test.ts',
 ]
 

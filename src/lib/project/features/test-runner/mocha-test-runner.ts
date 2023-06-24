@@ -23,7 +23,9 @@ export class MochaTestRunner
     // console.log('files',files)
     const useFiles = (_.isArray(files) && files.length > 0);
     const ext = (files.length > 1 || (!_.first(files).endsWith('.test.ts'))) ? '*.test.ts' : ''
-    const res = `${useFiles ? `src/tests/**/*${files.length === 1 ? `${_.first(files)}` : `(${files.join('|')})`}${ext}` : 'src/**/*.test.ts'}`
+    const res = `${useFiles
+      ? `src/**/tests/**/*${files.length === 1 ? `${_.first(files)}` : `(${files.join('|')})`}${ext}`
+      : 'src/**/tests/*.test.ts'}`
     return res;
   }
 

@@ -48,6 +48,12 @@ export class SourceMappingUrl {
     if (this.mappingLineIndex !== -1) {
       if (this.projectWithBuild.isInRelaseBundle || (process.platform !== 'win32')) { // TODO links on windows sucks d
         this.contentLines[this.mappingLineIndex] = `${SourceMappingUrl.SOURCEMAPDES}${path.basename(this.absFilePath)}.map`;
+      } else {
+        if (process.platform === 'win32') {
+          this.contentLines[this.mappingLineIndex] = `${SourceMappingUrl.SOURCEMAPDES}${crossPlatformPath(this.absFilePath)}.map`;
+        } else {
+          this.contentLines[this.mappingLineIndex] = `${SourceMappingUrl.SOURCEMAPDES}${path.basename(this.absFilePath)}.map`;
+        }
       }
     }
     const fixedContent = this.contentLines.join('\n');

@@ -60,7 +60,7 @@ export async function standaloneConfigBy(standaloneProject: Project): Promise<Mo
 
     Helpers.writeFile(`${pathToProjectEnvironment}.js`, createExampleConfigFor(standaloneProject));
 
-    Helpers.tsCodeModifier.formatFile(`${pathToProjectEnvironment}.js`); // @LAST
+    Helpers.tsCodeModifier.formatFile(`${pathToProjectEnvironment}.js`);
   }
 
   requireUncached(pathToProjectEnvironment);

@@ -541,7 +541,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     [].concat([
       ...this.resources,
       ...(this.isSmartContainerChild ? [config.file.package_json__tnp_json5] : []),
-    ]).forEach(res => { // @LAST copy resource to org build and copy shared assets
+    ]).forEach(res => { //  copy resource to org build and copy shared assets
       const file = path.join(this.location, res);
       const dest = path.join(bundleFolder, res);
       if (!fse.existsSync(file)) {

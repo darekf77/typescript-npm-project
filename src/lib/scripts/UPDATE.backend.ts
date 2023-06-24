@@ -73,7 +73,7 @@ async function MORPHISYNC(args, noExit = false) {
   }
 
 
-  // TODO @LAST SPLIT TO SEPARATED CONTAINERS
+  // TODO  SPLIT TO SEPARATED CONTAINERS
   // const tagToCheckout = Project.morphiTagToCheckoutForCurrentCliVersion(cwd);
   // const currentBranch = Helpers.git.currentBranchName(cwd);
   // Helpers.taskStarted(`Checking out lastest tag ${tagToCheckout} for firedev framework...`);

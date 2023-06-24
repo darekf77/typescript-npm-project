@@ -68,11 +68,15 @@ async function testSelectors(watch: boolean, debug: boolean, args: string) {
   const [possibleTest] = args.split(' ');
   const testType = TestTypeFiredevArr.includes(possibleTest as any) ? possibleTest : void 0;
   const res = testType ? testType
-    : await Helpers.consoleGui.select<TestTypeFiredev>(`What do you want to test ? ${watch ? '(single run)' : ''}`, [
-      { name: 'Mocha (backend tests from /src/tests/**/*.test.ts)', value: 'mocha' },
-      { name: 'Jest (angular unit/integration tests from /src/**/*.spec.ts )   ', value: 'jest' },
-      { name: 'Cypress (e2e tests from /src/app//**/*.e2e.ts )', value: 'cypress' },
-    ]);
+    : await Helpers.consoleGui.select<TestTypeFiredev>(`What do you want to test ? ${!watch
+      ? '(single run '
+      : '(watch mode '
+      } ${debug ? '- with debugger connected' : '- without debugger'})`,
+      [
+        { name: 'Mocha (backend tests from /src/tests/**/*.test.ts)', value: 'mocha' },
+        { name: 'Jest (angular unit/integration tests from /src/**/*.spec.ts )   ', value: 'jest' },
+        { name: 'Cypress (e2e tests from /src/app//**/*.e2e.ts )', value: 'cypress' },
+      ]);
   if (testType) {
     args = args.split(' ').slice(1).join(' ');
   }

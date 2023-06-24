@@ -407,7 +407,20 @@ export abstract class FolderProject {
       const fileOrDirPath = path.join(this.location, head);
       if (!head.startsWith('**')) {
         Helpers.log(`Removing: "${head}"`)
-        Helpers.remove(fileOrDirPath)
+        if (process.platform === 'win32') {
+          while (true) {
+            try {
+              Helpers.remove(fileOrDirPath);
+              break;
+            } catch (error) {
+              // TODO last notification to user
+              Helpers.pressKeyAndContinue('Please shut down your code debugger and any open windows from node_modules and press any key...')
+            }
+          }
+        } else {
+          Helpers.remove(fileOrDirPath)
+        }
+
       }
     }
     if (this.isCoreProject) {
