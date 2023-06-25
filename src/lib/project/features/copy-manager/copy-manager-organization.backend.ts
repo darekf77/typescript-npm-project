@@ -284,6 +284,64 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   }
   //#endregion
 
+  sourceMapContentFix(content: string, isBrowser: boolean, absFilePath: string) {
+    // @LAST
+    if (process.platform === 'win32' && !isBrowser) {
+      const json = JSON.parse(content);
+      if (json) {
+
+        // let resolveSource = _.first(json.sources);
+        //         console.log(`
+        // ORG
+        // ${absFilePath}
+        // BEFORE
+        //   ${resolveSource}`)
+        json.sources = (json.sources || []).map((pathToJoin: string) => {
+
+          let dirnameAbs = crossPlatformPath(path.dirname(absFilePath))
+
+          let resolved = crossPlatformPath(path.resolve(dirnameAbs, pathToJoin.startsWith('./') ? pathToJoin.replace('./', '') : pathToJoin));
+
+
+          const children = this.children;
+          for (let index = 0; index < children.length; index++) {
+            const child = children[index];
+            const localProjFolderName = `/${this.outDir}/${this.project.name}/${child.name}/tmp-source-${this.outDir}/`;
+            if (resolved.includes(localProjFolderName)) {
+              resolved = resolved.replace(localProjFolderName, `/${child.name}/src/`);
+            }
+
+
+            //                    dist/firedev-simple-org/main/tmp-local-copyto-proj-dist/node_modules/@firedev-simple-org/second/src/my-standalone-lib.ts
+            const ifFromLocal = `/${this.outDir}/${this.project.name}/${child.name}/tmp-local-copyto-proj-${this.outDir}/${config.folder.node_modules}/${this.rootPackageName}/`;
+
+            if (resolved.includes(ifFromLocal)) {
+              const [child] = resolved.replace(this.project.location, '').replace(ifFromLocal, '').split('/')
+              console.log('child: ' + child)
+              resolved = resolved
+                .replace(ifFromLocal, `/`)
+                .replace(`${this.project.location}/${child}/src/`, `${this.project.location}/${child}/src/lib/`)
+                ;
+            }
+
+            // const notInLib = `/${this.outDir}/${this.project.name}/${child.name}/tmp-local-copyto-proj-${this.outDir}/${config.folder.node_modules}/${this.rootPackageName}/`;
+          }
+
+          return resolved;
+        })
+
+        // resolveSource = _.first(json.sources);
+        //         console.log(`AFTER
+        // ${resolveSource}
+
+        // `)
+
+      }
+      content = JSON.stringify(json);
+    }
+    return content;
+  }
+
   //#region write specyfic for child dts files
   /**
    * final copy from dist|bundle to node_moules/rootpackagename
@@ -416,6 +474,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     const base = this.monitoredOutDir;
     const appFiles = Helpers.filesFrom([base, config.folder.app], true);
     const libFiles = Helpers.filesFrom([base, config.folder.lib], true);
+    // @LAST add for children
     const appFlatFiles = Helpers.filesFrom(base);
 
     const allFiles = [
