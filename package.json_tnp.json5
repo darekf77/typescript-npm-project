@@ -150,7 +150,6 @@
         "ng-talkback",
         "record-replay-req-res-scenario",
         "vpn-split",
-        "ng2-rest-swagger-generator",
         "node-cli-tester",
       ],
       trusted: {
@@ -288,7 +287,6 @@
         "magic-renamer": '16.0.46',
         "vpn-split": '16.0.1',
         "node-cli-tester": '16.0.2',
-        'ng2-rest-swagger-generator': '16.0.4',
         strings: {
           "@types/diff": "^3.2.2",
           diff: "^3.2.0",
