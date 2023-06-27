@@ -7,7 +7,6 @@ import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { VscodeProject } from '../abstract/project/vscode-project.backend';
 import { BrowserCodeCut } from '../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
-import { recreateApp } from './inside-structures/structs/inside-struct-helpers';
 import { appRelatedFiles, argsToClear, extAllowedToReplace } from '../../constants';
 //#endregion
 
@@ -15,11 +14,13 @@ export class SingularBuild extends FeatureForProject {
 
   //#region static / methods / get proxy project location
   static getProxyProj(workspaceOrContainer: Project, client: string, outFolder: Models.dev.BuildDir = 'dist') {
-    return  crossPlatformPath([workspaceOrContainer.location, outFolder, workspaceOrContainer.name, client]);
+    return crossPlatformPath([workspaceOrContainer.location, outFolder, workspaceOrContainer.name, client]);
   }
   //#endregion
 
   watchers: chokidar.FSWatcher[] = [];
+
+
 
   async createSingluarTargeProjFor(options: {
     parent: Project, client: Project, outFolder: Models.dev.BuildDir, watch?: boolean; nonClient?: boolean,
@@ -52,7 +53,7 @@ export class SingularBuild extends FeatureForProject {
 
     //#endregion
 
-    //#region symlinks app/lib
+    //#region symlinks app/lib fodlers
     (() => {
       [
         'app',
@@ -83,10 +84,11 @@ export class SingularBuild extends FeatureForProject {
           const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, '-', c.name, 'app'));
           Helpers.createSymLink(source_lib, dest_lib, { continueWhenExistedFolderDoesntExists: true });
         })();
+
         (() => {
           const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, '-', c.name, 'index.ts'));
           Helpers.writeFile(dest_lib,
-`export * from "./app";
+            `export * from "./app";
 import def from './app';
 export default def;
 `);
@@ -95,18 +97,14 @@ export default def;
         (() => {
           const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, `../${c.name}`, outFolder, 'index.js'));
           Helpers.writeFile(dest_lib, `var start = require("./compiled/-/${c.name}/app");
-          exports.default = start;`);
+exports.default = start;`);
         })();
 
-        for (let index = 0; index < appRelatedFiles.length; index++) {
-          const appFileName = appRelatedFiles[index];
-          (() => {
-            const source_lib = crossPlatformPath(path.join(c.location, config.folder.src, appFileName));
-            const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, '-', c.name, appFileName));
-            Helpers.createSymLink(source_lib, dest_lib, { continueWhenExistedFolderDoesntExists: true });
-          })();
-
-        }
+        (() => {
+          const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, `../${c.name}`, outFolder, 'app.js')); // fix for waiting in run.js
+          Helpers.writeFile(dest_lib, `var start = require("./compiled/-/${c.name}/app.js").default;
+exports.default = start;`);
+        })();
       }
     });
 
@@ -183,41 +181,68 @@ export default def;
     //#region handle app.* files watch/copy
     (() => {
 
-      const sourcesAppAFilesAbsPathes = appRelatedFiles.map(a => {
-        return crossPlatformPath(path.join(client.location, config.folder.src, a));
-      });
+      const filesToWatch = [];
 
-      recreateApp(client);
-
-
-      const copySourcesToDest = () => {
-        for (let index = 0; index < sourcesAppAFilesAbsPathes.length; index++) {
-          const absFileSource = sourcesAppAFilesAbsPathes[index];
-          const relativeAfile = absFileSource.replace(
-            `${crossPlatformPath(path.join(client.location, config.folder.src))}/`,
-            '',
-          );
-          if (Helpers.exists(absFileSource)) {
-            const dest = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, relativeAfile));
-            Helpers.removeFileIfExists(dest);
-            Helpers.copyFile(absFileSource, dest);
+      const copySourcesToDestNonTarget = () => {
+        children.forEach(c => {
+          if (!nonClient && c.name !== this.project.smartContainerBuildTarget.name) {
+            for (let index = 0; index < appRelatedFiles.length; index++) {
+              const appFileName = appRelatedFiles[index];
+              const source = crossPlatformPath([c.location, config.folder.src, appFileName]);
+              filesToWatch.push(source);
+              const dest = crossPlatformPath([smartContainerTargetProjPath, config.folder.src, '-', c.name, appFileName]);
+              Helpers.exists(source) && Helpers.copyFile(source, dest);
+            }
           }
+        });
+      };
+
+      const copySourcesToDestTarget = () => {
+        for (let index = 0; index < appRelatedFiles.length; index++) {
+          const appFileName = appRelatedFiles[index];
+          const source = crossPlatformPath(path.join(client.location, config.folder.src, appFileName))
+          const relativeAfile = source.replace(`${crossPlatformPath([client.location, config.folder.src])}/`, '',);
+          filesToWatch.push(source);
+          const dest = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, relativeAfile));
+          Helpers.exists(source) && Helpers.copyFile(source, dest);
         }
       };
 
+      const copyAll = () => {
+        copySourcesToDestNonTarget();
+        copySourcesToDestTarget();
+      };
+
       if (watch) {
-        copySourcesToDest();
-        const watcher = chokidar.watch(sourcesAppAFilesAbsPathes, {
+        copyAll();
+        const watcher = chokidar.watch(filesToWatch, {
           ignoreInitial: true,
           followSymlinks: false,
           ignorePermissionErrors: true,
         }).on('all', (event, f) => {
           f = crossPlatformPath(f);
-          const relativeAfile = f.replace(
-            `${crossPlatformPath(path.join(client.location, config.folder.src))}/`,
-            '',
-          );
-          const dest = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, relativeAfile));
+          // C:/Users/darek/projects/npm/firedev-projects/firedev-simple-org/main/src/app.ts
+          // C:/Users/darek/projects/npm/firedev-projects/firedev-simple-org
+          const containerLocaiton = this.project.location;
+          const childName = _.first(f.replace(containerLocaiton + '/' , '').split('/'));
+          const toReplace = crossPlatformPath([containerLocaiton, childName, config.folder.src,])
+
+          const relative = f.replace(toReplace + '/', '');
+          const isTarget = (childName === client.name);
+
+          const dest = isTarget
+            ? crossPlatformPath([smartContainerTargetProjPath, config.folder.src, relative])
+            : crossPlatformPath([smartContainerTargetProjPath, config.folder.src, '-', childName, relative]);
+
+          // console.log({
+          //   f,
+          //   containerLocaiton,
+          //   toReplace,
+          //   childName,
+          //   relative,
+          //   isTarget,
+          //   dest
+          // })
 
           if ((event === 'add') || (event === 'change')) {
             // Helpers.removeFileIfExists(dest);
@@ -229,7 +254,7 @@ export default def;
         })
         this.watchers.push(watcher);
       } else {
-        copySourcesToDest();
+        copyAll();
       }
     })();
     //#endregion
@@ -238,10 +263,6 @@ export default def;
     parent.node_modules.linkToProject(singularWatchProj);
 
     await singularWatchProj.filesStructure.init(''); // THIS CAUSE NOT NICE SHIT
-
-    if (nonClient) {
-
-    }
 
     VscodeProject.launchFroSmartContaienr(parent);
 

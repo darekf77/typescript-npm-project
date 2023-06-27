@@ -7,6 +7,7 @@ import { config, ConfigModels } from 'tnp-config';
 import { Project } from './project';
 import { Helpers, Project as $Project } from 'tnp-helpers';
 import { Models } from 'tnp-models';
+import { MESSAGES } from '../../../constants';
 const forStandAloneSrc = `${config.folder.src}-for-standalone`;
 export abstract class FolderProject {
 
@@ -414,7 +415,7 @@ export abstract class FolderProject {
               break;
             } catch (error) {
               // TODO last notification to user
-              Helpers.pressKeyAndContinue('Please shut down your code debugger and any open windows from node_modules and press any key...')
+              Helpers.pressKeyAndContinue(MESSAGES.SHUT_DOWN_FOLDERS_AND_DEBUGGERS)
             }
           }
         } else {

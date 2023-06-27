@@ -6,7 +6,7 @@ import { Helpers } from 'tnp-helpers';
 import { Project } from '../../../abstract/project/project';
 import { InsideStruct } from '../inside-struct';
 import { BaseInsideStruct } from './base-inside-struct';
-import { recreateApp, resolvePathToAsset } from './inside-struct-helpers';
+import { resolvePathToAsset } from './inside-struct-helpers';
 import { config } from 'tnp-config';
 import { getLoader } from './loaders/loaders';
 import { ID_LOADER_PRE_BOOTSTRAP, PRE_LOADER_NG_IF_INITED } from './inside-struct-constants';

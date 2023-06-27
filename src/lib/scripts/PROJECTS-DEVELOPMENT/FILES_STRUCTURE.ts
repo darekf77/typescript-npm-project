@@ -2,10 +2,13 @@
 import { _, crossPlatformPath } from 'tnp-core';
 import { fse } from 'tnp-core';
 import { path } from 'tnp-core';
+// import { notify } from 'node-notifier';
+// import toast from 'powertoast';
 
 import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
 import { config, ConfigModels } from 'tnp-config';
+import { MESSAGES } from '../../constants';
 
 export async function $LINK_PROJECTS_AND_FILES(args: string, exit = true) {
 
@@ -152,13 +155,28 @@ export async function CLEAN(args: string, exit = true) {
   const clear = async (proj: Project) => {
     if (proj.isContainer) {
       if (proj.isSmartContainer) {
-        proj.node_modules.remove();
-        proj.smartNodeModules.remove();
-        proj.removeFolderByRelativePath(config.folder.dist);
-        proj.removeFolderByRelativePath(config.folder.bundle);
-        proj.removeFolderByRelativePath(config.folder.dist + '-app');
-        proj.removeFolderByRelativePath(config.folder.bundle + '-app');
-        proj.removeFolderByRelativePath(config.folder.tmpBundleRelease);
+        while(true) {
+          try {
+            proj.node_modules.remove();
+            proj.smartNodeModules.remove();
+            proj.removeFolderByRelativePath(config.folder.dist);
+            proj.removeFolderByRelativePath(config.folder.bundle);
+            proj.removeFolderByRelativePath(config.folder.dist + '-app');
+            proj.removeFolderByRelativePath(config.folder.bundle + '-app');
+            proj.removeFolderByRelativePath(config.folder.tmpBundleRelease);
+            break;
+          } catch (error) {
+            // notify({
+            //   title: '[User action required]',
+            //   message: 'Please check your firedev build log...',
+            // }).notify({
+            //   title: '[User action required]',
+            //   message: 'Please check your firedev build log...',
+            // })
+            Helpers.pressKeyAndContinue(MESSAGES.SHUT_DOWN_FOLDERS_AND_DEBUGGERS)
+          }
+        }
+
       }
       // await clear(proj);
       const children = proj.children.filter(c => (c.typeIs('isomorphic-lib') || c.isSmartContainer)

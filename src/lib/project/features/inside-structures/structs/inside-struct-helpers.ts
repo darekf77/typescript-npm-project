@@ -107,6 +107,10 @@ export function recreateApp(project: Project) {
   //#region @backend
   //#region when app.ts or app is not available is not
 
+  if (project.isSmartContainerTarget) {
+    return;
+  }
+
   const appFile = crossPlatformPath(path.join(
     project.location,
     config.folder.src,

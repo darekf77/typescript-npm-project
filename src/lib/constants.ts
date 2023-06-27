@@ -60,7 +60,7 @@ export const frontEndOnly = [
 
 export const appRelatedFiles = [
   ...extAllowedToReplace.map(ext => `app${ext}`),
-  ...frontendFiles,
+  ...frontendFiles.map(ext => `app${ext}`),
   'app.models.ts',
   'app.store.ts',
   'app.constants.ts',
@@ -85,4 +85,9 @@ export const notAllowedProjectNames = [
 
 export function tempSourceFolder(outDir: Models.dev.BuildDir, appForLib: boolean, websql: boolean) {
   return `tmp-src-${appForLib ? 'app-' : ''}${outDir}${websql ? '-websql' : ''}`
+}
+
+
+export const MESSAGES = {
+  SHUT_DOWN_FOLDERS_AND_DEBUGGERS: 'Please shut down your code debugger and any open windows from node_modules and press any key...'
 }

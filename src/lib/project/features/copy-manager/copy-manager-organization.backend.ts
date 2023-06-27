@@ -290,13 +290,10 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       const json = JSON.parse(content);
       if (json) {
 
-        // let resolveSource = _.first(json.sources);
-        //         console.log(`
-        // ORG
-        // ${absFilePath}
-        // BEFORE
-        //   ${resolveSource}`)
         json.sources = (json.sources || []).map((pathToJoin: string) => {
+          if (this.targetProj.isInRelaseBundle) {
+            return '';
+          }
 
           let dirnameAbs = crossPlatformPath(path.dirname(absFilePath))
 
@@ -306,35 +303,48 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
           const children = this.children;
           for (let index = 0; index < children.length; index++) {
             const child = children[index];
-            const localProjFolderName = `/${this.outDir}/${this.project.name}/${child.name}/tmp-source-${this.outDir}/`;
-            if (resolved.includes(localProjFolderName)) {
-              resolved = resolved.replace(localProjFolderName, `/${child.name}/src/`);
-            }
 
+            // rule 1
+            (() => {
+              const localProjFolderName = `/${this.outDir}/${this.project.name}/${child.name}/tmp-source-${this.outDir}/`;
+              if (resolved.includes(localProjFolderName)) {
+                resolved = resolved.replace(localProjFolderName, `/${child.name}/src/`);
+              }
+            })();
 
-            //                    dist/firedev-simple-org/main/tmp-local-copyto-proj-dist/node_modules/@firedev-simple-org/second/src/my-standalone-lib.ts
-            const ifFromLocal = `/${this.outDir}/${this.project.name}/${child.name}/tmp-local-copyto-proj-${this.outDir}/${config.folder.node_modules}/${this.rootPackageName}/`;
+            // rule 2
+            (() => {
 
-            if (resolved.includes(ifFromLocal)) {
-              const [child] = resolved.replace(this.project.location, '').replace(ifFromLocal, '').split('/')
-              console.log('child: ' + child)
-              resolved = resolved
-                .replace(ifFromLocal, `/`)
-                .replace(`${this.project.location}/${child}/src/`, `${this.project.location}/${child}/src/lib/`)
-                ;
-            }
+              const ifFromLocal = `/${this.outDir}/${this.project.name}/${child.name}/tmp-local-copyto-proj-${this.outDir}/${config.folder.node_modules}/${this.rootPackageName}/`;
 
-            // const notInLib = `/${this.outDir}/${this.project.name}/${child.name}/tmp-local-copyto-proj-${this.outDir}/${config.folder.node_modules}/${this.rootPackageName}/`;
+              if (resolved.includes(ifFromLocal)) {
+                const [child] = resolved.replace(this.project.location, '').replace(ifFromLocal, '').split('/')
+                // console.log('child: ' + child)
+                resolved = resolved
+                  .replace(ifFromLocal, `/`)
+                  .replace(`${this.project.location}/${child}/src/`, `${this.project.location}/${child}/src/lib/`)
+                  ;
+              }
+            })();
+
+            // rule 3
+            (() => {
+              const isFromNonTarget = `/-/${child.name}/`;
+              if (resolved.includes(isFromNonTarget)) {
+                // const toRep = `/${config.folder.src}/-/`;
+                let [__, relative] = resolved.split(isFromNonTarget);
+                // console.log(`relative "${relative}"`)
+                const child = path.basename(resolved.replace(relative, ''));
+                // console.log(`CHILD "${child}"`)
+                // const relative = resolved.replace(this.project.location, '').split('/').slice(4).join('/');
+                resolved = crossPlatformPath([this.project.location, child, config.folder.src, relative]);
+              }
+            })();
           }
 
           return resolved;
         })
 
-        // resolveSource = _.first(json.sources);
-        //         console.log(`AFTER
-        // ${resolveSource}
-
-        // `)
 
       }
       content = JSON.stringify(json);
@@ -474,6 +484,17 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     const base = this.monitoredOutDir;
     const appFiles = Helpers.filesFrom([base, config.folder.app], true);
     const libFiles = Helpers.filesFrom([base, config.folder.lib], true);
+    const otherLibsApps = this.children
+      .filter(c => c.name !== this.targetProjName)
+      .map(c => {
+        const baseName = crossPlatformPath([base, '-', c.name]);
+        // console.log(baseName)
+        return Helpers.exists(baseName) ? Helpers.filesFrom(baseName, true) : [];
+      })
+      .reduce((a, b) => {
+        return a.concat(b);
+      }, []);
+
     // @LAST add for children
     const appFlatFiles = Helpers.filesFrom(base);
 
@@ -481,6 +502,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       ...appFiles,
       ...libFiles,
       ...appFlatFiles,
+      ...otherLibsApps
     ];
 
     return allFiles;
@@ -723,8 +745,9 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     destination: Project,
     isTempLocalProj: boolean,
     wasRecrusive: boolean,
+    specialReplace: '-' | 'libs' = config.folder.libs as any
   ) {
-
+    const specialAppFilesMode = (specialReplace === '-');
     const orgSpecyficFileRelativePath = specyficFileRelativePath;
 
     const distOrBundleLocation = crossPlatformPath(path.join(
@@ -744,7 +767,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       return;
     }
 
-    specyficFileRelativePath = specyficFileRelativePath.replace(`${config.folder.libs}/${childName}/`, '');
+    specyficFileRelativePath = specyficFileRelativePath.replace(`${specialReplace}/${childName}/`, '');
     const rootPackageNameForChild = crossPlatformPath(path.join(this.rootPackageName, child.name));
 
     Helpers.log(`Handle single file: ${specyficFileRelativePath} for ${rootPackageNameForChild}`)
@@ -759,7 +782,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       specyficFileRelativePath
     )));
 
-    if (!isTempLocalProj) {
+    if (!isTempLocalProj && !specialAppFilesMode) {
       const readyToCopyFileInLocalTempProj = crossPlatformPath(path.join(
         this.localTempProj.node_modules.pathFor(rootPackageNameForChild),
         specyficFileRelativePath
@@ -792,18 +815,45 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
 
     if (isBackendMapsFile || isBrowserMapsFile) {
       if (isBackendMapsFile) {
-        this.writeFixedMapFile(
-          false,
-          specyficFileRelativePath,
-          destination.node_modules.pathFor(rootPackageNameForChild),
-        )
+        if (specialAppFilesMode) {
+          const fixedContentCLIDebug = this.changedJsMapFilesInternalPathesForDebug(
+            Helpers.readFile(absOrgFilePathInDistOrBundle),
+            false,
+            true,
+            absOrgFilePathInDistOrBundle,
+          );
+          Helpers.writeFile(
+            absOrgFilePathInDistOrBundle,
+            fixedContentCLIDebug,
+          );
+        } else {
+          this.writeFixedMapFile(
+            false,
+            specyficFileRelativePath,
+            destination.node_modules.pathFor(rootPackageNameForChild),
+          )
+        }
+
       }
       if (isBrowserMapsFile) {
-        this.writeFixedMapFile(
-          true,
-          specyficFileRelativePath,
-          destination.node_modules.pathFor(rootPackageNameForChild),
-        )
+        if (specialAppFilesMode) {
+          const fixedContentCLIDebug = this.changedJsMapFilesInternalPathesForDebug(
+            Helpers.readFile(absOrgFilePathInDistOrBundle),
+            false,
+            true,
+            absOrgFilePathInDistOrBundle,
+          );
+          Helpers.writeFile(
+            absOrgFilePathInDistOrBundle,
+            fixedContentCLIDebug,
+          );
+        } else {
+          this.writeFixedMapFile(
+            true,
+            specyficFileRelativePath,
+            destination.node_modules.pathFor(rootPackageNameForChild),
+          )
+        }
       }
     } else {
       Helpers.writeFile(destinationFilePath, (Helpers.readFile(absOrgFilePathInDistOrBundle) || ''));
@@ -853,6 +903,23 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         )
       }
     }
+  }
+  //#endregion
+
+  //#region handle copy of single file / from non target apps
+  handleCopyOfSingleFileFromNonTargetFiles(
+    specyficFileRelativePath: string,
+    destination: Project,
+    isTempLocalProj: boolean,
+    wasRecrusive: boolean,
+  ) {
+    this.handleCopyOfSingleFileForChildFromLibs(
+      specyficFileRelativePath,
+      destination,
+      isTempLocalProj,
+      wasRecrusive,
+      '-'
+    );
   }
   //#endregion
 
@@ -911,6 +978,13 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         isTempLocalProj,
         wasRecrusive,
       );
+    } else if (specyficFileRelativePath.startsWith('-')) {
+      this.handleCopyOfSingleFileFromNonTargetFiles(
+        specyficFileRelativePath,
+        destination,
+        isTempLocalProj,
+        wasRecrusive,
+      )
     } else {
       this.handleCopyOfSingleFileFromAppAndRoot(
         specyficFileRelativePath,

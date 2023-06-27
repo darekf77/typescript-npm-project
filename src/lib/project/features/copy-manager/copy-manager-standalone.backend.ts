@@ -251,6 +251,11 @@ export class CopyManagerStandalone extends CopyManager {
       const json = JSON.parse(content);
       if (json) {
         json.sources = (json.sources || []).map((p: string) => {
+
+          if (this.project.isInRelaseBundle) {
+            return '';
+          }
+
           const localProjFolderName = `tmp-local-copyto-proj-${this.outDir}/${config.folder.node_modules}/${this.rootPackageName}`;
           let dirnameAbs = crossPlatformPath(path.dirname(absFilePath))
           if (dirnameAbs.includes(localProjFolderName)) {
@@ -651,7 +656,7 @@ export class CopyManagerStandalone extends CopyManager {
 
   //#region write fixed map files for non cli
   /**
-   * fix contaen of map files in destination package location
+   * fix content of map files in destination package location
    */
   writeFixedMapFileForNonCli(
     isForBrowser: boolean,

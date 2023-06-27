@@ -806,7 +806,10 @@ declare module "*.json" {
       if (this.project.isSmartContainerTarget) {
 
         fse.writeFileSync(absoluteBackendDestFilePath,
-          (isEmptyModuleBackendFile && isTsFile) ? `export function dummy${(new Date()).getTime()}() { }`
+          (isEmptyModuleBackendFile && isTsFile) ? `
+export function dummy${(new Date()).getTime()}() { }
+export default function dummyDefault${(new Date()).getTime()}() { }
+`
             : this.changeJsFileImportForOrgnanizaiton(this.rawContentBackend, absoluteBackendDestFilePath),
           'utf8');
       } else {

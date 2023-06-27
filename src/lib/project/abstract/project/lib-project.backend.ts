@@ -428,7 +428,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       crossPlatformPath([specyficProjectForBuild.location, specyficProjectForBuild.getTempProjName('bundle'), config.folder.node_modules, realCurrentProj.name]),
     ];
 
-    if (!specyficProjectForBuild.isCommandLineToolOnly) {
+    if (!specyficProjectForBuild.isCommandLineToolOnly && realCurrentProj.isStandaloneProject) {
       for (let index = 0; index < bundles.length; index++) {
         const bundleFolder = bundles[index];
         specyficProjectForBuild.createClientVersionAsCopyOfBrowser(bundleFolder);
@@ -463,7 +463,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       }
     }
 
-    if(!forAppRelaseBuild) {
+    if (!forAppRelaseBuild) {
       this.commit(newVersion);
     }
 
@@ -540,7 +540,12 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     }
     [].concat([
       ...this.resources,
-      ...(this.isSmartContainerChild ? [config.file.package_json__tnp_json5] : []),
+      ...(this.isSmartContainerChild ? [
+        config.file._npmignore,
+        config.file.package_json__tnp_json5
+      ] : [
+        config.file._npmignore,
+      ]),
     ]).forEach(res => { //  copy resource to org build and copy shared assets
       const file = path.join(this.location, res);
       const dest = path.join(bundleFolder, res);

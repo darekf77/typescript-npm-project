@@ -6,12 +6,32 @@ import { Helpers } from 'tnp-helpers';
 import { path } from 'tnp-core'
 import { config } from 'tnp-config';
 import { chokidar } from 'tnp-core';
-import { notify } from 'node-notifier';
+// const { notify } = require('node-notifier');
 import { CLASS } from 'typescript-class-helpers';
+// import toast from 'powertoast';
 import * as open from 'open';
 import chalk from 'chalk';
 import { URL } from 'url';
 //#endregion
+
+async function NOT(args: string) {
+  // _.times(10, (n) => {
+  // console.log(notify)
+  // toast(
+  //   {
+  //     title: 'My awesome title',
+  //     message: 'Hello from node, Mr. User!',
+  //     // icon: path.join(__dirname, 'coulson.jpg'), // Absolute path (doesn't work on balloons)
+  //     // sound: true, // Only Notification Center or Windows Toasters
+  //     // wait: true // Wait with callback, until user action is taken against notification, does not apply to Windows Toasters as they always wait or notify-send as it does not support the wait option
+  //   },
+  // );
+
+  // })
+
+  process.exit(0)
+}
+
 
 //#region sync to/from
 async function $SYNC_TO(args) {
@@ -350,16 +370,6 @@ export async function $NAME_TEST() {
   console.log(CLASS.getName($NAME_TEST))
 }
 
-async function NOT(args: string) {
-  _.times(10, (n) => {
-    notify({
-      message: 'hey' + args + n.toString(),
-      sound: true
-    })
-  })
-
-  process.exit(0)
-}
 
 async function $TARGET_PROJ_UPDATE() {
   (Project.Current as Project).targetProjects.update();
@@ -454,9 +464,23 @@ export async function $REMOVE_BAD_TAG(args: string) {
   process.exit(0)
 }
 
+
+export function $MOVE_JS_TO_TS(args) {
+  Helpers
+    .filesFrom(crossPlatformPath([process.cwd(), args]), true)
+    .forEach(f => {
+      if (path.extname(f) === '.js') {
+        Helpers.move(f, crossPlatformPath([path.dirname(f), path.basename(f).replace('.js', '.ts')]))
+      }
+    })
+  Helpers.info('DONE')
+  process.exit(0)
+}
+
 export default {
   //#region export default
   $REMOVE_BAD_TAG: Helpers.CLIWRAP($REMOVE_BAD_TAG, '$REMOVE_BAD_TAG'),
+  $MOVE_JS_TO_TS: Helpers.CLIWRAP($MOVE_JS_TO_TS, '$MOVE_JS_TO_TS'),
   $DIFF: Helpers.CLIWRAP($DIFF, '$DIFF'),
   $SHOW_OVERRIDE: Helpers.CLIWRAP($SHOW_OVERRIDE, '$SHOW_OVERRIDE'),
   $WATCHERS: Helpers.CLIWRAP($WATCHERS, '$WATCHERS'),
