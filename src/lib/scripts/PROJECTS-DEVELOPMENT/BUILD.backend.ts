@@ -60,6 +60,20 @@ const $BUILD_WATCH = async (args) => {
   }
 };
 
+const $BUILD_TO_ALL = async (args) => {
+  let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  if (proj.isSmartContainerChild) {
+    Helpers.error(`Smart container build only available from container level. `, false, true)
+  } else {
+    if ((proj.isStandaloneProject || proj.isSmartContainer) && proj.typeIsNot('vscode-ext')) {
+      // TODO skipCopyToSelection no loger ipmortant
+      args = `${args} --skipCopyToSelection --copytoAll`;
+    }
+    await proj.buildProcess.startForLibFromArgs(false, false, 'dist', args);
+  }
+};
+
+
 const $BUILD_UP = async (args) => {
   let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
   if (proj.isSmartContainerChild) {
@@ -100,6 +114,11 @@ const BUILD_DIST_WATCH_ALL = async (args) => {
 const BUILD_APP_WATCH = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', args);
 
 const $APP = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', args);
+const $WEBAPP = (args) => {
+  args += ' --websql';
+  return (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', args);
+}
+
 
 const $WEBSQL = (args) => {
   args += ' --websql';
@@ -523,6 +542,7 @@ export default {
   $BUILD: Helpers.CLIWRAP($BUILD, '$BUILD'),
   $CLEAN_BUILD: Helpers.CLIWRAP($CLEAN_BUILD, '$CLEAN_BUILD'),
   $BUILD_WATCH: Helpers.CLIWRAP($BUILD_WATCH, '$BUILD_WATCH'),
+  $BUILD_TO_ALL: Helpers.CLIWRAP($BUILD_TO_ALL, '$BUILD_TO_ALL'),
   $DEFAULT_BUILD: Helpers.CLIWRAP($DEFAULT_BUILD, '$DEFAULT_BUILD'),
   BUILD_DIST: Helpers.CLIWRAP(BUILD_DIST, 'BUILD_DIST'),
   BUILD_DIST_ALL: Helpers.CLIWRAP(BUILD_DIST_ALL, 'BUILD_DIST_ALL'),
@@ -539,6 +559,7 @@ export default {
   BLW: Helpers.CLIWRAP(BLW, 'BLW'),
   BUILD_APP_WATCH: Helpers.CLIWRAP(BUILD_APP_WATCH, 'BUILD_APP_WATCH'),
   $APP: Helpers.CLIWRAP($APP, '$APP'),
+  $WEBAPP: Helpers.CLIWRAP($WEBAPP, '$WEBAPP'),
   $WEBSQL: Helpers.CLIWRAP($WEBSQL, '$WEBSQL'),
   $BAW: Helpers.CLIWRAP($BAW, '$BAW'),
   $BUILD_DIST_PROD: Helpers.CLIWRAP($BUILD_DIST_PROD, '$BUILD_DIST_PROD'),
