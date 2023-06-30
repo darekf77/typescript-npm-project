@@ -120,7 +120,9 @@ export class NpmPackagesBase extends NpmPackagesCore {
       );
 
       if (installAllowed) {
-        if (this.useSmartInstall && !options.smartInstallPreparing) {
+        if ((this.useSmartInstall && !options.smartInstallPreparing)
+          || this.project.smartNodeModules.shouldBeReinstalled()
+        ) {
           this.project.smartNodeModules.install(remove ? 'uninstall' : 'install', ...npmPackages);
         } else {
           if (fullInstall) {

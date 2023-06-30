@@ -6,14 +6,14 @@ import {
   crossPlatformPath,
 } from 'tnp-core';
 
-import { config, ConfigModels } from 'tnp-config';
+import { config, ConfigModels, extAllowedToReplace, frontEndOnly, TAGS } from 'tnp-config';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import type { Project } from '../../../abstract/project/project';
 import { BuildOptions } from 'tnp-db';
 import { RegionRemover } from 'isomorphic-region-loader';
 import { MjsModule } from '../../../features/copy-manager/bundle-mjs-fesm-module-spliter.backend';
-import { extAllowedToReplace, frontEndOnly } from '../../../../constants';
+
 //#endregion
 
 //#region consts
@@ -571,7 +571,7 @@ export class BrowserCodeCut {
 
       if ((this.project.isStandaloneProject || this.project.isSmartContainer) && !this.isWebsqlMode) {
 
-        const regionsToRemove = ['@bro' + 'wser', '@web' + 'sqlOnly'];
+        const regionsToRemove = [TAGS.BROWSER, TAGS.WEBSQL_ONLY];
 
         const orgContentBackend = this.rawContentBackend;
         this.rawContentBackend = RegionRemover.from(

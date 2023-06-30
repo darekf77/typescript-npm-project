@@ -80,6 +80,8 @@ export class NodeModulesCore extends FeatureForProject {
   public dedupeCount = (packages?: string[]) => {
     dedupePackages(this.project.location, packages, true, !this.project.npmPackages.useSmartInstall)
   };
+
+
   public remove = (packageInside?: string) => {
     Helpers.log(`Removing node_modules from ${this.project?.name}`);
     if (packageInside) {

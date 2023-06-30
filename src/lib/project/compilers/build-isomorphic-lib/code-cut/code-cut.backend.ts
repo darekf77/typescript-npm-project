@@ -7,7 +7,7 @@ import { Models } from "tnp-models";
 import type { Project } from "../../../abstract/project/project";
 import type { BroswerCompilation } from "../compilations/compilation-browser.backend";
 import { BrowserCodeCut } from "./browser-code-cut.backend";
-import { extAllowedToReplace } from "../../../../constants";
+import { extAllowedToReplace } from "tnp-config";
 //#endregion
 
 export class CodeCut {

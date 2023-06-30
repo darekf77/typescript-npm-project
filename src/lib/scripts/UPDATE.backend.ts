@@ -47,7 +47,7 @@ async function $INIT_CORE() {
   process.exit(0)
 }
 
-async function MORPHISYNC(args, noExit = false) {
+async function MORPHISYNC(args, noExit = false, useLatestTag = false) {
   const cwd = config.morphiPathUserInUserDir;
   Helpers.info(`Fetching git data... `);
   try {
@@ -58,7 +58,7 @@ async function MORPHISYNC(args, noExit = false) {
 
   try {
     Helpers.run(`git checkout master`, { cwd, output: false }).sync();
-    Helpers.log('DONE CHECKINGOUT MASTER')
+    Helpers.log('DONE CHECKING OUT MASTER')
   } catch (error) {
     Helpers.log(error)
     Helpers.error(`[${config.frameworkName} Not ablt to checkout master branch for :${config.urlMorphi} in: ${cwd}`, false, true);
@@ -72,25 +72,27 @@ async function MORPHISYNC(args, noExit = false) {
     Helpers.error(`[${config.frameworkName} Not ablt to checkout master branch for :${config.urlMorphi} in: ${cwd}`, false, true);
   }
 
+  if (useLatestTag) {
+    // TODO  SPLIT TO SEPARATED CONTAINERS
+    const tagToCheckout = Project.morphiTagToCheckoutForCurrentCliVersion(cwd);
+    const currentBranch = Helpers.git.currentBranchName(cwd);
+    Helpers.taskStarted(`Checking out lastest tag ${tagToCheckout} for firedev framework...`);
+    if (currentBranch !== tagToCheckout) {
+      try {
+        Helpers.run(`git reset --hard && git clean -df && git checkout ${tagToCheckout}`, { cwd }).sync()
+      } catch (error) {
+        console.log(error)
+        Helpers.warn(`[${config.frameworkName} Not ablt to checkout latest tag of firedev framework (moprhi project) : ${config.urlMorphi} in: ${cwd}`, false);
+      }
+    }
+    try {
+      Helpers.run(`git pull origin ${tagToCheckout}`, { cwd }).sync()
+    } catch (error) {
+      console.log(error)
+      Helpers.warn(`[${config.frameworkName} Not ablt to pull latest tag of firedev framework (moprhi project) : ${config.urlMorphi} in: ${cwd}`, false);
+    }
+  }
 
-  // TODO  SPLIT TO SEPARATED CONTAINERS
-  // const tagToCheckout = Project.morphiTagToCheckoutForCurrentCliVersion(cwd);
-  // const currentBranch = Helpers.git.currentBranchName(cwd);
-  // Helpers.taskStarted(`Checking out lastest tag ${tagToCheckout} for firedev framework...`);
-  // if (currentBranch !== tagToCheckout) {
-  //   try {
-  //     Helpers.run(`git reset --hard && git clean -df && git checkout ${tagToCheckout}`, { cwd }).sync()
-  //   } catch (error) {
-  //     console.log(error)
-  //     Helpers.warn(`[${config.frameworkName} Not ablt to checkout latest tag of firedev framework (moprhi project) : ${config.urlMorphi} in: ${cwd}`, false);
-  //   }
-  // }
-  // try {
-  //   Helpers.run(`git pull origin ${tagToCheckout}`, { cwd }).sync()
-  // } catch (error) {
-  //   console.log(error)
-  //   Helpers.warn(`[${config.frameworkName} Not ablt to pull latest tag of firedev framework (moprhi project) : ${config.urlMorphi} in: ${cwd}`, false);
-  // }
 
   try {
     Helpers.run('rimraf .vscode', { cwd }).sync();
@@ -107,7 +109,7 @@ async function $AUTOUPDATE(args: string) {
   if (config.frameworkName === 'firedev') {
     if (await Helpers.questionYesNo(`Proceed with ${config.frameworkName} auto-update ?`)) {
       Helpers.run('npm i -g firedev --force').sync();
-      await MORPHISYNC(args, true)
+      await MORPHISYNC(args, true, true)
       const arrActive = config.activeFramewrokVersions;
       for (let index = 0; index < arrActive.length; index++) {
         const defaultFrameworkVersionForSpecyficContainer = arrActive[index];
@@ -170,7 +172,11 @@ async function $AUTOUPDATE(args: string) {
 }
 
 export async function SYNC(args) {
-  await MORPHISYNC(args);
+  await MORPHISYNC(args, false, true);
+}
+
+export async function LATEST_SYNC(args) {
+  await MORPHISYNC(args, false);
 }
 
 export async function BRANCH_NAME(args) {
@@ -184,6 +190,7 @@ export default {
   $INIT_CORE: Helpers.CLIWRAP($INIT_CORE, '$INIT_CORE'),
   MORPHISYNC: Helpers.CLIWRAP(MORPHISYNC, 'MORPHISYNC'),
   SYNC: Helpers.CLIWRAP(SYNC, 'SYNC'),
+  LATEST_SYNC: Helpers.CLIWRAP(LATEST_SYNC, 'LATEST_SYNC'),
   BRANCH_NAME: Helpers.CLIWRAP(BRANCH_NAME, 'BRANCH_NAME'),
 };
 

@@ -2,12 +2,13 @@
 import { chokidar, crossPlatformPath, _ } from 'tnp-core';
 import { path } from 'tnp-core'
 import { FeatureForProject, Project } from '../abstract';
-import { config } from 'tnp-config';
+import { appRelatedFiles, config } from 'tnp-config';
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { VscodeProject } from '../abstract/project/vscode-project.backend';
 import { BrowserCodeCut } from '../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
-import { appRelatedFiles, argsToClear, extAllowedToReplace } from '../../constants';
+import { argsToClear } from '../../constants';
+
 //#endregion
 
 export class SingularBuild extends FeatureForProject {
@@ -224,7 +225,7 @@ exports.default = start;`);
           // C:/Users/darek/projects/npm/firedev-projects/firedev-simple-org/main/src/app.ts
           // C:/Users/darek/projects/npm/firedev-projects/firedev-simple-org
           const containerLocaiton = this.project.location;
-          const childName = _.first(f.replace(containerLocaiton + '/' , '').split('/'));
+          const childName = _.first(f.replace(containerLocaiton + '/', '').split('/'));
           const toReplace = crossPlatformPath([containerLocaiton, childName, config.folder.src,])
 
           const relative = f.replace(toReplace + '/', '');

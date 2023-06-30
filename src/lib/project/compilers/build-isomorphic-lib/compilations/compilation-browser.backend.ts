@@ -17,6 +17,7 @@ import { JSON10 } from 'json10';
 import { CodeCut } from '../code-cut/code-cut.backend';
 import { codeCuttFn } from '../code-cut/cut-fn.backend';
 import { CLASS } from 'typescript-class-helpers';
+import { TAGS } from 'tnp-config';
 //#endregion
 
 @IncCompiler.Class({ className: 'BroswerCompilation' })
@@ -243,17 +244,17 @@ export class BroswerCompilation extends BackendCompilation {
 
     const replacements = [];
 
-    replacements.push(['@backe' + 'ndFunc', `return (void 0);`]);
-    replacements.push('@bac' + 'kend' as any);
+    replacements.push([TAGS.BACKEND_FUNC, `return (void 0);`]);
+    replacements.push(TAGS.BACKEND as any);
 
     if (!this.buildOptions.websql) {
-      replacements.push('@web' + 'sqlOnly' as any,);
-      replacements.push(['@websq' + 'lFunc', `return (void 0);`]);
-      replacements.push('@we' + 'bsql' as any,);
+      replacements.push(TAGS.WEBSQL_ONLY as any,);
+      replacements.push([TAGS.WEBSQL_FUNC, `return (void 0);`]);
+      replacements.push(TAGS.WEBSQL as any,);
     }
 
-    replacements.push(['@cutCode' + 'IfTrue', codeCuttFn(true)]);
-    replacements.push(['@cutCod' + 'eIfFalse', codeCuttFn(false)]);
+    replacements.push([TAGS.CUT_CODE_IF_TRUE, codeCuttFn(true)]);
+    replacements.push([TAGS.CUT_CODE_IF_FALSE, codeCuttFn(false)]);
 
     this.codecut = new CodeCut(
       this.absPathTmpSrcDistBundleFolder,

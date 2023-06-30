@@ -3,11 +3,11 @@ import { _, crossPlatformPath, path } from 'tnp-core';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { ProjectFactory } from './project-factory.backend';
-import { ConfigModels } from 'tnp-config';
+import { ConfigModels, TAGS, backendNodejsOnlyFiles, extAllowedToExportAndReplaceTSJSCodeFiles, frontendFiles, notNeededForExportFiles } from 'tnp-config';
 import { Project } from '../../project';
 import { config } from 'tnp-config';
 import { MagicRenamer } from 'magic-renamer';
-import { frontendFiles } from '../../constants';
+
 
 export async function RM(args: string, exit = true) {
   const proj = (Project.Current as Project);
@@ -207,9 +207,7 @@ async function $GENERATE(args: string) {
   if (isCustom) {
     //#region handle custom cases
     if (moduleName === 'generated-index-exports') {
-      const allowedFilesExt = ['.ts', '.tsx'];
 
-      const backendFiles = ['.backend.ts']
       const folders = [
         ...Helpers.foldersFrom(absPath).map(f => path.basename(f)),
         ...Helpers.filesFrom(absPath, false).map(f => path.basename(f)),
@@ -217,21 +215,21 @@ async function $GENERATE(args: string) {
         .filter(f => !['index.ts'].includes(f))
         .filter(f => !f.startsWith('.'))
         .filter(f => !f.startsWith('_'))
-        .filter(f => !f.endsWith('.routes.ts'))
-        .filter(f => (path.extname(f) === '') || !_.isUndefined(allowedFilesExt.find(a => f.endsWith(a))))
+        .filter(f => _.isUndefined(notNeededForExportFiles.find(e => f.endsWith(e))))
+        .filter(f => (path.extname(f) === '') || !_.isUndefined(extAllowedToExportAndReplaceTSJSCodeFiles.find(a => f.endsWith(a))))
         ;
       Helpers.writeFile(
         crossPlatformPath([absPath, config.file.index_ts]),
         folders.map(f => {
           if (!_.isUndefined(frontendFiles.find(bigExt => f.endsWith(bigExt)))) {
-            return `//#region @${'brow' + 'ser'}\n`
+            `${TAGS.COMMENT_REGION} ${TAGS.BROWSER}\n`
               + `export * from './${f.replace(path.extname(f), '')}';`
-              + `\n//${'#end' + 'region'}`
+              + + `\n${TAGS.COMMENT_END_REGION}\n`
           }
-          if (!_.isUndefined(backendFiles.find(bigExt => f.endsWith(bigExt)))) {
-            return `//#region @${'back' + 'end'}\n`
+          if (!_.isUndefined(backendNodejsOnlyFiles.find(bigExt => f.endsWith(bigExt)))) {
+            return `${TAGS.COMMENT_REGION} ${TAGS.BACKEND}\n`
               + `export * from './${f.replace(path.extname(f), '')}';`
-              + `\n//${'#end' + 'region'}`
+              + + `\n${TAGS.COMMENT_END_REGION}\n`
           }
           return `export * from './${f.replace(path.extname(f), '')}';`
         }).join('\n') + '\n'
@@ -241,9 +239,9 @@ async function $GENERATE(args: string) {
       if (!Helpers.isFolder(absFilePath)) {
         const content = Helpers.readFile(absFilePath);
         Helpers.writeFile(absFilePath,
-          `//#region @${'brow' + 'ser'}\n`
+          `${TAGS.COMMENT_REGION} ${TAGS.BROWSER}\n`
           + content
-          + `\n//${'#end' + 'region'}\n`
+          + `\n${TAGS.COMMENT_END_REGION}\n`
         );
       }
     }

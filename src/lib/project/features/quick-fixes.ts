@@ -250,6 +250,24 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
         const shared_folder_info = crossPlatformPath([
           this.project.location,
           config.folder.src,
+          config.folder.migrations,
+          'migrations-info.md'
+        ]);
+
+        Helpers.writeFile(shared_folder_info, `
+THIS FILE IS GENERATED. THIS FILE IS GENERATED. THIS FILE IS GENERATED.
+
+In folder is only for storing migration files with auto-generated name.
+
+THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
+          `.trimLeft())
+
+      })();
+
+      (() => {
+        const shared_folder_info = crossPlatformPath([
+          this.project.location,
+          config.folder.src,
           'tests',
           'mocha-tests-info.md',
         ]);

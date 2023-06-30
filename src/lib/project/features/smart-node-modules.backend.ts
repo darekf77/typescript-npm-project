@@ -242,6 +242,13 @@ export class SmartNodeModules extends FeatureForProject {
 
   //#region public api
 
+  //#region public api
+  public shouldBeReinstalled() {
+    return false; // TOOD @LAST
+    // const this.project.node_modules.dedupeCount
+  }
+  //#endregion
+
   //#region install/reinstall all packages
   public install(action: 'install' | 'uninstall' = 'install', ...packages: PackageType[]) {
     Helpers.log(`START SMART INSTALL...  for ${this.project.genericName}`);

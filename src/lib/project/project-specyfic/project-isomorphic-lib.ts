@@ -4,7 +4,7 @@ import { crossPlatformPath, ExecuteOptions, fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import { glob } from 'tnp-core';
 import * as inquirer from 'inquirer';
-import { config, ConfigModels } from 'tnp-config';
+import { config, ConfigModels, extAllowedToExportAndReplaceTSJSCodeFiles, extAllowedToReplace, TAGS } from 'tnp-config';
 import { RegionRemover } from 'isomorphic-region-loader';
 import { IncrementalBuildProcess } from '../compilers/build-isomorphic-lib/compilations/incremental-build-process.backend';
 import { PackagesRecognition } from '../features/package-recognition/packages-recognition';
@@ -1116,16 +1116,15 @@ export class ProjectIsomorphicLib
 
     const filesForModyficaiton = glob.sync(`${releaseSrcLocation}/**/*`);
     filesForModyficaiton
-      .filter(absolutePath => !Helpers.isFolder(absolutePath) && ['.ts', '.js', '.scss', '.html'].includes(path.extname(absolutePath)))
+      .filter(absolutePath => !Helpers.isFolder(absolutePath) && extAllowedToReplace.includes(path.extname(absolutePath)))
       .forEach(absolutePath => {
-        // if (absolutePath.endsWith('OTHER.backend.ts')) {
-        //   console.log({
-        //     absolutePath
-        //   });
-        //   debugger
-        // }
         let rawContent = Helpers.readFile(absolutePath);
-        rawContent = RegionRemover.from(absolutePath, rawContent, ['@notFor' + 'Npm'], this.project).output;
+        rawContent = RegionRemover.from(
+          absolutePath,
+          rawContent,
+          [TAGS.NOT_FOR_NPM],
+          this.project,
+        ).output;
         // rawContent = this.replaceRegionsWith(rawContent, ['@notFor'+'Npm']);
         Helpers.writeFile(absolutePath, rawContent);
       });
