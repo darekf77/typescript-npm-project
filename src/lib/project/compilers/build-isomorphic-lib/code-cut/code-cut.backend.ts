@@ -1,8 +1,7 @@
 //#region imports
-import { config } from "tnp-config";
+import { config, PREFIXES } from "tnp-config";
 import { crossPlatformPath, fse, path, _ } from "tnp-core";
 import { BuildOptions } from "tnp-db";
-import { PREFIXES, Helpers } from "tnp-helpers";
 import { Models } from "tnp-models";
 import type { Project } from "../../../abstract/project/project";
 import type { BroswerCompilation } from "../compilations/compilation-browser.backend";

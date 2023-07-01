@@ -9,22 +9,12 @@ import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config, ConfigModels } from 'tnp-config';
-import { HelpersMerge } from 'tnp-helpers';
 import { FeatureForProject } from '../../abstract';
 
-interface VSCodeSettings {
-  'files.exclude': { [files: string]: boolean; };
-  'workbench.colorTheme': 'Default Light+' | 'Kimbie Dark',
-  'workbench.colorCustomizations': {
-    'activityBar.background'?: string;
-    'activityBar.foreground'?: string;
-    'statusBar.background'?: string;
-  }
-}
 
 
 function getVscodeSettingsFrom(project: Project) {
-  let settings: VSCodeSettings;
+  let settings: ConfigModels.VSCodeSettings;
   const pathSettingsVScode = path.join(project.location, '.vscode', 'settings.json')
   if (Helpers.exists(pathSettingsVScode)) {
     settings = JSON5.parse(Helpers.readFile(pathSettingsVScode))
@@ -202,7 +192,7 @@ export class FilesRecreator extends FeatureForProject {
 
 
 
-  private modifyVscode(modifyFN: (settings: VSCodeSettings, project?: Project) => VSCodeSettings) {
+  private modifyVscode(modifyFN: (settings: ConfigModels.VSCodeSettings, project?: Project) =>  ConfigModels.VSCodeSettings) {
     const pathSettingsVScode = path.join(this.project.location, '.vscode', 'settings.json');
     Helpers.log('[modifyVscode] setting things...')
     if (this.project.isSite) {
@@ -217,7 +207,7 @@ export class FilesRecreator extends FeatureForProject {
     if (Helpers.exists(pathSettingsVScode)) {
       try {
         Helpers.log('parsing 1 ...')
-        let settings: VSCodeSettings = JSON5.parse(Helpers.readFile(pathSettingsVScode))
+        let settings: ConfigModels.VSCodeSettings = JSON5.parse(Helpers.readFile(pathSettingsVScode))
         settings = modifyFN(settings, this.project);
         Helpers.writeFile(pathSettingsVScode, settings);
       } catch (e) {
@@ -229,7 +219,7 @@ export class FilesRecreator extends FeatureForProject {
         const settingFromCore = path.join(Project.by<Project>(this.project._type).location, '.vscode', 'settings.json');
         Helpers.mkdirp(path.dirname(pathSettingsVScode));
         if (Helpers.exists(settingFromCore)) {
-          var settings: VSCodeSettings = JSON5.parse(Helpers.readFile(settingFromCore))
+          var settings: ConfigModels.VSCodeSettings = JSON5.parse(Helpers.readFile(settingFromCore))
           settings = modifyFN(settings, this.project);
           Helpers.writeFile(pathSettingsVScode, settings)
         }

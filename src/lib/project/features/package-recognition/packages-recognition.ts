@@ -5,8 +5,8 @@ import {
   fse,
   crossPlatformPath,
 } from 'tnp-core';
-import { Helpers, PREFIXES } from 'tnp-helpers';
-import { config } from 'tnp-config';
+import { Helpers } from 'tnp-helpers';
+import { config, PREFIXES } from 'tnp-config';
 import { BrowserCodeCut } from '../../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
 import type { Project } from '../../abstract/project/project';
 

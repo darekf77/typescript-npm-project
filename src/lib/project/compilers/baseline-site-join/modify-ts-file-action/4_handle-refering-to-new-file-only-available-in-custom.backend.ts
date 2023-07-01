@@ -6,9 +6,9 @@ import * as watch from 'watch'
 
 import { ModifyTsFileActionBase } from './modify-ts-file-action-base.backend';
 import { Helpers } from 'tnp-helpers';
-import { HelpersMerge } from 'tnp-helpers';
 import { config } from 'tnp-config';
 import { Project } from '../../../index';
+import { HelpersMerge } from '../merge-helpers';
 
 /**
  * Prefixed replacement

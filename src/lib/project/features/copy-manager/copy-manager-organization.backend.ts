@@ -1,7 +1,7 @@
 import { config } from "tnp-config";
 import { crossPlatformPath, glob, path, _ } from "tnp-core";
 import { BuildOptions } from "tnp-db";
-import { Helpers, PREFIXES } from "tnp-helpers";
+import { Helpers } from "tnp-helpers";
 import { Models } from "tnp-models";
 import { CLASS } from "typescript-class-helpers";
 import { Project } from "../../abstract/project/project";

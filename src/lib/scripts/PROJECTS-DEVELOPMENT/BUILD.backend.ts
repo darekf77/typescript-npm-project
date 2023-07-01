@@ -4,8 +4,8 @@ import * as express from 'express';
 import { path } from 'tnp-core';
 import { Project } from '../../project';
 import type { ProjectDocker } from '../../project';
-import { config } from 'tnp-config';
-import { Helpers, PREFIXES } from 'tnp-helpers';
+import { config, PREFIXES } from 'tnp-config';
+import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 //#endregion
 

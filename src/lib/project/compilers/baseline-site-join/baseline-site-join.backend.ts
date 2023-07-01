@@ -14,7 +14,8 @@ import { FeatureForProject, FeatureCompilerForProject } from '../../abstract';
 import { IncCompiler } from 'incremental-compiler';
 import { Project } from '../../abstract/project';
 import { FilesJoinActions } from './files-join-actions.backend';
-import { BaselineSiteJoinprefix, HelpersMerge } from 'tnp-helpers';
+import { BaselineSiteJoinprefix } from 'tnp-config';
+import { HelpersMerge } from './merge-helpers';
 
 
 function optionsBaselineSiteJoin(project: Project): IncCompiler.Models.BaseClientCompilerOptions {

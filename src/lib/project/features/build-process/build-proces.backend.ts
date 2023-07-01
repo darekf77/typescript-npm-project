@@ -9,7 +9,7 @@ import { FeatureForProject, Project } from '../../abstract';
 import { BuildOptions } from 'tnp-db';
 import { Models } from 'tnp-models';
 import { config, ConfigModels } from 'tnp-config';
-import { Helpers, Condition } from 'tnp-helpers';
+import { Helpers } from 'tnp-helpers';
 import { PROGRESS_DATA } from 'tnp-models';
 import { EnvironmentConfig } from '../environment-config';
 import { Log } from 'ng2-logger';

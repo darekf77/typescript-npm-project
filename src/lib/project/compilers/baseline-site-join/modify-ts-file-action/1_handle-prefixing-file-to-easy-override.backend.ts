@@ -3,8 +3,8 @@ import { _ } from 'tnp-core';
 import { path } from 'tnp-core'
 import { ModifyTsFileActionBase } from './modify-ts-file-action-base.backend';
 import { Helpers } from 'tnp-helpers';
-import { HelpersMerge } from 'tnp-helpers';
 import { Project } from '../../../abstract/project/project';
+import { HelpersMerge } from '../merge-helpers';
 //#endregion
 
 /**

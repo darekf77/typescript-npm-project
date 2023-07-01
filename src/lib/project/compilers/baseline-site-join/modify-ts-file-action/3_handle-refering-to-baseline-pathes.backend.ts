@@ -5,9 +5,9 @@ import { glob } from 'tnp-core';
 
 import { ModifyTsFileActionBase } from './modify-ts-file-action-base.backend';
 import { Helpers } from 'tnp-helpers';
-import { HelpersMerge } from 'tnp-helpers';
 import { config } from 'tnp-config';
 import { Project } from '../../../abstract/project';
+import { HelpersMerge } from '../merge-helpers';
 
 
 /**
