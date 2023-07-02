@@ -41,7 +41,7 @@ export class ProjectVscodeExt
   }
 
   projectSpecyficFilesLinked() {
-    return [
+    let files = [
       'src/extension.ts',
       'src/helpers.ts',
       'src/helpers-vscode.ts',
@@ -49,6 +49,11 @@ export class ProjectVscodeExt
       'src/execute-command.ts',
       'src/progress-output.ts',
     ]
+    if (this.frameworkVersionAtLeast('v3')) {
+      files = files.filter(f => f !== 'src/helpers-vscode.ts');
+    }
+
+    return files;
   }
 
 

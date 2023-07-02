@@ -192,7 +192,7 @@ export class FilesRecreator extends FeatureForProject {
 
 
 
-  private modifyVscode(modifyFN: (settings: ConfigModels.VSCodeSettings, project?: Project) =>  ConfigModels.VSCodeSettings) {
+  private modifyVscode(modifyFN: (settings: ConfigModels.VSCodeSettings, project?: Project) => ConfigModels.VSCodeSettings) {
     const pathSettingsVScode = path.join(this.project.location, '.vscode', 'settings.json');
     Helpers.log('[modifyVscode] setting things...')
     if (this.project.isSite) {
@@ -575,7 +575,7 @@ ${this.project.isVscodeExtension ? '' : coreFiles}
         if (file.linked) {
           Helpers.info(`Linking: ${file.from}`)
           Helpers.removeFileIfExists(file.where);
-          Helpers.createSymLink(file.from, file.where);
+          Helpers.createSymLink(file.from, file.where, { continueWhenExistedFolderDoesntExists: true });
         } else {
           Helpers.copyFile(file.from, file.where);
         }

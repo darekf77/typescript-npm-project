@@ -40,7 +40,11 @@ export class QuickFixes extends FeatureForProject {
   }
 
   recreateTempSourceNecessaryFiles(outDir: Models.dev.BuildDir) {
-    // if (this.project.typeIs('isomorphic-lib')) {
+    if (this.project.typeIsNot('isomorphic-lib')) {
+      return;
+    }
+
+
 
     (() => {
       const tsconfigBrowserPath = path.join(this.project.location, 'tsconfig.browser.json');
@@ -257,7 +261,7 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
         Helpers.writeFile(shared_folder_info, `
 THIS FILE IS GENERATED. THIS FILE IS GENERATED. THIS FILE IS GENERATED.
 
-In folder is only for storing migration files with auto-generated name.
+In folder is only for storing migration files with auto-generated names.
 
 THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
           `.trimLeft())
@@ -343,6 +347,7 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
         '@types/lowdb',
         '@types/eslint',
         '@types/eslint-scope',
+        '@types/inquirer',
       ].forEach(name => {
         Helpers.remove(path.join(this.project.node_modules.path, name));
       });
