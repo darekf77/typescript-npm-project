@@ -368,7 +368,8 @@ export class ProjectIsomorphicLib
       if (watch) {
         if (outDir === 'dist') {
           // command = `${loadNvm} && ${this.npmRunNg} serve ${portToServe} ${prod ? '--prod' : ''}`;
-          command = `${this.npmRunNg} serve ${portToServe} ${prod ? '--prod' : ''}`;
+          const isElectron = false;
+          command = `${this.npmRunNg} serve ${isElectron ? 'angular-electron' : 'app'}  ${portToServe} ${prod ? '--prod' : ''}`;
         } else {
           command = ngBuildCmd;
         }
@@ -837,6 +838,7 @@ export class ProjectIsomorphicLib
     }
     const buildLibDone = `LIB BUILD DONE.. `;
     const ifapp = 'if you want to start app build -> please run in other terminal command:';
+
     const ngserve = `${watch ? '--port 4201 # or whatever port' : '#'} to run angular ${watch
       ? 'ng serve'
       : 'ng build (for application - not lib)'

@@ -414,7 +414,7 @@
           // "electron-builder": "22.9.1",
           // "electron-reload": "1.5.0",
           // "conventional-changelog-cli": "2.1.1",
-          "wait-on": "5.0.1",
+          "wait-on": "7.0.1",
           // "webdriver-manager": "12.1.7",
           // "spectron": "13.0.0"
         },
