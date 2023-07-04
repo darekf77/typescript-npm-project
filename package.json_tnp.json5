@@ -285,7 +285,7 @@
         axios: "^0.17.1",
         "ng-talkback": '16.2.1',
         "magic-renamer": '16.0.47',
-        "vpn-split": '16.0.1',
+        "vpn-split": '16.0.2',
         "node-cli-tester": '16.0.2',
         strings: {
           "@types/diff": "^3.2.2",
