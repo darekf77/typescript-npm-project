@@ -179,7 +179,11 @@ async function $GENERATE(args: string) {
   // console.log({
   //   nearestProj: nearestProj?.location
   // })
-  const container = Project.by('container', nearestProj._frameworkVersion) as Project;
+  let container = Project.by('container', nearestProj._frameworkVersion) as Project;
+  if (container.frameworkVersionLessThan('v3')) {
+    container = Project.by('container', config.defaultFrameworkVersion) as Project;
+  }
+
   const myEntity = 'my-entity';
 
   const flags = {
