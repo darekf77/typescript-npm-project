@@ -39,3 +39,11 @@ export function tempSourceFolder(outDir: Models.dev.BuildDir, appForLib: boolean
 export const MESSAGES = {
   SHUT_DOWN_FOLDERS_AND_DEBUGGERS: 'Please shut down your code debugger and any open windows from node_modules and press any key...'
 }
+
+
+export const ONLY_COPY_ALLOWED = [
+  'background-worker-process',
+  'better-sqlite3',
+  '.bin',
+  '.install-date',
+];

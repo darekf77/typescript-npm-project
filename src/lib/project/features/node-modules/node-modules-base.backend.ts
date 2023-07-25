@@ -1,12 +1,12 @@
 //#region imports
-import { path } from 'tnp-core';
+import { crossPlatformPath, path } from 'tnp-core';
 import { fse } from 'tnp-core';
 import { _ } from 'tnp-core';
 import { glob } from 'tnp-core';
 import { CLI } from 'tnp-cli';
 import * as TerminalProgressBar from 'progress';
 
-import { config } from 'tnp-config';
+import { PREFIXES, config } from 'tnp-config';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
@@ -15,36 +15,35 @@ import {
   dedupePackages, nodeModulesExists, addDependenceis
 } from './node-modules-helpers.backend';
 import { NodeModulesCore } from './node-modules-core.backend';
+import { ONLY_COPY_ALLOWED } from '../../../constants';
 
 //#endregion
 
 export class NodeModulesBase extends NodeModulesCore {
-
-
-
   /**
    * Copy (just linke npm install) all package from
    * source project node_modules to itself
    * @param source project - source of node_modules
    * @param triggerMsg reason to copy packages
    */
-  public async copyFrom(source: Project, options: { triggerMsg: string; useDirectlySmartNodeModules?: boolean; }) {
-    const { triggerMsg, useDirectlySmartNodeModules } = options || {};
+  public async copyFrom(source: Project, options: { triggerMsg: string }) {
+    const { triggerMsg } = options || {};
 
     Helpers.logInfo(`[node_modules] Copy instalation of npm packages from ` +
       `${CLI.chalk.bold(source.genericName)} to ${CLI.chalk.bold(this.project.genericName)} ${triggerMsg}`);
 
     if (source.smartNodeModules.exists) {
+
       this.project.node_modules.remove();
       Helpers.mkdirp(this.project.node_modules.path);
       const packagesToLinkOrCopy = [
-        ...Helpers.foldersFrom(useDirectlySmartNodeModules ? source.smartNodeModules.path : source.node_modules.path),
-        ...Helpers.linksToFoldersFrom(useDirectlySmartNodeModules ? source.smartNodeModules.path : source.node_modules.path,
-
-          // this.project.frameworkVersionAtLeast('v3') // TODO not needed for now
-        ),
-        ...[path.join(source.node_modules.path, '.install-date')],
-      ];
+        ...Helpers.foldersFrom(source.smartNodeModules.path),
+        ...Helpers.linksToFoldersFrom(source.smartNodeModules.path),
+        ...[crossPlatformPath([source.node_modules.path, '.install-date'])],
+      ].filter(f => {
+        return fse.existsSync(f) &&
+          !path.basename(f).startsWith(PREFIXES.RESTORE_NPM)
+      });
 
       Helpers.logInfo(`
 
@@ -53,62 +52,28 @@ export class NodeModulesBase extends NodeModulesCore {
       `);
 
 
-      const filtered = packagesToLinkOrCopy
-        .filter(f => fse.existsSync(f));
-
-      const ONLY_COPY_ALLOWED = [
-        'background-worker-process',
-        'better-sqlite3',
-      ];
-
-      filtered.forEach(f => {
-        const dest = path.join(this.project.node_modules.path, path.basename(f));
-        const realPath = fse.realpathSync(f);
-        // console.log('realPath', realPath)
-        if (ONLY_COPY_ALLOWED.includes(path.basename(f))) { // TODO QUCIK_FIX
-          // console.log('HEELOOEOOEO')
-          // const filter = (src) => {
-          //   console.log(src)
-          //   return !/.*node_modules.*/g.test(src);
-          // };
-          Helpers.copy(realPath, dest, { overwrite: true, recursive: true });
-        } else if (['.bin', '.install-date'].includes(path.basename(f))) {
-          //#region handle specyfick folders and files
-          const linkFromBin = fse.realpathSync(f);
-          if (Helpers.exists(linkFromBin)) {
-            if (Helpers.isFolder(linkFromBin)) {
-              Helpers.removeFolderIfExists(dest);
-              const all = Helpers.filesFrom(linkFromBin);
-              all.forEach(f => {
-                Helpers.removeFileIfExists(path.join(dest, path.basename(f)));
-                if (Helpers.exists(f)) {
-                  f = fse.realpathSync(f);
-                  // const file = Helpers.readFile(f);
-                  // file.replace( new RegExp(),`require('../${path.basename(f)}/lib` )
-                  // `require('../lib`
-                  Helpers.createSymLink(f, path.join(dest, path.basename(f)));
-                } else {
-                  Helpers.warn(`[${config.frameworkName}] [node-modules-base] not existed file from bin `
-                    + `${path.basename(f)}`, false);
-                }
+      for (let index = 0; index < packagesToLinkOrCopy.length; index++) {
+        const f = packagesToLinkOrCopy[index];
+        const basename = path.basename(f);
+        const destAbsPath = crossPlatformPath([this.project.node_modules.path, basename]);
+        const sourceRealAbsPath = fse.realpathSync(f);
+        const copyInsteadLink = ONLY_COPY_ALLOWED.includes(basename);
+        if (Helpers.exists(sourceRealAbsPath)) {
+          if (copyInsteadLink) {
+            if (Helpers.isFolder(sourceRealAbsPath)) {
+              Helpers.copy(sourceRealAbsPath, destAbsPath, {
+                recursive: true,
               });
             } else {
-              Helpers.copyFile(linkFromBin, dest);
+              Helpers.copyFile(sourceRealAbsPath, destAbsPath);
             }
           } else {
-            Helpers.warn(`[${config.frameworkName}] [node-modules-base] not existed real link from bin `
-              + `${path.basename(f)}`, false);
-          }
-          //#endregion
-        } else {
-          if (process.platform === 'win32') {
-            // TODO QUICK_FIX on windows you can't create link to link
-            Helpers.createSymLink(fse.realpathSync(f), dest, { speedUpProcess: true });
-          } else {
-            Helpers.createSymLink(f, dest, { speedUpProcess: true });
+            Helpers.createSymLink(sourceRealAbsPath, destAbsPath, {
+              speedUpProcess: (process.platform === 'win32')
+            })
           }
         }
-      });
+      }
 
       return;
     }

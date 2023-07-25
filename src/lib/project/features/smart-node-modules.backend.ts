@@ -268,8 +268,7 @@ export class SmartNodeModules extends FeatureForProject {
     if (containerCore.location !== this.project.location) {
       this.project.node_modules.remove();
       this.project.node_modules.copyFrom(containerCore, {
-        triggerMsg: 'smart node_modules instalation',
-        useDirectlySmartNodeModules: true
+        triggerMsg: 'smart node_modules instalation'
       });
       this.handlePackagesOverride();
     }

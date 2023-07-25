@@ -45,5 +45,10 @@ ForEach-Object {$_.Line.Split(':')[1].Trim()} | `
 ForEach-Object { dism /Online /Remove-ProvisionedAppxPackage /PackageName:$_}
 ```
 
+# win 11 install without intenret
+
+fn shift f10
+OOBE\BYPASSNRO
+
 
 
