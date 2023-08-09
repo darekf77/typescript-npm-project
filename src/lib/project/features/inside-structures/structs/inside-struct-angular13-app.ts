@@ -211,8 +211,8 @@ ${appModuleFile}
           );
 
           appComponentFile = appComponentFile.replace(
-            `import { FiredevFileController, FiredevFile, FiredevFileCss } from 'firedev-ui';`,
-            `import { FiredevFileController, FiredevFile, FiredevFileCss } from 'firedev-ui/${this.websql ? config.folder.websql : config.folder.browser}';`,
+            `from 'firedev-ui';`,
+            `from 'firedev-ui/${this.websql ? config.folder.websql : config.folder.browser}';`,
           );
 
           appComponentFile = appComponentFile.replace(
@@ -275,6 +275,11 @@ ${appModuleFile}
             `import { FiredevAdmin } from 'firedev-ui';`,
             `import { FiredevAdmin } from 'firedev-ui/${this.websql ? config.folder.websql : config.folder.browser}';`,
           )
+
+          appMainFile = appMainFile.replace(
+            `import { Stor } from 'firedev-storage';`,
+            `import { Stor } from 'firedev-storage/${this.websql ? config.folder.websql : config.folder.browser}';`,
+          );
 
 
           Helpers.writeFile(appMainFilePath, appMainFile);
