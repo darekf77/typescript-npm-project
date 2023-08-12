@@ -13,6 +13,7 @@ import type { Project } from '../../../abstract/project/project';
 import { BuildOptions } from 'tnp-db';
 import { RegionRemover } from 'isomorphic-region-loader';
 import { MjsModule } from '../../../features/copy-manager/bundle-mjs-fesm-module-spliter.backend';
+import { CLI } from 'tnp-cli';
 
 //#endregion
 
@@ -226,6 +227,7 @@ export class BrowserCodeCut {
     }
 
     this.processAssetsLinksForApp();
+    this.warnAboutUsingFilesFromNodeModulesWithLibFiles(this.rawContentForAPPONLYBrowser, this.absFileSourcePathBrowserOrWebsqlAPPONLY);
 
     if (isTsFile) {
       if (!this.relativePath.startsWith('app/')) {
@@ -822,6 +824,81 @@ export default function dummyDefault${(new Date()).getTime()}() { }
     }
   }
   //#endregion
+
+  warnAboutUsingFilesFromNodeModulesWithLibFiles(
+    content: string,
+    absFilePath: string,
+  ) {
+    if (!absFilePath.endsWith('.ts')) {
+      // console.log(`NOT_FIXING: ${absFilePath}`)
+      return content;
+    }
+
+    if (this.project.isSmartContainerTarget
+      || !(this.relativePath.startsWith('app.ts') || this.relativePath.startsWith('app/'))
+    ) {
+      return;
+    }
+    const howMuchBack = (this.relativePath.split('/').length - 1);
+    // const debugFiles = [
+    //   // 'files.container.ts',
+    //   // 'app.ts',
+    // ];
+
+    // if (debugFiles.length > 0 && !debugFiles.includes(path.basename(absFilePath))) {
+    //   return;
+    // }
+
+    const recognizeImport = (usage: ConfigModels.TsUsage) => {
+      const importRegex = new RegExp(`${usage}.+from\\s+(\\'|\\").+(\\'|\\")`, 'g');
+
+      const asynMatches = (usage === 'import') ? content.match(regexAsyncImportG) : [];
+      const normalMatches = content.match(importRegex);
+
+      const asyncImports = (Array.isArray(asynMatches) ? asynMatches : []);
+      let importsLines = [
+        ...(Array.isArray(normalMatches) ? normalMatches : []),
+        ...asyncImports,
+      ];
+      return importsLines;
+    }
+    // @ts-ignore
+    let lines: [string, number][] = [
+      ...recognizeImport('import'),
+      ...recognizeImport('export')
+    ].map((line, index) => {
+      if (howMuchBack === 0) {
+        const importRegex = new RegExp(`from\\s+(\\'|\\")\\.\\/lib\\/`, 'g');
+        const match = importRegex.test(line);
+        return match ? [line, index] : void 0;
+      } else {
+        const importRegex = new RegExp(`from\\s+(\\'|\\")${_.times(howMuchBack, () => {
+          return '\\.\\.';
+        }).join('\\/')}\\/lib\\/`, 'g');
+        const match = importRegex.test(line);
+        return match ? [line, index] : void 0;
+      }
+
+    }).filter(f => !!f);
+
+    // if(lines.length > 0) {
+    //   console.log({
+    //     'this.relativePath': this.relativePath,
+    //     'absFilePath': absFilePath,
+    //   })
+    // }
+
+    for (let index = 0; index < lines.length; index++) {
+      const [wrongImport, lineindex] = lines[index];
+      Helpers.warn(`
+${CLI.chalk.bold('WARNING')}: ${CLI.chalk.underline('./src/' + this.relativePath + `:${lineindex + 2}:1`)} Don't import things from lib like that (it may not work in your ${this.project.name}/src/app project);
+${CLI.chalk.bold(wrongImport)};
+Please use something like that (use files version compiled in node_modules):
+import { < My Stuff > } from '${this.project.name}';`, false,);
+    }
+
+
+  }
 
   //#region methods / change js file import for organization
   /**
