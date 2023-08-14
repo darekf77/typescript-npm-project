@@ -20,14 +20,6 @@ const BUILD_DIST = async (args) => {
   await proj.buildProcess.startForLibFromArgs(false, false, 'dist', args);
 };
 
-const $BUILD = async (args) => {
-  let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
-  if (proj.isSmartContainerChild) {
-    await BUILD_DIST(args);
-  } else {
-
-  }
-};
 
 const BUILD_DIST_WATCH = async (args) => {
   return (Project.Current as Project)
@@ -58,6 +50,11 @@ const $BUILD_WATCH = async (args) => {
     }
     await proj.buildProcess.startForLibFromArgs(false, true, 'dist', args);
   }
+};
+
+
+const $BUILD = async (args) => {
+  await $BUILD_WATCH(args);
 };
 
 const $BUILD_TO_ALL = async (args) => {
