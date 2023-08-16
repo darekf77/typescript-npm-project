@@ -893,7 +893,7 @@ export default function dummyDefault${(new Date()).getTime()}() { }
       Helpers.warn(`
 ${CLI.chalk.bold('WARNING')}: ${CLI.chalk.underline('./src/' + this.relativePath + `:${lineindex + 2}:1`)} Don't import things from lib like that (it may not work in your ${this.project.name}/src/app project);
 ${CLI.chalk.bold(wrongImport)};
-Please use something like that (use files version compiled in node_modules):
+Please use version compiled in node_modules:
 import { < My Stuff > } from '${this.project.name}';`, false,);
     }
 
