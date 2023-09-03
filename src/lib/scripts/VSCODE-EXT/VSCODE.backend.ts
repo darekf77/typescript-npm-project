@@ -217,6 +217,9 @@ function $VSCODE_GLOBAL() {
     "git.detectSubmodules": false,
     "editor.wordBasedSuggestionswordBasedSuggestions": false,
     "git.openRepositoryInParentFolders": "never",
+    "eslint.migration.2_x": "off",
+    "redhat.telemetry.enabled": false,
+    "editor.accessibilitySupport": "off",
   };
   const settingspathWindows = path.join(crossPlatformPath(os.userInfo().homedir), 'AppData/Roaming/Code/User/settings.json');
   const settingspathLinux = path.join(crossPlatformPath(os.userInfo().homedir), '.config/Code/User/settings.json');
