@@ -190,6 +190,7 @@ export class PackagesRecognition {
         // }
       });
     this.recognizedPackages = [
+      ...(this.project.isStandaloneProject && !this.project.isSmartContainerTarget) ? [this.project.name] : [],
       ...folders,
       ...local,
       ...Object.values(config.frameworkNames),

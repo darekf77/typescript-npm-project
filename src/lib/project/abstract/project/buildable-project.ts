@@ -449,6 +449,35 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
     };
     //#endregion
 
+    const startCopyToManager = async () => {
+      Helpers.info(`${buildOptions.watch ? 'files watch started...' : ''}`);
+      Helpers.log(`[buildable-project] Build steps ended (project type: ${this._type}) ... `);
+
+      if (!buildOptions.appBuild) {
+        if ((this.isStandaloneProject && this.typeIs('isomorphic-lib')) || this.isSmartContainer) {
+          if (buildOptions.copyto.length > 0) {
+            Helpers.info(`[buildable-project] copying compiled code/assets to ${buildOptions.copyto.length} other projects... `);
+          }
+          // console.log('after build steps')
+          (() => {
+            {
+              return { CopyManagerOrganization, CopyManagerStandalone }
+            }
+          });
+          this.copyManager = CopyManager.for(this);
+          this.copyManager.init(buildOptions);
+          const taskName = 'copyto manger';
+          if (buildOptions.watch) {
+            await this.copyManager.startAndWatch(taskName)
+          } else {
+            await this.copyManager.start(taskName)
+          }
+        }
+      }
+    }
+
+
+
     if (skipBuild) {
       Helpers.log(`[buildable-project] Skip build for ${this.genericName}`);
     } else {
@@ -456,41 +485,20 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
       if (buildOptions.serveApp) {
         await this.buildSteps(buildOptions, async () => {
           if (buildOptions.appBuild || buildOptions.serveApp) {
-            await buildAssetsFile()
+            await buildAssetsFile();
+            await startCopyToManager();
           }
         });
       } else {
         await this.buildSteps(buildOptions);
         if (buildOptions.appBuild || buildOptions.serveApp) {
-          await buildAssetsFile()
+          await buildAssetsFile();
+          await startCopyToManager();
         }
       }
     }
 
-    Helpers.info(`${buildOptions.watch ? 'files watch started...' : ''}`);
-    Helpers.log(`[buildable-project] Build steps ended (project type: ${this._type}) ... `);
 
-    if (!buildOptions.appBuild) {
-      if ((this.isStandaloneProject && this.typeIs('isomorphic-lib')) || this.isSmartContainer) {
-        if (buildOptions.copyto.length > 0) {
-          Helpers.info(`[buildable-project] copying compiled code/assets to ${buildOptions.copyto.length} other projects... `);
-        }
-        // console.log('after build steps')
-        (() => {
-          {
-            return { CopyManagerOrganization, CopyManagerStandalone }
-          }
-        });
-        this.copyManager = CopyManager.for(this);
-        this.copyManager.init(buildOptions);
-        const taskName = 'copyto manger';
-        if (buildOptions.watch) {
-          await this.copyManager.startAndWatch(taskName)
-        } else {
-          await this.copyManager.start(taskName)
-        }
-      }
-    }
 
 
   }

@@ -60,7 +60,7 @@ export class BrowserCodeCut {
   }
 
   get additionalSmartPckages() {
-    const parent = this.getParent();
+    const parent = this.getParentContainer();
     const additionalSmartPckages = (!parent ? [] : parent.children.map(c => `@${parent.name}/${c.name}`));
     return additionalSmartPckages;
   }
@@ -232,12 +232,12 @@ export class BrowserCodeCut {
     if (isTsFile) {
       if (!this.relativePath.startsWith('app/')) {
         fse.writeFileSync(this.absFileSourcePathBrowserOrWebsql,
-          this.fixComments(this.rawContentForBrowser, endOfBrowserOrWebsqlCode),
+          this.fixBrowserFileBeforeSave(this.rawContentForBrowser, endOfBrowserOrWebsqlCode),
           'utf8'
         );
       }
       fse.writeFileSync(this.absFileSourcePathBrowserOrWebsqlAPPONLY,
-        this.fixComments(this.rawContentForAPPONLYBrowser, endOfBrowserOrWebsqlCode),
+        this.fixBrowserFileBeforeSave(this.rawContentForAPPONLYBrowser, endOfBrowserOrWebsqlCode),
         'utf8'
       );
     } else {
@@ -397,7 +397,7 @@ export class BrowserCodeCut {
 
   //#region methods / get parent
 
-  getParent() {
+  getParentContainer() {
     let parent: Project;
     if (this.project.isSmartContainer) {
       parent = this.project;
@@ -414,11 +414,11 @@ export class BrowserCodeCut {
 
   //#region methods / get inline package
   protected getInlinePackage(packageName: string): Models.InlinePkg {
-    const parent = this.getParent();
+    const parentContainer = this.getParentContainer();
     let packagesNames = BrowserCodeCut.IsomorphicLibs;
 
     packagesNames = packagesNames.concat([
-      ...(parent ? [] : [this.project.name]),
+      ...(parentContainer ? [] : [this.project.name]),
       ...this.additionalSmartPckages,
     ]);
 
@@ -749,16 +749,26 @@ declare module "*.json" {
   //#endregion
 
   //#region methods / fix comments
-  private fixComments(s: string, endComment?: string) {
+  private fixBrowserFileBeforeSave(s: string, endComment?: string) {
     if (!this.relativePath.endsWith('.ts')) {
       return s;
     }
 
     const endOfFile = ((this.relativePath.endsWith('.ts') && endComment) ? endComment : '');
+    const standaloneRegexImportExport = new RegExp(`from\\s+(\\'|\\")${Helpers.escapeStringForRegEx(this.project.name)}\\/(browser|websql)(\\'|\\")`, 'g');
+    const standaloneRegexImports = new RegExp(`imports\\((\\'|\\")${Helpers.escapeStringForRegEx(this.project.name)}\\/(browser|websql)(\\'|\\")\\)`, 'g');
 
-    const splited = s.split('\n');
-    return splited
-      .map((line) => {
+    const splited = [
+      '\n', // TODO artifically added
+      ...s.split('\n'),
+    ];
+
+    const ignoreIndex = [];
+    const res = splited
+      .map((line, index) => {
+        if (standaloneRegexImportExport.test(line) || standaloneRegexImports.test(line)) {
+          ignoreIndex.push(index - 1);
+        }
         if ((line.trimLeft().startsWith('// ') || line.trimLeft().startsWith('//#'))
           && (line.search('@ts-ignore') === -1)
         ) {
@@ -766,7 +776,13 @@ declare module "*.json" {
         }
         return line;
       })
-      .join('\n') + endOfFile;
+
+
+    for (let index = 0; index < ignoreIndex.length; index++) {
+      res[ignoreIndex[index]] = res[ignoreIndex[index]] + ' // @ts-ignore';
+    }
+
+    return res.join('\n') + endOfFile;
   }
   //#endregion
 
@@ -818,7 +834,7 @@ export default function dummyDefault${(new Date()).getTime()}() { }
 
         fse.writeFileSync(absoluteBackendDestFilePath,
           (isEmptyModuleBackendFile && isTsFile) ? `export function dummy${(new Date()).getTime()}() { }`
-            : this.rawContentBackend,
+            : this.changeJsFileImportForStandalone(this.rawContentBackend, absoluteBackendDestFilePath),
           'utf8');
       }
     }
@@ -907,6 +923,8 @@ import { < My Stuff > } from '${this.project.name}';`, false,);
   changeJsFileImportForOrgnanizaiton(
     content: string,
     absFilePath: string,
+    additionalSmartPckages = this.additionalSmartPckages,
+    isStandalone = false,
   ) {
     if (!absFilePath.endsWith('.ts')) {
       // console.log(`NOT_FIXING: ${absFilePath}`)
@@ -916,23 +934,24 @@ import { < My Stuff > } from '${this.project.name}';`, false,);
     // console.log(`FIXING: ${absFilePath}`)
 
     const howMuchBack = (this.relativePath.split('/').length - 1);
-    const additionalSmartPckages = this.additionalSmartPckages;
+
     for (let index = 0; index < additionalSmartPckages.length; index++) {
       const rootChildPackage = additionalSmartPckages[index];
       const [__, childName] = rootChildPackage.split('/');
+      const libName = isStandalone ? config.folder.lib : `${config.folder.libs}/${childName}`
       const back = (howMuchBack === 0) ? './' : _.times(howMuchBack).map(() => '../').join('');
 
       (() => {
         content = content.replace(
           new RegExp(`from\\s+(\\'|\\")${Helpers.escapeStringForRegEx(rootChildPackage)}(\\'|\\")`, 'g'),
-          `from '${back}${config.folder.libs}/${childName}'`
+          `from '${back}${libName}'`
         );
       })();
 
       (() => {
         content = content.replace(
           new RegExp(`from\\s+(\\'|\\")${Helpers.escapeStringForRegEx(rootChildPackage)}\\/`, 'g'),
-          `from '${back}${config.folder.libs}/${childName}/`
+          `from '${back}${libName}/`
         );
       })();
 
@@ -940,6 +959,18 @@ import { < My Stuff > } from '${this.project.name}';`, false,);
     // Helpers.warn(`[copytomanager] Empty content for ${absFilePath}`);
     // console.log({ absFilePathJSJSJ: absFilePath })
     return content;
+  }
+  //#endregion
+
+  //#region methods / change js file import for organization
+  /**
+   * TODO may be weak solutin
+   */
+  changeJsFileImportForStandalone(
+    content: string,
+    absFilePath: string,
+  ) {
+    return this.changeJsFileImportForOrgnanizaiton(content, absFilePath, [this.project.name], true);
   }
   //#endregion
 
