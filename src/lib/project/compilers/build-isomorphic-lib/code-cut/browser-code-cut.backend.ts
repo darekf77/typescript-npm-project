@@ -868,13 +868,13 @@ export default function dummyDefault${(new Date()).getTime()}() { }
       ...recognizeImport('export')
     ].map((line, index) => {
       if (howMuchBack === 0) {
-        const importRegex = new RegExp(`from\\s+(\\'|\\")\\.\\/lib\\/`, 'g');
+        const importRegex = new RegExp(`from\\s+(\\'|\\")\\.\\/lib(\\/|(\\'|\\"))`, 'g');
         const match = importRegex.test(line);
         return match ? [line, index] : void 0;
       } else {
         const importRegex = new RegExp(`from\\s+(\\'|\\")${_.times(howMuchBack, () => {
           return '\\.\\.';
-        }).join('\\/')}\\/lib\\/`, 'g');
+        }).join('\\/')}\\/lib(\\/|(\\'|\\"))`, 'g');
         const match = importRegex.test(line);
         return match ? [line, index] : void 0;
       }

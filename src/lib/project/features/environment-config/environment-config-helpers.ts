@@ -156,6 +156,11 @@ export function saveConfigWorkspca(project: Project, projectConfig: Models.env.E
       Helpers.warn(`[env config] parent not found by path ${parentPath}`);
     }
 
+  } else if (project.isStandaloneProject && !project.smartContainerBuildTarget) {
+    projectConfig['pathesTsconfig'] = `"paths": ` + JSON.stringify({
+      [`${project.name}`]: ["./src/lib"],
+      [`${project.name}/*`]: ["./src/lib/*"]
+    });
   } else {
     projectConfig['pathesTsconfig'] = `"paths": ` + JSON.stringify({});
   }
