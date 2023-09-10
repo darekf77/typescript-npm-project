@@ -2,14 +2,7 @@
   "extends": "./tsconfig.isomorphic.json",
   "compilerOptions": {
     "rootDir": "./src",
-    "paths": {
-      "tnp": [
-        "./src/lib"
-      ],
-      "tnp/*": [
-        "./src/lib/*"
-      ]
-    }
+    "paths": {}
   },
   "include": [
     "src/**/*"
