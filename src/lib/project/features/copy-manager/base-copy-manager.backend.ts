@@ -80,17 +80,26 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     const canCopyToNodeModules = (this.outDir === 'dist');
     let result = [];
 
+    const coreContainer = Project.by('container', this.project._frameworkVersion) as Project;
+    const tempCoreContainerPathForSmartNodeModules = Project.From(crossPlatformPath(path.dirname(coreContainer.smartNodeModules.path)));
+
+    const node_modules_projs = [
+      ...(canCopyToNodeModules ? [coreContainer] : []),
+      ...(canCopyToNodeModules ? [tempCoreContainerPathForSmartNodeModules] : []),
+      ...(canCopyToNodeModules ? [this.project] : [])
+    ];
+
     if (Array.isArray(this.copyto) && this.copyto.length > 0) {
       // @ts-ignore
       result = [
         this.localTempProj,
         ...this.copyto,
-        ...(canCopyToNodeModules ? [this.project] : []),
+        ...(node_modules_projs),
       ] as Project[];
     } else {
       result = [
         this.localTempProj,
-        ...(canCopyToNodeModules ? [this.project] : []),
+        ...(node_modules_projs),
       ];
     }
     return Helpers.arrays.uniqArray<Project>(result, 'location');
@@ -275,11 +284,19 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     }
 
 
+
+    const projectToCopyTo = this.projectToCopyTo;
+
     Helpers.log(`ASYNC ACTION
     absoluteFilePath: ${absoluteFilePath}
     specyficFileRelativePath: ${specyficFileRelativePath}
     `);
-    const projectToCopyTo = this.projectToCopyTo;
+
+//     Helpers.log(`
+//     copyto project:
+// ${projectToCopyTo.map(p => p.location).join('\n')}
+
+//     `)
 
     for (let index = 0; index < projectToCopyTo.length; index++) {
       const projectToCopy = projectToCopyTo[index];
