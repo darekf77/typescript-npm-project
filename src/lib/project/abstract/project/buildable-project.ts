@@ -492,6 +492,9 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
       });
     } else {
       await this.buildSteps(buildOptions);
+      if (buildOptions.appBuild) {
+        await buildAssetsFile();
+      }
       await startCopyToManager();
     }
 

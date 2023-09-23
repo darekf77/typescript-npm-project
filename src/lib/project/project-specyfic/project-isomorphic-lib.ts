@@ -105,6 +105,7 @@ export class ProjectIsomorphicLib
         'webpack.config.js',
         'webpack.backend-bundle-build.js',
         'run.js',
+        'run-org.js',
         ...this.filesTemplates(),
       ]).concat(
         !this.isStandaloneProject ? [

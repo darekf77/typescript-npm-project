@@ -247,7 +247,9 @@ export class CopyManagerStandalone extends CopyManager {
          * QUICK_FIX backend debugging on window
          * (still third party debug does not work)
          */
-    if (process.platform === 'win32' && !isBrowser) {
+    if (
+      // process.platform === 'win32' &&
+      !isBrowser) {
       const json = JSON.parse(content);
       if (json) {
         json.sources = (json.sources || []).map((p: string) => {

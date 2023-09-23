@@ -286,7 +286,9 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
 
   sourceMapContentFix(content: string, isBrowser: boolean, absFilePath: string) {
     // @LAST
-    if (process.platform === 'win32' && !isBrowser) {
+    if (
+      // process.platform === 'win32' &&
+      !isBrowser) {
       const json = JSON.parse(content);
       if (json) {
 

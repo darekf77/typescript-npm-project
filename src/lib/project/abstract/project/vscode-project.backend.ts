@@ -232,7 +232,7 @@ export abstract class VscodeProject {
         "request": "launch",
         "name": `Launch Server @${container.name}/${c.name}`,
         "cwd": "${workspaceFolder}" + `/dist/${container.name}/${c.name}`,
-        "program": "${workspaceFolder}" + `/dist/${container.name}/${c.name}/run.js`,
+        "program": "${workspaceFolder}" + `/dist/${container.name}/${c.name}/run-org.js`,
         "args": [
           `child=${c.name}`,
         ],

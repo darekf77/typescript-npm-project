@@ -384,6 +384,7 @@ export class FilesRecreator extends FeatureForProject {
                     settings['files.exclude'][`${c.name}/webpack*`] = true;
                     settings['files.exclude'][`${c.name}/index*`] = true;
                     settings['files.exclude'][`${c.name}/run.js`] = true;
+                    settings['files.exclude'][`${c.name}/run-org.js`] = true;
 
                     settings['files.exclude'][`${c.name}/src/index.ts`] = true;
                     settings['files.exclude'][`${c.name}/.vscode`] = true;
