@@ -208,6 +208,7 @@ function $VSCODE_GLOBAL() {
     'terminal.integrated.tabs.enabled': false,
     'tslint.autoFixOnSave': false, // TODO
     'tslint.enable': false, // TODO
+    'prettier.enable': false, // TODO
     'tslint.alwaysShowRuleFailuresAsWarnings': true,
     "workbench.editor.enablePreview": true,
     "security.workspace.trust.banner": "never",

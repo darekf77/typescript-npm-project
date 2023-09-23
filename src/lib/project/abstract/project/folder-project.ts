@@ -270,7 +270,10 @@ export abstract class FolderProject {
     }
   }
 
-  pathFor(relativePath: string) {
+  pathFor(relativePath: string | string[]) {
+    if (Array.isArray(relativePath)) {
+      relativePath = crossPlatformPath(relativePath.join('/'))
+    }
     if (path.isAbsolute(relativePath)) {
       Helpers.error(`Cannot join relative path with absolute: ${relativePath}`);
     }

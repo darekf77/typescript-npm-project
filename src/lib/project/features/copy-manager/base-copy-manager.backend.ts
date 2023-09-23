@@ -75,18 +75,27 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   }
   //#endregion
 
+  //#region  getters / core container for project
+  get coreContainer() {
+    return Project.by('container', this.project._frameworkVersion) as Project
+  }
+  //#endregion
+
+  //#region  getters / core container for project
+  get coreContainerSmartNodeModulesProj() {
+    const tempCoreContainerPathForSmartNodeModules = Project
+      .From(crossPlatformPath(path.dirname(this.coreContainer.smartNodeModules.path))) as Project;
+    return tempCoreContainerPathForSmartNodeModules;
+  }
+  //#endregion
+
   //#region getters / project to copy to
   get projectToCopyTo() {
     const canCopyToNodeModules = (this.outDir === 'dist');
     let result = [];
 
-    const coreContainer = Project.by('container', this.project._frameworkVersion) as Project;
-    const tempCoreContainerPathForSmartNodeModules = Project.From(crossPlatformPath(path.dirname(coreContainer.smartNodeModules.path)));
-
     const node_modules_projs = [
-      ...(canCopyToNodeModules ? [coreContainer] : []),
-      ...(canCopyToNodeModules ? [tempCoreContainerPathForSmartNodeModules] : []),
-      ...(canCopyToNodeModules ? [this.project] : [])
+      ...(canCopyToNodeModules ? [this.coreContainerSmartNodeModulesProj] : []),
     ];
 
     if (Array.isArray(this.copyto) && this.copyto.length > 0) {
@@ -283,8 +292,6 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       absoluteAssetFilePath = absoluteFilePath;
     }
 
-
-
     const projectToCopyTo = this.projectToCopyTo;
 
     Helpers.log(`ASYNC ACTION
@@ -292,11 +299,11 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     specyficFileRelativePath: ${specyficFileRelativePath}
     `);
 
-//     Helpers.log(`
-//     copyto project:
-// ${projectToCopyTo.map(p => p.location).join('\n')}
+    //     Helpers.log(`
+    //     copyto project:
+    // ${projectToCopyTo.map(p => p.location).join('\n')}
 
-//     `)
+    //     `)
 
     for (let index = 0; index < projectToCopyTo.length; index++) {
       const projectToCopy = projectToCopyTo[index];
@@ -316,10 +323,25 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   async syncAction(
     // files: string[]
   ) {
-    Helpers.log('SYNC ACTION');
+    // console.log('SYNC ACTION');
+    // @LAST why is this noe being fired
     const outDir = this.outDir;
 
     const projectToCopyTo = this.projectToCopyTo;
+    this.recreateProperLinksToCoreContainer();
+
+    if (projectToCopyTo.length > 0) {
+      const porjectINfo = projectToCopyTo.length === 1
+        ? `project "${(_.first(projectToCopyTo as any) as Project).name}"`
+        : `all ${projectToCopyTo.length} projects`;
+
+      log.info(`From now... ${porjectINfo} will be updated after every change...`);
+
+      Helpers.info(`[buildable-project] copying compiled code/assets to ${projectToCopyTo.length} other projects...
+${projectToCopyTo.map(proj => `- ${proj.genericName}`).join('\n')}
+      `);
+    }
+
 
     for (let index = 0; index < projectToCopyTo.length; index++) {
       const projectToCopy = projectToCopyTo[index];
@@ -330,6 +352,40 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
         }
       );
       log.data('copy done...')
+    }
+  }
+  //#endregion
+
+  //#region methods / recreate proper links to core container
+  private recreateProperLinksToCoreContainer() {
+    const canCopyToNodeModules = (this.outDir === 'dist');
+    // console.log({
+    //   canCopyToNodeModules
+    // })
+    if (!canCopyToNodeModules) {
+      return;
+    }
+    const root = [config.folder.node_modules, this.rootPackageName];
+
+    const coreContainerFlatNodeModulesPaht = this.coreContainer.pathFor(root);
+    const currentProjNodeMoudles = this.project.pathFor(root);
+
+    const folderToLink = [
+      coreContainerFlatNodeModulesPaht,
+      currentProjNodeMoudles,
+    ];
+    for (let index = 0; index < folderToLink.length; index++) {
+      const destFolder = folderToLink[index];
+      // console.log({ destFolder })
+      if (Helpers.isFolder(destFolder) || !Helpers.exists(destFolder)) {
+        Helpers.remove(destFolder);
+        Helpers.createSymLink(
+          this.coreContainerSmartNodeModulesProj.pathFor(root),
+          destFolder
+          , {
+            continueWhenExistedFolderDoesntExists: true,
+          });
+      }
     }
   }
   //#endregion
@@ -442,6 +498,11 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   //#endregion
 
   //#region abstract
+  /**
+   * first folder in node_modules for packge
+   * example:
+   * project/node_modules/<rootPackageName> # like 'ng2-rest' or '@angular'
+   */
   abstract get rootPackageName(): string;
   /**
    * Path for local-temp-project-path

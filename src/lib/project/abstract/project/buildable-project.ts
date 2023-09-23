@@ -165,6 +165,7 @@ export abstract class BuildableProject {
   }
   //#endregion
 
+  //#region methods allowed environments
   // @ts-ignore
   get allowedEnvironments(this: Project) {
     if (Helpers.isBrowser) {
@@ -180,7 +181,7 @@ export abstract class BuildableProject {
     return config.allowedEnvironments.concat('local');
     //#endregion
   }
-
+  //#endregion
 
   //#region @backend
   private async selectAllProjectCopyto(this: Project) {
@@ -403,10 +404,10 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
     //   this.buildOptions.copyto = []
     // }
 
-    if (!buildOptions.appBuild) {
-      Helpers.info(`[info] Copy compiled project to ${buildOptions.copyto.length} projects... `);
-      Helpers.logInfo((buildOptions.copyto as Project[]).map(p => p.genericName).join(';'));
-    }
+    // if (!buildOptions.appBuild) {
+    //   Helpers.info(`[info] Copy compiled project to ${buildOptions.copyto.length} projects... `);
+    //   Helpers.logInfo((buildOptions.copyto as Project[]).map(p => p.genericName).join(';'));
+    // }
 
     const { skipBuild = false } = require('minimist')(this.buildOptions.args.split(' '));
     // console.log({
@@ -414,6 +415,9 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
     // })
 
     //#region build assets file
+    /**
+     * Build assets file for app in app build mode
+     */
     const buildAssetsFile = async () => {
       // console.log('after build steps');
       let client: string;
@@ -455,9 +459,7 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
 
       if (!buildOptions.appBuild) {
         if ((this.isStandaloneProject && this.typeIs('isomorphic-lib')) || this.isSmartContainer) {
-          if (buildOptions.copyto.length > 0) {
-            Helpers.info(`[buildable-project] copying compiled code/assets to ${buildOptions.copyto.length} other projects... `);
-          }
+
           // console.log('after build steps')
           (() => {
             {
@@ -480,24 +482,18 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
 
     if (skipBuild) {
       Helpers.log(`[buildable-project] Skip build for ${this.genericName}`);
-    } else {
-      // console.log('before build steps')
-      if (buildOptions.serveApp) {
-        await this.buildSteps(buildOptions, async () => {
-          if (buildOptions.appBuild || buildOptions.serveApp) {
-            await buildAssetsFile();
-            await startCopyToManager();
-          }
-        });
-      } else {
-        await this.buildSteps(buildOptions);
-        if (buildOptions.appBuild || buildOptions.serveApp) {
-          await buildAssetsFile();
-          await startCopyToManager();
-        }
-      }
+      return;
     }
-
+    // console.log('before build steps')
+    if (buildOptions.serveApp) {
+      await this.buildSteps(buildOptions, async () => {
+        await buildAssetsFile();
+        await startCopyToManager();
+      });
+    } else {
+      await this.buildSteps(buildOptions);
+      await startCopyToManager();
+    }
 
 
 

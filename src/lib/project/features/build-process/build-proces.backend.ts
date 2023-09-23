@@ -203,15 +203,8 @@ inside generated projects...
     //#endregion
 
     await this.project.build(buildOptions);
-
-
     //#region handle end of building
-    if (buildOptions.copyto.length > 0) {
-      const porjectINfo = buildOptions.copyto.length === 1
-        ? `project "${(_.first(buildOptions.copyto as any) as Project).name}"`
-        : `all ${buildOptions.copyto.length} projects`;
-      log.info(`From now... ${porjectINfo} will be updated after every change...`)
-    }
+
     const msg = (buildOptions.watch ? `
       Files watcher started.. ${buildOptions.websql ? '[WEBSQL]' : ''}
     `: `
@@ -219,12 +212,7 @@ inside generated projects...
 
     ` )
 
-    // if (global.tnpNonInteractive) {
-    //   PROGRESS_DATA.log({ msg });
-    // } else {
     log.info(msg);
-    // global?.spinner?.start();
-    // }
 
     if (exit && !buildOptions.watch) {
       log.data('Build process exit')
