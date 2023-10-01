@@ -283,7 +283,7 @@ export abstract class BaseProject {
   }
   //#endregion
 
-  __cacheStandaloneDependencies: Project[];
+
 
   // @ts-ignore
   get workspaceDependencies(this: Project): Project[] {
@@ -292,16 +292,12 @@ export abstract class BaseProject {
       return [];
     }
     if (this.isStandaloneProject) {
-      if (!_.isUndefined(this.__cacheStandaloneDependencies)) {
-        return this.__cacheStandaloneDependencies;
-      }
       // const dependenciesNames = this.packageJson.dependencies();
       const dependenciesNames = this.packageJson.data?.tnp?.overrided?.includeOnly || []; // TODO NOT SURE
       const res = dependenciesNames.map(d => {
         const child = this.parent.children.find(f => f.name === d);
         return child;
       }).filter(f => !!f);
-      this.__cacheStandaloneDependencies = res;
       return res;
     }
 

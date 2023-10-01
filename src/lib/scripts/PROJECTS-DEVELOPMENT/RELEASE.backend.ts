@@ -158,6 +158,8 @@ ${proj.children.map((c) => ` - @${proj.name}/${c.name} v${newVersion}`).join('\n
     });
     args = commandString;
 
+    argsObj.all = true; // TODO @UNCOMMENT when cache fixed
+
     resolved = resolved.filter(f => f.location !== proj.location);
 
     const forceReleaseAll = !!argsObj.all || (resolved.length > 0);
