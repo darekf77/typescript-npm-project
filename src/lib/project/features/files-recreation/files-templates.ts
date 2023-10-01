@@ -1,5 +1,5 @@
 //#region @backend
-import { path } from 'tnp-core'
+import { crossPlatformPath, path } from 'tnp-core'
 import { fse } from 'tnp-core'
 import { _ } from 'tnp-core';
 import { FeatureForProject } from '../../abstract';
@@ -23,7 +23,7 @@ export class FilesTemplatesBuilder extends FeatureForProject {
     // `);
     for (let index = 0; index < files.length; index++) {
       const f = files[index];
-      const filePath = path.join(this.project.location, f);
+      const filePath = crossPlatformPath([this.project.location, f]);
       if (Helpers.exists(filePath)) {
         var fileContent = Helpers.readFile(filePath);
       }
@@ -129,7 +129,9 @@ export class FilesTemplatesBuilder extends FeatureForProject {
         Helpers.log(e);
         Helpers.info(newContent);
         Helpers.error(`[filetemplate] Not able to parse new content` +
-          ` for json in ${path.basename(filePath)}
+          ` for json in ${filePath}
+
+          [probably env does not work]
 
           `, soft, true);
       }

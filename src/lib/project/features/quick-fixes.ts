@@ -192,13 +192,6 @@ Object.defineProperty(document.body.style, 'transform', {
       'src/tsconfig.app.json',
       '.angular-cli.json'
     ]
-
-    if (this.project.frameworkVersionAtLeast('v2') && this.project.typeIs('angular-lib')) {
-      for (let index = 0; index < filesV1.length; index++) {
-        const oldFile = path.join(this.project.location, filesV1[index]);
-        Helpers.removeFileIfExists(oldFile)
-      }
-    }
   }
 
   public removeTnpFromItself() {
@@ -373,30 +366,6 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
         });
     }
 
-    if (this.project.isWorkspace) {
-      if (this.project.isGenerated) {
-        this.project.origin.node_modules.fixesForNodeModulesPackages
-          .forEach(f => {
-            const source = path.join(this.project.origin.location, f);
-            const dest = path.join(this.project.location, f);
-            if (fse.existsSync(dest)) {
-              Helpers.tryRemoveDir(dest);
-            }
-            Helpers.tryCopyFrom(source, dest);
-          });
-      }
-      if (this.project.isSite) {
-        this.project.baseline.node_modules.fixesForNodeModulesPackages
-          .forEach(f => {
-            const source = path.join(this.project.baseline.location, f);
-            const dest = path.join(this.project.location, f);
-            if (fse.existsSync(dest)) {
-              Helpers.tryRemoveDir(dest);
-            }
-            Helpers.tryCopyFrom(source, dest);
-          });
-      }
-    }
 
     Helpers.log(`Fixing bad npm packages - COMPLETE`);
   }
@@ -408,7 +377,7 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
     missingLibsNames.forEach(missingLibName => {
       const pathInProjectNodeModules = path.join(this.project.location, config.folder.node_modules, missingLibName)
       if (fse.existsSync(pathInProjectNodeModules)) {
-        if (this.project.isStandaloneProject || this.project.isWorkspace) {
+        if (this.project.isStandaloneProject) {
           Helpers.warn(`Package "${missingLibName}" will replaced with empty package mock. ${this.project.genericName}`)
         }
       }
@@ -468,9 +437,6 @@ export default _default;
    * This will prevent packages deletion from npm
    */
   public nodeModulesPackagesZipReplacement() {
-    if (!this.project.isWorkspace) {
-      return;
-    }
     const nodeModulesPath = path.join(this.project.location, config.folder.node_modules);
 
     if (!fse.existsSync(nodeModulesPath)) {

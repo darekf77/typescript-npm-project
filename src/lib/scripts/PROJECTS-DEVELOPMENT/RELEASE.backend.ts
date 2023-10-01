@@ -350,7 +350,7 @@ processing...
 
         `); // hash in package.json to check
 
-        if (depForPush.typeIs('angular-lib', 'isomorphic-lib') && depForPush.isSmartContainer) {
+        if (depForPush.typeIs('isomorphic-lib') && depForPush.isSmartContainer) {
           try {
             await depForPush.filesStructure.init('')
           } catch (error) {

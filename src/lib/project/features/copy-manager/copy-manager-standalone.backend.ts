@@ -96,6 +96,7 @@ export class CopyManagerStandalone extends CopyManager {
     const monitoredOutDirSharedAssets = this.monitoredOutDirSharedAssets;
 
     this.initOptions({
+
       folderPath: [
         monitoredOutDir,
         ...monitoredOutDirSharedAssets,

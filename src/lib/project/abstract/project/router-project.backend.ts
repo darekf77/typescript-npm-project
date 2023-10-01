@@ -19,11 +19,8 @@ export abstract class RouterProject {
   // @ts-ignore
   get port(this: Project) {
     let env: Models.env.EnvConfigProject;
-    if (this.isWorkspace) {
-      env = this.env?.config?.workspace?.workspace;
-    } else {
-      env = this.env?.config?.workspace?.projects?.find(p => p.name === this.name);
-    }
+
+    env = this.env?.config?.workspace?.projects?.find(p => p.name === this.name);
     const envPort = env?.port;
     return _.isNumber(envPort) ? envPort : this.__defaultPort;
   }
@@ -68,19 +65,6 @@ export abstract class RouterProject {
    */
   public async startServer(this: Project, args?: string) {
     if (this.typeIs('unknow')) {
-      return;
-    }
-    if (this.isWorkspace && !this.isGenerated) {
-
-      const genLocationWOrkspace = path.join(this.location, config.folder.bundle, this.name);
-      const genWorkspace = Project.From<Project>(genLocationWOrkspace)
-      if (!genWorkspace) {
-        Helpers.error(`Workspace folder "${config.folder.bundle}" does not exists.`
-          + ` Please run: ${chalk.bold(config.frameworkName + ' static:build')} in this workspace.
-Generated workspace should be here: ${genLocationWOrkspace}
-        `)
-      }
-      await genWorkspace.startServer(args);
       return;
     }
     if (this.isStandaloneProject) {

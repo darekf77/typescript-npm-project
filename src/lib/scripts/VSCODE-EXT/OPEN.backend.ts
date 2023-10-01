@@ -20,31 +20,6 @@ async function $OPEN(args: string) {
 }
 //#endregion
 
-//#region open / workspace
-function $OPEN_WORKSPACE() {
-  const workspacePath = path.join((Project.Current as Project).location);
-  if (!fse.existsSync(workspacePath)) {
-    (Project.Current as Project).recreateCodeWorkspace();
-  }
-  (Project.Current as Project).run(`code ${(Project.Current as Project).location} &`).sync();
-  process.exit(0)
-}
-//#endregion
-
-//#region open / workspace child
-function $OPEN_WORKSPACE_CHILDS() {
-  let proj: Project;
-  if ((Project.Current as Project).isWorkspace) {
-    proj = Project.Current as Project;
-  } else if ((Project.Current as Project).isWorkspaceChildProject) {
-    proj = (Project.Current as Project).parent;
-  }
-  if (proj.isWorkspace) {
-    proj.run(`${proj.children.map(c => `code ${c.name}`).join(' && ')}`).sync();
-  }
-  process.exit(0)
-}
-//#endregion
 
 //#region open / core container
 function $OPEN_CORE_CONTAINER() {
@@ -74,20 +49,6 @@ function $OPEN_CORE_PROJECT() {
 function $OPEN_TNP_PROJECT() {
   (Project.Tnp as Project).run(`code ${(Project.Tnp as Project).location} &`).sync();
   process.exit(0)
-}
-//#endregion
-
-//#region open / baseline
-function $OPEN_BASELINE() {
-  if ((Project.Current as Project).isSite) {
-    if ((Project.Current as Project).isWorkspace) {
-      (Project.Current as Project).baseline.run(`code ${(Project.Current as Project).baseline.location} &`).sync();
-    } else {
-      (Project.Current as Project).baseline.run(`code . &`).sync();
-    }
-    process.exit(0)
-  }
-  Helpers.error(`This is not "site project"`, false, true);
 }
 //#endregion
 
@@ -247,12 +208,9 @@ export default {
   $OPEN_DB: Helpers.CLIWRAP($OPEN_DB, '$OPEN_DB'),
   $OPEN_ROUTES: Helpers.CLIWRAP($OPEN_ROUTES, '$OPEN_ROUTES'),
   $OPEN_UNSTAGE: Helpers.CLIWRAP($OPEN_UNSTAGE, '$OPEN_UNSTAGE'),
-  $OPEN_WORKSPACE_CHILDS: Helpers.CLIWRAP($OPEN_WORKSPACE_CHILDS, '$OPEN_WORKSPACE_CHILDS'),
-  $OPEN_WORKSPACE: Helpers.CLIWRAP($OPEN_WORKSPACE, '$OPEN_WORKSPACE'),
   $IS_CORE_PROJECT: Helpers.CLIWRAP($IS_CORE_PROJECT, '$IS_CORE_PROJECT'),
   $OPEN_CORE_PROJECT: Helpers.CLIWRAP($OPEN_CORE_PROJECT, '$OPEN_CORE_PROJECT'),
   $OPEN_CORE_CONTAINER: Helpers.CLIWRAP($OPEN_CORE_CONTAINER, '$OPEN_CORE_CONTAINER'),
   $OPEN_TNP_PROJECT: Helpers.CLIWRAP($OPEN_TNP_PROJECT, '$OPEN_TNP_PROJECT'),
-  $OPEN_BASELINE: Helpers.CLIWRAP($OPEN_BASELINE, '$OPEN_BASELINE'),
 
 }

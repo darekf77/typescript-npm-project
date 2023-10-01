@@ -58,6 +58,7 @@ export class BackendCompilation extends IncCompiler.Base {
     super({
       folderPath: [path.join(cwd, srcFolder)],
       notifyOnFileUnlink: true,
+      followSymlinks: true,
     });
   }
   //#endregion
@@ -67,18 +68,12 @@ export class BackendCompilation extends IncCompiler.Base {
   //#region methods / compile
   async compile(watch = false) {
 
-    const ProjectClass = CLASS.getBy('Project') as typeof Project;
-    // QUICK_FIX for backend in ${config.frameworkName} projects
-    const currentProject = ProjectClass.From<Project>(this.cwd);
-    const generatedDeclarations = !currentProject.isWorkspaceChildProject;
-
-
     await this.libCompilation
       ({
         cwd: this.cwd,
         watch,
         outDir: this.outFolder as any,
-        generateDeclarations: generatedDeclarations,
+        generateDeclarations: true,
       });
   }
   //#endregion
@@ -192,7 +187,7 @@ export class BackendCompilation extends IncCompiler.Base {
       watch,
     } = options;
 
-    const isStandalone = (!project.isSmartContainerTarget && !project.isWorkspace && !project.isSmartContainerChild);
+    const isStandalone = (!project.isSmartContainerTarget && !project.isSmartContainerChild);
     const parent = !isStandalone ? (project.parent || project.smartContainerTargetParentContainer) : void 0;
 
     Helpers.info(`

@@ -125,37 +125,13 @@ export async function INIT_ALL(args: string, exit = true) {
 
 // }
 
-export async function STATIC_INIT(args: string, exit = true) {
-  // process.exit(0)
-  const staticVersion = await (Project.Current as Project).StaticVersion();
-  if (staticVersion) {
-    await staticVersion.filesStructure.init(args);
-  }
-
-  if (exit) {
-    process.exit(0)
-  }
-}
-
-export async function STATIC_INIT_ALL(args: string, exit = true) {
-  if (!args) {
-    args = ''
-  }
-  args += ` --recrusive`;
-  // process.exit(0)
-  await (await (Project.Current as Project).StaticVersion()).filesStructure.init(args);
-  if (exit) {
-    process.exit(0)
-  }
-}
-
 export async function CLEAN(args: string, exit = true) {
   const currentProj = (Project.Current as Project);
 
   const clear = async (proj: Project) => {
     if (proj.isContainer) {
       if (proj.isSmartContainer) {
-        while(true) {
+        while (true) {
           try {
             proj.node_modules.remove();
             proj.smartNodeModules.remove();
@@ -204,18 +180,9 @@ export const CLEAR = async (args, exit = true) => {
   }
 }
 
-export async function STATIC_CLEAN(args: string, exit = true) {
-  await (await (Project.Current as Project).StaticVersion(false)).filesStructure.clearFromArgs(args)
-  if (exit) {
-    process.exit(0);
-  }
-}
-
-export const STATIC_CLEAR = STATIC_CLEAN;
-
 export async function CLEAN_ALL(args: string, exit = true) {
   const proj = (Project.Current as Project);
-  if (proj.isWorkspaceChildProject && proj.isSmartContainerChild) {
+  if (proj.isSmartContainerChild) {
     await proj.parent.filesStructure.clear({ recrusive: true })
   } else {
     await proj.filesStructure.clear({ recrusive: true })
@@ -227,14 +194,6 @@ export async function CLEAN_ALL(args: string, exit = true) {
 
 export const CLEAR_ALL = CLEAN_ALL;
 
-export async function STATIC_CLEAN_ALL(args: string, exit = true) {
-  await (await (Project.Current as Project).StaticVersion(false)).filesStructure.clear({ recrusive: true })
-  if (exit) {
-    process.exit(0);
-  }
-}
-
-export const STATIC_CLEAR_ALL = STATIC_CLEAN_ALL;
 
 export async function RESET(args: string, exit = true) {
   await (Project.Current as Project).filesStructure.resetFromArgs(args)
@@ -245,33 +204,12 @@ export async function RESET(args: string, exit = true) {
 
 
 export async function RESET_ALL(args: string, exit = true) {
-  if ((Project.Current as Project).isWorkspaceChildProject) {
-    await (Project.Current as Project).parent.filesStructure.reset({ recrusive: true })
-  } else {
-    await (Project.Current as Project).filesStructure.reset({ recrusive: true })
-  }
+  await (Project.Current as Project).filesStructure.reset({ recrusive: true })
   if (exit) {
     process.exit(0);
   }
 }
 
-export async function STATIC_RESET(args: string, exit = true) {
-  await (await (Project.Current as Project).StaticVersion(false)).filesStructure.resetFromArgs(args)
-  if (exit) {
-    process.exit(0);
-  }
-}
-
-export async function STATIC_RESET_ALL(args: string, exit = true) {
-  let staticProj = await (Project.Current as Project).StaticVersion(false);
-  if (staticProj.isWorkspaceChildProject) {
-    staticProj = staticProj.parent;
-  }
-  await (await (Project.Current as Project).StaticVersion(false)).filesStructure.reset({ recrusive: true })
-  if (exit) {
-    process.exit(0);
-  }
-}
 
 function TEMPLATES_BUILDER() {
   (Project.Current as Project).filesTemplatesBuilder.rebuild();
@@ -288,41 +226,23 @@ const $INIT_EVERYWHERE = (args) => {
 
 // init().project();
 // init().watch.project()
-const S_INIT = (args, exit) => STATIC_INIT(args, exit);
 const CL = (args, exit) => CLEAN(args, exit);
-const SCL = (args, exit) => STATIC_CLEAN(args, exit);
-const SCLA = (args, exit) => STATIC_CLEAN_ALL(args, exit);
 const RST = (args, exit) => RESET(args, exit);
 const RSTA = (args, exit) => RESET_ALL(args, exit);
-const SRST = (args, exit) => STATIC_RESET(args, exit);
-const SRSTA = (args, exit) => STATIC_RESET_ALL(args, exit);
 
 export default {
   $INIT: Helpers.CLIWRAP($INIT, '$INIT'),
   $STRUCT: Helpers.CLIWRAP($STRUCT, '$STRUCT'),
   INIT_ALL: Helpers.CLIWRAP(INIT_ALL, 'INIT_ALL'),
-  STATIC_INIT: Helpers.CLIWRAP(STATIC_INIT, 'STATIC_INIT'),
-  STATIC_INIT_ALL: Helpers.CLIWRAP(STATIC_INIT_ALL, 'STATIC_INIT_ALL'),
-  S_INIT: Helpers.CLIWRAP(S_INIT, 'S_INIT'),
   CLEAN: Helpers.CLIWRAP(CLEAN, 'CLEAN'),
   CLEAR: Helpers.CLIWRAP(CLEAR, 'CLEAR'),
   CL: Helpers.CLIWRAP(CL, 'CL'),
-  STATIC_CLEAN: Helpers.CLIWRAP(STATIC_CLEAN, 'STATIC_CLEAN'),
-  STATIC_CLEAR: Helpers.CLIWRAP(STATIC_CLEAR, 'STATIC_CLEAR'),
-  SCL: Helpers.CLIWRAP(SCL, 'SCL'),
   CLEAN_ALL: Helpers.CLIWRAP(CLEAN_ALL, 'CLEAN_ALL'),
   CLEAR_ALL: Helpers.CLIWRAP(CLEAR_ALL, 'CLEAR_ALL'),
-  STATIC_CLEAN_ALL: Helpers.CLIWRAP(STATIC_CLEAN_ALL, 'STATIC_CLEAN_ALL'),
-  STATIC_CLEAR_ALL: Helpers.CLIWRAP(STATIC_CLEAR_ALL, 'STATIC_CLEAR_ALL,'),
-  SCLA: Helpers.CLIWRAP(SCLA, 'SCLA'),
   RESET: Helpers.CLIWRAP(RESET, 'RESET'),
   RESET_ALL: Helpers.CLIWRAP(RESET_ALL, 'RESET_ALL'),
   RST: Helpers.CLIWRAP(RST, 'RST'),
   RSTA: Helpers.CLIWRAP(RSTA, 'RSTA'),
-  STATIC_RESET: Helpers.CLIWRAP(STATIC_RESET, 'STATIC_RESET'),
-  STATIC_RESET_ALL: Helpers.CLIWRAP(STATIC_RESET_ALL, 'STATIC_RESET_ALL'),
-  SRST: Helpers.CLIWRAP(SRST, 'SRST'),
-  SRSTA: Helpers.CLIWRAP(SRSTA, 'SRSTA'),
   TEMPLATES_BUILDER: Helpers.CLIWRAP(TEMPLATES_BUILDER, 'TEMPLATES_BUILDER'),
   $INIT_EVERYWHERE: Helpers.CLIWRAP($INIT_EVERYWHERE, '$INIT_EVERYWHERE'),
 }

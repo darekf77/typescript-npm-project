@@ -90,12 +90,6 @@ export class SourceModForStandaloneProjects extends FeatureCompilerForProject {
     if (startFolder === 'src') {
       return project.typeIs('isomorphic-lib') ? 'lib' : 'app';
     }
-    if (project.typeIs('angular-lib') && startFolder === 'components') {
-      return 'lib';
-    }
-    if (project.isSiteInStrictMode && startFolder === config.folder.custom) {
-      return `${config.folder.custom}/${this.getModType(project, relativePath.replace(`${startFolder}/`, '') as any)}` as any;
-    }
   }
   //#endregion
 
@@ -112,9 +106,7 @@ export class SourceModForStandaloneProjects extends FeatureCompilerForProject {
       ...this.foldersCompiledJsDtsMap,
     ];
 
-    const children = this.project.isWorkspaceChildProject ?
-      this.project.parent.childrenThatAreThirdPartyInNodeModules
-      : this.project.childrenThatAreThirdPartyInNodeModules;
+    const children = this.project.childrenThatAreThirdPartyInNodeModules;
 
     children.forEach(child => {
       const libName = child.name;

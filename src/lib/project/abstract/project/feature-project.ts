@@ -3,16 +3,16 @@ import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import chalk from 'chalk';
 import {
-  StaticBuild, MochaTestRunner,
+   MochaTestRunner,
   FilesStructure, FilesTemplatesBuilder, BuildProcess,
-  WorkspaceSymlinks, NodeModules, FilesRecreator, FilesFactory,
+  NodeModules, FilesRecreator, FilesFactory,
   QuickFixes, NpmPackages, ProxyRouter, TargetProject, GitActions,
   SmartNodeModules, RecentFilesForContainer, LinkedRepos, Branding, DocsAppBuildConfig, AssetsManager,
   JestTestRunner,
   CypressTestRunner
 } from '../../features';
 
-import { BaselineSiteJoin, SourceModifier, FrameworkFilesGenerator, AssetsFileListGenerator } from '../../compilers';
+import {  SourceModifier, FrameworkFilesGenerator, AssetsFileListGenerator } from '../../compilers';
 import { CompilerCache } from '../../features/compiler-cache.backend';
 import { CopyManager } from '../../features/copy-manager';
 import { IncrementalBuildProcess } from '../../compilers/build-isomorphic-lib/compilations/incremental-build-process.backend';
@@ -57,10 +57,6 @@ export abstract class FeatureProject {
   //#endregion
 
   //#region @backend
-  public workspaceSymlinks: WorkspaceSymlinks;
-  //#endregion
-
-  //#region @backend
   public targetProjects: TargetProject;
   //#endregion
 
@@ -86,10 +82,6 @@ export abstract class FeatureProject {
 
   //#region @backend
   public filesFactory: FilesFactory;
-  //#endregion
-
-  //#region @backend
-  public join: BaselineSiteJoin;
   //#endregion
 
   //#region @backend

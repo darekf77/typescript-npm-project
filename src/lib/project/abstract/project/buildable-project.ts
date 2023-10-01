@@ -275,17 +275,6 @@ export abstract class BuildableProject {
     this.buildOptions = buildOptions;
 
     let baseHref: string;
-    // log('AM HERE')
-    if (this.typeIs('workspace')) {
-      baseHref = this.env.config.workspace.workspace.baseUrl;
-    } else if (this.isWorkspaceChildProject) {
-      if (buildOptions.appBuild) {
-        const proj = this.env.config && this.env.config.workspace.projects.find(p => {
-          return p.name === this.name;
-        });
-        baseHref = proj ? proj.baseUrl : void 0;
-      }
-    }
 
     // log(`basehref for current project `, baseHref)
     this.buildOptions.baseHref = baseHref;
@@ -293,16 +282,6 @@ export abstract class BuildableProject {
     if (!buildOptions.appBuild) {
       if (this.buildOptions.copytoAll) {
         await this.selectAllProjectCopyto();
-      } else {
-        if (!this.isVscodeExtension) {
-          if (!Array.isArray(this.buildOptions.copyto) || this.buildOptions.copyto.length === 0) {
-            if (this.isStandaloneProject && this.buildOptions.watch) {
-              if (!this.isGenerated) {
-                // await this.selectProjectToCopyTO(this.buildOptions);
-              }
-            }
-          }
-        }
       }
 
       // // TODO  -> FOR BUNDLE copyt node_modules not link
@@ -353,7 +332,7 @@ export abstract class BuildableProject {
 
     // @ts-ignore
     this.buildOptions.copyto = (this.buildOptions.copyto as Project[]).filter(f => {
-      if (f.typeIs('angular-lib', 'isomorphic-lib')) {
+      if (f.typeIs('isomorphic-lib')) {
         return true;
       }
       if (f.isContainer) {

@@ -99,28 +99,8 @@ export abstract class RecreatableProject {
     if (this.typeIs('unknow')) {
       return [];
     }
-    const extraFolders = this.getFolders()
-      .filter(f => !this.children.map(c => c.name).includes(path.basename(f)))
-      .filter(f => !['src', 'backup'].includes(path.basename(f)))
-      .map(f => path.basename(f))
 
-    if (this.typeIs('workspace')) {
-      return [
-        // 'environment.d.ts',
-        'environment.js',
-        'environment.dev.js',
-        'environment.prod.js',
-        'environment.test.js',
-        'environment.stage.js',
-        'environment.static.js',
-        'environment.online.js'
-      ].concat(!this.isSiteInStrictMode ? extraFolders : [])
-    }
-    const files: string[] = ['src']
-    if (this.typeIs('angular-lib')) {
-      files.push('components')
-    };
-
+    const files: string[] = ['src'];
     return files;
     //#endregion
   }

@@ -9,7 +9,8 @@ import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { IncCompiler } from 'incremental-compiler';
-import { SourceModForSite } from './source-mod-for-site.backend';
+import { SourceModForStandaloneProjects } from './source-mod-for-standalone-projects.backend';
+
 //#endregion
 
 const IS_ENABLE = false; // TODO UNCOMMENT
@@ -17,16 +18,10 @@ const IS_ENABLE = false; // TODO UNCOMMENT
 export function optionsSourceModifier(project: Project): IncCompiler.Models.BaseClientCompilerOptions {
   // console.log('PROJECT', project.name)
   let folderPath: string | string[] = void 0;
-  if (project.isWorkspaceChildProject || project.isStandaloneProject) {
+  if (project.isStandaloneProject) {
     folderPath = [
       path.join(project.location, config.folder.src),
-    ]
-    if (project.typeIs('angular-lib')) {
-      folderPath.push(path.join(project.location, config.folder.components));
-    }
-    if (project.isSiteInStrictMode) {
-      folderPath.push(path.join(project.location, config.folder.custom));
-    }
+    ];
   }
   const options: IncCompiler.Models.BaseClientCompilerOptions = {
     folderPath,
@@ -42,34 +37,31 @@ export function optionsSourceModifier(project: Project): IncCompiler.Models.Base
 
 
 @IncCompiler.Class({ className: 'SourceModifier' })
-export class SourceModifier extends SourceModForSite {
+export class SourceModifier extends SourceModForStandaloneProjects {
 
   async preAsyncAction() {
     if (!IS_ENABLE) {
       return;
     }
-    if (!(this.project.isWorkspaceChildProject || this.project.isStandaloneProject)) {
+    if (!(this.project.isStandaloneProject)) {
       return;
     }
     // console.log('INIT PRE ASYNC')
     let pathToWatch: string;
     let prefixTmpFolder = `tmp-src-dist-browser-for-`;
 
-    if (this.project.typeIs('angular-lib')) {
-      pathToWatch = config.folder.components;
-    } if (this.project.typeIs('isomorphic-lib', 'vscode-ext')) { // TODO all projects with src ?
+
+    if (this.project.typeIs('isomorphic-lib', 'vscode-ext')) { // TODO all projects with src ?
       pathToWatch = config.folder.src;
     }
     const isStandalone = this.project.isStandaloneProject;
     if (isStandalone) {
-      if (this.project.typeIs('angular-lib')) {
-        prefixTmpFolder = `tmp-src-dist`;
-      } if (this.project.typeIs('isomorphic-lib')) {
+      if (this.project.typeIs('isomorphic-lib')) {
         prefixTmpFolder = `tmp-src-dist-browser`;
       }
     }
     // console.log('INIT PRE ASYNC', pathToWatch)
-    const childrenNames = this.project.isStandaloneProject ? [] : this.project.parent.childrenThatAreClients.map(p => p.name);
+    const childrenNames = this.project.isStandaloneProject ? [] : this.project.parent.childrenThatAreLibs.map(p => p.name);
     chokidar.watch([pathToWatch], {
       ignoreInitial: true,
       followSymlinks: false,
@@ -143,7 +135,9 @@ export class SourceModifier extends SourceModForSite {
   }
 
   async syncAction(absoluteFilePathes: string[]) {
-
+    if (!IS_ENABLE) {
+      return;
+    }
     Helpers.log(`[sourceModifer][sync] files to check: \n\n${absoluteFilePathes.map(f => `${f}\n`)}\n\n`, 1);
 
     // console.log('absoluteFilePathes sm', absoluteFilePathes)
@@ -161,9 +155,7 @@ export class SourceModifier extends SourceModForSite {
 
     // console.log(relativePathesToProject)
     // process.exit(0)
-    if (!this.project.isStandaloneProject ||
-      (this.project.isStandaloneProject && this.project.typeIs('angular-lib'))) {
-
+    if (!this.project.isStandaloneProject) {
       Helpers.tryRemoveDir(path.join(this.project.location, config.folder.tempSrc));
       // console.log('for app replikator', relativePathesToProject)
       relativePathesToProject.forEach(relativePathToProject => {
@@ -205,22 +197,12 @@ export class SourceModifier extends SourceModForSite {
     // input = Helpers.tsCodeModifier.fixApostrphes(input); TODO QUICK_FIX @UNCOMMENT
     // input = Helpers.tsCodeModifier.fixRegexes(input);
     input = super.process(input, relativePath);
-    if (this.project.isWorkspaceChildProject) {
-      input = this.modWorkspaceChildrenLibsBetweenItself(input, modType, relativePath);
-      input = this.modSiteChildrenLibsInClient(input, modType, relativePath);
-    }
     return input;
   }
 
   async start(taskName?: string, afterInitCallBack?: () => void) {
     if (!IS_ENABLE) {
       return;
-    }
-    if (this.project.isSite) {
-      // if(!this.project || !this.project.baseline) {
-      //   console.trace('HERE')
-      // }
-      await this.project.baseline.sourceModifier.start(taskName);
     }
     return super.start(taskName, afterInitCallBack);
   }
@@ -229,14 +211,7 @@ export class SourceModifier extends SourceModForSite {
     if (!IS_ENABLE) {
       return;
     }
-    const { watchOnly } = options || {};
     Helpers.log(`Start source modifer for ${this.project.genericName}`)
-    if (this.project.isSite) {
-      // if(!this.project || !this.project.baseline) {
-      //   console.trace('HERE')
-      // }
-      await this.project.baseline.sourceModifier.startAndWatch(taskName, { watchOnly });
-    }
     return super.startAndWatch(taskName, options);
   }
 

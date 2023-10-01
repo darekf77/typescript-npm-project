@@ -88,9 +88,6 @@ export class ProjectIsomorphicLib
       `src/${config.file.entities_ts}`,
       `src/${config.file.controllers_ts}`,
     ];
-    if (this.isSiteInStrictMode) {
-      toIgnore = toIgnore.concat(toIgnore.map(f => `${config.folder.custom}/${f}`))
-    }
     return toIgnore;
     //#endregion
   }
@@ -323,10 +320,7 @@ export class ProjectIsomorphicLib
     }
 
 
-    const isStandalone = (this.isStandaloneProject
-      && !this.isWorkspaceChildProject
-      && !isSmartContainerTarget
-    );
+    const isStandalone = (this.isStandaloneProject && !isSmartContainerTarget);
     // console.log({ isStandalone, 'this.name': this.name });
 
     const buildOutDir = this.buildOptions.outDir;
@@ -551,7 +545,7 @@ export class ProjectIsomorphicLib
     //#endregion
 
     //#region preparing variables / general
-    const isStandalone = (!this.isWorkspace || !this.isSmartContainer);
+    const isStandalone = (!this.isSmartContainer);
 
     const sharedOptions = () => {
       return {

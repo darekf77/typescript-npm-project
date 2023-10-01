@@ -312,38 +312,6 @@ function $DEPS_RECREATE(args: string) {
 }
 
 
-async function $DEPS_TREE() {
-  const proj = (Project.Current as Project);
-  if (proj.isWorkspaceChildProject) {
-    const c = proj;
-    Helpers.info(`child: ${c.name}`);
-    const libs = c.libsForTraget(c);
-    if (libs.length === 0) {
-      Helpers.log(`-- no deps --`);
-    } else {
-      libs.forEach(d => {
-        Helpers.log(`dep ${d.name}`);
-      })
-    }
-  } else if (proj.isWorkspace) {
-    proj.children.forEach(c => {
-      Helpers.info(`child: ${c.name}`);
-      const libs = c.libsForTraget(c);
-      if (libs.length === 0) {
-        Helpers.log(`-- no deps --`);
-      } else {
-        libs.forEach(d => {
-          Helpers.log(`dep ${d.name}`);
-        })
-      }
-
-    });
-  }
-
-  process.exit(0)
-
-}
-
 async function $DEPS_TREE2() {
   const proj = (Project.Current as Project);
   proj.children.forEach(c => {
@@ -580,14 +548,6 @@ EXIT /b
     // }
     // Helpers.info(`Linking pacakges...DONE`);
     // process.exit(0)
-  } else {
-    if (project.isWorkspaceChildProject) {
-      project = project.parent;
-    }
-    if (!project.isWorkspace) {
-      Helpers.error(`This is not workspace or workpace child projct`, false, true)
-    }
-    project.workspaceSymlinks.add(`Add workspace symlinks`);
   }
   Helpers.info(`Linking DONE!`)
   process.exit(0)
@@ -623,19 +583,6 @@ export async function run(args: string[]) {
 }
 //#endregion
 
-//#region global unlink
-async function $UNLINK() {
-  let project = (Project.Current as Project);
-  if (project.isWorkspaceChildProject) {
-    project = project.parent;
-  }
-  if (!project.isWorkspace) {
-    Helpers.error(`This is not workspace or workpace child projct`, false, true)
-  }
-  project.workspaceSymlinks.remove(`Remove workspace symlinks`);
-  process.exit(0)
-}
-//#endregion
 //#endregion
 
 //#endregion
@@ -665,23 +612,15 @@ const $copy_module_to_project = async (args) => {
 
 function $SHOW_CORE_MODULES() {
   const container = Project.by('container', 'v1');
-  const workspace = Project.by('workspace', 'v1');
-  const al = Project.by('angular-lib', 'v1');
   const il = Project.by('isomorphic-lib', 'v1');
 
   const containerv2 = Project.by('container', 'v2');
-  const workspacev2 = Project.by('workspace', 'v2');
-  const alv2 = Project.by('angular-lib', 'v2');
   const ilv2 = Project.by('isomorphic-lib', 'v2');
   console.log(`
 v1 Container core:\t    ${container.location}
-v1 Workspace core:\t    ${workspace.location}
-v1 Angular-lib core:\t  ${al.location}
 v1 Isomorphic-lib core:\t  ${il.location}
 
 v2 Container core:\t    ${containerv2.location}
-v2 Workspace core:\t    ${workspacev2.location}
-v2 Angular-lib core:\t  ${alv2.location}
 v2 Isomorphic-lib core:\t  ${ilv2.location}
   `)
 
@@ -716,7 +655,6 @@ export default {
   $SHOW_REMOTES: Helpers.CLIWRAP($SHOW_REMOTES, '$SHOW_REMOTES'),
   $TREE: Helpers.CLIWRAP($TREE, '$TREE'),
   $DEPS_TREE2: Helpers.CLIWRAP($DEPS_TREE2, '$DEPS_TREE2'),
-  $DEPS_TREE: Helpers.CLIWRAP($DEPS_TREE, '$DEPS_TREE'),
   $INSTALL_IN_TNP: Helpers.CLIWRAP($INSTALL_IN_TNP, '$INSTALL_IN_TNP'),
   $I_IN_TNP: Helpers.CLIWRAP($I_IN_TNP, '$I_IN_TNP'),
   $DEPS_SET_CATEGORY: Helpers.CLIWRAP($DEPS_SET_CATEGORY, '$DEPS_SET_CATEGORY'),
@@ -748,7 +686,6 @@ export default {
   $REINSTALL: Helpers.CLIWRAP($REINSTALL, '$REINSTALL'),
   $LINK: Helpers.CLIWRAP($LINK, '$LINK'),
   $LN: Helpers.CLIWRAP($LN, '$LN'),
-  $UNLINK: Helpers.CLIWRAP($UNLINK, '$UNLINK'),
   $copytoproject: Helpers.CLIWRAP($copytoproject, '$copytoproject'),
   $copy_to_project: Helpers.CLIWRAP($copy_to_project, '$copy_to_project'),
   $copyto: Helpers.CLIWRAP($copyto, '$copyto'),

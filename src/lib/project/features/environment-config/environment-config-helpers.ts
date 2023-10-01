@@ -78,7 +78,7 @@ function requireUncached(module) {
 //#region create example config for
 function createExampleConfigFor(proj: Project) {
 
-  const configPathRequire = proj.isStandaloneProject ? '{ config: {} }' : `require('tnp').default`;
+  const configPathRequire = '{ config: {} }';
 
   return `
 const path = require('path')
@@ -109,10 +109,8 @@ export function saveConfigWorkspca(project: Project, projectConfig: Models.env.E
   projectConfig.currentProjectType = project._type;
   projectConfig.currentFrameworkVersion = Project.Tnp.version;
   projectConfig.currentProjectLocation = project.location;
-  projectConfig.currentProjectIsStrictSite = project.isSiteInStrictMode;
-  projectConfig.currentProjectIsDependencySite = project.isSiteInDependencyMode;
-  projectConfig.currentProjectIsStatic = project.isGenerated;
   projectConfig.isStandaloneProject = project.isStandaloneProject;
+  projectConfig.isSmartContainer = project.isSmartContainer;
   projectConfig.isSmartContainerTargetProject = project.isSmartContainerTarget;
 
   projectConfig.frameworks = project.frameworks;
@@ -161,6 +159,14 @@ export function saveConfigWorkspca(project: Project, projectConfig: Models.env.E
       [`${project.name}`]: ["./src/lib"],
       [`${project.name}/*`]: ["./src/lib/*"]
     });
+  } else if (project.isSmartContainer) {
+    projectConfig['pathesTsconfig'] = `"paths": ` + JSON.stringify(project.children.reduce((a, child) => {
+      return _.merge(a, {
+        // [`@${project.name}/${child.name}`]: [`${child.name}/src/lib/index.ts`],
+        [`@${project.name}/${child.name}`]: [`${child.name}/src/lib`],
+        [`@${project.name}/${child.name}/*`]: [`${child.name}/src/lib/*`]
+      })
+    }, {}));
   } else {
     projectConfig['pathesTsconfig'] = `"paths": ` + JSON.stringify({});
   }
@@ -171,8 +177,11 @@ export function saveConfigWorkspca(project: Project, projectConfig: Models.env.E
 
   if (project.isSmartContainerChild) {
     projectConfig[customRootDir] = `"rootDir": "../",`;
-  } else if (project.isSite) {
-    projectConfig[customRootDir] = `"rootDir": "./tmp-src",`
+  } else if (project.isSmartContainer) {
+    projectConfig[customRootDir] = `"rootDir": ".",`;
+    projectConfig['includeForContainer'] =  (project.children.map(c => {
+      return `"${c.name}/**/*"`
+    }).join(','))
   } else {
     projectConfig[customRootDir] = `"rootDir": "./src",`
   }
@@ -188,7 +197,7 @@ export function saveConfigWorkspca(project: Project, projectConfig: Models.env.E
   const tmpEnvironmentPath = path.join(project.location, config.file.tnpEnvironment_json)
   const tmpEnvironmentPathBrowser = path.join(project.location, 'tmp-environment-for-browser.json')
 
-  if (project.isStandaloneProject) {
+  if (project.isStandaloneProject || project.isSmartContainer) {
 
     Helpers.writeJson(tmpEnvironmentPath, projectConfig);
     const clonedConfig = _.cloneDeep(projectConfig);
@@ -199,7 +208,8 @@ export function saveConfigWorkspca(project: Project, projectConfig: Models.env.E
       }
     })
     Helpers.writeJson(tmpEnvironmentPathBrowser, clonedConfig);
-    Helpers.log(`config saved in standalone project ${chalk.bold(project.genericName)} ${tmpEnvironmentPath}`);
+    Helpers.log(`config saved in ${project.isStandaloneProject ? 'standalone' : 'smart container'} `
+      + `project ${chalk.bold(project.genericName)} ${tmpEnvironmentPath}`);
 
   }
 }

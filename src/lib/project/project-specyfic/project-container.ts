@@ -62,15 +62,16 @@ export class ProjectContainer
 
   async buildLib() { }
 
-  // filesTemplates() {
-  //   if (this.isSmartContainer) {
-  //     return [
-  //       '.vscode/launch.json.filetemplate',
-  //     ];
-  //   }
-
-  //   return [];
-  // }
+  filesTemplates() {
+    let templates = super.filesTemplates();
+    if (this.isSmartContainer) {
+      templates = [
+        'tsconfig.json.filetemplate',
+        ...templates,
+      ]
+    }
+    return templates;
+  }
 
   startOnCommand() {
     //#region @backendFunc
@@ -82,7 +83,7 @@ export class ProjectContainer
     //#region @backendFunc
     if (this.isSmartContainer) {
       return [
-        // 'angular.json'
+        ...this.filesTemplates(),
         // 'tsconfig.json',
         // ...this.vscodeFileTemplates,
         // '.vscode/launch.json'

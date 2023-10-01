@@ -105,7 +105,6 @@ export class NodeModulesBase extends NodeModulesCore {
     // }
 
     this.project.node_modules.dedupe();
-    // this.project.node_modules.stuberizeFrontendPackages();
   }
 
   private get copyBin() {

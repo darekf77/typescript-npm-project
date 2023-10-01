@@ -36,7 +36,6 @@ function INSTALL_ENV() {
 
 
 function recreate() {
-  (Project.Current as Project).recreate.initAssets();
   (Project.Current as Project).recreate.gitignore();
   process.exit(0)
 

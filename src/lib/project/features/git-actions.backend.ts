@@ -27,7 +27,7 @@ export class GitActions extends FeatureForProject {
       locaiton: ${this.project.location}`, false, true);
     }
     if (this.project.git.currentBranchName !== 'master') {
-      if (this.project.isContainer || this.project.isWorkspace) {
+      if (this.project.isContainer) {
         if (this.project.git.isGitRepo && this.project.git.isGitRoot) {
           this.project.run(`git checkout -b master && git add --all . && git commit -m "first"`).async();
         }
@@ -135,7 +135,7 @@ ${shouldBeProjectArr.map((p, index) => `- ${index + 1}. ${p}`).join('\n')}
   private async repeatMenu(action: keyof GitActions, force = false, origin = 'origin') {
     await Helpers.actionWrapper(async () => {
       fixRemote(this.project,
-        (this.project.isContainerChild || this.project.isWorkspaceChildProject)
+        (this.project.isContainerChild)
           ? this.project.parent.sshOnly : this.project.sshOnly
       )
       if (action === 'pull') {

@@ -335,7 +335,6 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         Helpers.mkdirp(absolutePathReleaseProject);
         this.copyManager.generateSourceCopyIn(absolutePathReleaseProject, {
           useTempLocation: true, // TODO not needed
-          markAsGenerated: false, // TODO not needed
           forceCopyPackageJSON: true, // TODO not needed
           // @ts-ignore
           dereference: true,

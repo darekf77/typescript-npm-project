@@ -88,14 +88,9 @@ const $BUILD_UP = async (args) => {
 async function $DEFAULT_BUILD(args) {
   const project = (Project.Current as Project);
   if (project.isStandaloneProject) {
-    if (project.typeIs('angular-lib')) {
-      await BUILD_DIST_WATCH(args);
-      // await $BUILD_APP(args);
-    } else if (project.typeIs('isomorphic-lib')) {
+    if (project.typeIs('isomorphic-lib')) {
       await BUILD_DIST_WATCH(args);
     }
-  } if (project.isWorkspaceChildProject) {
-    await $BUILD(args);
   } else {
     process.exit(0);
   }
@@ -212,43 +207,6 @@ async function $BUILD_DOCS_PROD(args) {
 
 //#endregion
 
-//#region STATIC BUILD
-
-const STATIC_BUILD_LIB = async (args) => {
-  const staticVersionOfProject = await (Project.Current as Project).StaticVersion();
-  if (staticVersionOfProject) {
-    await staticVersionOfProject.buildProcess.startForLib({ args, staticBuildAllowed: true });
-  } else {
-    Helpers.log(`No static version for project: ${(Project.Current as Project).name}`);
-  }
-
-};
-
-const STATIC_BUILD_PROD = async (args) => {
-  const staticVersionOfProject = await (Project.Current as Project).StaticVersion();
-  if (staticVersionOfProject) {
-    await staticVersionOfProject.buildProcess.startForLib({ prod: true, args, staticBuildAllowed: true });
-  } else {
-    Helpers.log(`No static version for project: ${(Project.Current as Project).name}`);
-  }
-};
-
-const STATIC_BUILD_LIB_PROD = async (args) => (await (Project.Current as Project).StaticVersion()).buildProcess
-  .startForLib({ prod: true, args, staticBuildAllowed: true });
-
-const STATIC_BUILD_APP = async (args) => (await (Project.Current as Project).StaticVersion()).buildProcess
-  .startForApp({ args, staticBuildAllowed: true });
-
-const STATIC_BUILD_APP_PROD = async (args) => (await (Project.Current as Project).StaticVersion()).buildProcess
-  .startForApp({ prod: true, args, staticBuildAllowed: true });
-
-const SBP = (args) => STATIC_BUILD_PROD(args);
-const SBL = (args) => STATIC_BUILD_LIB(args);
-const SBLP = (args) => STATIC_BUILD_LIB_PROD(args);
-const SBA = (args) => STATIC_BUILD_APP(args);
-const SBAP = (args) => STATIC_BUILD_APP_PROD(args);
-//#endregion
-
 //#region SERVE
 const $SERVE = async (args) => {
   let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
@@ -259,7 +217,7 @@ const $SERVE = async (args) => {
     if (!proj.env || !proj.env.config || !proj.env.config.build.options) {
       Helpers.error(`Please build your project first`, false, true);
     }
-    if (proj.typeIs('angular-lib') || (proj.typeIs('isomorphic-lib') && proj.frameworkVersionAtLeast('v3'))) {
+    if ((proj.typeIs('isomorphic-lib') && proj.frameworkVersionAtLeast('v3'))) {
       //#region serve angular lib
       const localUrl = `http://localhost:${8080}/${proj.name}/`;
       const app = express();
@@ -527,9 +485,26 @@ const $STOP = async (args) => {
 
 //#endregion
 
+//#region rebuild
+// TODO
+const $REBUILD = async (args) => {
+  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  if (proj?.isContainer) {
+    const children = proj.projectsInOrderForChainBuild();
+    for (const child of children) {
+      console.log(child.genericName)
+    }
+  } else {
+    await $BUILD_WATCH(args);
+  }
+  process.exit(0);
+};
+//#endregion
+
 export default {
   //#region export default
   DEV: Helpers.CLIWRAP(DEV, 'DEV'),
+  $REBUILD: Helpers.CLIWRAP($REBUILD, '$REBUILD'),
   $BUILD_UP: Helpers.CLIWRAP($BUILD_UP, '$BUILD_UP'),
   BUILD_NG: Helpers.CLIWRAP(BUILD_NG, 'BUILD_NG'),
   BUILD_NG_WATCH: Helpers.CLIWRAP(BUILD_NG_WATCH, 'BUILD_NG_WATCH'),

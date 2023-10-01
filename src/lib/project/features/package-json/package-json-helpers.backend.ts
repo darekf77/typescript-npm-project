@@ -58,9 +58,6 @@ function resovleNewDepsAndOverrideForProject(project: Project) {
   let toOverrideDependencies = (project.packageJson.data.tnp.overrided &&
     project.packageJson.data.tnp.overrided.dependencies) ?
     project.packageJson.data.tnp.overrided.dependencies : {};
-  if (project.isWorkspaceChildProject) {
-    toOverrideDependencies = {};
-  }
 
   let parentOverride = {};
   const orgNewDeps = _.cloneDeep((Project.Tnp as Project).packageJson.data.dependencies);
@@ -69,9 +66,6 @@ function resovleNewDepsAndOverrideForProject(project: Project) {
 
   if (project.isStandaloneProject && !project.isTnp) {
     newDepsForProject = getAndTravelCoreDeps({ type: project._type });
-  } else if ((project.isWorkspace && project.isContainerChild) || project.isWorkspaceChildProject) {
-    newDepsForProject = _.cloneDeep(project.parent.packageJson.data.dependencies);
-    parentOverride = _.cloneDeep(project.parent.packageJson.data.tnp.overrided.dependencies);
   } else {
     newDepsForProject = getAndTravelCoreDeps();
   }
@@ -209,7 +203,6 @@ export function setDependencyAndSave(p: Models.npm.Package, reason: string, proj
   if (!p || !p.name) {
     Helpers.error(`Cannot set invalid dependency for project ${project.genericName}: ${JSON5.stringify(p)}`, false, true);
   }
-  project = (project.isWorkspaceChildProject ? project.parent : project);
 
   if (project.isTnp && !_.isString(p.version)) {
     try {
@@ -245,7 +238,7 @@ export function setDependencyAndSave(p: Models.npm.Package, reason: string, proj
       }
       project.packageJson.data.devDependencies[p.name] = p.version;
     }
-  } else if (project.isStandaloneProject || project.isWorkspace || project.isContainer) {
+  } else if (project.isStandaloneProject || project.isContainer) {
 
     if (p.version) {
       project.packageJson.data.tnp.overrided.dependencies[p.name] = p.version;
@@ -270,7 +263,6 @@ export function removeDependencyAndSave(p: Models.npm.Package, reason: string, p
   if (!p || !p.name) {
     Helpers.error(`Cannot remove invalid dependency for project ${project.genericName}: ${JSON5.stringify(p)}`, false, true);
   }
-  project = (project.isWorkspaceChildProject ? project.parent : project);
   if (project.isTnp) {
     getAndTravelCoreDeps({
       updateFn: (obj, pkgName) => {
@@ -462,9 +454,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   if (project.isTnp) {
     recrateInPackageJson = true;
   }
-  if (recrateInPackageJson && action === 'save' && (project.isWorkspaceChildProject || (project.isContainerChild && project.isWorkspace))) {
-    recrateInPackageJson = false;
-  }
+
 
   if (project.frameworkVersionAtLeast('v2') && !global.actionShowingDepsForContainer) {
     const projForVer = Project.by<Project>('container', project._frameworkVersion);

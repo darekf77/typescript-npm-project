@@ -5,7 +5,7 @@ import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
 import { path } from 'tnp-core'
 import { config } from 'tnp-config';
-import { chokidar } from 'tnp-core';
+// import { chokidar } from 'tnp-core';
 // const { notify } = require('node-notifier');
 import { CLASS } from 'typescript-class-helpers';
 // import toast from 'powertoast';
@@ -54,52 +54,51 @@ async function $SYNC_TO(args) {
     //#endregion
   } else {
     //#region sync to destination location
-    const { resolved: destinaitonProjects, commandString } = Helpers.cliTool.argsFromBegin<Project>(args, location => {
-      return Project.From(location);
-    });
+    // const { resolved: destinaitonProjects, commandString } = Helpers.cliTool.argsFromBegin<Project>(args, location => {
+    //   return Project.From(location);
+    // });
 
-    args = commandString;
-    const currentProj = (Project.Current as Project);
-    const toSync = [
-      ...(currentProj.typeIs('angular-lib') ? [config.folder.components] : []),
-      ...(currentProj.typeIsNot('unknow', 'unknow-npm-project') ? [config.folder.src] : []),
-    ];
-    Helpers.info(`Folder to sync: ${toSync.join(',')}`)
-    if (destinaitonProjects.length === 0) {
-      Helpers.error(`No project to sync`, false, true);
-    }
+    // args = commandString;
+    // const currentProj = (Project.Current as Project);
+    // const toSync = [
+    //   ...(currentProj.typeIsNot('unknow', 'unknow-npm-project') ? [config.folder.src] : []),
+    // ];
+    // Helpers.info(`Folder to sync: ${toSync.join(',')}`)
+    // if (destinaitonProjects.length === 0) {
+    //   Helpers.error(`No project to sync`, false, true);
+    // }
 
-    let destProj = _.first(destinaitonProjects);
-    if (destProj.isContainer) {
-      const properContainerChild = destProj.children.find(c => c.name === currentProj.name);
-      destProj = properContainerChild;
-    }
+    // let destProj = _.first(destinaitonProjects);
+    // if (destProj.isContainer) {
+    //   const properContainerChild = destProj.children.find(c => c.name === currentProj.name);
+    //   destProj = properContainerChild;
+    // }
 
-    if (!destProj || destProj.name !== currentProj.name) {
-      Helpers.error(`You can only sync projects with same name`, false, true);
-    }
+    // if (!destProj || destProj.name !== currentProj.name) {
+    //   Helpers.error(`You can only sync projects with same name`, false, true);
+    // }
 
-    for (let j = 0; j < toSync.length; j++) {
-      const source = path.join(currentProj.location, toSync[j]);
-      Helpers.info(`
-        source: ${currentProj.genericName}
-        destination:${destProj.genericName}
-      `);
-      chokidar.watch([source], {
-        ignoreInitial: false,
-        followSymlinks: false,
-        ignorePermissionErrors: true,
-      }).on('all', async (event, f) => {
-        if (event !== 'addDir' && event !== 'unlinkDir') {
-          const dest = path.join(destProj.location, toSync[j], f.replace(source, ''));
-          if (!Helpers.exists(path.dirname(dest))) {
-            Helpers.mkdirp(path.dirname(dest));
-          }
-          Helpers.copyFile(f, dest);
-          Helpers.log(`Copy: ${dest}`);
-        }
-      });
-    }
+    // for (let j = 0; j < toSync.length; j++) {
+    //   const source = path.join(currentProj.location, toSync[j]);
+    //   Helpers.info(`
+    //     source: ${currentProj.genericName}
+    //     destination:${destProj.genericName}
+    //   `);
+    //   chokidar.watch([source], {
+    //     ignoreInitial: false,
+    //     followSymlinks: false,
+    //     ignorePermissionErrors: true,
+    //   }).on('all', async (event, f) => {
+    //     if (event !== 'addDir' && event !== 'unlinkDir') {
+    //       const dest = path.join(destProj.location, toSync[j], f.replace(source, ''));
+    //       if (!Helpers.exists(path.dirname(dest))) {
+    //         Helpers.mkdirp(path.dirname(dest));
+    //       }
+    //       Helpers.copyFile(f, dest);
+    //       Helpers.log(`Copy: ${dest}`);
+    //     }
+    //   });
+    // }
 
     //#endregion
   }
@@ -240,20 +239,6 @@ function close(args) {
 }
 //#endregion
 
-//#region choki
-const CHOKI = () => {
-  const project = (Project.Current as Project);
-  // console.log(`PRE ASYNC FOR ${this.project.genericName}`)
-  chokidar.watch([config.folder.src, config.folder.components], {
-    ignoreInitial: true,
-    followSymlinks: false,
-    ignorePermissionErrors: true,
-    cwd: project.location
-  }).on('unlinkDir', (relativeDir) => {
-
-  })
-}
-//#endregion
 
 //#region info / check
 export async function $INFO(args: string) {
@@ -289,7 +274,6 @@ export async function $INFO(args: string) {
     monorepo: ${proj.isMonorepo}
 
     isStandaloneProject: ${proj.isStandaloneProject}
-    isGenerated: ${proj.isGenerated}
     isCoreProject: ${proj.isCoreProject}
     isSmartContainer: ${proj.isSmartContainer}
     isSmartContainerChild: ${proj.isSmartContainerChild}
@@ -353,17 +337,6 @@ based on ${githubUrl}
   process.exit(0);
 }
 //#endregion
-
-//#region childs requried
-async function $CHILDS_REQUIRED(args: string) {
-  if (!(Project.Current as Project).isWorkspaceChildProject) {
-    Helpers.error(`Not worksapce child`, false, true);
-  }
-  console.log((Project.Current as Project).sortedRequiredWorkspaceDependencies.map(c => c.name));
-  process.exit(0)
-}
-//#endregion
-
 
 export async function $NAME_TEST() {
   // CLASS.getConfig($NAME_TEST)[0].
@@ -487,7 +460,6 @@ export default {
   $TARGET_PROJ_UPDATE: Helpers.CLIWRAP($TARGET_PROJ_UPDATE, '$TARGET_PROJ_UPDATE'),
   $INFO: Helpers.CLIWRAP($INFO, '$INFO'),
   $CHECK: Helpers.CLIWRAP($CHECK, '$CHECK'),
-  $CHILDS_REQUIRE: Helpers.CLIWRAP($CHILDS_REQUIRED, '$CHILDS_REQUIRED'),
   killvscode: Helpers.CLIWRAP(killvscode, 'killvscode'),
   vscodekill: Helpers.CLIWRAP(vscodekill, 'vscodekill'),
   close: Helpers.CLIWRAP(close, 'close'),
@@ -497,7 +469,6 @@ export default {
   $KILLNODE: Helpers.CLIWRAP($KILLNODE, '$KILLNODE'),
   $KILLALLCODE: Helpers.CLIWRAP($KILLALLCODE, '$KILLALLCODE'),
   $KILLCODE: Helpers.CLIWRAP($KILLCODE, '$KILLCODE'),
-  CHOKI: Helpers.CLIWRAP(CHOKI, 'CHOKI'),
   NOT: Helpers.CLIWRAP(NOT, 'NOT'),
   $FORK: Helpers.CLIWRAP($FORK, '$FORK'),
   $SYNC_TO: Helpers.CLIWRAP($SYNC_TO, '$SYNC_TO'),

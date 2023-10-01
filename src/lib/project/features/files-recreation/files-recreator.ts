@@ -10,6 +10,7 @@ import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
 import { config, ConfigModels } from 'tnp-config';
 import { FeatureForProject } from '../../abstract';
+import { CLI } from 'tnp-cli';
 
 
 
@@ -27,7 +28,7 @@ function getVscodeSettingsFrom(project: Project) {
 export class FilesRecreator extends FeatureForProject {
 
   public async init() {
-    Helpers.log('recreation init')
+    Helpers.log(`recreation init of ${CLI.chalk.bold(this.project.genericName)}`)
     if (this.project.typeIs('container')) {
       this.gitignore();
       this.handleProjectSpecyficFiles();
@@ -39,20 +40,17 @@ export class FilesRecreator extends FeatureForProject {
       await this.project.insideStructure.recrate('bundle');
     }
 
-    this.initAssets();
     this.handleProjectSpecyficFiles();
     this.commonFiles();
 
     this.gitignore();
     this.npmignore();
-    this.customFolder();
     Helpers.log('recreation end')
 
   }
 
   initVscode() {
     this.vscode.settings.hideOrShowFilesInVscode(true);
-    this.vscode.settings.colorsFromWorkspace();
   }
 
 
@@ -117,30 +115,12 @@ export class FilesRecreator extends FeatureForProject {
           '.sass-cache',
           '.sourcemaps'
         ])
-          .concat((self.project.isSiteInStrictMode && self.project.isGeneratingControllerEntities) ? [
-            path.join(config.folder.custom, config.folder.src, config.file.entities_ts),
-            path.join(config.folder.custom, config.folder.src, config.file.controllers_ts)
-          ] : [])
           .concat(self.project.filesTemplates().map(f => f.replace('.filetemplate', '')))
-          .concat(self.project.typeIs('angular-lib') ? [
-            'components/tsconfig.json',
-            'src/tsconfig.app.json'
-          ] : [])
           .concat(self.project.linkedFolders
             .map(l => l.to?.replace(/^\.\//, ''))
             .filter(f => !!f)
-          )
-          .concat( // for site ignore auto-generate scr
-            self.project.isSiteInStrictMode ? (
-              self.project.customizableFilesAndFolders
-                .concat(self.project.customizableFilesAndFolders.map(f => {
-                  return Helpers.path.PREFIX(f);
-                }))
-                .concat(self.project.customizableFilesAndFolders.map(f => {
-                  return `!${path.join(config.folder.custom, f)}`
-                }))
-            ) : []
-          )).concat( // common files for all project
+          ))
+          .concat( // common files for all project
             self.project.isCoreProject ? [] : self.commonFilesForAllProjects
           ).concat( // core files of projects types
             self.project.isCoreProject ? [] : self.project.projectSpecyficFiles().filter(relativeFilePath => {
@@ -152,10 +132,6 @@ export class FilesRecreator extends FeatureForProject {
               config.folder.components,
             ].map(f => `${f}-for-stanalone`)
           )
-          .concat(self.project.isWorkspaceChildProject ? [
-            ...self.assetsToIgnore,
-            // 'src/assets/*/*'
-          ] : [])
           .concat((!self.project.isStandaloneProject && !self.project.isCoreProject)
             ? self.project.projectSpecyficIgnoredFiles() : [])
           .concat(self.project.isTnp ? ['projects/tmp*'] : [])
@@ -172,7 +148,7 @@ export class FilesRecreator extends FeatureForProject {
         return gitignoreFiles.map(f => `/${crossPlatformPath(f)}`)
       },
       get npmignore() {
-        const allowedProject: ConfigModels.LibType[] = ['isomorphic-lib', 'angular-lib']
+        const allowedProject: ConfigModels.LibType[] = ['isomorphic-lib']
         const canBeUseAsNpmPackage = self.project.typeIs(...allowedProject);
         const npmignoreFiles = [
           '.vscode',
@@ -194,16 +170,8 @@ export class FilesRecreator extends FeatureForProject {
 
   private modifyVscode(modifyFN: (settings: ConfigModels.VSCodeSettings, project?: Project) => ConfigModels.VSCodeSettings) {
     const pathSettingsVScode = path.join(this.project.location, '.vscode', 'settings.json');
+
     Helpers.log('[modifyVscode] setting things...')
-    if (this.project.isSite) {
-      if (!fse.existsSync(pathSettingsVScode)) {
-        Helpers.mkdirp(path.dirname(pathSettingsVScode));
-        const settingsFromBaseline = path.join(this.project.baseline.location, '.vscode', 'settings.json');
-        if (fse.existsSync(settingsFromBaseline)) {
-          fse.copyFileSync(settingsFromBaseline, pathSettingsVScode);
-        }
-      }
-    }
     if (Helpers.exists(pathSettingsVScode)) {
       try {
         Helpers.log('parsing 1 ...')
@@ -269,40 +237,6 @@ export class FilesRecreator extends FeatureForProject {
               return settings;
             });
           },
-
-          colorsFromWorkspace() {
-            self.modifyVscode((settings, project) => {
-
-              if (project.isWorkspaceChildProject) {
-
-                if (!settings['workbench.colorCustomizations']) {
-                  settings['workbench.colorCustomizations'] = {};
-                }
-
-                // update activity bar color
-                const parentSettings = getVscodeSettingsFrom(project.parent);
-                const statuBarColor = parentSettings &&
-                  parentSettings['workbench.colorCustomizations'] &&
-                  parentSettings['workbench.colorCustomizations']['statusBar.background'];
-                settings['workbench.colorCustomizations']['statusBar.background'] = statuBarColor;
-                settings['workbench.colorCustomizations']['statusBar.debuggingBackground'] = statuBarColor;
-
-                // update background color
-                if (project.isSite) {
-                  const baselineColor = getVscodeSettingsFrom(project.baseline);
-                  const activityBarBcg = baselineColor &&
-                    baselineColor['workbench.colorCustomizations'] &&
-                    baselineColor['workbench.colorCustomizations']['activityBar.background'];
-                  settings['workbench.colorCustomizations']['activityBar.background'] = activityBarBcg;
-                  settings['workbench.colorCustomizations']['statusBar.background'] = activityBarBcg;
-                }
-
-              }
-
-              return settings;
-            });
-          },
-
           hideOrShowFilesInVscode(hide: boolean = true) {
             self.modifyVscode(settings => {
               settings['files.exclude'] = {};
@@ -367,7 +301,7 @@ export class FilesRecreator extends FeatureForProject {
 
               if (hide) {
                 settings = getSettingsFor(self.project, settings) as any;
-                if (self.project.isWorkspace || self.project.isSmartContainer) {
+                if (self.project.isSmartContainer) {
 
                   if (self.project.isSmartContainer) {
                     settings['files.exclude'][`recent.json`] = true;
@@ -416,18 +350,6 @@ export class FilesRecreator extends FeatureForProject {
 
 
   }
-
-  customFolder() {
-    if (this.project.isBasedOnOtherProject) {
-      const customFolder = path.join(this.project.location, config.folder.custom)
-      const srcFolder = path.join(this.project.location, config.folder.src)
-      if (!fse.existsSync(customFolder)) {
-        Helpers.mkdirp(customFolder);
-        Helpers.mkdirp(srcFolder);
-      }
-    }
-  }
-
 
   npmignore() {
     Helpers.writeFile(path.join(this.project.location, '.npmignore'),
@@ -516,11 +438,8 @@ ${this.project.isVscodeExtension ? '' : coreFiles}
 
     let defaultProjectProptotype: Project;
 
-    if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIsNot('isomorphic-lib', 'vscode-ext')) {
-      // nothing here
-    } else {
-      defaultProjectProptotype = Project.by<Project>(this.project._type, this.project._frameworkVersion) as Project;
-    }
+
+    defaultProjectProptotype = Project.by<Project>(this.project._type, this.project._frameworkVersion) as Project;
 
     const files: Models.other.RecreateFile[] = [];
 
@@ -538,6 +457,10 @@ ${this.project.isVscodeExtension ? '' : coreFiles}
     } else if (defaultProjectProptotype) {
       const projectSpecyficFilesLinked = this.project.projectSpecyficFilesLinked();
       const projectSpecyficFiles = this.project.projectSpecyficFiles();
+      // console.log({
+      //   projectSpecyficFiles,
+      //   project: this.project.genericName
+      // })
       projectSpecyficFiles.forEach(relativeFilePath => {
         relativeFilePath = crossPlatformPath(relativeFilePath);
         let from = crossPlatformPath(path.join(defaultProjectProptotype.location, relativeFilePath));
@@ -586,8 +509,7 @@ ${this.project.isVscodeExtension ? '' : coreFiles}
   }
 
   commonFiles() {
-
-    const wokrspace = Project.by<Project>('workspace', this.project._frameworkVersion);
+    const wokrspace = Project.by<Project>('container', this.project._frameworkVersion);
 
     const files = this.commonFilesForAllProjects;
     files.map(file => {
@@ -598,110 +520,6 @@ ${this.project.isVscodeExtension ? '' : coreFiles}
     }).forEach(file => {
       Helpers.copyFile(file.from, file.where);
     })
-  }
-
-  private quickFixForFileNotInRightFolder() {
-    const folderAA = path.join(
-      this.project.location,
-      config.folder.components,
-      config.folder.assets,
-    );
-    const folderForProject = path.join(
-      folderAA,
-      this.project.name,
-    );
-    const notInRightPlace = glob.sync(`${folderAA}/**/*.*`);
-    Helpers.log('notInRightPlace' + notInRightPlace)
-    if (notInRightPlace.length > 0) {
-      notInRightPlace
-        .map(f => {
-          return f.replace(folderAA, '')
-        })
-        .forEach(rp => {
-          const sour = path.join(folderAA, rp);
-          const dest = path.join(folderForProject, rp);
-          Helpers.log('SOUR' + sour)
-          Helpers.log('DEST' + dest)
-          if (!fse.lstatSync(sour).isDirectory()) {
-            Helpers.copyFile(sour, dest);
-          }
-        })
-
-    }
-  }
-
-  get assetsRelativePathes() {
-    const assetsFolders = [];
-    if (this.project.typeIsNot('angular-lib')) {
-      return [];
-    }
-    const assetsRelativeAngularLib = path.join(
-      config.folder.components,
-      config.folder.assets,
-      this.project.name
-    );
-
-    const pathTOCheck = path.join(this.project.location, assetsRelativeAngularLib)
-    if (!Helpers.exists(pathTOCheck)) {
-      Helpers.mkdirp(pathTOCheck);
-      Helpers.writeFile(path.join(pathTOCheck, 'put-your-assets-here.txt'), `
-    This file is generated..
-    Please put asset files related for this project here..
-      ` );
-      // this.quickFixForFileNotInRightFolder();
-    }
-    assetsFolders.push(assetsRelativeAngularLib);
-    return assetsFolders;
-  }
-
-  get assetsToIgnore() {
-    if (!this.project.isWorkspaceChildProject) {
-      return [];
-    }
-    return this.project.parent.children
-      .filter(f => {
-        return f.typeIs('angular-lib');
-      })
-      .map(a => a.recreate.assetsRelativePathes)
-      .reduce((a, b) => {
-        return a.concat(b);
-      }, [])
-      .map(asset => {
-        return crossPlatformPath(path.join(config.folder.src, asset.replace(new RegExp(`^${config.folder.components}\/`), '')));
-      })
-  }
-
-  /**
-   * QUICK_FIX needs to be before gitignore recreatino ! change it
-   */
-  initAssets() {
-    if (!this.project.isWorkspaceChildProject) {
-      return;
-    }
-
-    this.project.parent.children
-      .filter(f => {
-        return f.typeIs('angular-lib');
-      })
-      .forEach(p => {
-        p.recreate.assetsRelativePathes
-          .map(rp => crossPlatformPath(path.join(p.location, rp)))
-          .filter(ap => fse.existsSync(ap))
-          .forEach(ap => {
-            const dest = path.join(
-              this.project.location,
-              config.folder.src,
-              config.folder.assets,
-              p.name,
-            );
-            // Helpers.info(`COPY ASSET FROM ${ap} to ${dest}`)
-            Helpers.copy(ap, dest);
-          })
-      });
-
-    // this.assetsToIgnore.forEach(rp => {
-
-    // })
   }
 
 

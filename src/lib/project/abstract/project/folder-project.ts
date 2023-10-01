@@ -80,7 +80,6 @@ export abstract class FolderProject {
     }
     return this.children.filter(c => {
       return c.typeIs(...([
-        'angular-lib',
         'isomorphic-lib'
       ] as ConfigModels.LibType[]));
     });
@@ -98,10 +97,7 @@ export abstract class FolderProject {
     }
     return this.children.filter(c => {
       return c.typeIs(...([
-        'angular-lib',
         'isomorphic-lib',
-        'angular-client',
-        'ionic-client',
       ] as ConfigModels.LibType[]));
     });
     //#endregion
@@ -362,10 +358,6 @@ export abstract class FolderProject {
       Helpers.remove(fileTemplate.replace('.filetemplate', ''));
     });
 
-    if (this.isWorkspace && this.isGenerated && this.isBasedOnOtherProject) {
-      const siteLocationInDist = path.resolve(path.join('..', this.location, this.baseline.name));
-      Helpers.tryRemoveDir(siteLocationInDist);
-    }
     if (this.typeIs('unknow')) {
       return;
     }
@@ -394,9 +386,6 @@ export abstract class FolderProject {
         }
         return true;
       })
-    if (this.isWorkspace) {
-      gitginoredfiles = gitginoredfiles.filter(f => !f.startsWith(config.folder.dist))
-    }
 
     if (this.isCoreProject) {
       gitginoredfiles = gitginoredfiles.filter(f => {

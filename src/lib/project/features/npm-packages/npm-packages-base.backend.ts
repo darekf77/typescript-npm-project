@@ -101,11 +101,9 @@ export class NpmPackagesBase extends NpmPackagesCore {
       }
     }
 
-    if (this.project.isWorkspaceChildProject) {
-      this.project.parent.npmPackages.installProcess(`workspace child: ${this.project.name} ${triggeredMsg} `, options)
-    }
 
-    if (this.project.isStandaloneProject || this.project.isWorkspace || this.project.isUnknowNpmProject || this.project.isContainer) {
+
+    if (this.project.isStandaloneProject || this.project.isUnknowNpmProject || this.project.isContainer) {
 
       this.project.packageJson.showDeps(`${this.project._type} instalation before full insall [${triggeredMsg}]`);
 
@@ -135,13 +133,8 @@ export class NpmPackagesBase extends NpmPackagesCore {
         Helpers.log(`Project is not allowed to have node_modules installed`)
       }
 
-      if (this.project.isWorkspace) {
-        this.project.workspaceSymlinks.add(triggeredMsg)
-      }
-      if (this.project.isContainerChild && this.project.isWorkspace) {
-        this.project.packageJson.hideDeps(`${this.project._type} hide deps for container child [${triggeredMsg}]`);
-      }
-      if ((this.project.isWorkspace || this.project.isStandaloneProject)) {
+
+      if (this.project.isStandaloneProject) {
         if (!this.project.node_modules.isLink) {
           if (!this.project.node_modules.itIsSmartInstalation) {
             this.project.node_modules.dedupe();
@@ -151,7 +144,6 @@ export class NpmPackagesBase extends NpmPackagesCore {
         // TODO this does not apply for smartInstalation..
         // but how to check if smart installation is smart not normal ?
 
-        // this.project.node_modules.stuberizeFrontendPackages();
       }
 
       this.project.packageJson.save(`${this.project._type} instalation after  [${triggeredMsg}]`);

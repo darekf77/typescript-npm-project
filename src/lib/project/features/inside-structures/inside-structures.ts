@@ -68,8 +68,7 @@ export class InsideStructures extends FeatureForProject {
   //#region api / recreate
   public async recrate(outFolder: ConfigModels.OutFolder, watchBuild = true) {
     // console.log('recreate start')
-    const clients: Project[] = this.project.isWorkspaceChildProject
-      ? this.project.parent.childrenThatAreLibs : [];
+    const clients: Project[] = [];
 
     const action = async (client: Project) => {
       const structs = [

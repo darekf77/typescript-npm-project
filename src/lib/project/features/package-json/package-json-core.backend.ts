@@ -144,12 +144,6 @@ export class PackageJsonCore {
     return Array.isArray(p.resources) ? p.resources : [];
   }
 
-  get workspaceDependencies(): string[] {
-    const p = this.data.tnp && this.data.tnp.required;
-    // console.log(`${this.locationOfJson}`, p)
-    return Array.isArray(p) ? p : [];
-  }
-
   dependencies(): string[] {
     const p = _.keys(this.data?.dependencies);
     // console.log(`${this.locationOfJson}`, p)
@@ -184,12 +178,6 @@ export class PackageJsonCore {
     return deps.includes(dependencyName);
   }
 
-  get workspaceDependenciesServers(): string[] {
-    const p = this.data.tnp && this.data.tnp.requiredServers;
-    // console.log(`${this.locationOfJson}`, p)
-    return Array.isArray(p) ? p : [];
-  }
-
   get additionalNpmNames() {
     const p = this.data.tnp?.additionalNpmNames;
     return _.isArray(p) ? p : [];
@@ -209,40 +197,6 @@ export class PackageJsonCore {
 
   get isLink() {
     return Helpers.isSymlinkFileExitedOrUnexisted(this.path);
-  }
-
-  get pathToBaseline(): string {
-    if (this.data && this.data.tnp &&
-      (_.isString(this.data.tnp.basedOn) || _.isArray(this.data.tnp.dependsOn))
-    ) {
-
-      const pathToBaselineDependency = _.isString(_.first(this.data.tnp.dependsOn)) ?
-        path.resolve(path.join(path.dirname(this.cwd), _.first(this.data.tnp.dependsOn))) : '';
-      const pathToBaselineStricSite = _.isString(this.data.tnp.basedOn) ?
-        path.resolve(path.join(path.dirname(this.cwd), this.data.tnp.basedOn)) : '';
-
-      if (fse.existsSync(pathToBaselineStricSite)) {
-        this.fixUnexistedBaselineInNOdeModules(pathToBaselineStricSite)
-        return pathToBaselineStricSite;
-      } else if (this.data.tnp.dependsOn?.length > 0 && fse.existsSync(pathToBaselineDependency)) {
-        this.fixUnexistedBaselineInNOdeModules(pathToBaselineDependency);
-        return pathToBaselineDependency;
-      } else {
-        if (_.isString(this.data.tnp.basedOn)) {
-          Helpers.error(`[pathToBaseline] Wron value for ${chalk.bold('basedOn')} in package.json  (${this.cwd})`);
-        } else {
-          Helpers.warn(`[pathToBaseline] path to baselien not exists:
-          strict-site: ${pathToBaselineStricSite}
-          dependency-site: ${pathToBaselineDependency}
-          `);
-        }
-      }
-
-      if (!global[CoreConfig.message.globalSystemToolMode] && !global.testMode) {
-        Helpers.warn(`[pathToBaseline] Returning undefined to not show error message: ${this.data.tnp.basedOn} `)
-        return;
-      }
-    }
   }
 
   get isCoreProject() {
@@ -291,17 +245,6 @@ export class PackageJsonCore {
     //   console.log('fond', this.location)
     // }
     return res;
-  }
-
-  get isGenerated() {
-    if (this.data.tnp && !_.isUndefined(this.data.tnp.isGenerated)) {
-      if (_.isBoolean(this.data.tnp.isGenerated)) {
-        return this.data.tnp.isGenerated;
-      }
-      Helpers.error(`[isGenerated] Bad value in package.json, tnp.isGenerated should be boolean.`, true, true);
-      Helpers.error(`[isGenerated] Location of package.json: ${this.cwd}`, true, true)
-    }
-    return false;
   }
 
   get useFramework() {

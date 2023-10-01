@@ -18,12 +18,10 @@ export function $VSCODE_EXT(args: string, exit = true) {
 
 function showfilesfor(project: Project) {
   project.recreate.vscode.settings.hideOrShowFilesInVscode(false);
-  project.recreate.vscode.settings.colorsFromWorkspace();
 }
 
 function hidefilesfor(project: Project) {
   project.recreate.vscode.settings.hideOrShowFilesInVscode(true);
-  project.recreate.vscode.settings.colorsFromWorkspace();
 }
 
 export function $VSCODE_TEMP_SHOW(args: string, exit = true) {
@@ -42,7 +40,6 @@ export function $VSCODE_TEMP_HIDE(args: string, exit = true) {
 
 export function $INIT_VSCODE() {
   (Project.Current as Project).recreate.vscode.settings.hideOrShowFilesInVscode();
-  (Project.Current as Project).recreate.vscode.settings.colorsFromWorkspace();
   process.exit(0);
 }
 
@@ -245,31 +242,22 @@ function $VSCODE_GLOBAL() {
 
 const $FILES_HIDE = (args, exit) => $VSCODE_TEMP_HIDE(args, exit);
 const $FILES_SHOW = (args, exit) => $VSCODE_TEMP_SHOW(args, exit);
+
 const $FILES_SHOW_ALL = (args, exit = true) => {
   let proj: Project;
-  if ((Project.Current as Project).isWorkspaceChildProject) {
-    proj = (Project.Current as Project).parent;
-  } else {
-    proj = (Project.Current as Project);
-  }
+
+  proj = (Project.Current as Project);
+
   showfilesfor(proj);
-  if (proj.isWorkspace) {
-    proj.children.forEach(c => showfilesfor(c));
-  }
   exit && process.exit(0);
 };
 
 const $FILES_HIDE_ALL = (args, exit = true) => {
   let proj: Project;
-  if ((Project.Current as Project).isWorkspaceChildProject) {
-    proj = (Project.Current as Project).parent;
-  } else {
-    proj = (Project.Current as Project);
-  }
+
+  proj = (Project.Current as Project);
+
   hidefilesfor(proj);
-  if (proj.isWorkspace) {
-    proj.children.forEach(c => hidefilesfor(c));
-  }
   exit && process.exit(0);
 };
 

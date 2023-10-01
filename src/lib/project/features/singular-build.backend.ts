@@ -260,14 +260,14 @@ exports.default = start;`);
     })();
     //#endregion
 
-    let singularWatchProj = Project.From<Project>(smartContainerTargetProjPath);
-    parent.node_modules.linkToProject(singularWatchProj);
+    let smartContainerTargetProject = Project.From<Project>(smartContainerTargetProjPath);
+    parent.node_modules.linkToProject(smartContainerTargetProject);
 
-    await singularWatchProj.filesStructure.init(''); // THIS CAUSE NOT NICE SHIT
+    await smartContainerTargetProject.filesStructure.init(''); // THIS CAUSE NOT NICE SHIT
 
     VscodeProject.launchFroSmartContaienr(parent);
 
-    return singularWatchProj;
+    return smartContainerTargetProject;
   }
 
 

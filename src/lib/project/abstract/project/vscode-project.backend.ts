@@ -50,10 +50,6 @@ export abstract class VscodeProject {
 
   //#region public api / recreate settings worksapce
   public recreateCodeWorkspace(this: Project) {
-
-    if (!this.isWorkspace) {
-      return;
-    }
     const configSettings = {};
 
     try {
@@ -195,21 +191,13 @@ export abstract class VscodeProject {
     }
     //#endregion
 
-    if (this.isWorkspace) {
-      //#region handle worksapce
-      this.children
-        .filter(c => c.typeIs('angular-lib'))
-        .forEach(c => {
-          tasks.push(templateNgServeTask(c))
-        })
-      //#endregion
-    } else {
-      //#region handle standalone and workspace childs
-      if (this.typeIs('angular-lib', 'isomorphic-lib')) {
-        tasks.push(templateNgServeTask());
-      }
-      //#endregion
+
+    //#region handle standalone and workspace childs
+    if (this.typeIs('isomorphic-lib')) {
+      tasks.push(templateNgServeTask());
     }
+    //#endregion
+
 
     return JSON.stringify({
       'version': '2.0.0',
@@ -360,136 +348,26 @@ export abstract class VscodeProject {
     };
     //#endregion
 
-    if (this.isWorkspace) {
-      //#region handle workspace
-      const servers = this.children
-        .filter(c => c.typeIs('isomorphic-lib'));
-      const clients = this.children
-        .filter(c => c.typeIs('angular-lib'));
 
-      const serverConfigs = [];
-      servers.forEach(server => {
-        clients.forEach(client => {
-          serverConfigs.push(templateForServer(server, client, true))
-        });
-      });
-
-      const clientConfigs = clients.map(c => {
-        const servePort = getPort(c, currentWorkspaceConfig);
-        return startNgServeTemplate(servePort, c, true);
-      });
-
+    //#region handle standalone or worksapce child
+    if (this.typeIs('isomorphic-lib')) {
       configurations = [
-        ...clientConfigs,
-        ...serverConfigs,
+        // startNodemonServer()
       ];
-
-      configurations.forEach(c => {
-        c.presentation = {
-          // "hidden": true
-          // "order": 1,
-          // "group": "configs"
-        }
-      });
-
-
-      clients.forEach(c => {
-        const requiredServersForClient = [
-          ...c.workspaceDependencies,
-          ...c.workspaceDependenciesServers,
-        ].filter(s => s.typeIs('isomorphic-lib'))
-          .map(s => s.name);
-
-        const serversForClient = serverConfigs
-          .filter(s => {
-            return requiredServersForClient.filter(r => {
-              return (s.name as string).endsWith(`${r} for ${c.name}`)
-            }).length > 0;
-          })
-          .map(s => s.name)
-
+      if (this.isStandaloneProject) {
+        configurations.push(templateForServer(this, this, false));
+        configurations.push(startNgServeTemplate(9000, void 0, false));
         compounds.push({
-          name: `Debug backend/frontend - ${c.name} ( ${[
-            ...c.workspaceDependencies,
-            ...c.workspaceDependenciesServers,
-          ].map(d => d.name).join(', ')} )`,
+          name: 'Debug backend/frontend',
           configurations: [
-            `Debugger with ng serve for ${c.name}`,
-            ...serversForClient,
+            ...configurations.map(c => c.name)
           ]
-        })
-      });
-
-      //#endregion
-    } else {
-      //#region handle standalone or worksapce child
-      if (this.typeIs('angular-lib')) {
-        const servePort = getPort(this, currentWorkspaceConfig);
-        configurations = [
-          startNgServeTemplate(servePort, void 0, false)
-        ];
-
-        if (this.isWorkspaceChildProject) {
-
-          this.parent.children
-            .filter(c => c.typeIs('isomorphic-lib'))
-            .forEach(c => {
-              configurations.push(templateForServer(c, this, false));
-            })
-
-          configurations.forEach(c => {
-            c.presentation = {
-              // "hidden": true
-              // "order": 1,
-              'group': 'configs'
-            }
-          });
-
-        }
-
-        if (!(this.isStandaloneProject && this.typeIs('angular-lib'))) {
-          compounds.push({
-            name: 'Debug backend/frontend',
-            configurations: [
-              ...configurations.map(c => c.name)
-            ]
-          });
-        };
-
+        });
+        configurations.push(temlateAttachProcess);
       }
-      if (this.typeIs('isomorphic-lib')) {
-        configurations = [
-          // startNodemonServer()
-        ];
-        if (this.isStandaloneProject) {
-          configurations.push(templateForServer(this, this, false));
-          configurations.push(startNgServeTemplate(9000, void 0, false));
-          compounds.push({
-            name: 'Debug backend/frontend',
-            configurations: [
-              ...configurations.map(c => c.name)
-            ]
-          });
-          configurations.push(temlateAttachProcess);
-        }
-        //#region start serve for each agnular-lib ?
-        if (this.isWorkspaceChildProject) {
-
-          this.parent.children
-            .filter(c => c.typeIs('angular-lib', 'isomorphic-lib'))
-            .forEach(c => {
-              const t = templateForServer(this, c, false);
-              t['presentation'] = {
-                group: 'workspaceServers'
-              }
-              configurations.push(t);
-            })
-
-        }
-        //#endregion
-      }
-      //#endregion
     }
+    //#endregion
+
     return JSON.stringify({
       version: '0.2.0',
       configurations,
@@ -506,11 +384,9 @@ function getPort(project: Project, workspaceConfig: Models.env.EnvConfig) {
     console.log('not working !')
   }
   let env: Models.env.EnvConfigProject;
-  if (project.isWorkspace) {
-    env = workspaceConfig.workspace?.workspace;
-  } else {
-    env = workspaceConfig.workspace?.projects?.find(p => p.name === project.name);
-  }
+
+  env = workspaceConfig.workspace?.projects?.find(p => p.name === project.name);
+
   const envPort = env?.port;
   return _.isNumber(envPort) ? envPort : project.getDefaultPort();
 }

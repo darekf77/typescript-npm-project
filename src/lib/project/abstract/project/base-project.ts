@@ -37,10 +37,7 @@ export abstract class BaseProject {
       this.cache['genericName'];
     }
 
-    let result = [
-      (this.isWorkspace && this.isGenerated) ? `${(this.origin && this.origin.parent) ?
-        this.origin.parent.name : ' - no origin - '}` : ''
-    ];
+    let result = [];
     if (this.isSmartContainerTarget) {
       // result = [
       //   this.smartContainerTargetParentContainer.name,
@@ -51,14 +48,10 @@ export abstract class BaseProject {
       result = result.concat(this.findParentsNames(this));
     }
 
-    if (this.isGenerated) {
-      result.push(`((${chalk.bold('GENERATED')}))${this.name}`)
-    } else {
-      if (this.isSmartContainerTarget) {
-        result.push(this.smartContainerTargetParentContainer.name);
-      }
-      result.push(this.name);
+    if (this.isSmartContainerTarget) {
+      result.push(this.smartContainerTargetParentContainer.name);
     }
+    result.push(this.name);
     const res = result.filter(f => !!f).join('/').trim()
     if (_.isNil(this.cache['genericName'])) {
       this.cache['genericName'] = res;
@@ -127,16 +120,6 @@ export abstract class BaseProject {
   }
 
   // @ts-ignore
-  get isContainerWorkspaceRelated(this: Project) {
-    if (Helpers.isBrowser) {
-      return this.browser.isForRecreation;
-    }
-    //#region @backend
-    return (this.isWorkspaceChildProject || this.isWorkspace || this.isContainer);
-    //#endregion
-  }
-
-  // @ts-ignore
   get isSmartContainerTarget(this: Project) {
     const folderBefore = path.basename(path.dirname(path.dirname(this.location)));
     return [config.folder.dist, config.folder.bundle].includes(folderBefore)
@@ -186,16 +169,6 @@ export abstract class BaseProject {
     }
     //#region @backend
     return this.typeIs('vscode-ext');
-    //#endregion
-  }
-
-  // @ts-ignore
-  get isWorkspace(this: Project) {
-    if (Helpers.isBrowser) {
-      return this.browser.isWorkspace;
-    }
-    //#region @backend
-    return this.typeIs('workspace');
     //#endregion
   }
 
@@ -251,23 +224,6 @@ export abstract class BaseProject {
     //#endregion
   }
 
-  // @ts-ignore
-  get labels(this: Project) {
-    const self = this;
-    return {
-      get generated() {
-        //#region @backendFunc
-        return self.isGenerated ? '(generated)' : '';
-        //#endregion
-      },
-      get extendedBoldName() {
-        //#region @backendFunc
-        return chalk.bold(`${self.labels.generated} ${self.parent ? (self.parent.name + '/') : ''}${self.name}`);
-        //#endregion
-      }
-    }
-  }
-
   //#region @backend
   // @ts-ignore
   get allResources(this: Project) {
@@ -291,19 +247,6 @@ export abstract class BaseProject {
   }
   //#endregion
 
-  // @ts-ignore
-  get isWorkspaceChildProject(this: Project) {
-    if (Helpers.isBrowser) {
-      return this.browser.isWorkspaceChildProject;
-    }
-    //#region @backend
-    // if (!!this.parent && this.parent.isWorkspaceChildProject) { // QUICK_FIX for temporary projects
-    //   return true;
-    // }
-    return !!this.parent && this.parent.typeIs('workspace');
-    //#endregion
-  }
-
   /**
    * Standalone project ready for publish on npm
    * Types of standalone project:
@@ -319,10 +262,7 @@ export abstract class BaseProject {
     if (this.typeIs('unknow')) {
       return false;
     }
-    return (
-      !this.isWorkspaceChildProject
-      && !this.isWorkspace
-      && !this.isContainer
+    return (!this.isContainer
       && !this.isUnknowNpmProject
       && !this.isDocker
     );
@@ -342,21 +282,6 @@ export abstract class BaseProject {
     return this.packageJson.linkedFolders;
   }
   //#endregion
-  // @ts-ignore
-  get dependsOn(this: Project): Project[] {
-    //#region @backendFunc
-    if (this.isWorkspace) {
-      return this.packageJson.dependsOn.map(name => {
-        const child = this.parent.child(name);
-        if (!child) {
-          Helpers.error(`Unknow baseline project "${name}" inside ${this.packageJson.path}`, false, true);
-        }
-        return child;
-      }).filter(f => !!f);
-    }
-    return [];
-    //#endregion
-  }
 
   __cacheStandaloneDependencies: Project[];
 
@@ -366,20 +291,7 @@ export abstract class BaseProject {
     if (this.typeIs('unknow')) {
       return [];
     }
-    if (this.isWorkspaceChildProject) {
-      if (this.isSite) {
-        return this.baseline.workspaceDependencies.map(c => {
-          return this.parent.child(c.name);
-        });
-      }
-      return this.packageJson.workspaceDependencies.map(name => {
-        const child = this.parent.child(name);
-        if (!child) {
-          Helpers.error(`Unknow child "${name}" inside ${this.packageJson.path}`, false, true);
-        }
-        return child;
-      }).filter(f => !!f);
-    } else if (this.isStandaloneProject) {
+    if (this.isStandaloneProject) {
       if (!_.isUndefined(this.__cacheStandaloneDependencies)) {
         return this.__cacheStandaloneDependencies;
       }
@@ -394,55 +306,6 @@ export abstract class BaseProject {
     }
 
     return [];
-    //#endregion
-  }
-
-  // @ts-ignore
-  get workspaceDependenciesServers(this: Project): Project[] {
-    //#region @backendFunc
-    if (this.typeIs('unknow')) {
-      return [];
-    }
-    let servers: Project[] = [];
-    if (this.isWorkspaceChildProject) {
-      if (this.isSite) {
-        servers = this.baseline.workspaceDependenciesServers.map(c => {
-          return this.parent.child(c.name);
-        });
-      } else {
-        servers = this.packageJson.workspaceDependenciesServers.map(name => {
-          const child = this.parent.child(name);
-          if (!child) {
-            Helpers.error(`Unknow child "${name}" inside ${this.packageJson.path}`, false, true);
-          }
-          return child;
-        }).filter(f => !!f);
-      }
-    }
-    let foundedBadServer: Project;
-    if (!_.isUndefined(servers.find(c => {
-      const res = this.workspaceDependencies.indexOf(c) !== -1;
-      if (res) {
-        foundedBadServer = c;
-      }
-      return res;
-    }))) {
-      Helpers.error(`
-
-Please put your server dependencies (in package.json) to :
-workspaceDependencies: ["${foundedBadServer.name}"]
-workspaceDependenciesServer: []
-or
-workspaceDependencies: []
-workspaceDependenciesServer: ["${foundedBadServer.name}"]
-
-NEVER like this:
-workspaceDependencies: ["${foundedBadServer.name}"]
-workspaceDependenciesServer: ["${foundedBadServer.name}"]
-
-      `)
-    }
-    return servers;
     //#endregion
   }
 

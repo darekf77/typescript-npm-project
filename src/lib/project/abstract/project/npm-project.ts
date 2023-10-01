@@ -434,14 +434,6 @@ export class NpmProject {
       return [];
     }
     return this.getDepsAsPackage(type).map(packageObj => {
-      if (type === 'tnp_required_workspace_child') {
-        let p = path.resolve(path.join(this.location, '..', packageObj.name))
-        if (this.isWorkspaceChildProject && fse.existsSync(p)) {
-          const project = $Project.From<Project>(p);
-          return project;
-        }
-      }
-
       let p = path.join(contextFolder ? contextFolder : this.location, config.folder.node_modules, packageObj.name);
       if (fse.existsSync(p)) {
         const project = $Project.From<Project>(p);
@@ -466,17 +458,12 @@ export class NpmProject {
       this.packageJson.data.tnp.overrided &&
       this.packageJson.data.tnp.overrided.dependencies;
 
-    const isTnpRequredWorkspaceChildren = (type === 'tnp_required_workspace_child') &&
-      this.packageJson.data.tnp &&
-      this.packageJson.data.tnp.required;
 
     let installType: Models.npm.InstalationType;
 
     let data: any;
     if (isTnpOverridedDependency) {
       data = this.packageJson.data.tnp.overrided.dependencies
-    } else if (isTnpRequredWorkspaceChildren) {
-      data = this.packageJson.data.tnp.required;
     } else {
       data = this.packageJson.data[type];
       if (type === 'dependencies') {
@@ -515,7 +502,7 @@ export class NpmProject {
     }
 
     // log('TYPEEEEE', this.type)
-    const libs: ConfigModels.LibType[] = ['angular-lib', 'isomorphic-lib', 'vscode-ext'];
+    const libs: ConfigModels.LibType[] = ['isomorphic-lib', 'vscode-ext'];
     if (this.typeIsNot(...libs)) {
       if (soft) {
         return false;

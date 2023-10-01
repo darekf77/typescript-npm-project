@@ -28,9 +28,6 @@ export class EnvironmentConfig
 
   //#region @backend
   private async updateData(configEn?: Models.env.EnvConfig) {
-    if (this.project.isStandaloneProject && this.project.isGenerated) {
-      return;
-    }
 
     if (this.project.git.isGitRepo) {
       if (!configEn && this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
@@ -54,9 +51,6 @@ export class EnvironmentConfig
 
 
   public async init(args?: string) {
-    if (this.project.isStandaloneProject && this.project.isGenerated) {
-      return;
-    }
     const configResult = await standaloneConfigBy(this.project);
 
     configResult.isCoreProject = this.project.isCoreProject;
@@ -87,7 +81,7 @@ export class EnvironmentConfig
   /**
    * Can be accesed only after env.prepare()
    */
-  public get config(): any{
+  public get config(): any {
     //#region @backend
     const configPath = crossPlatformPath([this.project.location, config.file.tnpEnvironment_json]);
     return Helpers.readJson(configPath)

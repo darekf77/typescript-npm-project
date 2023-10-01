@@ -821,21 +821,22 @@ declare module "*.json" {
       }
 
 
+
       if (this.project.isSmartContainerTarget) {
+        const contentSmartTarget = (isEmptyModuleBackendFile && isTsFile) ? `
+        export function dummy${(new Date()).getTime()}() { }
+        export default function dummyDefault${(new Date()).getTime()}() { }
+        `
+          : this.changeJsFileImportForOrgnanizaiton(this.rawContentBackend, absoluteBackendDestFilePath);
 
-        fse.writeFileSync(absoluteBackendDestFilePath,
-          (isEmptyModuleBackendFile && isTsFile) ? `
-export function dummy${(new Date()).getTime()}() { }
-export default function dummyDefault${(new Date()).getTime()}() { }
-`
-            : this.changeJsFileImportForOrgnanizaiton(this.rawContentBackend, absoluteBackendDestFilePath),
-          'utf8');
+        // console.log('should save smart container target file: ', absoluteBackendDestFilePath)
+        fse.writeFileSync(absoluteBackendDestFilePath, contentSmartTarget, 'utf8');
       } else {
+        const contentStandalone = (isEmptyModuleBackendFile && isTsFile) ? `export function dummy${(new Date()).getTime()}() { }`
+          : this.changeJsFileImportForStandalone(this.rawContentBackend, absoluteBackendDestFilePath);
 
-        fse.writeFileSync(absoluteBackendDestFilePath,
-          (isEmptyModuleBackendFile && isTsFile) ? `export function dummy${(new Date()).getTime()}() { }`
-            : this.changeJsFileImportForStandalone(this.rawContentBackend, absoluteBackendDestFilePath),
-          'utf8');
+          // console.log('should save standalone project file: ', absoluteBackendDestFilePath)
+        fse.writeFileSync(absoluteBackendDestFilePath, contentStandalone, 'utf8');
       }
     }
   }

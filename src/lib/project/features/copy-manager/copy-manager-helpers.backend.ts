@@ -88,7 +88,7 @@ export namespace CopyMangerHelpers {
       Helpers.remove(tempDestination);
     }
 
-    if (project.isContainerWorkspaceRelated) {
+    if (project.isContainer) {
       // console.log(`For project: ${this.project.genericName} files:
       // ${this.project.projectSourceFiles()}
       // `)

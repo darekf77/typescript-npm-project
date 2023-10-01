@@ -8,7 +8,6 @@ export * from './npm-packages';
 export * from './proxy-router';
 export * from './quick-fixes';
 export * from './test-runner';
-export * from './workspace-symlinks';
 export * from './target-project.backend';
 export * from './git-actions.backend';
 export * from './smart-node-modules.backend';

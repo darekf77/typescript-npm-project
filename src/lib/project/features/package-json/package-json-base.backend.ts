@@ -74,13 +74,9 @@ export class PackageJsonBase extends PackageJsonCore {
       return;
     }
 
-    if (this.project.isStandaloneProject || this.project.isContainer || (this.project.isWorkspace && !this.project.isContainerChild)) {
+    if (this.project.isStandaloneProject || this.project.isContainer) {
       const tnp = (Project.Tnp as Project);
       tnp.packageJson.prepareForSave(action, tnp);
-    }
-
-    if ((this.project.isContainerChild && this.project.isWorkspace) || this.project.isWorkspaceChildProject) {
-      this.project.parent.packageJson.prepareForSave(action);
     }
 
     reolveAndSaveDeps(this.project, action, this.reasonToHidePackages, this.reasonToShowPackages);
@@ -135,9 +131,6 @@ export class PackageJsonBase extends PackageJsonCore {
     if (this.project.isTnp) {
       Helpers.log(`Npm reset not available for Tnp project`)
       return;
-    }
-    if (this.project.isWorkspaceChildProject || (this.project.isContainerChild && this.project.isWorkspace)) {
-      this.project.parent.packageJson.reset();
     }
     this.data.tnp.overrided.dependencies = {};
     this.save(`reset of npm`);

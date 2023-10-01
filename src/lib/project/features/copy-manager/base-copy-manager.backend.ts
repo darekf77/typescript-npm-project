@@ -159,15 +159,13 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     if (_.isUndefined(options.useTempLocation)) {
       options.useTempLocation = true;
     }
-    if (_.isUndefined(options.markAsGenerated)) {
-      options.markAsGenerated = true;
-    }
+
     if (_.isUndefined(options.regenerateOnlyCoreProjects)) {
       options.regenerateOnlyCoreProjects = true;
     }
     //#endregion
 
-    const { override, showInfo, markAsGenerated } = options;
+    const { override, showInfo } = options;
 
     const sourceLocation = this.project.location;
     //#region modify package.json for generated
@@ -177,14 +175,6 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     ), {
       encoding: 'utf8'
     });
-    if (markAsGenerated && packageJson && packageJson.tnp) {
-      packageJson.tnp.isGenerated = true;
-    }
-    if (this.project.isContainerWorkspaceRelated || options.forceCopyPackageJSON) {
-      if (this.project.isWorkspace && markAsGenerated) {
-        packageJson.tnp.isCoreProject = false;
-      }
-    }
     //#endregion
 
     //#region execute copy
@@ -203,7 +193,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     //#endregion
 
     //#region handle additional package.json markings
-    if (this.project.isContainerWorkspaceRelated || this.project.isVscodeExtension || options.forceCopyPackageJSON) {
+    if (this.project.isContainer || this.project.isVscodeExtension || options.forceCopyPackageJSON) {
       const packageJsonLocation = crossPlatformPath(path.join(destinationLocation, config.file.package_json));
       // console.log(`packageJsonLocation: ${ packageJsonLocation } `)
       // console.log('packageJson', packageJson)
@@ -212,17 +202,6 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
         encoding: 'utf8'
       });
       // console.log(`packageJsonLocation saved: ${ packageJsonLocation } `)
-    }
-    if (this.project.isWorkspace) {
-      if (options.markAsGenerated) {
-        Helpers.writeFile(path.resolve(path.join(destinationLocation, '../info.txt')), `
-    This workspace is generated.
-    `);
-      } else {
-        Helpers.writeFile(path.resolve(path.join(destinationLocation, '../info.txt')), `
-    This is container for workspaces.
-    `);
-      }
     }
     //#endregion
 
@@ -237,7 +216,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     }
 
     //#region recrusive execution for childrens
-    if (options.regenerateProjectChilds && this.project.isContainerWorkspaceRelated) {
+    if (options.regenerateProjectChilds && this.project.isContainer) {
       let childs = this.project.children.filter(f => !['lib', 'app'].includes(path.basename(f.location)));
 
       if (options.regenerateOnlyCoreProjects) {
@@ -246,8 +225,6 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
             childs = this.project.children.filter(c => c.typeIs('isomorphic-lib') && c.frameworkVersionAtLeast('v3'));
           } else if (this.project.isContainer) {
             childs = this.project.children.filter(c => c.name === 'workspace');
-          } else if (this.project.isWorkspace) {
-            childs = this.project.children.filter(c => config.projectTypes.forNpmLibs.includes(c.name as any));
           }
         } else {
           childs = [];

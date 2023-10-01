@@ -37,12 +37,6 @@ export class BuildProcess extends FeatureForProject {
     if (_.isUndefined(options.staticBuildAllowed)) {
       options.staticBuildAllowed = false;
     }
-    if (project.isGenerated && !options.staticBuildAllowed) {
-      log.error(`Please use command:
-$ ${config.frameworkName} static:build
-inside generated projects...
-`, false, true);
-    }
 
     if (!_.isString(options.args)) {
       options.args = ''
@@ -78,40 +72,6 @@ inside generated projects...
   }
   //#endregion
 
-  //#region mereg npm project
-  private mergeNpmPorject() {
-    // console.log(this.project.parent.getAllChildren({ unknowIncluded: true }))
-    log.data(`[mergeNpmPorject] started.. for ${this.project.genericName}`)
-    if (this.project.isWorkspaceChildProject) {
-
-      this.project.parent.getFolders()
-        .filter(p => !this.project.parent.children.map(c => c.name).includes(path.basename(p)))
-        .forEach(p => {
-          const moduleInNodeModules = path.join(this.project.parent.location, config.folder.node_modules, path.basename(p));
-          const moduleAsChild = path.join(this.project.parent.location, path.basename(p));
-
-          if (fse.existsSync(moduleInNodeModules)) {
-            let files = glob.sync(`${moduleAsChild}/**/*.*`);
-            files = files.map(f => f.replace(moduleAsChild, ''))
-            files.forEach(f => {
-
-              const inNodeM = path.join(moduleInNodeModules, f);
-              const newToReplace = path.join(moduleAsChild, f);
-              if (fse.existsSync(inNodeM)) {
-                if (!fse.existsSync(`${inNodeM}.orginalFile`)) {
-                  fse.copyFileSync(inNodeM, `${inNodeM}.orginalFile`)
-                }
-                fse.copyFileSync(newToReplace, inNodeM);
-              }
-            });
-          }
-        });
-
-    }
-    log.data(`[mergeNpmPorject] finish..`)
-  }
-  //#endregion
-
   private async build(buildOptions: BuildOptions, allowedLibs: ConfigModels.LibType[], exit = true) {
 
     if (this.project.frameworkVersionLessThan('v4')) {
@@ -131,13 +91,6 @@ inside generated projects...
 
     log.data(`[build] in build of ${this.project.genericName}, type: ${this.project._type}`);
     this.project.buildOptions = buildOptions;
-
-    if (this.project.isGenerated && buildOptions.watch && !this.project.isStandaloneProject) {
-      buildOptions.watch = false;
-      Helpers.warn(`You cannot build static project in watch mode. Change to build mode: watch=false`);
-    }
-
-    this.mergeNpmPorject();
 
     //#region make sure project allowed for build
     if (_.isArray(allowedLibs) && this.project.typeIsNot(...allowedLibs)) {
@@ -165,27 +118,12 @@ inside generated projects...
     }
     log.data('before file templates')
 
-    //#region update environment data for "childs"
-    if (this.project.isStandaloneProject || this.project.isWorkspaceChildProject) {
-      if (this.project.typeIs('angular-lib')) {
-        this.project.filesTemplatesBuilder.rebuildFile('src/index.html.filetemplate');
-      }
-    }
-    //#endregion
-
-    //#region report initial progres
-    if (!buildOptions.watch && this.project.isGenerated && this.project.isWorkspace) {
-      PROGRESS_DATA.log({ value: 0, msg: `Static build initing` });
-    }
-    //#endregion
-
     //#region handle build clients projects
 
     log.data(`
 
     projec: ${this.project.genericName}
     type: ${this.project._type}
-    generated: ${this.project.isGenerated}
     `);
 
 

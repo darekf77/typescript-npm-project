@@ -26,7 +26,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
     }
     const tmpProjectsStandalone = `tmp-libs-for-{{{outFolder}}}${this.websql ? '-websql' : ''}/${project.name}`;
     const tmpProjects = `tmp-libs-for-{{{outFolder}}}${this.websql ? '-websql' : ''}/${project.name}--for--{{{client}}}`;
-    const tmpSource = `tmp-src-{{{outFolder}}}${this.websql ? '-websql' : ''}`;
+    // const tmpSource = `tmp-src-{{{outFolder}}}${this.websql ? '-websql' : ''}`;
     const result = InsideStruct.from({
       //#region pathes from container codere isomrophic lib
       relateivePathesFromContainer: [

@@ -23,15 +23,6 @@ export type InitOptions = {
 }
 
 export class FilesStructure extends FeatureForProject {
-  // handledSmartContainer = {};
-  findBaselines(proj: Project, baselines: Project[] = []): Project[] {
-    if (!!proj.baseline) {
-      baselines.unshift(proj.baseline)
-    } else {
-      return baselines;
-    }
-    return this.findBaselines(proj.baseline);
-  }
 
   private fixOptionsArgs(options: InitOptions) {
     if (_.isUndefined(options)) {
@@ -64,9 +55,7 @@ export class FilesStructure extends FeatureForProject {
       args = '';
     }
     args += ' --struct';
-    if (!this.project.isGenerated) {
-      Helpers.removeIfExists(path.join(this.project.location, config.file.tnpEnvironment_json));
-    }
+    Helpers.removeIfExists(path.join(this.project.location, config.file.tnpEnvironment_json));
     await this.init(args);
   }
 
@@ -105,10 +94,6 @@ export class FilesStructure extends FeatureForProject {
       }
     }
 
-    if (options.initiator.location === this.project.location && this.project.isWorkspace && options.watch) {
-      recrusive = true;
-    }
-
     Helpers.log(`[init] __initProcedure start for  ${this.project.genericName} `)
     await this.project.__initProcedure();
     Helpers.log(`[init] __initProcedure end for  ${this.project.genericName} `)
@@ -143,15 +128,15 @@ export class FilesStructure extends FeatureForProject {
     }
 
     this.project.quickFixes.missingAngularLibFiles();
-    if (this.project.isWorkspace || this.project.isTnp) { // TODO make it for standalone
+    if (this.project.isTnp) { // TODO make it for standalone
       this.project.quickFixes.overritenBadNpmPackages();
 
     }
-    if (this.project.isWorkspace || this.project.isStandaloneProject || this.project.isContainer) {
+    if (this.project.isStandaloneProject || this.project.isContainer) {
       this.project.quickFixes.missingLibs(config.quickFixes.missingLibs)
     }
 
-    if (this.project.isWorkspace || this.project.isStandaloneProject) {
+    if (this.project.isStandaloneProject) {
 
       //#region TODO BIG QUICK_FIX
 
@@ -206,21 +191,14 @@ export class FilesStructure extends FeatureForProject {
     }
     //#endregion
 
-    if (this.project.isWorkspaceChildProject) {
-      const isInNodeMOdules = path.join(this.project.parent.location, config.folder.node_modules, this.project.name);
-      if (!fse.existsSync(isInNodeMOdules)) {
-        this.project.parent.workspaceSymlinks.add(`Init of workspace child project`)
-      }
-    }
-
     await this.project.recreate.init();
     this.project.recreate.vscode.settings.toogleHideOrShowDeps();
 
-    if (this.project.isStandaloneProject) {
+    if (this.project.isStandaloneProject || this.project.isSmartContainer) {
       if (_.isNil(this.project.buildOptions)) { // TODO QUICK_FIX
         this.project.buildOptions = {} as any;
       }
-      await (this.project.env as any as EnvironmentConfig).init(args);
+      await this.project.env.init(args);
       this.project.filesTemplatesBuilder.rebuild();
     }
 
@@ -259,6 +237,7 @@ export class FilesStructure extends FeatureForProject {
     if (this.project.isSmartContainer && !skipSmartContainerDistBundleInit) {
       //#region handle smart container
       Helpers.writeFile([this.project.location, 'angular.json'], this.angularJsonContainer);
+      await this.project.recreate.init();
       await this.project.singluarBuild.init(watch, false, 'dist', args, client);
       await this.project.singluarBuild.init(watch, false, 'bundle', args, client);
       //#endregion
@@ -269,7 +248,7 @@ export class FilesStructure extends FeatureForProject {
     this.project.quickFixes.badTypesInNodeModules();
 
     if (!this.project.isDocker && !this.project.isVscodeExtension) {
-      if (this.project.isWorkspaceChildProject || this.project.isStandaloneProject) {
+      if (this.project.isStandaloneProject) {
         if (watch) {
           await this.project.frameworkFileGenerator.startAndWatch(this.taskNames.frameworkFileGenerator, {
             watchOnly, afterInitCallBack: async () => {

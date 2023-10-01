@@ -42,15 +42,10 @@ export abstract class DependencyProject {
     }
 
 
-    if (!this.isWorkspaceChildProject && !this.isStandaloneProject) {
+    if (!this.isStandaloneProject) {
       return [];
     }
     let deps: Project[] = this.sortedRequiredWorkspaceDependencies;
-
-    if (this.isWorkspaceChildProject && this.typeIs('angular-lib') && this.workspaceDependenciesServers.length > 0) {
-      deps = deps.concat(this.workspaceDependenciesServers);
-      // TODO handle deps of project.workspaceDependenciesServers
-    }
     if (this.isStandaloneProject) {
       deps = deps.filter(d => d.name !== this.name);
     }
@@ -114,7 +109,6 @@ export abstract class DependencyProject {
       this.children.filter(p => {
         return this.env && this.env.config && !!this.env.config.workspace.projects.find(wp => wp.name === p.name);
       }))
-      .filter(c => c.typeIs('angular-lib'))
       .map(c => {
         return { project: c, appBuild: true };
       }) as any;
@@ -143,7 +137,6 @@ export abstract class DependencyProject {
 
     return [
       ...libsForTargets,
-      ...(this.isGenerated ? aloneServers : []),
       // ...targetClients.map(c => c.appBuild = false),
       ...(buildAppsForProjects ? targetClients : [])
     ] as any;
@@ -151,7 +144,7 @@ export abstract class DependencyProject {
 
   // @ts-ignore
   public get sortedRequiredWorkspaceDependencies(this: Project): Project[] {
-    if (!this.isWorkspaceChildProject && !this.isStandaloneProject) {
+    if (!this.isStandaloneProject) {
       return [];
     }
     return this.libsForTraget(this).concat([this])
@@ -159,7 +152,7 @@ export abstract class DependencyProject {
 
 
   libsForTraget(this: Project, project: Project) {
-    if (!this.isWorkspaceChildProject && !this.isStandaloneProject) {
+    if (!this.isStandaloneProject) {
       return [];
     }
     return libs([{ project: project as any, appBuild: false }]).map(c => c.project);

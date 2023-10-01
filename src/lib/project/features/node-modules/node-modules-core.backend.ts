@@ -76,7 +76,7 @@ export class NodeModulesCore extends FeatureForProject {
     );
     // }
   };
-  // public stuberizeFrontendPackages = (packages?: string[]) => stuberizeFrontendPackages(this.project, packages);
+
   public dedupeCount = (packages?: string[]) => {
     dedupePackages(this.project.location, packages, true, !this.project.npmPackages.useSmartInstall)
   };
@@ -90,10 +90,8 @@ export class NodeModulesCore extends FeatureForProject {
     }
     Helpers.remove(this.path, true)
   };
+
   public linkToProject = (target: Project) => {
-    if (!this.project.node_modules.exist && !this.project.isWorkspace) { // TODO QUICK_FIX make it async install
-      this.project.run(`${config.frameworkName} install`).sync();
-    }
     Helpers.createSymLink(this.path, target.node_modules.path)
   };
 

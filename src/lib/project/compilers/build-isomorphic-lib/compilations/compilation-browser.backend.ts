@@ -101,7 +101,6 @@ export class BroswerCompilation extends BackendCompilation {
   //#region methods / sync action
   async syncAction(absFilesFromSrc: string[]) {
 
-    // console.log('[compilation browser] syncAction', absFileFromSrc)
     Helpers.removeFolderIfExists(this.absPathTmpSrcDistBundleFolder);
     Helpers.mkdirp(this.absPathTmpSrcDistBundleFolder);
 

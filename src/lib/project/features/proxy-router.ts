@@ -48,19 +48,6 @@ export class ProxyRouter extends FeatureForProject {
 
 
 
-  public async activateServer(onServerReady: (serverPort?: number) => void) {
-
-    // console.log('activate server this.routes', this.routes.map(r => r.name))
-
-    if (this.project.typeIs('workspace')) {
-
-      this.server(onServerReady)
-    } else {
-      Helpers.error(`Bad project type "${this.project._type}" for server activation.`, true)
-      Helpers.error(`Project "${this.project.name}" is not a ${chalk.bold('workspace')} type project.`)
-    }
-  }
-
   private getTarget(req: http.IncomingMessage): string {
     const p = this.getProjectFrom(req);
     return p ? p.routerTargetHttp() : void 0;
