@@ -16,7 +16,7 @@ import { BuildOptions } from 'tnp-db';
 import { PackageJSON } from '../../lib/project/features/package-json/package-json';
 import { dummyfiles } from './copyto-manager-dummy-files';
 import { ProjectUnknowNpm } from '../../lib/project/project-specyfic/project-unknow-npm';
-import { ProjectWorkspace } from '../../lib/project/project-specyfic/project-workspace';
+
 //#endregion
 
 const wrap = SpecWrap.create();
@@ -24,7 +24,7 @@ const wrap = SpecWrap.create();
 describe(wrap.describe(`${config.frameworkName} / copyto manager`), async () => {
 
   // THIS IS REQUIRE BECAUSE OF CIRCURAL DEPS ISSUES
-  ({ Project, ProjectIsomorphicLib, ProjectContainer, PackageJSON, ProjectUnknowNpm, ProjectWorkspace })
+  ({ Project, ProjectIsomorphicLib, ProjectContainer, PackageJSON, ProjectUnknowNpm })
 
   //#region test / it should copy files to another project at first run
   await wrap.it(`should copy files to another project ${config.folder.node_modules}`,
