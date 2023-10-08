@@ -267,7 +267,7 @@
         "firedev-ports": '16.0.51',
         "firedev-crud-deamon": '16.0.45',
         "firedev-ui": '16.0.10',
-        "tnp-core": '16.0.26',
+        "tnp-core": '16.0.27',
         "tnp-cli": '16.0.8',
         "tnp-tools": "0.0.58",
         "any-project-cli": '16.0.33',
@@ -346,7 +346,7 @@
           jscodeshift: "^0.6.3",
           "@types/fs-extra": "^7.0.0",
           "@types/rimraf": "^2.0.2",
-          "incremental-compiler": '16.0.32',
+          "incremental-compiler": '16.0.33',
           open: "7.2.1",
           // "sharp": "0.23.3", - > proble with dependncies
           // "@types/sharp": "0.23.1",
