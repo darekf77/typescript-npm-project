@@ -272,32 +272,39 @@ export * from './lib';
 
         })();
 
+        const libPackageJson = crossPlatformPath([
+          projectLocation,
+          this.project.isStandaloneProject
+            ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
+          `projects/${projectName}/package.json`
+        ]);
+
+        const ngPackageJson = crossPlatformPath([
+          projectLocation,
+          this.project.isStandaloneProject
+            ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
+          `projects/${projectName}/ng-package.json`
+        ]);
+
+        const angularJson = crossPlatformPath([
+          projectLocation,
+          this.project.isStandaloneProject
+            ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
+          `angular.json`
+        ]);
+
+        const tsconfigJson = crossPlatformPath([
+          projectLocation,
+          this.project.isStandaloneProject
+            ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
+          `tsconfig.json`
+        ]);
 
         [
-          path.join(
-            projectLocation,
-            this.project.isStandaloneProject
-              ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
-            `projects/${projectName}/package.json`
-          ),
-          path.join(
-            projectLocation,
-            this.project.isStandaloneProject
-              ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
-            `projects/${projectName}/ng-package.json`
-          ),
-          path.join(
-            projectLocation,
-            this.project.isStandaloneProject
-              ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
-            `angular.json`
-          ),
-          path.join(
-            projectLocation,
-            this.project.isStandaloneProject
-              ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
-            `tsconfig.json`
-          ),
+          libPackageJson,
+          ngPackageJson,
+          angularJson,
+          tsconfigJson,
         ].forEach(f => {
           let content = Helpers.readFile(f) || '';
           content = content.replace(new RegExp('my\\-lib', 'g'), projectName);
@@ -311,21 +318,20 @@ export * from './lib';
         });
 
         (() => {
-          const ngPath = crossPlatformPath(path.join(
-            projectLocation,
-            this.project.isStandaloneProject
-              ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
-            `projects/${projectName}/ng-package.json`));
-
-          // console.log({
-          //   ngPath
-          // })
-          const json = Helpers.readJson(ngPath); // dist is on porpose
+          const json = Helpers.readJson(ngPackageJson); // dist is on porpose
           json.dest = json.dest.replace(`/dist/${projectName}`, `/../../${outFolder}/`
             + `${this.websql ? config.folder.websql : config.folder.browser}`);
 
-          Helpers.writeJson(ngPath, json);
+          Helpers.writeJson(ngPackageJson, json);
         })();
+
+        // (() => {
+        //   let json = Helpers.readFile(libPackageJson); // dist is on porpose
+        //   json = json.replace(`"${projectName}"`, `"${projectName}/`
+        //     + `${this.websql ? config.folder.websql : config.folder.browser}"`);
+
+        //   Helpers.writeJson(libPackageJson, JSON.parse(json));
+        // })();
 
         recreateApp(project);
         recreateIndex(project);

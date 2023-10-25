@@ -188,30 +188,30 @@ ${remotes.map((r, i) => `${i + 1}. ${r.origin} ${r.url}`).join('\n')}
       return;
     }
     const withContent = [] as Project[];
-    Helpers.actionWrapper(() => {
-      for (let index = 0; index < children.length; index++) {
-        const child = children[index];
-        const content = (Helpers.commnadOutputAsString(`diff2html  --output=stdout`, child.location, { showWholeCommandNotOnlyLastLine: true }));
-        if (content) {
-          withContent.push(child)
-          Helpers.writeFile([proj.location, folderName, `${child.name}.html`], content);
-        } else {
-          Helpers.writeFile([proj.location, folderName, `${child.name}.html`], ' - NOTHING HAS CHANGED - ');
-        }
-      }
-    }, 'generating project changes summary...')
+    // Helpers.actionWrapper(() => {
+    //   for (let index = 0; index < children.length; index++) {
+    //     const child = children[index];
+    //     const content = (Helpers.commnadOutputAsString(`diff2html  --output=stdout`, child.location, { showWholeCommandNotOnlyLastLine: true }));
+    //     if (content) {
+    //       withContent.push(child)
+    //       Helpers.writeFile([proj.location, folderName, `${child.name}.html`], content);
+    //     } else {
+    //       Helpers.writeFile([proj.location, folderName, `${child.name}.html`], ' - NOTHING HAS CHANGED - ');
+    //     }
+    //   }
+    // }, 'generating project changes summary...')
 
 
     const filePath = crossPlatformPath([proj.location, folderName, 'index.html'])
-    Helpers.writeFile(filePath, (`
+    //     Helpers.writeFile(filePath, (`
 
-LAST PUSH CHANGES ${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}
+    // LAST PUSH CHANGES ${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}
 
-${withContent.map(c => {
-      return `<h2><a href="./${c.name}.html">${c.name}</a></h2>`
-    }).join('\n')}
+    // ${withContent.map(c => {
+    //       return `<h2><a href="./${c.name}.html">${c.name}</a></h2>`
+    //     }).join('\n')}
 
-    `));
+    //     `));
     return filePath;
   }
 

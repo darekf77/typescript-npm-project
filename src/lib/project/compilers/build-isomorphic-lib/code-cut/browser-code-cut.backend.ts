@@ -20,6 +20,9 @@ import { CLI } from 'tnp-cli';
 //#region consts
 const regexAsyncImport = /\ import\((\`|\'|\")([a-zA-Z|\-|\@|\/|\.]+)(\`|\'|\")\)/;
 const regexAsyncImportG = /\ import\((\`|\'|\")([a-zA-Z|\-|\@|\/|\.]+)(\`|\'|\")\)/g;
+const debugFiles = [
+  // 'firedev-cms.models.ts'
+]
 //#endregion
 
 export class BrowserCodeCut {
@@ -232,12 +235,12 @@ export class BrowserCodeCut {
     if (isTsFile) {
       if (!this.relativePath.startsWith('app/')) {
         fse.writeFileSync(this.absFileSourcePathBrowserOrWebsql,
-          this.fixBrowserFileBeforeSave(this.rawContentForBrowser, endOfBrowserOrWebsqlCode),
+          this.changeBrowserOrWebsqlFileContentBeforeSave(this.rawContentForBrowser, endOfBrowserOrWebsqlCode, this.absFileSourcePathBrowserOrWebsql),
           'utf8'
         );
       }
       fse.writeFileSync(this.absFileSourcePathBrowserOrWebsqlAPPONLY,
-        this.fixBrowserFileBeforeSave(this.rawContentForAPPONLYBrowser, endOfBrowserOrWebsqlCode),
+        this.changeBrowserOrWebsqlFileContentBeforeSave(this.rawContentForAPPONLYBrowser, endOfBrowserOrWebsqlCode, this.absFileSourcePathBrowserOrWebsqlAPPONLY),
         'utf8'
       );
     } else {
@@ -748,44 +751,6 @@ declare module "*.json" {
   }
   //#endregion
 
-  //#region methods / fix comments
-  private fixBrowserFileBeforeSave(s: string, endComment?: string) {
-    if (!this.relativePath.endsWith('.ts')) {
-      return s;
-    }
-
-    const endOfFile = ((this.relativePath.endsWith('.ts') && endComment) ? endComment : '');
-    const standaloneRegexImportExport = new RegExp(`from\\s+(\\'|\\")${Helpers.escapeStringForRegEx(this.project.name)}\\/(browser|websql)(\\'|\\")`, 'g');
-    const standaloneRegexImports = new RegExp(`imports\\((\\'|\\")${Helpers.escapeStringForRegEx(this.project.name)}\\/(browser|websql)(\\'|\\")\\)`, 'g');
-
-    const splited = [
-      '\n', // TODO artifically added
-      ...s.split('\n'),
-    ];
-
-    const ignoreIndex = [];
-    const res = splited
-      .map((line, index) => {
-        if (standaloneRegexImportExport.test(line) || standaloneRegexImports.test(line)) {
-          ignoreIndex.push(index - 1);
-        }
-        if ((line.trimLeft().startsWith('// ') || line.trimLeft().startsWith('//#'))
-          && (line.search('@ts-ignore') === -1)
-        ) {
-          return ''
-        }
-        return line;
-      })
-
-
-    for (let index = 0; index < ignoreIndex.length; index++) {
-      res[ignoreIndex[index]] = res[ignoreIndex[index]] + ' // @ts-ignore';
-    }
-
-    return res.join('\n') + endOfFile;
-  }
-  //#endregion
-
   //#region methods / save
   save() {
     if (this.isAssetsFile) {
@@ -827,21 +792,22 @@ declare module "*.json" {
         export function dummy${(new Date()).getTime()}() { }
         export default function dummyDefault${(new Date()).getTime()}() { }
         `
-          : this.changeJsFileImportForOrgnanizaiton(this.rawContentBackend, absoluteBackendDestFilePath);
+          : this.changeOrganizationBackendFileContentBeforeSave(this.rawContentBackend, absoluteBackendDestFilePath);
 
         // console.log('should save smart container target file: ', absoluteBackendDestFilePath)
         fse.writeFileSync(absoluteBackendDestFilePath, contentSmartTarget, 'utf8');
       } else {
         const contentStandalone = (isEmptyModuleBackendFile && isTsFile) ? `export function dummy${(new Date()).getTime()}() { }`
-          : this.changeJsFileImportForStandalone(this.rawContentBackend, absoluteBackendDestFilePath);
+          : this.changeStandaloneBackendFileContentBeforeSave(this.rawContentBackend, absoluteBackendDestFilePath);
 
-          // console.log('should save standalone project file: ', absoluteBackendDestFilePath)
+        // console.log('should save standalone project file: ', absoluteBackendDestFilePath)
         fse.writeFileSync(absoluteBackendDestFilePath, contentStandalone, 'utf8');
       }
     }
   }
   //#endregion
 
+  //#region methods / warn about using file from node_modules with lib files
   warnAboutUsingFilesFromNodeModulesWithLibFiles(
     content: string,
     absFilePath: string,
@@ -913,26 +879,82 @@ ${CLI.chalk.bold(wrongImport)};
 Please use version compiled in node_modules:
 import { < My Stuff > } from '${this.project.name}';`, false,);
     }
-
-
   }
+  //#endregion
 
-  //#region methods / change js file import for organization
-  /**
-   * TODO may be weak solutin
-   */
-  changeJsFileImportForOrgnanizaiton(
-    content: string,
-    absFilePath: string,
-    additionalSmartPckages = this.additionalSmartPckages,
-    isStandalone = false,
-  ) {
+  //#region methods / fix comments
+  private changeBrowserOrWebsqlFileContentBeforeSave(browserOrWebsqlFileContent: string, endComment: string, absFilePath: string, packageName = this.project.name) {
+    if (!this.relativePath.endsWith('.ts')) {
+      return browserOrWebsqlFileContent;
+    }
+
+    const endOfFile = ((this.relativePath.endsWith('.ts') && endComment) ? endComment : '');
+    const standaloneRegexImportExport = new RegExp(`from\\s+(\\'|\\")${Helpers.escapeStringForRegEx(packageName)}\\/(browser|websql)(\\'|\\")`, 'g');
+    const standaloneRegexImports = new RegExp(`imports\\((\\'|\\")${Helpers.escapeStringForRegEx(packageName)}\\/(browser|websql)(\\'|\\")\\)`, 'g');
+
+    //#region debug stuff
+    // const debug = debugFiles.includes(path.basename(absFilePath));
+    // if (debug) {
+    //   console.log('Fixing browser/websqlf file: ' + absFilePath)
+    //   console.log({
+    //     standaloneRegexImportExport,
+    //     standaloneRegexImports,
+    //   })
+    // }
+    //#endregion
+
+    const splited = [
+      '\n', // TODO artifically added
+      ...browserOrWebsqlFileContent.split('\n'),
+    ];
+
+    const ignoreIndex = [];
+    const res = splited
+      .map((line, index) => {
+        if (standaloneRegexImportExport.test(line) || standaloneRegexImports.test(line)) {
+          ignoreIndex.push(index - 1);
+        }
+        if ((line.trimLeft().startsWith('// ') || line.trimLeft().startsWith('//#'))
+          && (line.search('@ts-ignore') === -1)
+        ) {
+          return ''
+        }
+        return line;
+      })
+
+
+    for (let index = 0; index < ignoreIndex.length; index++) {
+      res[ignoreIndex[index]] = res[ignoreIndex[index]] + ' // @ts-ignore';
+    }
+
+    let result = res.join('\n') + endOfFile;
+
+    if (this.project.isSmartContainerTarget) {
+      // TODO @LAST check this
+      // result = this.changeOrganizationBackendFileContentBeforeSave(result, absFilePath, true);
+    } else {
+      result = this.changeStandaloneBackendFileContentBeforeSave(result, absFilePath, true);
+    }
+    return result;
+  }
+  //#endregion
+
+  //#region methods / change content before saving file
+  changeContenBeforeSave(content: string, absFilePath: string, options: {
+    additionalSmartPckages: string[];
+    isStandalone: boolean;
+    isBrowser: boolean;
+  }) {
     if (!absFilePath.endsWith('.ts')) {
       // console.log(`NOT_FIXING: ${absFilePath}`)
       return content;
     }
 
-    // console.log(`FIXING: ${absFilePath}`)
+
+    const { isBrowser, isStandalone, additionalSmartPckages } = options;
+
+    // const debug = debugFiles.includes(path.basename(absFilePath));
+    // debug && console.log(`FIXING: ${absFilePath} for ${isStandalone ? 'STANDALONE' : 'ORGANIZATION'}`)
 
     const howMuchBack = (this.relativePath.split('/').length - 1);
 
@@ -941,20 +963,29 @@ import { < My Stuff > } from '${this.project.name}';`, false,);
       const [__, childName] = rootChildPackage.split('/');
       const libName = isStandalone ? config.folder.lib : `${config.folder.libs}/${childName}`
       const back = (howMuchBack === 0) ? './' : _.times(howMuchBack).map(() => '../').join('');
+      const escapedName = Helpers.escapeStringForRegEx(rootChildPackage);
 
-      (() => {
-        content = content.replace(
-          new RegExp(`from\\s+(\\'|\\")${Helpers.escapeStringForRegEx(rootChildPackage)}(\\'|\\")`, 'g'),
-          `from '${back}${libName}'`
-        );
-      })();
-
-      (() => {
-        content = content.replace(
-          new RegExp(`from\\s+(\\'|\\")${Helpers.escapeStringForRegEx(rootChildPackage)}\\/`, 'g'),
-          `from '${back}${libName}/`
-        );
-      })();
+      if (isBrowser) {
+        const regexFull = new RegExp(`from\\s+(\\'|\\")${escapedName}\\/(browser|websql)(\\'|\\")`, 'g');
+        const regexPartial = new RegExp(`from\\s+(\\'|\\")${escapedName}\\/(browser|websql)\\/`, 'g');
+        // debug && console.log({
+        //   escapedName,
+        //   regexFull,
+        //   regexPartial,
+        // });
+        content = content.replace(regexFull, `from '${back}${libName}'`);
+        content = content.replace(regexPartial, `from '${back}${libName}/`);
+      } else {
+        const regexFull = new RegExp(`from\\s+(\\'|\\")${escapedName}(\\'|\\")`, 'g');
+        const regexPartial = new RegExp(`from\\s+(\\'|\\")${escapedName}\\/`, 'g');
+        // debug && console.log({
+        //   escapedName,
+        //   regexFull,
+        //   regexPartial,
+        // });
+        content = content.replace(regexFull, `from '${back}${libName}'`);
+        content = content.replace(regexPartial, `from '${back}${libName}/`);
+      }
 
     }
     // Helpers.warn(`[copytomanager] Empty content for ${absFilePath}`);
@@ -963,15 +994,37 @@ import { < My Stuff > } from '${this.project.name}';`, false,);
   }
   //#endregion
 
-  //#region methods / change js file import for organization
+  //#region methods / change file import/export for organization
   /**
    * TODO may be weak solutin
    */
-  changeJsFileImportForStandalone(
+  changeOrganizationBackendFileContentBeforeSave(
     content: string,
     absFilePath: string,
+    isBrowser: boolean = false,
+  ): string {
+    return this.changeContenBeforeSave(content, absFilePath, {
+      additionalSmartPckages: this.additionalSmartPckages,
+      isStandalone: true,
+      isBrowser,
+    });
+  }
+  //#endregion
+
+  //#region methods / change file import/export for standalone
+  /**
+   * TODO may be weak solutin
+   */
+  changeStandaloneBackendFileContentBeforeSave(
+    content: string,
+    absFilePath: string,
+    isBrowser: boolean = false,
   ) {
-    return this.changeJsFileImportForOrgnanizaiton(content, absFilePath, [this.project.name], true);
+    return this.changeContenBeforeSave(content, absFilePath, {
+      additionalSmartPckages: [this.project.name],
+      isStandalone: true,
+      isBrowser,
+    });
   }
   //#endregion
 
