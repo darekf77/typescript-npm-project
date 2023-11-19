@@ -88,6 +88,7 @@ async function $SYNC_TO(args) {
     //     ignoreInitial: false,
     //     followSymlinks: false,
     //     ignorePermissionErrors: true,
+    //      ...COMPILER_POOLING,
     //   }).on('all', async (event, f) => {
     //     if (event !== 'addDir' && event !== 'unlinkDir') {
     //       const dest = path.join(destProj.location, toSync[j], f.replace(source, ''));
@@ -152,6 +153,7 @@ function $SYNC_FROM(args) {
   //   //     ignoreInitial: false,
   //   //     followSymlinks: false,
   //   //     ignorePermissionErrors: true,
+  //   //     ...COMPILER_POOLING,
   //   //   }).on('all', async (event, f) => {
   //   //     if (event !== 'addDir' && event !== 'unlinkDir') {
   //   //       const dest = path.join(destProj.location, toSync[j], f.replace(source, ''));
@@ -205,7 +207,7 @@ const $KILLNODE = () => {
 const $KILLALLCODE = () => {
   if (process.platform === 'win32') {
     Helpers.run(`taskkill /f /im code.exe`).sync();
-    return;
+    process.exit(0);
   }
   Helpers.run(`fkill -f code`).sync();
   process.exit(0);

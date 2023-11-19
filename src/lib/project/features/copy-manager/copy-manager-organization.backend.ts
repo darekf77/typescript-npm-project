@@ -285,7 +285,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   //#endregion
 
   sourceMapContentFix(content: string, isBrowser: boolean, absFilePath: string) {
-    // @LAST
+
     if (
       // process.platform === 'win32' &&
       !isBrowser) {

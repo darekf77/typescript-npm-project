@@ -2,13 +2,15 @@
 import { _ } from 'tnp-core';
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
+//#region @backend
 import { chokidar } from 'tnp-core';
+//#endregion
 
 import { config } from 'tnp-config';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
-import { IncCompiler } from 'incremental-compiler';
+import { COMPILER_POOLING, IncCompiler } from 'incremental-compiler';
 import { SourceModForStandaloneProjects } from './source-mod-for-standalone-projects.backend';
 
 //#endregion
@@ -66,7 +68,8 @@ export class SourceModifier extends SourceModForStandaloneProjects {
       ignoreInitial: true,
       followSymlinks: false,
       ignorePermissionErrors: true,
-      cwd: this.project.location
+      cwd: this.project.location,
+      ...COMPILER_POOLING,
     })
       .on('unlinkDir', (relativeDir) => {
         // console.log('UNLINK', relativeDir)

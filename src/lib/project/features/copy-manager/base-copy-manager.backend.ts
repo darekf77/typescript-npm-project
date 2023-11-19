@@ -300,8 +300,6 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   async syncAction(
     // files: string[]
   ) {
-    // console.log('SYNC ACTION');
-    // @LAST why is this noe being fired
     const outDir = this.outDir;
 
     const projectToCopyTo = this.projectToCopyTo;

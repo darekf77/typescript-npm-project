@@ -10,6 +10,7 @@
   @@@@ RESOLVE WITH NEW ANGULAR IMPORT SYSTEM
 
 # ISSUES
+- on windows if development server is running can't move/rename folder
 - sometime too much dedupe is a BAD THING
 - dont put Class Componentts to input @Input() 
 - maximulat call stack exceeded for lazy loading routing -> include router module
@@ -17,8 +18,8 @@
 - should be ONLY ONE VERION of (NG2-REST, MORPHI, RXJS and other...)
 - id, shoud be with undefined (TODO temp soluition)
 - class properties: arrays and object can't have defult propty
- - check if each controller, entity is added to 3 init (index.ts,entites.ts,controlers.ts)
- - "assets" relative from html,css ,  "/assets" from scss
+- check if each controller, entity is added to 3 init (index.ts,entites.ts,controlers.ts)
+- "assets" relative from html,css ,  "/assets" from scss
 - in site, if you are decorating entities REMEMBER to overrirde EntityRepository
 - if you are changing environment setting you have to start build (or watch:build) again
 - watch for circural typescript dependencies !

@@ -8,6 +8,7 @@ import { Models } from 'tnp-models';
 import { VscodeProject } from '../abstract/project/vscode-project.backend';
 import { BrowserCodeCut } from '../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
 import { argsToClear } from '../../constants';
+import { COMPILER_POOLING } from 'incremental-compiler';
 
 //#endregion
 
@@ -154,6 +155,7 @@ exports.default = start;`);
             ignoreInitial: true,
             followSymlinks: false,
             ignorePermissionErrors: true,
+            ...COMPILER_POOLING,
           }).on('all', (event, f) => {
             f = crossPlatformPath(f);
             const dest = (path.join(dest_assets, Helpers.removeSlashAtBegin(f.replace(`${source_assets}`, ''))))
@@ -220,6 +222,7 @@ exports.default = start;`);
           ignoreInitial: true,
           followSymlinks: false,
           ignorePermissionErrors: true,
+          ...COMPILER_POOLING,
         }).on('all', (event, f) => {
           f = crossPlatformPath(f);
           // C:/Users/darek/projects/npm/firedev-projects/firedev-simple-org/main/src/app.ts

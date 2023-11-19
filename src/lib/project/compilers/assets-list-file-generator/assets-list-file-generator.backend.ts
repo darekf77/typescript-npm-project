@@ -4,6 +4,7 @@ import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { FeatureForProject } from '../../abstract';
 import { folder_shared_folder_info } from '../../../constants';
+import { COMPILER_POOLING } from 'incremental-compiler';
 
 
 export class AssetsFileListGenerator extends FeatureForProject {
@@ -108,6 +109,7 @@ export class AssetsFileListGenerator extends FeatureForProject {
       followSymlinks: false,
       ignorePermissionErrors: true,
       ignored: (filePath) => this.shoudBeIgnore(filePath),
+      ...COMPILER_POOLING,
     }).on('all', (event, f) => {
       f = crossPlatformPath(f);
       const relative = f.replace(srcPath, '');
