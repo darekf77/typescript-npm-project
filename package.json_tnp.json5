@@ -268,7 +268,7 @@
         "tnp-tools": "0.0.58",
         "any-project-cli": "16.0.33",
         "@types/node": "10.12.30",
-        morphi: "16.2.8",
+        morphi: '16.2.10',
         gulp: "^3.9.1",
         "ng2-logger": "16.0.10",
         "ng2-rest": "16.0.15",
@@ -342,7 +342,7 @@
           jscodeshift: "^0.6.3",
           "@types/fs-extra": "^7.0.0",
           "@types/rimraf": "^2.0.2",
-          "incremental-compiler": "16.0.33",
+          "incremental-compiler": '16.0.34',
           open: "7.2.1",
           // "sharp": "0.23.3", - > proble with dependncies
           // "@types/sharp": "0.23.1",
