@@ -29,10 +29,12 @@ export class NodeModulesCore extends FeatureForProject {
     }
     const tnpProj = Project.Tnp as Project;
     const arrTrusted = tnpProj.packageJson.data.tnp.core.dependencies.trusted[this.project._frameworkVersion];
+    const arrAddTrusted = tnpProj.packageJson.data.tnp.core.dependencies['additionalTrusted'] || {};
     const packagesNames = (_.isArray(packages) && packages.length > 0) ? packages :
       Helpers.arrays.uniqArray([
         ...(tnpProj).packageJson.data.tnp.core.dependencies.dedupe,
         ...arrTrusted,
+        ...arrAddTrusted,
       ])
 
 

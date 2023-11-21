@@ -130,6 +130,7 @@
         "mocha",
         "jest",
         "chai",
+        "vpn-split"
       ],
       neverAsLink: [],
       stubForBackend: [

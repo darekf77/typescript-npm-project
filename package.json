@@ -124,7 +124,8 @@
           "axios",
           "mocha",
           "jest",
-          "chai"
+          "chai",
+          "vpn-split"
         ],
         "neverAsLink": [],
         "stubForBackend": [
