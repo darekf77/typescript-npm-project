@@ -2,15 +2,11 @@
 import { _ } from 'tnp-core';
 import { fse } from 'tnp-core'
 import { path } from 'tnp-core'
-//#region @backend
-import { chokidar } from 'tnp-core';
-//#endregion
-
 import { config } from 'tnp-config';
 import { Project } from '../../abstract';
 import { Models } from 'tnp-models';
 import { Helpers } from 'tnp-helpers';
-import { COMPILER_POOLING, IncCompiler } from 'incremental-compiler';
+import { COMPILER_POOLING, IncCompiler, incrementalWatcher } from 'incremental-compiler';
 import { SourceModForStandaloneProjects } from './source-mod-for-standalone-projects.backend';
 
 //#endregion
@@ -64,15 +60,15 @@ export class SourceModifier extends SourceModForStandaloneProjects {
     }
     // console.log('INIT PRE ASYNC', pathToWatch)
     const childrenNames = this.project.isStandaloneProject ? [] : this.project.parent.childrenThatAreLibs.map(p => p.name);
-    chokidar.watch([pathToWatch], {
+    (await incrementalWatcher([pathToWatch], {
+      name: 'FIREDEV SOURCE MODIFIER',
       ignoreInitial: true,
       followSymlinks: false,
-      ignorePermissionErrors: true,
       cwd: this.project.location,
       ...COMPILER_POOLING,
-    })
+    }))
       .on('unlinkDir', (relativeDir) => {
-        // console.log('UNLINK', relativeDir)
+        // console.log('FIREDEV SOURCE MODIFIER EVENT')
         relativeDir = relativeDir.split('/').slice(1).join('/');
         if (isStandalone) {
           const checkDelete = path.join(

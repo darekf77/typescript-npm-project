@@ -1,16 +1,17 @@
 //#region imports
-//#region @backend
 import { PackagesRecognition } from '../../features/package-recognition/packages-recognition';
 import { BuildOptions } from 'tnp-db';
 import * as inquirer from 'inquirer';
 import { crossPlatformPath, path } from 'tnp-core';
 import chalk from 'chalk';
-//#endregion
+import { enableWatchers } from 'incremental-compiler';
+
 import { _ } from 'tnp-core';
 import { config } from 'tnp-config';
 import { Project } from './project';
 import { Helpers, Project as $Project } from 'tnp-helpers';
 import { CopyManager } from '../../features/copy-manager';
+
 import { CopyManagerStandalone } from '../../features/copy-manager/copy-manager-standalone.backend';
 import { CopyManagerOrganization } from '../../features/copy-manager/copy-manager-organization.backend';
 import { argsToClear } from '../../../constants';
@@ -455,6 +456,8 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
           }
         }
       }
+
+      enableWatchers();
     }
 
 

@@ -1,11 +1,11 @@
-import { chokidar, crossPlatformPath, _, path } from 'tnp-core';
+import { crossPlatformPath, _, path } from 'tnp-core';
 import { config } from 'tnp-config'
 import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { FeatureForProject } from '../../abstract';
 import { folder_shared_folder_info } from '../../../constants';
-import { COMPILER_POOLING } from 'incremental-compiler';
-
+import { COMPILER_POOLING, incrementalWatcher } from 'incremental-compiler';
+import { IncrementalWatcherInstance } from 'incremental-compiler';
 
 export class AssetsFileListGenerator extends FeatureForProject {
 
@@ -13,7 +13,7 @@ export class AssetsFileListGenerator extends FeatureForProject {
   private targetProjectName: string;
   private outFolder: Models.dev.BuildDir;
   private websql: boolean;
-  watchers: chokidar.FSWatcher[] = [];
+  watchers: IncrementalWatcherInstance[] = [];
   readonly filename = 'assets-list.json';
   private detectedFiles = [] as string[];
 
@@ -104,13 +104,14 @@ export class AssetsFileListGenerator extends FeatureForProject {
     await this.start(targetProjectName, outFolder, websql);
     const srcPath = this.srcPath;
 
-    const watcher = chokidar.watch([this.assetsFolder, `${this.assetsFolder}/**/*.*`], {
+    const watcher = (await incrementalWatcher([this.assetsFolder, `${this.assetsFolder}/**/*.*`], {
+      name: `FIREDEV ASSETS LIST`,
       ignoreInitial: true,
       followSymlinks: false,
-      ignorePermissionErrors: true,
       ignored: (filePath) => this.shoudBeIgnore(filePath),
       ...COMPILER_POOLING,
-    }).on('all', (event, f) => {
+    })).on('all', (event, f) => {
+      // console.log('FIREDEV ASSETS LIST EVENT')
       f = crossPlatformPath(f);
       const relative = f.replace(srcPath, '');
       if (this.allowedOnList(f)) {

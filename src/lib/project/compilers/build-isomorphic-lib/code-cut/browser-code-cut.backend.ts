@@ -22,6 +22,7 @@ const regexAsyncImport = /\ import\((\`|\'|\")([a-zA-Z|\-|\@|\/|\.]+)(\`|\'|\")\
 const regexAsyncImportG = /\ import\((\`|\'|\")([a-zA-Z|\-|\@|\/|\.]+)(\`|\'|\")\)/g;
 const debugFiles = [
   // 'firedev-cms.models.ts'
+  // 'app.ts'
 ]
 //#endregion
 
@@ -214,6 +215,7 @@ export class BrowserCodeCut {
 
   //#region methods / save normal file
   private saveNormalFile(isTsFile: boolean, endOfBrowserOrWebsqlCode?: string) {
+    // console.log('SAVE NORMAL FILE')
     if (this.isAssetsFile) {
       this.absFileSourcePathBrowserOrWebsql = this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsql);
       // console.log(`ASSETE: ${this.absFileSourcePathBrowserOrWebsql}`)
@@ -1005,7 +1007,7 @@ import { < My Stuff > } from '${this.project.name}';`, false,);
   ): string {
     return this.changeContenBeforeSave(content, absFilePath, {
       additionalSmartPckages: this.additionalSmartPckages,
-      isStandalone: true,
+      isStandalone: false,
       isBrowser,
     });
   }

@@ -1,5 +1,5 @@
 //#region imports
-import { chokidar, crossPlatformPath, _ } from 'tnp-core';
+import { crossPlatformPath, _ } from 'tnp-core';
 import { path } from 'tnp-core'
 import { FeatureForProject, Project } from '../abstract';
 import { appRelatedFiles, config } from 'tnp-config';
@@ -8,7 +8,8 @@ import { Models } from 'tnp-models';
 import { VscodeProject } from '../abstract/project/vscode-project.backend';
 import { BrowserCodeCut } from '../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
 import { argsToClear } from '../../constants';
-import { COMPILER_POOLING } from 'incremental-compiler';
+import { COMPILER_POOLING, IncrementalWatcherInstance, incrementalWatcher } from 'incremental-compiler';
+import { CLI } from 'tnp-cli';
 
 //#endregion
 
@@ -20,7 +21,7 @@ export class SingularBuild extends FeatureForProject {
   }
   //#endregion
 
-  watchers: chokidar.FSWatcher[] = [];
+  watchers: IncrementalWatcherInstance[] = [];
 
 
 
@@ -138,7 +139,8 @@ exports.default = start;`);
     //#endregion
 
     //#region handle assets watch/copy
-    children.forEach(c => {
+    for (let index = 0; index < children.length; index++) {
+      const c = children[index];
       const source_assets = crossPlatformPath(path.join(c.location, config.folder.src, 'assets'));
       const dest_assets = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, 'assets', 'assets-for', parent.name + '--' + c.name));
 
@@ -148,17 +150,19 @@ exports.default = start;`);
 
       if (watch) {
         // SYNCING FOLDERS
-        (() => {
+        (async () => {
 
           Helpers.copy(source_assets, dest_assets, { recursive: true, overwrite: true });
-          const watcher = chokidar.watch(source_assets, {
+          const watcher = (await incrementalWatcher(source_assets, {
+            name: `FIREDEV SINGULAR BUILD ASSETS WATCHER `,
             ignoreInitial: true,
             followSymlinks: false,
-            ignorePermissionErrors: true,
             ...COMPILER_POOLING,
-          }).on('all', (event, f) => {
+          })).on('all', (event, f) => {
+            // console.log('FIREDEV SINGULAR BUILD ASSETS WATCHER EVENT')
             f = crossPlatformPath(f);
             const dest = (path.join(dest_assets, Helpers.removeSlashAtBegin(f.replace(`${source_assets}`, ''))))
+            // console.log('SYNCING FOLDERS ', f, event)
             if ((event === 'add') || (event === 'change')) {
               Helpers.removeFileIfExists(dest);
               Helpers.copyFile(f, dest);
@@ -178,11 +182,13 @@ exports.default = start;`);
       } else {
         Helpers.copy(source_assets, dest_assets, { recursive: true, overwrite: true });
       }
-    });
+    }
+
+
     //#endregion
 
     //#region handle app.* files watch/copy
-    (() => {
+    await (async () => {
 
       const filesToWatch = [];
 
@@ -218,15 +224,17 @@ exports.default = start;`);
 
       if (watch) {
         copyAll();
-        const watcher = chokidar.watch(filesToWatch, {
+        const watcher = (await incrementalWatcher(filesToWatch, {
+          name: `FIREDEV SINGULAR BUILD CODE WATCHER`,
           ignoreInitial: true,
           followSymlinks: false,
-          ignorePermissionErrors: true,
           ...COMPILER_POOLING,
-        }).on('all', (event, f) => {
+        })).on('all', (event, f) => {
+          // console.log('FIREDEV SINGULAR BUILD CODE WATCHER EVENT')
           f = crossPlatformPath(f);
           // C:/Users/darek/projects/npm/firedev-projects/firedev-simple-org/main/src/app.ts
           // C:/Users/darek/projects/npm/firedev-projects/firedev-simple-org
+          // console.log('FIREDEV SINGULAR BUILD CODE WATCHER EVENT')
           const containerLocaiton = this.project.location;
           const childName = _.first(f.replace(containerLocaiton + '/', '').split('/'));
           const toReplace = crossPlatformPath([containerLocaiton, childName, config.folder.src,])
@@ -295,10 +303,16 @@ exports.default = start;`);
     if (!smartContainerBuildTarget && children.length > 1) {
       Helpers.logError(`
 
-    Please specify in your configuration:
+    Please specify in your configuration proper ${CLI.chalk.bold('smartContainerBuildTarget')}:
+
+    file: ${config.file.package_json__tnp_json5}
+
       ...
         smartContainerBuildTarget: <name of main project>
       ...
+
+
+
           `, false, false);
     }
 

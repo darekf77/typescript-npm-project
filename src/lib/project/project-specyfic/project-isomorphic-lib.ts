@@ -567,10 +567,10 @@ export class ProjectIsomorphicLib
 
             if (line.search(`/src/libs/`) !== -1) {
               const [__, ___, ____, moduleName] = line.split('/');
-              console.log({
-                moduleName,
-                standalone: 'inlib'
-              })
+              // console.log({
+              //   moduleName,
+              //   standalone: 'inlib'
+              // })
               return line.replace(
                 `/src/libs/${moduleName}/`,
                 `/${moduleName}/src/lib/`,

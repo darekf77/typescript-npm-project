@@ -5,15 +5,17 @@ import { Project } from '../../project';
 import { Helpers } from 'tnp-helpers';
 import { path } from 'tnp-core'
 import { config } from 'tnp-config';
-// import { chokidar } from 'tnp-core';
 // const { notify } = require('node-notifier');
 import { CLASS } from 'typescript-class-helpers';
 // import toast from 'powertoast';
 import * as open from 'open';
 import chalk from 'chalk';
 import { URL } from 'url';
+import { enableWatchers, incrementalWatcher, IncrementalWatcherOptions } from 'incremental-compiler';
+
 //#endregion
 
+//#region not
 async function NOT(args: string) {
   // _.times(10, (n) => {
   // console.log(notify)
@@ -31,7 +33,7 @@ async function NOT(args: string) {
 
   process.exit(0)
 }
-
+//#endregion
 
 //#region sync to/from
 async function $SYNC_TO(args) {
@@ -84,10 +86,9 @@ async function $SYNC_TO(args) {
     //     source: ${currentProj.genericName}
     //     destination:${destProj.genericName}
     //   `);
-    //   chokidar.watch([source], {
+    //   incrementalWatcher([source], {
     //     ignoreInitial: false,
     //     followSymlinks: false,
-    //     ignorePermissionErrors: true,
     //      ...COMPILER_POOLING,
     //   }).on('all', async (event, f) => {
     //     if (event !== 'addDir' && event !== 'unlinkDir') {
@@ -149,12 +150,11 @@ function $SYNC_FROM(args) {
   //   //   source: ${currentProj.genericName}
   //   //   destination:${destProj.genericName}
   //   // `);
-  //   //   chokidar.watch([source], {
+  //   //   await (incrementalWatcher([source], {
   //   //     ignoreInitial: false,
   //   //     followSymlinks: false,
-  //   //     ignorePermissionErrors: true,
   //   //     ...COMPILER_POOLING,
-  //   //   }).on('all', async (event, f) => {
+  //   //   })).on('all', async (event, f) => {
   //   //     if (event !== 'addDir' && event !== 'unlinkDir') {
   //   //       const dest = path.join(destProj.location, toSync[j], f.replace(source, ''));
   //   //       Helpers.copyFile(f, dest);
@@ -240,7 +240,6 @@ function close(args) {
   killvscode(args);
 }
 //#endregion
-
 
 //#region info / check
 export async function $INFO(args: string) {
@@ -340,31 +339,30 @@ based on ${githubUrl}
 }
 //#endregion
 
-export async function $NAME_TEST() {
-  // CLASS.getConfig($NAME_TEST)[0].
-  console.log(CLASS.getName($NAME_TEST))
-}
-
-
+//#region target proj update
 async function $TARGET_PROJ_UPDATE() {
   (Project.Current as Project).targetProjects.update();
   process.exit(0)
 }
+//#endregion
 
+//#region watcher
 function $WATCHERS() {
   Helpers.run(`find /proc/*/fd -user "$USER" -lname anon_inode:inotify -printf '%hinfo/%f\n' 2>/dev/null | xargs cat | grep -c '^inotify'`).sync();
   process.exit(0)
 }
+//#endregion
 
+//#region diff
 export async function $DIFF() {
-
   const proj = Project.Current as Project;
   const changesFilePath = await proj.gitActions.containerChangeLog(proj, proj.children);
   await open(changesFilePath)
   process.exit(0);
 }
+//#endregion
 
-
+//#region show override
 export async function $SHOW_OVERRIDE() {
 
   const proj = Project.Current as Project;
@@ -381,7 +379,9 @@ ${_.keys(override).length > 0 ? _.keys(override).map((key, index) => `-${key}:${
 
   process.exit(0);
 }
+//#endregion
 
+//#region remove bad tag
 export async function $REMOVE_BAD_TAG(args: string) {
   //#region @notForNpm
   const proj = Project.Current as Project;
@@ -438,8 +438,9 @@ export async function $REMOVE_BAD_TAG(args: string) {
   //#endregion
   process.exit(0)
 }
+//#endregion
 
-
+//#region move js to ts
 export function $MOVE_JS_TO_TS(args) {
   Helpers
     .filesFrom(crossPlatformPath([process.cwd(), args]), true)
@@ -451,9 +452,45 @@ export function $MOVE_JS_TO_TS(args) {
   Helpers.info('DONE')
   process.exit(0)
 }
+//#endregion
+
+
+export async function PROPERWATCHERTEST(engine: string) {
+  const proj = Project.Current as Project;
+  const watchLocation = crossPlatformPath([proj.location, config.folder.src]);
+  const symlinkCatalog = crossPlatformPath([proj.location, 'symlinkCatalog']);
+  const symlinkCatalogInWatch = crossPlatformPath([watchLocation, 'symlink']);
+  const symlinkCatalogFile = crossPlatformPath([proj.location, 'symlinkCatalog', 'dupa.txt']);
+  const options: IncrementalWatcherOptions = {
+    name: `[firedev]  properwatchtest (testing only)`,
+    ignoreInitial: true,
+  };
+
+  Helpers.remove(symlinkCatalog);
+  Helpers.writeFile(symlinkCatalogFile, 'hello dupa');
+
+  Helpers.createSymLink(symlinkCatalog, symlinkCatalogInWatch);
+
+  (await incrementalWatcher(watchLocation, options)).on('all', (a, b) => {
+    console.log('FIRSTA', a, b);
+  });
+
+  (await incrementalWatcher(watchLocation, options)).on('all', (a, b) => {
+    console.log('SECOND', a, b);
+  });
+
+  (await incrementalWatcher(symlinkCatalog, options)).on('all', (a, b) => {
+    console.log('THIRD', a, b);
+  });
+
+  enableWatchers();
+  console.log('await done');
+}
+
 
 export default {
   //#region export default
+  PROPERWATCHERTEST: Helpers.CLIWRAP(PROPERWATCHERTEST, 'PROPERWATCHERTEST'),
   $REMOVE_BAD_TAG: Helpers.CLIWRAP($REMOVE_BAD_TAG, '$REMOVE_BAD_TAG'),
   $MOVE_JS_TO_TS: Helpers.CLIWRAP($MOVE_JS_TO_TS, '$MOVE_JS_TO_TS'),
   $DIFF: Helpers.CLIWRAP($DIFF, '$DIFF'),

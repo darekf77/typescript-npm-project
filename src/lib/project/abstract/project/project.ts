@@ -24,7 +24,7 @@ import { VscodeProject } from './vscode-project.backend';
 import { RouterProject } from './router-project.backend';
 import { RecreatableProject } from './recreatable-project.backend';
 import { EntityProject } from './entity-projects.backend';
-import { BuildableProject } from './buildable-project';
+import { BuildableProject } from './buildable-project.backend';
 import {
   PackageJSON, QuickFixes,
   NpmPackages, NodeModules, FilesRecreator, FilesFactory,

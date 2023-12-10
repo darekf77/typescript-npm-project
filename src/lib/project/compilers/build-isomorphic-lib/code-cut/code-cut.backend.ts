@@ -52,6 +52,10 @@ export class CodeCut {
    * ex: assets/file.png or my-app/component.ts
    */
   files(relativeFilesToProcess: string[], remove: boolean = false) {
+    // console.log('files CODE CUT!!! ');
+    // if(relativeFilesToProcess.length === 1) {
+    //   console.log('files CODE CUT!!! ',relativeFilesToProcess);
+    // }
     // console.log('options in fiels', this.options)
     for (let index = 0; index < relativeFilesToProcess.length; index++) {
       const relativeFilePath = relativeFilesToProcess[index];
