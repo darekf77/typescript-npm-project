@@ -457,6 +457,7 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
         }
       }
 
+      // console.log('NOT ENABLING WATCHERS')
       enableWatchers();
     }
 

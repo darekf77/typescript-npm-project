@@ -468,7 +468,8 @@ export async function PROPERWATCHERTEST(engine: string) {
 
   Helpers.remove(symlinkCatalog);
   Helpers.writeFile(symlinkCatalogFile, 'hello dupa');
-
+  Helpers.writeFile(crossPlatformPath([proj.location, config.folder.src, 'a1', 'aa']), 'asdasdasdhello dupa');
+  Helpers.writeFile(crossPlatformPath([proj.location, config.folder.src, 'a2', 'ccc']), 'heasdasdllo asdasd');
   Helpers.createSymLink(symlinkCatalog, symlinkCatalogInWatch);
 
   (await incrementalWatcher(watchLocation, options)).on('all', (a, b) => {

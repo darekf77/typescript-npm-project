@@ -1,5 +1,5 @@
-import { path, Helpers } from 'tnp-core';
-import { fse, crossPlatformPath } from 'tnp-core'
+import { path, Helpers, chokidar } from 'tnp-core';
+import { fse, crossPlatformPath } from 'tnp-core';
 
 declare const global: any;
 if (global.globalSystemToolMode) {
@@ -155,7 +155,7 @@ export async function start(
   const commandArg = argsv[commandArgIndex];
   if (commandArg && !commandArg.startsWith('-')) {
     const longerCommandVersion = config.argsReplacements[commandArg];
-    if(longerCommandVersion) {
+    if (longerCommandVersion) {
       argsv[commandArgIndex] = longerCommandVersion;
     }
 

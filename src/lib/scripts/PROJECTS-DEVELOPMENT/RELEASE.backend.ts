@@ -443,14 +443,14 @@ const SET_MINOR_VER = async (args: string) => {
 
   for (let index = 0; index < children.length; index++) {
     const child = children[index] as Project;
-    if (child.minorVersion === minorVersionToSet) {
-      Helpers.info(`[${child.name}] Minor version ${minorVersionToSet} alread set.`);
-    } else {
-      Helpers.info(`[${child.name}] Updating minor version for ${child.name}@${child.packageJson.data.version} => ${minorVersionToSet} ... `);
-      await child.setMinorVersion(minorVersionToSet, true);
-    }
+    // if (child.minorVersion === minorVersionToSet) {
+    //   Helpers.info(`[${child.name}] Minor version ${minorVersionToSet} alread set.`);
+    // } else {
+    Helpers.info(`[${child.name}] Updating minor version for ${child.name}@${child.packageJson.data.version} => ${minorVersionToSet} ... `);
+    await child.setMinorVersion(minorVersionToSet, true);
+    // }
 
-    Helpers.taskDone();
+    // Helpers.taskDone();
   }
   process.exit(0)
 }

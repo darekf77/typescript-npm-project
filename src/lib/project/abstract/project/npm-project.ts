@@ -95,7 +95,7 @@ export class NpmProject {
     }
 
     const currentMinorVersion = Number(ver[1]);
-    const newVer = [ver[0], minorVersionToSet, ver[2]].join('.');
+    const newVer = [ver[0], minorVersionToSet, 0].join('.');
 
     if (minorVersionToSet <= currentMinorVersion && !force) {
       Helpers.warn(`Ommiting... Trying to set same or lower minor version for project: ${this.genericName}
