@@ -64,10 +64,10 @@ export abstract class BuildableProject {
     if (!Array.isArray(trusted)) {
       return [];
     }
-    return [
+    return Helpers.arrays.uniqArray([
       ...trusted,
       ...this.additionalTrustedPackages,
-    ];
+    ]);
   }
 
   // @ts-ignore
