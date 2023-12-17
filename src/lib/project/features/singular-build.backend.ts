@@ -265,7 +265,11 @@ exports.default = start;`);
           //   dest
           // })
 
-          if ((relative === 'index.ts') || relative.startsWith('app/') || filesToWatch.includes(relative)) {
+          if (
+            isTarget
+            || (!isTarget && ((relative === 'index.ts') || relative.startsWith('app/') || relative.startsWith('app.'))
+            )
+          ) {
             if ((event === 'add') || (event === 'change')) {
               // Helpers.removeFileIfExists(dest);
               Helpers.copyFile(f, dest);
