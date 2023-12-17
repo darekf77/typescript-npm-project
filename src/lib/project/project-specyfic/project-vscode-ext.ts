@@ -28,7 +28,6 @@ export class ProjectVscodeExt
   projectSpecyficFiles(): string[] {
     //#region @backendFunc
     return [
-      '.vscode/launch.json',
       '.vscode/tasks.json',
       '.vscodeignore',
       'vsc-extension-quickstart.md',

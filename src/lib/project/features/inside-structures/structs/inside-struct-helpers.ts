@@ -11,6 +11,7 @@ import { Helpers } from 'tnp-helpers';
 import { Models } from 'tnp-models';
 import { EXPORT_TEMPLATE } from '../../../../templates';
 import { Project } from '../../../abstract/project/project';
+import { DEFAULT_PORT, PortUtils } from '../../../../constants';
 
 export function resolveBrowserPathToAssetFrom(projectTargetOrStandalone: Project, absolutePath: string, outFolder: Models.dev.BuildDir, websql: boolean) {
   let resultBrowserPath = '';
@@ -117,12 +118,22 @@ export function recreateApp(project: Project) {
     'app.ts'
   ));
 
+  const appHostsFile = crossPlatformPath(path.join(
+    project.location,
+    config.folder.src,
+    'app.hosts.ts'
+  ));
+
   const appFolderWithIndex = crossPlatformPath(path.join(
     project.location,
     config.folder.src,
     'app',
     'index.ts',
   ));
+
+  if (!Helpers.exists(appFile) && !Helpers.exists(appFolderWithIndex)) {
+    Helpers.writeFile(appHostsFile, PortUtils(DEFAULT_PORT.SERVER_LOCALHOST).tempalteFor(DEFAULT_PORT.SERVER_LOCALHOST + 400));
+  }
 
   if (!Helpers.exists(appFile) && !Helpers.exists(appFolderWithIndex)) {
 
@@ -133,7 +144,7 @@ export function recreateApp(project: Project) {
     Helpers.writeFile(appFile, `
 
 ${'//#reg' + 'ion'} ${'@not' + 'ForNpm'}
-
+import { HOST_BACKEND_PORT } from './app.hosts';
 ${'//#reg' + 'ion'} @${'bro' + 'wser'}
 import { NgModule } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
@@ -160,8 +171,9 @@ export class ${moduleName} { }
 //#endregion
 
 
-async function start(port: number) {
+async function start() {
   console.log('hello world');
+  console.log('Please start your server on port: '+ HOST_BACKEND_PORT);
 }
 
 export default start;

@@ -4,9 +4,6 @@ import { Helpers } from "tnp-helpers";
 import { Models } from "tnp-models";
 import { CopyMangerHelpers } from "./copy-manager-helpers.backend";
 
-const notAllowedToChangeDts = [
-  config.file.public_api_d_ts
-];
 export const TS_NOCHECK = '// @ts-nocheck';
 
 /**

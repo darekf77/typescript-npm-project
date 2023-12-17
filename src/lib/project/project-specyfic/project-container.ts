@@ -86,7 +86,6 @@ export class ProjectContainer
         ...this.filesTemplates(),
         // 'tsconfig.json',
         // ...this.vscodeFileTemplates,
-        // '.vscode/launch.json'
       ]
     }
     return [

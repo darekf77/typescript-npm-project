@@ -31,7 +31,7 @@ import {
   FilesTemplatesBuilder,
   MochaTestRunner, JestTestRunner, CypressTestRunner,
   EnvironmentConfig,
-  ProxyRouter, FilesStructure, BuildProcess, TargetProject,
+  ProxyRouter, FilesStructure, BuildProcessFeature, TargetProject,
   GitActions,
   WebpackBackendCompilation,
   LinkedRepos,
@@ -193,7 +193,7 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('proxyRouter', ProxyRouter);
       this.defineProperty<Project>('copyManager', CopyManager);
       this.defineProperty<Project>('filesStructure', FilesStructure);
-      this.defineProperty<Project>('buildProcess', BuildProcess);
+      this.defineProperty<Project>('buildProcess', BuildProcessFeature);
       this.defineProperty<Project>('targetProjects', TargetProject);
       this.defineProperty<Project>('gitActions', GitActions);
       this.defineProperty<Project>('smartNodeModules', SmartNodeModules);

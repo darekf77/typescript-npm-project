@@ -13,12 +13,16 @@ import { Helpers } from 'tnp-helpers';
 import { PROGRESS_DATA } from 'tnp-models';
 import { EnvironmentConfig } from '../environment-config';
 import { Log } from 'ng2-logger';
+import { Morphi as Firedev } from 'morphi';
+import { BuildProcess, BuildProcessController } from './app/build-process';
+import { CLI } from 'tnp-cli';
+// import { FiredevBinaryFile, FiredevBinaryFileController, FiredevFile, FiredevFileController, FiredevFileCss } from 'firedev-ui';
 
 const log = Log.create(__filename)
 
 //#endregion
 
-export class BuildProcess extends FeatureForProject {
+export class BuildProcessFeature extends FeatureForProject {
 
   //#region prepare build options
   public static prepareOptionsBuildProcess(options: Models.dev.StartForOptions, project: Project): BuildOptions {
@@ -54,7 +58,7 @@ export class BuildProcess extends FeatureForProject {
    * prod, watch, outDir, args, overrideOptions
    */
   async startForLib(options: Models.dev.StartForOptions, exit = true) {
-    options = BuildProcess.prepareOptionsBuildProcess(options, this.project);
+    options = BuildProcessFeature.prepareOptionsBuildProcess(options, this.project);
     options.appBuild = false;
     const buildOptions: BuildOptions = await BuildOptions.from(options.args, this.project as any, options, 'startForLib');
     await this.build(buildOptions, config.allowedTypes.libs, exit);
@@ -65,7 +69,7 @@ export class BuildProcess extends FeatureForProject {
   }
 
   async startForApp(options: Models.dev.StartForOptions, exit = true) {
-    options = BuildProcess.prepareOptionsBuildProcess(options, this.project);
+    options = BuildProcessFeature.prepareOptionsBuildProcess(options, this.project);
     options.appBuild = true;
     const buildOptions: BuildOptions = await BuildOptions.from(options.args, this.project as any, options, 'startForApp');
     await this.build(buildOptions, config.allowedTypes.app, exit);
@@ -73,6 +77,18 @@ export class BuildProcess extends FeatureForProject {
   //#endregion
 
   private async build(buildOptions: BuildOptions, allowedLibs: ConfigModels.LibType[], exit = true) {
+    //#region initial messages
+    if (!this.project.copyManager.coreContainerSmartNodeModulesProj) {
+      Helpers.error(`${_.upperFirst(config.frameworkName)} has incorrect/missing packages container.
+Please use command:
+
+      ${config.frameworkName} autoupdate
+      // or
+      ${config.frameworkName} au
+
+to fix it.
+      `, false, true)
+    }
 
     if (this.project.frameworkVersionLessThan('v4')) {
       Helpers.error(`Please upgrade firedev framework version to to at least v4
@@ -90,6 +106,8 @@ export class BuildProcess extends FeatureForProject {
     `)
 
     log.data(`[build] in build of ${this.project.genericName}, type: ${this.project._type}`);
+    //#endregion
+
     this.project.buildOptions = buildOptions;
 
     //#region make sure project allowed for build
@@ -139,6 +157,44 @@ export class BuildProcess extends FeatureForProject {
     }
 
     //#endregion
+
+    // console.log({
+    //   'buildOptions.appBuild': buildOptions.appBuild
+    // })
+    if (!buildOptions.appBuild) {
+      const assignedPort = await this.project.assignFreePort(4100);
+      const host = `http://localhost:${assignedPort}`;
+      Helpers.info(`
+
+
+
+You can check info about build in ${CLI.chalk.bold(host)}
+
+
+
+      `)
+      Helpers.taskStarted(`starting project service... ${host}`)
+      const context = await Firedev.init({
+        host,
+        controllers: [
+          BuildProcessController,
+        ],
+        entities: [
+          BuildProcess,
+        ],
+        //#region @websql
+        config: {
+          type: 'better-sqlite3',
+          database: `tmp-build-process${buildOptions.websql ? '-websql' : ''}.sqlite`,
+          logging: false,
+        }
+        //#endregion
+      });
+      const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
+      await controller.initialize(this, this.project, assignedPort);
+      Helpers.taskDone('project service started')
+      // console.log({ context })
+    }
 
     await this.project.build(buildOptions);
     //#region handle end of building

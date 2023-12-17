@@ -388,6 +388,7 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+app.hosts.ts
 ${this.project.linkedRepos.git.ignored()}
 ${this.project.isStandaloneProject ? `/${config.folder.testsEnvironments}` : ''}
 

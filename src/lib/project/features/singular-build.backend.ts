@@ -34,7 +34,8 @@ export class SingularBuild extends FeatureForProject {
       .filter(c => (c.typeIs('isomorphic-lib')) && c.frameworkVersionAtLeast('v3'))
       ;
 
-    const smartContainerTargetProjPath = SingularBuild.getProxyProj(parent, client.name, outFolder); // path.join(parent.location, outFolder, parent.name, client.name);
+    const smartContainerTargetProjPath = SingularBuild.getProxyProj(parent, client.name, outFolder);
+
     Helpers.log(`dist project: ${smartContainerTargetProjPath}`);
     if (!Helpers.exists(smartContainerTargetProjPath)) {
       Helpers.mkdirp(smartContainerTargetProjPath);
@@ -64,6 +65,7 @@ export class SingularBuild extends FeatureForProject {
       ].forEach(f => {
         const source = crossPlatformPath(path.join(client.location, config.folder.src, f));
         const dest = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, f));
+        // console.log({ dest })
         if (!Helpers.exists(source)) {
           Helpers.mkdirp(source);
         }
@@ -81,6 +83,7 @@ export class SingularBuild extends FeatureForProject {
         const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, 'libs', c.name));
         Helpers.createSymLink(source_lib, dest_lib);
       })();
+
       if (!nonClient && c.name !== this.project.smartContainerBuildTarget.name) {
         (() => {
           const source_lib = crossPlatformPath(path.join(c.location, config.folder.src, 'app'));
@@ -199,8 +202,11 @@ exports.default = start;`);
               const appFileName = appRelatedFiles[index];
               const source = crossPlatformPath([c.location, config.folder.src, appFileName]);
               filesToWatch.push(source);
-              const dest = crossPlatformPath([smartContainerTargetProjPath, config.folder.src, '-', c.name, appFileName]);
-              Helpers.exists(source) && Helpers.copyFile(source, dest);
+              const appFilesCopyDest = crossPlatformPath([smartContainerTargetProjPath, config.folder.src, '-', c.name, appFileName]);
+              // console.log({
+              //   appFilesCopyDest
+              // })
+              Helpers.exists(source) && Helpers.copyFile(source, appFilesCopyDest);
             }
           }
         });
@@ -212,8 +218,11 @@ exports.default = start;`);
           const source = crossPlatformPath(path.join(client.location, config.folder.src, appFileName))
           const relativeAfile = source.replace(`${crossPlatformPath([client.location, config.folder.src])}/`, '',);
           filesToWatch.push(source);
-          const dest = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, relativeAfile));
-          Helpers.exists(source) && Helpers.copyFile(source, dest);
+          const appFileCopyDestination = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, relativeAfile));
+          // console.log({
+          //   appFileCopyDestination
+          // })
+          Helpers.exists(source) && Helpers.copyFile(source, appFileCopyDestination);
         }
       };
 
@@ -230,7 +239,7 @@ exports.default = start;`);
           followSymlinks: false,
           ...COMPILER_POOLING,
         })).on('all', (event, f) => {
-          // console.log('FIREDEV SINGULAR BUILD CODE WATCHER EVENT')
+
           f = crossPlatformPath(f);
           // C:/Users/darek/projects/npm/firedev-projects/firedev-simple-org/main/src/app.ts
           // C:/Users/darek/projects/npm/firedev-projects/firedev-simple-org
@@ -256,12 +265,16 @@ exports.default = start;`);
           //   dest
           // })
 
-          if ((event === 'add') || (event === 'change')) {
-            // Helpers.removeFileIfExists(dest);
-            Helpers.copyFile(f, dest);
-          }
-          if (event === 'unlink') {
-            Helpers.removeFileIfExists(dest);
+          if ((relative === 'index.ts') || relative.startsWith('app/') || filesToWatch.includes(relative)) {
+            if ((event === 'add') || (event === 'change')) {
+              // Helpers.removeFileIfExists(dest);
+              Helpers.copyFile(f, dest);
+            }
+            if (event === 'unlink') {
+              Helpers.removeFileIfExists(dest);
+            }
+          } else {
+            // console.log(`ommiting: ${relative}`)
           }
         })
         this.watchers.push(watcher);
@@ -276,12 +289,12 @@ exports.default = start;`);
 
     await smartContainerTargetProject.filesStructure.init(''); // THIS CAUSE NOT NICE SHIT
 
-    VscodeProject.launchFroSmartContaienr(parent);
 
     return smartContainerTargetProject;
   }
 
 
+  //#region init
   async init(watch: boolean, prod: boolean, outDir: Models.dev.BuildDir, args: string, _client?: string | Project) {
     if (!this.project.isSmartContainer) {
       return;
@@ -336,5 +349,6 @@ exports.default = start;`);
     Helpers.log(`[singular build] init structure ${!!singularWatchProj}`);
 
   }
+  //#endregion
 
 }

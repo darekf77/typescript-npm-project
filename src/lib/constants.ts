@@ -18,8 +18,39 @@ export const folder_shared_folder_info = 'shared_folder_info.txt';
 export const DEFAULT_PORT = {
   BUNDLE_SERVER_DOCS: 4000,
   APP_BUILD_LOCALHOST: 4200,
-  WEBSQL_APP_BUILD_LOCALHOST: 4201,
   SERVER_LOCALHOST: 4199,
+}
+
+export const PortUtils = (basePort: number) => {
+  /**
+   * max childs
+   */
+  const max = 20;
+  const n = ((basePort - (basePort % 1000)) / 1000);
+  return {
+    get calculateFor() {
+      return {
+        get standaloneServer() {
+          const portForStandalone = basePort + 400 + n
+          return portForStandalone;
+        },
+        containerServer(index: number) {
+          return basePort + 500 + (n * max) + index;
+        }
+      }
+    },
+    tempalteFor(backendPort: number) {
+      return `
+// THIS FILE IS GENERATED - DO NOT MODIFY
+
+export const HOST_BACKEND_PORT = ${backendPort};
+
+// You can check build here http://localhost:${basePort}
+
+// THIS FILE IS GENERATED - DO NOT MODIFY
+`.trim()
+    }
+  }
 }
 
 export const notAllowedProjectNames = [

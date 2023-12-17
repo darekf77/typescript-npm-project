@@ -1,5 +1,5 @@
 //#region imports
-import { BuildOptions, BuildProcess, EnvironmentConfig } from '../../features';
+import { BuildOptions, BuildProcessFeature, EnvironmentConfig } from '../../features';
 import { crossPlatformPath, fse } from 'tnp-core'
 import { path } from 'tnp-core'
 import { glob } from 'tnp-core';
@@ -408,7 +408,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     allArgs: ${allArgs}
     `)
 
-    await this.build(BuildProcess.prepareOptionsBuildProcess({
+    await this.build(BuildProcessFeature.prepareOptionsBuildProcess({
       prod,
       obscure,
       includeNodeModules,

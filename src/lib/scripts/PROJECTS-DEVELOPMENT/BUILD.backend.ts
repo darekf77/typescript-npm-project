@@ -288,16 +288,6 @@ const $START = async (args) => {
   const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
 
   if (proj.isStandaloneProject || proj.isSmartContainer) {
-    args = `${args} --serveApp`;
-    await (Project.Current as Project)
-      .buildProcess
-      .startForLibFromArgs(false, true, 'dist', args);
-  }
-};
-
-const $START_WATCH = async (args) => {
-  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
-  if (proj.isStandaloneProject || proj.isSmartContainer) {
     if (proj.typeIsNot('vscode-ext')) {
       // TODO skipCopyToSelection no loger ipmortant
       args = `${args} --skipCopyToSelection --copytoAll`;
@@ -308,6 +298,20 @@ const $START_WATCH = async (args) => {
       .startForLibFromArgs(false, true, 'dist', args);
   }
 };
+
+// const $START_WATCH = async (args) => {
+//   const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+//   if (proj.isStandaloneProject || proj.isSmartContainer) {
+//     if (proj.typeIsNot('vscode-ext')) {
+//       // TODO skipCopyToSelection no loger ipmortant
+//       args = `${args} --skipCopyToSelection --copytoAll`;
+//     }
+//     args = `${args} --serveApp`;
+//     await (Project.Current as Project)
+//       .buildProcess
+//       .startForLibFromArgs(false, true, 'dist', args);
+//   }
+// };
 
 
 const $REVERT = async (args: string) => {
@@ -462,7 +466,6 @@ const $BACKUP = async (args) => {
   process.exit(0);
 };
 
-const $STATIC_START = async (args) => $START(args);
 
 const $INSTALL_LOCALLY = async (args) => {
   const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));
@@ -548,10 +551,9 @@ export default {
   $START_APP: Helpers.CLIWRAP($START_APP, '$START_APP'),
   $BUILD_PROD: Helpers.CLIWRAP($BUILD_PROD, '$BUILD_PROD'),
   $START: Helpers.CLIWRAP($START, '$START'),
-  $START_WATCH: Helpers.CLIWRAP($START_WATCH, '$START_WATCH'),
+  // $START_WATCH: Helpers.CLIWRAP($START_WATCH, '$START_WATCH'),
   // $RUN: Helpers.CLIWRAP($RUN, '$RUN'),
   $STOP: Helpers.CLIWRAP($STOP, '$STOP'),
-  $STATIC_START: Helpers.CLIWRAP($STATIC_START, '$STATIC_START'),
   $SERVE: Helpers.CLIWRAP($SERVE, '$SERVE'),
   $INSTALL_LOCALLY: Helpers.CLIWRAP($INSTALL_LOCALLY, '$INSTALL_LOCALLY'),
   $BACKUP: Helpers.CLIWRAP($BACKUP, '$BACKUP'),

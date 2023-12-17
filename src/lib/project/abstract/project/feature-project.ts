@@ -4,7 +4,7 @@ import { path } from 'tnp-core'
 import chalk from 'chalk';
 import {
    MochaTestRunner,
-  FilesStructure, FilesTemplatesBuilder, BuildProcess,
+  FilesStructure, FilesTemplatesBuilder, BuildProcessFeature,
   NodeModules, FilesRecreator, FilesFactory,
   QuickFixes, NpmPackages, ProxyRouter, TargetProject, GitActions,
   SmartNodeModules, RecentFilesForContainer, LinkedRepos, Branding, DocsAppBuildConfig, AssetsManager,
@@ -49,7 +49,7 @@ export abstract class FeatureProject {
   //#endregion
 
   //#region @backend
-  public buildProcess: BuildProcess;
+  public buildProcess: BuildProcessFeature;
   //#endregion
 
   //#region @backend

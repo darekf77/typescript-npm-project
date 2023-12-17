@@ -795,14 +795,11 @@ declare module "*.json" {
         export default function dummyDefault${(new Date()).getTime()}() { }
         `
           : this.changeOrganizationBackendFileContentBeforeSave(this.rawContentBackend, absoluteBackendDestFilePath);
-
-        // console.log('should save smart container target file: ', absoluteBackendDestFilePath)
         fse.writeFileSync(absoluteBackendDestFilePath, contentSmartTarget, 'utf8');
       } else {
         const contentStandalone = (isEmptyModuleBackendFile && isTsFile) ? `export function dummy${(new Date()).getTime()}() { }`
           : this.changeStandaloneBackendFileContentBeforeSave(this.rawContentBackend, absoluteBackendDestFilePath);
 
-        // console.log('should save standalone project file: ', absoluteBackendDestFilePath)
         fse.writeFileSync(absoluteBackendDestFilePath, contentStandalone, 'utf8');
       }
     }

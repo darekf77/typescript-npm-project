@@ -308,11 +308,7 @@ export class ProjectIsomorphicLib
       port = argsAdditionalParams.port;
     }
     if (!_.isNumber(port) || !port) {
-      if (websql) {
-        port = DEFAULT_PORT.WEBSQL_APP_BUILD_LOCALHOST;
-      } else {
-        port = DEFAULT_PORT.APP_BUILD_LOCALHOST;
-      }
+      port = await this.assignFreePort(DEFAULT_PORT.APP_BUILD_LOCALHOST);
     }
 
     if (watch) {

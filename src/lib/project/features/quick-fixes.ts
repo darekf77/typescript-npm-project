@@ -215,12 +215,18 @@ Object.defineProperty(document.body.style, 'transform', {
     if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
 
       (() => {
-        const indexTs = crossPlatformPath(path.join(this.project.location, config.folder.src, 'lib/index.ts'));
-        if (!Helpers.exists(indexTs)) {
-          Helpers.writeFile(indexTs, `
-          export function helloWorldFrom${_.upperFirst(_.camelCase(this.project.name))}() { }
-          `.trimLeft())
+        if (
+          (this.project.isStandaloneProject && !this.project.isSmartContainerTarget)
+          || this.project.isSmartContainerChild
+        ) {
+          const indexTs = crossPlatformPath(path.join(this.project.location, config.folder.src, 'lib/index.ts'));
+          if (!Helpers.exists(indexTs)) {
+            Helpers.writeFile(indexTs, `
+            export function helloWorldFrom${_.upperFirst(_.camelCase(this.project.name))}() { }
+            `.trimLeft())
+          }
         }
+
       })();
 
       (() => {

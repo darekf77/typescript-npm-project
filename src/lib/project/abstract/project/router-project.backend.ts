@@ -7,15 +7,23 @@ import { ChildProcess } from 'child_process';
 
 import { Project } from './project';
 import { Helpers } from 'tnp-helpers';
-import { Morphi } from 'morphi';
+
 import { Models } from 'tnp-models';
 import { config } from 'tnp-config';
 import { EnvironmentConfig } from '../../features';
 import type { ProjectDocker } from '../../project-specyfic';
 
+
 export abstract class RouterProject {
+  /**
+  * @deprecated
+  */
   protected __defaultPort: number;
 
+
+  /**
+   * @deprecated
+   */
   // @ts-ignore
   get port(this: Project) {
     let env: Models.env.EnvConfigProject;
@@ -25,6 +33,9 @@ export abstract class RouterProject {
     return _.isNumber(envPort) ? envPort : this.__defaultPort;
   }
 
+   /**
+   * @deprecated
+   */
   //#region @backend
   protected startOnCommand(this: Project, args: string): string {
     // should be abstract
@@ -32,6 +43,9 @@ export abstract class RouterProject {
   }
   //#endregion
 
+   /**
+   * @deprecated
+   */
   public routerTargetHttp(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser._routerTargetHttp;
@@ -42,10 +56,16 @@ export abstract class RouterProject {
     return `http://localhost:${this.getDefaultPort()}`;
   }
 
+   /**
+   * @deprecated
+   */
   public setDefaultPort(this: Project, port: number) {
     this.__defaultPort = port;
   }
 
+   /**
+   * @deprecated
+   */
   public getDefaultPort(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser && this.browser.defaultPort;
@@ -55,11 +75,15 @@ export abstract class RouterProject {
 
   }
 
+   /**
+   * @deprecated
+   */
   public setDefaultPortByType(this: Project) {
     this.setDefaultPort(Project.DefaultPortByType(this._type))
   }
 
   /**
+   * @deprecated
    * Start server on top of static build
    * @param port
    */

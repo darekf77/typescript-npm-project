@@ -7,9 +7,10 @@ import * as json5 from 'json5';
 
 import { Project } from './project';
 import { Helpers } from 'tnp-helpers';
-import { Morphi } from 'morphi';
+
 import { Models } from 'tnp-models';
 import { config } from 'tnp-config';
+import { PortUtils } from '../../../constants';
 //#endregion
 
 const runtimeArgs = [
@@ -29,7 +30,6 @@ export abstract class VscodeProject {
   get vscodeFileTemplates(this: Project) {
     if (this.frameworkVersionAtLeast('v2')) {
       return [
-        '.vscode/launch.json.filetemplate',
         '.vscode/tasks.json.filetemplate',
       ];
     }
@@ -207,186 +207,189 @@ export abstract class VscodeProject {
   }
   //#endregion
 
-  public static launchFroSmartContaienr(container: Project) {
-    if (!container.isSmartContainer) {
-      return;
-    }
+  //#region save launch json
+  public saveLaunchJson(this: Project, basePort: number) {
 
-    const configurations = container.children.filter(f => {
-      return f.frameworkVersionAtLeast('v3') && f.typeIs('isomorphic-lib');
-    }).map(c => {
-      return {
-        "type": "node",
-        "request": "launch",
-        "name": `Launch Server @${container.name}/${c.name}`,
-        "cwd": "${workspaceFolder}" + `/dist/${container.name}/${c.name}`,
-        "program": "${workspaceFolder}" + `/dist/${container.name}/${c.name}/run-org.js`,
-        "args": [
-          `child=${c.name}`,
+
+
+    if (this.isSmartContainer) {
+      //#region container save
+      const container = this;
+      const configurations = container.children.filter(f => {
+        return f.frameworkVersionAtLeast('v3') && f.typeIs('isomorphic-lib');
+      }).map((c, index) => {
+        const backendPort = PortUtils(basePort).calculateFor.containerServer(index);
+        c.writeFile('src/app.hosts.ts', PortUtils(basePort).tempalteFor(backendPort))
+        return {
+          "type": "node",
+          "request": "launch",
+          "name": `Launch Server @${container.name}/${c.name}`,
+          "cwd": "${workspaceFolder}" + `/dist/${container.name}/${c.name}`,
+          "program": "${workspaceFolder}" + `/dist/${container.name}/${c.name}/run-org.js`,
+          "args": [
+            `--child=${c.name}`,
+            `--port=${backendPort}`
+          ],
+          // "sourceMaps": true,
+          // "outFiles": [ // TODOD this is causing unbound breakpoing in thir party modules
+          //   "${workspaceFolder}" + ` / dist / ${ container.name } / ${ c.name } / dist/**/ *.js`
+          // ],
+          runtimeArgs,
+          "presentation": {
+            "group": "workspaceServers"
+          }
+        }
+      })
+
+      const temlateSmartContine = {
+        "version": "0.2.0",
+        configurations,
+        // "compounds": []
+      };
+
+
+
+      const launchJSOnFilePath = path.join(container.location, '.vscode/launch.json')
+      Helpers.writeFile(launchJSOnFilePath, temlateSmartContine);
+      //#endregion
+
+    } else if (this.isStandaloneProject && !this.isSmartContainerTarget) {
+      //#region standalone save
+
+      let configurations = [];
+      let compounds: { name: string; configurations: any[] }[] = [];
+
+      //#region template attach process
+      const temlateAttachProcess = {
+        'type': 'node',
+        'request': 'attach',
+        'name': 'Attach to global cli tool',
+        'port': 9229,
+        'skipFiles': [
+          '<node_internals>/**'
         ],
-        // "sourceMaps": true,
-        // "outFiles": [ // TODOD this is causing unbound breakpoing in thir party modules
-        //   "${workspaceFolder}" + `/dist/${container.name}/${c.name}/dist/**/*.js`
-        // ],
-        runtimeArgs,
-        "presentation": {
-          "group": "workspaceServers"
-        }
-      }
-    })
-
-    const temlateSmartContine = {
-      "version": "0.2.0",
-      configurations,
-      // "compounds": []
-    };
-    const launchJSOnFilePath = path.join(container.location, '.vscode/launch.json')
-    Helpers.writeFile(launchJSOnFilePath, temlateSmartContine);
-  }
-
-  //#region public api / get template of launch.json
-  getTemlateOfLaunchJSON(this: Project, currentWorkspaceConfig: Models.env.EnvConfig) {
-    let configurations = [];
-    let compounds: { name: string; configurations: any[] }[] = [];
-
-    //#region template attach process
-    const temlateAttachProcess = {
-      'type': 'node',
-      'request': 'attach',
-      'name': 'Attach to global cli tool',
-      'port': 9229,
-      'skipFiles': [
-        '<node_internals>/**'
-      ],
-      // "outFiles": ["${workspaceFolder}/dist/**/*.js"] // not wokring for copy manager
-    };
-    //#endregion
-
-    //#region tempalte start normal nodejs server
-    const templateForServer = (serverChild: Project, clientProject: Project, workspaceLevel: boolean) => {
-      const startServerTemplate = {
-        'type': 'node',
-        'request': 'launch',
-        'name': 'Launch Server',
-        'program': '${workspaceFolder}/run.js',
-        'cwd': void 0,
-        'args': [],
-        // "outFiles": ["${workspaceFolder}/dist/**/*.js"], becouse of this debugging inside node_moudles
-        // with compy manager created moduels does not work..
-        runtimeArgs
+        // "outFiles": ["${workspaceFolder}/dist/**/*.js"] // not wokring for copy manager
       };
-      if (serverChild.name !== clientProject.name) {
-        let cwd = '${workspaceFolder}' + `/../${serverChild.name}`;
+      //#endregion
+
+      //#region tempalte start normal nodejs server
+      const templateForServer = (serverChild: Project, clientProject: Project, workspaceLevel: boolean) => {
+        const backendPort = PortUtils(basePort).calculateFor.standaloneServer;
+        clientProject.writeFile('src/app.hosts.ts', PortUtils(basePort).tempalteFor(backendPort))
+        const startServerTemplate = {
+          'type': 'node',
+          'request': 'launch',
+          'name': 'Launch Server',
+          'program': '${workspaceFolder}/run.js',
+          'cwd': void 0,
+          'args': [`port=${backendPort}`],
+          // "outFiles": ["${workspaceFolder}/dist/**/*.js"], becouse of this debugging inside node_moudles
+          // with compy manager created moduels does not work..
+          runtimeArgs
+        };
+        if (serverChild.name !== clientProject.name) {
+          let cwd = '${workspaceFolder}' + `/../ ${serverChild.name}`;
+          if (workspaceLevel) {
+            cwd = '${workspaceFolder}' + `/${serverChild.name}`;
+          }
+          startServerTemplate.program = cwd + '/run.js';
+          startServerTemplate.cwd = cwd;
+        }
+        if ((serverChild.location === clientProject.location) && serverChild.isStandaloneProject) {
+          startServerTemplate.name = `${startServerTemplate.name} standalone`
+        } else {
+          startServerTemplate.name = `${startServerTemplate.name} ${serverChild.name} for ${clientProject.name}`
+        }
+        startServerTemplate.args.push(`--ENVoverride=${encodeURIComponent(JSON.stringify({
+          clientProjectName: clientProject.name
+        } as Models.env.EnvConfig, null, 4))
+          } `);
+        return startServerTemplate;
+      };
+      //#endregion
+
+      //#region tempalte start nodemon nodejs server
+      const startNodemonServer = () => {
+        const result = {
+          'type': 'node',
+          'request': 'launch',
+          'remoteRoot': '${workspaceRoot}',
+          'localRoot': '${workspaceRoot}',
+          'name': 'Launch Nodemon server',
+          'runtimeExecutable': 'nodemon',
+          'program': '${workspaceFolder}/run.js',
+          'restart': true,
+          'sourceMaps': true,
+          'console': 'internalConsole',
+          'internalConsoleOptions': 'neverOpen',
+          runtimeArgs
+        };
+        return result;
+      }
+      //#endregion
+
+      //#region  tempalte start ng serve
+
+      const startNgServeTemplate = (servePort: number, workspaceChild: Project, workspaceLevel: boolean) => {
+        const result = {
+          'name': 'Debugger with ng serve',
+          'type': 'chrome',
+          'request': 'launch',
+          cwd: void 0,
+          // "userDataDir": false,
+          'preLaunchTask': 'Ng Serve',
+          'postDebugTask': 'terminateall',
+          'sourceMaps': true,
+          // "url": `http://localhost:${!isNaN(servePort) ? servePort : 4200}/#`,
+          'webRoot': '${workspaceFolder}',
+          'sourceMapPathOverrides': {
+            'webpack:/*': '${webRoot}/*',
+            '/./*': '${webRoot}/*',
+            '/tmp-src/*': '${webRoot}/*',
+            '/*': '*',
+            '/./~/*': '${webRoot}/node_modules/*'
+          }
+        }
+        if (workspaceChild) {
+          result.cwd = '${workspaceFolder}' + `/${workspaceChild.name}`;
+          result.webRoot = '${workspaceFolder}' + `/${workspaceChild.name}`;
+          result.name = `${result.name} for ${workspaceChild.name}`
+        }
         if (workspaceLevel) {
-          cwd = '${workspaceFolder}' + `/${serverChild.name}`;
+          result.preLaunchTask = `${result.preLaunchTask} for ${workspaceChild.name}`;
         }
-        startServerTemplate.program = cwd + '/run.js';
-        startServerTemplate.cwd = cwd;
-      }
-      if ((serverChild.location === clientProject.location) && serverChild.isStandaloneProject) {
-        startServerTemplate.name = `${startServerTemplate.name} standalone`
-      } else {
-        startServerTemplate.name = `${startServerTemplate.name} ${serverChild.name} for ${clientProject.name}`
-      }
-      startServerTemplate.args.push(`--ENVoverride=${encodeURIComponent(JSON.stringify({
-        clientProjectName: clientProject.name
-      } as Models.env.EnvConfig, null, 4))}`);
-      return startServerTemplate;
-    };
-    //#endregion
-
-    //#region tempalte start nodemon nodejs server
-    function startNodemonServer() {
-      const result = {
-        'type': 'node',
-        'request': 'launch',
-        'remoteRoot': '${workspaceRoot}',
-        'localRoot': '${workspaceRoot}',
-        'name': 'Launch Nodemon server',
-        'runtimeExecutable': 'nodemon',
-        'program': '${workspaceFolder}/run.js',
-        'restart': true,
-        'sourceMaps': true,
-        'console': 'internalConsole',
-        'internalConsoleOptions': 'neverOpen',
-        runtimeArgs
+        return result;
       };
-      return result;
-    }
-    //#endregion
+      //#endregion
 
-    //#region  tempalte start ng serve
-    function startNgServeTemplate(servePort: number, workspaceChild: Project, workspaceLevel: boolean) {
-      const result = {
-        'name': 'Debugger with ng serve',
-        'type': 'chrome',
-        'request': 'launch',
-        cwd: void 0,
-        // "userDataDir": false,
-        'preLaunchTask': 'Ng Serve',
-        'postDebugTask': 'terminateall',
-        'sourceMaps': true,
-        // "url": `http://localhost:${!isNaN(servePort) ? servePort : 4200}/#`,
-        'webRoot': '${workspaceFolder}',
-        'sourceMapPathOverrides': {
-          'webpack:/*': '${webRoot}/*',
-          '/./*': '${webRoot}/*',
-          '/tmp-src/*': '${webRoot}/*',
-          '/*': '*',
-          '/./~/*': '${webRoot}/node_modules/*'
+      //#region handle standalone or worksapce child
+      if (this.typeIs('isomorphic-lib')) {
+        configurations = [
+          // startNodemonServer()
+        ];
+        if (this.isStandaloneProject) {
+          configurations.push(templateForServer(this, this, false));
+          configurations.push(startNgServeTemplate(9000, void 0, false));
+          compounds.push({
+            name: 'Debug backend/frontend',
+            configurations: [
+              ...configurations.map(c => c.name)
+            ]
+          });
+          configurations.push(temlateAttachProcess);
         }
       }
-      if (workspaceChild) {
-        result.cwd = '${workspaceFolder}' + `/${workspaceChild.name}`;
-        result.webRoot = '${workspaceFolder}' + `/${workspaceChild.name}`;
-        result.name = `${result.name} for ${workspaceChild.name}`
-      }
-      if (workspaceLevel) {
-        result.preLaunchTask = `${result.preLaunchTask} for ${workspaceChild.name}`;
-      }
-      return result;
-    };
-    //#endregion
+      //#endregion
 
+      const launchJSOnFilePath = path.join(this.location, '.vscode/launch.json');
 
-    //#region handle standalone or worksapce child
-    if (this.typeIs('isomorphic-lib')) {
-      configurations = [
-        // startNodemonServer()
-      ];
-      if (this.isStandaloneProject) {
-        configurations.push(templateForServer(this, this, false));
-        configurations.push(startNgServeTemplate(9000, void 0, false));
-        compounds.push({
-          name: 'Debug backend/frontend',
-          configurations: [
-            ...configurations.map(c => c.name)
-          ]
-        });
-        configurations.push(temlateAttachProcess);
-      }
+      Helpers.writeJson(launchJSOnFilePath, {
+        version: '0.2.0',
+        configurations,
+        compounds
+      });
+      //#endregion
     }
-    //#endregion
-
-    return JSON.stringify({
-      version: '0.2.0',
-      configurations,
-      compounds
-    });
   }
   //#endregion
-
-  //#endregion
-}
-
-function getPort(project: Project, workspaceConfig: Models.env.EnvConfig) {
-  if (!workspaceConfig) {
-    console.log('not working !')
-  }
-  let env: Models.env.EnvConfigProject;
-
-  env = workspaceConfig.workspace?.projects?.find(p => p.name === project.name);
-
-  const envPort = env?.port;
-  return _.isNumber(envPort) ? envPort : project.getDefaultPort();
 }
