@@ -7,11 +7,11 @@ import {
   crossPlatformPath, path, fse,
   //#endregion
   _, Helpers
-} from 'tnp-core';
-import { Morphi } from 'morphi';
+} from 'tnp-core/src';
+import { Morphi } from 'morphi/src';
 import type { Project } from '../../abstract';
 import { PackageJsonFile } from './package-json-file';
-import { config } from 'tnp-config';
+import { config } from 'tnp-config/src';
 //#endregion
 @Morphi.Entity<PackageJSON>({
   className: 'PackageJSON',

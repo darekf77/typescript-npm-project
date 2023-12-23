@@ -1,16 +1,16 @@
 //#region @backend
-import { _ } from 'tnp-core';
-import { path } from 'tnp-core'
-import { fse } from 'tnp-core'
+import { _ } from 'tnp-core/src';
+import { path } from 'tnp-core/src'
+import { fse } from 'tnp-core/src'
 import { SingularBuild } from '../features/singular-build.backend';
 import { Project } from '../abstract';
 //#endregion
-import { BuildOptions } from 'tnp-db';
-import { Helpers } from 'tnp-helpers';
-import { CLASS } from 'typescript-class-helpers';
+import { BuildOptions } from 'tnp-db/src';
+import { Helpers } from 'tnp-helpers/src';
+import { CLASS } from 'typescript-class-helpers/src';
 import type { ProjectIsomorphicLib } from './project-isomorphic-lib';
-import { Models } from 'tnp-models';
-import { config } from 'tnp-config';
+import { Models } from 'tnp-models/src';
+import { config } from 'tnp-config/src';
 import { argsToClear } from '../../constants';
 
 //#region @backend

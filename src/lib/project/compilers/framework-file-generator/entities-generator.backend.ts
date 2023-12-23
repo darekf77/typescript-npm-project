@@ -1,12 +1,12 @@
-import { fse } from 'tnp-core'
-import { path } from 'tnp-core'
+import { fse } from 'tnp-core/src'
+import { path } from 'tnp-core/src'
 import * as JSON5 from 'json5';
-import { glob } from 'tnp-core';
+import { glob } from 'tnp-core/src';
 
-import { Helpers } from 'tnp-helpers';
+import { Helpers } from 'tnp-helpers/src';
 import { Project, FeatureCompilerForProject } from '../../abstract';
-import { IncCompiler } from 'incremental-compiler';
-import { config } from 'tnp-config';
+import { IncCompiler } from 'incremental-compiler/src';
+import { config } from 'tnp-config/src';
 import { optionsFrameworkFileGen } from './framework-files-generator.backend';
 
 /**

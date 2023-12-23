@@ -2,12 +2,12 @@
 import {
   crossPlatformPath,
   path, _
-} from 'tnp-core';
+} from 'tnp-core/src';
 //#endregion
-import { CLASS } from 'typescript-class-helpers';
-import { config, ConfigModels } from 'tnp-config';
+import { CLASS } from 'typescript-class-helpers/src';
+import { config, ConfigModels } from 'tnp-config/src';
 
-import { Helpers } from 'tnp-helpers';
+import { Helpers } from 'tnp-helpers/src';
 import { FeatureForProject } from '../../abstract/feature-for-project';
 import { Project } from '../../abstract/project/project';
 import { InsideStruct, Opt } from './inside-struct';

@@ -1,6 +1,6 @@
 //#region @backend
-import { fse } from 'tnp-core'
-import { path } from 'tnp-core'
+import { fse } from 'tnp-core/src'
+import { path } from 'tnp-core/src'
 import chalk from 'chalk';
 import {
    MochaTestRunner,
@@ -21,7 +21,7 @@ import { InsideStructures } from '../../features/inside-structures/inside-struct
 import { SingularBuild } from '../../features/singular-build.backend';
 import { WebpackBackendCompilation } from '../../features/webpack-backend-compilation.backend';
 //#endregion
-import { _ } from 'tnp-core';
+import { _ } from 'tnp-core/src';
 
 
 export abstract class FeatureProject {

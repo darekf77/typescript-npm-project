@@ -1,17 +1,17 @@
-import { os, _ } from 'tnp-core';
-import { crossPlatformPath } from 'tnp-core'
+import { os, _ } from 'tnp-core/src';
+import { crossPlatformPath } from 'tnp-core/src'
 import { Project } from '../project';
 import * as  psList from 'ps-list';
-import { CLASS } from 'typescript-class-helpers';
-import { Helpers } from 'tnp-helpers';
-import { Models } from 'tnp-models';
+import { CLASS } from 'typescript-class-helpers/src';
+import { Helpers } from 'tnp-helpers/src';
+import { Models } from 'tnp-models/src';
 import chalk from 'chalk';
-import { path, fse } from 'tnp-core'
-import { config } from 'tnp-config';
+import { path, fse } from 'tnp-core/src'
+import { config } from 'tnp-config/src';
 // import * as nodemailer from 'nodemailer';
 
-import { CLI } from 'tnp-cli';
-import { Log } from 'ng2-logger';
+import { CLI } from 'tnp-cli/src';
+import { Log } from 'ng2-logger/src';
 
 const log = Log.create(path.basename(__filename))
 

@@ -1,7 +1,7 @@
-import { _ } from 'tnp-core';
+import { _ } from 'tnp-core/src';
 import { ImpReplaceOptions } from './source-modifier.models';
-import { Helpers } from 'tnp-helpers';
-import { config } from 'tnp-config';
+import { Helpers } from 'tnp-helpers/src';
+import { config } from 'tnp-config/src';
 
 
 export function impReplace(impReplaceOptions: ImpReplaceOptions) {

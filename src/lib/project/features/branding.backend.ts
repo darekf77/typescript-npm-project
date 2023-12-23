@@ -1,14 +1,13 @@
-
 //#region imports
-import { crossPlatformPath, path } from 'tnp-core'
-import { fse } from 'tnp-core'
+import { crossPlatformPath, path } from 'tnp-core/src'
+import { fse } from 'tnp-core/src'
 
-import { _ } from 'tnp-core';
-import { Helpers } from 'tnp-helpers';
+import { _ } from 'tnp-core/src';
+import { Helpers } from 'tnp-helpers/src';
 import { Project } from '../../project/abstract/project/project';
-import { config } from 'tnp-config';
+import { config } from 'tnp-config/src';
 import { FeatureForProject } from '../abstract/feature-for-project';
-import { Models } from 'tnp-models';
+import { Models } from 'tnp-models/src';
 
 
 const htmlBasename = 'html-pwa.html';

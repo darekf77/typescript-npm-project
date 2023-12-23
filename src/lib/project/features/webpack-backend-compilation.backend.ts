@@ -1,8 +1,8 @@
-import { CLI } from "tnp-cli";
-import { config } from "tnp-config";
-import { path } from "tnp-core";
-import { BuildOptions } from "tnp-db";
-import { Helpers } from "tnp-helpers";
+import { CLI } from "tnp-cli/src";
+import { config } from "tnp-config/src";
+import { path } from "tnp-core/src";
+import { BuildOptions } from "tnp-db/src";
+import { Helpers } from "tnp-helpers/src";
 import { EXPORT_TEMPLATE } from "../../templates";
 import { FeatureForProject } from "../abstract/feature-for-project";
 

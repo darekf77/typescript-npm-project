@@ -1,6 +1,6 @@
 //#region  @backend
 import COMPILERS from './COMPILERS-TESTING/COMPILERS.backend';
-import { DB } from 'tnp-db';
+import { DB } from 'tnp-db/src';
 import DEPS from './DEPENDENCIES-MANAGEMENT/DEPS.backend';
 import CLOUD from './CLOUD/CLOUD.backend';
 import NEW from './NEW-PROJECT_FILES_MODULES/NEW.backend';

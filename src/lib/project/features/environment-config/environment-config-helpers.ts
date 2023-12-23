@@ -1,15 +1,15 @@
 //#region @backend
 import chalk from 'chalk';
-import { crossPlatformPath, _ } from 'tnp-core';
-import { path } from 'tnp-core'
-import { fse } from 'tnp-core'
+import { crossPlatformPath, _ } from 'tnp-core/src';
+import { path } from 'tnp-core/src'
+import { fse } from 'tnp-core/src'
 
-import { config, ConfigModels } from 'tnp-config';
-import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
+import { config, ConfigModels } from 'tnp-config/src';
+import { Models } from 'tnp-models/src';
+import { Helpers } from 'tnp-helpers/src';
 import { Project } from '../../abstract';
 import { config as schemaConfig } from './example-environment-config';
-import { walk } from 'lodash-walk-object';
+import { walk } from 'lodash-walk-object/src';
 
 //#region handle error
 export function handleError(workspaceConfig: Models.env.EnvConfig, fileContent: string, pathToConfig: string) {
@@ -22,7 +22,7 @@ ${chalk.bold(JSON.stringify(workspaceConfig, null, 4))}
 
   Helpers.error(`Please follow worksapce environment config schema:\n
 ${Helpers.terminalLine()}
-  let { config } = require('tnp').default;
+  let { config } = require('tnp/src').default;
 
   config = ${chalk.bold(JSON.stringify(schemaConfig, null, 4))}
 

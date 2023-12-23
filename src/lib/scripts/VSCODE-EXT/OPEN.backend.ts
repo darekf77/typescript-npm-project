@@ -1,11 +1,11 @@
 //#region imports
-import { glob, _ } from 'tnp-core';
+import { glob, _ } from 'tnp-core/src';
 import * as express from 'express';
-import { path } from 'tnp-core'
-import { fse } from 'tnp-core'
-import { config } from 'tnp-config';
+import { path } from 'tnp-core/src'
+import { fse } from 'tnp-core/src'
+import { config } from 'tnp-config/src';
 import { Project } from '../../project';
-import { Helpers } from 'tnp-helpers';
+import { Helpers } from 'tnp-helpers/src';
 import chalk from 'chalk';
 //#endregion
 

@@ -1,9 +1,9 @@
 //#region @backend
-import { path, crossPlatformPath } from 'tnp-core'
-import { _ } from 'tnp-core';
-import { config } from 'tnp-config';
+import { path, crossPlatformPath } from 'tnp-core/src'
+import { _ } from 'tnp-core/src';
+import { config } from 'tnp-config/src';
 import { NodeModulesBase } from './node-modules-base.backend';
-import { Helpers } from 'tnp-helpers';
+import { Helpers } from 'tnp-helpers/src';
 
 export class NodeModules extends NodeModulesBase {
 

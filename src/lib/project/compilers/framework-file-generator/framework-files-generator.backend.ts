@@ -1,14 +1,14 @@
 //#region @backend
-import { crossPlatformPath, fse } from 'tnp-core'
-import { path } from 'tnp-core'
+import { crossPlatformPath, fse } from 'tnp-core/src'
+import { path } from 'tnp-core/src'
 import * as JSON5 from 'json5';
-import { glob } from 'tnp-core';
+import { glob } from 'tnp-core/src';
 
 import { Project } from '../../abstract';
-import { config } from 'tnp-config';
-import { Helpers } from 'tnp-helpers';
+import { config } from 'tnp-config/src';
+import { Helpers } from 'tnp-helpers/src';
 import { FeatureCompilerForProject } from '../../abstract';
-import { IncCompiler } from 'incremental-compiler';
+import { IncCompiler } from 'incremental-compiler/src';
 import { ControllersGenerator } from './controllers-generator.backend';
 
 

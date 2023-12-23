@@ -1,15 +1,15 @@
 //#region imports
-import { crossPlatformPath, _ } from 'tnp-core';
-import { path } from 'tnp-core'
+import { crossPlatformPath, _ } from 'tnp-core/src';
+import { path } from 'tnp-core/src'
 import { FeatureForProject, Project } from '../abstract';
-import { appRelatedFiles, config } from 'tnp-config';
-import { Helpers } from 'tnp-helpers';
-import { Models } from 'tnp-models';
+import { appRelatedFiles, config } from 'tnp-config/src';
+import { Helpers } from 'tnp-helpers/src';
+import { Models } from 'tnp-models/src';
 import { VscodeProject } from '../abstract/project/vscode-project.backend';
 import { BrowserCodeCut } from '../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
 import { argsToClear } from '../../constants';
-import { COMPILER_POOLING, IncrementalWatcherInstance, incrementalWatcher } from 'incremental-compiler';
-import { CLI } from 'tnp-cli';
+import { COMPILER_POOLING, IncrementalWatcherInstance, incrementalWatcher } from 'incremental-compiler/src';
+import { CLI } from 'tnp-cli/src';
 
 //#endregion
 

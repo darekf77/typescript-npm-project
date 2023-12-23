@@ -1,9 +1,9 @@
-import { config, PREFIXES } from "tnp-config";
-import { crossPlatformPath, glob, path, _ } from "tnp-core";
-import { BuildOptions } from "tnp-db";
-import { Helpers } from "tnp-helpers";
-import { Models } from "tnp-models";
-import { CLASS } from "typescript-class-helpers";
+import { config, PREFIXES } from "tnp-config/src";
+import { crossPlatformPath, glob, path, _ } from "tnp-core/src";
+import { BuildOptions } from "tnp-db/src";
+import { Helpers } from "tnp-helpers/src";
+import { Models } from "tnp-models/src";
+import { CLASS } from "typescript-class-helpers/src";
 import { argsToClear } from "../../../constants";
 import { Project } from "../../abstract/project/project";
 import { CopyMangerHelpers } from "./copy-manager-helpers.backend";

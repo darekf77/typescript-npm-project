@@ -1,7 +1,7 @@
-import { config, ConfigModels } from 'tnp-config';
-import { chalk, crossPlatformPath, path, _ } from 'tnp-core';
-import { Helpers } from 'tnp-helpers';
-import { Models } from 'tnp-models';
+import { config, ConfigModels } from 'tnp-config/src';
+import { chalk, crossPlatformPath, path, _ } from 'tnp-core/src';
+import { Helpers } from 'tnp-helpers/src';
+import { Models } from 'tnp-models/src';
 import { Project } from '../../project/abstract/project';
 
 const $RELEASE_ALL = async (args: string) => {

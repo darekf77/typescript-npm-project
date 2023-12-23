@@ -1,4 +1,4 @@
-import { _ } from 'tnp-core';
+import { _ } from 'tnp-core/src';
 import { FileTmpForSave } from './file-tmp-for-save.backend';
 
 export abstract class BaseFiredevFileTemplate {
@@ -14,10 +14,10 @@ export abstract class BaseFiredevFileTemplate {
 
   protected baseImports() {
     return `
-import { _ } from 'tnp-core';
+import { _ } from 'tnp-core/src';
 //#region @backend
-import { path } from 'tnp-core'
-import { fse } from 'tnp-core'
+import { path } from 'tnp-core/src'
+import { fse } from 'tnp-core/src'
 //#endregion
     `.trim();
   }

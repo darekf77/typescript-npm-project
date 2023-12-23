@@ -1,9 +1,9 @@
-import { config } from "tnp-config";
-import { crossPlatformPath, glob, path, _ } from "tnp-core";
-import { BuildOptions } from "tnp-db";
-import { Helpers } from "tnp-helpers";
-import { Models } from "tnp-models";
-import { CLASS } from "typescript-class-helpers";
+import { config } from "tnp-config/src";
+import { crossPlatformPath, glob, path, _ } from "tnp-core/src";
+import { BuildOptions } from "tnp-db/src";
+import { Helpers } from "tnp-helpers/src";
+import { Models } from "tnp-models/src";
+import { CLASS } from "typescript-class-helpers/src";
 import { Project } from "../../abstract/project/project";
 import { BundleMjsFesmModuleSpliter } from "./bundle-mjs-fesm-module-spliter.backend";
 import { CopyMangerHelpers } from "./copy-manager-helpers.backend";

@@ -5,5 +5,5 @@ export * from './project';
 export * from './project/project-specyfic';
 //#endregion
 
-import { Morphi } from 'morphi';
+import { Morphi } from 'morphi/src';
 export import Firedev = Morphi;

@@ -1,13 +1,13 @@
 //#region imports
-import { _, crossPlatformPath } from 'tnp-core';
-import { path } from 'tnp-core'
-import { fse } from 'tnp-core'
+import { _, crossPlatformPath } from 'tnp-core/src';
+import { path } from 'tnp-core/src'
+import { fse } from 'tnp-core/src'
 import * as open from 'open';
-import { glob } from 'tnp-core';
+import { glob } from 'tnp-core/src';
 import chalk from 'chalk';
 import { Project } from '../../project/abstract/project';
-import { Helpers } from 'tnp-helpers';
-import { config } from 'tnp-config';
+import { Helpers } from 'tnp-helpers/src';
+import { config } from 'tnp-config/src';
 import { resolvePacakgesFromArgs } from '../../project/features/npm-packages/npm-packages-helpers.backend';
 
 import { $VSCODE_TEMP_HIDE, $VSCODE_TEMP_SHOW } from '../VSCODE-EXT/VSCODE.backend';
@@ -555,7 +555,7 @@ EXIT /b
 
 function templateBin(debug = false) {
   return `#!/usr/bin/env node ${debug ? '--inspect' : ''}
-var { fse, crossPlatformPath, path } = require('tnp-core');
+var { fse, crossPlatformPath, path } = require('tnp-core/src');
 var path = {
   dist: path.join(crossPlatformPath(__dirname), '../dist/index.js'),
   bundle: path.join(crossPlatformPath(__dirname), '../index.js')
@@ -568,7 +568,7 @@ run(process.argv.slice(2));
 }
 
 function templateStartBackedn() {
-  return `import { Helpers } from 'tnp-helpers';
+  return `import { Helpers } from 'tnp-helpers/src';
 
 export async function run(args: string[]) {
   console.log('Hello from', require('path').basename(process.argv[1]))

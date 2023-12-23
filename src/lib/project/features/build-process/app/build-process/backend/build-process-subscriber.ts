@@ -3,7 +3,7 @@
 import {
   EntitySubscriberInterface, EventSubscriber, InsertEvent,
   RemoveEvent, UpdateEvent
-} from 'firedev-typeorm';
+} from 'firedev-typeorm/src';
 import type { BuildProcess } from '../build-process';
 //#endregion
 

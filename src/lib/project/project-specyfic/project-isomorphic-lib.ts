@@ -1,21 +1,21 @@
 //#region imports
 //#region @backend
-import { crossPlatformPath, ExecuteOptions, fse } from 'tnp-core'
-import { path } from 'tnp-core'
-import { glob } from 'tnp-core';
+import { crossPlatformPath, ExecuteOptions, fse } from 'tnp-core/src'
+import { path } from 'tnp-core/src'
+import { glob } from 'tnp-core/src';
 import * as inquirer from 'inquirer';
-import { config, ConfigModels, extAllowedToExportAndReplaceTSJSCodeFiles, extAllowedToReplace, TAGS } from 'tnp-config';
-import { RegionRemover } from 'isomorphic-region-loader';
+import { config, ConfigModels, extAllowedToExportAndReplaceTSJSCodeFiles, extAllowedToReplace, TAGS } from 'tnp-config/src';
+import { RegionRemover } from 'isomorphic-region-loader/src';
 import { IncrementalBuildProcess } from '../compilers/build-isomorphic-lib/compilations/incremental-build-process.backend';
 import { PackagesRecognition } from '../features/package-recognition/packages-recognition';
 //#endregion
 import { Project } from '../abstract/project/project';
-import { _ } from 'tnp-core';
-import { Helpers } from 'tnp-helpers';
-import { Models } from 'tnp-models';
-import { BuildOptions } from 'tnp-db';
-import { CLASS } from 'typescript-class-helpers';
-import { CLI } from 'tnp-cli';
+import { _ } from 'tnp-core/src';
+import { Helpers } from 'tnp-helpers/src';
+import { Models } from 'tnp-models/src';
+import { BuildOptions } from 'tnp-db/src';
+import { CLASS } from 'typescript-class-helpers/src';
+import { CLI } from 'tnp-cli/src';
 import { argsToClear, DEFAULT_PORT } from '../../constants';
 //#endregion
 
@@ -1127,4 +1127,3 @@ export class ProjectIsomorphicLib
 
   //#endregion
 }
-

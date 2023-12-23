@@ -1,12 +1,12 @@
 //#region imports
-import { _ } from 'tnp-core';
-import { fse } from 'tnp-core'
-import { path } from 'tnp-core'
-import { config } from 'tnp-config';
+import { _ } from 'tnp-core/src';
+import { fse } from 'tnp-core/src'
+import { path } from 'tnp-core/src'
+import { config } from 'tnp-config/src';
 import { Project } from '../../abstract';
-import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
-import { COMPILER_POOLING, IncCompiler, incrementalWatcher } from 'incremental-compiler';
+import { Models } from 'tnp-models/src';
+import { Helpers } from 'tnp-helpers/src';
+import { COMPILER_POOLING, IncCompiler, incrementalWatcher } from 'incremental-compiler/src';
 import { SourceModForStandaloneProjects } from './source-mod-for-standalone-projects.backend';
 
 //#endregion

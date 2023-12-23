@@ -1,4 +1,4 @@
-import { _ } from 'tnp-core';
+import { _ } from 'tnp-core/src';
 import { BaseFiredevFileTemplate } from './base-firedev-file-template.backend';
 import { FileTmpForSave } from './file-tmp-for-save.backend';
 

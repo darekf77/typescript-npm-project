@@ -1,8 +1,8 @@
 //#region imports
 //#region @backend
-import { crossPlatformPath, fse } from 'tnp-core'
-import { path } from 'tnp-core'
-import { _ } from 'tnp-core';
+import { crossPlatformPath, fse } from 'tnp-core/src'
+import { path } from 'tnp-core/src'
+import { _ } from 'tnp-core/src';
 import {
   handleError,
   saveConfigWorkspca as saveEnvironmentConfig,
@@ -10,9 +10,9 @@ import {
 } from './environment-config-helpers';
 import { FeatureForProject } from '../../abstract';
 //#endregion
-import { Helpers } from 'tnp-helpers';
-import { config, ConfigModels } from 'tnp-config';
-import { Models } from 'tnp-models';
+import { Helpers } from 'tnp-helpers/src';
+import { config, ConfigModels } from 'tnp-config/src';
+import { Models } from 'tnp-models/src';
 //#endregion
 
 export class EnvironmentConfig

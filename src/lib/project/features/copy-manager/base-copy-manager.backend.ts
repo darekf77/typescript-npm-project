@@ -1,15 +1,15 @@
 //#region imports
-import { crossPlatformPath, _ } from 'tnp-core';
-import { fse } from 'tnp-core'
-import { path } from 'tnp-core'
-import { config } from 'tnp-config';
+import { crossPlatformPath, _ } from 'tnp-core/src';
+import { fse } from 'tnp-core/src'
+import { path } from 'tnp-core/src'
+import { config } from 'tnp-config/src';
 import { Project } from '../../abstract';
-import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';;
+import { Models } from 'tnp-models/src';
+import { Helpers } from 'tnp-helpers/src';;
 import { FeatureCompilerForProject } from '../../abstract';
 import { CopyMangerHelpers } from './copy-manager-helpers.backend';
-import { IncCompiler } from 'incremental-compiler';
-import { Log } from 'ng2-logger';
+import { IncCompiler } from 'incremental-compiler/src';
+import { Log } from 'ng2-logger/src';
 import { SourceMappingUrl } from './source-maping-url.backend';
 
 const REPLACE_INDEX_D_TS_IN_DEST_WHEN_WATCH = false;

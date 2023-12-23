@@ -1,12 +1,12 @@
 //#region imports
 import chalk from 'chalk';
-import { path, _ } from 'tnp-core';
+import { path, _ } from 'tnp-core/src';
 
-import { Helpers } from 'tnp-helpers';
-import { Models } from 'tnp-models';
+import { Helpers } from 'tnp-helpers/src';
+import { Models } from 'tnp-models/src';
 import { NpmPackagesCore } from './npm-packages-core.backend';
 import { fixOptionsNpmInstall } from './npm-packages-helpers.backend';
-import { PROGRESS_DATA } from 'tnp-models';
+import { PROGRESS_DATA } from 'tnp-models/src';
 //#endregion
 
 export class NpmPackagesBase extends NpmPackagesCore {

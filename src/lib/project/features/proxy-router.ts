@@ -1,11 +1,11 @@
 //#region @backend
 import chalk from 'chalk';
-import { _ } from 'tnp-core';
+import { _ } from 'tnp-core/src';
 import * as portfinder from 'portfinder';
 import * as httpProxy from 'http-proxy';
 import * as http from 'http';
 
-import { Helpers } from 'tnp-helpers';
+import { Helpers } from 'tnp-helpers/src';
 import { Project, FeatureForProject } from '../abstract';
 
 export class ProxyRouter extends FeatureForProject {

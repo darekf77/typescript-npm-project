@@ -1,15 +1,15 @@
 //#region imports
-import { path, crossPlatformPath } from 'tnp-core'
-import { _ } from 'tnp-core';
+import { path, crossPlatformPath } from 'tnp-core/src'
+import { _ } from 'tnp-core/src';
 
-import { config } from 'tnp-config';
+import { config } from 'tnp-config/src';
 import type { Project } from '../../../../project/abstract/project/project';
-import { Helpers } from 'tnp-helpers';
-import { BuildOptions } from 'tnp-db';
+import { Helpers } from 'tnp-helpers/src';
+import { BuildOptions } from 'tnp-db/src';
 import { BackendCompilation } from './compilation-backend.backend';
 import { BroswerCompilation } from './compilation-browser.backend';
-import { IncCompiler } from 'incremental-compiler';
-import { CLI } from 'tnp-cli';
+import { IncCompiler } from 'incremental-compiler/src';
+import { CLI } from 'tnp-cli/src';
 //#endregion
 
 export class IncrementalBuildProcess {

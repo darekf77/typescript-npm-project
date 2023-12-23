@@ -1,18 +1,18 @@
 //#region imports
 import { describe } from 'mocha';
 import { expect, use } from 'chai';
-import { fse } from 'tnp-core'
-import { path } from 'tnp-core'
-import { _ } from 'tnp-core';
+import { fse } from 'tnp-core/src'
+import { path } from 'tnp-core/src'
+import { _ } from 'tnp-core/src';
 import { it } from 'mocha';
 import { SpecWrap } from '../_helpers.spec';
-import { config } from 'tnp-config';
+import { config } from 'tnp-config/src';
 import { Project } from '../../lib/project/abstract/project/project';
-import { Helpers } from 'tnp-helpers';
-import { CLASS } from 'typescript-class-helpers';
+import { Helpers } from 'tnp-helpers/src';
+import { CLASS } from 'typescript-class-helpers/src';
 import { ProjectIsomorphicLib } from '../../lib/project/project-specyfic/project-isomorphic-lib';
 import { ProjectContainer } from '../../lib/project/project-specyfic/project-container';
-import { BuildOptions } from 'tnp-db';
+import { BuildOptions } from 'tnp-db/src';
 import { PackageJSON } from '../../lib/project/features/package-json/package-json';
 import { dummyfiles } from './copyto-manager-dummy-files';
 import { ProjectUnknowNpm } from '../../lib/project/project-specyfic/project-unknow-npm';

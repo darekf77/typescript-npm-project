@@ -1,9 +1,9 @@
 //#region @backend
-import { _ } from 'tnp-core';
-import { Helpers } from 'tnp-helpers';
+import { _ } from 'tnp-core/src';
+import { Helpers } from 'tnp-helpers/src';
 import { NpmPackagesBase } from './npm-packages-base.backend';
 import { resolvePacakgesFromArgs } from './npm-packages-helpers.backend';
-import { config } from 'tnp-config';
+import { config } from 'tnp-config/src';
 
 export class NpmPackages extends NpmPackagesBase {
 

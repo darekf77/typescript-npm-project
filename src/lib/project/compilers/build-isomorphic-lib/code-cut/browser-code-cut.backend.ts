@@ -4,16 +4,16 @@ import {
   path,
   fse,
   crossPlatformPath,
-} from 'tnp-core';
+} from 'tnp-core/src';
 
-import { config, ConfigModels, extAllowedToReplace, frontEndOnly, TAGS } from 'tnp-config';
-import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
+import { config, ConfigModels, extAllowedToReplace, frontEndOnly, TAGS } from 'tnp-config/src';
+import { Models } from 'tnp-models/src';
+import { Helpers } from 'tnp-helpers/src';
 import type { Project } from '../../../abstract/project/project';
-import { BuildOptions } from 'tnp-db';
-import { RegionRemover } from 'isomorphic-region-loader';
+import { BuildOptions } from 'tnp-db/src';
+import { RegionRemover } from 'isomorphic-region-loader/src';
 import { MjsModule } from '../../../features/copy-manager/bundle-mjs-fesm-module-spliter.backend';
-import { CLI } from 'tnp-cli';
+import { CLI } from 'tnp-cli/src';
 
 //#endregion
 
@@ -35,8 +35,8 @@ const debugFiles = [
  *
  * to be changed into:
  *
- * import { ProcessController, Process } from '@codete-ngrx-quick-start/shared';
- * loadChildren: () => import(`@codete-ngrx-quick-start/realtime-process`)
+ * import { ProcessController, Process } from '@codete-ngrx-quick-start/shared/src';
+ * loadChildren: () => import(`@codete-ngrx-quick-start/realtime-process/src`)
  *
  */
 
@@ -759,7 +759,7 @@ export class BrowserCodeCut {
         },
         /**
          * what can be done more
-         * import * as json2 from '@codete-rxjs-quick-start/shared/assets/shared/';
+         * import * as json2 from '@codete-rxjs-quick-start/shared/assets/shared//src';
   console.log({ json2 })
 
   declare module "*.json" {

@@ -1,16 +1,16 @@
 //#region imports
 import { BuildOptions, BuildProcessFeature, EnvironmentConfig } from '../../features';
-import { crossPlatformPath, fse } from 'tnp-core'
-import { path } from 'tnp-core'
-import { glob } from 'tnp-core';
+import { crossPlatformPath, fse } from 'tnp-core/src'
+import { path } from 'tnp-core/src'
+import { glob } from 'tnp-core/src';
 import * as getDependents from 'npm-get-dependents';
 import chalk from 'chalk';
 import { Project } from './project';
-import { _ } from 'tnp-core';
-import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
-import { config } from 'tnp-config';
-import { Log } from 'ng2-logger';
+import { _ } from 'tnp-core/src';
+import { Models } from 'tnp-models/src';
+import { Helpers } from 'tnp-helpers/src';
+import { config } from 'tnp-config/src';
+import { Log } from 'ng2-logger/src';
 import { LibProjectStandalone } from './lib-project-standalone.backend';
 import { LibProjectSmartContainer } from './lib-project-smart-container.backend';
 import { LibProjectVscodeExt } from './lib-project-vscode-ext';

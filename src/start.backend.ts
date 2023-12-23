@@ -1,5 +1,5 @@
-import { path, Helpers, chokidar } from 'tnp-core';
-import { fse, crossPlatformPath } from 'tnp-core';
+import { path, Helpers, chokidar } from 'tnp-core/src';
+import { fse, crossPlatformPath } from 'tnp-core/src';
 
 declare const global: any;
 if (global.globalSystemToolMode) {
@@ -56,8 +56,8 @@ if (Object.keys(global['ENV']).length === 0) {
 }
 
 //#region imports
-import { _ } from 'tnp-core';
-import { config } from 'tnp-config';
+import { _ } from 'tnp-core/src';
+import { config } from 'tnp-config/src';
 import scriptsFnArr from './lib/scripts/index';
 
 import axios from 'axios';
@@ -70,10 +70,10 @@ import { Project } from './lib/project';
 
 
 // import { ConsoleUi } from './console-ui';
-import { Helpers as TnpHelpers } from 'tnp-helpers';
+import { Helpers as TnpHelpers } from 'tnp-helpers/src';
 
-import { CLASS } from 'typescript-class-helpers';
-import { CLI } from 'tnp-cli';
+import { CLASS } from 'typescript-class-helpers/src';
+import { CLI } from 'tnp-cli/src';
 //#endregion
 
 
@@ -278,5 +278,3 @@ export async function start(
 
 
 }
-
-

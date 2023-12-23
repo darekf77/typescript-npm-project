@@ -1,13 +1,13 @@
 //#region @backend
-import { _, crossPlatformPath } from 'tnp-core';
-import { fse } from 'tnp-core';
-import { path } from 'tnp-core';
+import { _, crossPlatformPath } from 'tnp-core/src';
+import { fse } from 'tnp-core/src';
+import { path } from 'tnp-core/src';
 // import { notify } from 'node-notifier';
 // import toast from 'powertoast';
 
 import { Project } from '../../project';
-import { Helpers } from 'tnp-helpers';
-import { config, ConfigModels } from 'tnp-config';
+import { Helpers } from 'tnp-helpers/src';
+import { config, ConfigModels } from 'tnp-config/src';
 import { MESSAGES } from '../../constants';
 
 export async function $LINK_PROJECTS_AND_FILES(args: string, exit = true) {

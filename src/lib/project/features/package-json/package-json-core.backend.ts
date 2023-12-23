@@ -1,16 +1,16 @@
 //#region imports
-import { fse, CoreConfig, crossPlatformPath } from 'tnp-core'
-import { path } from 'tnp-core'
+import { fse, CoreConfig, crossPlatformPath } from 'tnp-core/src'
+import { path } from 'tnp-core/src'
 import * as JSON5 from 'json5';
-import * as json5Write from 'json10-writer';
-import { _ } from 'tnp-core';
+import * as json5Write from 'json10-writer/src';
+import { _ } from 'tnp-core/src';
 import * as semver from 'semver';
 import chalk from 'chalk';
 
-import { config, ConfigModels } from 'tnp-config';
+import { config, ConfigModels } from 'tnp-config/src';
 import { Project } from '../../abstract';
-import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
+import { Models } from 'tnp-models/src';
+import { Helpers } from 'tnp-helpers/src';
 //#endregion
 
 const trace = !global.hideLog;

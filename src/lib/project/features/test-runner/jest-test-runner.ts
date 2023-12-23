@@ -1,16 +1,16 @@
 //#region @backend
-import { _, crossPlatformPath } from 'tnp-core';
-import { path } from 'tnp-core'
+import { _, crossPlatformPath } from 'tnp-core/src';
+import { path } from 'tnp-core/src'
 import { FeatureForProject } from '../../abstract';
 import type { Project } from '../../abstract';
 //#endregion
 
-import { config } from 'tnp-config';
-import { Helpers } from 'tnp-helpers';
+import { config } from 'tnp-config/src';
+import { Helpers } from 'tnp-helpers/src';
 import type { ProjectIsomorphicLib } from '../../project-specyfic/project-isomorphic-lib';
-import { BuildOptions } from 'tnp-db';
-import { CLASS } from 'typescript-class-helpers';
-import { Models } from 'tnp-models';
+import { BuildOptions } from 'tnp-db/src';
+import { CLASS } from 'typescript-class-helpers/src';
+import { Models } from 'tnp-models/src';
 import { tempSourceFolder } from '../../../constants';
 
 @CLASS.NAME('JestTestRunner')
@@ -75,4 +75,3 @@ export class JestTestRunner
 
 
 }
-

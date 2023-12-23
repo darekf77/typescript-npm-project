@@ -1,3 +1,3 @@
 //#region @backend
-import { _ } from 'tnp-core';
+import { _ } from 'tnp-core/src';
 //#endregion

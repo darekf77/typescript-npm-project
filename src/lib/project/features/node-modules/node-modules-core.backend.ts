@@ -1,10 +1,10 @@
 //#region imports
-import { crossPlatformPath, path } from 'tnp-core';
-import { fse } from 'tnp-core';
-import { _ } from 'tnp-core';
-import { config } from 'tnp-config';
+import { crossPlatformPath, path } from 'tnp-core/src';
+import { fse } from 'tnp-core/src';
+import { _ } from 'tnp-core/src';
+import { config } from 'tnp-config/src';
 import { Project } from '../../abstract';
-import { Helpers } from 'tnp-helpers';
+import { Helpers } from 'tnp-helpers/src';
 import { FeatureForProject } from '../../abstract';
 import {
   dedupePackages, nodeModulesExists, nodeModulesHasOnlyLinks

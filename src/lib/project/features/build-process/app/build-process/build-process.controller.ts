@@ -1,7 +1,7 @@
 //#region imports
-import { Morphi as Firedev } from 'morphi';
+import { Morphi as Firedev } from 'morphi/src';
 import { BuildProcess } from './build-process';
-import { _ } from 'tnp-core';
+import { _ } from 'tnp-core/src';
 import {
   randUserName,
   randAddress,

@@ -1,16 +1,16 @@
 //#region imports
 //#region @backend
-import { IncCompiler } from 'incremental-compiler';
+import { IncCompiler } from 'incremental-compiler/src';
 //#endregion
 import {
   //#region @backend
   path, crossPlatformPath
   //#endregion
-} from 'tnp-core'
-import { _ } from 'tnp-core';
+} from 'tnp-core/src'
+import { _ } from 'tnp-core/src';
 import { Project } from './project';
-import { Helpers } from 'tnp-helpers';
-import { config } from 'tnp-config';
+import { Helpers } from 'tnp-helpers/src';
+import { config } from 'tnp-config/src';
 //#endregion
 
 export abstract class FeatureCompilerForProject<RES_ASYNC = any, RES_SYNC = any, ADDITIONAL_DATA = any>

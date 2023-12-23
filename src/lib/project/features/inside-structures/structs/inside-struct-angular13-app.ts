@@ -1,13 +1,13 @@
 //#region @backend
-import { CLASS } from 'typescript-class-helpers';
-import { crossPlatformPath, path, _ } from 'tnp-core';
-import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
+import { CLASS } from 'typescript-class-helpers/src';
+import { crossPlatformPath, path, _ } from 'tnp-core/src';
+import { Models } from 'tnp-models/src';
+import { Helpers } from 'tnp-helpers/src';
 import { Project } from '../../../abstract/project/project';
 import { InsideStruct } from '../inside-struct';
 import { BaseInsideStruct } from './base-inside-struct';
 import { resolvePathToAsset } from './inside-struct-helpers';
-import { config } from 'tnp-config';
+import { config } from 'tnp-config/src';
 import { getLoader } from './loaders/loaders';
 import { ID_LOADER_PRE_BOOTSTRAP, PRE_LOADER_NG_IF_INITED } from './inside-struct-constants';
 import { imageLoader } from './loaders/image-loader';
@@ -201,18 +201,18 @@ ${appModuleFile}
           let appComponentFile = Helpers.readFile(appComponentFilePath);
 
           appComponentFile = appComponentFile.replace(
-            `import { Firedev } from 'firedev';`,
-            `import { Firedev } from 'firedev/${this.websql ? config.folder.websql : config.folder.browser}';`,
+            `import { Firedev } from 'firedev/src';`,
+            `import { Firedev } from 'firedev/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
           );
 
           appComponentFile = appComponentFile.replace(
-            `import { Morphi } from 'morphi';`,
-            `import { Morphi } from 'morphi/${this.websql ? config.folder.websql : config.folder.browser}';`,
+            `import { Morphi } from 'morphi/src';`,
+            `import { Morphi } from 'morphi/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
           );
 
           appComponentFile = appComponentFile.replace(
-            `from 'firedev-ui';`,
-            `from 'firedev-ui/${this.websql ? config.folder.websql : config.folder.browser}';`,
+            `from 'firedev-ui/src';`,
+            `from 'firedev-ui/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
           );
 
           appComponentFile = appComponentFile.replace(
@@ -236,8 +236,8 @@ ${appModuleFile}
           let appModuleFile = Helpers.readFile(appComponentFilePath);
 
           appModuleFile = appModuleFile.replace(
-            `import { FiredevAdminModeConfigurationModule } from 'firedev-ui';`,
-            `import { FiredevAdminModeConfigurationModule } from 'firedev-ui/${this.websql ? config.folder.websql : config.folder.browser}';`,
+            `import { FiredevAdminModeConfigurationModule } from 'firedev-ui/src';`,
+            `import { FiredevAdminModeConfigurationModule } from 'firedev-ui/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
           );
 
           Helpers.writeFile(appComponentFilePath, appModuleFile);
@@ -267,18 +267,18 @@ ${appModuleFile}
           }
 
           appMainFile = appMainFile.replace(
-            `import { Helpers } from 'tnp-core';`,
-            `import { Helpers } from 'tnp-core/${this.websql ? config.folder.websql : config.folder.browser}';`,
+            `import { Helpers } from 'tnp-core/src';`,
+            `import { Helpers } from 'tnp-core/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
           )
 
           appMainFile = appMainFile.replace(
-            `import { FiredevAdmin } from 'firedev-ui';`,
-            `import { FiredevAdmin } from 'firedev-ui/${this.websql ? config.folder.websql : config.folder.browser}';`,
+            `import { FiredevAdmin } from 'firedev-ui/src';`,
+            `import { FiredevAdmin } from 'firedev-ui/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
           )
 
           appMainFile = appMainFile.replace(
-            `import { Stor } from 'firedev-storage';`,
-            `import { Stor } from 'firedev-storage/${this.websql ? config.folder.websql : config.folder.browser}';`,
+            `import { Stor } from 'firedev-storage/src';`,
+            `import { Stor } from 'firedev-storage/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
           );
 
 

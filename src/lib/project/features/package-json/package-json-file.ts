@@ -1,11 +1,11 @@
 //#region imports
 //#region @backend
-import { path } from 'tnp-core';
+import { path } from 'tnp-core/src';
 //#endregion
-import { config, ConfigModels } from 'tnp-config';
-import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
-import { _ } from 'tnp-core';
+import { config, ConfigModels } from 'tnp-config/src';
+import { Models } from 'tnp-models/src';
+import { Helpers } from 'tnp-helpers/src';
+import { _ } from 'tnp-core/src';
 //#endregion
 
 

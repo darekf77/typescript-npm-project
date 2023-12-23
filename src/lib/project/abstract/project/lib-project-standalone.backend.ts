@@ -1,8 +1,8 @@
-import { CLI } from "tnp-cli";
-import { config } from "tnp-config";
-import { crossPlatformPath, path, _ } from "tnp-core";
-import { Helpers } from "tnp-helpers";
-import { Models } from "tnp-models";
+import { CLI } from "tnp-cli/src";
+import { config } from "tnp-config/src";
+import { crossPlatformPath, path, _ } from "tnp-core/src";
+import { Helpers } from "tnp-helpers/src";
+import { Models } from "tnp-models/src";
 import { AppBuildConfig } from "../../features/docs-app-build-config.backend";
 import { LibPorjectBase } from "./lib-project-base.backend";
 import { Project } from "./project";
@@ -293,4 +293,3 @@ export function updateChildrenVersion(project: Project, newVersion, name, update
   Helpers.log(`[release - ${name}][lib-proj] children of ${project.genericName}: \n${project.children.map(c => c.location)}\n`)
   project.children.forEach(childProject => updateChildrenVersion(childProject, newVersion, name, updatedProjectw));
 }
-

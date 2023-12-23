@@ -1,5 +1,5 @@
-import { crossPlatformPath } from "tnp-core";
-import { Helpers } from "tnp-helpers";
+import { crossPlatformPath } from "tnp-core/src";
+import { Helpers } from "tnp-helpers/src";
 
 
 async function SELECT_JAVA() {

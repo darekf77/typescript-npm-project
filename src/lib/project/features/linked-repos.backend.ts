@@ -1,7 +1,7 @@
-import { config, PREFIXES } from "tnp-config";
-import { path } from "tnp-core";
-import { Helpers } from "tnp-helpers";
-import { Models } from "tnp-models";
+import { config, PREFIXES } from "tnp-config/src";
+import { path } from "tnp-core/src";
+import { Helpers } from "tnp-helpers/src";
+import { Models } from "tnp-models/src";
 import { FeatureForProject } from "../abstract/feature-for-project";
 import { Project } from "../abstract/project";
 

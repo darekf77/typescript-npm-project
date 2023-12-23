@@ -1,4 +1,4 @@
-import { Helpers } from 'tnp-helpers';
+import { Helpers } from 'tnp-helpers/src';
 
 
 function $BASH_CONFIG_VNC_START() {

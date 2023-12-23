@@ -1,6 +1,6 @@
-import { path } from 'tnp-core'
-import { Helpers } from 'tnp-helpers';
-import { config, ConfigModels } from 'tnp-config';
+import { path } from 'tnp-core/src'
+import { Helpers } from 'tnp-helpers/src';
+import { config, ConfigModels } from 'tnp-config/src';
 
 import { Project } from '../project/abstract/project';
 import { PackagesRecognition } from '../project/features/package-recognition/packages-recognition';
@@ -193,4 +193,3 @@ export default {
   LATEST_SYNC: Helpers.CLIWRAP(LATEST_SYNC, 'LATEST_SYNC'),
   BRANCH_NAME: Helpers.CLIWRAP(BRANCH_NAME, 'BRANCH_NAME'),
 };
-

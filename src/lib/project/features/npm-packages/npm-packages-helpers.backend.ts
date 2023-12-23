@@ -1,13 +1,13 @@
 //#region imports
 import chalk from 'chalk';
-import { path } from 'tnp-core';
-import { fse } from 'tnp-core';
-import { _, moment } from 'tnp-core';
+import { path } from 'tnp-core/src';
+import { fse } from 'tnp-core/src';
+import { _, moment } from 'tnp-core/src';
 
 import { Project } from '../../abstract';
-import { Helpers } from 'tnp-helpers';
-import { Models } from 'tnp-models';
-import { config } from 'tnp-config';
+import { Helpers } from 'tnp-helpers/src';
+import { Models } from 'tnp-models/src';
+import { config } from 'tnp-config/src';
 //#endregion
 
 

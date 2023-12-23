@@ -1,8 +1,8 @@
-import { CLI } from "tnp-cli";
-import { config } from "tnp-config";
-import { crossPlatformPath, fse, path, _ } from "tnp-core";
-import { Helpers } from "tnp-helpers";
-import { Models } from "tnp-models";
+import { CLI } from "tnp-cli/src";
+import { config } from "tnp-config/src";
+import { crossPlatformPath, fse, path, _ } from "tnp-core/src";
+import { Helpers } from "tnp-helpers/src";
+import { Models } from "tnp-models/src";
 import type { LibProject } from "./lib-project.backend";
 import { Project } from "./project";
 
@@ -66,4 +66,3 @@ export class LibProjectVscodeExt {
 
 
 }
-

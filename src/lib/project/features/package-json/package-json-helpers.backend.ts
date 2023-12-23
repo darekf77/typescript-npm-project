@@ -1,12 +1,12 @@
 //#region imports
-import { crossPlatformPath, os, _ } from 'tnp-core';
+import { crossPlatformPath, os, _ } from 'tnp-core/src';
 import * as JSON5 from 'json5';
 import chalk from 'chalk';
 import * as semver from 'semver';
 import { Project } from '../../abstract';
-import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
-import { config, ConfigModels } from 'tnp-config';
+import { Models } from 'tnp-models/src';
+import { Helpers } from 'tnp-helpers/src';
+import { config, ConfigModels } from 'tnp-config/src';
 
 
 // console.log([

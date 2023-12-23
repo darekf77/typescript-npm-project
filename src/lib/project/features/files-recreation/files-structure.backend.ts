@@ -1,14 +1,14 @@
-import { path } from 'tnp-core'
-import { _ } from 'tnp-core';
+import { path } from 'tnp-core/src'
+import { _ } from 'tnp-core/src';
 import chalk from 'chalk';
-import { fse } from 'tnp-core'
+import { fse } from 'tnp-core/src'
 
-import { Helpers } from 'tnp-helpers';
+import { Helpers } from 'tnp-helpers/src';
 import { FeatureForProject, Project } from '../../abstract';
-import { config } from 'tnp-config';
+import { config } from 'tnp-config/src';
 import { ProjectFactory } from '../../../scripts/NEW-PROJECT_FILES_MODULES';
-import { PROGRESS_DATA } from 'tnp-models';
-import { Models } from 'tnp-models';
+import { PROGRESS_DATA } from 'tnp-models/src';
+import { Models } from 'tnp-models/src';
 import { EnvironmentConfig } from '../environment-config';
 import { argsToClear } from '../../../constants';
 

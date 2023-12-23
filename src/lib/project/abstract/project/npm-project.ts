@@ -1,15 +1,15 @@
 //#region @backend
-import { _, CoreConfig } from 'tnp-core';
-import { fse } from 'tnp-core'
-import { path } from 'tnp-core'
+import { _, CoreConfig } from 'tnp-core/src';
+import { fse } from 'tnp-core/src'
+import { path } from 'tnp-core/src'
 import chalk from 'chalk';
 import * as semver from 'semver';
 //#endregion
 
 import type { Project } from './project';
-import { Models } from 'tnp-models';
-import { Helpers, Project as $Project } from 'tnp-helpers';
-import { config, ConfigModels } from 'tnp-config';
+import { Models } from 'tnp-models/src';
+import { Helpers, Project as $Project } from 'tnp-helpers/src';
+import { config, ConfigModels } from 'tnp-config/src';
 
 export class NpmProject {
 

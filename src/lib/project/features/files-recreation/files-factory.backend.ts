@@ -1,8 +1,8 @@
 import { FeatureForProject } from '../../abstract';
-import { fse } from 'tnp-core'
-import { path } from 'tnp-core'
-import { _ } from 'tnp-core';
-import { Helpers } from 'tnp-helpers';
+import { fse } from 'tnp-core/src'
+import { path } from 'tnp-core/src'
+import { _ } from 'tnp-core/src';
+import { Helpers } from 'tnp-helpers/src';
 
 
 export class FilesFactory extends FeatureForProject {
@@ -48,7 +48,7 @@ export class FilesFactory extends FeatureForProject {
     this.create(relativePath, kebebCaseName, `${fileNameWithoutExt}.ts`)
       .file(
       `
-import { Morphi } from 'morphi';
+import { Morphi } from 'morphi/src';
 
 export interface I${fileNameWithoutExt} {
   id?: number;
@@ -87,7 +87,7 @@ export class ${fileNameWithoutExt} extends Morphi.Base.Entity<${fileNameWithoutE
     this.create(relativePath, kebebCaseName, `${NameController}.ts`)
       .file(
       `
-import { Morphi } from 'morphi';
+import { Morphi } from 'morphi/src';
 import { ${fileNameWithoutExt} } from './${fileNameWithoutExt}';
 
 @Morphi.Controller({

@@ -1,14 +1,14 @@
-import { config } from 'tnp-config';
+import { config } from 'tnp-config/src';
 
 import {
   _,
   //#region @backend
   crossPlatformPath, path
   //#endregion
-} from 'tnp-core';
+} from 'tnp-core/src';
 
-import { Helpers } from 'tnp-helpers';
-import { Models } from 'tnp-models';
+import { Helpers } from 'tnp-helpers/src';
+import { Models } from 'tnp-models/src';
 import { EXPORT_TEMPLATE } from '../../../../templates';
 import { Project } from '../../../abstract/project/project';
 import { DEFAULT_PORT, PortUtils } from '../../../../constants';

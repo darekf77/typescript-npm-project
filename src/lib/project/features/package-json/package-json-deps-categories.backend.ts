@@ -1,12 +1,12 @@
-import { _ } from 'tnp-core';
+import { _ } from 'tnp-core/src';
 import * as JSON5 from 'json5';
 import * as inquirer from 'inquirer';
 
 import { FeatureForProject, Project } from '../../abstract';
 import { getAndTravelCoreDeps } from './package-json-helpers.backend';
-import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
-import { ConfigModels, CoreLibCategoryArr } from 'tnp-config';
+import { Models } from 'tnp-models/src';
+import { Helpers } from 'tnp-helpers/src';
+import { ConfigModels, CoreLibCategoryArr } from 'tnp-config/src';
 
 export type GetPkgType = { category: ConfigModels.CoreLibCategory; version: string; };
 

@@ -1,9 +1,9 @@
 //#region imports / exports
-import { _ } from 'tnp-core';
-import { path } from 'tnp-core'
+import { _ } from 'tnp-core/src';
+import { path } from 'tnp-core/src'
 
-import { config } from 'tnp-config';
-import { Helpers } from 'tnp-helpers';
+import { config } from 'tnp-config/src';
+import { Helpers } from 'tnp-helpers/src';
 import { FeatureForProject } from '../abstract/feature-for-project';
 import { Project } from '../abstract/project';
 

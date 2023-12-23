@@ -1,9 +1,9 @@
-import { _, crossPlatformPath } from 'tnp-core';
-import { fse } from 'tnp-core'
-import { path } from 'tnp-core'
-import { Models } from 'tnp-models';
-import { config } from 'tnp-config';
-import { Helpers } from 'tnp-helpers';
+import { _, crossPlatformPath } from 'tnp-core/src';
+import { fse } from 'tnp-core/src'
+import { path } from 'tnp-core/src'
+import { Models } from 'tnp-models/src';
+import { config } from 'tnp-config/src';
+import { Helpers } from 'tnp-helpers/src';
 import '../global-typings';
 
 const PATHES = {

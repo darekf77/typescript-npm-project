@@ -1,5 +1,5 @@
-import { ConfigModels } from 'tnp-config';
-import { Models } from 'tnp-models';
+import { ConfigModels } from 'tnp-config/src';
+import { Models } from 'tnp-models/src';
 import { Project } from '../../abstract/project/project';
 
 export type Opt = {

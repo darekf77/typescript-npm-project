@@ -1,12 +1,12 @@
 //#region imports
-import { crossPlatformPath, _ } from 'tnp-core';
-import { fse } from 'tnp-core';
+import { crossPlatformPath, _ } from 'tnp-core/src';
+import { fse } from 'tnp-core/src';
 import chalk from 'chalk';
-import { Helpers } from 'tnp-helpers';
-import { path } from 'tnp-core';
-import { config } from 'tnp-config';
-import { Models, PROGRESS_DATA } from 'tnp-models';
-import { os } from 'tnp-core';
+import { Helpers } from 'tnp-helpers/src';
+import { path } from 'tnp-core/src';
+import { config } from 'tnp-config/src';
+import { Models, PROGRESS_DATA } from 'tnp-models/src';
+import { os } from 'tnp-core/src';
 import { FeatureForProject, Project } from '../abstract';
 import * as dateformat from 'dateformat';
 import { html2md } from './html-to-md';

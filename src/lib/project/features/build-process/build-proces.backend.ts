@@ -1,21 +1,21 @@
 //#region imports
-import { _ } from 'tnp-core';
+import { _ } from 'tnp-core/src';
 import chalk from 'chalk';
-import { fse } from 'tnp-core'
-import { path } from 'tnp-core'
-import { glob } from 'tnp-core';
+import { fse } from 'tnp-core/src'
+import { path } from 'tnp-core/src'
+import { glob } from 'tnp-core/src';
 
 import { FeatureForProject, Project } from '../../abstract';
-import { BuildOptions } from 'tnp-db';
-import { Models } from 'tnp-models';
-import { config, ConfigModels } from 'tnp-config';
-import { Helpers } from 'tnp-helpers';
-import { PROGRESS_DATA } from 'tnp-models';
+import { BuildOptions } from 'tnp-db/src';
+import { Models } from 'tnp-models/src';
+import { config, ConfigModels } from 'tnp-config/src';
+import { Helpers } from 'tnp-helpers/src';
+import { PROGRESS_DATA } from 'tnp-models/src';
 import { EnvironmentConfig } from '../environment-config';
-import { Log } from 'ng2-logger';
-import { Morphi as Firedev } from 'morphi';
+import { Log } from 'ng2-logger/src';
+import { Morphi as Firedev } from 'morphi/src';
 import { BuildProcess, BuildProcessController } from './app/build-process';
-import { CLI } from 'tnp-cli';
+import { CLI } from 'tnp-cli/src';
 // import { FiredevBinaryFile, FiredevBinaryFileController, FiredevFile, FiredevFileController, FiredevFileCss } from 'firedev-ui';
 
 const log = Log.create(__filename)
@@ -216,5 +216,3 @@ You can check info about build in ${CLI.chalk.bold(host)}
   }
 
 }
-
-

@@ -1,13 +1,13 @@
 //#region @backend
-import { _ } from 'tnp-core';
-import { path } from 'tnp-core'
+import { _ } from 'tnp-core/src';
+import { path } from 'tnp-core/src'
 import { FeatureForProject } from '../../abstract';
-import { child_process } from 'tnp-core';
+import { child_process } from 'tnp-core/src';
 //#endregion
 
-import { config } from 'tnp-config';
-import { Helpers } from 'tnp-helpers';
-import { CLASS } from 'typescript-class-helpers';
+import { config } from 'tnp-config/src';
+import { Helpers } from 'tnp-helpers/src';
+import { CLASS } from 'typescript-class-helpers/src';
 
 @CLASS.NAME('MochaTestRunner')
 export class MochaTestRunner
@@ -61,4 +61,3 @@ export class MochaTestRunner
 
 
 }
-

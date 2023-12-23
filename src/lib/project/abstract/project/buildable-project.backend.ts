@@ -1,15 +1,15 @@
 //#region imports
 import { PackagesRecognition } from '../../features/package-recognition/packages-recognition';
-import { BuildOptions } from 'tnp-db';
+import { BuildOptions } from 'tnp-db/src';
 import * as inquirer from 'inquirer';
-import { crossPlatformPath, path } from 'tnp-core';
+import { crossPlatformPath, path } from 'tnp-core/src';
 import chalk from 'chalk';
 
 
-import { _ } from 'tnp-core';
-import { config } from 'tnp-config';
+import { _ } from 'tnp-core/src';
+import { config } from 'tnp-config/src';
 import { Project } from './project';
-import { Helpers, Project as $Project } from 'tnp-helpers';
+import { Helpers, Project as $Project } from 'tnp-helpers/src';
 import { CopyManager } from '../../features/copy-manager';
 
 import { CopyManagerStandalone } from '../../features/copy-manager/copy-manager-standalone.backend';

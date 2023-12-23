@@ -1,15 +1,15 @@
 //#region imports
-import { fse } from 'tnp-core'
-import { path } from 'tnp-core'
-import { _ } from 'tnp-core';
+import { fse } from 'tnp-core/src'
+import { path } from 'tnp-core/src'
+import { _ } from 'tnp-core/src';
 import chalk from 'chalk';
 import * as json5 from 'json5';
 
 import { Project } from './project';
-import { Helpers } from 'tnp-helpers';
+import { Helpers } from 'tnp-helpers/src';
 
-import { Models } from 'tnp-models';
-import { config } from 'tnp-config';
+import { Models } from 'tnp-models/src';
+import { config } from 'tnp-config/src';
 import { PortUtils } from '../../../constants';
 //#endregion
 

@@ -1,5 +1,5 @@
-import { crossPlatformPath, path, _ } from "tnp-core";
-import { Helpers } from "tnp-helpers";
+import { crossPlatformPath, path, _ } from "tnp-core/src";
+import { Helpers } from "tnp-helpers/src";
 import { Project } from "../../abstract/project/project";
 
 export class SourceMappingUrl {

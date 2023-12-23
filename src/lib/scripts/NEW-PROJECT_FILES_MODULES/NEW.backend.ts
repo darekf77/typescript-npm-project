@@ -1,12 +1,12 @@
 //#region @backend
-import { _, crossPlatformPath, path } from 'tnp-core';
-import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
+import { _, crossPlatformPath, path } from 'tnp-core/src';
+import { Models } from 'tnp-models/src';
+import { Helpers } from 'tnp-helpers/src';
 import { ProjectFactory } from './project-factory.backend';
-import { ConfigModels, TAGS, backendNodejsOnlyFiles, extAllowedToExportAndReplaceTSJSCodeFiles, frontendFiles, notNeededForExportFiles } from 'tnp-config';
+import { ConfigModels, TAGS, backendNodejsOnlyFiles, extAllowedToExportAndReplaceTSJSCodeFiles, frontendFiles, notNeededForExportFiles } from 'tnp-config/src';
 import { Project } from '../../project';
-import { config } from 'tnp-config';
-import { MagicRenamer } from 'magic-renamer';
+import { config } from 'tnp-config/src';
+import { MagicRenamer } from 'magic-renamer/src';
 
 
 export async function RM(args: string, exit = true) {

@@ -1,4 +1,4 @@
-import { Helpers } from 'tnp-core';
+import { Helpers } from 'tnp-core/src';
 
 export function codeCuttFn(cutIftrue: boolean) {
   return function (expression: string, reservedExpOne: any, reservedExpSec?: string) {

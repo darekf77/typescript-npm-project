@@ -1,5 +1,5 @@
 import { Project } from '../../project';
-import { Helpers } from 'tnp-helpers';
+import { Helpers } from 'tnp-helpers/src';
 
 const testTasks = 'Test task'
 

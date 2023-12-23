@@ -1,11 +1,11 @@
-import { crossPlatformPath, _, path } from 'tnp-core';
-import { config } from 'tnp-config'
-import { Helpers } from 'tnp-helpers';
-import { Models } from 'tnp-models';
+import { crossPlatformPath, _, path } from 'tnp-core/src';
+import { config } from 'tnp-config/src'
+import { Helpers } from 'tnp-helpers/src';
+import { Models } from 'tnp-models/src';
 import { FeatureForProject } from '../../abstract';
 import { folder_shared_folder_info } from '../../../constants';
-import { COMPILER_POOLING, incrementalWatcher } from 'incremental-compiler';
-import { IncrementalWatcherInstance } from 'incremental-compiler';
+import { COMPILER_POOLING, incrementalWatcher } from 'incremental-compiler/src';
+import { IncrementalWatcherInstance } from 'incremental-compiler/src';
 
 export class AssetsFileListGenerator extends FeatureForProject {
 

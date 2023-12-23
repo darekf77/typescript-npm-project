@@ -1,4 +1,4 @@
-import { _ } from 'tnp-core';
+import { _ } from 'tnp-core/src';
 import { FeatureForProject } from '../abstract';
 
 export class CompilerCache extends FeatureForProject {

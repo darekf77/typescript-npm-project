@@ -1,12 +1,12 @@
 //#region @backend
 import chalk from 'chalk';
 export { ChildProcess } from 'child_process';
-import { path } from 'tnp-core';
+import { path } from 'tnp-core/src';
 //#endregion
-import { _ } from 'tnp-core';
-import { Helpers } from 'tnp-helpers';
+import { _ } from 'tnp-core/src';
+import { Helpers } from 'tnp-helpers/src';
 import { Project } from './project';
-import { config } from 'tnp-config';
+import { config } from 'tnp-config/src';
 
 export abstract class BaseProject {
 

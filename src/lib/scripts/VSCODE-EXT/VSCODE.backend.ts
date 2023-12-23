@@ -1,6 +1,6 @@
-import { Helpers } from 'tnp-helpers';
-import { path, _, crossPlatformPath, os } from 'tnp-core';
-import { config } from 'tnp-config';
+import { Helpers } from 'tnp-helpers/src';
+import { path, _, crossPlatformPath, os } from 'tnp-core/src';
+import { config } from 'tnp-config/src';
 import { Project } from '../../project/abstract/project';
 
 export function $VSCODE_EXT(args: string, exit = true) {

@@ -1,12 +1,12 @@
 //#region @backend
-import { path } from 'tnp-core'
-import { _ } from 'tnp-core';
+import { path } from 'tnp-core/src'
+import { _ } from 'tnp-core/src';
 import { Project } from '../abstract';
-import { config } from 'tnp-config';
+import { config } from 'tnp-config/src';
 //#endregion
-import { BuildOptions } from 'tnp-db';
-import { CLASS } from 'typescript-class-helpers';
-import { Helpers } from 'tnp-helpers';
+import { BuildOptions } from 'tnp-db/src';
+import { CLASS } from 'typescript-class-helpers/src';
+import { Helpers } from 'tnp-helpers/src';
 
 //#region @backend
 @CLASS.NAME('ProjectDocker')
@@ -116,5 +116,3 @@ export class ProjectDocker
     //#endregion
   }
 }
-
-

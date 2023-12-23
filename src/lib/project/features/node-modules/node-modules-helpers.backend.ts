@@ -1,13 +1,13 @@
-import { path } from 'tnp-core'
-import { fse } from 'tnp-core'
-import { _ } from 'tnp-core';
-import { CLI } from 'tnp-cli';
-import { glob } from 'tnp-core';
+import { path } from 'tnp-core/src'
+import { fse } from 'tnp-core/src'
+import { _ } from 'tnp-core/src';
+import { CLI } from 'tnp-cli/src';
+import { glob } from 'tnp-core/src';
 
 import { Project } from '../../abstract';
-import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
-import { config } from 'tnp-config';
+import { Models } from 'tnp-models/src';
+import { Helpers } from 'tnp-helpers/src';
+import { config } from 'tnp-config/src';
 
 //#region dedupe packages
 export function dedupePackages(projectLocation: string, packagesNames?: string[], countOnly = false, warnings = true) {

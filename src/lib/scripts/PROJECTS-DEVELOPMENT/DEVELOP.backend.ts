@@ -1,17 +1,17 @@
 //#region imports
-import { _, crossPlatformPath } from 'tnp-core';
-import { fse } from 'tnp-core'
+import { _, crossPlatformPath } from 'tnp-core/src';
+import { fse } from 'tnp-core/src'
 import { Project } from '../../project';
-import { Helpers } from 'tnp-helpers';
-import { path } from 'tnp-core'
-import { config } from 'tnp-config';
+import { Helpers } from 'tnp-helpers/src';
+import { path } from 'tnp-core/src'
+import { config } from 'tnp-config/src';
 // const { notify } = require('node-notifier');
-import { CLASS } from 'typescript-class-helpers';
+import { CLASS } from 'typescript-class-helpers/src';
 // import toast from 'powertoast';
 import * as open from 'open';
 import chalk from 'chalk';
 import { URL } from 'url';
-import { incrementalWatcher, IncrementalWatcherOptions } from 'incremental-compiler';
+import { incrementalWatcher, IncrementalWatcherOptions } from 'incremental-compiler/src';
 import { PackagesRecognition } from '../../project/features/package-recognition/packages-recognition';
 import { BrowserCodeCut } from '../../project/compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
 

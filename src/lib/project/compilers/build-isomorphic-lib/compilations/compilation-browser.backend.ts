@@ -5,19 +5,19 @@ import {
   fse,
   rimraf,
   crossPlatformPath,
-} from 'tnp-core';
-import { IncCompiler } from 'incremental-compiler';
-import { config, ConfigModels } from 'tnp-config';
-import { Helpers } from 'tnp-helpers';
+} from 'tnp-core/src';
+import { IncCompiler } from 'incremental-compiler/src';
+import { config, ConfigModels } from 'tnp-config/src';
+import { Helpers } from 'tnp-helpers/src';
 import { BackendCompilation } from './compilation-backend.backend';
-import { BuildOptions } from 'tnp-db';
+import { BuildOptions } from 'tnp-db/src';
 import { Project } from '../../../abstract/project/project';
-import { Models } from 'tnp-models';
-import { JSON10 } from 'json10';
+import { Models } from 'tnp-models/src';
+import { JSON10 } from 'json10/src';
 import { CodeCut } from '../code-cut/code-cut.backend';
 import { codeCuttFn } from '../code-cut/cut-fn.backend';
-import { CLASS } from 'typescript-class-helpers';
-import { TAGS } from 'tnp-config';
+import { CLASS } from 'typescript-class-helpers/src';
+import { TAGS } from 'tnp-config/src';
 //#endregion
 
 @IncCompiler.Class({ className: 'BroswerCompilation' })

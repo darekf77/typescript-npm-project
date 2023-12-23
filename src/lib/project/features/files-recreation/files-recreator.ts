@@ -1,16 +1,16 @@
 //#region @backend
-import { fse, crossPlatformPath } from 'tnp-core'
-import { path } from 'tnp-core'
+import { fse, crossPlatformPath } from 'tnp-core/src'
+import { path } from 'tnp-core/src'
 import * as JSON5 from 'json5';
-import { glob } from 'tnp-core';
-import { _ } from 'tnp-core';
+import { glob } from 'tnp-core/src';
+import { _ } from 'tnp-core/src';
 // local
 import { Project } from '../../abstract';
-import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
-import { config, ConfigModels } from 'tnp-config';
+import { Models } from 'tnp-models/src';
+import { Helpers } from 'tnp-helpers/src';
+import { config, ConfigModels } from 'tnp-config/src';
 import { FeatureForProject } from '../../abstract';
-import { CLI } from 'tnp-cli';
+import { CLI } from 'tnp-cli/src';
 
 
 

@@ -1,12 +1,12 @@
-import { path } from 'tnp-core'
+import { path } from 'tnp-core/src'
 import * as semver from 'semver';
 
 import { Project } from '../../abstract';
-import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
-import { config } from 'tnp-config';
+import { Models } from 'tnp-models/src';
+import { Helpers } from 'tnp-helpers/src';
+import { config } from 'tnp-config/src';
 
-import { _ } from 'tnp-core';
+import { _ } from 'tnp-core/src';
 import { reolveAndSaveDeps, removeDependencyAndSave, setDependencyAndSave, findVersionRange } from './package-json-helpers.backend';
 import { PackageJsonCore } from './package-json-core.backend';
 import { PackageJsonDepsCoreCategories } from './package-json-deps-categories.backend';

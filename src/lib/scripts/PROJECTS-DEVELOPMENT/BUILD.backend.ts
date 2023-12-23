@@ -1,12 +1,12 @@
 //#region imports
-import { _, crossPlatformPath } from 'tnp-core';
+import { _, crossPlatformPath } from 'tnp-core/src';
 import * as express from 'express';
-import { path } from 'tnp-core';
+import { path } from 'tnp-core/src';
 import { Project } from '../../project';
 import type { ProjectDocker } from '../../project';
-import { config, PREFIXES } from 'tnp-config';
-import { Helpers } from 'tnp-helpers';
-import { Models } from 'tnp-models';
+import { config, PREFIXES } from 'tnp-config/src';
+import { Helpers } from 'tnp-helpers/src';
+import { Models } from 'tnp-models/src';
 //#endregion
 
 //#region BUILD

@@ -1,9 +1,9 @@
 //#region @backend
-import { _ } from 'tnp-core';
-import { path, glob } from 'tnp-core'
-import { Helpers } from 'tnp-helpers';
-import { CLI } from 'tnp-cli';
-import { config } from 'tnp-config';
+import { _ } from 'tnp-core/src';
+import { path, glob } from 'tnp-core/src'
+import { Helpers } from 'tnp-helpers/src';
+import { CLI } from 'tnp-cli/src';
+import { config } from 'tnp-config/src';
 
 
 const generalHelp = `

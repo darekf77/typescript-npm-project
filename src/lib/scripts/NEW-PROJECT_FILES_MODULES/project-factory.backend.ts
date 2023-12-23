@@ -1,13 +1,13 @@
-import { crossPlatformPath, _ } from 'tnp-core';
-import { path } from 'tnp-core'
-import { fse } from 'tnp-core'
+import { crossPlatformPath, _ } from 'tnp-core/src';
+import { path } from 'tnp-core/src'
+import { fse } from 'tnp-core/src'
 
-import { JSON10 } from 'json10';
-import { config, ConfigModels } from 'tnp-config';
-import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
+import { JSON10 } from 'json10/src';
+import { config, ConfigModels } from 'tnp-config/src';
+import { Models } from 'tnp-models/src';
+import { Helpers } from 'tnp-helpers/src';
 import { Project } from '../../project/abstract/project/project';
-import { CLI } from 'tnp-cli';
+import { CLI } from 'tnp-cli/src';
 import { notAllowedProjectNames } from '../../constants';
 
 //#region site option

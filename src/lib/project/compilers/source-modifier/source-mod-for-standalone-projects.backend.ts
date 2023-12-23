@@ -1,12 +1,12 @@
-import { path } from 'tnp-core'
-import { _ } from 'tnp-core';
-import { fse } from 'tnp-core'
+import { path } from 'tnp-core/src'
+import { _ } from 'tnp-core/src';
+import { fse } from 'tnp-core/src'
 
 import { Project, FeatureCompilerForProject } from '../../abstract';
-import { config } from 'tnp-config';
+import { config } from 'tnp-config/src';
 import { ModType, CheckType } from './source-modifier.models';
-import { Helpers } from 'tnp-helpers';
-import { Models } from 'tnp-models';
+import { Helpers } from 'tnp-helpers/src';
+import { Models } from 'tnp-models/src';
 import { impReplace } from './source-modifier.helpers.backend';
 import { optionsSourceModifier } from './source-modifier.backend';
 

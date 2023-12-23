@@ -1,8 +1,8 @@
 //#region @backend
 import { Project } from '../abstract';
 //#endregion
-import { BuildOptions } from 'tnp-db';
-import { CLASS } from 'typescript-class-helpers';
+import { BuildOptions } from 'tnp-db/src';
+import { CLASS } from 'typescript-class-helpers/src';
 
 /**
  * DO NOT USE environment variables in this project directly

@@ -1,12 +1,12 @@
 //#region imports
-import { config, PREFIXES } from "tnp-config";
-import { crossPlatformPath, fse, path, _ } from "tnp-core";
-import { BuildOptions } from "tnp-db";
-import { Models } from "tnp-models";
+import { config, PREFIXES } from "tnp-config/src";
+import { crossPlatformPath, fse, path, _ } from "tnp-core/src";
+import { BuildOptions } from "tnp-db/src";
+import { Models } from "tnp-models/src";
 import type { Project } from "../../../abstract/project/project";
 import type { BroswerCompilation } from "../compilations/compilation-browser.backend";
 import { BrowserCodeCut } from "./browser-code-cut.backend";
-import { extAllowedToReplace } from "tnp-config";
+import { extAllowedToReplace } from "tnp-config/src";
 //#endregion
 
 export class CodeCut {
@@ -109,4 +109,3 @@ export class CodeCut {
 
   //#endregion
 }
-

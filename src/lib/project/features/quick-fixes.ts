@@ -1,12 +1,12 @@
 //#region @backend
-import { path, _ } from 'tnp-core'
-import { fse, rimraf } from 'tnp-core'
-import { glob, crossPlatformPath } from 'tnp-core';
+import { path, _ } from 'tnp-core/src'
+import { fse, rimraf } from 'tnp-core/src'
+import { glob, crossPlatformPath } from 'tnp-core/src';
 import chalk from 'chalk';
 import { FeatureForProject, Project } from '../abstract';
-import { Helpers } from 'tnp-helpers';
-import { config, ConfigModels } from 'tnp-config';
-import { Models } from 'tnp-models';
+import { Helpers } from 'tnp-helpers/src';
+import { config, ConfigModels } from 'tnp-config/src';
+import { Models } from 'tnp-models/src';
 import { folder_shared_folder_info, tempSourceFolder } from '../../constants';
 
 export class QuickFixes extends FeatureForProject {

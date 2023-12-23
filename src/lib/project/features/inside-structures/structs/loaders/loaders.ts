@@ -1,4 +1,4 @@
-import { _ } from 'tnp-core';
+import { _ } from 'tnp-core/src';
 import { idsDefault } from './loader-ids-default';
 import { idsEllipsis } from './loader-ids-ellipsis';
 import { idsFacebook } from './loader-ids-facebook';

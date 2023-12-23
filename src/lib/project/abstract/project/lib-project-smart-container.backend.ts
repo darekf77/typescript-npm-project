@@ -1,9 +1,9 @@
-import { CLI } from "tnp-cli";
-import { config } from "tnp-config";
-import { crossPlatformPath, path } from "tnp-core";
-import { Helpers } from "tnp-helpers";
-import { Models } from "tnp-models";
-import { CLASS } from "typescript-class-helpers";
+import { CLI } from "tnp-cli/src";
+import { config } from "tnp-config/src";
+import { crossPlatformPath, path } from "tnp-core/src";
+import { Helpers } from "tnp-helpers/src";
+import { Models } from "tnp-models/src";
+import { CLASS } from "typescript-class-helpers/src";
 import { AppBuildConfig } from "../../features/docs-app-build-config.backend";
 import { LibPorjectBase } from "./lib-project-base.backend";
 import type { LibProject } from "./lib-project.backend";

@@ -1,9 +1,9 @@
 //#region imports
 import type { BuildProcess } from "./build-process";
-import { _ } from 'tnp-core';
+import { _ } from 'tnp-core/src';
 import { BUILD_PROCESS_TABLE_NAME, DEF_MODEL_VALUE_BUILD_PROCESS } from "./build-process.constants";
 //#region @websql
-import { NumberColumn, PropsEntitySQL, QueryTable, StringColumn } from "firedev-type-sql";
+import { NumberColumn, PropsEntitySQL, QueryTable, StringColumn } from "firedev-type-sql/src";
 //#endregion
 //#endregion
 

@@ -1,9 +1,9 @@
 //#region @backend
-import { _, crossPlatformPath } from 'tnp-core';
-import { Helpers } from 'tnp-helpers';
+import { _, crossPlatformPath } from 'tnp-core/src';
+import { Helpers } from 'tnp-helpers/src';
 import { Project } from '../../project';
-import { PROGRESS_DATA } from 'tnp-models';
-import { config } from 'tnp-config';
+import { PROGRESS_DATA } from 'tnp-models/src';
+import { config } from 'tnp-config/src';
 import { TestTypeFiredev, TestTypeFiredevArr } from '../../models';
 
 

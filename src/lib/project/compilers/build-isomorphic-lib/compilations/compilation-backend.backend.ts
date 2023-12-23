@@ -1,11 +1,11 @@
 //#region imports
-import { IncCompiler } from "incremental-compiler";
-import { CLI } from "tnp-cli";
-import { config, ConfigModels } from "tnp-config";
-import { crossPlatformPath, fse, path, _ } from "tnp-core";
-import { Helpers } from "tnp-helpers";
-import { Models } from "tnp-models";
-import { CLASS } from "typescript-class-helpers";
+import { IncCompiler } from "incremental-compiler/src";
+import { CLI } from "tnp-cli/src";
+import { config, ConfigModels } from "tnp-config/src";
+import { crossPlatformPath, fse, path, _ } from "tnp-core/src";
+import { Helpers } from "tnp-helpers/src";
+import { Models } from "tnp-models/src";
+import { CLASS } from "typescript-class-helpers/src";
 import type { Project } from "../../../abstract/project";
 //#endregion
 

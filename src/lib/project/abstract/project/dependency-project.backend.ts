@@ -1,9 +1,9 @@
 //#region imports
-import { _ } from 'tnp-core';
-import { path } from 'tnp-core'
-import { fse } from 'tnp-core'
-import { Models } from 'tnp-models';
-import { Helpers, ProjectBuild } from 'tnp-helpers';
+import { _ } from 'tnp-core/src';
+import { path } from 'tnp-core/src'
+import { fse } from 'tnp-core/src'
+import { Models } from 'tnp-models/src';
+import { Helpers, ProjectBuild } from 'tnp-helpers/src';
 import { Project } from './project';
 import chalk from 'chalk';
 //#endregion

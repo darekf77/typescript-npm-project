@@ -1,12 +1,12 @@
 //#region @backend
-import { fse, crossPlatformPath, glob } from 'tnp-core';
-import { path } from 'tnp-core';
+import { fse, crossPlatformPath, glob } from 'tnp-core/src';
+import { path } from 'tnp-core/src';
 //#endregion
-import { _ } from 'tnp-core';
-import { config, ConfigModels } from 'tnp-config';
+import { _ } from 'tnp-core/src';
+import { config, ConfigModels } from 'tnp-config/src';
 import { Project } from './project';
-import { Helpers, Project as $Project } from 'tnp-helpers';
-import { Models } from 'tnp-models';
+import { Helpers, Project as $Project } from 'tnp-helpers/src';
+import { Models } from 'tnp-models/src';
 import { MESSAGES } from '../../../constants';
 const forStandAloneSrc = `${config.folder.src}-for-standalone`;
 export abstract class FolderProject {

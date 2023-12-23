@@ -1,11 +1,11 @@
-import { crossPlatformPath, _ } from 'tnp-core';
-import { path } from 'tnp-core'
+import { crossPlatformPath, _ } from 'tnp-core/src';
+import { path } from 'tnp-core/src'
 import chalk from 'chalk';
 import { FeatureForProject, Project } from '../abstract';
-import { config } from 'tnp-config';
-import { Helpers } from 'tnp-helpers';
-import { Models } from 'tnp-models';
-import { CLI } from 'tnp-cli';
+import { config } from 'tnp-config/src';
+import { Helpers } from 'tnp-helpers/src';
+import { Models } from 'tnp-models/src';
+import { CLI } from 'tnp-cli/src';
 
 export type OverridePacakge = { [name: string]: string | null; };
 export type PackageType = Pick<Models.npm.Package, 'name' | 'version'>;

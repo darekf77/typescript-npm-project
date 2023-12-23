@@ -1,8 +1,7 @@
-
-import { config } from "tnp-config";
-import { crossPlatformPath, fse, path } from "tnp-core";
-import { Helpers } from "tnp-helpers";
-import { Models } from "tnp-models";
+import { config } from "tnp-config/src";
+import { crossPlatformPath, fse, path } from "tnp-core/src";
+import { Helpers } from "tnp-helpers/src";
+import { Models } from "tnp-models/src";
 import { FeatureForProject } from "../abstract/feature-for-project";
 
 const assetsFor = `${config.folder.assets}-for`

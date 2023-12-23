@@ -1,13 +1,13 @@
 //#region @backend
-import { fse, crossPlatformPath } from 'tnp-core'
-import { path } from 'tnp-core'
-import { _ } from 'tnp-core';
+import { fse, crossPlatformPath } from 'tnp-core/src'
+import { path } from 'tnp-core/src'
+import { _ } from 'tnp-core/src';
 import { PackagesRecognition } from '../../features/package-recognition/packages-recognition';
 //#endregion
 import type { Project } from './project';
-import { Project as $Project } from 'tnp-helpers';
-import { Helpers } from 'tnp-helpers';
-import { config, ConfigModels } from 'tnp-config';
+import { Project as $Project } from 'tnp-helpers/src';
+import { Helpers } from 'tnp-helpers/src';
+import { config, ConfigModels } from 'tnp-config/src';
 
 export abstract class TnpProject {
 

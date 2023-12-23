@@ -4,13 +4,13 @@ import {
   path,
   //#endregion
   _
-} from 'tnp-core';
-import { ConfigModels } from 'tnp-config';
-import { Helpers } from 'tnp-helpers';
+} from 'tnp-core/src';
+import { ConfigModels } from 'tnp-config/src';
+import { Helpers } from 'tnp-helpers/src';
 import { Project } from '../../../abstract/project/project';
-import { config } from 'tnp-config';
-import { Models } from 'tnp-models';
-import { CLASS } from 'typescript-class-helpers';
+import { config } from 'tnp-config/src';
+import { Models } from 'tnp-models/src';
+import { CLASS } from 'typescript-class-helpers/src';
 import { BaseInsideStruct } from './base-inside-struct';
 import { InsideStruct } from '../inside-struct';
 import { recreateApp, recreateIndex } from './inside-struct-helpers';

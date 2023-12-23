@@ -1,4 +1,4 @@
-import { Models } from 'tnp-models';
+import { Models } from 'tnp-models/src';
 
 
 declare global {

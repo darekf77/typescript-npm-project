@@ -1,18 +1,18 @@
 //#region @backend
 import chalk from 'chalk';
-import { fse } from 'tnp-core'
-import { path } from 'tnp-core'
-import { _, crossPlatformPath } from 'tnp-core';
+import { fse } from 'tnp-core/src'
+import { path } from 'tnp-core/src'
+import { _, crossPlatformPath } from 'tnp-core/src';
 import * as json5 from 'json5';
 export { ChildProcess } from 'child_process';
 import { ChildProcess } from 'child_process';
 //#endregion
-import { Project as $Project } from 'tnp-helpers';
-import { config, ConfigModels } from 'tnp-config';
-import { Models } from 'tnp-models';
-import { Helpers } from 'tnp-helpers';
+import { Project as $Project } from 'tnp-helpers/src';
+import { config, ConfigModels } from 'tnp-config/src';
+import { Models } from 'tnp-models/src';
+import { Helpers } from 'tnp-helpers/src';
 
-import { Morphi } from 'morphi';
+import { Morphi } from 'morphi/src';
 //#region @backend
 import { BaseProject } from './base-project';
 import { NpmProject } from './npm-project';
@@ -51,7 +51,7 @@ import { CloudProject } from './cloud-project';
 import { GlobalWorkerApps } from '../../features/global-worker-apps';
 import { InsideStructures } from '../../features/inside-structures/inside-structures';
 import { SingularBuild } from '../../features/singular-build.backend';
-import { CLASS } from 'typescript-class-helpers';
+import { CLASS } from 'typescript-class-helpers/src';
 //#endregion
 
 @Morphi.Entity<Project>({
