@@ -162,37 +162,37 @@ to fix it.
     //   'buildOptions.appBuild': buildOptions.appBuild
     // })
     if (!buildOptions.appBuild) {
-//       const assignedPort = await this.project.assignFreePort(4100);
-//       const host = `http://localhost:${assignedPort}`;
-//       Helpers.info(`
+      const assignedPort = await this.project.assignFreePort(4100);
+      const host = `http://localhost:${assignedPort}`;
+      Helpers.info(`
 
 
 
-// You can check info about build in ${CLI.chalk.bold(host)}
+You can check info about build in ${CLI.chalk.bold(host)}
 
 
 
-//       `)
-//       Helpers.taskStarted(`starting project service... ${host}`)
-//       const context = await Firedev.init({
-//         host,
-//         controllers: [
-//           BuildProcessController,
-//         ],
-//         entities: [
-//           BuildProcess,
-//         ],
-//         //#region @websql
-//         config: {
-//           type: 'better-sqlite3',
-//           database: `tmp-build-process${buildOptions.websql ? '-websql' : ''}.sqlite`,
-//           logging: false,
-//         }
-//         //#endregion
-//       });
-//       const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
-//       await controller.initialize(this, this.project, assignedPort);
-//       Helpers.taskDone('project service started')
+      `)
+      Helpers.taskStarted(`starting project service... ${host}`)
+      const context = await Firedev.init({
+        host,
+        controllers: [
+          BuildProcessController,
+        ],
+        entities: [
+          BuildProcess,
+        ],
+        //#region @websql
+        config: {
+          type: 'better-sqlite3',
+          database: `tmp-build-process${buildOptions.websql ? '-websql' : ''}.sqlite`,
+          logging: false,
+        }
+        //#endregion
+      });
+      const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
+      await controller.initialize(this, this.project, assignedPort);
+      Helpers.taskDone('project service started')
       // console.log({ context })
     }
 
