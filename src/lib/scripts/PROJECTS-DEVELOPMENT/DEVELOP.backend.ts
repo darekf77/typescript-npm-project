@@ -12,8 +12,9 @@ import * as open from 'open';
 import chalk from 'chalk';
 import { URL } from 'url';
 import { incrementalWatcher, IncrementalWatcherOptions } from 'incremental-compiler';
-import { PackagesRecognition } from 'tnp/project/features/package-recognition/packages-recognition';
-import { BrowserCodeCut } from 'tnp/project/compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
+import { PackagesRecognition } from '../../project/features/package-recognition/packages-recognition';
+import { BrowserCodeCut } from '../../project/compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
+
 
 //#endregion
 
