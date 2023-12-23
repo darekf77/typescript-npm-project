@@ -343,9 +343,9 @@ export class BrowserCodeCut {
       let appendingToNewFlatOutput = false;
       let newFlatOutput = '';
       fileContent.split(/\r?\n/).forEach((line, index) => {
-        if (line.trimStart().startsWith('// ') && !line.includes('@ts-ignore')) {
-          line = `/* ${Helpers.escapeStringForRegEx(line)} */`
-        }
+        // if (line.trimStart().startsWith('// ') && !line.includes('@ts-ignore')) {
+        //   line = `/* ${Helpers.escapeStringForRegEx(line)} */`
+        // }
         const matchSingleLineExport = isExport && singleLineExport.test(line);
         const matchCommentStart = commentStart.test(line);
         const matchCommentEnd = commentEnds.test(line);
