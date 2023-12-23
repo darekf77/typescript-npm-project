@@ -355,6 +355,12 @@ export class CopyManagerStandalone extends CopyManager {
       config.folder.src
     ));
 
+    const destPackageLinkSourceDtsLocation = crossPlatformPath(path.join(
+      destination.node_modules.pathFor(this.rootPackageName),
+      'src.d.ts'
+    ));
+
+    Helpers.removeIfExists(destPackageLinkSourceDtsLocation);
     Helpers.removeIfExists(destPackageLinkSourceLocation);
     Helpers.createSymLink(this.sourcePathToLink, destPackageLinkSourceLocation);
   }

@@ -622,6 +622,19 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
 
     return destPackageLinkSourceLocation;
   }
+
+  destPackageLinkSourceSrcDtsLocation(destination: Project, child: Project, currentBrowserFolder?: Models.dev.BuildDirBrowser) {
+    const destPackageLinkSourceLocation = currentBrowserFolder ? crossPlatformPath(path.join(
+      destination.node_modules.pathFor(this.childPackageName(child)),
+      currentBrowserFolder,
+      'src.d.ts'
+    )) : crossPlatformPath(path.join(
+      destination.node_modules.pathFor(this.childPackageName(child)),
+      'src.d.ts'
+    ));
+
+    return destPackageLinkSourceLocation;
+  }
   //#endregion
 
   //#region remove or add links
@@ -631,6 +644,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
 
       const destPackageLinkSourceLocation = this.destPackageLinkSourceLocation(destination, child);
       Helpers.removeIfExists(destPackageLinkSourceLocation);
+      Helpers.removeIfExists(this.destPackageLinkSourceSrcDtsLocation(destination, child));
       if (!remove) {
         Helpers.createSymLink(this.sourcePathToLinkFor(child), destPackageLinkSourceLocation);
       }
@@ -643,6 +657,11 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
           currentBrowserFolder,
         );
         Helpers.removeIfExists(destPackageLinkSourceLocationForBrowser);
+        Helpers.removeIfExists(this.destPackageLinkSourceSrcDtsLocation(
+          destination,
+          child,
+          currentBrowserFolder,
+        ));
         if (!remove) {
           Helpers.createSymLink(this.sourcePathToLinkFor(child), destPackageLinkSourceLocationForBrowser);
         }
