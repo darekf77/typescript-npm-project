@@ -20,10 +20,26 @@ import { CLI } from 'tnp-cli';
 //#region consts
 const regexAsyncImport = /\ import\((\`|\'|\")([a-zA-Z|\-|\@|\/|\.]+)(\`|\'|\")\)/;
 const regexAsyncImportG = /\ import\((\`|\'|\")([a-zA-Z|\-|\@|\/|\.]+)(\`|\'|\")\)/g;
+
+
 const debugFiles = [
   // 'firedev-cms.models.ts'
   // 'app.ts'
-]
+];
+
+/**
+ * Allow imports or exports with '/src' at tthe end
+ *
+ * import { ProcessController, Process } from '@codete-ngrx-quick-start/shared/src';
+ * loadChildren: () => import(`@codete-ngrx-quick-start/realtime-process/src`)
+ *
+ * to be changed into:
+ *
+ * import { ProcessController, Process } from '@codete-ngrx-quick-start/shared';
+ * loadChildren: () => import(`@codete-ngrx-quick-start/realtime-process`)
+ *
+ */
+
 //#endregion
 
 export class BrowserCodeCut {
@@ -133,11 +149,12 @@ export class BrowserCodeCut {
 
   //#region methods / init
   init() {
-    this.rawContentForBrowser = Helpers.readFile(this.absSourcePathFromSrc, void 0, true) || '';
+    this.rawContentForBrowser = this.removeSrcAtEndFromImortExports(Helpers.readFile(this.absSourcePathFromSrc, void 0, true) || '');
     this.rawContentForAPPONLYBrowser = this.rawContentForBrowser; // TODO not needed ?
     this.rawContentBackend = this.rawContentForBrowser; // at the beginning those are normal files from src
     return this;
   }
+
   //#endregion
 
   //#region methods / init and save
@@ -260,8 +277,48 @@ export class BrowserCodeCut {
   }
   //#endregion
 
+  private processRegexForSrcRemove(regexEnd: RegExp, line): string {
+    const matches = line.match(regexEnd);
+    const firstMatch = _.first(matches) as string;
+    const endCharacters = firstMatch.slice(-1);
+    const clean = firstMatch.replace('/src' + endCharacters, endCharacters);
+    return line.replace(firstMatch, clean);
+  }
+
+  private removeSrcAtEndFromImortExports(content: string): string {
+    const regexEnd = /from\s+(\'|\").+\/src(\'|\")/g;
+    const singleLineImporrt = /import\((\'|\"|\`).+\/src(\'|\"|\`)\)/g;
+    const singleLineRequire = /require\((\'|\"|\`).+\/src(\'|\"|\`)\)/g;
+
+    const commentMultilieStart = /^\/\*/;
+    const commentSingleLineStart = /^\/\//;
+
+    return content.split(/\r?\n/).map((line, index) => {
+      const trimedLine = line.trimStart();
+      if (commentMultilieStart.test(trimedLine) || commentSingleLineStart.test(trimedLine)) {
+        return line;
+      }
+      if (regexEnd.test(line)) {
+        return this.processRegexForSrcRemove(regexEnd, line);
+      }
+      if (singleLineImporrt.test(line)) {
+        return this.processRegexForSrcRemove(singleLineImporrt, line);
+      }
+      if (singleLineRequire.test(line)) {
+        return this.processRegexForSrcRemove(singleLineRequire, line);
+      }
+      return line;
+    }).join('\n');
+  }
+
+  private processBrowserNotCorrectImportsExports = (importOrExportLine: string) => {
+    // TODO @LAST
+    return importOrExportLine;
+  }
+
   //#region methods / flat typescript import export
   public FLATTypescriptImportExport(usage: ConfigModels.TsUsage) {
+
     if (this.isAssetsFile) {
       return this;
     }
@@ -272,18 +329,23 @@ export class BrowserCodeCut {
     const fileContent: string = this.rawContentForBrowser;
     const commentStart = new RegExp(`\\/\\*`);
     const commentEnds = new RegExp(`\\*\\/`);
-    const commentEndExportOnly = new RegExp(`^(\\ )*\\}\\;?\\ *`);
-    const singleLineExport = new RegExp(`^\\ *export\\ +\\{.*\\}\\;?`)
 
+    const commentEndExportOnly = new RegExp(`^(\\ )*\\}\\;?\\ *`);
+    const singleLineExport = new RegExp(`^\\ *export\\ +\\{.*\\}\\;?`);
+
+    const regexEnd = new RegExp(`from\\s+(\\'|\\").+(\\'|\\")`);
     const regextStart = new RegExp(`${usage}\\s+{`)
-    const regexEnd = new RegExp(`from\\s+(\\'|\\").+(\\'|\\")`)
+
+
     let toAppendLines = 0;
     let insideComment = false;
     if (_.isString(fileContent)) {
       let appendingToNewFlatOutput = false;
       let newFlatOutput = '';
       fileContent.split(/\r?\n/).forEach((line, index) => {
-
+        if (line.trimStart().startsWith('// ') && !line.includes('@ts-ignore')) {
+          line = `/* ${Helpers.escapeStringForRegEx(line)} */`
+        }
         const matchSingleLineExport = isExport && singleLineExport.test(line);
         const matchCommentStart = commentStart.test(line);
         const matchCommentEnd = commentEnds.test(line);
@@ -316,7 +378,7 @@ export class BrowserCodeCut {
             toAppendLines++;
           } else if (matchEnd) {
             appendingToNewFlatOutput = false;
-            newFlatOutput += ` ${line}${_.times(toAppendLines,
+            newFlatOutput += ` ${this.processBrowserNotCorrectImportsExports(line)}${_.times(toAppendLines,
               () => `${Models.label.flatenImportExportRequred}\n`).join('')}`;
             toAppendLines = 0;
           }
@@ -329,7 +391,7 @@ export class BrowserCodeCut {
             } else {
               appendingToNewFlatOutput = (matchStart && !matchEnd);
               // if (joiningLine) console.log('line', line)
-              newFlatOutput += (((index > 0) ? '\n' : '') + line);
+              newFlatOutput += (((index > 0) ? '\n' : '') + this.processBrowserNotCorrectImportsExports(line));
             }
             toAppendLines = 1;
           }
@@ -675,9 +737,9 @@ export class BrowserCodeCut {
         },
         /**
          *
-// @ts-ignore
-import * as json1 from '/shared/src/assets/hamsters/test.json';
-console.log({ json1 }) -> WORKS NOW
+  // @ts-ignore
+  import * as json1 from '/shared/src/assets/hamsters/test.json';
+  console.log({ json1 }) -> WORKS NOW
          */
         {
           from: ` from '/assets/assets-for/${relativeAssetPathPart}/`,
@@ -690,12 +752,12 @@ console.log({ json1 }) -> WORKS NOW
         /**
          * what can be done more
          * import * as json2 from '@codete-rxjs-quick-start/shared/assets/shared/';
-console.log({ json2 })
+  console.log({ json2 })
 
-declare module "*.json" {
+  declare module "*.json" {
   const value: any;
   export default value;
-}
+  }
 
          */
       ] as {

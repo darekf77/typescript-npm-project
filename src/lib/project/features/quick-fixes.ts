@@ -22,6 +22,15 @@ export class QuickFixes extends FeatureForProject {
 
       Helpers.remove(`${bundleForPublishPath}/app*`); // QUICK_FIX
       Helpers.remove(`${bundleForPublishPath}/tests*`); // QUICK_FIX
+      Helpers.remove(`${bundleForPublishPath}/src`, true); // QUICK_FIX
+      Helpers.writeFile(crossPlatformPath([bundleForPublishPath, 'src.d.ts']), `
+// THIS FILE IS GENERATED
+export * from './lib';
+// THIS FILE IS GENERATED
+// please use command: firedev build:watch to see here links for your globally builded lib code files
+// THIS FILE IS GENERATED
+      `.trimStart());
+
       const pjPath = crossPlatformPath([
         bundleForPublishPath,
         config.file.package_json,
@@ -36,6 +45,33 @@ export class QuickFixes extends FeatureForProject {
       }
       Helpers.removeFileIfExists(pjPath);
       Helpers.writeJson(pjPath, pj)// QUICK_FIX
+    }
+  }
+
+  updateContainerProjectBeforePublishing(project: Project, realCurrentProj: Project, specyficProjectForBuild: Project) {
+    if (project.isSmartContainer) {
+
+      const base = path.join(
+        specyficProjectForBuild.location,
+        specyficProjectForBuild.getTempProjName('bundle'),
+        config.folder.node_modules,
+        `@${realCurrentProj.name}`,
+      );
+
+      for (const child of realCurrentProj.children) {
+        const bundleForPublishPath = crossPlatformPath([base, child.name]);
+        // console.log({
+        //   bundleForPublishPath
+        // })
+        Helpers.remove(`${bundleForPublishPath}/src`, true); // QUICK_FIX
+        Helpers.writeFile(crossPlatformPath([bundleForPublishPath, 'src.d.ts']), `
+  // THIS FILE IS GENERATED
+  export * from './index';
+  // THIS FILE IS GENERATED
+  // please use command: firedev build:watch to see here links for your globally builded lib code files
+  // THIS FILE IS GENERATED
+        `.trimStart());
+      }
     }
   }
 

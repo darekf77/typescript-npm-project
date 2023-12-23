@@ -179,6 +179,12 @@ export abstract class LibProject {
           realCurrentProj,
           specyficProjectForBuild,
         );
+      } else {
+        realCurrentProj.quickFixes.updateContainerProjectBeforePublishing(
+          this,
+          realCurrentProj,
+          specyficProjectForBuild,
+        );
       }
 
       if (!global.tnpNonInteractive) {

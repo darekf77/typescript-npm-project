@@ -4,7 +4,7 @@ import { BuildOptions } from 'tnp-db';
 import * as inquirer from 'inquirer';
 import { crossPlatformPath, path } from 'tnp-core';
 import chalk from 'chalk';
-import { enableWatchers } from 'incremental-compiler';
+
 
 import { _ } from 'tnp-core';
 import { config } from 'tnp-config';
@@ -458,7 +458,7 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
       }
 
       // console.log('NOT ENABLING WATCHERS')
-      enableWatchers();
+
     }
 
 

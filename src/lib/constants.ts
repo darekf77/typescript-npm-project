@@ -58,6 +58,12 @@ export const notAllowedProjectNames = [
   'apps',
   'libs',
   'lib',
+  'src',
+  'migrations',
+  'assets',
+  'assets-for',
+  'browser',
+  'websql',
   '_',
 ]
 

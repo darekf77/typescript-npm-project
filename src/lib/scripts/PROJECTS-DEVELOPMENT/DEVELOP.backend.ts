@@ -11,7 +11,9 @@ import { CLASS } from 'typescript-class-helpers';
 import * as open from 'open';
 import chalk from 'chalk';
 import { URL } from 'url';
-import { enableWatchers, incrementalWatcher, IncrementalWatcherOptions } from 'incremental-compiler';
+import { incrementalWatcher, IncrementalWatcherOptions } from 'incremental-compiler';
+import { PackagesRecognition } from 'tnp/project/features/package-recognition/packages-recognition';
+import { BrowserCodeCut } from 'tnp/project/compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
 
 //#endregion
 
@@ -484,13 +486,95 @@ export async function PROPERWATCHERTEST(engine: string) {
     console.log('THIRD', a, b);
   });
 
-  enableWatchers();
   console.log('await done');
 }
 
+async function ADD_IMPORT_SRC() {
+  const project = Project.Current as Project;
+
+
+  const regexEnd = /from\s+(\'|\").+(\'|\")/g;
+  const singleLineImporrt = /import\((\'|\"|\`).+(\'|\"|\`)\)/g;
+  const singleLineRequire = /require\((\'|\"|\`).+(\'|\"|\`)\)/g;
+  const srcEnd = /\/src(\'|\"|\`)/;
+  const betweenApos = /(\'|\"|\`).+(\'|\"|\`)/g;
+
+  const commentMultilieStart = /^\/\*/;
+  const commentSingleLineStart = /^\/\//;
+
+  const processAddSrcAtEnd = (regexEnd: RegExp, line: string, packages: string[], matchType: 'from_import_export' | 'imports' | 'require'): string => {
+    const matches = line.match(regexEnd);
+    const firstMatch = _.first(matches) as string;
+    const importMatch = (_.first(firstMatch.match(betweenApos)) as string).replace(/(\'|\"|\`)/g, '');
+    const isOrg = importMatch.startsWith('@');
+    const packageName = importMatch.split('/').slice(0, isOrg ? 2 : 1).join('/');
+    if (packages.includes(packageName) && !srcEnd.test(firstMatch)) {
+      let clean: string;
+      if (matchType === 'require' || matchType === 'imports') {
+        const endCharacters = firstMatch.slice(-2);
+        clean = firstMatch.slice(0, firstMatch.length - 2) + '/src' + endCharacters;
+      } else {
+        let endCharacters = firstMatch.slice(-1);
+        clean = firstMatch.slice(0, firstMatch.length - 1) + '/src' + endCharacters;
+      }
+
+      return line.replace(firstMatch, clean);
+    }
+    return line;
+  }
+
+  const changeImport = (content: string, packages: string[]) => {
+    return content.split(/\r?\n/).map((line, index) => {
+      const trimedLine = line.trimStart();
+      if (commentMultilieStart.test(trimedLine) || commentSingleLineStart.test(trimedLine)) {
+        return line;
+      }
+      if (regexEnd.test(line)) {
+        return processAddSrcAtEnd(regexEnd, line, packages, 'from_import_export');
+      }
+      if (singleLineImporrt.test(line)) {
+        return processAddSrcAtEnd(singleLineImporrt, line, packages, 'imports');
+      }
+      if (singleLineRequire.test(line)) {
+        return processAddSrcAtEnd(singleLineRequire, line, packages, 'require');
+      }
+      return line;
+    }).join('\n') + '\n';
+  };
+
+  const addImportSrc = (proj: Project) => {
+    PackagesRecognition.fromProject(proj).start(true, 'src adding process');
+    const pacakges = [
+      ...BrowserCodeCut.IsomorphicLibs,
+      ...(proj.isSmartContainerChild ? proj.parent.children.map(c => `@${proj.parent.name}/${c.name}`) : []),
+    ];
+    // console.log(pacakges)
+
+    const files = Helpers.filesFrom(proj.pathFor('src'), true).filter(f => f.endsWith('.ts'));
+
+    for (const file of files) {
+      const originalContent = Helpers.readFile(file);
+      const changed = changeImport(originalContent, pacakges);
+      if (originalContent && changed && originalContent?.trim().replace(/\s/g, '') !== changed?.trim().replace(/\s/g, '')) {
+        Helpers.writeFile(file, changed);
+      }
+    }
+  };
+
+  if (project.isStandaloneProject) {
+    addImportSrc(project);
+  } else if (project.isContainer) {
+    for (const child of project.children) {
+      addImportSrc(child);
+    }
+  }
+
+  process.exit(0);
+}
 
 export default {
   //#region export default
+  ADD_IMPORT_SRC: Helpers.CLIWRAP(ADD_IMPORT_SRC, 'ADD_IMPORT_SRC'),
   PROPERWATCHERTEST: Helpers.CLIWRAP(PROPERWATCHERTEST, 'PROPERWATCHERTEST'),
   $REMOVE_BAD_TAG: Helpers.CLIWRAP($REMOVE_BAD_TAG, '$REMOVE_BAD_TAG'),
   $MOVE_JS_TO_TS: Helpers.CLIWRAP($MOVE_JS_TO_TS, '$MOVE_JS_TO_TS'),
