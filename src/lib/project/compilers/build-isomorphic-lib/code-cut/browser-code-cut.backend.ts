@@ -277,11 +277,19 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  private processRegexForSrcRemove(regexEnd: RegExp, line): string {
+  private processRegexForSrcRemove(regexEnd: RegExp, line: string, matchType: 'from_import_export' | 'imports' | 'require'): string {
     const matches = line.match(regexEnd);
     const firstMatch = _.first(matches) as string;
-    const endCharacters = firstMatch.slice(-1);
-    const clean = firstMatch.replace('/src' + endCharacters, endCharacters);
+
+    let clean: string;
+    if (matchType === 'require' || matchType === 'imports') {
+      const endCharacters = firstMatch.slice(-2);
+      clean = firstMatch.replace('/src' + endCharacters, endCharacters);
+    } else {
+      let endCharacters = firstMatch.slice(-1);
+      clean = firstMatch.replace('/src' + endCharacters, endCharacters);
+    }
+
     return line.replace(firstMatch, clean);
   }
 
@@ -299,13 +307,13 @@ export class BrowserCodeCut {
         return line;
       }
       if (regexEnd.test(line)) {
-        return this.processRegexForSrcRemove(regexEnd, line);
+        return this.processRegexForSrcRemove(regexEnd, line, 'from_import_export');
       }
       if (singleLineImporrt.test(line)) {
-        return this.processRegexForSrcRemove(singleLineImporrt, line);
+        return this.processRegexForSrcRemove(singleLineImporrt, line, 'imports');
       }
       if (singleLineRequire.test(line)) {
-        return this.processRegexForSrcRemove(singleLineRequire, line);
+        return this.processRegexForSrcRemove(singleLineRequire, line, 'require');
       }
       return line;
     }).join('\n');
