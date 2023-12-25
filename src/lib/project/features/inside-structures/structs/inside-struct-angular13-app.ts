@@ -423,11 +423,14 @@ ${appModuleFile}
 
           let indexHtmlFile = Helpers.readFile(indexHtmlFilePath);
 
-          const title = this.project.env.config?.title
-
+          const title = this.project.env.config?.title;
+          const titleToReplace = title ? title : _.startCase(this.project.name);
+          // console.log({
+          //   titleToReplace
+          // })
           indexHtmlFile = indexHtmlFile.replace(
             '<title>App</title>',
-            `<title>${title ? title : _.startCase(this.project.name)}</title>`
+            `<title>${titleToReplace}</title>`
           );
           Helpers.writeFile(indexHtmlFilePath, indexHtmlFile);
         })();
