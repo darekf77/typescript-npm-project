@@ -73,15 +73,14 @@ export class CopyMangerOrganizationAngularFiles {
     wasRecrusive: boolean,
   ): void {
 
-    const currentBrowserFolder = _.first(
-      specyficFileRelativePath.split('/')
-    ) as Models.dev.BuildDirBrowser;
-
     const angularCompilationFolderOrLibs = _.first(
       specyficFileRelativePath.split('/').slice(1)
     ) as keyof typeof CopyMangerHelpers.angularBrowserComiplationFolders;
 
     if (CopyMangerHelpers.angularBrowserComiplationFoldersArr.includes(angularCompilationFolderOrLibs)) {
+      const currentBrowserFolder: Models.dev.BuildDirBrowser = _.first(
+        specyficFileRelativePath.split('/')
+      ) as Models.dev.BuildDirBrowser;
       this.actionForFolder(
         destination,
         isTempLocalProj,
@@ -92,26 +91,55 @@ export class CopyMangerOrganizationAngularFiles {
         }
       );
     } else if (angularCompilationFolderOrLibs === config.folder.libs) {
-      const childName = _.first(specyficFileRelativePath.split('/').slice(2));
-      const child = this.children.find(c => c.name === childName);
-      const rootPackageNameForChildBrowser = this.rootPackageNameForChildBrowser(child, currentBrowserFolder);
-      const relativePath = specyficFileRelativePath.split('/').splice(3).join('/');
-      const absSourcePath = isTempLocalProj
-        ? crossPlatformPath(path.join(this.monitoredOutDir, specyficFileRelativePath))
-        : crossPlatformPath(path.join(
-          this.localTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
+      for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
+        const browserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
+        const childName = _.first(specyficFileRelativePath.split('/').slice(2));
+        const child = this.children.find(c => c.name === childName);
+        const rootPackageNameForChildBrowser = this.rootPackageNameForChildBrowser(child, browserFolder);
+        const relativePath = specyficFileRelativePath.split('/').splice(3).join('/');
+        const absSourcePath = isTempLocalProj
+          ? crossPlatformPath(path.join(this.monitoredOutDir, specyficFileRelativePath))
+          : crossPlatformPath(path.join(
+            this.localTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
+            relativePath,
+          ));
+
+        let content = Helpers.readFile(absSourcePath);
+        if (isTempLocalProj && relativePath.endsWith('.d.ts')) {
+          content = this.dtsFixer.forContent(content, browserFolder);
+        }
+        const detinationFilePath = crossPlatformPath(path.join(
+          destination.node_modules.pathFor(rootPackageNameForChildBrowser),
           relativePath,
         ));
-
-      let content = Helpers.readFile(absSourcePath);
-      if (isTempLocalProj && relativePath.endsWith('.d.ts')) {
-        content = this.dtsFixer.forContent(content, currentBrowserFolder);
+        Helpers.writeFile(detinationFilePath, content);
       }
-      const detinationFilePath = crossPlatformPath(path.join(
-        destination.node_modules.pathFor(rootPackageNameForChildBrowser),
-        relativePath,
-      ));
-      Helpers.writeFile(detinationFilePath, content);
+    } else if (angularCompilationFolderOrLibs === config.folder.lib) {
+
+      const child = this.targetProj; // @ts-ignore
+
+      for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
+        const browserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
+        const rootPackageNameForChildBrowser = this.rootPackageNameForChildBrowser(child, browserFolder);
+        const relativePath = specyficFileRelativePath.split('/').splice(2).join('/');
+
+        const absSourcePath = isTempLocalProj
+          ? crossPlatformPath(path.join(this.monitoredOutDir, specyficFileRelativePath))
+          : crossPlatformPath(path.join(
+            this.localTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
+            relativePath,
+          ));
+
+        let content = Helpers.readFile(absSourcePath);
+        if (isTempLocalProj && relativePath.endsWith('.d.ts')) {
+          content = this.dtsFixer.forContent(content, browserFolder);
+        }
+        const detinationFilePath = crossPlatformPath(path.join(
+          destination.node_modules.pathFor(rootPackageNameForChildBrowser),
+          relativePath,
+        ));
+        Helpers.writeFile(detinationFilePath, content);
+      }
     } else {
       // console.log('should be something here?')
       // TODO
