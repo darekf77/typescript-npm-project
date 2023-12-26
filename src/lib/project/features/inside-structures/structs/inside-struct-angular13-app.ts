@@ -385,7 +385,7 @@ ${appModuleFile}
             const loaderIsImage = _.isString(loaderData);
 
             if (loaderIsImage) {
-              const pathToAsset = basename + resolvePathToAsset(projectTargetOrStandalone, loaderData, outFolder, websql);
+              const pathToAsset = projectTargetOrStandalone.env.config?.useDomain ? '' : basename + resolvePathToAsset(projectTargetOrStandalone, loaderData, outFolder, websql);
               indexHtmlFile = indexHtmlFile.replace(
                 '<!-- <<<TO_REPLACE_LOADER>>> -->',
                 imageLoader(pathToAsset, true),
