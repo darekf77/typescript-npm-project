@@ -21,9 +21,16 @@ export class EnvironmentConfig
 //#endregion
 {
   coptyTo(destination: string) {
-    const source = path.join(this.project.location, config.file.environment_js);
-    const dest = path.join(destination, config.file.environment_js);
-    Helpers.copyFile(source, dest);
+    (() => {
+      const source = path.join(this.project.location, config.file.environment_js);
+      const dest = path.join(destination, config.file.environment_js);
+      Helpers.copyFile(source, dest);
+    })();
+    (() => {
+      const source = path.join(this.project.location, config.file.tnpEnvironment_json);
+      const dest = path.join(destination, config.file.tnpEnvironment_json);
+      Helpers.copyFile(source, dest);
+    })();
   }
 
   //#region @backend
@@ -78,8 +85,10 @@ export class EnvironmentConfig
   }
   //#endregion
 
-  /**
-   * Can be accesed only after env.prepare()
+   /**
+    * TODO @LAST
+    * IMPORTANT
+   * Can be accesed only after project.env.init()
    */
   public get config(): any {
     //#region @backend

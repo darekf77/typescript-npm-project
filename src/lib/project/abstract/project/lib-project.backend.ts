@@ -349,13 +349,15 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
         this.packageJson.linkTo(absolutePathReleaseProject);
         if (this.isStandaloneProject) {
+          await this.env.init();
           (this.env as any as EnvironmentConfig).coptyTo(absolutePathReleaseProject)
         }
 
         if (this.isSmartContainer) {
           const children = this.children;
           for (let index = 0; index < children.length; index++) {
-            const child = children[index];
+            const child = children[index] as Project;
+            await child.env.init();
             (child.env as any as EnvironmentConfig).coptyTo(crossPlatformPath([absolutePathReleaseProject, child.name]))
           }
 
