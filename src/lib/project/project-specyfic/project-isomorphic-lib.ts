@@ -350,7 +350,7 @@ export class ProjectIsomorphicLib
       const portToServe = _.isNumber(port) ? `--port=${port}` : '';
       const aot = flags.includes('aot');
       // const ngBuildCmd = // TODO LOAD NVME HERE
-      const ngBuildCmd = `npm-run ng build `
+      const ngBuildCmd = `npm-run ng build app`
         + `${aot ? '--aot=true' : ''} `
         + `${prod ? '--configuration production' : ''} `
         + `${watch ? '--watch' : ''}`
