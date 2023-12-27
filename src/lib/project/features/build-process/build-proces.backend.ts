@@ -1,5 +1,5 @@
 //#region imports
-import { _ } from 'tnp-core/src';
+import { _, frameworkName } from 'tnp-core/src';
 import chalk from 'chalk';
 import { fse } from 'tnp-core/src'
 import { path } from 'tnp-core/src'
@@ -161,37 +161,49 @@ to fix it.
     // console.log({
     //   'buildOptions.appBuild': buildOptions.appBuild
     // })
-    if (!buildOptions.appBuild) {
+    if (!buildOptions.appBuild && frameworkName !== 'firedev') {
       const assignedPort = await this.project.assignFreePort(4100);
-      const host = `http://localhost:${assignedPort}`;
-      Helpers.info(`
+
+      if (frameworkName === 'tnp') { // TODO @REMOVE
+        const host = `http://localhost:${assignedPort}`;
+        Helpers.info(`
 
 
 
-You can check info about build in ${CLI.chalk.bold(host)}
+  You can check info about build in ${CLI.chalk.bold(host)}
 
 
 
-      `)
-      Helpers.taskStarted(`starting project service... ${host}`)
-      const context = await Firedev.init({
-        host,
-        controllers: [
-          BuildProcessController,
-        ],
-        entities: [
-          BuildProcess,
-        ],
-        //#region @websql
-        config: {
-          type: 'better-sqlite3',
-          database: `tmp-build-process${buildOptions.websql ? '-websql' : ''}.sqlite`,
-          logging: false,
+        `)
+        Helpers.taskStarted(`starting project service... ${host}`)
+        try {
+          const context = await Firedev.init({
+            host,
+            controllers: [
+              BuildProcessController,
+            ],
+            entities: [
+              BuildProcess,
+            ],
+            //#region @websql
+            config: {
+              type: 'better-sqlite3',
+              database: `tmp-build-process${buildOptions.websql ? '-websql' : ''}.sqlite`,
+              logging: false,
+            }
+            //#endregion
+          });
+        } catch (error) {
+          console.error(error);
+          Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
         }
-        //#endregion
-      });
-      const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
-      await controller.initialize(this, this.project, assignedPort);
+
+        // const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
+        // await controller.initialize(this, this.project, assignedPort);
+      }
+
+
+      this.project.saveLaunchJson(assignedPort);
       Helpers.taskDone('project service started')
       // console.log({ context })
     }
