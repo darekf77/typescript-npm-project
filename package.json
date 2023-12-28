@@ -281,7 +281,7 @@
           "axios": "^0.17.1",
           "ng-talkback": "16.5.4",
           "magic-renamer": "16.5.4",
-          "vpn-split": "16.5.4",
+          "vpn-split": "16.5.5",
           "node-cli-tester": "16.5.4",
           "strings": {
             "@types/diff": "^3.2.2",
@@ -836,7 +836,7 @@
     "uuid": "8.3.2",
     "validator": "9.2.0",
     "video.js": "8.3.0",
-    "vpn-split": "~16.5.4",
+    "vpn-split": "~16.5.5",
     "vscode": "1.1.37",
     "wait-on": "7.0.1",
     "watch": "1.0.2",
