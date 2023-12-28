@@ -287,11 +287,22 @@ export function $PRINT_RELATIVES(folder) {
 }
 
 //#region @notForNpm
+/**
+ *  npm install --global bin-version-check-cli
+ *  npm i -g yt-dlp
+ *
+ * @param args
+ */
 export function $MP3(args) {
-  Helpers.run('yt-dlp --verbose --extract-audio --audio-format mp3 ' + args,
+  const downloadPath = crossPlatformPath(path.join(os.userInfo().homedir, 'Downloads', 'mp3-from-youtube'));
+  if(!Helpers.exists(downloadPath)) {
+    Helpers.mkdirp(downloadPath)
+  }
+
+  Helpers.run(`cd ${downloadPath} && yt-dlp --verbose --extract-audio --audio-format mp3 ` + args,
     {
       output: true,
-      cwd: crossPlatformPath(path.join(os.userInfo().homedir, 'Downloads'))
+      cwd: downloadPath
     }).sync();
   process.exit(0)
 }
