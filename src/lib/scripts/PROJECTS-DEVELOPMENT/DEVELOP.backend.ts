@@ -573,8 +573,19 @@ async function ADD_IMPORT_SRC() {
   process.exit(0);
 }
 
+export const BACKUP_NM = () => {
+  const folderSource = crossPlatformPath([process.cwd(), config.folder.node_modules]);
+  const folderDest = crossPlatformPath([process.cwd(), `tmp-${config.folder.node_modules}`]);
+  Helpers.remove(folderDest);
+  Helpers.taskStarted('Copying node_modules...');
+  Helpers.copy(folderSource, folderDest);
+  Helpers.taskDone('Done copying');
+  process.exit(0)
+}
+
 export default {
   //#region export default
+  BACKUP_NM: Helpers.CLIWRAP(BACKUP_NM, 'BACKUP_NM'),
   ADD_IMPORT_SRC: Helpers.CLIWRAP(ADD_IMPORT_SRC, 'ADD_IMPORT_SRC'),
   PROPERWATCHERTEST: Helpers.CLIWRAP(PROPERWATCHERTEST, 'PROPERWATCHERTEST'),
   $REMOVE_BAD_TAG: Helpers.CLIWRAP($REMOVE_BAD_TAG, '$REMOVE_BAD_TAG'),
