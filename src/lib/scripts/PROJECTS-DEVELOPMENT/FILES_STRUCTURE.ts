@@ -135,6 +135,7 @@ export async function CLEAN(args: string, exit = true) {
           try {
             proj.node_modules.remove();
             proj.smartNodeModules.remove();
+            Helpers.remove(crossPlatformPath([proj.location, 'tmp-*']));
             proj.removeFolderByRelativePath(config.folder.dist);
             proj.removeFolderByRelativePath(config.folder.bundle);
             proj.removeFolderByRelativePath(config.folder.dist + '-app');
@@ -163,6 +164,8 @@ export async function CLEAN(args: string, exit = true) {
       }
     } else if (proj.isStandaloneProject) {
       await proj.filesStructure.clearFromArgs(args);
+      Helpers.remove(crossPlatformPath([proj.location, 'tmp-*']));
+      Helpers.removeFileIfExists(crossPlatformPath([proj.location, 'src/app.hosts.ts']));
     }
   };
 

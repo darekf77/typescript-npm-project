@@ -45,15 +45,15 @@ export class BuildProcessController extends Firedev.Base.Controller<any> {
 
   async initialize(buildProcess: BuildProcessFeature, project: Project, basePort: number) {
 
-    project.saveLaunchJson(basePort);
+    // project.saveLaunchJson(basePort);
 
-    if (project.isSmartContainer) {
-      const container = project;
+    // if (project.isSmartContainer) {
+    //   const container = project;
 
-    } else if (project.isStandaloneProject && !project.isSmartContainerTarget) {
-      const standalone = project;
+    // } else if (project.isStandaloneProject && !project.isSmartContainerTarget) {
+    //   const standalone = project;
 
-    }
+    // }
   }
 
 }

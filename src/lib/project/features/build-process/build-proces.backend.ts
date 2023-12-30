@@ -120,44 +120,6 @@ to fix it.
     }
     //#endregion
 
-    if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
-
-      if (!this.project.node_modules.exist) {
-        Helpers.error('Please start lib build first', false, true)
-      }
-
-    } else {
-      if (buildOptions.watch) {
-        log.data('is lib build watch')
-        await this.project.filesStructure.init(buildOptions.args, { watch: true, watchOnly: buildOptions.watchOnly });
-      } else {
-        await this.project.filesStructure.init(buildOptions.args);
-      }
-    }
-    log.data('before file templates')
-
-    //#region handle build clients projects
-
-    log.data(`
-
-    projec: ${this.project.genericName}
-    type: ${this.project._type}
-    `);
-
-
-    //#endregion
-
-    //#region report start building message
-    // console.log('WEBSQL', buildOptions.websql)
-
-    log.taskStarted(`\n\t${chalk.bold('[build-process] Start of Building')} ${this.project.genericName} `
-      + `(${buildOptions.appBuild ? 'app' : 'lib'}) ${buildOptions.websql ? '[WEBSQL]' : ''}\n`);
-    if (global.tnpNonInteractive) {
-      PROGRESS_DATA.log({ msg: `[build-process] Start of building ${this.project.genericName} ${buildOptions.websql ? '[WEBSQL]' : ''}` })
-    }
-
-    //#endregion
-
     // console.log({
     //   'buildOptions.appBuild': buildOptions.appBuild
     // })
@@ -207,6 +169,46 @@ to fix it.
       Helpers.taskDone('project service started')
       // console.log({ context })
     }
+
+    if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
+
+      if (!this.project.node_modules.exist) {
+        Helpers.error('Please start lib build first', false, true)
+      }
+
+    } else {
+      if (buildOptions.watch) {
+        log.data('is lib build watch')
+        await this.project.filesStructure.init(buildOptions.args, { watch: true, watchOnly: buildOptions.watchOnly });
+      } else {
+        await this.project.filesStructure.init(buildOptions.args);
+      }
+    }
+    log.data('before file templates')
+
+    //#region handle build clients projects
+
+    log.data(`
+
+    projec: ${this.project.genericName}
+    type: ${this.project._type}
+    `);
+
+
+    //#endregion
+
+    //#region report start building message
+    // console.log('WEBSQL', buildOptions.websql)
+
+    log.taskStarted(`\n\t${chalk.bold('[build-process] Start of Building')} ${this.project.genericName} `
+      + `(${buildOptions.appBuild ? 'app' : 'lib'}) ${buildOptions.websql ? '[WEBSQL]' : ''}\n`);
+    if (global.tnpNonInteractive) {
+      PROGRESS_DATA.log({ msg: `[build-process] Start of building ${this.project.genericName} ${buildOptions.websql ? '[WEBSQL]' : ''}` })
+    }
+
+    //#endregion
+
+
 
     await this.project.build(buildOptions);
     //#region handle end of building
