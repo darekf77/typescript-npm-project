@@ -34,7 +34,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
 
   protected readonly notAllowedFiles = [
     '.DS_Store',
-    config.file.index_d_ts,
+    // config.file.index_d_ts,
   ];
 
   protected readonly sourceFolders = [
