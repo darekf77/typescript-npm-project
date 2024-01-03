@@ -251,6 +251,10 @@ export class BrowserCodeCut {
     this.processAssetsLinksForApp();
     this.warnAboutUsingFilesFromNodeModulesWithLibFiles(this.rawContentForAPPONLYBrowser, this.absFileSourcePathBrowserOrWebsqlAPPONLY);
 
+    if (!this.isAssetsFile && this.relativePath.endsWith('.backend.ts')) {
+      return;
+    }
+
     if (isTsFile) {
       if (!this.relativePath.startsWith('app/')) {
         fse.writeFileSync(this.absFileSourcePathBrowserOrWebsql,
