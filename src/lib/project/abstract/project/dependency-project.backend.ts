@@ -230,6 +230,9 @@ function libs(targetClients: ProjectBuild[], targetAsLibAlso = false) {
 }
 
 
+/**
+ * @deprecated
+ */
 function reorderResult(result = [] as Project[]) {
   let i = 0;
   let maxNoup = 0;
