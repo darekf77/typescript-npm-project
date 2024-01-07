@@ -250,25 +250,30 @@ export class FilesStructure extends FeatureForProject {
     if (!this.project.isDocker && !this.project.isVscodeExtension) {
       if (this.project.isStandaloneProject) {
         if (watch) {
-          await this.project.frameworkFileGenerator.startAndWatch(this.taskNames.frameworkFileGenerator, {
-            watchOnly, afterInitCallBack: async () => {
-              await this.project.compilerCache.setUpdatoDate.frameworkFileGenerator();
-            }
-          });
+          await this.project.frameworkFileGenerator.startAndWatch(
+            {
+              taskName: this.taskNames.frameworkFileGenerator,
+              watchOnly,
+              afterInitCallBack: async () => {
+                await this.project.compilerCache.setUpdatoDate.frameworkFileGenerator();
+              }
+            });
           // if (!this.project) {
           //   console.trace('HERE')
           // }
-          await this.project.sourceModifier.startAndWatch(this.taskNames.sourceModifir, {
-            watchOnly, afterInitCallBack: async () => {
+          await this.project.sourceModifier.startAndWatch({
+            taskName: this.taskNames.sourceModifir,
+            watchOnly,
+            afterInitCallBack: async () => {
               await this.project.compilerCache.setUpdatoDate.sourceModifier();
             }
           });
         } else {
-          await this.project.frameworkFileGenerator.start(this.taskNames.frameworkFileGenerator);
+          await this.project.frameworkFileGenerator.start({ taskName: this.taskNames.frameworkFileGenerator });
           // if (!this.project) {
           //   console.trace('HERE')
           // }
-          await this.project.sourceModifier.start(this.taskNames.sourceModifir);
+          await this.project.sourceModifier.start({ taskName: this.taskNames.sourceModifir });
         }
         // process.exit(0)
       }

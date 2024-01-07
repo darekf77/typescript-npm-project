@@ -199,19 +199,19 @@ export class SourceModifier extends SourceModForStandaloneProjects {
     return input;
   }
 
-  async start(taskName?: string, afterInitCallBack?: () => void) {
+  async start(options?: IncCompiler.Models.StartOptions) {
     if (!IS_ENABLE) {
       return;
     }
-    return super.start(taskName, afterInitCallBack);
+    return super.start(options);
   }
 
-  async startAndWatch(taskName?: string, options?: IncCompiler.Models.StartAndWatchOptions) {
+  async startAndWatch(options?: IncCompiler.Models.StartAndWatchOptions) {
     if (!IS_ENABLE) {
       return;
     }
     Helpers.log(`Start source modifer for ${this.project.genericName}`)
-    return super.startAndWatch(taskName, options);
+    return super.startAndWatch(options);
   }
 
 }

@@ -13,9 +13,9 @@ import { Helpers } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
 //#endregion
 
-export abstract class FeatureCompilerForProject<RES_ASYNC = any, RES_SYNC = any, ADDITIONAL_DATA = any>
+export abstract class FeatureCompilerForProject<ADDITIONAL_DATA = any>
   //#region @backend
-  extends IncCompiler.Base<RES_ASYNC, RES_SYNC, ADDITIONAL_DATA>
+  extends IncCompiler.Base<ADDITIONAL_DATA>
 //#endregion
 {
 

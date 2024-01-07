@@ -450,9 +450,9 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
           this.copyManager.init(buildOptions);
           const taskName = 'copyto manger';
           if (buildOptions.watch) {
-            await this.copyManager.startAndWatch(taskName)
+            await this.copyManager.startAndWatch({ taskName })
           } else {
-            await this.copyManager.start(taskName)
+            await this.copyManager.start({ taskName })
           }
         }
       }

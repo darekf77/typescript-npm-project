@@ -4,30 +4,30 @@ import { Helpers } from 'tnp-helpers/src';
 const testTasks = 'Test task'
 
 async function $COMPILER_SM() {
-  await (Project.Current as Project).sourceModifier.start(testTasks);
+  await (Project.Current as Project).sourceModifier.start({ taskName: testTasks });
   process.exit(0)
 }
 
 async function $COMPILER_SM_WATCH() {
-  await (Project.Current as Project).sourceModifier.startAndWatch(testTasks);
+  await (Project.Current as Project).sourceModifier.startAndWatch({ taskName: testTasks });
 }
 
 async function $COMPILER_SM_WATCH_ONLY() {
-  await (Project.Current as Project).sourceModifier.startAndWatch(testTasks, { watchOnly: true });
+  await (Project.Current as Project).sourceModifier.startAndWatch({ taskName: testTasks, watchOnly: true });
 }
 
 async function $COMPILER_FFG() {
   console.info('FRAMEWORK FILES FGENERATOR')
-  await (Project.Current as Project).frameworkFileGenerator.start(testTasks);
+  await (Project.Current as Project).frameworkFileGenerator.start({ taskName: testTasks });
   process.exit(0)
 }
 
 async function $COMPILER_FFG_WATCH() {
-  await (Project.Current as Project).frameworkFileGenerator.startAndWatch(testTasks);
+  await (Project.Current as Project).frameworkFileGenerator.startAndWatch({ taskName: testTasks });
 }
 
 async function $COMPILER_FFG_WATCH_ONLY() {
-  await (Project.Current as Project).frameworkFileGenerator.startAndWatch(testTasks, { watchOnly: true });
+  await (Project.Current as Project).frameworkFileGenerator.startAndWatch({ taskName: testTasks, watchOnly: true });
 }
 
 
