@@ -52,6 +52,9 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         // 'app/README.md',
         'app/angular.json',
         'app/jest.config.js',
+        'app/electron-builder.json',
+        'app/electron/main.js',
+        'app/electron/package.json',
         'app/karma.conf.js',
         'app/package-lock.json',
         'app/package.json',
@@ -549,6 +552,47 @@ ${appModuleFile}
           Helpers.remove(assetsDest);
           Helpers.createSymLink(assetsSource, assetsDest)
 
+
+        })();
+        //#endregion
+
+        //#region electron
+        (() => {
+
+          if (client.isSmartContainerTarget) {
+            return;
+          }
+
+          const electronBackend = crossPlatformPath(path.join(
+            project.location,
+            replacement('{{{outFolder}}}')
+          ));
+
+          if (!Helpers.exists(electronBackend)) {
+            Helpers.mkdirp(electronBackend);
+          }
+
+          const compileTs = crossPlatformPath(path.join(
+            project.location
+            ,
+            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+            ,
+            `/electron/compiled`
+          ));
+          Helpers.remove(compileTs);
+          Helpers.createSymLink(electronBackend, compileTs)
+
+          const electronConfigPath = crossPlatformPath(path.join(
+            project.location
+            ,
+            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+            ,
+            `/electron-builder.json`
+          ));
+
+          const electronConfig = Helpers.readJson(electronConfigPath);
+          electronConfig.directories.output = replacement(`../../tmp-electron-release/{{{outFolder}}}${this.websql ? '-websql' : ''}/`);
+          Helpers.writeJson(electronConfigPath, electronConfig);
 
         })();
         //#endregion

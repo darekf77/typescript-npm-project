@@ -25,6 +25,7 @@ import { RouterProject } from './router-project.backend';
 import { RecreatableProject } from './recreatable-project.backend';
 import { EntityProject } from './entity-projects.backend';
 import { BuildableProject } from './buildable-project.backend';
+import { ElectronProject } from './electron-project.backend';
 import {
   PackageJSON, QuickFixes,
   NpmPackages, NodeModules, FilesRecreator, FilesFactory,
@@ -231,6 +232,7 @@ export interface Project extends
   RecreatableProject,
   EntityProject,
   BuildableProject,
+  ElectronProject,
   DbProcessProject,
   DependencyProject,
   CompilerCache {
@@ -254,6 +256,7 @@ Helpers.applyMixins(Project, [
   RecreatableProject,
   EntityProject,
   BuildableProject,
+  ElectronProject,
   DbProcessProject,
   DependencyProject,
   CompilerCache

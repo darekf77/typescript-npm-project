@@ -504,8 +504,55 @@ const $REBUILD = async (args) => {
 };
 //#endregion
 
+const ELECTRON_WATCH = async (args: string) => {
+  const proj = Project.Current as Project;
+  if (proj.isStandaloneProject) {
+    await proj.serverElectron(args);
+  } else {
+    Helpers.error(`Electron apps compilation only for standalone projects`, false, true);
+  }
+}
+
+const ELECTRON_BUILD = async (args: string) => {
+  const proj = Project.Current as Project;
+  if (proj.isStandaloneProject) {
+    await proj.buildElectron('dist', args);
+  } else {
+    Helpers.error(`Electron apps compilation only for standalone projects`, false, true);
+  }
+  process.exit(0)
+}
+
+
+const ELECTRON_BUILD_BUNDLE = async (args: string) => {
+  const proj = Project.Current as Project;
+  if (proj.isStandaloneProject) {
+    await proj.buildElectron('bundle', args);
+  } else {
+    Helpers.error(`Electron apps compilation only for standalone projects`, false, true);
+  }
+  process.exit(0)
+}
+
+
+const INACTIVE_LINKS = async (args: string) => {
+  const proj = Project.Current as Project;
+  const unexistedLinks = Helpers
+    .linksToFolderFrom(proj.pathFor(config.folder.node_modules))
+    .filter(link => Helpers.isUnexistedLink(link));
+  ;
+  console.log({ unexistedLinks })
+  process.exit(0)
+}
+
+
+
 export default {
   //#region export default
+  INACTIVE_LINKS: Helpers.CLIWRAP(INACTIVE_LINKS, 'INACTIVE_LINKS'),
+  ELECTRON_WATCH: Helpers.CLIWRAP(ELECTRON_WATCH, 'ELECTRON_WATCH'),
+  ELECTRON_BUILD: Helpers.CLIWRAP(ELECTRON_BUILD, 'ELECTRON_BUILD'),
+  ELECTRON_BUILD_BUNDLE: Helpers.CLIWRAP(ELECTRON_BUILD_BUNDLE, 'ELECTRON_BUILD_BUNDLE'),
   DEV: Helpers.CLIWRAP(DEV, 'DEV'),
   $REBUILD: Helpers.CLIWRAP($REBUILD, '$REBUILD'),
   $BUILD_UP: Helpers.CLIWRAP($BUILD_UP, '$BUILD_UP'),
