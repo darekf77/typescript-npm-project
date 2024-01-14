@@ -16,6 +16,7 @@ import { Log } from 'ng2-logger/src';
 import { Morphi as Firedev } from 'morphi/src';
 import { BuildProcess, BuildProcessController } from './app/build-process';
 import { CLI } from 'tnp-cli/src';
+import { DEFAULT_PORT } from '../../../constants';
 // import { FiredevBinaryFile, FiredevBinaryFileController, FiredevFile, FiredevFileController, FiredevFileCss } from 'firedev-ui';
 
 const log = Log.create(__filename)
@@ -123,12 +124,13 @@ to fix it.
     // console.log({
     //   'buildOptions.appBuild': buildOptions.appBuild
     // })
-    if (!buildOptions.appBuild && frameworkName !== 'firedev') {
+    const tmpBuildPort = 'tmp-build-port';
+    if (!buildOptions.appBuild) {
       const assignedPort = await this.project.assignFreePort(4100);
+      Helpers.writeFile(this.project.pathFor(tmpBuildPort), assignedPort?.toString());
 
-      if (frameworkName === 'tnp') { // TODO @REMOVE
-        const host = `http://localhost:${assignedPort}`;
-        Helpers.info(`
+      const host = `http://localhost:${assignedPort}`;
+      Helpers.info(`
 
 
 
@@ -137,33 +139,36 @@ to fix it.
 
 
         `)
-        Helpers.taskStarted(`starting project service... ${host}`)
-        try {
-          const context = await Firedev.init({
-            host,
-            controllers: [
-              BuildProcessController,
-            ],
-            entities: [
-              BuildProcess,
-            ],
-            //#region @websql
-            config: {
-              type: 'better-sqlite3',
-              database: `tmp-build-process${buildOptions.websql ? '-websql' : ''}.sqlite`,
-              logging: false,
-            }
-            //#endregion
-          });
-        } catch (error) {
-          console.error(error);
-          Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
-        }
-
+      Helpers.taskStarted(`starting project service... ${host}`)
+      try {
+        const context = await Firedev.init({
+          mode: 'backend/frontend-worker',
+          host,
+          controllers: [
+            BuildProcessController,
+          ],
+          entities: [
+            BuildProcess,
+          ],
+          //#region @websql
+          config: {
+            type: 'better-sqlite3',
+            database: `tmp-build-process.sqlite`,
+            logging: false,
+          }
+          //#endregion
+        });
         // const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
-        // await controller.initialize(this, this.project, assignedPort);
-      }
+        // await controller.initialize(this.project);
 
+
+        // this.project.standaloneNormalAppPort = Number((await controller.getPortFor('normal').received).responseText);
+        // this.project.standaloneWebsqlAppPort = Number((await controller.getPortFor('websql').received).responseText);
+
+      } catch (error) {
+        console.error(error);
+        Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
+      }
 
       this.project.saveLaunchJson(assignedPort);
       Helpers.taskDone('project service started')
@@ -171,6 +176,32 @@ to fix it.
     }
 
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
+
+      if (!buildOptions.serveApp) {
+        // const assignedPortFromFile = Number(Helpers.readFile(this.project.pathFor(tmpBuildPort)));
+        // const host = `http://localhost:${assignedPortFromFile}`;
+        // try {
+        //   const context = await Firedev.init({
+        //     mode: 'remote-backend',
+        //     host,
+        //     controllers: [
+        //       BuildProcessController,
+        //     ],
+        //     entities: [
+        //       BuildProcess,
+        //     ]
+        //   });
+        //   const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
+        //   await controller.initialize(this.project);
+
+        //   this.project.standaloneNormalAppPort = (await controller.getPortFor('normal').received).body.numericValue;
+        //   this.project.standaloneWebsqlAppPort = (await controller.getPortFor('websql').received).body.numericValue;
+        //   this.project.saveLaunchJson(assignedPortFromFile);
+        // } catch (error) {
+        //   console.error(error);
+        //   Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
+        // }
+      }
 
       if (!this.project.node_modules.exist) {
         Helpers.error('Please start lib build first', false, true)

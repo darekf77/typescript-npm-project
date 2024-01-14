@@ -167,9 +167,7 @@ const $BUILD_DIST_APP = (args) => (Project.Current as Project).buildProcess.star
 const $BUILD_BUNDLE_APP = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, false, 'bundle', args);
 
 const $BUILD_APP_WATCH_PROD = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', args);
-const $START_APP = async (args) => {
-  await (Project.Current as Project).startServer(args);
-};
+
 
 const $BUILD_PROD = async (args) => {
   if ((Project.Current as Project).typeIs(...config.allowedTypes.libs)) {
@@ -209,78 +207,78 @@ async function $BUILD_DOCS_PROD(args) {
 
 //#region SERVE
 const $SERVE = async (args) => {
-  let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
-  if (!proj) {
-    proj = Project.nearestTo<Project>(crossPlatformPath(process.cwd()));
-  }
-  if (proj && proj.isStandaloneProject) {
-    if (!proj.env || !proj.env.config || !proj.env.config.build.options) {
-      Helpers.error(`Please build your project first`, false, true);
-    }
-    if ((proj.typeIs('isomorphic-lib') && proj.frameworkVersionAtLeast('v3'))) {
-      //#region serve angular lib
-      const localUrl = `http://localhost:${8080}/${proj.name}/`;
-      const app = express();
-      const filesLocation = path.join(proj.location, config.folder.docs);
-      const mainfestOverride = `/${proj.name}/${config.file.manifest_webmanifest}`;
+  // let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  // if (!proj) {
+  //   proj = Project.nearestTo<Project>(crossPlatformPath(process.cwd()));
+  // }
+  // if (proj && proj.isStandaloneProject) {
+  //   if (!proj.env || !proj.env.config || !proj.env.config.build.options) {
+  //     Helpers.error(`Please build your project first`, false, true);
+  //   }
+  //   if ((proj.typeIs('isomorphic-lib') && proj.frameworkVersionAtLeast('v3'))) {
+  //     //#region serve angular lib
+  //     const localUrl = `http://localhost:${8080}/${proj.name}/`;
+  //     const app = express();
+  //     const filesLocation = path.join(proj.location, config.folder.docs);
+  //     const mainfestOverride = `/${proj.name}/${config.file.manifest_webmanifest}`;
 
-      app.get(`/${proj.name}/*`, (req, res) => {
-        // res.set('Service-Worker-Allowed',
-        //   [
-        //     '/bs4-breakpoint/',
-        //   ].join(', '))
+  //     app.get(`/${proj.name}/*`, (req, res) => {
+  //       // res.set('Service-Worker-Allowed',
+  //       //   [
+  //       //     '/bs4-breakpoint/',
+  //       //   ].join(', '))
 
-        // console.log(`path: "${req.path}"`)
-        // console.log(`ORIG: "${req.originalUrl}"`)
-        let filePath = req.originalUrl
-          .replace(/\/$/, '')
-          .replace(new RegExp(Helpers.escapeStringForRegEx(`/${proj.name}`)), '')
-          .replace(new RegExp(Helpers.escapeStringForRegEx(`/${proj.name}`)), '') // QUICKFIX
-          .replace(/^\//, '');
-        // console.log(`path file: "${filePath}"`)
-        // res.send(filePath)
-        // res.end()
-        if (filePath.includes('?')) {
-          filePath = filePath.split('?')[0];
-        }
-        if (filePath === '') {
-          filePath = 'index.html';
-        }
+  //       // console.log(`path: "${req.path}"`)
+  //       // console.log(`ORIG: "${req.originalUrl}"`)
+  //       let filePath = req.originalUrl
+  //         .replace(/\/$/, '')
+  //         .replace(new RegExp(Helpers.escapeStringForRegEx(`/${proj.name}`)), '')
+  //         .replace(new RegExp(Helpers.escapeStringForRegEx(`/${proj.name}`)), '') // QUICKFIX
+  //         .replace(/^\//, '');
+  //       // console.log(`path file: "${filePath}"`)
+  //       // res.send(filePath)
+  //       // res.end()
+  //       if (filePath.includes('?')) {
+  //         filePath = filePath.split('?')[0];
+  //       }
+  //       if (filePath === '') {
+  //         filePath = 'index.html';
+  //       }
 
-        if (filePath === config.file.manifest_webmanifest) {
-          const localMainfest = path.join(filesLocation, config.file.manifest_webmanifest);
-          const file = JSON.parse(Helpers.readFile(localMainfest));
-          file.start_url = localUrl;
-          // console.log('mainfest override')
-          res.json(file);
-        } else {
-          res.sendFile(filePath, { root: filesLocation });
-        }
-      });
-      app.listen(8080, () => {
-        console.log(`${config.frameworkName} standalone serve is runnning on: ${localUrl}`);
-      });
-      //#endregion
-    }
-    if (proj.typeIs('isomorphic-lib', 'docker')) {
-      await proj.startServer(args);
-    }
+  //       if (filePath === config.file.manifest_webmanifest) {
+  //         const localMainfest = path.join(filesLocation, config.file.manifest_webmanifest);
+  //         const file = JSON.parse(Helpers.readFile(localMainfest));
+  //         file.start_url = localUrl;
+  //         // console.log('mainfest override')
+  //         res.json(file);
+  //       } else {
+  //         res.sendFile(filePath, { root: filesLocation });
+  //       }
+  //     });
+  //     app.listen(8080, () => {
+  //       console.log(`${config.frameworkName} standalone serve is runnning on: ${localUrl}`);
+  //     });
+  //     //#endregion
+  //   }
+  //   if (proj.typeIs('isomorphic-lib', 'docker')) {
+  //     await proj.startServer(args);
+  //   }
 
-  } else {
-    const configServe: Models.dev.BuildServeArgsServe = require('minimist')(args.split(' '));
-    if (!configServe.port && !configServe.baseUrl && !configServe.outDir) {
-      Helpers.error(`Bad arguments for ${config.frameworkName} serve: ${configServe}`);
-    }
-    const app = express();
-    app.use(configServe.baseUrl, express.static(crossPlatformPath(path.join(crossPlatformPath(process.cwd()), configServe.outDir))));
-    app.listen(configServe.port, () => {
-      console.log(`${config.frameworkName} serve is runnning on: http://localhost:${configServe.port}${configServe.baseUrl}
+  // } else {
+  //   const configServe: Models.dev.BuildServeArgsServe = require('minimist')(args.split(' '));
+  //   if (!configServe.port && !configServe.baseUrl && !configServe.outDir) {
+  //     Helpers.error(`Bad arguments for ${config.frameworkName} serve: ${configServe}`);
+  //   }
+  //   const app = express();
+  //   app.use(configServe.baseUrl, express.static(crossPlatformPath(path.join(crossPlatformPath(process.cwd()), configServe.outDir))));
+  //   app.listen(configServe.port, () => {
+  //     console.log(`${config.frameworkName} serve is runnning on: http://localhost:${configServe.port}${configServe.baseUrl}
 
-      Access project link: http://localhost:${proj.env.config.workspace.workspace.port}${configServe.baseUrl}
+  //     Access project link: http://localhost:${proj.env.config.workspace.workspace.port}${configServe.baseUrl}
 
-      `);
-    });
-  }
+  //     `);
+  //   });
+  // }
 
 };
 
@@ -595,7 +593,7 @@ export default {
   $BUILD_BUNDLE_APP: Helpers.CLIWRAP($BUILD_BUNDLE_APP, '$BUILD_BUNDLE_APP'),
 
   $BUILD_APP_WATCH_PROD: Helpers.CLIWRAP($BUILD_APP_WATCH_PROD, '$BUILD_APP_WATCH_PROD'),
-  $START_APP: Helpers.CLIWRAP($START_APP, '$START_APP'),
+
   $BUILD_PROD: Helpers.CLIWRAP($BUILD_PROD, '$BUILD_PROD'),
   $START: Helpers.CLIWRAP($START, '$START'),
   // $START_WATCH: Helpers.CLIWRAP($START_WATCH, '$START_WATCH'),

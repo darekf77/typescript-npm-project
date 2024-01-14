@@ -1,94 +1,94 @@
-//#region @backend
-import chalk from 'chalk';
-import { _ } from 'tnp-core/src';
-import * as portfinder from 'portfinder';
-import * as httpProxy from 'http-proxy';
-import * as http from 'http';
+// //#region @backend
+// import chalk from 'chalk';
+// import { _ } from 'tnp-core/src';
+// import * as portfinder from 'portfinder';
+// import * as httpProxy from 'http-proxy';
+// import * as http from 'http';
 
-import { Helpers } from 'tnp-helpers/src';
-import { Project, FeatureForProject } from '../abstract';
+// import { Helpers } from 'tnp-helpers/src';
+// import { Project, FeatureForProject } from '../abstract';
 
-export class ProxyRouter extends FeatureForProject {
+// export class ProxyRouter extends FeatureForProject {
 
-  private static takenPorts = [];
+//   private static takenPorts = [];
 
-  public static async getFreePort(from: number = 4000) {
-    try {
+//   public static async getFreePort(from: number = 4000) {
+//     try {
 
-      // console.log(ProjectRouter.takenPorts)
-      while (this.takenPorts.includes(from)) {
-        from += 1;
-      }
-      // console.log('from ', from)
-      this.takenPorts.push(from)
-      const port = await portfinder.getPortPromise({ port: from })
-      this.takenPorts.push(port);
-      return port;
-    } catch (err) {
-      Helpers.error(err)
-    }
-  }
-
-
-  private getProjectFrom(req: http.IncomingMessage): Project {
-    // console.log('req', req)
-    // console.log('getProject.From routes', this.routes.map(r => r.baseUrl))
-    // console.log(`Request url "${req.url}"`)
-    const r = this.project.env.config.workspace.projects.find(r => {
-      return new RegExp(`${r.baseUrl}.*`, 'g').test(req.url)
-    })
-    if (r) {
-      // req.url = req.url.replace(r.baseUrl, '');
-      // console.log('Founded route ', r.name)
-
-      const project = this.project.children.find(p => p.name === r.name);
-      return project;
-    }
-  }
+//       // console.log(ProjectRouter.takenPorts)
+//       while (this.takenPorts.includes(from)) {
+//         from += 1;
+//       }
+//       // console.log('from ', from)
+//       this.takenPorts.push(from)
+//       const port = await portfinder.getPortPromise({ port: from })
+//       this.takenPorts.push(port);
+//       return port;
+//     } catch (err) {
+//       Helpers.error(err)
+//     }
+//   }
 
 
+//   private getProjectFrom(req: http.IncomingMessage): Project {
+//     // console.log('req', req)
+//     // console.log('getProject.From routes', this.routes.map(r => r.baseUrl))
+//     // console.log(`Request url "${req.url}"`)
+//     const r = this.project.env.config.workspace.projects.find(r => {
+//       return new RegExp(`${r.baseUrl}.*`, 'g').test(req.url)
+//     })
+//     if (r) {
+//       // req.url = req.url.replace(r.baseUrl, '');
+//       // console.log('Founded route ', r.name)
 
-  private getTarget(req: http.IncomingMessage): string {
-    const p = this.getProjectFrom(req);
-    return p ? p.routerTargetHttp() : void 0;
-  }
+//       const project = this.project.children.find(p => p.name === r.name);
+//       return project;
+//     }
+//   }
 
-  private server(onServerReady: (serverPort?: number) => void) {
-    const proxy = httpProxy.createProxyServer({});
 
-    const server = http.createServer((req, res) => {
-      const target = this.getTarget(req);
-      if (target) {
-        proxy.web(req, res, { target });
-      } else {
-        res.write('not found')
-        res.end();
-      }
-    });
 
-    server.on('upgrade', (req, socket, head) => {
-      const target = this.getTarget(req)
-      proxy.ws(req, socket, head, target ? { target } : void 0);
-    });
+//   private getTarget(req: http.IncomingMessage): string {
+//     const p = this.getProjectFrom(req);
+//     return p ? p.routerTargetHttp() : void 0;
+//   }
 
-    const serverPort = this.project.getDefaultPort();
+//   private server(onServerReady: (serverPort?: number) => void) {
+//     const proxy = httpProxy.createProxyServer({});
 
-    server.listen(serverPort, () => {
-      Helpers.log(`Proxy Router activate on ${this.project.env.config.workspace.workspace.host}`)
-      if (_.isFunction(onServerReady)) {
-        onServerReady(serverPort);
-      }
-    }).on('error', e => {
-      Helpers.log('proxy server error ')
-      Helpers.error(e, true, true)
-    })
-  }
+//     const server = http.createServer((req, res) => {
+//       const target = this.getTarget(req);
+//       if (target) {
+//         proxy.web(req, res, { target });
+//       } else {
+//         res.write('not found')
+//         res.end();
+//       }
+//     });
 
-  // private async portTests() {
-  //   console.log(await ProxyRouter.getFreePort())
-  //   console.log(await ProxyRouter.getFreePort())
-  //   console.log(await ProxyRouter.getFreePort())
-  // }
+//     server.on('upgrade', (req, socket, head) => {
+//       const target = this.getTarget(req)
+//       proxy.ws(req, socket, head, target ? { target } : void 0);
+//     });
 
-}
-//#endregion
+//     // const serverPort = this.project.getDefaultPort();
+
+//     // server.listen(serverPort, () => {
+//     //   Helpers.log(`Proxy Router activate on ${this.project.env.config.workspace.workspace.host}`)
+//     //   if (_.isFunction(onServerReady)) {
+//     //     onServerReady(serverPort);
+//     //   }
+//     // }).on('error', e => {
+//     //   Helpers.log('proxy server error ')
+//     //   Helpers.error(e, true, true)
+//     // })
+//   }
+
+//   // private async portTests() {
+//   //   console.log(await ProxyRouter.getFreePort())
+//   //   console.log(await ProxyRouter.getFreePort())
+//   //   console.log(await ProxyRouter.getFreePort())
+//   // }
+
+// }
+// //#endregion

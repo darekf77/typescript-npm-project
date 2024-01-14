@@ -299,7 +299,6 @@ export class ProjectIsomorphicLib
     let client = _.first(forClient as Project[]);
     let port: number;
     if (client) {
-      port = client.getDefaultPort();
       webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name}`;
     }
 
@@ -307,6 +306,10 @@ export class ProjectIsomorphicLib
     if (_.isNumber(argsAdditionalParams.port)) {
       port = argsAdditionalParams.port;
     }
+    if (!_.isNumber(port) || !port) {
+      port = websql ? this.standaloneWebsqlAppPort : this.standaloneNormalAppPort;
+    }
+
     if (!_.isNumber(port) || !port) {
       port = await this.assignFreePort(DEFAULT_PORT.APP_BUILD_LOCALHOST);
     }

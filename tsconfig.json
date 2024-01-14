@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.isomorphic.json",
   "compilerOptions": {
+    "strictNullChecks": false,
     "rootDir": "./src",
     "paths": {
       "tnp": [

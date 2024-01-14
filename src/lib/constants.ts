@@ -1,4 +1,5 @@
 import { Models } from "tnp-models/src";
+import type { Project } from "./project/abstract";
 
 export const argsToClear = [
   'websql',
@@ -22,6 +23,7 @@ export const DEFAULT_PORT = {
 }
 
 export const PortUtils = (basePort: number) => {
+
   /**
    * max childs
    */
@@ -39,16 +41,24 @@ export const PortUtils = (basePort: number) => {
         }
       }
     },
-    tempalteFor(backendPort: number) {
+    appHostTemplateFor(backendPort: number, project: Project) {
+      //#region @backendFunc
+      const clientPorts = (project.isStandaloneProject && !project.isSmartContainerTarget) ? `
+export const CLIENT_DEV_NORMAL_APP_PORT = ${project.standaloneNormalAppPort};
+export const CLIENT_DEV_WEBSQL_APP_PORT = ${project.standaloneWebsqlAppPort};
+      `: ''
+
       return `
 // THIS FILE IS GENERATED - DO NOT MODIFY
 
 export const HOST_BACKEND_PORT = ${backendPort};
+${clientPorts}
 
 // You can check build here http://localhost:${basePort}
 
 // THIS FILE IS GENERATED - DO NOT MODIFY
 `.trim()
+      //#endregion
     }
   }
 }

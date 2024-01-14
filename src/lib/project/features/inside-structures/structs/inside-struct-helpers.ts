@@ -132,7 +132,8 @@ export function recreateApp(project: Project) {
   ));
 
   if (!Helpers.exists(appFile) && !Helpers.exists(appFolderWithIndex)) {
-    Helpers.writeFile(appHostsFile, PortUtils(DEFAULT_PORT.SERVER_LOCALHOST).tempalteFor(DEFAULT_PORT.SERVER_LOCALHOST + 400));
+    Helpers.writeFile(appHostsFile, PortUtils(DEFAULT_PORT.SERVER_LOCALHOST).appHostTemplateFor(
+      DEFAULT_PORT.SERVER_LOCALHOST + 400, project));
   }
 
   if (!Helpers.exists(appFile) && !Helpers.exists(appFolderWithIndex)) {

@@ -21,7 +21,7 @@ import { TnpProject } from './tnp-project';
 import { FolderProject } from './folder-project';
 import { LibProject } from './lib-project.backend';
 import { VscodeProject } from './vscode-project.backend';
-import { RouterProject } from './router-project.backend';
+
 import { RecreatableProject } from './recreatable-project.backend';
 import { EntityProject } from './entity-projects.backend';
 import { BuildableProject } from './buildable-project.backend';
@@ -32,7 +32,7 @@ import {
   FilesTemplatesBuilder,
   MochaTestRunner, JestTestRunner, CypressTestRunner,
   EnvironmentConfig,
-  ProxyRouter, FilesStructure, BuildProcessFeature, TargetProject,
+  FilesStructure, BuildProcessFeature, TargetProject,
   GitActions,
   WebpackBackendCompilation,
   LinkedRepos,
@@ -116,6 +116,8 @@ export class Project extends $Project<Project>
   env?: EnvironmentConfig;
   //#endregion
   browser: any;
+  standaloneNormalAppPort: number;
+  standaloneWebsqlAppPort: number;
   location: string;
 
   //#region @backend
@@ -189,9 +191,7 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('testsJest', JestTestRunner);
       this.defineProperty<Project>('testsCypress', CypressTestRunner);
       Project.projects.push(this);
-      this.__defaultPort = Project.DefaultPortByType(this._type);
       this.defineProperty<Project>('env', EnvironmentConfig);
-      this.defineProperty<Project>('proxyRouter', ProxyRouter);
       this.defineProperty<Project>('copyManager', CopyManager);
       this.defineProperty<Project>('filesStructure', FilesStructure);
       this.defineProperty<Project>('buildProcess', BuildProcessFeature);
@@ -228,7 +228,6 @@ export interface Project extends
   LibProject,
   VscodeProject,
   TnpProject,
-  RouterProject,
   RecreatableProject,
   EntityProject,
   BuildableProject,
@@ -252,7 +251,6 @@ Helpers.applyMixins(Project, [
   LibProject,
   VscodeProject,
 
-  RouterProject,
   RecreatableProject,
   EntityProject,
   BuildableProject,

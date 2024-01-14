@@ -6,7 +6,7 @@ import {
    MochaTestRunner,
   FilesStructure, FilesTemplatesBuilder, BuildProcessFeature,
   NodeModules, FilesRecreator, FilesFactory,
-  QuickFixes, NpmPackages, ProxyRouter, TargetProject, GitActions,
+  QuickFixes, NpmPackages, TargetProject, GitActions,
   SmartNodeModules, RecentFilesForContainer, LinkedRepos, Branding, DocsAppBuildConfig, AssetsManager,
   JestTestRunner,
   CypressTestRunner
@@ -110,10 +110,6 @@ export abstract class FeatureProject {
 
   //#region @backend
   public env: EnvironmentConfig;
-  //#endregion
-
-  //#region @backend
-  public proxyRouter: ProxyRouter;
   //#endregion
 
   //#region @backend
