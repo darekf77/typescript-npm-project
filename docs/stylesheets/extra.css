@@ -1,0 +1,25 @@
+[title="Documentation"] {
+  display: none !important;
+}
+
+/* [aria-label="Navigation"] {
+  label.md-nav__link--active {
+    background: none !important;
+    box-shadow: none !important;
+  }
+} */
+
+[href="."], [href="./"] {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+[data-md-color-scheme="default"] {
+  [data-md-component="main"] {
+    background-color: #ffc0cb73;
+  }
+}
+
+/* [data-md-component="search"], [data-md-component="palette"] {
+  margin-bottom: -102px;
+} */

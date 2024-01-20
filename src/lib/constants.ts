@@ -54,7 +54,9 @@ export const CLIENT_DEV_WEBSQL_APP_PORT = ${project.standaloneWebsqlAppPort};
 export const HOST_BACKEND_PORT = ${backendPort};
 ${clientPorts}
 
-// You can check build here http://localhost:${basePort}
+// Check yout build info here http://localhost:${basePort}
+// NORMAL APP: http://localhost:${project.standaloneNormalAppPort}
+// WEBSQL APP: http://localhost:${project.standaloneWebsqlAppPort}
 
 // THIS FILE IS GENERATED - DO NOT MODIFY
 `.trim()

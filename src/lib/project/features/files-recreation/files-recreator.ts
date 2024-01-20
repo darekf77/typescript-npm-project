@@ -79,7 +79,7 @@ export class FilesRecreator extends FeatureForProject {
                 ? [config.file.package_json]
                 : []
             ),
-            'docs',
+            // 'docs',
             'logo.svg',
             // ...(self.project.isWorkspace ? self.project.children.map(c => c.name) : [])
           ])
