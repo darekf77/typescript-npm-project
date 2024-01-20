@@ -126,6 +126,8 @@ to fix it.
     // })
     const tmpBuildPort = 'tmp-build-port';
     if (!buildOptions.appBuild) {
+
+      //#region main lib code build ports assignations
       const assignedPort = await this.project.assignFreePort(4100);
       Helpers.writeFile(this.project.pathFor(tmpBuildPort), assignedPort?.toString());
 
@@ -158,12 +160,9 @@ to fix it.
           }
           //#endregion
         });
-        // const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
-        // await controller.initialize(this.project);
-
-
-        // this.project.standaloneNormalAppPort = Number((await controller.getPortFor('normal').received).responseText);
-        // this.project.standaloneWebsqlAppPort = Number((await controller.getPortFor('websql').received).responseText);
+        const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
+        await controller.initialize(this.project);
+        await BuildProcess.assignPortForClient();
 
       } catch (error) {
         console.error(error);
@@ -173,35 +172,37 @@ to fix it.
       this.project.saveLaunchJson(assignedPort);
       Helpers.taskDone('project service started')
       // console.log({ context })
+      //#endregion
     }
+
 
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
 
       if (!buildOptions.serveApp) {
-        // const assignedPortFromFile = Number(Helpers.readFile(this.project.pathFor(tmpBuildPort)));
-        // const host = `http://localhost:${assignedPortFromFile}`;
-        // try {
-        //   const context = await Firedev.init({
-        //     mode: 'remote-backend',
-        //     host,
-        //     controllers: [
-        //       BuildProcessController,
-        //     ],
-        //     entities: [
-        //       BuildProcess,
-        //     ]
-        //   });
-        //   const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
-        //   await controller.initialize(this.project);
-
-        //   this.project.standaloneNormalAppPort = (await controller.getPortFor('normal').received).body.numericValue;
-        //   this.project.standaloneWebsqlAppPort = (await controller.getPortFor('websql').received).body.numericValue;
-        //   this.project.saveLaunchJson(assignedPortFromFile);
-        // } catch (error) {
-        //   console.error(error);
-        //   Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
-        // }
+        const assignedPortFromFile = Number(Helpers.readFile(this.project.pathFor(tmpBuildPort)));
+        const host = `http://localhost:${assignedPortFromFile}`;
+        try {
+          const context = await Firedev.init({
+            mode: 'remote-backend',
+            host,
+            controllers: [
+              BuildProcessController,
+            ],
+            entities: [
+              BuildProcess,
+            ]
+          });
+          const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
+          await controller.initialize(this.project);
+          this.project.standaloneNormalAppPort = (await controller.getPortForClient().received).body.numericValue;
+        } catch (error) {
+          console.error(error);
+          Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
+        }
+        this.project.saveLaunchJson(assignedPortFromFile);
       }
+
+
 
       if (!this.project.node_modules.exist) {
         Helpers.error('Please start lib build first', false, true)

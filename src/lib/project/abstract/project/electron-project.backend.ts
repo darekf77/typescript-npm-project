@@ -14,7 +14,7 @@ export abstract class ElectronProject {
     args = Helpers.cliTool.removeArgFromString(args, argsToClear);
     const elecProj = Project.From(this.pathFor([`tmp-apps-for-${config.folder.dist}${websql ? '-websql' : ''}`, this.name]));
     Helpers.info('Starting electron...')
-    elecProj.run(`npm-run  electron . --serve`).async();
+    elecProj.run(`npm-run  electron . --serve ${websql ? '--websql' : ''}`).async();
   }
 
 

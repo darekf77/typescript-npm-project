@@ -117,7 +117,22 @@ export class Project extends $Project<Project>
   //#endregion
   browser: any;
   standaloneNormalAppPort: number;
-  standaloneWebsqlAppPort: number;
+  get standaloneWebsqlAppPort() {
+    return this.standaloneNormalAppPort + 50;
+  }
+
+  get portsInfo(): string {
+    //#region @backendFunc
+    return `
+
+
+    currentPorts.NORMAL_APP ${this.standaloneNormalAppPort} <br>
+    currentPorts.WEBSQL_APP ${this.standaloneWebsqlAppPort} <br>
+
+    `;
+    //#endregion
+  }
+
   location: string;
 
   //#region @backend
@@ -136,8 +151,13 @@ export class Project extends $Project<Project>
   }
   //#endregion
 
-  // @ts-ignore
-  get info(this: Project) {
+
+  get info(
+    //#region @backed
+    // @ts-ignore
+    this: Project
+    //#endregion
+  ) {
     if (Morphi.IsBrowser) {
       return this.browser.info as any;
     }

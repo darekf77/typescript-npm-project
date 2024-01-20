@@ -47,6 +47,11 @@ export class BuildProcess extends Firedev.Base.Entity<any> {
   static emptyModel() {
     return BuildProcess.from(defaultModelValues);
   }
+
+  static async assignPortForClient() {
+    await Firedev.getResponseValue<void>(this.ctrl.assignPortForClient());
+  }
+
   //#endregion
 
   //#region constructor
