@@ -205,8 +205,14 @@ export class FilesRecreator extends FeatureForProject {
           toogleHideOrShowDeps() {
             let action: 'hide' | 'show' | 'nothing';
             self.modifyVscode((settings) => {
-              const exclude = settings['files.exclude'];
-              if (!exclude) {
+
+              settings['search.exclude'] = {
+                'docs': true,
+                'projects': true,
+                'bin': true,
+              };
+
+              if (!settings['files.exclude']) {
                 settings['files.exclude'] = {};
               }
               if (Object.keys(settings['files.exclude']).length === 0) {

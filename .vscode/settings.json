@@ -61,10 +61,9 @@
     "package.json_tnp.json": true
   },
   "search.exclude": {
-    "**/node_modules": true,
-    "**/bower_components": true,
-    "**/projects": true,
-    "projects": true
+    "docs": true,
+    "projects": true,
+    "bin": true
   },
   "workbench.colorCustomizations": {
     "activityBar.background": "#5c3735",

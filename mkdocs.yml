@@ -1,4 +1,7 @@
 site_name: Documentation
+nav:
+  - Introduction: index.md
+  - NPM: npm-packages.md
 theme:
   name: material
   features:
@@ -13,21 +16,25 @@ theme:
     - content.code.copy
   language: en
   palette:
-    - scheme: default
-      toggle:
-        icon: material/toggle-switch-off-outline
-        name: Switch to dark mode
-      primary: red
-      accent: red
-    - scheme: slate
-      toggle:
-        icon: material/toggle-switch
-        name: Switch to light mode
-      primary: red
-      accent: red
+    primary: custom
+    # - scheme: default
+    #   toggle:
+    #     icon: material/toggle-switch-off-outline
+    #     name: Switch to dark mode
+      # primary: red
+      # accent: red
+    # - scheme: slate
+    #   toggle:
+    #     icon: material/toggle-switch
+    #     name: Switch to light mode
+      # primary: red
+      # accent: red
 
 extra_css:
   - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/extra.js
 
 # plugins:
 #   - social

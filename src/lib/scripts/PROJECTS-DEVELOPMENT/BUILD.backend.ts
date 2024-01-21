@@ -185,6 +185,29 @@ const $BAW = (args) => BUILD_APP_WATCH(args);
 //#endregion
 
 //#region BUILD / DOCS
+
+
+export const DocsActions = {
+  BUILD_DOCS_FIREDEV: {
+    name: 'Build docs for www.firedev.io',
+    value: 'mkdocs build --site-dir ../../firedev-projects/www-firedev-io/docs/documentation',
+  },
+  SERVE_DOCS_FIREDEV: {
+    name: 'Serve docs for www.firedev.io on 8000',
+    value: 'mkdocs serve',
+  },
+}
+
+async function $DOCS(args) {
+  const proj = Project.Current as Project;
+
+  const res = await Helpers.consoleGui.select('What you wanna do with docs ?', Object.values(DocsActions));
+
+  proj.run(res, { output: true }).sync();
+  Helpers.info('DONE BUILDING DOCS')
+  process.exit(0);
+}
+
 async function $BUILD_DOCS(args) {
   if ((Project.Current as Project).isStandaloneProject) {
     await (Project.Current as Project).filesStructure.init('');
@@ -603,5 +626,6 @@ export default {
   $INSTALL_LOCALLY: Helpers.CLIWRAP($INSTALL_LOCALLY, '$INSTALL_LOCALLY'),
   $BACKUP: Helpers.CLIWRAP($BACKUP, '$BACKUP'),
   $REVERT: Helpers.CLIWRAP($REVERT, '$REVERT'),
+  $DOCS: Helpers.CLIWRAP($DOCS, '$DOCS'),
   //#endregion
 };

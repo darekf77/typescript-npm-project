@@ -1,4 +1,6 @@
-# Firedev commands
+# Npm App/Libs
+
+## Standalone projects
 \+ Create new standalone app (simple project, cli tools or entry projects for big applications)
 that can be relaased in npm as normal packages
 (example **my-standalone-app**)
@@ -6,6 +8,8 @@ that can be relaased in npm as normal packages
 firedev new my-standalone-app
 ```
 ---
+
+## Organization projects
 \+ Create new organization app (for complex projects)
 that can be released in npm as organization packages 
 (example **@organization/my-app-or-lib **)
