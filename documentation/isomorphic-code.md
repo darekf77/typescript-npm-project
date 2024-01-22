@@ -1,105 +1,6 @@
-# Introduction
+# Advantages of Isomorphic Code & Firedev Framework
 
-<img src="./__images/logo-header-bold.png" >
-
-**Firedev** 🔥🔥🔥 is a solution for
-
-\+
-[typescript](https://www.typescriptlang.org/)  
-
-\+
-[angular](https://angular.io/) 
-
-\+
-[rxjs](https://rxjs.dev/)  / [ngrx](https://ngrx.io/) (optional) 
-
-\+
-[nodejs](https://nodejs.org/en/)
-
-\+ [typeorm](https://typeorm.io/)
-- [sqlite](https://github.com/WiseLibs/better-sqlite3) - SUPPORTED
-- [sql.js](https://sql.js.org) - SUPPORTED IN WEBSQL MODE
-- [mysql](https://www.mysql.com/) - support in progress
-- [postgress](https://www.postgresql.org) - support in progress
-- [mongo](https://www.postgresql.org) - support in progress
-
-
-backend/frontend [*isomorphic](https://en.wikipedia.org/wiki/Isomorphic_JavaScript)  apps .
-
-
-## Required version of NodeJS** 
-- Windows 10/11 (gitbash): >= v16 
-- MacOS: >= v16
-- Linux: >= v16
-
-*lower versions of NodeJS are unofficialy 
-support for MacOS/Linux
-
-## How to
-
-## How to install firedev
-```
-npm i -g firedev
-```
-
-## How to install firedev Visual Studio Code extension
-Go to: https://marketplace.visualstudio.com/items?itemName=firedev.firedev-vscode-ext
-
-(WARNING before using *firedev-vscode-ext*, please at lease once 
-execute **any** command of **firedev** in your temrinal)
-
-<p style="text-align: center;border: 1px solid black;"><img src="./__images/vscode-ext.png" ></p>
-
-##  How to uninstall firedev from local machine
-Firedev stores a big global container (in ~/.firedev) for npm packages that are being shared 
-accros all firedev apps
-```
-npm uninstall -g firedev
-rm -rf ~/.firedev  # firedev local packages repository
-```
-
-## Philosophy of Firedev
-=> One language for browser/backend/database - **TypeScript**
-
-=> Builded on top of rock solid frameworks
-
-=> **Never** ever **repeat** single line of **code**
-
-=> Everything automatically generated, strongly typed
-
-=> Crazy fast / developer-friendly coding in <b>Visual Studio Code</b>
-
-=> Shared <b>node_modules</b> for similar projects (from one big npm pacakges container)
-
-=>**No need for local node_modules** => many projects takes megabytes instead gigabytes
-
-=> Automation for releasing projects (standalone and organization) to github pages / npm repositories (github actions, dockers support comming soon)
-
-=> Develop libraries and apps at the same time! (mixed NodeJs packages with proper Angular ivy packages)
-
-=> Assets from project can be shared with npm package! (only those from **/src/assets/shared**)
-
-=> Two development modes
-  1. NORMAL - sqlite/mysql for database and normal NodeJS server
-  ```
-  firedev start # in any project
-  ```
-  2. WEBSQL - sql.js for database/server in browser development mode
-  ```
-  firedev start --websql  # in any project
-  ```
-
-
-=> WEBSQL mode is a perfect solution for:
-
-*\+ github pages serverless demo apps with "almost" full functionality!* 
-
-*\+ e2e/integration tests*
-
-*\+ local NodeJS/database development without starting NodeJS server!*
-
-# Advantages of Firedev
-## 1. No separation between backend and frontend code 
+### 1. No separation between backend and frontend code 
 - use BE entity as FE dto!
 - this is a dream situation for any developer!
 - perfect solution for any kind of projects ( hobbyst / freelancers / enterprise )
@@ -175,7 +76,7 @@ class CommonService {
 
 ```
 
-## 2. Additional "Websql Mode" for writing backend in browser!
+### 2. Additional "Websql Mode" for writing backend in browser!
 - Instead running local server - run everything (db,backend) in browser thanks to sql.js/typeorm !
 - This is possible ONLY in firedev with highest possible abstraction concepts
 
@@ -216,7 +117,7 @@ Database columns can be created in browser/frontend with sql.js !
  clear database after each page refresh.
 
 
-## 3. Smooth REST api
+### 3. Smooth REST api
 - define host only once for backend and frontend!
 - no more of ugly acces to server... firedev takes it to next level !
 - in Angular/RxJS environemtn => it more than pefect solution !
@@ -288,7 +189,7 @@ context.host // -> available on backend and frontend !
 
 
 ```
-## 4. CRUD api in 60 seconds or less...
+### 4. CRUD api in 60 seconds or less...
 - use observable or promises .. .whatever you like
 ```ts
 @Firedev.Entity()
@@ -329,7 +230,7 @@ export class TasksComponent implements OnInit {
 
 ```
 
-## 5. Super easy realtime / sockets communication
+### 5. Super easy realtime / sockets communication
 - realtime communication as simple as possible!
 task.ts
 ```ts

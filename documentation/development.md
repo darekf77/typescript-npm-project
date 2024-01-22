@@ -1,4 +1,4 @@
-# Npm App/Libs
+# Developmetn of App/Libs
 
 ## Standalone projects
 \+ Create new standalone app (simple project, cli tools or entry projects for big applications)
@@ -45,7 +45,7 @@ firedev au  #  auto:update
 ```
 firedev version
 ```
-# Standalone/Organization project structure
+## Projects structure
 - **Organization project (smart container)** has many "small" **standalone projects** inside itself.
 - Standalone projects can be also use as global cli terminal tools
 - In ANY firedev project property "name" in package.json MUST be equal project's folder basename

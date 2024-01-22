@@ -1,7 +1,13 @@
-site_name: Documentation
+site_name: Firedev Documentation
+site_url: https://firedev.io/documentation
+docs_dir: documentation
 nav:
-  - Introduction: index.md
-  - NPM: npm-packages.md
+  - Introduction: intro.md
+  - Setup: setup/index.md
+  - Isomorphic Code: isomorphic-code.md
+  - Development: development.md
+  - Tutorials: tutorials.md
+  - Changelog: changelog.md
 theme:
   name: material
   features:
