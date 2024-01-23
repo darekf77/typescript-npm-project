@@ -154,7 +154,7 @@ to fix it.
           ],
           //#region @websql
           config: {
-            type: 'better-sqlite3',
+            type: config.frameworkName === 'firedev' ? ':memory:' as any : 'better-sqlite3',
             database: this.project.pathFor(`tmp-build-process.sqlite`),
             logging: false,
           }
