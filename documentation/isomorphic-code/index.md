@@ -111,7 +111,7 @@ class User {
 ```
 Database columns can be created in browser/frontend with sql.js !
 
-<p style="text-align: center;"><img src="./__images/admin-mode.png" ></p>
+<p style="text-align: center;"><img src="../__images/admin-mode.png" ></p>
 
 \+ also you can set in *Firedev Admin Mode* if you prefere to 
  clear database after each page refresh.

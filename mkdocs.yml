@@ -2,12 +2,12 @@ site_name: Firedev Documentation
 site_url: https://firedev.io/documentation
 docs_dir: documentation
 nav:
-  - Introduction: intro.md
+  - Introduction: introduction/index.md
   - Setup: setup/index.md
-  - Isomorphic Code: isomorphic-code.md
-  - Development: development.md
+  - Isomorphic Code: isomorphic-code/index.md
+  - Development: development/index.md
   - Tutorials: tutorials.md
-  - Changelog: changelog.md
+  - Changelog: changelog/index.md
 theme:
   name: material
   features:
@@ -23,6 +23,7 @@ theme:
   language: en
   palette:
     primary: custom
+    accent: custom
     # - scheme: default
     #   toggle:
     #     icon: material/toggle-switch-off-outline

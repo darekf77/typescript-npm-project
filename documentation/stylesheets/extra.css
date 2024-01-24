@@ -1,7 +1,10 @@
 :root {
-  --md-primary-fg-color:        #ff8c8b;
+  --md-primary-fg-color: #ff8c8b;
   --md-primary-fg-color--light: #ECB7B7;
-  --md-primary-fg-color--dark:  #90030C;
+  --md-primary-fg-color--dark: #90030C;
+  --md-accent-fg-color: #fb706d;
+  --md-accent-fg-color--light: #fb706d;
+  --md-accent-fg-color--dark: #fb706d;
 }
 
 [data-md-component="logo"] {
@@ -15,7 +18,8 @@
   }
 } */
 
-[href="."], [href="./"] {
+[href="."],
+[href="./"] {
   background: none !important;
   box-shadow: none !important;
 }

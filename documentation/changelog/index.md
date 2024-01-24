@@ -9,17 +9,11 @@
 
 - support for Angular 16
 - automatic port assigments
-
-## Firedev v15 (end of support)
-
 - support for Angular 15
 - typeorm entities/types generator
 - firedev.json5
 - updated socket.io
 - auto-generated typeorm query selector
-
-## Firedev v14 (end of support)
-
 
 ## Firedev v13 (end of support)
 - support for angular 13

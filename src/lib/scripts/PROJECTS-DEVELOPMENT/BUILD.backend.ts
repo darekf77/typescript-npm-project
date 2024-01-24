@@ -11,7 +11,7 @@ import { Models } from 'tnp-models/src';
 
 //#region BUILD
 
-
+//#region BUILD / BUILD
 const BUILD_DIST = async (args) => {
   let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
   if (proj.isSmartContainerChild) {
@@ -83,6 +83,7 @@ const $BUILD_UP = async (args) => {
     await proj.buildProcess.startForLibFromArgs(false, false, 'dist', args);
   }
 };
+//#endregion
 
 //#region BUILD / DEFAULT
 async function $DEFAULT_BUILD(args) {
@@ -185,13 +186,13 @@ const $BAW = (args) => BUILD_APP_WATCH(args);
 //#endregion
 
 //#region BUILD / DOCS
-
-
 export const DocsActions = {
+  //#region @notForNpm
   BUILD_DOCS_FIREDEV: {
     name: 'Build docs for www.firedev.io',
     value: 'mkdocs build --site-dir ../../firedev-projects/www-firedev-io/docs/documentation',
   },
+  //#endregion
   SERVE_DOCS_FIREDEV: {
     name: 'Serve docs for www.firedev.io on 8000',
     value: 'mkdocs serve',
@@ -224,7 +225,6 @@ async function $BUILD_DOCS_PROD(args) {
   process.exit(0);
 }
 //#endregion
-
 
 //#endregion
 
@@ -525,6 +525,7 @@ const $REBUILD = async (args) => {
 };
 //#endregion
 
+//#region electron
 const ELECTRON_WATCH = async (args: string) => {
   const proj = Project.Current as Project;
   if (proj.isStandaloneProject) {
@@ -554,8 +555,9 @@ const ELECTRON_BUILD_BUNDLE = async (args: string) => {
   }
   process.exit(0)
 }
+//#endregion
 
-
+//#region inactive links
 const INACTIVE_LINKS = async (args: string) => {
   const proj = Project.Current as Project;
   const unexistedLinks = Helpers
@@ -565,7 +567,7 @@ const INACTIVE_LINKS = async (args: string) => {
   console.log({ unexistedLinks })
   process.exit(0)
 }
-
+//#endregion
 
 
 export default {

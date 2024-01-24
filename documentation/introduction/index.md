@@ -1,6 +1,6 @@
 # Introduction
 
-## Why firedev?
+## Why would u use firedev?
 
 **Firedev** 🔥🔥🔥 is a solution for
 
@@ -32,11 +32,11 @@
 
 backend/frontend [*isomorphic](https://en.wikipedia.org/wiki/Isomorphic_JavaScript)  libs/apps with *isomorphic code*.
 
+<!-- <br/><br/>
 <br/><br/>
 <br/><br/>
 <br/><br/>
-<br/><br/>
-<br/><br/>
+<br/><br/> -->
 
 ## Philosophy of Firedev
 ### 1. One language for browser/backend/database - **TypeScript**
