@@ -7,6 +7,7 @@ import type { ProjectDocker } from '../../project';
 import { config, PREFIXES } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
 import { Models } from 'tnp-models/src';
+import { TEMP_DOCS } from '../../constants';
 //#endregion
 
 //#region BUILD
@@ -190,7 +191,7 @@ export const DocsActions = {
   //#region @notForNpm
   BUILD_DOCS_FIREDEV: {
     name: 'Build docs for www.firedev.io',
-    value: 'python -m mkdocs build --site-dir ../../firedev-projects/www-firedev-io/docs/documentation',
+    value: `python -m mkdocs build --site-dir ../../firedev-projects/www-firedev-io/${TEMP_DOCS}`,
   },
   //#endregion
   SERVE_DOCS_FIREDEV: {

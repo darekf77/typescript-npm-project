@@ -6,6 +6,7 @@ import { Models } from "tnp-models/src";
 import { AppBuildConfig } from "../../features/docs-app-build-config.backend";
 import { LibPorjectBase } from "./lib-project-base.backend";
 import { Project } from "./project";
+import { TEMP_DOCS } from "../../../constants";
 
 
 export class LibProjectStandalone extends LibPorjectBase {
@@ -110,16 +111,23 @@ export class LibProjectStandalone extends LibPorjectBase {
       `);
       //#endregion
 
+
       await Helpers.runSyncOrAsync(libBuildCallback);
 
       const libBuildCommand = ''; // `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'} && `
       await this.project.run(`${libBuildCommand}`
         + `${config.frameworkName} build:${config.folder.bundle}:app:${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
-        + `${appBuildOptions.websql ? '--websql' : ''} ${global.hideLog ? '' : '-verbose'}`).sync();
+        + `${appBuildOptions.websql ? '--websql' : ''} ${global.hideLog ? '' : '-verbose'} --forAppRelaseBuild`).sync();
 
       try {
         realCurrentProj.run('git checkout docs/CNAME').sync();
       } catch (error) { }
+
+      const tempDocs = realCurrentProj.pathFor(TEMP_DOCS);
+      const docsIndocs = realCurrentProj.pathFor('docs/documentation');
+      if (Helpers.exists(tempDocs)) {
+        Helpers.copy(tempDocs, docsIndocs);
+      }
 
       const assetsListPathSourceMain = crossPlatformPath([
         realCurrentProj.location,

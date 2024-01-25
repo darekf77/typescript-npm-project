@@ -25,6 +25,8 @@ const log = Log.create(__filename)
 
 export class BuildProcessFeature extends FeatureForProject {
 
+
+
   //#region prepare build options
   public static prepareOptionsBuildProcess(options: Models.dev.StartForOptions, project: Project): BuildOptions {
     if (_.isUndefined(options)) {
@@ -125,7 +127,9 @@ to fix it.
     //   'buildOptions.appBuild': buildOptions.appBuild
     // })
     const tmpBuildPort = 'tmp-build-port';
-    if (!buildOptions.appBuild) {
+    const forAppRelaseBuild = (buildOptions?.args?.trim()?.search('--forAppRelaseBuild') !== -1);
+
+    if (!buildOptions.appBuild && !forAppRelaseBuild) {
 
       //#region main lib code build ports assignations
       const assignedPort = await this.project.assignFreePort(4100);
@@ -182,7 +186,7 @@ to fix it.
 
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
 
-      if (!buildOptions.serveApp) {
+      if (!buildOptions.serveApp && !forAppRelaseBuild) {
         const assignedPortFromFile = Number(Helpers.readFile(this.project.pathFor(tmpBuildPort)));
         const host = `http://localhost:${assignedPortFromFile}`;
         try {

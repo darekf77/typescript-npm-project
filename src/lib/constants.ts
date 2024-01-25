@@ -16,6 +16,8 @@ export const argsToClear = [
 
 export const folder_shared_folder_info = 'shared_folder_info.txt';
 
+export const TEMP_DOCS = 'tmp-documentation';
+
 export const DEFAULT_PORT = {
   BUNDLE_SERVER_DOCS: 4000,
   APP_BUILD_LOCALHOST: 4200,
