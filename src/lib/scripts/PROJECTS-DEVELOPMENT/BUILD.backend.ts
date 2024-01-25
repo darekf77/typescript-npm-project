@@ -190,12 +190,12 @@ export const DocsActions = {
   //#region @notForNpm
   BUILD_DOCS_FIREDEV: {
     name: 'Build docs for www.firedev.io',
-    value: 'mkdocs build --site-dir ../../firedev-projects/www-firedev-io/docs/documentation',
+    value: 'python -m mkdocs build --site-dir ../../firedev-projects/www-firedev-io/docs/documentation',
   },
   //#endregion
   SERVE_DOCS_FIREDEV: {
     name: 'Serve docs for www.firedev.io on 8000',
-    value: 'mkdocs serve',
+    value: 'python -m mkdocs serve',
   },
 }
 
