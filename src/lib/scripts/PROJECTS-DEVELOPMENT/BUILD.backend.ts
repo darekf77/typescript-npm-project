@@ -189,23 +189,56 @@ const $BAW = (args) => BUILD_APP_WATCH(args);
 //#region BUILD / DOCS
 export const DocsActions = {
   //#region @notForNpm
+  SELECT_COMMAND: {
+    name: '< select command >',
+  },
+  BUILD_DEPLY_DOCS_FIREDEV: {
+    name: 'Build & deply docs for www.firedev.io',
+    value: {
+      command: `python -m mkdocs build --site-dir ../../firedev-projects/www-firedev-io/docs/documentation`,
+      action: async () => {
+        const firedevProj = Project.From([process.cwd(), '../../firedev-projects/www-firedev-io']);
+        if (await Helpers.questionYesNo('Push and commit docs update ?')) {
+          firedevProj.git.commit('update docs');
+          firedevProj.git.pushCurrentBranch()
+        }
+      }
+    },
+  },
   BUILD_DOCS_FIREDEV: {
     name: 'Build docs for www.firedev.io',
-    value: `python -m mkdocs build --site-dir ../../firedev-projects/www-firedev-io/${TEMP_DOCS}`,
+    value: {
+      command: `python -m mkdocs build --site-dir ../../firedev-projects/www-firedev-io/${TEMP_DOCS}`,
+      action: void 0,
+    },
   },
   //#endregion
   SERVE_DOCS_FIREDEV: {
     name: 'Serve docs for www.firedev.io on 8000',
-    value: 'python -m mkdocs serve',
+    value: {
+      command: 'python -m mkdocs serve',
+      action: void 0,
+    },
   },
 }
 
 async function $DOCS(args) {
+
   const proj = Project.Current as Project;
 
-  const res = await Helpers.consoleGui.select('What you wanna do with docs ?', Object.values(DocsActions));
+  let res;
+  while (true) {
+    Helpers.clearConsole()
+    res = await Helpers.consoleGui.select('What you wanna do with docs ?', Object.values(DocsActions) as any);
+    if (res.command) {
+      break;
+    }
+  }
 
-  proj.run(res, { output: true }).sync();
+  proj.run(res.command, { output: true }).sync();
+  if (_.isFunction(res.action)) {
+    await res.action();
+  }
   Helpers.info('DONE BUILDING DOCS')
   process.exit(0);
 }

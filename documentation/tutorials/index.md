@@ -1,8 +1,9 @@
 # Tutorials
 
 <!-- ## Blog posts: -->
-- [rx-js-quick-introduction-with-examples-for-beginner-level-angular-developers](https://codete.com/blog/rx-js-quick-introduction-with-examples-for-beginner-level-angular-developers)
-- [ngrx-quick-introduction](https://codete.com/blog/ngrx-quick-introduction)
+- <a href="https://codete.com/blog/rx-js-quick-introduction-with-examples-for-beginner-level-angular-developers" target="_blank">rx-js-quick-introduction-with-examples-for-beginner-level-angular-developers</a>
+
+- <a href="https://codete.com/blog/ngrx-quick-introduction" target="_blank">ngrx-quick-introduction</a>
 
 <!-- <br><br><br><br><br>
 
