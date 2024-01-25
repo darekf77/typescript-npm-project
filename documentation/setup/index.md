@@ -1,5 +1,11 @@
 # Getting Started
 
+## Supported OS-es:
+- Win10, Win11 (gitbash)
+- MacOS (min. High Sierra)
+- Linux (min. Ubuntnu 18)
+
+
 ## Required version of NodeJS** 
 - Windows 10/11 (gitbash): >= v16 
 - MacOS: >= v16

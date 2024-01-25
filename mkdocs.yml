@@ -6,8 +6,9 @@ nav:
   - Setup: setup/index.md
   - Isomorphic Code: isomorphic-code/index.md
   - Development: development/index.md
-  - Tutorials: tutorials.md
+  - Tutorials: tutorials/index.md
   - Changelog: changelog/index.md
+  - QA: qa/index.md
 theme:
   name: material
   features:

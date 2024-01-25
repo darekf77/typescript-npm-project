@@ -1,9 +1,13 @@
 # Advantages of Isomorphic Code & Firedev Framework
 
+Isomorphic code in TypeScript offers a range of advantages for web developers. 
+By enabling code reuse on both client and server sides,
+ it enhances efficiency and maintains consistency
+
 ### 1. No separation between backend and frontend code 
 - use BE entity as FE dto!
-- this is a dream situation for any developer!
-- perfect solution for any kind of projects ( hobbyst / freelancers / enterprise )
+- this is a dream situation for many developers!
+- perfect solution for all kinds of projects ( hobbyst / freelancers / enterprise )
 - CRAZY FAST business changes across database tables and frontend 
 Angular templates - CHECK!
 - frontend/backend/database code refactor at the same time!
@@ -232,6 +236,7 @@ export class TasksComponent implements OnInit {
 
 ### 5. Super easy realtime / sockets communication
 - realtime communication as simple as possible!
+
 task.ts
 ```ts
 @Firedev.Entity()
@@ -243,11 +248,13 @@ class Task {
   id: number;
 }
 ```
+
 task.controller.ts
- ```ts
+```ts
 @Firedev.Controlle({ entity: Task })
-export class TaskController extends Firedev.Base.Controller<Task>{ } 
+export class TaskController extends Firedev.Base.Controller<Task>{ }
 ```
+
 task.component.ts
 ```ts
 @Component({
@@ -276,4 +283,5 @@ export class TasksComponent implements OnInit, OnDestroy {
   }
 
 }
- ```
+```
+

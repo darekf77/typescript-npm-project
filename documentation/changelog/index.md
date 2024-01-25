@@ -2,15 +2,18 @@
 
 ## Firedev v17 (in progress)
 
-- support for Angular 17
+- support for Angular 17, Node 18
 - (Eslint + Prettier) instead Tslint
+- firedev.json5 instead package.json_tnp.json5
+- electron support 
+- open-source docker with cloud (curl -o- https://firedev.io/install-on-server-script.sh | bash)
+- buildin content manager
 
 ## Firedev v16 (LTS)
 
-- support for Angular 16
+- support for Angular 16, Node 16
 - automatic port assigments
-- support for Angular 15
-- typeorm entities/types generator
+- vscode plugin code generator
 - firedev.json5
 - updated socket.io
 - auto-generated typeorm query selector

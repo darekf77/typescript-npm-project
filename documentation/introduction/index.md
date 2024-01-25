@@ -1,8 +1,8 @@
 # Introduction
 
-## Why would u use firedev?
+## What is firedev?
 
-**Firedev** 🔥🔥🔥 is a solution for
+**Firedev** 🔥🔥🔥 is a solution (global cli tool + framework) for
 
 \+
 [typescript](https://www.typescriptlang.org/)  
@@ -41,16 +41,18 @@ backend/frontend [*isomorphic](https://en.wikipedia.org/wiki/Isomorphic_JavaScri
 ## Philosophy of Firedev
 ### 1. One language for browser/backend/database - **TypeScript**
 
-### 2 .Builded on top of rock solid frameworks
+### 2 Rock solid frameworks as foundation.
 
 ### 3. **Never** ever **repeat** single line of **code**
+only possible with isomorphic code
 
 ### 4. Everything automatically generated, strongly typed
 
-### 5. Crazy fast / developer-friendly coding in <b>Visual Studio Code</b>
+### 5. Fast/developer-friendly coding in <b>Visual Studio Code</b>
 
-### 6.  Shared <b>node_modules</b> for similar projects (from one big npm pacakges container)
-    **No need for local node_modules** => many projects takes megabytes instead gigabytes
+### 6. Every package available everywhere - shared <b>node_modules</b> for similar projects 
+Firedev hasone big npm pacakges container (located in: ~/.firedev/morphi/projects/container-v4 - )
+**There is no need for local node_modules** => many projects takes megabytes instead gigabytes
 
 ### 8. Automation for releasing projects (standalone and organization) to github pages / npm repositories
 
@@ -58,7 +60,9 @@ backend/frontend [*isomorphic](https://en.wikipedia.org/wiki/Isomorphic_JavaScri
 
 ### 10.  Assets from project can be shared with npm package! (only those from **/src/assets/shared**)
 
-=> Two development modes
+### 11.  Websql development mode
+
+
   1. NORMAL - sqlite/mysql for database and normal NodeJS server
   ```
   firedev start # in any project
@@ -68,8 +72,7 @@ backend/frontend [*isomorphic](https://en.wikipedia.org/wiki/Isomorphic_JavaScri
   firedev start --websql  # in any project
   ```
 
-
-=> WEBSQL mode is a perfect solution for:
+> WEBSQL mode is a perfect solution for:
 
 *\+ github pages serverless demo apps with "almost" full functionality!* 
 
