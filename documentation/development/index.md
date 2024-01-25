@@ -51,7 +51,7 @@ firedev version
 - In ANY firedev project property "name" in package.json MUST be equal project's folder basename
 - organization subprojects can be easily transformed to standalone projects just by taking them out of smart container
 
-<p style="text-align: center;"><img src="../__images/code-structure.png" ></p>
+<p style="text-align: center;"><img src="../assets/images/code-structure.png" ></p>
 
 ## CLI commands
 

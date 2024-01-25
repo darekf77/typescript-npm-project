@@ -1,5 +1,5 @@
 site_name: Firedev Documentation
-site_url: https://firedev.io/documentation
+# site_url: https://firedev.io/documentation
 docs_dir: documentation
 nav:
   - Introduction: introduction/index.md

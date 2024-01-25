@@ -26,7 +26,7 @@ Go to: https://marketplace.visualstudio.com/items?itemName=firedev.firedev-vscod
 (WARNING before using *firedev-vscode-ext*, please at lease once 
 execute **any** command of **firedev** in your temrinal)
 
-<p style="text-align: center;border: 1px solid black;"><img src="../__images/vscode-ext.png" ></p>
+<p style="text-align: center;border: 1px solid black;"><img src="../assets/images/vscode-ext.png" ></p>
 
 ##  How to uninstall firedev from local machine
 Firedev stores a big global container (in ~/.firedev) for npm packages that are being shared 
