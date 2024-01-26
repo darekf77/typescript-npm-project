@@ -388,7 +388,24 @@ git pull/push or children packages release. Normal container can wrap "standalon
       lastIsBrandNew,
     } = await this.initContainersAndApps(cwd, nameFromArgs, version);
 
+    if (!lastContainer?.packageJson.data?.tnp?.smartContainerBuildTarget && lastContainer?.children.length > 0) {
+      if (appProj.isSmartContainerChild) {
+        lastContainer.packageJson.data.tnp.smartContainerBuildTarget = _.first(lastContainer.children.filter(c => c.name !== appProj.name))?.name;
+        lastContainer.packageJson.save('updating smart container target')
+      }
+    }
+
+
     if (appProj.isSmartContainerChild) {
+
+      // QUICK_FIX
+      appProj.writeFile('src/lib/my-organization-proj.ts',`
+export function myOrgProj${(new Date()).getTime()}() {
+  console.log('hello my organization project')
+}
+
+      `)
+
       Helpers.writeFile([appProj.location, 'README.md'], `
       #  @${appProj.parent.name}/${appProj.name}
 
