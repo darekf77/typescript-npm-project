@@ -81,6 +81,7 @@ export const notAllowedProjectNames = [
   'browser',
   'websql',
   'compiled',
+  'docs',
   '_',
 ]
 
