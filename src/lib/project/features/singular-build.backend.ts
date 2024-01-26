@@ -10,6 +10,7 @@ import { BrowserCodeCut } from '../compilers/build-isomorphic-lib/code-cut/brows
 import { argsToClear } from '../../constants';
 import { COMPILER_POOLING, IncrementalWatcherInstance, incrementalWatcher } from 'incremental-compiler/src';
 import { CLI } from 'tnp-cli/src';
+import { recreateApp } from './inside-structures/structs/inside-struct-helpers';
 
 //#endregion
 
@@ -310,6 +311,7 @@ exports.default = start;`);
 
     for (let index = 0; index < children.length; index++) {
       const c = children[index];
+      recreateApp(c);
       await c.filesStructure.init('');
     }
     args = Helpers.cliTool.removeArgFromString(args, argsToClear);

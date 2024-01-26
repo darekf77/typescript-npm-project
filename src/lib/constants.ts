@@ -24,6 +24,8 @@ export const DEFAULT_PORT = {
   SERVER_LOCALHOST: 4199,
 }
 
+export const tmpBuildPort = 'tmp-build-port';
+
 export const PortUtils = (basePort: number) => {
 
   /**

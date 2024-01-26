@@ -107,10 +107,15 @@ ${exportsContainer}
 export function recreateApp(project: Project) {
   //#region @backend
   //#region when app.ts or app is not available is not
+  // console.log('TRYING ', project.location)
 
   if (project.isSmartContainerTarget) {
-    return;
+    project = project.smartContainerTargetParentContainer?.children.find(c => c.name === project.name);
+    if (!project) {
+      return;
+    }
   }
+  // console.log('RECREAT TO ', project.location)
 
   const appFile = crossPlatformPath(path.join(
     project.location,
@@ -137,7 +142,10 @@ export function recreateApp(project: Project) {
     'index.ts',
   ));
 
-  if (!Helpers.exists(appFile) && !Helpers.exists(appFolderWithIndex)) {
+
+  if (!Helpers.exists(appFile)
+    // && !Helpers.exists(appFolderWithIndex)
+  ) {
     Helpers.writeFile(appFile, appfileTemplate(project))
   }
 
@@ -168,38 +176,93 @@ export function appfileTemplate(project: Project) {
 
   // TODO quick fix for @ browser remover
   return `
-
+import { Firedev } from 'firedev';
+import { Observable, map } from 'rxjs';
 ${'//#reg' + 'ion'} ${'@not' + 'ForNpm'}
 import { HOST_BACKEND_PORT } from './app.hosts';
 ${'//#reg' + 'ion'} @${'bro' + 'wser'}
 import { NgModule } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
 
 @Component({
-selector: 'app-${project.name}',
-template: 'hello from ${project.name}',
-styles: [\` body { margin: 0px !important; } \`],
+  selector: 'app-${project.name}',
+  template: \`hello from ${project.name}<br>
+    <br>
+    users from backend
+    <ul>
+      <li *ngFor="let user of (users$ | async)"> {{ user | json }} </li>
+    </ul>
+  \`,
+  styles: [\` body { margin: 0px !important; } \`],
 })
 export class ${componentName} implements OnInit {
-constructor() { }
+  users$: Observable<User[]> = User.ctrl.getAll().received.observable
+    .pipe(map(data => data.body.json));
 
-ngOnInit() { }
+  constructor() { }
+  ngOnInit() { }
 }
 
 @NgModule({
-imports: [],
-exports: [${componentName}],
-declarations: [${componentName}],
-providers: [],
+  imports: [CommonModule],
+  exports: [${componentName}],
+  declarations: [${componentName}],
+  providers: [],
 })
 export class ${moduleName} { }
 //#endregion
 
+@Firedev.Entity({ className: 'User' })
+class User extends Firedev.Base.Entity {
+  public static ctrl?: UserController;
+  ${'//#reg' + 'ion'} @${'web' + 'sql'}
+  @Firedev.Orm.Column.Generated()
+  ${'//#end' + 'region'}
+  id?: string | number;
+
+}
+
+@Firedev.Controller({ className: 'UserController', entity: User })
+class UserController extends Firedev.Base.Controller<User> {
+
+  ${'//#reg' + 'ion'} @${'web' + 'sql'}
+  async initExampleDbData(): Promise<void> {
+    await this.repository.save(new User())
+  }
+  ${'//#end' + 'region'}
+}
 
 async function start() {
-console.log('hello world');
-console.log('Please start your server on port: '+ HOST_BACKEND_PORT);
+  console.log('hello world');
+  console.log('Your server will start on port '+ HOST_BACKEND_PORT);
+  const host = 'http://localhost:' + HOST_BACKEND_PORT;
+
+  const context = await Firedev.init({
+    host,
+    controllers: [
+      UserController,
+      // PUT FIREDEV CONTORLLERS HERE
+    ],
+    entities: [
+      User,
+      // PUT FIREDEV ENTITIES HERE
+    ],
+    ${'//#reg' + 'ion'} @${'web' + 'sql'}
+    config: {
+      type: 'better-sqlite3',
+      database: 'tmp-db.sqlite',
+      logging: false,
+    }
+    ${'//#end' + 'region'}
+  });
+
+  if (Firedev.isBrowser) {
+    const users = (await User.ctrl.getAll().received).body.json;
+    console.log({
+      'users from backend': users
+    })
+  }
 }
 
 export default start;

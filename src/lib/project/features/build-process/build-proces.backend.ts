@@ -16,7 +16,7 @@ import { Log } from 'ng2-logger/src';
 import { Morphi as Firedev } from 'morphi/src';
 import { BuildProcess, BuildProcessController } from './app/build-process';
 import { CLI } from 'tnp-cli/src';
-import { DEFAULT_PORT } from '../../../constants';
+import { DEFAULT_PORT, tmpBuildPort } from '../../../constants';
 // import { FiredevBinaryFile, FiredevBinaryFileController, FiredevFile, FiredevFileController, FiredevFileCss } from 'firedev-ui';
 
 const log = Log.create(__filename)
@@ -126,7 +126,7 @@ to fix it.
     // console.log({
     //   'buildOptions.appBuild': buildOptions.appBuild
     // })
-    const tmpBuildPort = 'tmp-build-port';
+
     const forAppRelaseBuild = (buildOptions?.args?.trim()?.search('--forAppRelaseBuild') !== -1);
 
     if (!buildOptions.appBuild && !forAppRelaseBuild) {

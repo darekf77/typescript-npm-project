@@ -53,7 +53,14 @@ export class BuildProcessController extends Firedev.Base.Controller<any> {
   @Firedev.Http.POST()
   assignPortForClient(): Firedev.Response<void> {
     return async (req, res) => {
-      this.project.standaloneNormalAppPort = await this.project.assignFreePort(DEFAULT_PORT.APP_BUILD_LOCALHOST);
+
+      if (this.project.isSmartContainer) {
+        for (const [index, child] of this.project.children.entries()) {
+          child.standaloneNormalAppPort = await this.project.assignFreePort(DEFAULT_PORT.APP_BUILD_LOCALHOST) + index;
+        }
+      } else {
+        this.project.standaloneNormalAppPort = await this.project.assignFreePort(DEFAULT_PORT.APP_BUILD_LOCALHOST);
+      }
     }
   };
 

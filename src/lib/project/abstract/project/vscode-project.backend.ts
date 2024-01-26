@@ -209,7 +209,7 @@ export abstract class VscodeProject {
 
   //#region save launch json
   public saveLaunchJson(this: Project, basePort: number) {
-    // console.log('WRITING HOSTS ')
+    // console.log('WRITING HOSTS ' + basePort, this.location)
 
 
     if (this.isSmartContainer) {
