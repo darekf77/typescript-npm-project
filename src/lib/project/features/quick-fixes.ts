@@ -296,7 +296,25 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
         Helpers.writeFile(shared_folder_info, `
 THIS FILE IS GENERATED. THIS FILE IS GENERATED. THIS FILE IS GENERATED.
 
-In folder is only for storing migration files with auto-generated names.
+This folder is only for storing migration files with auto-generated names.
+
+THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
+          `.trimLeft())
+
+      })();
+
+      (() => {
+        const shared_folder_info = crossPlatformPath([
+          this.project.location,
+          config.folder.src,
+          config.folder.lib,
+          'lib-info.md'
+        ]);
+
+        Helpers.writeFile(shared_folder_info, `
+THIS FILE IS GENERATED. THIS FILE IS GENERATED. THIS FILE IS GENERATED.
+
+This folder is an entry point for npm Angular/NodeJS library
 
 THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
           `.trimLeft())

@@ -87,7 +87,8 @@ export class CopyMangerOrganizationAngularFiles {
         currentBrowserFolder,
         angularCompilationFolderOrLibs,
         {
-          specyficFileRelativePathForBrowserModule: specyficFileRelativePath.split('/').slice(2).join('/')
+          specyficFileRelativePathForBrowserModule: specyficFileRelativePath.split('/').slice(2).join('/'),
+          singleFile: true, // TODO @LAST
         }
       );
     } else if (angularCompilationFolderOrLibs === config.folder.libs) {
@@ -157,9 +158,10 @@ export class CopyMangerOrganizationAngularFiles {
     angularCompilationFolder: keyof typeof CopyMangerHelpers.angularBrowserComiplationFolders,
     options?: {
       specyficFileRelativePathForBrowserModule?: string,
+      singleFile?: boolean;
     }
   ) {
-    const { specyficFileRelativePathForBrowserModule } = options || {
+    const { specyficFileRelativePathForBrowserModule, singleFile } = options || {
       specyficFileRelativePathForBrowserModule: void 0 as string
     };
 
@@ -191,7 +193,10 @@ export class CopyMangerOrganizationAngularFiles {
 
       const sourceBrowserOrWerbsqlFolderAbsPath = isTempLocalProj ? path_InMonitoredLocation : path_InLocalTempProj;
 
-      Helpers.remove(childBrowserOrWebsqlDestAbsPath); // TODO This may be expensive
+      if (!singleFile) {
+        Helpers.remove(childBrowserOrWebsqlDestAbsPath); // TODO This may be expensive
+      }
+
       Helpers.copy(sourceBrowserOrWerbsqlFolderAbsPath, childBrowserOrWebsqlDestAbsPath, {
         copySymlinksAsFiles: false,
       });
