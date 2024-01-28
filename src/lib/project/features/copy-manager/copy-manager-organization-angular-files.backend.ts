@@ -196,6 +196,7 @@ export class CopyMangerOrganizationAngularFiles {
       if (!singleFile) {
         Helpers.remove(childBrowserOrWebsqlDestAbsPath); // TODO This may be expensive
       }
+      console.log({ singleFile })
 
       Helpers.copy(sourceBrowserOrWerbsqlFolderAbsPath, childBrowserOrWebsqlDestAbsPath, {
         copySymlinksAsFiles: false,
