@@ -160,6 +160,7 @@ function $VSCODE_GLOBAL() {
   };
 
   let settings = {
+    "window.commandCenter": false,
     'git.enableSmartCommit': true,
     'terminal.integrated.scrollback': 10000,
     // 'files.insertFinalNewline': true,
