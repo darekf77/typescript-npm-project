@@ -53,6 +53,7 @@ import { GlobalWorkerApps } from '../../features/global-worker-apps';
 import { InsideStructures } from '../../features/inside-structures/inside-structures';
 import { SingularBuild } from '../../features/singular-build.backend';
 import { CLASS } from 'typescript-class-helpers/src';
+import { PortUtils } from '../../../constants';
 //#endregion
 
 @Morphi.Entity<Project>({
@@ -116,9 +117,28 @@ export class Project extends $Project<Project>
   env?: EnvironmentConfig;
   //#endregion
   browser: any;
-  standaloneNormalAppPort: number;
+
+  private _projectInfoPort: number;
+  set projectInfoPort(v) {
+    this._projectInfoPort = v;
+    for (const child of this.children) {
+      child.projectInfoPort = v;
+    }
+  }
+
+  get projectInfoPort() {
+    return this._projectInfoPort;
+  }
+
+  get standaloneNormalAppPort() {
+    //#region @backendFunc
+    return PortUtils.instance(this.projectInfoPort).calculateClientPortFor(this.project, { websql: false })
+    //#endregion
+  }
   get standaloneWebsqlAppPort() {
-    return this.standaloneNormalAppPort + 50;
+    //#region @backendFunc
+    return PortUtils.instance(this.projectInfoPort).calculateClientPortFor(this.project, { websql: true })
+    //#endregion
   }
 
   get portsInfo(): string {

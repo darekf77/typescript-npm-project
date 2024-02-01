@@ -218,8 +218,8 @@ export abstract class VscodeProject {
       const configurations = container.children.filter(f => {
         return f.frameworkVersionAtLeast('v3') && f.typeIs('isomorphic-lib');
       }).map((c, index) => {
-        const backendPort = PortUtils(basePort).calculateFor.containerServer(index);
-        c.writeFile('src/app.hosts.ts', PortUtils(basePort).appHostTemplateFor(backendPort, c))
+        const backendPort = PortUtils.instance(basePort).calculateServerPortFor(c);
+        c.writeFile('src/app.hosts.ts', PortUtils.instance(basePort).appHostTemplateFor(c))
         return {
           "type": "node",
           "request": "launch",
@@ -274,8 +274,8 @@ export abstract class VscodeProject {
 
       //#region tempalte start normal nodejs server
       const templateForServer = (serverChild: Project, clientProject: Project, workspaceLevel: boolean) => {
-        const backendPort = PortUtils(basePort).calculateFor.standaloneServer;
-        clientProject.writeFile('src/app.hosts.ts', PortUtils(basePort).appHostTemplateFor(backendPort, this))
+        const backendPort = PortUtils.instance(basePort).calculateServerPortFor(serverChild);
+        clientProject.writeFile('src/app.hosts.ts', PortUtils.instance(basePort).appHostTemplateFor(serverChild))
         const startServerTemplate = {
           'type': 'node',
           'request': 'launch',

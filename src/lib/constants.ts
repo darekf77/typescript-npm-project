@@ -26,48 +26,124 @@ export const DEFAULT_PORT = {
 
 export const tmpBuildPort = 'tmp-build-port';
 
-export const PortUtils = (basePort: number) => {
+/**
+ *
+ * Ports for:
+      max = max instances = max container childs = 20;
+      n = folder process build number (searches for new port always)
+      index = container project index (can't exceeds max)
+
+      build process service 4100 = 4100 + n
+
+      standalone server 4500 = 4100  + 400 + n
+      containers servers 4600 = 4100  + 500 + n * max + index
+
+      standalone ng serve normal 4300 = 4100  + 200 + n
+      standalone ng serve websql 4400 = 4100  + 300 + n
+
+      container ng serve normal 4800 = 4100  + 700 + n + max + index
+      container ng serve websql 4900 = 4100  + 800 + n + max + index
+ *
+ * @param basePort 4100 + n
+ * @returns
+ */
+export class PortUtils {
+  static instance(basePort: number) {
+    return new PortUtils(basePort);
+  }
+
+  private readonly n: number;
+  constructor(
+    private basePort: number,
+  ) {
+    this.n = ((basePort - (basePort % 1000)) / 1000);
+  }
 
   /**
-   * max childs
+   * max container  childs
    */
-  const max = 20;
-  const n = ((basePort - (basePort % 1000)) / 1000);
-  return {
-    get calculateFor() {
-      return {
-        get standaloneServer() {
-          const portForStandalone = basePort + 400 + n
-          return portForStandalone;
-        },
-        containerServer(index: number) {
-          return basePort + 500 + (n * max) + index;
-        }
-      }
-    },
-    appHostTemplateFor(backendPort: number, project: Project) {
-      //#region @backendFunc
-      const clientPorts = (project.isStandaloneProject && !project.isSmartContainerTarget) ? `
+  private max = 20;
+
+  calculateServerPortFor(project: Project): number {
+    //#region @backendFunc
+    if (!project.isStandaloneProject) {
+      return;
+    }
+    if (project.isStandaloneProject && !project.isSmartContainerTarget) {
+      return this.calculateForStandaloneServer();
+    }
+    if (project.isSmartContainerTarget) {
+      project = project.smartContainerTargetParentContainer.children.find(c => c.name === project.name);
+    }
+    const index = project.parent.children.indexOf(project);
+    return this.calculateForContainerServer(index);
+    //#endregion
+  }
+
+  calculateClientPortFor(project: Project, { websql }: { websql: boolean }): number {
+    //#region @backendFunc
+    if (!project.isStandaloneProject) {
+      return;
+    }
+    if (project.isStandaloneProject && !project.isSmartContainerTarget) {
+      return this.calculateForStandaloneClient({ websql });
+    }
+    if (project.isSmartContainerTarget) {
+      project = project.smartContainerTargetParentContainer.children.find(c => c.name === project.name);
+    }
+    const index = project.parent.children.indexOf(project);
+    return this.calculateForContainerClient(index, { websql });
+    //#endregion
+  }
+
+  private calculateForStandaloneServer() {
+    const portForStandalone = this.basePort + 400 + this.n
+    return portForStandalone;
+  }
+
+  private calculateForContainerServer(index: number) {
+    return this.basePort + 500 + (this.n * this.max) + index;
+  }
+
+  private calculateForStandaloneClient({ websql }: { websql: boolean }) {
+    const portForStandalone = (this.basePort + (websql ? 300 : 200)) + this.n;
+    return portForStandalone;
+  }
+
+  private calculateForContainerClient(index: number, { websql }: { websql: boolean }) {
+    const portForStandalone = (this.basePort + (websql ? 800 : 700)) + this.n * this.max + index;
+    return portForStandalone;
+  }
+
+
+
+  appHostTemplateFor(project: Project) {
+    const backendPort = this.calculateServerPortFor(project);
+
+    //#region @backendFunc
+    const clientPorts = (project.isStandaloneProject && !project.isSmartContainerTarget) ? `
 export const CLIENT_DEV_NORMAL_APP_PORT = ${project.standaloneNormalAppPort};
 export const CLIENT_DEV_WEBSQL_APP_PORT = ${project.standaloneWebsqlAppPort};
-      `: ''
+    `: ''
 
-      return `
+    return `
 // THIS FILE IS GENERATED - DO NOT MODIFY
 
 export const HOST_BACKEND_PORT = ${backendPort};
 ${clientPorts}
 
-// Check yout build info here http://localhost:${basePort}
+// Check yout build info here http://localhost:${this.basePort}
 // NORMAL APP: http://localhost:${project.standaloneNormalAppPort}
 // WEBSQL APP: http://localhost:${project.standaloneWebsqlAppPort}
 
 // THIS FILE IS GENERATED - DO NOT MODIFY
 `.trim()
-      //#endregion
-    }
+    //#endregion
   }
+
 }
+
+
 
 export const notAllowedProjectNames = [
   'app',

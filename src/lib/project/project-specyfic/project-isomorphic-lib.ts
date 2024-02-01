@@ -297,25 +297,25 @@ export class ProjectIsomorphicLib
     // ) : '');
 
     let client = _.first(forClient as Project[]);
-    let port: number;
+    let portAssignedToAppBuild: number;
     if (client) {
       webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name}`;
     }
 
     const argsAdditionalParams: { port: number; } = Helpers.cliTool.argsFrom(args) || {} as any;
     if (_.isNumber(argsAdditionalParams.port)) {
-      port = argsAdditionalParams.port;
+      portAssignedToAppBuild = argsAdditionalParams.port;
     }
-    if (!_.isNumber(port) || !port) {
-      port = websql ? this.standaloneWebsqlAppPort : this.standaloneNormalAppPort;
+    if (!_.isNumber(portAssignedToAppBuild) || !portAssignedToAppBuild) {
+      portAssignedToAppBuild = websql ? this.standaloneWebsqlAppPort : this.standaloneNormalAppPort;
     }
 
-    if (!_.isNumber(port) || !port) {
-      port = await this.assignFreePort(DEFAULT_PORT.APP_BUILD_LOCALHOST);
+    if (!_.isNumber(portAssignedToAppBuild) || !portAssignedToAppBuild) {
+      portAssignedToAppBuild = await this.assignFreePort(DEFAULT_PORT.APP_BUILD_LOCALHOST);
     }
 
     if (watch) {
-      await Helpers.killProcessByPort(port);
+      await Helpers.killProcessByPort(portAssignedToAppBuild);
     }
 
 
@@ -350,7 +350,7 @@ export class ProjectIsomorphicLib
     let command: string;
     if (this.frameworkVersionAtLeast('v3')) {
       //#region prepare angular variables for new v3 inside structure build
-      const portToServe = _.isNumber(port) ? `--port=${port}` : '';
+      const portAssignedToAppBuildCommandPart = _.isNumber(portAssignedToAppBuild) ? `--port=${portAssignedToAppBuild}` : '';
       const aot = flags.includes('aot');
       // const ngBuildCmd = // TODO LOAD NVME HERE
       const ngBuildCmd = `npm-run ng build app`
@@ -363,7 +363,7 @@ export class ProjectIsomorphicLib
         if (outDir === 'dist') {
           // command = `${loadNvm} && ${this.npmRunNg} serve ${portToServe} ${prod ? '--prod' : ''}`;
           const isElectron = false;
-          command = `${this.npmRunNg} serve ${isElectron ? 'angular-electron' : 'app'}  ${portToServe} ${prod ? '--prod' : ''}`;
+          command = `${this.npmRunNg} serve ${isElectron ? 'angular-electron' : 'app'}  ${portAssignedToAppBuildCommandPart} ${prod ? '--prod' : ''}`;
         } else {
           command = ngBuildCmd;
         }
@@ -373,8 +373,8 @@ export class ProjectIsomorphicLib
       //#endregion
     } else {
       //#region @deprecated prepare webpack variables
-      if (_.isNumber(port)) {
-        webpackEnvParams = `${webpackEnvParams} --env.port=${port}`;
+      if (_.isNumber(portAssignedToAppBuild)) {
+        webpackEnvParams = `${webpackEnvParams} --env.port=${portAssignedToAppBuild}`;
       }
       command = `npm-run webpack-dev-server ${webpackEnvParams}`;
       //#endregion

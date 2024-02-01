@@ -152,8 +152,7 @@ export function recreateApp(project: Project) {
   if (!Helpers.exists(appHostsFile)
     // && !Helpers.exists(appFolderWithIndex) // TODO @LAST why not to remove this
   ) {
-    Helpers.writeFile(appHostsFile, PortUtils(DEFAULT_PORT.SERVER_LOCALHOST).appHostTemplateFor(
-      DEFAULT_PORT.SERVER_LOCALHOST + 400, project));
+    Helpers.writeFile(appHostsFile, PortUtils.instance(project.projectInfoPort).appHostTemplateFor(project));
   }
 
   if (!Helpers.exists(appElectornFile)

@@ -12,7 +12,7 @@ import { BUILD_PROCESS } from './build-process.models';
 import { BuildProcessBackend } from './backend/build-process-backend';
 import type { BuildProcessFeature } from '../../build-proces.backend';
 import { Project } from '../../../../abstract/project';
-import { DEFAULT_PORT } from '../../../../../constants';
+import { DEFAULT_PORT, PortUtils } from '../../../../../constants';
 
 //#endregion
 //#endregion
@@ -49,27 +49,6 @@ export class BuildProcessController extends Firedev.Base.Controller<any> {
       `;
     }
   }
-
-  @Firedev.Http.POST()
-  assignPortForClient(): Firedev.Response<void> {
-    return async (req, res) => {
-
-      if (this.project.isSmartContainer) {
-        for (const [index, child] of this.project.children.entries()) {
-          child.standaloneNormalAppPort = await this.project.assignFreePort(DEFAULT_PORT.APP_BUILD_LOCALHOST) + index;
-        }
-      } else {
-        this.project.standaloneNormalAppPort = await this.project.assignFreePort(DEFAULT_PORT.APP_BUILD_LOCALHOST);
-      }
-    }
-  };
-
-  @Firedev.Http.GET()
-  getPortForClient(): Firedev.Response<number> {
-    return async (req, res) => {
-      return this.project.standaloneNormalAppPort;
-    }
-  };
 
   private readonly project: Project;
   async initialize(project: Project) {

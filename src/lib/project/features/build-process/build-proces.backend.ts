@@ -16,7 +16,7 @@ import { Log } from 'ng2-logger/src';
 import { Morphi as Firedev } from 'morphi/src';
 import { BuildProcess, BuildProcessController } from './app/build-process';
 import { CLI } from 'tnp-cli/src';
-import { DEFAULT_PORT, tmpBuildPort } from '../../../constants';
+import { DEFAULT_PORT, PortUtils, tmpBuildPort } from '../../../constants';
 // import { FiredevBinaryFile, FiredevBinaryFileController, FiredevFile, FiredevFileController, FiredevFileCss } from 'firedev-ui';
 
 const log = Log.create(__filename)
@@ -81,6 +81,8 @@ export class BuildProcessFeature extends FeatureForProject {
 
   private async build(buildOptions: BuildOptions, allowedLibs: ConfigModels.LibType[], exit = true) {
     //#region initial messages
+    const forAppRelaseBuild = (buildOptions?.args?.trim()?.search('--forAppRelaseBuild') !== -1);
+
     if (!this.project.copyManager.coreContainerSmartNodeModulesProj) {
       Helpers.error(`${_.upperFirst(config.frameworkName)} has incorrect/missing packages container.
 Please use command:
@@ -112,6 +114,7 @@ to fix it.
     //#endregion
 
     this.project.buildOptions = buildOptions;
+    const websql = !!buildOptions.websql;
 
     //#region make sure project allowed for build
     if (_.isArray(allowedLibs) && this.project.typeIsNot(...allowedLibs)) {
@@ -123,19 +126,14 @@ to fix it.
     }
     //#endregion
 
-    // console.log({
-    //   'buildOptions.appBuild': buildOptions.appBuild
-    // })
-
-    const forAppRelaseBuild = (buildOptions?.args?.trim()?.search('--forAppRelaseBuild') !== -1);
 
     if (!buildOptions.appBuild && !forAppRelaseBuild) {
-
       //#region main lib code build ports assignations
-      const assignedPort = await this.project.assignFreePort(4100);
-      Helpers.writeFile(this.project.pathFor(tmpBuildPort), assignedPort?.toString());
+      const projectInfoPort = await this.project.assignFreePort(4100);
+      this.project.projectInfoPort = projectInfoPort;
+      Helpers.writeFile(this.project.pathFor(tmpBuildPort), projectInfoPort?.toString());
 
-      const host = `http://localhost:${assignedPort}`;
+      const host = `http://localhost:${projectInfoPort}`;
       Helpers.info(`
 
 
@@ -170,25 +168,25 @@ to fix it.
         });
         const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
         await controller.initialize(this.project);
-        await BuildProcess.assignPortForClient();
-
       } catch (error) {
         console.error(error);
         Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
       }
 
-      this.project.saveLaunchJson(assignedPort);
+      this.project.saveLaunchJson(projectInfoPort);
       Helpers.taskDone('project service started')
       // console.log({ context })
       //#endregion
     }
 
-
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
 
-      if (!buildOptions.serveApp && !forAppRelaseBuild) {
-        const assignedPortFromFile = Number(Helpers.readFile(this.project.pathFor(tmpBuildPort)));
-        const host = `http://localhost:${assignedPortFromFile}`;
+      if (!forAppRelaseBuild) {
+        //#region initializae client app remote connection to build server
+        const projectInfoPortFromFile = Number(Helpers.readFile(this.project.pathFor(tmpBuildPort)));
+        this.project.projectInfoPort = projectInfoPortFromFile;
+
+        const host = `http://localhost:${projectInfoPortFromFile}`;
         try {
           const context = await Firedev.init({
             mode: 'remote-backend',
@@ -202,27 +200,37 @@ to fix it.
           });
           const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
           await controller.initialize(this.project);
-          this.project.standaloneNormalAppPort = (await controller.getPortForClient().received).body.numericValue;
+          // this.project.standaloneNormalAppPort = (await controller.getPortForClient().received).body.numericValue;
         } catch (error) {
           console.error(error);
           Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
         }
-        this.project.saveLaunchJson(assignedPortFromFile);
+        this.project.saveLaunchJson(projectInfoPortFromFile);
+        //#endregion
       }
 
-
-
       if (!this.project.node_modules.exist) {
-        Helpers.error('Please start lib build first', false, true)
+        //#region prevent empty node_modules
+        Helpers.error(`Please start lib build first:
+
+        ${config.frameworkName} build:watch # short -> ${config.frameworkName} bw
+or use command:
+
+${config.frameworkName} start
+
+        `, false, true);
+        //#endregion
       }
 
     } else {
+      //#region normal/watch lib build
       if (buildOptions.watch) {
         log.data('is lib build watch')
         await this.project.filesStructure.init(buildOptions.args, { watch: true, watchOnly: buildOptions.watchOnly });
       } else {
         await this.project.filesStructure.init(buildOptions.args);
       }
+      //#endregion
     }
     log.data('before file templates')
 
