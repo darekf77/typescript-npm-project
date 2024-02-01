@@ -119,25 +119,34 @@ export class Project extends $Project<Project>
   browser: any;
 
   private _projectInfoPort: number;
-  set projectInfoPort(v) {
+
+  setProjectInfoPort(v) {
+    //#region @backend
     this._projectInfoPort = v;
     for (const child of this.children) {
-      child.projectInfoPort = v;
+      child.setProjectInfoPort(v);
     }
+    //#endregion
   }
 
   get projectInfoPort() {
-    return this._projectInfoPort;
+    //#region @backendFunc
+    let port = this._projectInfoPort;
+    if (!port && this.isSmartContainerTarget) {
+      return this.smartContainerTargetParentContainer?._projectInfoPort;
+    }
+    return port;
+    //#endregion
   }
 
   get standaloneNormalAppPort() {
     //#region @backendFunc
-    return PortUtils.instance(this.projectInfoPort).calculateClientPortFor(this.project, { websql: false })
+    return PortUtils.instance(this.projectInfoPort).calculateClientPortFor(this, { websql: false })
     //#endregion
   }
   get standaloneWebsqlAppPort() {
     //#region @backendFunc
-    return PortUtils.instance(this.projectInfoPort).calculateClientPortFor(this.project, { websql: true })
+    return PortUtils.instance(this.projectInfoPort).calculateClientPortFor(this, { websql: true })
     //#endregion
   }
 
@@ -173,7 +182,7 @@ export class Project extends $Project<Project>
 
 
   get info(
-    //#region @backed
+    //#region @backend
     // @ts-ignore
     this: Project
     //#endregion

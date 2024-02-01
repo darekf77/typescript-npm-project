@@ -66,53 +66,59 @@ export class PortUtils {
 
   calculateServerPortFor(project: Project): number {
     //#region @backendFunc
-    if (!project.isStandaloneProject) {
+    if (project.isContainer) {
       return;
-    }
-    if (project.isStandaloneProject && !project.isSmartContainerTarget) {
-      return this.calculateForStandaloneServer();
     }
     if (project.isSmartContainerTarget) {
       project = project.smartContainerTargetParentContainer.children.find(c => c.name === project.name);
     }
-    const index = project.parent.children.indexOf(project);
-    return this.calculateForContainerServer(index);
+    if (project.isSmartContainerChild) {
+      const index = project.parent.children.indexOf(project);
+      return this.calculateForContainerServer(index);
+    }
+    if (project.isStandaloneProject) {
+      return this.calculateForStandaloneServer();
+    }
     //#endregion
   }
 
   calculateClientPortFor(project: Project, { websql }: { websql: boolean }): number {
     //#region @backendFunc
-    if (!project.isStandaloneProject) {
+    if (project.isContainer) {
       return;
-    }
-    if (project.isStandaloneProject && !project.isSmartContainerTarget) {
-      return this.calculateForStandaloneClient({ websql });
     }
     if (project.isSmartContainerTarget) {
       project = project.smartContainerTargetParentContainer.children.find(c => c.name === project.name);
     }
-    const index = project.parent.children.indexOf(project);
-    return this.calculateForContainerClient(index, { websql });
+    if (project.isSmartContainerChild) {
+      const index = project.parent.children.indexOf(project);
+      return this.calculateForContainerClient(index, { websql });
+    }
+    if (project.isStandaloneProject) {
+      return this.calculateForStandaloneClient({ websql });
+    }
     //#endregion
   }
 
   private calculateForStandaloneServer() {
-    const portForStandalone = this.basePort + 400 + this.n
-    return portForStandalone;
+    const clientStandalonePort = this.basePort + 400 + this.n
+    return clientStandalonePort;
   }
 
   private calculateForContainerServer(index: number) {
-    return this.basePort + 500 + (this.n * this.max) + index;
+    const clientSmartContainerChildPort = this.basePort + 500 + (this.n * this.max) + index;
+    // console.log({ clientSmartContainerChildPort })
+    return clientSmartContainerChildPort;
   }
 
   private calculateForStandaloneClient({ websql }: { websql: boolean }) {
-    const portForStandalone = (this.basePort + (websql ? 300 : 200)) + this.n;
-    return portForStandalone;
+    const clientPort = (this.basePort + (websql ? 300 : 200)) + this.n;
+    return clientPort;
   }
 
   private calculateForContainerClient(index: number, { websql }: { websql: boolean }) {
-    const portForStandalone = (this.basePort + (websql ? 800 : 700)) + this.n * this.max + index;
-    return portForStandalone;
+    const clientPort = (this.basePort + (websql ? 800 : 700)) + this.n * this.max + index;
+    return clientPort;
   }
 
 

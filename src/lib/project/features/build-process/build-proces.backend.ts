@@ -130,7 +130,7 @@ to fix it.
     if (!buildOptions.appBuild && !forAppRelaseBuild) {
       //#region main lib code build ports assignations
       const projectInfoPort = await this.project.assignFreePort(4100);
-      this.project.projectInfoPort = projectInfoPort;
+      this.project.setProjectInfoPort(projectInfoPort);
       Helpers.writeFile(this.project.pathFor(tmpBuildPort), projectInfoPort?.toString());
 
       const host = `http://localhost:${projectInfoPort}`;
@@ -184,7 +184,7 @@ to fix it.
       if (!forAppRelaseBuild) {
         //#region initializae client app remote connection to build server
         const projectInfoPortFromFile = Number(Helpers.readFile(this.project.pathFor(tmpBuildPort)));
-        this.project.projectInfoPort = projectInfoPortFromFile;
+        this.project.setProjectInfoPort(projectInfoPortFromFile);
 
         const host = `http://localhost:${projectInfoPortFromFile}`;
         try {
