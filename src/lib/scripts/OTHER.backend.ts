@@ -290,6 +290,7 @@ export function $PRINT_RELATIVES(folder) {
 /**
  *  npm install --global bin-version-check-cli
  *  npm i -g yt-dlp
+ *  choco install ffmpeg
  *
  * @param args
  */
