@@ -199,6 +199,7 @@ export class CopyMangerOrganizationAngularFiles {
       // console.log({ singleFile })
       Helpers.copy(sourceBrowserOrWerbsqlFolderAbsPath, childBrowserOrWebsqlDestAbsPath, {
         copySymlinksAsFiles: false,
+        dontAskOnError: true,
       });
 
       if (isTempLocalProj) {
