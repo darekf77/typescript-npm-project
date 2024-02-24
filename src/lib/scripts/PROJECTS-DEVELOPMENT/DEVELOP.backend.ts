@@ -297,6 +297,10 @@ export async function $INFO(args: string) {
 
     location: ${proj.location}
 
+
+    children (${proj.children?.length || 0}):
+${(proj.children || []).map(c => '- ' + c.packageJson.name).join('\n')}
+
     `)
   // }
 

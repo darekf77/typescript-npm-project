@@ -187,7 +187,7 @@ export class PackageJsonCore {
     return this.data.tnp?.core?.dependencies?.trusted || {} as any;
   }
 
-  get trustedMaxMajor(): {  [ver in ConfigModels.FrameworkVersion]: number; } {
+  get trustedMaxMajor(): { [ver in ConfigModels.FrameworkVersion]: number; } {
     return this.data.tnp?.core?.dependencies?.['trustedMaxMajor'] || {} as any;
   }
 

@@ -123,6 +123,7 @@ ${shouldBeProjectArr.map((p, index) => `- ${index + 1}. ${p}`).join('\n')}
       ...this.project.children.filter(c => {
         return this.project.packageJson.linkedProjects.includes(c.name);
       }),
+      ...(this.project.hasFile('taon.json') ? this.project.children : []),
       ... this.project.linkedProjectsExisted,
     ];
 

@@ -59,6 +59,15 @@ export abstract class FolderProject {
     }
     //#region @backend
 
+    if (this.pathFor('taon.json')) {
+      return Helpers.foldersFrom(this.location)
+        .filter(f => !f.startsWith('.') && ![
+          config.folder.node_modules,
+        ].includes(path.basename(f)))
+        .map(f => Project.From(f) as Project)
+        .filter(f => !!f)
+    }
+
     if (this.isTnp && !global.globalSystemToolMode) {
       return [];
     }
@@ -274,6 +283,16 @@ export abstract class FolderProject {
       Helpers.error(`Cannot join relative path with absolute: ${relativePath}`);
     }
     return crossPlatformPath(path.join(this.location, relativePath))
+  }
+
+  hasFile(relativePath: string | string[]) {
+    if (Array.isArray(relativePath)) {
+      relativePath = crossPlatformPath(relativePath.join('/'))
+    }
+    if (path.isAbsolute(relativePath)) {
+      Helpers.error(`Cannot join relative path with absolute: ${relativePath}`);
+    }
+    return Helpers.exists(crossPlatformPath(path.join(this.location, relativePath)))
   }
 
   path(this: Project, relativePath: string, currentProjectLocation?: string) {
