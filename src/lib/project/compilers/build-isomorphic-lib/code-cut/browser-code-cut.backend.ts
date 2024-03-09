@@ -12,7 +12,7 @@ import { Helpers } from 'tnp-helpers/src';
 import type { Project } from '../../../abstract/project/project';
 import { BuildOptions } from 'tnp-db/src';
 import { RegionRemover } from 'isomorphic-region-loader/src';
-import { MjsModule } from '../../../features/copy-manager/bundle-mjs-fesm-module-spliter.backend';
+import { MjsModule } from '../../../features/copy-manager/mjs-fesm-module-spliter.backend';
 import { CLI } from 'tnp-cli/src';
 
 //#endregion
@@ -100,17 +100,17 @@ export class BrowserCodeCut {
     /**
      * ex. < project location >/tmp-src-dist-websql
      */
-    protected absPathTmpSrcDistBundleFolder: string,
+    protected absPathTmpSrcDistFolder: string,
     private project?: Project,
     private buildOptions?: BuildOptions,
   ) {
 
-    this.absPathTmpSrcDistBundleFolder = crossPlatformPath(absPathTmpSrcDistBundleFolder);
+    this.absPathTmpSrcDistFolder = crossPlatformPath(absPathTmpSrcDistFolder);
     this.absFileSourcePathBrowserOrWebsql = crossPlatformPath(absFileSourcePathBrowserOrWebsql);
     this.absFileSourcePathBrowserOrWebsqlAPPONLY = this.absFileSourcePathBrowserOrWebsql.replace(
       `tmp-src-${buildOptions.outDir}${buildOptions.websql ? '-websql' : ''}`,
       `tmp-src-app-${buildOptions.outDir}${buildOptions.websql ? '-websql' : ''}`
-    ); // for slighted modifed app bundle
+    ); // for slighted modifed app release dist
 
     this.absSourcePathFromSrc = crossPlatformPath(absSourcePathFromSrc);
 
@@ -129,19 +129,16 @@ export class BrowserCodeCut {
     }
 
     this.relativePath = crossPlatformPath(this.absFileSourcePathBrowserOrWebsql)
-      .replace(`${this.absPathTmpSrcDistBundleFolder}/`, '')
+      .replace(`${this.absPathTmpSrcDistFolder}/`, '')
 
     this.absoluteBackendDestFilePath = crossPlatformPath(path.join(
-      this.absPathTmpSrcDistBundleFolder.replace('tmp-src', 'tmp-source'),
+      this.absPathTmpSrcDistFolder.replace('tmp-src', 'tmp-source'),
       this.relativePath, // .replace('-websql', '') // backend is ONE
     ));
 
     // console.log('RELATIVE ', this.relativePath)
 
-    this.isWebsqlMode = (
-      this.relativePath.startsWith(`tmp-src-${config.folder.dist}-${config.folder.websql}`)
-      || this.relativePath.startsWith(`tmp-src-${config.folder.bundle}-${config.folder.websql}`)
-    );
+    this.isWebsqlMode = (this.relativePath.startsWith(`tmp-src-${config.folder.dist}-${config.folder.websql}`));
   }
   //#endregion
 
@@ -706,7 +703,7 @@ export class BrowserCodeCut {
     // const forAppRelaseBuild = (this.buildOptions?.args?.search('--forAppRelaseBuild') !== -1)
 
 
-    let basenameWithSlash = this.project.isInRelaseBundle ? `/${pathname}/` : '/';
+    let basenameWithSlash = this.project.isInRelaseDist ? `/${pathname}/` : '/';
     if (this.project.env.config?.useDomain) {
       basenameWithSlash = '/';
     }

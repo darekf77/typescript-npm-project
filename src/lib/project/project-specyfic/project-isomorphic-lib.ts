@@ -100,7 +100,7 @@ export class ProjectIsomorphicLib
       .concat([
         'tsconfig.browser.json',
         'webpack.config.js',
-        'webpack.backend-bundle-build.js',
+        'webpack.backend-dist-build.js',
         'run.js',
         'run-org.js',
         ...this.filesTemplates(),
@@ -128,14 +128,12 @@ export class ProjectIsomorphicLib
     let files = [
       'tsconfig.json.filetemplate',
       'tsconfig.backend.dist.json.filetemplate',
-      'tsconfig.backend.bundle.json.filetemplate',
     ];
 
     if (this.frameworkVersionAtLeast('v2')) {
       files = [
         'tsconfig.isomorphic.json.filetemplate',
         'tsconfig.isomorphic-flat-dist.json.filetemplate',
-        'tsconfig.isomorphic-flat-bundle.json.filetemplate',
         'tsconfig.browser.json.filetemplate',
         ...this.vscodeFileTemplates,
         ...files,
@@ -159,7 +157,7 @@ export class ProjectIsomorphicLib
     if (this.frameworkVersionAtLeast('v2')) {
       files.push({
         sourceProject: Project.by<Project>(this._type, 'v1'),
-        relativePath: 'webpack.backend-bundle-build.js'
+        relativePath: 'webpack.backend-dist-build.js'
       });
     }
 
@@ -245,7 +243,7 @@ export class ProjectIsomorphicLib
     const isSmartContainerTargetNonClient = this.isSmartContainerTargetNonClient;
 
     let basename = ''
-    if (this.isInRelaseBundle) {
+    if (this.isInRelaseDist) {
       if (!this.env.config?.useDomain) {
         basename = `--base-href /${isSmartContainerTarget ? this.smartContainerTargetParentContainer.name : this.name}/`;
         if (isSmartContainerTargetNonClient) {
@@ -265,7 +263,7 @@ export class ProjectIsomorphicLib
     const backeFromRelase = `../../../../`;
     const backeFromContainerTarget = `../../../`;
     let back = backAppTmpFolders;
-    if (this.isInRelaseBundle) {
+    if (this.isInRelaseDist) {
       if (isSmartContainerTarget) {
         back = `${backAppTmpFolders}${backeFromContainerTarget}${backeFromRelase}`;
       } else {
@@ -277,7 +275,7 @@ export class ProjectIsomorphicLib
       }
     }
 
-    let outDirApp = this.isInRelaseBundle ? config.folder.docs : `${outDir}-app${websql ? '-websql' : ''}`;
+    let outDirApp = this.isInRelaseDist ? config.folder.docs : `${outDir}-app${websql ? '-websql' : ''}`;
     if (isSmartContainerTargetNonClient) {
       outDirApp = `${outDirApp}/-/${this.name}`;
     }
@@ -500,7 +498,7 @@ export class ProjectIsomorphicLib
     const productionModeButIncludePackageJsonDeps = (obscure || uglify) && !includeNodeModules;
 
 
-    if (outDir === 'bundle' && (obscure || uglify)) {
+    if (this.isInRelaseDist && (obscure || uglify)) { // @LAST
       this.quickFixes.overritenBadNpmPackages();
     }
 
@@ -534,13 +532,6 @@ export class ProjectIsomorphicLib
 
     `);
 
-
-
-    // const webPack1 = `require('webpack')`;
-    // const webPack2 = `require('${this.npmPackages.global('webpack', true)}')`;
-    // const fileWEbpack = path.join(this.location, 'webpack.backend-bundle-build.js')
-    // const fileContent = Helpers.readFile(fileWEbpack).replace(webPack1, webPack2);
-    // Helpers.writeFile(fileWEbpack, fileContent);
     //#endregion
 
     //#region preparing variables / general
@@ -606,12 +597,12 @@ export class ProjectIsomorphicLib
 
     if (this.buildOptions.watch) {
       if (productionModeButIncludePackageJsonDeps) {
-        //#region webpack bundle build
+        //#region webpack dist release build
         await incrementalBuildProcess.startAndWatch(`isomorphic compilation (only browser) `);
         await incrementalBuildProcessWebsql.startAndWatch(`isomorphic compilation (only browser) [WEBSQL]`);
-        // Helpers.error(`Watch build not available for bundle build`, false, true);
-        // Helpers.info(`Starting watch bundle build for fast cli.. ${this.buildOptions.websql ? '[WEBSQL]' : ''}`);
-        Helpers.info(`Starting watch bundle build for fast cli.. `);
+        // Helpers.error(`Watch build not available for dist release build`, false, true);
+        // Helpers.info(`Starting watch dist release build for fast cli.. ${this.buildOptions.websql ? '[WEBSQL]' : ''}`);
+        Helpers.info(`Starting watch dist release build for fast cli.. `);
 
         try {
           await this.webpackBackendBuild.run({
@@ -681,7 +672,7 @@ export class ProjectIsomorphicLib
             appBuildOpt.appBuild = true;
             await this.buildSteps(appBuildOpt);
           } else {
-            this.showMesageWhenBuildLibDoneForSmartContainer(args, watch, this.isInRelaseBundle);
+            this.showMesageWhenBuildLibDoneForSmartContainer(args, watch, this.isInRelaseDist);
           }
         }
         //#endregion
@@ -768,7 +759,7 @@ export class ProjectIsomorphicLib
           await proxyProjectWebsql.execute(commandForLibraryBuild, {
             ...sharedOptions(),
           });
-          this.showMesageWhenBuildLibDoneForSmartContainer(args, watch, this.isInRelaseBundle);
+          this.showMesageWhenBuildLibDoneForSmartContainer(args, watch, this.isInRelaseDist);
         } catch (e) {
           Helpers.log(e)
           Helpers.error(`
@@ -968,7 +959,7 @@ export class ProjectIsomorphicLib
     //   .forEach(f => Helpers.removeFileIfExists(f))
     //   ;
 
-    const baseBundleOrDist = crossPlatformPath(path.join(this.location, outDir));
+    const baseDistRelease = crossPlatformPath(path.join(this.location, outDir));
     const nccBase = crossPlatformPath(path.join(this.location, outDir, 'temp', 'ncc'));
 
     Helpers
@@ -976,7 +967,7 @@ export class ProjectIsomorphicLib
       .filter(f => f.replace(`${nccBase}/`, '') !== config.file.package_json)
       .forEach(f => {
         const relativePath = f.replace(`${nccBase}/`, '');
-        const dest = crossPlatformPath(path.join(baseBundleOrDist, relativePath));
+        const dest = crossPlatformPath(path.join(baseDistRelease, relativePath));
         Helpers.copyFile(f, dest);
       });
 
@@ -1055,12 +1046,12 @@ export class ProjectIsomorphicLib
   //#region private methods / compile/obscure backend code
   private backendObscureCode(outDir: Models.dev.BuildDir, reservedNames: string[], mainCliJSFileName = 'index.js') {
     //#region @backendFunc
-    if (!Helpers.exists(path.join(this.location, config.folder.bundle, mainCliJSFileName))) {
-      Helpers.warn(`[obscureCode] Nothing to obscure... no ${mainCliJSFileName} in bundle`)
+    if (!Helpers.exists(path.join(this.location, config.folder.dist, mainCliJSFileName))) {
+      Helpers.warn(`[obscureCode] Nothing to obscure... no ${mainCliJSFileName} in release dist`)
       return
     }
-    const commnad = `npm-run javascript-obfuscator bundle/${mainCliJSFileName} `
-      + ` --output bundle/${mainCliJSFileName}`
+    const commnad = `npm-run javascript-obfuscator dist/${mainCliJSFileName} `
+      + ` --output dist/${mainCliJSFileName}`
       + ` --target node`
       + ` --string-array-rotate true`
       // + ` --stringArray true`
@@ -1082,14 +1073,14 @@ export class ProjectIsomorphicLib
 
   //#region private methods / cut release code
 
-  private get tmpSrcBundleFolder() {
-    return `tmp-cut-relase-src-${config.folder.bundle}${this.buildOptions.websql ? '-websql' : ''}`
+  private get tmpSrcDistReleaseFolder() {
+    return `tmp-cut-relase-src-${config.folder.dist}${this.buildOptions.websql ? '-websql' : ''}`
   }
 
   private cutReleaseCodeRestore() {
     //#region @backend
     const releaseSrcLocation = crossPlatformPath(path.join(this.location, config.folder.src));
-    const releaseSrcLocationOrg = crossPlatformPath(path.join(this.location, this.tmpSrcBundleFolder));
+    const releaseSrcLocationOrg = crossPlatformPath(path.join(this.location, this.tmpSrcDistReleaseFolder));
 
     Helpers.removeFolderIfExists(releaseSrcLocation);
     Helpers.copy(releaseSrcLocationOrg, releaseSrcLocation);
@@ -1100,7 +1091,7 @@ export class ProjectIsomorphicLib
   private cutReleaseCode() {
     //#region @backend
     const releaseSrcLocation = crossPlatformPath(path.join(this.location, config.folder.src));
-    const releaseSrcLocationOrg = crossPlatformPath(path.join(this.location, this.tmpSrcBundleFolder));
+    const releaseSrcLocationOrg = crossPlatformPath(path.join(this.location, this.tmpSrcDistReleaseFolder));
     Helpers.removeFolderIfExists(releaseSrcLocationOrg);
     Helpers.copy(releaseSrcLocation, releaseSrcLocationOrg, {
       copySymlinksAsFiles: true,

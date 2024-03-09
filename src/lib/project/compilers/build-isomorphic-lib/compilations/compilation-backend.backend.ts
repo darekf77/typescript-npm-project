@@ -26,7 +26,7 @@ export class BackendCompilation extends IncCompiler.Base {
   get tsConfigBrowserName() {
     return 'tsconfig.browser.json'
   }
-  public get absPathTmpSrcDistBundleFolder() {
+  public get absPathTmpSrcDistFolder() {
     if (_.isString(this.srcFolder) && _.isString(this.cwd)) {
       return crossPlatformPath(path.join(this.cwd, this.srcFolder));
     }

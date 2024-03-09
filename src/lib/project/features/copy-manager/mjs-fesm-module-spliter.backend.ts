@@ -71,11 +71,11 @@ export class MjsModule {
   }
   //#endregion
 }
-export class BundleMjsFesmModuleSpliter {
+export class MjsFesmModuleSpliter {
 
   //#region static
   public static fixForTarget(smartContainerChild: Project, mjsFileAbsPath: string, buildDirBrowser: Models.dev.BuildDirBrowser) {
-    return (new BundleMjsFesmModuleSpliter(smartContainerChild, mjsFileAbsPath, buildDirBrowser)).process();
+    return (new MjsFesmModuleSpliter(smartContainerChild, mjsFileAbsPath, buildDirBrowser)).process();
   }
   //#endregion
 

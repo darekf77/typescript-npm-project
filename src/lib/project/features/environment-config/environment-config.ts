@@ -86,8 +86,7 @@ export class EnvironmentConfig
   //#endregion
 
    /**
-    * TODO @LAST
-    * IMPORTANT
+    * @IMPORTANT
    * Can be accesed only after project.env.init()
    */
   public get config(): any {

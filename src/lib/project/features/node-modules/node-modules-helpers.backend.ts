@@ -241,15 +241,14 @@ const regexIsExportedConst = new RegExp(`export\\ +const `)
 const specialFunctionEnd = `//<replace>`;
 const notAllowedFolderToCopy = [
   'browser',
-  'bundles',
+  'dists',
   'esm5',
   'esm2015',
   'fesm2022',
   'fesm5',
   'fesm2015',
   'fesm2022',
-  'dist',
-  'bundle'
+  'dist'
 ];
 
 function fixPackageJson(pathToPacakgeJson: string, project: Project) {

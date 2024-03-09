@@ -20,7 +20,7 @@ export class CodeCut {
     /**
      * absoulte path ex: <project-path>/tmp-src-dist
      */
-    protected absPathTmpSrcDistBundleFolder: string,
+    protected absPathTmpSrcDistFolder: string,
     protected options: Models.dev.ReplaceOptionsExtended,
     /**
      * it may be not available for global, for all compilatoin
@@ -65,13 +65,13 @@ export class CodeCut {
     }
 
     const absSourceFromSrc = crossPlatformPath(path.join(
-      path.dirname(this.absPathTmpSrcDistBundleFolder),
+      path.dirname(this.absPathTmpSrcDistFolder),
       config.folder.src,
       relativePathToFile,
     ));
 
     const absolutePathToFile = crossPlatformPath(path.join(
-      this.absPathTmpSrcDistBundleFolder,
+      this.absPathTmpSrcDistFolder,
       relativePathToFile,
     ));
 
@@ -84,7 +84,7 @@ export class CodeCut {
       return (new BrowserCodeCut(
         absSourceFromSrc,
         absolutePathToFile,
-        this.absPathTmpSrcDistBundleFolder,
+        this.absPathTmpSrcDistFolder,
         this.project,
         this.buildOptions,
       )).initAndSave(remove);
@@ -93,7 +93,7 @@ export class CodeCut {
     return (new BrowserCodeCut(
       absSourceFromSrc,
       absolutePathToFile,
-      this.absPathTmpSrcDistBundleFolder,
+      this.absPathTmpSrcDistFolder,
       this.project,
       this.buildOptions,
     ))

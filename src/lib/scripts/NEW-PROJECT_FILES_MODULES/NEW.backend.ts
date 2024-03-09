@@ -22,11 +22,10 @@ export async function RM(args: string, exit = true) {
       if (rootProj && rootProj.isContainer) {
         if (rootProj.isSmartContainer && !rootProj.smartContainerBuildTarget) {
           rootProj.removeFolderByRelativePath(config.folder.dist);
-          rootProj.removeFolderByRelativePath(config.folder.bundle);
         }
         rootProj.removeFolderByRelativePath(config.folder.node_modules)
         if (rootProj.children.length === 0) {
-          await rootProj.filesStructure.init('--skipSmartContainerDistBundleInit')
+          await rootProj.filesStructure.init('--skipSmartContainerDistInit')
         } else {
           await rootProj.filesStructure.init('')
         }

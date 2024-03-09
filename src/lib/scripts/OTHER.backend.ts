@@ -131,8 +131,8 @@ const PSINFO = async (a) => {
 }
 
 
-function $isbundlemode(args) {
-  console.log('IS BUNDLE MODE? ', Project.isBundleMode)
+function $isdistreleasemode(args) {
+  console.log('IS DIST RELEASE MODE? ', Project.isReleaseDistMode)
   process.exit(0)
 }
 
@@ -172,8 +172,8 @@ const COPY_RESOURCES = () => {
   const proj = (Project.Current as Project);
   proj.checkIfReadyForNpm();
   if (proj.isStandaloneProject) {
-    const bundleFolder = path.join(proj.location, config.folder.bundle);
-    proj.bundleResources(bundleFolder);
+    const distReleaseFolder = path.join(proj.location, config.folder.dist);
+    proj.packReleaseDistResources(distReleaseFolder);
   } else {
     // TODO
   }
@@ -355,7 +355,7 @@ export default {
   $FILEINFO: Helpers.CLIWRAP($FILEINFO, '$FILEINFO'),
   RUN_PROCESS: Helpers.CLIWRAP(RUN_PROCESS, 'RUN_PROCESS'),
   PSINFO: Helpers.CLIWRAP(PSINFO, 'PSINFO'),
-  $isbundlemode: Helpers.CLIWRAP($isbundlemode, '$isbundlemode'),
+  $isdistreleasemode: Helpers.CLIWRAP($isdistreleasemode, '$isdistreleasemode'),
   $ASSETS: Helpers.CLIWRAP($ASSETS, '$ASSETS'),
   $VERSION: Helpers.CLIWRAP($VERSION, '$VERSION'),
   $VERSIONS: Helpers.CLIWRAP($VERSIONS, '$VERSIONS'),

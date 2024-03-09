@@ -255,7 +255,7 @@ export class CopyManagerStandalone extends CopyManager {
       if (json) {
         json.sources = (json.sources || []).map((p: string) => {
 
-          if (this.project.isInRelaseBundle) {
+          if (this.project.isInRelaseDist) {
             return '';
           }
 
@@ -318,11 +318,11 @@ export class CopyManagerStandalone extends CopyManager {
       ? this.monitoredOutDir // other package are getting data from temp-local-projecg
       : this.localTempProj.node_modules.pathFor(this.rootPackageName);
 
-    if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist|bundle)
+    if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist)
       this.dtsFixer.processFolderWithBrowserWebsqlFolders(monitorDir);
     }
 
-    //#region final copy from dist|bundle to node_moules/rootpackagename
+    //#region final copy from dist to node_moules/rootpackagename
     const pkgLocInDestNodeModules = destination.node_modules.pathFor(this.rootPackageName);
     const filter = Helpers.filterDontCopy(this.sourceFolders, monitorDir);
 
@@ -428,7 +428,7 @@ export class CopyManagerStandalone extends CopyManager {
   * destination is (should be) tmp-local-project
   *
   * Fix for 2 things:
-  * - debugging when in cli mode (fix in actual (dist|bundle)/(browser/websql)  )
+  * - debugging when in cli mode (fix in actual (dist)/(browser/websql)  )
   * - debugging when in node_modules of other project (fixing only tmp-local-project)
   * @param destinationPackageLocation desitnation/node_modues/< rootPackageName >
   */
@@ -492,9 +492,9 @@ export class CopyManagerStandalone extends CopyManager {
   //#endregion
 
   //#region fix d.ts import with wrong package names
-  fixDtsImportsWithWronPackageName(absOrgFilePathInDistOrBundle: string, destinationFilePath: string) {
-    if (absOrgFilePathInDistOrBundle.endsWith('.d.ts')) {
-      const contentToWriteInDestination = (Helpers.readFile(absOrgFilePathInDistOrBundle) || '');
+  fixDtsImportsWithWronPackageName(absOrgFilePathInDist: string, destinationFilePath: string) {
+    if (absOrgFilePathInDist.endsWith('.d.ts')) {
+      const contentToWriteInDestination = (Helpers.readFile(absOrgFilePathInDist) || '');
       for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
         const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
         const newContent = this.dtsFixer.forContent(
@@ -557,7 +557,7 @@ export class CopyManagerStandalone extends CopyManager {
       return;
     }
 
-    let absOrgFilePathInDistOrBundle = crossPlatformPath(path.normalize(path.join(
+    let absOrgFilePathInDist = crossPlatformPath(path.normalize(path.join(
       this.project.location,
       this.outDir,
       specyficFileRelativePath
@@ -566,19 +566,19 @@ export class CopyManagerStandalone extends CopyManager {
     // TODO QUICK_FIOX DISTINC WHEN IT COM FROM BROWSER
     // and do not allow
     if (destinationFilePath.endsWith('d.ts')) {
-      const newAbsOrgFilePathInDistOrBundle = absOrgFilePathInDistOrBundle.replace(
+      const newAbsOrgFilePathInDist = absOrgFilePathInDist.replace(
         `/${this.outDir}/${specyficFileRelativePath}`,
         `/${this.outDir}-nocutsrc/${specyficFileRelativePath}`,
       );
-      if (!Helpers.exists(newAbsOrgFilePathInDistOrBundle)) {
-        Helpers.log(`[copyto] New path does not exists or in browser | websql: ${newAbsOrgFilePathInDistOrBundle}`)
+      if (!Helpers.exists(newAbsOrgFilePathInDist)) {
+        Helpers.log(`[copyto] New path does not exists or in browser | websql: ${newAbsOrgFilePathInDist}`)
       } else {
-        absOrgFilePathInDistOrBundle = newAbsOrgFilePathInDistOrBundle;
+        absOrgFilePathInDist = newAbsOrgFilePathInDist;
       }
     }
 
 
-    this.fixDtsImportsWithWronPackageName(absOrgFilePathInDistOrBundle, destinationFilePath)
+    this.fixDtsImportsWithWronPackageName(absOrgFilePathInDist, destinationFilePath)
 
 
     const isBackendMapsFile = destinationFilePath.endsWith('.js.map');
@@ -601,7 +601,7 @@ export class CopyManagerStandalone extends CopyManager {
         )
       }
     } else {
-      Helpers.writeFile(destinationFilePath, (Helpers.readFile(absOrgFilePathInDistOrBundle) || ''));
+      Helpers.writeFile(destinationFilePath, (Helpers.readFile(absOrgFilePathInDist) || ''));
     }
 
 
@@ -614,10 +614,10 @@ export class CopyManagerStandalone extends CopyManager {
   }
   //#endregion
 
-  //#region prevent not fixing files in dist|bundle when source map hasn't been changed
+  //#region prevent not fixing files in dist when source map hasn't been changed
   /**
    * if I am changing just thing in single line - maps are not being triggered asynch (it is good)
-   * BUT typescript/angular compiler changes maps files inside dist|bundle or dist|bundle/browser|websql
+   * BUT typescript/angular compiler changes maps files inside dist or dist/browser|websql
    *
    *
    */
@@ -761,7 +761,7 @@ export class CopyManagerStandalone extends CopyManager {
   //#endregion
 
   //#region update backend full dts files
-  updateBackendFullDtsFiles(destinationOrBundleOrDist: Project | string) {
+  updateBackendFullDtsFiles(destinationOrDist: Project | string) {
     const base = crossPlatformPath(path.join(this.project.location, `${this.outDir}-nocutsrc`));
 
     const filesToUpdate = Helpers
@@ -773,9 +773,9 @@ export class CopyManagerStandalone extends CopyManager {
       const relativePath = filesToUpdate[index];
       const source = crossPlatformPath(path.join(base, relativePath));
       const dest = crossPlatformPath(path.join(
-        _.isString(destinationOrBundleOrDist)
+        _.isString(destinationOrDist)
           ? this.monitoredOutDir :
-          destinationOrBundleOrDist.node_modules.pathFor(this.rootPackageName),
+          destinationOrDist.node_modules.pathFor(this.rootPackageName),
         relativePath,
       ));
       // if (Helpers.exists(dest)) {

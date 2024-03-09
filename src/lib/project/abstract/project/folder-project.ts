@@ -400,9 +400,9 @@ export abstract class FolderProject {
         if (config.filesNotAllowedToClean.includes(f)) {
           return false;
         }
-        if (f.startsWith(config.folder.bundle) && this.isTnp) {
-          return false;
-        }
+        // if (f.startsWith(config.folder.dist) && this.isTnp) { // @LAST
+        //   return false;
+        // }
         return true;
       })
 

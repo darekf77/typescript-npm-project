@@ -45,7 +45,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     ...CopyMangerHelpers.browserwebsqlFolders.map(currentBrowserFolder => {
       return crossPlatformPath(path.join(currentBrowserFolder, config.folder.src))
     }),
-    // probably is not needed -> I ma not using bundle for node_modules
+    // probably is not needed -> I ma not using dist for node_modules
     crossPlatformPath(path.join(config.folder.client, config.file.package_json)),
   ];
 
@@ -138,8 +138,8 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     if (_.isUndefined(options)) {
       options = {} as any;
     }
-    if (_.isUndefined(options.filterForBundle)) {
-      options.filterForBundle = true;
+    if (_.isUndefined(options.filterForReleaseDist)) {
+      options.filterForReleaseDist = true;
     }
     if (_.isUndefined(options.forceCopyPackageJSON)) {
       options.forceCopyPackageJSON = false;
@@ -489,7 +489,7 @@ ${projectToCopyTo.map(proj => `- ${proj.genericName}`).join('\n')}
    *
    * monitoredOutDir/specyficRelativeFilePath
    * equals:
-   * projectLocation/(dist|bundle)/specyficRelativeFilePath
+   * projectLocation/(dist)/specyficRelativeFilePath
    */
   abstract get monitoredOutDir(): string;
 
@@ -513,7 +513,7 @@ ${projectToCopyTo.map(proj => `- ${proj.genericName}`).join('\n')}
   abstract copyCompiledSourcesAndDeclarations(destination: Project, isTempLocalProj: boolean);
   abstract copySharedAssets(destination: Project, isTempLocalProj: boolean);
   abstract linksForPackageAreOk(destination: Project): boolean;
-  abstract updateBackendFullDtsFiles(destinationOrBundleOrDist: Project | string): void;
+  abstract updateBackendFullDtsFiles(destinationOrDist: Project | string): void;
 
   //#endregion
 

@@ -310,7 +310,7 @@ export * from './lib';
           content = content.replace(new RegExp('my\\-lib', 'g'), projectName);
           if (path.basename(f) === 'tsconfig.json') {
             content = content.replace(
-              new RegExp(Helpers.escapeStringForRegEx(`"${config.folder.bundle}/${projectName}`), 'g'),
+              new RegExp(Helpers.escapeStringForRegEx(`"${config.folder.dist}/${projectName}`), 'g'),
               `"../../${outFolder}/${this.websql ? config.folder.websql : config.folder.browser}/${projectName}`);
           }
 

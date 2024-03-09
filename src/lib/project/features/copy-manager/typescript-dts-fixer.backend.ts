@@ -60,7 +60,7 @@ export class TypescriptDtsFixer {
 
   //#region helpers / fix d.ts import files in folder
   /**
-   *  fixing d.ts for (dist|bundle)/(browser|websql) when destination local project
+   *  fixing d.ts for (dist)/(browser|websql) when destination local project
    * @param absPathFolderLocationWithBrowserAdnWebsql usually dist
    * @param isTempLocalProj
    */

@@ -66,8 +66,8 @@ export abstract class LibProject {
   }
 
   // @ts-ignore
-  get isInRelaseBundle(this: Project) {
-    return this.location.includes('tmp-bundle-release/bundle');
+  get isInRelaseDist(this: Project) {
+    return this.location.includes('tmp-dist-release/dist');
   };
 
 
@@ -187,32 +187,40 @@ export abstract class LibProject {
         );
       }
 
+      let publish = true;
+
       if (!global.tnpNonInteractive) {
-        await Helpers.questionYesNo(`Do you wanna check bundle folder before publishing ?`, async () => {
-          specyficProjectForBuild.run(`code ${this.getTempProjName('bundle')}/${config.folder.node_modules}`).sync();
+        await Helpers.questionYesNo(`Do you wanna check compiled version before publishing ?`, async () => {
+          specyficProjectForBuild.run(`code ${this.getTempProjName('dist')}/${config.folder.node_modules}`).sync();
           Helpers.pressKeyAndContinue(`Check your compiled code and press any key ...`)
         });
-
       }
 
-      if (this.isSmartContainer) {
-        await specyficProjectForBuild.smartcontainer.publish({
-          realCurrentProj,
-          rootPackageName: `@${this.name}`,
-          newVersion,
-          automaticRelease,
-          prod,
-        })
+      publish = await Helpers.questionYesNo(`Publish this package ?`);
+
+      if (publish) {
+        if (this.isSmartContainer) {
+          await specyficProjectForBuild.smartcontainer.publish({
+            realCurrentProj,
+            rootPackageName: `@${this.name}`,
+            newVersion,
+            automaticRelease,
+            prod,
+          })
+        }
+
+        if (this.isStandaloneProject) {
+          await specyficProjectForBuild.standalone.publish({
+            realCurrentProj,
+            newVersion,
+            automaticRelease,
+            prod,
+          });
+        }
+      } else {
+        Helpers.info('Omitting npm publish...')
       }
 
-      if (this.isStandaloneProject) {
-        await specyficProjectForBuild.standalone.publish({
-          realCurrentProj,
-          newVersion,
-          automaticRelease,
-          prod,
-        });
-      }
 
     }
     //#endregion
@@ -240,13 +248,13 @@ export abstract class LibProject {
 
 
     if (!automaticReleaseDocs && Helpers.exists(docsCwd)) {
-      await this.infoBeforePublish(realCurrentProj, DEFAULT_PORT.BUNDLE_SERVER_DOCS);
+      await this.infoBeforePublish(realCurrentProj, DEFAULT_PORT.DIST_SERVER_DOCS);
 
     }
 
     await this.pushToGitRepo(realCurrentProj, newVersion, automaticReleaseDocs);
     if (!automaticReleaseDocs && Helpers.exists(docsCwd)) {
-      await Helpers.killProcessByPort(DEFAULT_PORT.BUNDLE_SERVER_DOCS)
+      await Helpers.killProcessByPort(DEFAULT_PORT.DIST_SERVER_DOCS)
     }
     Helpers.info('RELEASE DONE');
     process.exit(0);
@@ -263,8 +271,8 @@ export abstract class LibProject {
     if (!Helpers.exists(docsCwd)) {
       return;
     }
-    await Helpers.killProcessByPort(DEFAULT_PORT.BUNDLE_SERVER_DOCS)
-    const commandHostLoclDocs = `firedev-http-server -s -p ${DEFAULT_PORT.BUNDLE_SERVER_DOCS} --base-dir ${this.name}`;
+    await Helpers.killProcessByPort(DEFAULT_PORT.DIST_SERVER_DOCS)
+    const commandHostLoclDocs = `firedev-http-server -s -p ${DEFAULT_PORT.DIST_SERVER_DOCS} --base-dir ${this.name}`;
 
     // console.log({
     //   cwd, commandHostLoclDocs
@@ -317,8 +325,8 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       releaseOptions.useTempFolder = true;
     }
 
-    const baseFolder = path.join(this.location, 'tmp-bundle-release');
-    const absolutePathReleaseProject = path.join(baseFolder, 'bundle', 'project', this.name);
+    const baseFolder = path.join(this.location, config.folder.tmpDistRelease);
+    const absolutePathReleaseProject = path.join(baseFolder, config.folder.dist, 'project', this.name);
 
     if (this.isStandaloneProject || this.isSmartContainer) {
       if (releaseOptions.useTempFolder) {
@@ -381,7 +389,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         releaseOptions.useTempFolder = false;
         const vscodeFolder = path.join(generatedProject.location, config.folder._vscode);
         Helpers.removeFolderIfExists(vscodeFolder);
-        await generatedProject.insideStructure.recrate('bundle')
+        await generatedProject.insideStructure.recrate('dist')
         await generatedProject.release(releaseOptions);
         return true;
       }
@@ -396,7 +404,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     this.run(`${config.frameworkName} init ${this.isStandaloneProject ? '' : this.smartContainerBuildTarget.name}`).sync();
     const specyficProjectForBuild = this.isStandaloneProject ? this : Project.From(crossPlatformPath(path.join(
       this.location,
-      config.folder.bundle,
+      config.folder.dist,
       this.name,
       this.smartContainerBuildTarget.name,
     ))) as Project;
@@ -422,42 +430,44 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       includeNodeModules,
       nodts,
       uglify,
-      outDir: config.folder.bundle as 'bundle',
+      outDir: config.folder.dist as 'dist',
       args: allArgs,
     }, this) as any);
 
 
-    // Helpers.move(browserBundle, websqlBundleTemp);
-    // Helpers.move(browserBundleTemp, browserBundle);
+    // Helpers.move(browserDist, websqlDistTemp);
+    // Helpers.move(browserDistTemp, browserDist);
 
-    const bundles = [
-      crossPlatformPath([specyficProjectForBuild.location, config.folder.bundle]),
-      crossPlatformPath([specyficProjectForBuild.location, specyficProjectForBuild.getTempProjName('bundle'), config.folder.node_modules, realCurrentProj.name]),
+    const dists = [
+      crossPlatformPath([specyficProjectForBuild.location, config.folder.dist]),
+      crossPlatformPath([specyficProjectForBuild.location,
+      specyficProjectForBuild.getTempProjName('dist'),
+      config.folder.node_modules, realCurrentProj.name]),
     ];
 
     if (!specyficProjectForBuild.isCommandLineToolOnly && realCurrentProj.isStandaloneProject) {
-      for (let index = 0; index < bundles.length; index++) {
-        const bundleFolder = bundles[index];
-        specyficProjectForBuild.createClientVersionAsCopyOfBrowser(bundleFolder);
+      for (let index = 0; index < dists.length; index++) {
+        const releaseDistFolder = dists[index];
+        specyficProjectForBuild.createClientVersionAsCopyOfBrowser(releaseDistFolder);
       }
     }
 
-    for (let index = 0; index < bundles.length; index++) {
-      const bundleFolder = bundles[index];
-      specyficProjectForBuild.compileBrowserES5version(bundleFolder);
+    for (let index = 0; index < dists.length; index++) {
+      const releaseDist = dists[index];
+      specyficProjectForBuild.compileBrowserES5version(releaseDist);
     }
 
     if (realCurrentProj.isStandaloneProject) {
-      for (let index = 0; index < bundles.length; index++) {
-        const bundleFolder = bundles[index];
-        specyficProjectForBuild.bundleResources(bundleFolder);
+      for (let index = 0; index < dists.length; index++) {
+        const releaseDist = dists[index];
+        specyficProjectForBuild.packReleaseDistResources(releaseDist);
       }
-      specyficProjectForBuild.copyEssentialFilesTo(bundles, 'bundle');
+      specyficProjectForBuild.copyEssentialFilesTo(dists, 'dist');
     } else if (realCurrentProj.isSmartContainer) {
       const rootPackageName = `@${this.name}`;
       const base = path.join(
         specyficProjectForBuild.location,
-        specyficProjectForBuild.getTempProjName('bundle'),
+        specyficProjectForBuild.getTempProjName('dist'),
         config.folder.node_modules,
         rootPackageName,
       );
@@ -465,8 +475,8 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       for (let index = 0; index < childrenPackages.length; index++) {
         const childName = childrenPackages[index];
         const child = Project.From([realCurrentProj.location, childName]) as Project;
-        const bundleFolder = path.join(base, childName);
-        child.bundleResources(bundleFolder);
+        const releaseDistFolder = path.join(base, childName);
+        child.packReleaseDistResources(releaseDistFolder);
       }
     }
 
@@ -495,7 +505,8 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     if (this.typeIs('isomorphic-lib')) {
       this.copyWhenExist(config.file.tnpEnvironment_json, destinations);
     }
-    if (outDir === 'bundle') {
+
+    if (this.isInRelaseDist) { // @LAST probably something else
       this.copyWhenExist(config.file.package_json, destinations);
       this.linkWhenExist(config.folder.node_modules, destinations);
       this.copyWhenExist('package.json', destinations.map(d => crossPlatformPath([d, config.folder.client])));
@@ -507,9 +518,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
    * In vscode there is a mess..
    * TODO
    */
-  removeJsMapsFrom(absPathBundleFolder: string) {
+  removeJsMapsFrom(absPathReleaseDistFolder: string) {
     return; // TODO not a good idea
-    Helpers.filesFrom(absPathBundleFolder, true)
+    Helpers.filesFrom(absPathReleaseDistFolder, true)
       .filter(f => f.endsWith('.js.map') || f.endsWith('.mjs.map'))
       .forEach(f => Helpers.removeFileIfExists(f));
   }
@@ -520,11 +531,11 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   }
 
 
-  private createClientVersionAsCopyOfBrowser(this: Project, bundleFolder: string) {
+  private createClientVersionAsCopyOfBrowser(this: Project, releaseDistFolder: string) {
     //
 
-    const browser = path.join(bundleFolder, config.folder.browser)
-    const client = path.join(bundleFolder, config.folder.client)
+    const browser = path.join(releaseDistFolder, config.folder.browser)
+    const client = path.join(releaseDistFolder, config.folder.client)
     if (fse.existsSync(browser)) {
       Helpers.remove(client)
       Helpers.tryCopyFrom(browser, client);
@@ -538,12 +549,12 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
   }
 
-  public bundleResources(this: Project, bundleFolder: string) {
+  public packReleaseDistResources(this: Project, releaseDistFolder: string) {
     //
     this.checkIfReadyForNpm()
 
-    if (!fse.existsSync(bundleFolder)) {
-      fse.mkdirSync(bundleFolder);
+    if (!fse.existsSync(releaseDistFolder)) {
+      fse.mkdirSync(releaseDistFolder);
     }
     [].concat([
       ...this.resources,
@@ -555,7 +566,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       ]),
     ]).forEach(res => { //  copy resource to org build and copy shared assets
       const file = path.join(this.location, res);
-      const dest = path.join(bundleFolder, res);
+      const dest = path.join(releaseDistFolder, res);
       if (!fse.existsSync(file)) {
         Helpers.error(`[${config.frameworkName}][lib-project] Resource file: ${chalk.bold(path.basename(file))} does not `
           + `exist in "${this.genericName}"  (package.json > resources[])
@@ -573,7 +584,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         fse.copyFileSync(file, dest);
       }
     })
-    Helpers.logInfo(`Resources copied to release folder: ${config.folder.bundle}`);
+    Helpers.logInfo(`Resources copied to release folder: ${config.folder.dist}`);
 
   }
 
@@ -694,7 +705,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
 
   // methods / compile es5
-  private compileBrowserES5version(this: Project, pathBundle: string) {
+  private compileBrowserES5version(this: Project, pathReleaseDist: string) {
     //
     // TODO fix this for angular-lib
     if (this.frameworkVersionAtLeast('v3')) {
@@ -706,8 +717,8 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     }
 
 
-    const cwdBrowser = path.join(pathBundle, config.folder.browser);
-    const cwdClient = path.join(pathBundle, config.folder.client);
+    const cwdBrowser = path.join(pathReleaseDist, config.folder.browser);
+    const cwdClient = path.join(pathReleaseDist, config.folder.client);
     const pathBabelRc = path.join(cwdBrowser, config.file._babelrc);
     const pathCompiled = path.join(cwdBrowser, 'es5');
     const pathCompiledClient = path.join(cwdClient, 'es5');

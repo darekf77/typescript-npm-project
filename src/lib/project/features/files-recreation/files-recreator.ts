@@ -37,7 +37,6 @@ export class FilesRecreator extends FeatureForProject {
 
     if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib') && !this.project?.parent?.isSmartContainer) {
       await this.project.insideStructure.recrate('dist');
-      await this.project.insideStructure.recrate('bundle');
     }
 
     this.handleProjectSpecyficFiles();
@@ -71,7 +70,7 @@ export class FilesRecreator extends FeatureForProject {
           .concat([
             '.gitignore',
             '.npmignore',
-            '.npmrc',
+            // '.npmrc',
             '.babelrc',
             'package.json_devDependencies.json',
             ...(  // TODO or firedev json
@@ -97,7 +96,6 @@ export class FilesRecreator extends FeatureForProject {
           config.folder.node_modules,
           'tmp*',
           'dist*',
-          'bundle*',
           'browser',
           'browser*',
           'websql',
@@ -136,8 +134,7 @@ export class FilesRecreator extends FeatureForProject {
             ? self.project.projectSpecyficIgnoredFiles() : [])
           .concat(self.project.isTnp ? ['projects/tmp*'] : [])
           .concat([
-            'tsconfig.backend.dist.json',
-            'tsconfig.backend.bundle.json',
+            'tsconfig.backend.dist.json'
           ])
         // .concat(self.project.isContainer ? [
         //   ...(self.project.children.filter(c => c.git.isGitRepo).map(c => c.name))
@@ -255,9 +252,7 @@ export class FilesRecreator extends FeatureForProject {
                 s['files.exclude'][`_changelog`] = true;
 
                 s['files.exclude']['tsconfig.backend.dist.json'] = true;
-                s['files.exclude']['tsconfig.backend.bundle.json'] = true;
                 s['files.exclude']['tsconfig.backend.dist.json.filetemplate'] = true;
-                s['files.exclude']['tsconfig.backend.bundle.json.filetemplate'] = true;
 
                 if (project.isVscodeExtension) {
                   s['files.exclude']["out"] = true;
@@ -397,6 +392,10 @@ testem.log
 app.hosts.ts
 ${this.project.linkedRepos.git.ignored()}
 ${this.project.isStandaloneProject ? `/${config.folder.testsEnvironments}` : ''}
+/src/lib/lib-info.md
+/src/migrations/migrations-info.md
+/src/tests/mocha-tests-info.md
+/src/assets/shared/shared_folder_info.txt
 
 # System Files
 .DS_Store
@@ -415,6 +414,7 @@ ${this.project.isCoreProject ? '!*.filetemplate' : '*.filetemplate'}
 ${this.project.isDocker ? '!Dockerfile.filetemplate' : ''}
 ${this.project.isSmartContainer ? '/angular.json' : ''}
 ${this.project.isVscodeExtension ? '' : coreFiles}
+/.vscode/launch.json
 
 `.trimRight() + '\n');
 

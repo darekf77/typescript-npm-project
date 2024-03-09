@@ -30,7 +30,6 @@ export class SourceModForStandaloneProjects extends FeatureCompilerForProject {
     //#region folder with code invisible to user... compiler in backgroud
     return [
       config.folder.dist,
-      config.folder.bundle,
       config.folder.browser,
       config.folder.client,
       config.folder.module,

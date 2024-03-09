@@ -137,10 +137,8 @@ export async function CLEAN(args: string, exit = true) {
             proj.smartNodeModules.remove();
             Helpers.remove(crossPlatformPath([proj.location, 'tmp-*']));
             proj.removeFolderByRelativePath(config.folder.dist);
-            proj.removeFolderByRelativePath(config.folder.bundle);
             proj.removeFolderByRelativePath(config.folder.dist + '-app');
-            proj.removeFolderByRelativePath(config.folder.bundle + '-app');
-            proj.removeFolderByRelativePath(config.folder.tmpBundleRelease);
+            proj.removeFolderByRelativePath(config.folder.tmpDistRelease);
             break;
           } catch (error) {
             // notify({

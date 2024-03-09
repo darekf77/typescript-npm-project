@@ -145,8 +145,7 @@ export function saveConfigWorkspca(project: Project, projectConfig: Models.env.E
         }
       }, {}));
       projectConfig['pathesTsconfig'] = generatedPathes;
-      projectConfig['pathesTsconfigSourceDist'] = generatedPathes.replace(/\/src/g, '/tmp-source-dist')
-      projectConfig['pathesTsconfigSourceBundle'] = generatedPathes.replace(/\/src/g, '/tmp-source-bundle')
+      projectConfig['pathesTsconfigSourceDist'] = generatedPathes.replace(/\/src/g, '/tmp-source-dist');
 
       // workspaceConfig['exclusion'] = `exclude:[]`;
     } else {
@@ -178,7 +177,7 @@ export function saveConfigWorkspca(project: Project, projectConfig: Models.env.E
     projectConfig[customRootDir] = `"rootDir": "../",`;
   } else if (project.isSmartContainer) {
     projectConfig[customRootDir] = `"rootDir": ".",`;
-    projectConfig['includeForContainer'] =  (project.children.map(c => {
+    projectConfig['includeForContainer'] = (project.children.map(c => {
       return `"${c.name}/**/*"`
     }).join(','))
   } else {

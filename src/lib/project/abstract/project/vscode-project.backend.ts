@@ -68,26 +68,12 @@ export abstract class VscodeProject {
       // console.log(err)
     }
 
-    const bundledChildrensFolder = path.join(this.location, config.folder.bundle);
-    if (!fse.existsSync(bundledChildrensFolder)) {
-      Helpers.mkdirp(bundledChildrensFolder);
+    const packaedDistChildrensFolder = path.join(this.location, config.folder.dist);
+    if (!fse.existsSync(packaedDistChildrensFolder)) {
+      Helpers.mkdirp(packaedDistChildrensFolder);
     }
     configSettings['terminal.integrated.cwd'] = '${workspaceFolder}';
 
-    const codeWorkspace = {
-      folders: [
-        { path: '.' },
-        ...this.children
-          .map(c => {
-            return { path: c.name }
-          }),
-        { path: 'bundle' },
-        { path: 'dist' }
-      ],
-      settings: configSettings,
-      // tasks: JSON.parse(this.temlateOfTasksJSON(this.env.config)),
-      // launch: JSON.parse(this.temlateOfLaunchJSON(this.env.config))
-    };
     const codeworkspacefilepath = path.join(this.location, this.nameOfCodeWorkspace);
     Helpers.removeFileIfExists(codeworkspacefilepath)
     // fse.writeJSONSync(codeworkspacefilepath, codeWorkspace, {

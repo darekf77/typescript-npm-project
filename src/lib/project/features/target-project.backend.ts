@@ -120,7 +120,6 @@ async function generate(project: Project, t: Models.npm.TargetProject) {
           omitFolders: [
             config.folder.node_modules,
             config.folder.dist,
-            config.folder.bundle,
             config.folder.out,
           ],
         });

@@ -13,17 +13,17 @@ export class QuickFixes extends FeatureForProject {
 
   updateStanaloneProjectBeforePublishing(project: Project, realCurrentProj: Project, specyficProjectForBuild: Project) {
     if (project.isStandaloneProject) {
-      const bundleForPublishPath = crossPlatformPath([
+      const distForPublishPath = crossPlatformPath([
         specyficProjectForBuild.location,
-        project.getTempProjName('bundle'),
+        project.getTempProjName('dist'),
         config.folder.node_modules,
         project.name
       ]);
 
-      Helpers.remove(`${bundleForPublishPath}/app*`); // QUICK_FIX
-      Helpers.remove(`${bundleForPublishPath}/tests*`); // QUICK_FIX
-      Helpers.remove(`${bundleForPublishPath}/src`, true); // QUICK_FIX
-      Helpers.writeFile(crossPlatformPath([bundleForPublishPath, 'src.d.ts']), `
+      Helpers.remove(`${distForPublishPath}/app*`); // QUICK_FIX
+      Helpers.remove(`${distForPublishPath}/tests*`); // QUICK_FIX
+      Helpers.remove(`${distForPublishPath}/src`, true); // QUICK_FIX
+      Helpers.writeFile(crossPlatformPath([distForPublishPath, 'src.d.ts']), `
 // THIS FILE IS GENERATED
 export * from './lib';
 // THIS FILE IS GENERATED
@@ -32,7 +32,7 @@ export * from './lib';
       `.trimStart());
 
       const pjPath = crossPlatformPath([
-        bundleForPublishPath,
+        distForPublishPath,
         config.file.package_json,
       ]);
 
@@ -53,18 +53,18 @@ export * from './lib';
 
       const base = path.join(
         specyficProjectForBuild.location,
-        specyficProjectForBuild.getTempProjName('bundle'),
+        specyficProjectForBuild.getTempProjName('dist'),
         config.folder.node_modules,
         `@${realCurrentProj.name}`,
       );
 
       for (const child of realCurrentProj.children) {
-        const bundleForPublishPath = crossPlatformPath([base, child.name]);
+        const distReleaseForPublishPath = crossPlatformPath([base, child.name]);
         // console.log({
-        //   bundleForPublishPath
+        //   distReleaseForPublishPath
         // })
-        Helpers.remove(`${bundleForPublishPath}/src`, true); // QUICK_FIX
-        Helpers.writeFile(crossPlatformPath([bundleForPublishPath, 'src.d.ts']), `
+        Helpers.remove(`${distReleaseForPublishPath}/src`, true); // QUICK_FIX
+        Helpers.writeFile(crossPlatformPath([distReleaseForPublishPath, 'src.d.ts']), `
   // THIS FILE IS GENERATED
   export * from './index';
   // THIS FILE IS GENERATED
@@ -204,7 +204,6 @@ Object.defineProperty(document.body.style, 'transform', {
     //       "projects",
     //       "docs",
     //       "dist",
-    //       "bundle",
     //       "example",
     //       "examples",
     //       "browser",
@@ -239,7 +238,7 @@ Object.defineProperty(document.body.style, 'transform', {
         'tnp',
       ]);
       // TODO only tnp can release tnp (for @vercel/ncc builder)
-      if ((config.frameworkName === 'tnp') && (this.project.name === 'tnp') && this.project.isInRelaseBundle) {
+      if ((config.frameworkName === 'tnp') && (this.project.name === 'tnp') && this.project.isInRelaseDist) {
         Helpers.remove(folderToDelete);
       }
     }

@@ -3,7 +3,7 @@ import { crossPlatformPath, path, _ } from "tnp-core/src";
 import { Helpers } from "tnp-helpers/src";
 import { Models } from "tnp-models/src";
 import { Project } from "../../abstract/project/project";
-import { BundleMjsFesmModuleSpliter } from "./bundle-mjs-fesm-module-spliter.backend";
+import { MjsFesmModuleSpliter } from "./mjs-fesm-module-spliter.backend";
 import { CopyMangerHelpers } from "./copy-manager-helpers.backend";
 import type { CopyManagerOrganization } from "./copy-manager-organization.backend";
 
@@ -305,7 +305,7 @@ export class CopyMangerOrganizationAngularFiles {
     //#region <child-name>.d.ts
     Helpers.writeFile([location, `${child.name}.d.ts`], `
 /**
- * Generated bundle index. Do not edit.
+ * Generated dist release index. Do not edit.
  */
 /// <amd-module name="main" />
 export * from './${config.file.public_api}';
@@ -315,7 +315,7 @@ export * from './${config.file.public_api}';
     //#region public api.ts
     Helpers.writeFile([location, config.file.public_api_d_ts], `
      /**
-      * Generated bundle index. Do not edit.
+      * Generated  dist release index. Do not edit.
       */
      /// <amd-module name="main" />
      export * from './${config.file.index}';
@@ -435,7 +435,7 @@ export * from './${config.file.public_api}';
     }
 
     if (useModuleSpliter && !isMap) {
-      BundleMjsFesmModuleSpliter.fixForTarget(
+      MjsFesmModuleSpliter.fixForTarget(
         child,
         destinationLocationMjsFileDest,
         currentBrowserFolder,

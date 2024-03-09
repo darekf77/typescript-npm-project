@@ -1,6 +1,6 @@
 # DEVELOPMENT ( BUILD, RELEASE, SERVE )
 
-# Output folders: dist, bundle
+# Output folders: dist
 
 # Normal build
 

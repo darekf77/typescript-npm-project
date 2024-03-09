@@ -118,9 +118,7 @@ firedev build:dist
 firedev bd
 firedev build:dist:watch
 firedev bdw
-firedev build:bundle
 firedev bb
-firedev build:bundle:watch
 firedev bbw
 
 # global lib build
@@ -140,9 +138,7 @@ firedev build:dist:app
 firedev bda
 firedev build:dist:app:watch
 firedev bdaw
-firedev build:bundle:app
 firedev bba
-firedev build:bundle:app:watch
 firedev bbaw
 ```
 

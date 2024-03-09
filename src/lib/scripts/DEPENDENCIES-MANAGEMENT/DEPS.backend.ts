@@ -558,9 +558,9 @@ function templateBin(debug = false) {
 var { fse, crossPlatformPath, path } = require('tnp-core/src');
 var path = {
   dist: path.join(crossPlatformPath(__dirname), '../dist/index.js'),
-  bundle: path.join(crossPlatformPath(__dirname), '../index.js')
+  npm: path.join(crossPlatformPath(__dirname), '../index.js')
 }
-var p = fse.existsSync(path.dist) ? path.dist : path.bundle;
+var p = fse.existsSync(path.dist) ? path.dist : path.npm;
 global.globalSystemToolMode = true;
 var run = require(p).run;
 run(process.argv.slice(2));

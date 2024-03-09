@@ -9,7 +9,7 @@ import { FeatureForProject } from "../abstract/feature-for-project";
 export interface WebpackBackendCompilationOpt {
   watch: boolean;
   buildType: 'app' | 'lib';
-  outDir: 'dist' | 'bundle';
+  outDir: 'dist';
   uglify?: boolean;
   buildTitle?: string;
   includeNodeModules?: boolean;
@@ -22,7 +22,7 @@ export class WebpackBackendCompilation extends FeatureForProject {
     const webpackGlob = this.project.npmPackages.global('webpack');
 
     const webpackCommand = `node ${webpackGlob} --version && node ${webpackGlob} `
-      + `--config webpack.backend-bundle-build.js ${watch ? '--watch' : ''
+      + `--config webpack.backend-dist-build.js ${watch ? '--watch' : ''
       } --env.outDir=${outDir} `;
 
     const showInfoWebpack = () => {

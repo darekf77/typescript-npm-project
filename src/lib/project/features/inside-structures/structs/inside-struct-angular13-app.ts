@@ -135,7 +135,7 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         ],
         //#endregion
 
-        //#region link not containter target clients - whole dist or bundle
+        //#region link not containter target clients - whole dist
         [
           (opt) => {
             const { projectName, client, outFolder } = opt;
@@ -185,7 +185,7 @@ ${appModuleFile}
 
           if (!watchBuild) { // TODO it will colide with ng serve ?
             appModuleFile = appModuleFile
-              .replace(new RegExp(Helpers.escapeStringForRegEx('//bundleOnly'), 'g'), '');
+              .replace(new RegExp(Helpers.escapeStringForRegEx('//distReleaseOnly'), 'g'), '');
           }
 
           Helpers.writeFile(appModuleFilePath, appModuleFile);
@@ -312,7 +312,7 @@ ${appModuleFile}
         //#region LOADERS & BACKGROUNDS REPLACEMENT
         (() => {
           const projectTargetOrStandalone = this.project;
-          const basename = this.project.isInRelaseBundle ?
+          const basename = this.project.isInRelaseDist ?
             `/${(this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name)}`
             : '';
 
@@ -449,7 +449,7 @@ ${appModuleFile}
 
           let mainTsFile = Helpers.readFile(mainFilePath);
 
-          const basename = this.project.isInRelaseBundle ?
+          const basename = this.project.isInRelaseDist ?
             `/${(this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name)}`
             : '';
 
@@ -481,7 +481,7 @@ ${appModuleFile}
 
           let stylesScssFile = Helpers.readFile(stylesFilePath);
 
-          const basename = this.project.isInRelaseBundle ?
+          const basename = this.project.isInRelaseDist ?
             `/${(this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name)}`
             : '';
 
@@ -668,7 +668,7 @@ ${appModuleFile}
             //#endregion
           }
 
-          // const basename = this.isInRelaseBundle ?
+          // const basename = this.isInRelaseDist ?
           //   `${(this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name)}/`
           //   : '';
 

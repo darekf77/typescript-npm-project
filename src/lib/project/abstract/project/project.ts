@@ -125,8 +125,9 @@ export class Project extends $Project<Project>
   setProjectInfoPort(v) {
     //#region @backend
     this._projectInfoPort = v;
-    for (const child of this.children) {
-      child.setProjectInfoPort(v);
+    const children = this.children.filter(f => f.location !== this.location);
+    for (const child of children) {
+      child.setProjectInfoPort(v); // @LAST why error
     }
     //#endregion
   }
@@ -201,8 +202,8 @@ export class Project extends $Project<Project>
     return Project.Tnp as Project;
   }
 
-  get isBundleMode() {
-    return Project.isBundleMode;
+  get isReleaseDistMode() {
+    return Project.isReleaseDistMode;
   }
 
   removeItself(this: Project) {

@@ -5,7 +5,7 @@ import { Helpers } from "tnp-helpers/src";
 import { Models } from "tnp-models/src";
 import { CLASS } from "typescript-class-helpers/src";
 import { Project } from "../../abstract/project/project";
-import { BundleMjsFesmModuleSpliter } from "./bundle-mjs-fesm-module-spliter.backend";
+import { MjsFesmModuleSpliter } from "./mjs-fesm-module-spliter.backend";
 import { CopyMangerHelpers } from "./copy-manager-helpers.backend";
 import { CopyMangerOrganizationAngularFiles } from "./copy-manager-organization-angular-files.backend";
 import { CopyManagerStandalone } from "./copy-manager-standalone.backend";
@@ -229,7 +229,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       // content = content.replace(regex1, `"./${config.folder.src}`);
       // content = content.replace(regex2, config.folder.src);
     } else {
-      if (isForLaunchJsonDebugging) { // files is in dist or bundle or container target project
+      if (isForLaunchJsonDebugging) { // files is in dist or container target project
         // I am not allowing organizaition as cli tool
 
         const relative = crossPlatformPath(absFilePath).replace(`${this.monitoredOutDir}/`, '');
@@ -293,7 +293,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       if (json) {
 
         json.sources = (json.sources || []).map((pathToJoin: string) => {
-          if (this.targetProj.isInRelaseBundle) {
+          if (this.targetProj.isInRelaseDist) {
             return '';
           }
 
@@ -356,7 +356,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
 
   //#region write specyfic for child dts files
   /**
-   * final copy from dist|bundle to node_moules/rootpackagename
+   * final copy from dist to node_moules/rootpackagename
    */
   writeSpecyficForChildDtsFiles(destination: Project, rootPackageNameForChildBrowser: string, monitorDirForModuleBrowser: string) {
     const pkgLocInDestNodeModulesForChildBrowser = destination.node_modules.pathFor(rootPackageNameForChildBrowser);
@@ -406,7 +406,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         ? crossPlatformPath(path.join(this.monitoredOutDir, currentBrowserFolder, config.folder.lib))
         : this.localTempProj.node_modules.pathFor(rootPackageNameForChildBrowser);
 
-      if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist|bundle)
+      if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist)
         this.dtsFixer.processFolder(monitorDirForModuleBrowser, currentBrowserFolder);
       }
       this.writeSpecyficForChildDtsFiles(destination, rootPackageNameForChildBrowser, monitorDirForModuleBrowser);
@@ -415,7 +415,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         ? crossPlatformPath(path.join(this.monitoredOutDir, currentBrowserFolder, config.folder.libs, child.name))
         : this.localTempProj.node_modules.pathFor(rootPackageNameForChildBrowser);
 
-      if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist|bundle)
+      if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist)
         this.dtsFixer.processFolder(monitorDirForModuleBrowser, currentBrowserFolder);
       }
       this.writeSpecyficForChildDtsFiles(destination, rootPackageNameForChildBrowser, monitorDirForModuleBrowser);
@@ -497,7 +497,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         return a.concat(b);
       }, []);
 
-    // @LAST add for children
+    // TODO add for children
     const appFlatFiles = Helpers.filesFrom(base);
 
     const allFiles = [
@@ -564,11 +564,11 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         ? crossPlatformPath(path.join(this.monitoredOutDir, config.folder.libs, child.name))
         : this.localTempProj.node_modules.pathFor(rootPackageNameForChild);
 
-      // if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist|bundle)
+      // if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist)
       //   this.dtsFixer.processFolderWithBrowserWebsqlFolders(monitorDirForModule); // no need for fixing backend
       // }
 
-      //#region final copy from dist|bundle to node_moules/rootpackagename
+      //#region final copy from dist to node_moules/rootpackagename
       const pkgLocInDestNodeModulesForChild = destination.node_modules.pathFor(rootPackageNameForChild);
       const filter = Helpers.filterDontCopy(this.sourceFolders, monitorDirForModule);
       this.removeSourceLinksFolders(pkgLocInDestNodeModulesForChild);
@@ -771,12 +771,12 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     const specialAppFilesMode = (specialReplace === '-');
     const orgSpecyficFileRelativePath = specyficFileRelativePath;
 
-    const distOrBundleLocation = crossPlatformPath(path.join(
+    const distLocation = crossPlatformPath(path.join(
       this.targetProj.location,
       this.outDir,
     ))
-    let absOrgFilePathInDistOrBundle = crossPlatformPath(path.normalize(path.join(
-      distOrBundleLocation,
+    let absOrgFilePathInDist = crossPlatformPath(path.normalize(path.join(
+      distLocation,
       orgSpecyficFileRelativePath
     )));
 
@@ -818,18 +818,18 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     // TODO QUICK_FIOX DISTINC WHEN IT COM FROM BROWSER
     // and do not allow
     if (destinationFilePath.endsWith('d.ts')) {
-      const newAbsOrgFilePathInDistOrBundle = absOrgFilePathInDistOrBundle.replace(
+      const newAbsOrgFilePathInDist = absOrgFilePathInDist.replace(
         `/${this.targetProjName}/${this.outDir}/${orgSpecyficFileRelativePath}`,
         `/${this.targetProjName}/${this.outDir}-nocutsrc/${orgSpecyficFileRelativePath}`,
       );
-      if (!Helpers.exists(newAbsOrgFilePathInDistOrBundle)) {
-        Helpers.log(`[copyto] New path does not exists or in browser | websql: ${newAbsOrgFilePathInDistOrBundle}`)
+      if (!Helpers.exists(newAbsOrgFilePathInDist)) {
+        Helpers.log(`[copyto] New path does not exists or in browser | websql: ${newAbsOrgFilePathInDist}`)
       } else {
-        absOrgFilePathInDistOrBundle = newAbsOrgFilePathInDistOrBundle;
+        absOrgFilePathInDist = newAbsOrgFilePathInDist;
       }
     }
 
-    this.fixDtsImportsWithWronPackageName(absOrgFilePathInDistOrBundle, destinationFilePath)
+    this.fixDtsImportsWithWronPackageName(absOrgFilePathInDist, destinationFilePath)
 
     const isBackendMapsFile = destinationFilePath.endsWith('.js.map');
     const isBrowserMapsFile = destinationFilePath.endsWith('.mjs.map');
@@ -838,13 +838,13 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       if (isBackendMapsFile) {
         if (specialAppFilesMode) {
           const fixedContentCLIDebug = this.changedJsMapFilesInternalPathesForDebug(
-            Helpers.readFile(absOrgFilePathInDistOrBundle),
+            Helpers.readFile(absOrgFilePathInDist),
             false,
             true,
-            absOrgFilePathInDistOrBundle,
+            absOrgFilePathInDist,
           );
           Helpers.writeFile(
-            absOrgFilePathInDistOrBundle,
+            absOrgFilePathInDist,
             fixedContentCLIDebug,
           );
         } else {
@@ -859,13 +859,13 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       if (isBrowserMapsFile) {
         if (specialAppFilesMode) {
           const fixedContentCLIDebug = this.changedJsMapFilesInternalPathesForDebug(
-            Helpers.readFile(absOrgFilePathInDistOrBundle),
+            Helpers.readFile(absOrgFilePathInDist),
             false,
             true,
-            absOrgFilePathInDistOrBundle,
+            absOrgFilePathInDist,
           );
           Helpers.writeFile(
-            absOrgFilePathInDistOrBundle,
+            absOrgFilePathInDist,
             fixedContentCLIDebug,
           );
         } else {
@@ -877,12 +877,12 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         }
       }
     } else {
-      Helpers.writeFile(destinationFilePath, (Helpers.readFile(absOrgFilePathInDistOrBundle) || ''));
+      Helpers.writeFile(destinationFilePath, (Helpers.readFile(absOrgFilePathInDist) || ''));
     }
   }
   //#endregion
 
-  //#region handle copy of single file / from app or root of (dist|bundle)
+  //#region handle copy of single file / from app or root of (dist)
   handleCopyOfSingleFileFromAppAndRoot(
     specyficFileRelativePath: string,
     destination: Project,
@@ -891,12 +891,12 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   ) {
     const orgSpecyficFileRelativePath = specyficFileRelativePath;
 
-    const distOrBundleLocation = crossPlatformPath(path.join(
+    const distLocation = crossPlatformPath(path.join(
       this.targetProj.location,
       this.outDir,
     ))
-    const absOrgFilePathInDistOrBundle = crossPlatformPath(path.normalize(path.join(
-      distOrBundleLocation,
+    const absOrgFilePathInDist = crossPlatformPath(path.normalize(path.join(
+      distLocation,
       orgSpecyficFileRelativePath
     )));
 
@@ -904,8 +904,8 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     const isBrowserMapsFileAppJS = specyficFileRelativePath.endsWith('.mjs.map');
 
     // this.fixDtsImportsWithWronPackageName(
-    //   absOrgFilePathInDistOrBundle,
-    //   absOrgFilePathInDistOrBundle,
+    //   absOrgFilePathInDist,
+    //   absOrgFilePathInDist,
     // );
 
     if (isBackendMapsFileAppJS || isBrowserMapsFileAppJS) {
@@ -913,14 +913,14 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         this.writeFixedMapFile(
           false,
           specyficFileRelativePath,
-          distOrBundleLocation,
+          distLocation,
         )
       }
       if (isBrowserMapsFileAppJS) {
         this.writeFixedMapFile(
           true,
           specyficFileRelativePath,
-          distOrBundleLocation
+          distLocation
         )
       }
     }
@@ -1022,7 +1022,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
    * package ready to realse should have all/full *.d.ts files.. .to avoid any
    * erors when we import more "ui package" to backend code
    */
-  updateBackendFullDtsFiles(destinationOrBundleOrDist: Project | string) {
+  updateBackendFullDtsFiles(destinationOrDist: Project | string) {
     const base = crossPlatformPath(path.join(this.targetProj.location, `${this.outDir}-nocutsrc`, config.folder.libs));
 
     const filesToUpdate = Helpers
@@ -1035,9 +1035,9 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       // const childName = _.first(relativePath.split('/'));
       const source = crossPlatformPath(path.join(base, relativePath));
       const dest = crossPlatformPath(path.join(
-        _.isString(destinationOrBundleOrDist)
+        _.isString(destinationOrDist)
           ? crossPlatformPath(path.join(this.monitoredOutDir, config.folder.libs))
-          : destinationOrBundleOrDist.node_modules.pathFor(crossPlatformPath(path.join(
+          : destinationOrDist.node_modules.pathFor(crossPlatformPath(path.join(
             this.rootPackageName,
             // childName,
           ))),

@@ -122,7 +122,7 @@ export abstract class BaseProject {
   // @ts-ignore
   get isSmartContainerTarget(this: Project) {
     const folderBefore = path.basename(path.dirname(path.dirname(this.location)));
-    return [config.folder.dist, config.folder.bundle].includes(folderBefore)
+    return [config.folder.dist].includes(folderBefore)
       && this.smartContainerTargetParentContainer?.isSmartContainer;
   }
 
@@ -232,7 +232,6 @@ export abstract class BaseProject {
       'tsconfig.json',
       'tsconfig.browser.json',
       'tsconfig.isomorphic.json',
-      'tsconfig.isomorphic-flat-bundle.json',
       'tsconfig.isomorphic-flat-dist.json',
       config.file._npmrc,
       config.file._npmignore,

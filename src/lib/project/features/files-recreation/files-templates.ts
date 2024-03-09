@@ -37,7 +37,6 @@ export class FilesTemplatesBuilder extends FeatureForProject {
       // Helpers.log(`Processed DONE for ${f}`);
     }
     this.project.quickFixes.recreateTempSourceNecessaryFiles('dist');
-    this.project.quickFixes.recreateTempSourceNecessaryFiles('bundle'); // TODO refactor init
   }
 
   rebuildFile(filetemplateRelativePath, soft = false) {

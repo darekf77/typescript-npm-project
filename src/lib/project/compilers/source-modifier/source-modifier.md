@@ -14,7 +14,7 @@ Client types = 'isomorphic-lib'
 
 - Prevention of use builded folder:
 
-* (angular-lib-name|isomorphic-lib-name)/(browser|browser-for-\*|module|dist|bundle|)
+* (angular-lib-name|isomorphic-lib-name)/(browser|browser-for-\*|module|dist|)
   => (angular-lib-name|isomorphic-lib-name)/(src|components)
 
 - Browser workspace isomorphic children compilation for client:
@@ -30,7 +30,7 @@ Client types = 'isomorphic-lib'
 
 - Prevention of use baseline/builded folder:
 
-  - baseline/(workspace-child-(angular-lib|isomorphic-lib)-name)/(browser|browser-for-\*|module|dist|bundle|)
+  - baseline/(workspace-child-(angular-lib|isomorphic-lib)-name)/(browser|browser-for-\*|module|dist|)
     => baseline/(workspace-child-(angular-lib|isomorphic-lib)-name)/(src|components)
 
 - Site join change:

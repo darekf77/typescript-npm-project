@@ -149,7 +149,7 @@ export class NodeModulesBase extends NodeModulesCore {
           projToCopy.linkTo(pDestPath);
         } else {
           const addedSuccess = projToCopy.copyManager.generateSourceCopyIn(pDestPath,
-            { override, filterForBundle: false, showInfo: false });
+            { override, filterForReleaseDist: false, showInfo: false });
           if (!addedSuccess) {
             return;
           }
@@ -176,7 +176,7 @@ export class NodeModulesBase extends NodeModulesCore {
                 projToCopy.linkTo(pDestPathPackage);
               } else {
                 projToCopy.copyManager.generateSourceCopyIn(pDestPathPackage,
-                  { override, filterForBundle: false, showInfo: false });
+                  { override, filterForReleaseDist: false, showInfo: false });
               }
 
             } else {

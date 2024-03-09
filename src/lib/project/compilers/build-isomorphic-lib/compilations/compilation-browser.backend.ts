@@ -32,7 +32,7 @@ export class BroswerCompilation extends BackendCompilation {
   /**
    * ex: <project-path>/tmp-src-dist
    */
-  public get absPathTmpSrcDistBundleFolder() {
+  public get absPathTmpSrcDistFolder() {
     if (_.isString(this.sourceOutBrowser) && _.isString(this.cwd)) {
       return crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser));
     }
@@ -56,11 +56,11 @@ export class BroswerCompilation extends BackendCompilation {
     public moduleName: string,
     public ENV: Models.env.EnvConfig,
     /**
-     * tmp-src-for-(dist|bundle)-browser
+     * tmp-src-for-(dist)-browser
      */
     protected sourceOutBrowser: string,
     /**
-     * browser-for-(dist|bundle|projectName)
+     * browser-for-(dist|projectName)
      */
     outFolder: ConfigModels.OutFolder,
     location: string,
@@ -101,16 +101,15 @@ export class BroswerCompilation extends BackendCompilation {
   //#region methods / sync action
   async syncAction(absFilesFromSrc: string[]) {
 
-    Helpers.removeFolderIfExists(this.absPathTmpSrcDistBundleFolder);
-    Helpers.mkdirp(this.absPathTmpSrcDistBundleFolder);
+    Helpers.removeFolderIfExists(this.absPathTmpSrcDistFolder);
+    Helpers.mkdirp(this.absPathTmpSrcDistFolder);
 
-    const tmpSource = this.absPathTmpSrcDistBundleFolder.replace('tmp-src-', 'tmp-source-');
+    const tmpSource = this.absPathTmpSrcDistFolder.replace('tmp-src-', 'tmp-source-');
     Helpers.removeFolderIfExists(tmpSource);
     Helpers.mkdirp(tmpSource);
 
     this.initCodeCut();
     this.project.quickFixes.recreateTempSourceNecessaryFiles('dist');
-    this.project.quickFixes.recreateTempSourceNecessaryFiles('bundle');
 
     const filesBase = crossPlatformPath(path.join(this.cwd, this.srcFolder))
     const relativePathesToProcess = absFilesFromSrc.map(absFilePath => {
@@ -126,7 +125,7 @@ export class BroswerCompilation extends BackendCompilation {
         const fileAbsPath = crossPlatformPath(filesToCopy[index]);
         const relativeFilePath = fileAbsPath.replace(`${coreAssetsPath}/`, '');
         const destAbsPath = crossPlatformPath([
-          this.absPathTmpSrcDistBundleFolder,
+          this.absPathTmpSrcDistFolder,
           config.folder.assets,
           relativeFilePath,
         ]);
@@ -134,7 +133,6 @@ export class BroswerCompilation extends BackendCompilation {
         // if (relativeFilePath.startsWith(`${config.folder.shared}/`)) {
         //   const arr = [
         //     crossPlatformPath([this.cwd, config.folder.dist]),
-        //     crossPlatformPath([this.cwd, config.folder.bundle]),
         //   ];
         //   for (let index = 0; index < arr.length; index++) {
         //     const absPathDest = crossPlatformPath([arr[index], config.folder.assets, relativeFilePath]);
@@ -257,7 +255,7 @@ export class BroswerCompilation extends BackendCompilation {
     replacements.push([TAGS.CUT_CODE_IF_FALSE, codeCuttFn(false)]);
 
     this.codecut = new CodeCut(
-      this.absPathTmpSrcDistBundleFolder,
+      this.absPathTmpSrcDistFolder,
       {
         replacements: replacements.filter(f => !!f),
         env

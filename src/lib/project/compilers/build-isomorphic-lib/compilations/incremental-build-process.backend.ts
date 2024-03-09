@@ -91,7 +91,7 @@ export class IncrementalBuildProcess {
       const envConfig = {} as any;
       let browserOutFolder = Helpers.getBrowserVerPath(moduleName, this.buildOptions.websql);
 
-      if (outFolder === 'bundle') {
+      if (this.project.isInRelaseDist) { // @LAST
         browserOutFolder = crossPlatformPath(path.join(outFolder, browserOutFolder));
       }
       this.browserCompilations = [
@@ -121,11 +121,11 @@ export class IncrementalBuildProcess {
 
   //#region  methods
   protected browserTaksName(taskName: string, bc: BroswerCompilation) {
-    return `browser ${taskName} in ${path.basename(bc.absPathTmpSrcDistBundleFolder)}`
+    return `browser ${taskName} in ${path.basename(bc.absPathTmpSrcDistFolder)}`
   }
 
   protected backendTaskName(taskName) {
-    return `${taskName} in ${path.basename(this.backendCompilation.absPathTmpSrcDistBundleFolder)}`
+    return `${taskName} in ${path.basename(this.backendCompilation.absPathTmpSrcDistFolder)}`
   }
 
   private recreateBrowserLinks(bc: BroswerCompilation) {

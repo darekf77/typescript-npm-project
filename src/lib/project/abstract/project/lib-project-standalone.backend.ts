@@ -14,7 +14,7 @@ export class LibProjectStandalone extends LibPorjectBase {
   preparePackage(smartContainer: Project, newVersion: string) {
     const base = path.join(
       this.project.location,
-      config.folder.bundle,
+      config.folder.dist,
     );
 
     this.project.removeJsMapsFrom(base);
@@ -26,7 +26,7 @@ export class LibProjectStandalone extends LibPorjectBase {
     //   config.folder.client,
     //   '',
     // ].forEach(c => {
-    //   const pjPath = path.join(this.lib.location, config.folder.bundle, c, config.file.package_json);
+    //   const pjPath = path.join(this.lib.location, config.folder.dist, c, config.file.package_json);
     //   const content = Helpers.readJson(pjPath);
     //   Helpers.remove(pjPath);
     //   Helpers.writeFile(pjPath, content);
@@ -34,17 +34,17 @@ export class LibProjectStandalone extends LibPorjectBase {
 
     this.project.packageJson.showDeps(`after release show when ok`);
     if (this.project.packageJson.data.tnp.libReleaseOptions.includeNodeModules) {
-      // this.lib.packageJson.clearForRelase('bundle');
+      // this.lib.packageJson.clearForRelase('dist');
     } else {
       //#region copy packagejson before relase (beacuse it may be link)
-      const packageJsonInBundlePath = path.join(this.project.location, config.folder.bundle, config.file.package_json);
-      const orgPj = Helpers.readFile(packageJsonInBundlePath);
-      Helpers.removeFileIfExists(packageJsonInBundlePath);
-      Helpers.writeFile(packageJsonInBundlePath, orgPj);
+      const packageJsonInDistReleasePath = path.join(this.project.location, config.folder.dist, config.file.package_json);
+      const orgPj = Helpers.readFile(packageJsonInDistReleasePath);
+      Helpers.removeFileIfExists(packageJsonInDistReleasePath);
+      Helpers.writeFile(packageJsonInDistReleasePath, orgPj);
       //#endregion
 
       if (this.project.packageJson.name === 'tnp') {  // TODO QUICK_FIX
-        Helpers.setValueToJSON(path.join(this.project.location, config.folder.bundle, config.file.package_json), 'dependencies',
+        Helpers.setValueToJSON(path.join(this.project.location, config.folder.dist, config.file.package_json), 'dependencies',
           this.project.TnpProject.packageJson.data.tnp.overrided.includeOnly.reduce((a, b) => {
             return _.merge(a, {
               [b]: this.project.TnpProject.packageJson.data.dependencies[b]
@@ -52,16 +52,16 @@ export class LibProjectStandalone extends LibPorjectBase {
           }, {})
         );
       } else {
-        Helpers.setValueToJSON(packageJsonInBundlePath, 'devDependencies', {});
+        Helpers.setValueToJSON(packageJsonInDistReleasePath, 'devDependencies', {});
         // QUICK FIX include only
         const includeOnly = realCurrentProj.packageJson.data.tnp?.overrided?.includeOnly || [];
-        const dependencies = Helpers.readJson(packageJsonInBundlePath, {}).dependencies || {};
+        const dependencies = Helpers.readJson(packageJsonInDistReleasePath, {}).dependencies || {};
         Object.keys(dependencies).forEach(packageName => {
           if (!includeOnly.includes(packageName)) {
             delete dependencies[packageName];
           }
         });
-        Helpers.setValueToJSON(packageJsonInBundlePath, 'dependencies', dependencies);
+        Helpers.setValueToJSON(packageJsonInDistReleasePath, 'dependencies', dependencies);
       }
     }
 
@@ -114,9 +114,9 @@ export class LibProjectStandalone extends LibPorjectBase {
 
       await Helpers.runSyncOrAsync(libBuildCallback);
 
-      const libBuildCommand = ''; // `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'} && `
+      const libBuildCommand = ''; // `${config.frameworkName} build:${config.folder.dist} ${global.hideLog ? '' : '-verbose'} && `
       await this.project.run(`${libBuildCommand}`
-        + `${config.frameworkName} build:${config.folder.bundle}:app:${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
+        + `${config.frameworkName} build:${config.folder.dist}:app:${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
         + `${appBuildOptions.websql ? '--websql' : ''} ${global.hideLog ? '' : '-verbose'} --forAppRelaseBuild`).sync();
 
       try {
@@ -131,8 +131,8 @@ export class LibProjectStandalone extends LibPorjectBase {
 
       const assetsListPathSourceMain = crossPlatformPath([
         realCurrentProj.location,
-        `tmp-bundle-release/${config.folder.bundle}/project/${realCurrentProj.name}`,
-        `tmp-apps-for-${config.folder.bundle}${appBuildOptions.websql ? '-websql' : ''}`,
+        `tmp-dist-release/${config.folder.dist}/project/${realCurrentProj.name}`,
+        `tmp-apps-for-${config.folder.dist}${appBuildOptions.websql ? '-websql' : ''}`,
         realCurrentProj.name,
         config.folder.src,
         config.folder.assets,
@@ -169,14 +169,14 @@ export class LibProjectStandalone extends LibPorjectBase {
       prod,
     } = options;
 
-    const existedBundle = crossPlatformPath([this.project.location, this.project.getTempProjName('bundle'), config.folder.node_modules, realCurrentProj.name]);
-    Helpers.info(`Publish cwd: ${existedBundle}`)
+    const existedReleaseDist = crossPlatformPath([this.project.location, this.project.getTempProjName('dist'), config.folder.node_modules, realCurrentProj.name]);
+    Helpers.info(`Publish cwd: ${existedReleaseDist}`)
     await Helpers.questionYesNo(`Publish on npm version: ${newVersion} ?`, async () => {
 
       // publishing standalone
       try {
         this.project.run('npm publish', {
-          cwd: existedBundle,
+          cwd: existedReleaseDist,
           output: true
         }).sync();
       } catch (e) {
@@ -188,12 +188,12 @@ export class LibProjectStandalone extends LibPorjectBase {
       const names = this.project.packageJson.additionalNpmNames;
       for (let index = 0; index < names.length; index++) {
         const c = names[index];
-        const additionBase = crossPlatformPath(path.resolve(path.join(this.project.location, `../../../additional-bundle-${c}`)));
+        const additionBase = crossPlatformPath(path.resolve(path.join(this.project.location, `../../../additional-dist-${c}`)));
         Helpers.mkdirp(additionBase);
-        Helpers.copy(existedBundle, additionBase, {
+        Helpers.copy(existedReleaseDist, additionBase, {
           copySymlinksAsFiles: true,
           omitFolders: [config.folder.node_modules],
-          omitFoldersBaseFolder: existedBundle
+          omitFoldersBaseFolder: existedReleaseDist
         });
         const pathPackageJsonRelease = path.join(additionBase, config.file.package_json);
         const packageJsonAdd: Models.npm.IPackageJSON = Helpers.readJson(path.join(additionBase, config.file.package_json));
@@ -205,16 +205,16 @@ export class LibProjectStandalone extends LibPorjectBase {
         //   delete packageJsonAdd.bin[k];
         // });
         Helpers.writeFile(pathPackageJsonRelease, packageJsonAdd);
-        Helpers.info('log addtional bundle created');
+        Helpers.info('log addtional dist created');
         try {
           if (!global.tnpNonInteractive) {
             Helpers.run(`code ${additionBase}`).sync();
-            Helpers.info(`Check you additional bundle for ${CLI.chalk.bold(c)} and press any key to publish...`);
+            Helpers.info(`Check you additional dist for ${CLI.chalk.bold(c)} and press any key to publish...`);
             Helpers.pressKeyAndContinue();
           }
           Helpers.run('npm publish', { cwd: additionBase }).sync();
         } catch (error) {
-          Helpers.warn(`No able to push additional bundle for name: ${c}`)
+          Helpers.warn(`No able to push additional dist for name: ${c}`)
         }
       }
 
@@ -246,7 +246,7 @@ export class LibProjectStandalone extends LibPorjectBase {
         coreCont,
       ].filter(f => !!f)
         .forEach(c => {
-          c.smartNodeModules.updateFromReleaseBundle(realCurrentProj);
+          c.smartNodeModules.updateFromReleaseDist(realCurrentProj);
         });
     }
 

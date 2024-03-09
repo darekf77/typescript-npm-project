@@ -46,7 +46,7 @@ export class SourceMappingUrl {
 
   process(): string {
     if (this.mappingLineIndex !== -1) {
-      if (this.projectWithBuild.isInRelaseBundle) { // TODO links on windows sucks d
+      if (this.projectWithBuild.isInRelaseDist) { // TODO links on windows sucks d
         this.contentLines[this.mappingLineIndex] = `${SourceMappingUrl.SOURCEMAPDES}${path.basename(this.absFilePath)}.map`;
       } else {
         this.contentLines[this.mappingLineIndex] = `${SourceMappingUrl.SOURCEMAPDES}${crossPlatformPath(this.absFilePath)}.map`;

@@ -16,6 +16,8 @@ Check firedev on http://firedev.io
 - @LAST
 - @REMOVE_THIS
 - @UCOMMENT
+- @QUESTION
+- @IMPORTANT
 - @TODO
 - @QUICK_FIX
 - TODO UNCOMMENT temporrary fix
@@ -24,12 +26,8 @@ Check firedev on http://firedev.io
 
 tmp-src-dist
 tmp-src-dist-websql
-tmp-src-bundle
-tmp-src-bundle-websql
 tmp-src-app-dist
 tmp-src-app-dist-websql
-tmp-src-app-bundle
-tmp-src-app-bundle-websql
 
 tmp-src-dist
 tmp-src-dist-websql
@@ -38,13 +36,10 @@ tmp-source-dist-websql
 
 tmp-libs-for-dist
 tmp-libs-for-dist-websql
-tmp-libs-for-bundle
-tmp-libs-for-bundle-websql
+
 
 tmp-apps-for-dist
 tmp-apps-for-dist-websql
-tmp-apps-for-bundle
-tmp-apps-for-bundle-websql
 
 tmp-local-copyto-proj-dist
-tmp-bundle-release
+

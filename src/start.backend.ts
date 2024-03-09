@@ -141,7 +141,7 @@ export function handleSpecialArgs(argsv: string[]) {
 export async function start(
   argsv: string[],
   frameworkName: 'tnp' | 'firedev' = 'tnp',
-  mode: 'dist' | 'bundle' | 'npm' = 'dist'
+  mode: 'dist' | 'npm' = 'dist'
 ) {
 
   // // const proc = require('process');

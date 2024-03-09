@@ -285,7 +285,7 @@ export abstract class BuildableProject {
         await this.selectAllProjectCopyto();
       }
 
-      // // TODO  -> FOR BUNDLE copyt node_modules not link
+      // // TODO  -> FOR RELASE copyt node_modules not link
       if (!_.isArray(this.buildOptions.copyto)) {
         this.buildOptions.copyto = [];
       }

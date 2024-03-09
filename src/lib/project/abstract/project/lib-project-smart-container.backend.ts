@@ -15,7 +15,7 @@ export class LibProjectSmartContainer extends LibPorjectBase {
     const rootPackageName = `@${smartContainer.name}`;
     const base = path.join(
       this.project.location,
-      this.project.getTempProjName('bundle'),
+      this.project.getTempProjName('dist'),
       config.folder.node_modules,
       rootPackageName,
     )
@@ -65,7 +65,7 @@ export class LibProjectSmartContainer extends LibPorjectBase {
 
     const base = path.join(
       this.project.location,
-      this.project.getTempProjName('bundle'),
+      this.project.getTempProjName('dist'),
       config.folder.node_modules,
       rootPackageName,
     );
@@ -226,14 +226,14 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
       await Helpers.runSyncOrAsync(libBuildCallback);
 
       // (() => {
-      //   const libBuildCOmmand = `${config.frameworkName} build:${config.folder.bundle} ${global.hideLog ? '' : '-verbose'}`;
+      //   const libBuildCOmmand = `${config.frameworkName} build:${config.folder.dist} ${global.hideLog ? '' : '-verbose'}`;
       //   smartContainer.run(libBuildCOmmand).sync();
       // })();
 
 
       const cmd = (childProjName: string, productinoBuild: boolean, websqlBuild: boolean, isMainTarget = false) => {
         const commandToBuildDOcs = `${config.frameworkName} `
-          + `build:${config.folder.bundle}:app:${productinoBuild ? 'prod' : ''} ${childProjName} `
+          + `build:${config.folder.dist}:app:${productinoBuild ? 'prod' : ''} ${childProjName} `
           + `  ${websqlBuild ? '--websql' : ''}         ${global.hideLog ? '' : '-verbose'}`
 
         // console.log({
@@ -245,10 +245,10 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
         const assetsListPathSourceMain = crossPlatformPath([
           crossPlatformPath(path.resolve(path.join(this.project.location, '..'))),
           realCurrentProj.name,
-          config.folder.bundle,
+          config.folder.dist,
           realCurrentProj.name,
           childProjName,
-          `tmp-apps-for-${config.folder.bundle}${websqlBuild ? '-websql' : ''}`,
+          `tmp-apps-for-${config.folder.dist}${websqlBuild ? '-websql' : ''}`,
           childProjName,
           config.folder.src,
           config.folder.assets,

@@ -11,14 +11,14 @@ export type OverridePacakge = { [name: string]: string | null; };
 export type PackageType = Pick<Models.npm.Package, 'name' | 'version'>;
 
 export class SmartNodeModules extends FeatureForProject {
-  updateFromReleaseBundle(destination: Project) {
+  updateFromReleaseDist(destination: Project) {
     const source = crossPlatformPath([
       destination.location,
-      'tmp-bundle-release',
-      'bundle',
+      config.folder.tmpDistRelease,
+      config.folder.dist,
       'project',
       destination.name,
-      `tmp-local-copyto-proj-${config.folder.bundle}/${config.folder.node_modules}/${destination.name}`,
+      `tmp-local-copyto-proj-${config.folder.dist}/${config.folder.node_modules}/${destination.name}`,
     ]);
 
     if (destination.npmPackages.useSmartInstall) {

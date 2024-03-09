@@ -71,7 +71,7 @@ export class FilesStructure extends FeatureForProject {
     }
     const { alreadyInitedPorjects, watch, watchOnly } = options;
     let {
-      skipNodeModules, websql, recrusive, env, struct, skipSmartContainerDistBundleInit, branding
+      skipNodeModules, websql, recrusive, env, struct, skipSmartContainerDistInit, branding
     }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
     args = Helpers.cliTool.removeArgFromString(args, argsToClear);
 
@@ -234,12 +234,11 @@ export class FilesStructure extends FeatureForProject {
     }
 
 
-    if (this.project.isSmartContainer && !skipSmartContainerDistBundleInit) {
+    if (this.project.isSmartContainer && !skipSmartContainerDistInit) {
       //#region handle smart container
       Helpers.writeFile([this.project.location, 'angular.json'], this.angularJsonContainer);
       await this.project.recreate.init();
       await this.project.singluarBuild.init(watch, false, 'dist', args, client);
-      await this.project.singluarBuild.init(watch, false, 'bundle', args, client);
       //#endregion
     }
 

@@ -150,13 +150,13 @@ export function recreateApp(project: Project) {
   }
 
   if (!Helpers.exists(appHostsFile)
-    // && !Helpers.exists(appFolderWithIndex) // TODO @LAST why not to remove this
+    // && !Helpers.exists(appFolderWithIndex) // TODO @QUESTION why not to remove this
   ) {
     Helpers.writeFile(appHostsFile, PortUtils.instance(project.projectInfoPort).appHostTemplateFor(project));
   }
 
   if (!Helpers.exists(appElectornFile)
-    // && !Helpers.exists(appFolderWithIndex) // TODO @LAST why not to remove this
+    // && !Helpers.exists(appFolderWithIndex) // TODO @QUESTION why not to remove this
   ) {
     Helpers.writeFile(appElectornFile, appElectronTemplate(project))
   }

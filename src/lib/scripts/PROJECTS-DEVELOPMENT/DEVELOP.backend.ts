@@ -461,6 +461,10 @@ export function $MOVE_JS_TO_TS(args) {
 }
 //#endregion
 
+export async function CODE(args: string) {
+  Helpers.run(`code --install-extension ${args}`).sync();
+  process.exit(0);
+}
 
 export async function PROPERWATCHERTEST(engine: string) {
   const proj = Project.Current as Project;
@@ -589,6 +593,7 @@ export const BACKUP_NM = () => {
 
 export default {
   //#region export default
+  CODE: Helpers.CLIWRAP(CODE, 'CODE'),
   BACKUP_NM: Helpers.CLIWRAP(BACKUP_NM, 'BACKUP_NM'),
   ADD_IMPORT_SRC: Helpers.CLIWRAP(ADD_IMPORT_SRC, 'ADD_IMPORT_SRC'),
   PROPERWATCHERTEST: Helpers.CLIWRAP(PROPERWATCHERTEST, 'PROPERWATCHERTEST'),

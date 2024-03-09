@@ -29,6 +29,7 @@ export class ProjectVscodeExt
     //#region @backendFunc
     return [
       '.vscode/tasks.json',
+      '.vscode/launch.json',
       '.vscodeignore',
       'vsc-extension-quickstart.md',
       'tsconfig.json',

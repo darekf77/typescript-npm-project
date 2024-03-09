@@ -39,7 +39,7 @@ export namespace CopyMangerHelpers {
     options: Models.other.GenerateProjectCopyOpt,
     project: Project,
   ) {
-    const { useTempLocation, filterForBundle, ommitSourceCode, override } = options;
+    const { useTempLocation, filterForReleaseDist, ommitSourceCode, override } = options;
     let tempDestination: string;
     // console.log('useTempLocation',useTempLocation)
     if (useTempLocation) {
@@ -67,12 +67,12 @@ export namespace CopyMangerHelpers {
     // const toOmmitV3 = ((project.frameworkVersionAtLeast('v3') && project.typeIs('isomorphic-lib')) ? ['app', 'lib'] : []);
 
     const foldersToSkip = [
-      ...(filterForBundle ? [
+      ...(filterForReleaseDist ? [
         '.vscode',
         ...Helpers.values(config.tempFolders),
       ] : []),
       ...(project.projectLinkedFiles().map(c => c.relativePath)),
-      ...((filterForBundle && ommitSourceCode) ? sourceFolders : []),
+      ...((filterForReleaseDist && ommitSourceCode) ? sourceFolders : []),
       // ...toOmmitV3,
     ];
 
