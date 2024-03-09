@@ -45,5 +45,6 @@
         "wenfangdu.snippet-generator",
         "SimonSiefke.svg-preview",
         "ctcuff.font-preview",
+        "ms-azuretools.vscode-docker",
     ]
 }
