@@ -178,6 +178,9 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
             //#region fixing tsconfig pathes
             const parent = this.project.smartContainerTargetParentContainer;
             const otherChildren = parent.children.filter(c => c.name !== this.project.name);
+            // console.log({
+            //   otherChildren: otherChildren.map(c => c.location)
+            // })
             const base = this.project.name;
             if (tsconfigJson) {
               tsconfigJson.compilerOptions.paths = otherChildren.reduce((a, b) => {

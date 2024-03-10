@@ -59,13 +59,17 @@ export abstract class FolderProject {
     }
     //#region @backend
 
-    if (this.pathFor('taon.json')) {
-      return Helpers.foldersFrom(this.location)
+    if (this.pathExists('taon.json')) {
+      const taonChildren = Helpers.foldersFrom(this.location)
         .filter(f => !f.startsWith('.') && ![
           config.folder.node_modules,
         ].includes(path.basename(f)))
         .map(f => Project.From(f) as Project)
-        .filter(f => !!f)
+        .filter(f => !!f);
+      // console.log({
+      //   taonChildren: taonChildren.map(c => c.location)
+      // })
+      return taonChildren;
     }
 
     if (this.isTnp && !global.globalSystemToolMode) {
@@ -74,7 +78,11 @@ export abstract class FolderProject {
     if (this.typeIs('unknow')) {
       return [];
     }
-    return this.getAllChildren()
+    const all = this.getAllChildren();
+    // console.log({
+    //   all: all.map(c => c.location)
+    // })
+    return all;
     //#endregion
   }
 
@@ -128,7 +136,7 @@ export abstract class FolderProject {
 
     let res = subdirectories
       .map(dir => {
-        // log('child:', dir)
+        // console.log('child:', dir)
         return $Project.From<Project>(dir);
       })
       .filter(c => !!c)
@@ -285,14 +293,19 @@ export abstract class FolderProject {
     return crossPlatformPath(path.join(this.location, relativePath))
   }
 
-  hasFile(relativePath: string | string[]) {
-    if (Array.isArray(relativePath)) {
-      relativePath = crossPlatformPath(relativePath.join('/'))
-    }
-    if (path.isAbsolute(relativePath)) {
-      Helpers.error(`Cannot join relative path with absolute: ${relativePath}`);
-    }
-    return Helpers.exists(crossPlatformPath(path.join(this.location, relativePath)))
+
+  /**
+   * same has project.hasFile();
+   */
+  pathExists(relativePath: string | string[]): boolean {
+    return this.hasFile(relativePath);
+  }
+
+  /**
+   * same as project.pathExists();
+   */
+  hasFile(relativePath: string | string[]): boolean {
+    return Helpers.exists(this.pathFor(relativePath));
   }
 
   path(this: Project, relativePath: string, currentProjectLocation?: string) {
