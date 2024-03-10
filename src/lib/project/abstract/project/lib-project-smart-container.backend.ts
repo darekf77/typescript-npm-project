@@ -1,3 +1,4 @@
+//#region imports
 import { CLI } from "tnp-cli/src";
 import { config } from "tnp-config/src";
 import { crossPlatformPath, path } from "tnp-core/src";
@@ -8,9 +9,11 @@ import { AppBuildConfig } from "../../features/docs-app-build-config.backend";
 import { LibPorjectBase } from "./lib-project-base.backend";
 import type { LibProject } from "./lib-project.backend";
 import { Project } from "./project";
+//#endregion
 
 export class LibProjectSmartContainer extends LibPorjectBase {
 
+  //#region prepare package
   preparePackage(smartContainer: Project, newVersion: string) {
     const rootPackageName = `@${smartContainer.name}`;
     const base = path.join(
@@ -46,7 +49,9 @@ export class LibProjectSmartContainer extends LibPorjectBase {
       });
 
   }
+  //#endregion
 
+  //#region publish
   async publish(options: {
     realCurrentProj: Project,
     newVersion: string,
@@ -94,8 +99,9 @@ export class LibProjectSmartContainer extends LibPorjectBase {
     });
 
   }
+  //#endregion
 
-
+  //#region build docs
   async buildDocs(prod: boolean, realCurrentProj: Project, automaticReleaseDocs: boolean, libBuildCallback: (websql: boolean, prod: boolean) => any): Promise<boolean> {
     // TODO
 
@@ -233,7 +239,7 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
 
       const cmd = (childProjName: string, productinoBuild: boolean, websqlBuild: boolean, isMainTarget = false) => {
         const commandToBuildDOcs = `${config.frameworkName} `
-          + `build:${config.folder.dist}:app:${productinoBuild ? 'prod' : ''} ${childProjName} `
+          + `build:app:${productinoBuild ? 'prod' : ''} ${childProjName} `
           + `  ${websqlBuild ? '--websql' : ''}         ${global.hideLog ? '' : '-verbose'}`
 
         // console.log({
@@ -286,6 +292,6 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
       Helpers.log(this.messages.docsBuildDone);
     });
   }
-
+  //#endregion
 
 }

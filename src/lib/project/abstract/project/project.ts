@@ -49,8 +49,6 @@ import { DependencyProject } from './dependency-project.backend';
 import { CompilerCache } from '../../features/compiler-cache.backend';
 import { SmartNodeModules } from '../../features/smart-node-modules.backend';
 import { RecentFilesForContainer } from '../../features/recent-files.backend';
-import { CloudProject } from './cloud-project';
-import { GlobalWorkerApps } from '../../features/global-worker-apps';
 import { InsideStructures } from '../../features/inside-structures/inside-structures';
 import { SingularBuild } from '../../features/singular-build.backend';
 import { CLASS } from 'typescript-class-helpers/src';
@@ -251,7 +249,6 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('gitActions', GitActions);
       this.defineProperty<Project>('smartNodeModules', SmartNodeModules);
       this.defineProperty<Project>('recent', RecentFilesForContainer);
-      this.defineProperty<Project>('workerApps', GlobalWorkerApps);
       this.defineProperty<Project>('insideStructure', InsideStructures);
       this.defineProperty<Project>('singluarBuild', SingularBuild);
       this.defineProperty<Project>('webpackBackendBuild', WebpackBackendCompilation);
@@ -275,8 +272,6 @@ export interface Project extends
   FeatureProject,
   TnpProject,
   FolderProject,
-  CloudProject
-  ,
   LibProject,
   VscodeProject,
   TnpProject,
@@ -298,7 +293,6 @@ Helpers.applyMixins(Project, [
   FeatureProject,
   TnpProject,
   FolderProject,
-  CloudProject,
 
   LibProject,
   VscodeProject,

@@ -69,7 +69,7 @@ function help(argsString: string) {
       Helpers.log(`\nHelp for command "${CLI.chalk.green(command)}":\n`)
       Helpers.log(docs)
     } else {
-      Helpers.error(`No documentation for ${CLI.chalk.bold(command)}`)
+      Helpers.error(`No documentation for ${CLI.chalk.bold(command)}`, false, true)
     }
   }
   process.exit(0);

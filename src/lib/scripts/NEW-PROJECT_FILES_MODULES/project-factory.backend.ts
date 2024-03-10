@@ -1,7 +1,7 @@
+//#region imports
 import { crossPlatformPath, _ } from 'tnp-core/src';
-import { path } from 'tnp-core/src'
-import { fse } from 'tnp-core/src'
-
+import { path } from 'tnp-core/src';
+import { fse } from 'tnp-core/src';
 import { JSON10 } from 'json10/src';
 import { config, ConfigModels } from 'tnp-config/src';
 import { Models } from 'tnp-models/src';
@@ -9,6 +9,7 @@ import { Helpers } from 'tnp-helpers/src';
 import { Project } from '../../project/abstract/project/project';
 import { CLI } from 'tnp-cli/src';
 import { notAllowedProjectNames } from '../../constants';
+//#endregion
 
 //#region site option
 export type NewSiteOptions = {
@@ -399,7 +400,7 @@ git pull/push or children packages release. Normal container can wrap "standalon
     if (appProj.isSmartContainerChild) {
 
       // QUICK_FIX
-      appProj.writeFile('src/lib/my-organization-proj.ts',`
+      appProj.writeFile('src/lib/my-organization-proj.ts', `
 export function myOrgProj${(new Date()).getTime()}() {
   console.log('hello my organization project')
 }
@@ -454,3 +455,4 @@ export function myOrgProj${(new Date()).getTime()}() {
   //#endregion
 
 }
+

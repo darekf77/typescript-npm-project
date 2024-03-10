@@ -31,47 +31,34 @@ export abstract class LibProject {
   private smartcontainer: LibProjectSmartContainer;
   public vscodext: LibProjectVscodeExt;
 
-  // @ts-ignore
-  libProjectInit(this: Project) {
-    this.standalone = new LibProjectStandalone(this as any);
-    this.smartcontainer = new LibProjectSmartContainer(this as any);
-    this.vscodext = new LibProjectVscodeExt(this as any);
-  }
-
+  //#region  fields & getters / is global system tool
   // @ts-ignore
   get isGlobalSystemTool(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isGlobalSystemTool;
     }
-    //
     return this.packageJson && this.packageJson.isGlobalSystemTool;
-
   }
+  //#endregion
 
+  //#region  fields & getters / is command line tools only
   // @ts-ignore
   get isCommandLineToolOnly(this: Project) {
     if (Helpers.isBrowser) {
       return this.browser.isCommandLineToolOnly;
     }
-    //
     return this.packageJson && this.packageJson.isCommandLineToolOnly;
-
   }
+  //#endregion
 
-  // @ts-ignore
-  get isGeneratingControllerEntities(this: Project) {
-    //
-    return this.typeIs('isomorphic-lib') && this.useFramework;
-
-  }
-
+  //#region  fields & getters / is in release dist
   // @ts-ignore
   get isInRelaseDist(this: Project) {
     return this.location.includes('tmp-dist-release/dist');
   };
+  //#endregion
 
-
-  // angular core app files
+  //#region  fields & getters / angular core app files
   get angularCoreAppFiles() {
     //
     const files = [
@@ -114,9 +101,9 @@ export abstract class LibProject {
   }
   //#endregion
 
-  //#region  api
+  //#endregion
 
-  //#region  api / release
+  //#region release
 
   public async release(this: Project, releaseOptions?: Models.dev.ReleaseOptions) {
 
@@ -261,6 +248,18 @@ export abstract class LibProject {
   }
   //#endregion
 
+  //#region  methods
+
+  //#region  methods / lib project init
+  // @ts-ignore
+  libProjectInit(this: Project) {
+    this.standalone = new LibProjectStandalone(this as any);
+    this.smartcontainer = new LibProjectSmartContainer(this as any);
+    this.vscodext = new LibProjectVscodeExt(this as any);
+  }
+  //#endregion
+
+  //#region methods / info before publish
   private async infoBeforePublish(this: Project, realCurrentProj: Project, defaultTestPort: Number) {
     if (this.env.config?.useDomain) {
       Helpers.info(`Cannot local preview.. using doamin: ${this.env.config.domain}`)
@@ -302,8 +301,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
 
   }
+  //#endregion
 
-  //#region  methods
+  //#region methods / create temp project
   private async createTempProject(this: Project, releaseOptions?: Models.dev.ReleaseOptions, automaticRelease = false): Promise<boolean> {
 
     if (_.isUndefined(releaseOptions.useTempFolder)) {
@@ -395,9 +395,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       }
     }
   }
+  //#endregion
 
-
-
+  //#region methods / release build
   async relaseBuild(this: Project, newVersion: string, realCurrentProj: Project, releaseOptions: Models.dev.ReleaseOptions, forAppRelaseBuild: boolean) {
     const { prod, obscure, includeNodeModules, nodts, uglify, args } = releaseOptions;
 
@@ -486,12 +486,15 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
     return specyficProjectForBuild;
   }
+  //#endregion
 
-
+  //#region methods / build lib placeholder
   protected async buildLib() {
     Helpers.log(`[buildLib] callend buildLib not implemented`)
   }
+  //#endregion
 
+  //#region methods / copy essential files
   protected copyEssentialFilesTo(this: Project, destinations: string[], outDir: Models.dev.BuildDir) {
     //
     this.copyWhenExist('bin', destinations);
@@ -512,7 +515,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       this.copyWhenExist('package.json', destinations.map(d => crossPlatformPath([d, config.folder.client])));
     }
   }
+  //#endregion
 
+  //#region methods / remove (m)js.map files from release
   /**
    * because of that
    * In vscode there is a mess..
@@ -524,13 +529,16 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       .filter(f => f.endsWith('.js.map') || f.endsWith('.mjs.map'))
       .forEach(f => Helpers.removeFileIfExists(f));
   }
+  //#endregion
 
+  //#region methods / get temp project name
   getTempProjName(outdir: Models.dev.BuildDir) {
     const tempProjName = `tmp-local-copyto-proj-${outdir}`;
     return tempProjName;
   }
+  //#endregion
 
-
+  //#region methods / create /client folder from /browser folder
   private createClientVersionAsCopyOfBrowser(this: Project, releaseDistFolder: string) {
     //
 
@@ -546,9 +554,10 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       Helpers.writeFile(`${browser}.js`, msg);
       Helpers.writeFile(`${client}.js`, msg);
     }
-
   }
+  //#endregion
 
+  //#region methods / pack resources
   public packReleaseDistResources(this: Project, releaseDistFolder: string) {
     //
     this.checkIfReadyForNpm()
@@ -587,7 +596,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     Helpers.logInfo(`Resources copied to release folder: ${config.folder.dist}`);
 
   }
+  //#endregion
 
+  //#region methods / remove tag nad commit
   removeTagAndCommit(automaticRelease: boolean) {
     // Helpers.error(`PLEASE RUN: `, true, true);
     // if (!tagOnly) {
@@ -598,21 +609,22 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     //   Helpers.error('release problem...', false, true);
     // }
   }
+  //#endregion
 
-  // methods / project linked files
+  //#region methods / project linked files placeholder
   projectLinkedFiles(this: Project): { sourceProject: Project, relativePath: string }[] {
     const files = [];
     return files;
   }
+  //#endregion
 
-
-  // methods / create if not exists
+  //#region methods / recreate if not exits placeholder
   recreateIfNotExists() {
     return [];
   }
+  //#endregion
 
-
-  // methods / project specify files
+  //#region methods / project specify files
   projectSpecyficFiles(this: Project) {
     const files = [
       'index.js',
@@ -621,17 +633,17 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     ];
     return files;
   }
+  //#endregion
 
-
-  // methods / project specyfic files linked
+  //#region methods / project specyfic files linked
   projectSpecyficFilesLinked(this: Project) {
     const files = [
     ];
     return files;
   }
+  //#endregion
 
-
-  // methods / check if loggin in to npm
+  //#region methods / check if loggin in to npm
   private checkIfLogginInToNpm(this: Project) {
     //
     // if (!this.canBePublishToNpmRegistry) {
@@ -642,11 +654,10 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     } catch (e) {
       Helpers.error(`Please login in to npm.`, false, true)
     }
-
   }
+  //#endregion
 
-
-  // methods / copy when exists
+  //#region methods / copy when exists
   protected copyWhenExist(this: Project, relativePath: string, destinations: string[]) {
 
     const absPath = crossPlatformPath([this.location, relativePath]);
@@ -670,7 +681,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
 
   }
+  //#endregion
 
+  //#region methods / link when exists
   protected linkWhenExist(this: Project, relativePath: string, destinations: string[]) {
 
     let absPath = path.join(this.location, relativePath);
@@ -687,11 +700,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       }
     }
   }
+  //#endregion
 
-
-
-
-  // methods / commit
+  //#region methods / commit
   private commit(this: Project, newVer?: string, message = 'new version') {
 
     if (newVer) {
@@ -699,12 +710,10 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     } else {
       this.git.commit('relese update')
     }
-
-
   }
+  //#endregion
 
-
-  // methods / compile es5
+  //#region methods / compile es5
   private compileBrowserES5version(this: Project, pathReleaseDist: string) {
     //
     // TODO fix this for angular-lib
@@ -734,11 +743,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     Helpers.removeFileIfExists(pathBabelRc);
 
   }
+  //#endregion
 
-
-
-
-  // methods / push to git repo
+  //#region methods / push to git repo
   async pushToGitRepo(this: Project, realCurrentProj: Project, newVersion?: string, pushWithoutAsking = false) {
 
     const push = async () => {
@@ -776,6 +783,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   }
   //#endregion
 
+  //#endregion
 }
 
 //

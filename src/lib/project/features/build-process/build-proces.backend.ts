@@ -25,8 +25,6 @@ const log = Log.create(__filename)
 
 export class BuildProcessFeature extends FeatureForProject {
 
-
-
   //#region prepare build options
   public static prepareOptionsBuildProcess(options: Models.dev.StartForOptions, project: Project): BuildOptions {
     if (_.isUndefined(options)) {
@@ -61,7 +59,7 @@ export class BuildProcessFeature extends FeatureForProject {
    * prod, watch, outDir, args, overrideOptions
    */
   async startForLib(options: Models.dev.StartForOptions, exit = true) {
-    options = BuildProcessFeature.prepareOptionsBuildProcess(options, this.project);
+    options = BuildProcessFeature.prepareOptionsBuildProcess(options, this.project) as any;
     options.appBuild = false;
     const buildOptions: BuildOptions = await BuildOptions.from(options.args, this.project as any, options, 'startForLib');
     await this.build(buildOptions, config.allowedTypes.libs, exit);
@@ -72,7 +70,7 @@ export class BuildProcessFeature extends FeatureForProject {
   }
 
   async startForApp(options: Models.dev.StartForOptions, exit = true) {
-    options = BuildProcessFeature.prepareOptionsBuildProcess(options, this.project);
+    options = BuildProcessFeature.prepareOptionsBuildProcess(options, this.project) as any;
     options.appBuild = true;
     const buildOptions: BuildOptions = await BuildOptions.from(options.args, this.project as any, options, 'startForApp');
     await this.build(buildOptions, config.allowedTypes.app, exit);
@@ -114,7 +112,7 @@ to fix it.
     //#endregion
 
     this.project.buildOptions = buildOptions;
-    const websql = !!buildOptions.websql;
+    // const websql = !!buildOptions.websql;
 
     //#region make sure project allowed for build
     if (_.isArray(allowedLibs) && this.project.typeIsNot(...allowedLibs)) {

@@ -1,4 +1,4 @@
-//#region @backend
+//#region imports
 import { _, crossPlatformPath, path } from 'tnp-core/src';
 import { Models } from 'tnp-models/src';
 import { Helpers } from 'tnp-helpers/src';
@@ -7,8 +7,12 @@ import { ConfigModels, TAGS, backendNodejsOnlyFiles, extAllowedToExportAndReplac
 import { Project } from '../../project';
 import { config } from 'tnp-config/src';
 import { MagicRenamer } from 'magic-renamer/src';
+//#endregion
 
-
+//#region remove
+/**
+ * TODO
+ */
 export async function RM(args: string, exit = true) {
   const proj = (Project.Current as Project);
   if (proj.isContainer) {
@@ -44,33 +48,16 @@ export async function RM(args: string, exit = true) {
 export async function REMOVE(args: string, exit = true) {
   await RM(args, exit)
 }
+//#endregion
 
+//#region new
 export async function NEW(args: string, exit = true) {
   const cwd = crossPlatformPath(process.cwd());
-  const argv = args.split(' ');
-  const type = 'isomorphic-lib';  // argv[0] as ConfigModels.NewFactoryType;
-  // if (type === 'model') {
-  //   await ProjectFactory.Instance.createModelFromArgs(args, exit, cwd);
-  // } else {
-  await ProjectFactory.Instance.containerStandaloneFromArgs(args, exit, cwd)
-  // }
+  await ProjectFactory.Instance.containerStandaloneFromArgs(args, exit, cwd);
 }
+//#endregion
 
-// export function NEW_SITE(args: string, exit = true) {
-//   const cwd = crossPlatformPath(process.cwd());
-//   ProjectFactory.Instance.workspaceSiteFromArgs(args, exit, cwd, true);
-// }
-
-// export function $NEW_STRICT_SITE(args: string, exit = true) {
-//   const cwd = crossPlatformPath(process.cwd());
-//   ProjectFactory.Instance.workspaceSiteFromArgs(args, exit, cwd, true);
-// }
-
-// export function $NEW_DEPENDENCY_SITE(args: string, exit = true) {
-//   const cwd = crossPlatformPath(process.cwd());
-//   ProjectFactory.Instance.workspaceSiteFromArgs(args, exit, cwd, false);
-// }
-
+//#region update
 export async function $UPDATE(args: string) {
   const cwd = crossPlatformPath(process.cwd());
 
@@ -153,8 +140,9 @@ Would you like to update current project configuration?`)) {
 
   process.exit(0)
 }
+//#endregion
 
-
+//#region copy and rename (vscode option)
 async function $COPY_AND_RENAME(args: string) {
   // console.log(`>> ${args} <<`)
   const cwd = process.cwd();
@@ -162,6 +150,9 @@ async function $COPY_AND_RENAME(args: string) {
   await ins.start(args, true);
   process.exit(0);
 }
+//#endregion
+
+//#region generate (vscode option)
 
 async function $GENERATE(args: string) {
   const argsv = args.split(' ');
@@ -268,9 +259,7 @@ async function $GENERATE(args: string) {
   console.info('GENERATION DONE')
   process.exit(0)
 }
-
-
-
+//#endregion
 export default {
   $COPY_AND_RENAME: Helpers.CLIWRAP($COPY_AND_RENAME, '$COPY_AND_RENAME'),
   $UPDATE: Helpers.CLIWRAP($UPDATE, '$UPDATE'),
@@ -278,9 +267,5 @@ export default {
   REMOVE: Helpers.CLIWRAP(REMOVE, 'REMOVE'),
   RM: Helpers.CLIWRAP(RM, 'RM'),
   NEW: Helpers.CLIWRAP(NEW, 'NEW'),
-  // NEW_SITE: Helpers.CLIWRAP(NEW_SITE, 'NEW_SITE'),
-  // $NEW_STRICT_SITE: Helpers.CLIWRAP($NEW_STRICT_SITE, '$NEW_STRICT_SITE'),
-  // $NEW_DEPENDENCY_SITE: Helpers.CLIWRAP($NEW_DEPENDENCY_SITE, '$NEW_DEPENDENCY_SITE'),
 };
 
-//#endregion

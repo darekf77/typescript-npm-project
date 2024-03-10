@@ -1,3 +1,4 @@
+//#region imports
 import { CLI } from "tnp-cli/src";
 import { config } from "tnp-config/src";
 import { crossPlatformPath, path, _ } from "tnp-core/src";
@@ -7,10 +8,11 @@ import { AppBuildConfig } from "../../features/docs-app-build-config.backend";
 import { LibPorjectBase } from "./lib-project-base.backend";
 import { Project } from "./project";
 import { TEMP_DOCS } from "../../../constants";
-
+//#endregion
 
 export class LibProjectStandalone extends LibPorjectBase {
 
+  //#region prepare package
   preparePackage(smartContainer: Project, newVersion: string) {
     const base = path.join(
       this.project.location,
@@ -19,7 +21,9 @@ export class LibProjectStandalone extends LibPorjectBase {
 
     this.project.removeJsMapsFrom(base);
   }
+  //#endregion
 
+  //#region  fix package.json
   fixPackageJson(realCurrentProj: Project) {
     // [
     //   // config.folder.browser, /// TODO FIX for typescript
@@ -66,7 +70,9 @@ export class LibProjectStandalone extends LibPorjectBase {
     }
 
   }
+  //#endregion
 
+  //#region build docs
   async buildDocs(prod: boolean, realCurrentProj: Project, automaticReleaseDocs: boolean, libBuildCallback: (websql: boolean, prod: boolean) => any): Promise<boolean> {
     return await Helpers.questionYesNo(this.messages.docsBuildQuesions, async () => {
       const mainProjectName = realCurrentProj.name;
@@ -116,7 +122,7 @@ export class LibProjectStandalone extends LibPorjectBase {
 
       const libBuildCommand = ''; // `${config.frameworkName} build:${config.folder.dist} ${global.hideLog ? '' : '-verbose'} && `
       await this.project.run(`${libBuildCommand}`
-        + `${config.frameworkName} build:${config.folder.dist}:app:${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
+        + `${config.frameworkName} build:app:${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
         + `${appBuildOptions.websql ? '--websql' : ''} ${global.hideLog ? '' : '-verbose'} --forAppRelaseBuild`).sync();
 
       try {
@@ -153,8 +159,9 @@ export class LibProjectStandalone extends LibPorjectBase {
       Helpers.log(this.messages.docsBuildDone);
     });
   }
+  //#endregion
 
-
+  //#region publis
   async publish(options: {
     realCurrentProj: Project,
     newVersion: string,
@@ -224,7 +231,9 @@ export class LibProjectStandalone extends LibPorjectBase {
     });
 
   }
+  //#endregion
 
+  //#region update core/special projects/container
   updateTnpAndCoreContainers(realCurrentProj: Project) {
     //#region @notForNpm
     const tnpProj = Project.Tnp as Project;
@@ -253,8 +262,9 @@ export class LibProjectStandalone extends LibPorjectBase {
 
     //#endregion
   }
+  //#endregion
 
-
+  //#region bump version in other projects
   /**
    * Return how many projects has changed
    * @param bumbVersionIn
@@ -278,12 +288,12 @@ export class LibProjectStandalone extends LibPorjectBase {
       }
     }
   }
-
+  //#endregion
 
 }
 
-
-export function updateChildrenVersion(project: Project, newVersion, name, updatedProjectw: Project[] = []) {
+//#region update children version
+function updateChildrenVersion(project: Project, newVersion, name, updatedProjectw: Project[] = []) {
   if (updatedProjectw.filter(p => p.location === project.location).length > 0) {
     Helpers.log(`[release - ${name}][lib-proj] Alredy update ${project.genericName}`)
     return;
@@ -301,3 +311,4 @@ export function updateChildrenVersion(project: Project, newVersion, name, update
   Helpers.log(`[release - ${name}][lib-proj] children of ${project.genericName}: \n${project.children.map(c => c.location)}\n`)
   project.children.forEach(childProject => updateChildrenVersion(childProject, newVersion, name, updatedProjectw));
 }
+//#endregion

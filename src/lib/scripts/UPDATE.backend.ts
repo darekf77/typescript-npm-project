@@ -47,7 +47,7 @@ async function $INIT_CORE() {
   process.exit(0)
 }
 
-async function MORPHISYNC(args, noExit = false, useLatestTag = false) {
+async function REPOSITORY_SYNC(args, noExit = false, useLatestTag = false) {
   const cwd = config.morphiPathUserInUserDir;
   Helpers.info(`Fetching git data... `);
   try {
@@ -109,7 +109,7 @@ async function $AUTOUPDATE(args: string) {
   if (config.frameworkName === 'firedev') {
     if (await Helpers.questionYesNo(`Proceed with ${config.frameworkName} auto-update ?`)) {
       Helpers.run('npm i -g firedev --force').sync();
-      await MORPHISYNC(args, true, true)
+      await REPOSITORY_SYNC(args, true, true)
       const arrActive = config.activeFramewrokVersions;
       for (let index = 0; index < arrActive.length; index++) {
         const defaultFrameworkVersionForSpecyficContainer = arrActive[index];
@@ -172,11 +172,11 @@ async function $AUTOUPDATE(args: string) {
 }
 
 export async function SYNC(args) {
-  await MORPHISYNC(args, false, true);
+  await REPOSITORY_SYNC(args, false, true);
 }
 
 export async function LATEST_SYNC(args) {
-  await MORPHISYNC(args, false);
+  await REPOSITORY_SYNC(args, false);
 }
 
 export async function BRANCH_NAME(args) {
@@ -188,7 +188,6 @@ export default {
   $UPDATE_ISOMORPHIC: Helpers.CLIWRAP($UPDATE_ISOMORPHIC, '$UPDATE_ISOMORPHIC'),
   $AUTOUPDATE: Helpers.CLIWRAP($AUTOUPDATE, '$AUTOUPDATE'),
   $INIT_CORE: Helpers.CLIWRAP($INIT_CORE, '$INIT_CORE'),
-  MORPHISYNC: Helpers.CLIWRAP(MORPHISYNC, 'MORPHISYNC'),
   SYNC: Helpers.CLIWRAP(SYNC, 'SYNC'),
   LATEST_SYNC: Helpers.CLIWRAP(LATEST_SYNC, 'LATEST_SYNC'),
   BRANCH_NAME: Helpers.CLIWRAP(BRANCH_NAME, 'BRANCH_NAME'),

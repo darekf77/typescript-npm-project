@@ -254,21 +254,7 @@ const HIDE = (args) => {
   Helpers.info('Done')
 };
 
-function $INSTALL_IN_TNP() {
-  const inTnp = path.join((Project.Tnp as Project).location, config.folder.node_modules, (Project.Current as Project).name);
-  const inCurrent = path.join((Project.Current as Project).location, config.folder.dist);
-  if (!fse.existsSync(inCurrent)) {
-    Helpers.error(`Please build dist version of project first with tsc: tsc`, false, true);
-  }
-  Helpers.tryRemoveDir(inTnp);
-  Helpers.tryCopyFrom(inCurrent, inTnp);
-  Helpers.info(`Current project "${(Project.Current as Project).genericName}" installed in node_moduels of tnp`);
-  process.exit(0)
-}
 
-const $I_IN_TNP = () => {
-  $INSTALL_IN_TNP()
-};
 
 const $DEPS_SET_CAT = (args) => {
   $DEPS_SET_CATEGORY(args);
@@ -311,23 +297,6 @@ function $DEPS_RECREATE(args: string) {
   DEPS_SHOW(args)
 }
 
-
-async function $DEPS_TREE2() {
-  const proj = (Project.Current as Project);
-  proj.children.forEach(c => {
-    Helpers.info(`child: ${c.name}`);
-    if (c.workspaceDependencies.length === 0) {
-      Helpers.log(`-- no deps --`);
-    } else {
-      c.workspaceDependencies.forEach(d => {
-        Helpers.log(`dep ${d.name}`);
-      })
-    }
-
-  });
-  process.exit(0)
-
-}
 
 export function $DEPS_JSON() {
   const node_moduels = path.join(process.cwd(), config.folder.node_modules);
@@ -629,16 +598,7 @@ v2 Isomorphic-lib core:\t  ${ilv2.location}
 //#endregion
 
 
-async function $TREE(arg: string) {
-  const files = Helpers.getRecrusiveFilesFrom(crossPlatformPath(path.join(process.cwd(), arg)));
-  for (let index = 0; index < files.length; index++) {
-    const f = files[index];
-    console.log(`'${f.replace(process.cwd(), '')}',`)
-  }
-  process.exit(0)
-}
-
-function $SHOW_REMOTES() {
+function $GIT_SHOW_REMOTES() {
   const folders = Helpers.foldersFrom(process.cwd());
 
   folders
@@ -652,40 +612,46 @@ function $SHOW_REMOTES() {
 
 export default {
   SMART_REINSTALL: Helpers.CLIWRAP(SMART_REINSTALL, 'SMART_REINSTALL'),
-  $SHOW_REMOTES: Helpers.CLIWRAP($SHOW_REMOTES, '$SHOW_REMOTES'),
-  $TREE: Helpers.CLIWRAP($TREE, '$TREE'),
-  $DEPS_TREE2: Helpers.CLIWRAP($DEPS_TREE2, '$DEPS_TREE2'),
-  $INSTALL_IN_TNP: Helpers.CLIWRAP($INSTALL_IN_TNP, '$INSTALL_IN_TNP'),
-  $I_IN_TNP: Helpers.CLIWRAP($I_IN_TNP, '$I_IN_TNP'),
+  $GIT_SHOW_REMOTES: Helpers.CLIWRAP($GIT_SHOW_REMOTES, '$GIT_SHOW_REMOTES'),
+
   $DEPS_SET_CATEGORY: Helpers.CLIWRAP($DEPS_SET_CATEGORY, '$DEPS_SET_CATEGORY'),
   $DEPS_SET_CAT: Helpers.CLIWRAP($DEPS_SET_CAT, '$DEPS_SET_CAT'),
   $DEPS_UPDATE_FROM: Helpers.CLIWRAP($DEPS_UPDATE_FROM, '$DEPS_UPDATE_FROM'),
   $DEPS_COPY_FROM: Helpers.CLIWRAP($DEPS_COPY_FROM, '$DEPS_COPY_FROM'),
   $DEPS_FROM: Helpers.CLIWRAP($DEPS_FROM, '$DEPS_FROM'),
-  $RESET_NPM: Helpers.CLIWRAP($RESET_NPM, '$RESET_NPM'),
-  $DEPS_RESET: Helpers.CLIWRAP($DEPS_RESET, '$DEPS_RESET'),
-  $DEDUPE: Helpers.CLIWRAP($DEDUPE, '$DEDUPE'),
-  $DEDUPE_COUNT: Helpers.CLIWRAP($DEDUPE_COUNT, '$DEDUPE_COUNT'),
-  $DEDUPE_CHECK: Helpers.CLIWRAP($DEDUPE_CHECK, '$DEDUPE_CHECK'),
-  $DEPS_DEDUPE: Helpers.CLIWRAP($DEPS_DEDUPE, '$DEPS_DEDUPE'),
   DEPS_SHOW: Helpers.CLIWRAP(DEPS_SHOW, 'DEPS_SHOW'),
-  SHOW: Helpers.CLIWRAP(SHOW, 'SHOW'),
-  HIDE: Helpers.CLIWRAP(HIDE, 'HIDE'),
   SHOW_DEPS: Helpers.CLIWRAP(SHOW_DEPS, 'SHOW_DEPS'),
-  $DEPS_RECREATE: Helpers.CLIWRAP($DEPS_RECREATE, '$DEPS_RECREATE'),
-  $SHOW_CORE_MODULES: Helpers.CLIWRAP($SHOW_CORE_MODULES, '$SHOW_CORE_MODULES'),
+  $DEPS_RESET: Helpers.CLIWRAP($DEPS_RESET, '$DEPS_RESET'),
   DEPS_SHOW_IF_STANDALONE: Helpers.CLIWRAP(DEPS_SHOW_IF_STANDALONE, 'DEPS_SHOW_IF_STANDALONE'),
   DEPS_HIDE: Helpers.CLIWRAP(DEPS_HIDE, 'DEPS_HIDE'),
   $DEPS_JSON: Helpers.CLIWRAP($DEPS_JSON, '$DEPS_JSON'),
   HIDE_DEPS: Helpers.CLIWRAP(HIDE_DEPS, 'HIDE_DEPS'),
   $DEPS_CLEAN: Helpers.CLIWRAP($DEPS_CLEAN, '$DEPS_CLEAN'),
+
+  $RESET_NPM: Helpers.CLIWRAP($RESET_NPM, '$RESET_NPM'),
+
+  $DEDUPE: Helpers.CLIWRAP($DEDUPE, '$DEDUPE'),
+  $DEDUPE_COUNT: Helpers.CLIWRAP($DEDUPE_COUNT, '$DEDUPE_COUNT'),
+  $DEDUPE_CHECK: Helpers.CLIWRAP($DEDUPE_CHECK, '$DEDUPE_CHECK'),
+  $DEPS_DEDUPE: Helpers.CLIWRAP($DEPS_DEDUPE, '$DEPS_DEDUPE'),
+
+
+  SHOW: Helpers.CLIWRAP(SHOW, 'SHOW'),
+  HIDE: Helpers.CLIWRAP(HIDE, 'HIDE'),
+
+
+  $DEPS_RECREATE: Helpers.CLIWRAP($DEPS_RECREATE, '$DEPS_RECREATE'),
+  $SHOW_CORE_MODULES: Helpers.CLIWRAP($SHOW_CORE_MODULES, '$SHOW_CORE_MODULES'),
+
   $INSTALL: Helpers.CLIWRAP($INSTALL, '$INSTALL'),
   $UNINSTALL: Helpers.CLIWRAP($UNINSTALL, 'UNINSTALL'),
   $I: Helpers.CLIWRAP($I, '$I'),
   $SINSTALL: Helpers.CLIWRAP($SINSTALL, '$SINSTALL'),
   $REINSTALL: Helpers.CLIWRAP($REINSTALL, '$REINSTALL'),
+
   $LINK: Helpers.CLIWRAP($LINK, '$LINK'),
   $LN: Helpers.CLIWRAP($LN, '$LN'),
+
   $copytoproject: Helpers.CLIWRAP($copytoproject, '$copytoproject'),
   $copy_to_project: Helpers.CLIWRAP($copy_to_project, '$copy_to_project'),
   $copyto: Helpers.CLIWRAP($copyto, '$copyto'),
