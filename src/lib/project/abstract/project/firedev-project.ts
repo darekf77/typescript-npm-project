@@ -9,7 +9,7 @@ import { Project as $Project } from 'tnp-helpers/src';
 import { Helpers } from 'tnp-helpers/src';
 import { config, ConfigModels } from 'tnp-config/src';
 
-export abstract class TnpProject {
+export abstract class FiredevProject {
 
   // @ts-ignore
   public get _frameworkVersion(this: Project) {

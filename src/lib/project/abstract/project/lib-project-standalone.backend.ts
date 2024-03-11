@@ -49,9 +49,9 @@ export class LibProjectStandalone extends LibPorjectBase {
 
       if (this.project.packageJson.name === 'tnp') {  // TODO QUICK_FIX
         Helpers.setValueToJSON(path.join(this.project.location, config.folder.dist, config.file.package_json), 'dependencies',
-          this.project.TnpProject.packageJson.data.tnp.overrided.includeOnly.reduce((a, b) => {
+          this.project.FiredevProject.packageJson.data.tnp.overrided.includeOnly.reduce((a, b) => {
             return _.merge(a, {
-              [b]: this.project.TnpProject.packageJson.data.dependencies[b]
+              [b]: this.project.FiredevProject.packageJson.data.dependencies[b]
             })
           }, {})
         );
@@ -238,7 +238,7 @@ export class LibProjectStandalone extends LibPorjectBase {
     //#region @notForNpm
     const tnpProj = Project.Tnp as Project;
 
-    const updateLocalTnpProjectWithOwnNodeModules = (config.frameworkName === 'tnp')
+    const updateLocalFiredevProjectWithOwnNodeModules = (config.frameworkName === 'tnp')
       && (realCurrentProj.name !== 'tnp')
       && (realCurrentProj._frameworkVersion === tnpProj._frameworkVersion);
 
@@ -251,7 +251,7 @@ export class LibProjectStandalone extends LibPorjectBase {
       (_.isArray(arrTrusted) && arrTrusted.includes(this.project.name))
     ) {
       [
-        ...(updateLocalTnpProjectWithOwnNodeModules ? [tnpProj] : []),
+        ...(updateLocalFiredevProjectWithOwnNodeModules ? [tnpProj] : []),
         coreCont,
       ].filter(f => !!f)
         .forEach(c => {
@@ -276,12 +276,12 @@ export class LibProjectStandalone extends LibPorjectBase {
       // console.log('UPDATE VERSION !!!!!!!!!!!!!')
       updateChildrenVersion(this.project, newVersion, this.project.name);
     } else {
-      if (this.project.TnpProject.name === this.project.name) {
+      if (this.project.FiredevProject.name === this.project.name) {
         Helpers.info(`Ommiting version bump ${this.project.name} - for ${config.frameworkName} itself`)
-      } else if (this.project.packageJson.hasDependency(this.project.TnpProject.name)) {
+      } else if (this.project.packageJson.hasDependency(this.project.FiredevProject.name)) {
         Helpers.info(`Ommiting version bump ${this.project.name} - has ${config.frameworkName} as dependency`)
       } else {
-        this.project.TnpProject.packageJson.setDependencyAndSave({
+        this.project.FiredevProject.packageJson.setDependencyAndSave({
           name: this.project.name,
           version: newVersion,
         }, `Bump new version "${newVersion}" of ${this.project.name}`);

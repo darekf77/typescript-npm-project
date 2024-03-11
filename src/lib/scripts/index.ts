@@ -15,11 +15,13 @@ import OPEN from './VSCODE-EXT/OPEN.backend';
 import OTHER from './OTHER.backend';
 import HELP from './HELP.backend';
 import UPDATE from './UPDATE.backend';
+import CI from './CI.backend';
 
 export default [
   COMPILERS,
   DB,
   DEPS,
+  CI,
   NEW,
   BUILD,
   RELEASE,

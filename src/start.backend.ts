@@ -1,3 +1,4 @@
+//#region imports & constants
 import { path, Helpers, chokidar } from 'tnp-core/src';
 import { fse, crossPlatformPath } from 'tnp-core/src';
 
@@ -55,7 +56,6 @@ if (Object.keys(global['ENV']).length === 0) {
   Helpers.warn(`[firedev][tmp-environment] ENVIRONMENT CONFIG IS NOT DEFINED/EMPTY`);
 }
 
-//#region imports
 import { _ } from 'tnp-core/src';
 import { config } from 'tnp-config/src';
 import scriptsFnArr from './lib/scripts/index';
@@ -74,8 +74,8 @@ import { Helpers as TnpHelpers } from 'tnp-helpers/src';
 
 import { CLASS } from 'typescript-class-helpers/src';
 import { CLI } from 'tnp-cli/src';
+import type { CommandLineFeature } from './lib/project/abstract/command-line-feature.backend';
 //#endregion
-
 
 //#region handle special args
 const SPECIAL_ARGS = [
@@ -224,9 +224,13 @@ export async function start(
           if (!_.isString(v)) {
             const vFn: Function = (Array.isArray(v) && v.length >= 1 ? v[0] : v) as any;
             const vFnName = CLASS.getName(vFn);
-            functionsToCHeck.push(vFn)
+            functionsToCHeck.push(vFn);
+            // console.log({
+            //   vFnName,
+            //   props: CLASS.getMethodsNames(vFn),
+            // })
             if (_.isFunction(vFn)) {
-              const check = TnpHelpers.cliTool.match(vFnName, argsv);
+              const check = TnpHelpers.cliTool.match(vFnName, argsv, CLASS.getMethodsNames(vFn).filter(f => !f.startsWith('_')));
               if (check.isMatch) {
                 recognized = true;
                 // spinner && spinner?.stop()
@@ -234,7 +238,12 @@ export async function start(
                 // process.exit(0)
                 Helpers.log('--- recognized command ---' + CLASS.getName(vFn))
                 global?.spinner?.stop();
-                vFn.apply(null, [TnpHelpers.cliTool.globalArgumentsParserTnp(check.restOfArgs)]);
+                // if (Helpers.isClass(vFn)) {
+                const obj: CommandLineFeature = new (vFn as any)(TnpHelpers.cliTool.globalArgumentsParserTnp(check.restOfArgs), Project.Current as Project, check.methodNameToCall);
+                // obj.init();
+                // } else {
+                //   vFn.apply(null, [TnpHelpers.cliTool.globalArgumentsParserTnp(check.restOfArgs)]);
+                // }
                 breakLoop = true;
                 break;
               }

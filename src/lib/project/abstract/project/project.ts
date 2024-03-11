@@ -18,7 +18,7 @@ import { Morphi } from 'morphi/src';
 import { BaseProject } from './base-project';
 import { NpmProject } from './npm-project';
 import { FeatureProject } from './feature-project';
-import { TnpProject } from './tnp-project';
+import { FiredevProject } from './firedev-project';
 import { FolderProject } from './folder-project';
 import { LibProject } from './lib-project.backend';
 import { VscodeProject } from './vscode-project.backend';
@@ -44,7 +44,6 @@ import {
 } from '../../features';
 import { SourceModifier, FrameworkFilesGenerator, AssetsFileListGenerator } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
-import { DbProcessProject } from './db-process-project.backend';
 import { DependencyProject } from './dependency-project.backend';
 import { CompilerCache } from '../../features/compiler-cache.backend';
 import { SmartNodeModules } from '../../features/smart-node-modules.backend';
@@ -196,7 +195,7 @@ export class Project extends $Project<Project>
     //#endregion
   }
 
-  get TnpProject() {
+  get FiredevProject() {
     return Project.Tnp as Project;
   }
 
@@ -270,16 +269,15 @@ export interface Project extends
   BaseProject,
   NpmProject,
   FeatureProject,
-  TnpProject,
+  FiredevProject,
   FolderProject,
   LibProject,
   VscodeProject,
-  TnpProject,
+  FiredevProject,
   RecreatableProject,
   EntityProject,
   BuildableProject,
   ElectronProject,
-  DbProcessProject,
   DependencyProject,
   CompilerCache {
 
@@ -291,7 +289,7 @@ Helpers.applyMixins(Project, [
   BaseProject,
   NpmProject,
   FeatureProject,
-  TnpProject,
+  FiredevProject,
   FolderProject,
 
   LibProject,
@@ -301,7 +299,6 @@ Helpers.applyMixins(Project, [
   EntityProject,
   BuildableProject,
   ElectronProject,
-  DbProcessProject,
   DependencyProject,
   CompilerCache
 ])

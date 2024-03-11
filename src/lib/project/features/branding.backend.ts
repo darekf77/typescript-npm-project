@@ -8,8 +8,7 @@ import { Project } from '../../project/abstract/project/project';
 import { config } from 'tnp-config/src';
 import { FeatureForProject } from '../abstract/feature-for-project';
 import { Models } from 'tnp-models/src';
-
-
+ `d`
 const htmlBasename = 'html-pwa.html';
 const generatedPwa = [config.folder.generated, 'pwa']
 const subPath = [config.folder.src, config.folder.assets, ...generatedPwa]
