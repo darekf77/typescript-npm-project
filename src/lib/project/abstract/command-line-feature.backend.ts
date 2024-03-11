@@ -47,5 +47,9 @@ export abstract class CommandLineFeature<PARAMS = any> {
   protected exit() {
     process.exit(0)
   }
+
+  /**
+   * method called when not using class methods
+   */
   public abstract _(args: string, project: Project);
 }
