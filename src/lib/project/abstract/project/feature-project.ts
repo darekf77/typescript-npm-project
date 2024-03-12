@@ -12,7 +12,7 @@ import {
   CypressTestRunner
 } from '../../features';
 
-import { SourceModifier, FrameworkFilesGenerator, AssetsFileListGenerator } from '../../compilers';
+import { AssetsFileListGenerator } from '../../compilers';
 import { CompilerCache } from '../../features/compiler-cache.backend';
 import { CopyManager } from '../../features/copy-manager';
 import { PackageJSON, EnvironmentConfig } from '../../features';
@@ -80,19 +80,11 @@ export abstract class FeatureProject {
   //#endregion
 
   //#region @backend
-  public sourceModifier: SourceModifier;
-  //#endregion
-
-  //#region @backend
   public quickFixes: QuickFixes;
   //#endregion
 
   //#region @backend
   public smartNodeModules: SmartNodeModules;
-  //#endregion
-
-  //#region @backend
-  public frameworkFileGenerator: FrameworkFilesGenerator;
   //#endregion
 
   //#region @backend

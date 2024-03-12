@@ -13,7 +13,6 @@ import { config, ConfigModels } from 'tnp-config/src';
 import { Models } from 'tnp-models/src';
 import { Helpers } from 'tnp-helpers/src';
 
-import { Morphi } from 'morphi/src';
 //#region @backend
 import { BaseProject } from './base-project';
 import { NpmProject } from './npm-project';
@@ -42,7 +41,7 @@ import {
   AssetsManager,
 
 } from '../../features';
-import { SourceModifier, FrameworkFilesGenerator, AssetsFileListGenerator } from '../../compilers';
+import { AssetsFileListGenerator } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
 import { DependencyProject } from './dependency-project.backend';
 import { CompilerCache } from '../../features/compiler-cache.backend';
@@ -54,63 +53,6 @@ import { PortUtils } from '../../../constants';
 //#endregion
 //#endregion
 
-@Morphi.Entity<Project>({
-  className: 'Project',
-  classFamily: 'Project',
-  classNameInBrowser: 'PROJECT',
-  uniqueKeyProp: 'location',
-  mapping: {
-    packageJson: 'PackageJSON'
-  },
-  additionalMapping: {
-    'browser.children': ['Project'],
-    'browser.children.browser.childeren': ['Project'],
-    'browser.children.browser.childeren.browser.childeren': ['Project'],
-    'browser.parent': 'Project',
-    'browser.parent.browser.parent': 'Project',
-    'browser.baseline': 'Project',
-    'browser.baseline.browser.baseline': 'Project',
-    'browser.preview': 'Project',
-    'browser.preview.browser.preview': 'Project',
-  },
-  //#region @backend
-  createTable: false,
-  browserTransformFn: (entity: Project, mdc: any) => {
-    // log('I AM TRANSFORMING ENTITY!!!', mdc)
-    let exclude = [];
-    if (!entity.browser) {
-      entity.browser = {} as any;
-    }
-    if (!!mdc && mdc.exclude.length > 0) {
-      exclude = mdc.exclude;
-    }
-    // if(exclude.length > 0) {
-    //   log('exclude in Project', exclude)
-    // }
-
-    // @ts-ignore
-    if (!(exclude.length > 0 && exclude.includes('children'))) {
-      // log('SET CHILDREND')
-      entity.browser.children = entity.children as any;
-    } else {
-      entity.browser.children = void 0
-    }
-
-    // @ts-ignore
-    if (!(exclude.length > 0 && exclude.includes('parent'))) {
-      entity.browser.parent = entity.parent as any;
-    } else {
-      entity.browser.parent = void 0
-    }
-
-    entity.browser.genericName = entity.genericName;
-    entity.browser.name = entity.name;
-    entity.browser.isStandaloneProject = entity.isStandaloneProject;
-    entity.browser.isContainer = entity.isContainer;
-
-  }
-  //#endregion
-} as any) // @ts-ignore
 export class Project extends $Project<Project>
 {
   //#region @backend
@@ -188,7 +130,7 @@ export class Project extends $Project<Project>
     this: Project
     //#endregion
   ) {
-    if (Morphi.IsBrowser) {
+    if (Helpers.isBrowser) {
       return this.browser.info as any;
     }
     //#region @backend
@@ -231,8 +173,6 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('npmPackages', NpmPackages);
       this.defineProperty<Project>('recreate', FilesRecreator);
       this.defineProperty<Project>('filesFactory', FilesFactory);
-      this.defineProperty<Project>('sourceModifier', SourceModifier);
-      this.defineProperty<Project>('frameworkFileGenerator', FrameworkFilesGenerator);
       this.defineProperty<Project>('filesTemplatesBuilder', FilesTemplatesBuilder);
       // console.log({
       //   MochaTestRunner, JestTestRunner, CypressTestRunner,

@@ -4,7 +4,7 @@
 
 ### Usage of region **@backend**
 ```ts
-import { Morphi } from 'morphi'
+import { Firedev } from 'firedev'
 
 console.log('visible everywhere')
 //#region @backend
@@ -18,7 +18,7 @@ if(Helpers.isBrowser) {
 
 ### Usage of region **@backendFunc**
 ```ts
-import { Morphi } from 'morphi'
+import { Firedev } from 'firedev'
 
 
 class MyController {

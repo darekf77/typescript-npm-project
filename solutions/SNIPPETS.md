@@ -55,7 +55,7 @@ if (isNaN(parsed)) {
 ```ts
 
 //#region @notForNpm
-import { Morphi } from 'morphi';
+import { Firedev } from 'firedev';
 // import 'core-js/client/shim';
 // import 'reflect-metadata';
 require('zone.js/dist/zone');
@@ -131,7 +131,7 @@ export default start;
 # backend and angular material
 
 ```ts
-import { Morphi } from 'morphi';
+import { Firedev } from 'firedev';
 // import 'core-js/client/shim';
 // import 'reflect-metadata';
 if (Morphi.isBrowser) {
