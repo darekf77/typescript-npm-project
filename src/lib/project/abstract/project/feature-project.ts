@@ -3,19 +3,18 @@ import { fse } from 'tnp-core/src'
 import { path } from 'tnp-core/src'
 import chalk from 'chalk';
 import {
-   MochaTestRunner,
+  MochaTestRunner,
   FilesStructure, FilesTemplatesBuilder, BuildProcessFeature,
   NodeModules, FilesRecreator, FilesFactory,
   QuickFixes, NpmPackages, TargetProject, GitActions,
-  SmartNodeModules, RecentFilesForContainer, LinkedRepos, Branding, DocsAppBuildConfig, AssetsManager,
+  SmartNodeModules, LinkedRepos, Branding, DocsAppBuildConfig, AssetsManager,
   JestTestRunner,
   CypressTestRunner
 } from '../../features';
 
-import {  SourceModifier, FrameworkFilesGenerator, AssetsFileListGenerator } from '../../compilers';
+import { SourceModifier, FrameworkFilesGenerator, AssetsFileListGenerator } from '../../compilers';
 import { CompilerCache } from '../../features/compiler-cache.backend';
 import { CopyManager } from '../../features/copy-manager';
-import { IncrementalBuildProcess } from '../../compilers/build-isomorphic-lib/compilations/incremental-build-process.backend';
 import { PackageJSON, EnvironmentConfig } from '../../features';
 import { InsideStructures } from '../../features/inside-structures/inside-structures';
 import { SingularBuild } from '../../features/singular-build.backend';
@@ -58,10 +57,6 @@ export abstract class FeatureProject {
 
   //#region @backend
   public targetProjects: TargetProject;
-  //#endregion
-
-  //#region @backend
-  public recent: RecentFilesForContainer;
   //#endregion
 
   //#region @backend

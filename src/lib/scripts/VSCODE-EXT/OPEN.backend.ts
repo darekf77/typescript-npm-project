@@ -20,7 +20,6 @@ async function $OPEN(args: string) {
 }
 //#endregion
 
-
 //#region open / core container
 function $OPEN_CORE_CONTAINER() {
   const proj = Project.Current as Project;
@@ -152,59 +151,11 @@ function $LOCATION() {
   process.exit(0)
 }
 
-async function $RECENT_SAVE_ACTIVE(args) {
-  await (Project.Current as Project).recent.saveActiveProjects();
-  process.exit(0);
-}
-
-const $RECENT_ACTIVE_SAVE = (args) => $RECENT_SAVE_ACTIVE(args)
-
-function $RECENT_SET(args) {
-  (Project.Current as Project).recent.setFrom(args);
-  process.exit(0);
-}
-
-
-function $OPEN_RECENT() {
-  (Project.Current as Project).recent.openRecent();
-  process.exit(0);
-}
-
-function $CLOSE_RECENT() {
-
-}
-
-function $SET_RECENT(args) {
-  $RECENT_SET(args);
-}
-
-function $RECENT_OPEN() {
-  $OPEN_RECENT();
-}
-
-function $RECENT() {
-  $OPEN_RECENT();
-}
-
-function $RECENT_CLOSE() {
-  $CLOSE_RECENT();
-}
 //#endregion
 
 export default {
   $LOCATION: Helpers.CLIWRAP($LOCATION, '$LOCATION'),
   $OPEN: Helpers.CLIWRAP($OPEN, '$OPEN'),
-
-  $RECENT_SAVE_ACTIVE: Helpers.CLIWRAP($RECENT_SAVE_ACTIVE, '$RECENT_SAVE_ACTIVE'),
-  $RECENT_SET: Helpers.CLIWRAP($RECENT_SET, '$RECENT_SET'),
-  $OPEN_RECENT: Helpers.CLIWRAP($OPEN_RECENT, '$OPEN_RECENT'),
-  $CLOSE_RECENT: Helpers.CLIWRAP($CLOSE_RECENT, '$CLOSE_RECENT'),
-  $RECENT_CLOSE: Helpers.CLIWRAP($RECENT_CLOSE, '$RECENT_CLOSE'),
-  $RECENT_OPEN: Helpers.CLIWRAP($RECENT_OPEN, '$RECENT_OPEN'),
-  $RECENT: Helpers.CLIWRAP($RECENT, '$RECENT'),
-  $RECENT_ACTIVE_SAVE: Helpers.CLIWRAP($RECENT_ACTIVE_SAVE, '$RECENT_ACTIVE_SAVE'),
-  $SET_RECENT: Helpers.CLIWRAP($SET_RECENT, '$SET_RECENT'),
-
   $OPEN_DB: Helpers.CLIWRAP($OPEN_DB, '$OPEN_DB'),
   $OPEN_ROUTES: Helpers.CLIWRAP($OPEN_ROUTES, '$OPEN_ROUTES'),
   $OPEN_UNSTAGE: Helpers.CLIWRAP($OPEN_UNSTAGE, '$OPEN_UNSTAGE'),

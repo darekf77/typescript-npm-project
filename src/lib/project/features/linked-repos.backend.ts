@@ -81,7 +81,7 @@ export class LinkedRepos extends FeatureForProject {
               `, false, true)
           }
 
-          const toLink = repo.relativeFoldersLinks.filter(f => !(f.from === f.to && f.from === '' && f.from === ''));
+          const toLink = (repo.relativeFoldersLinks || []).filter(f => !(f.from === f.to && f.from === '' && f.from === ''));
 
           for (let index = 0; index < toLink.length; index++) {
             const element = toLink[index];
@@ -118,7 +118,7 @@ export class LinkedRepos extends FeatureForProject {
                     `${path.basename(foundedExistedDestPath).replace(path.extname(foundedExistedDestPath), '')}`
                     + `${this.prefixes.ORIGINAL}${path.extname(foundedExistedDestPath)}`
                   );
-                  if (contentNew !== contentExisted) {
+                  if (contentNew && (contentNew !== contentExisted)) {
                     Helpers.writeFile(originalFilePath, contentNew)
                   } else {
                     Helpers.removeFileIfExists(originalFilePath);

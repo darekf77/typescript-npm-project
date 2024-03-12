@@ -47,7 +47,6 @@ import { CopyManager } from '../../features/copy-manager';
 import { DependencyProject } from './dependency-project.backend';
 import { CompilerCache } from '../../features/compiler-cache.backend';
 import { SmartNodeModules } from '../../features/smart-node-modules.backend';
-import { RecentFilesForContainer } from '../../features/recent-files.backend';
 import { InsideStructures } from '../../features/inside-structures/inside-structures';
 import { SingularBuild } from '../../features/singular-build.backend';
 import { CLASS } from 'typescript-class-helpers/src';
@@ -89,6 +88,7 @@ import { PortUtils } from '../../../constants';
     //   log('exclude in Project', exclude)
     // }
 
+    // @ts-ignore
     if (!(exclude.length > 0 && exclude.includes('children'))) {
       // log('SET CHILDREND')
       entity.browser.children = entity.children as any;
@@ -96,6 +96,7 @@ import { PortUtils } from '../../../constants';
       entity.browser.children = void 0
     }
 
+    // @ts-ignore
     if (!(exclude.length > 0 && exclude.includes('parent'))) {
       entity.browser.parent = entity.parent as any;
     } else {
@@ -247,7 +248,6 @@ export class Project extends $Project<Project>
       this.defineProperty<Project>('targetProjects', TargetProject);
       this.defineProperty<Project>('gitActions', GitActions);
       this.defineProperty<Project>('smartNodeModules', SmartNodeModules);
-      this.defineProperty<Project>('recent', RecentFilesForContainer);
       this.defineProperty<Project>('insideStructure', InsideStructures);
       this.defineProperty<Project>('singluarBuild', SingularBuild);
       this.defineProperty<Project>('webpackBackendBuild', WebpackBackendCompilation);

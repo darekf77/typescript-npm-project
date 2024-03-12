@@ -10,7 +10,6 @@ export * from './test-runner';
 export * from './target-project.backend';
 export * from './git-actions.backend';
 export * from './smart-node-modules.backend';
-export * from './recent-files.backend';
 export * from './webpack-backend-compilation.backend';
 export * from './linked-repos.backend';
 export * from './assets-manager.backend';

@@ -225,7 +225,6 @@ ${remotes.map((r, i) => `${i + 1}. ${r.origin} ${r.url}`).join('\n')}
       if (!this.project.isSmartContainer) {
         await this.project.filesStructure.init('');
       }
-      await this.project.recent.saveActiveProjects(false);
     }
     this.before();
     const linedChildren = await this.getLinkedPorjectsAndChildrens('push')
