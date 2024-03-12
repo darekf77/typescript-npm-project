@@ -66,7 +66,7 @@ import axios from 'axios';
  */
 axios.defaults.timeout = config.CONST.BACKEND_HTTP_REQUEST_TIMEOUT; // TODO QUICK_FIX
 
-import { Project } from './lib/project';
+// import { Project } from './lib/project';
 
 
 // import { ConsoleUi } from './console-ui';
@@ -239,7 +239,7 @@ export async function start(
                 Helpers.log('--- recognized command ---' + CLASS.getName(vFn))
                 global?.spinner?.stop();
                 // if (Helpers.isClass(vFn)) {
-                const obj: CommandLineFeature = new (vFn as any)(TnpHelpers.cliTool.globalArgumentsParserTnp(check.restOfArgs), Project.Current as Project, check.methodNameToCall);
+                const obj: CommandLineFeature = new (vFn as any)(TnpHelpers.cliTool.globalArgumentsParserTnp(check.restOfArgs), check.methodNameToCall);
                 // obj.init();
                 // } else {
                 //   vFn.apply(null, [TnpHelpers.cliTool.globalArgumentsParserTnp(check.restOfArgs)]);

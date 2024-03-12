@@ -9,8 +9,8 @@ export abstract class CommandLineFeature<PARAMS = any> {
   protected readonly args: string[];
   constructor(
     protected readonly argsWithParams: string,
-    protected readonly project: Project,
     private readonly methodNameToCall: string,
+    private readonly project: Project = Project.Current as Project,
   ) {
     // console.log({ args, methodNameToCall })
 

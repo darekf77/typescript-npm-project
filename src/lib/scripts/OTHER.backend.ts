@@ -1,6 +1,6 @@
 import { os, _ } from 'tnp-core/src';
 import { crossPlatformPath } from 'tnp-core/src'
-import { Project } from '../project';
+import { Project } from '../project/abstract/project/project';
 import * as  psList from 'ps-list';
 import { CLASS } from 'typescript-class-helpers/src';
 import { Helpers } from 'tnp-helpers/src';
