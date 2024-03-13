@@ -2,7 +2,7 @@
 import { crossPlatformPath, path } from 'tnp-core/src'
 import { fse } from 'tnp-core/src'
 import { _ } from 'tnp-core/src';
-import { FeatureForProject } from '../../abstract';
+import { FeatureForProject } from '../../abstract/feature-for-project';
 import { Models } from 'tnp-models/src';
 import { Helpers } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';

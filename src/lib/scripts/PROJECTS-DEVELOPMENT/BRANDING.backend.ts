@@ -4,7 +4,7 @@ import { Project } from "../../project/abstract/project";
 
 export async function $BRANDING(args: string, exit = true) {
 
-  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  const proj = Project.resolveChildProject(args);
 
   if (proj.isStandaloneProject || proj.isSmartContainerChild || proj.isSmartContainerTarget) {
     await proj.branding.apply(true);

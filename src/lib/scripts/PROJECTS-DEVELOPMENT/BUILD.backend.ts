@@ -14,7 +14,7 @@ import { TEMP_DOCS } from '../../constants';
 //#region BUILD / build:watch
 
 const $BUILD_WATCH = async (args) => {
-  let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  let proj = Project.resolveChildProject(args);
   if (proj.isSmartContainerChild) {
     Helpers.error(`Smart container build only available from container level. `, false, true)
   } else {
@@ -29,7 +29,7 @@ const $BUILD_WATCH = async (args) => {
 
 //#region BUILD / build
 const $BUILD = async (args) => {
-  let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  let proj = Project.resolveChildProject(args);
   if (proj.isSmartContainerChild) {
     Helpers.error(`Smart container build only available from container level. `, false, true)
   } else {
@@ -58,15 +58,15 @@ async function $DEFAULT_BUILD(args) {
  * $ firedev app  # sqlite (default), mysql, postgress + docker up
  * $ firedev app --websql   # in browser websql
  */
-const $APP = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, true, 'dist', args);
+const $APP = (args) => Project.Current.buildProcess.startForAppFromArgs(false, true, 'dist', args);
 //#endregion
 
 //#region BUILD / build app prod
-const $BUILD_APP_PROD = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(true, false, 'dist', args);
+const $BUILD_APP_PROD = (args) => Project.Current.buildProcess.startForAppFromArgs(true, false, 'dist', args);
 //#endregion
 
 //#region BUILD / build app
-const $BUILD_APP = (args) => (Project.Current as Project).buildProcess.startForAppFromArgs(false, false, 'dist', args);
+const $BUILD_APP = (args) => Project.Current.buildProcess.startForAppFromArgs(false, false, 'dist', args);
 //#endregion
 
 //#region BUILD / start
@@ -74,7 +74,7 @@ const $BUILD_APP = (args) => (Project.Current as Project).buildProcess.startForA
  * quick lib/app bootstrapp watch build
  */
 const $START = async (args) => {
-  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  const proj = Project.resolveChildProject(args);
 
   if (proj.isStandaloneProject || proj.isSmartContainer) {
     if (proj.typeIsNot('vscode-ext')) {
@@ -82,7 +82,7 @@ const $START = async (args) => {
       args = `${args} --skipCopyToSelection --copytoAll`;
     }
     args = `${args} --serveApp`;
-    await (Project.Current as Project)
+    await Project.Current
       .buildProcess
       .startForLibFromArgs(false, true, 'dist', args);
   }
@@ -157,7 +157,7 @@ async function $MKDOCS(args) {
 const $INSTALL_LOCALLY = async (args) => {
   const argsObj: Models.dev.ReleaseOptions = require('minimist')(args.split(' '));
   argsObj.args = args;
-  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  const proj = Project.resolveChildProject(args);
   if (proj.isVscodeExtension) {
     await proj.vscodext.installLocaly(argsObj);
   }

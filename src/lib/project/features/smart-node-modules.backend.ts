@@ -1,11 +1,12 @@
 import { crossPlatformPath, _ } from 'tnp-core/src';
 import { path } from 'tnp-core/src'
 import chalk from 'chalk';
-import { FeatureForProject, Project } from '../abstract';
+import { Project } from '../abstract/project/project';
 import { config } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
 import { Models } from 'tnp-models/src';
 import { CLI } from 'tnp-cli/src';
+import { FeatureForProject } from '../abstract/feature-for-project';
 
 export type OverridePacakge = { [name: string]: string | null; };
 export type PackageType = Pick<Models.npm.Package, 'name' | 'version'>;
@@ -179,7 +180,7 @@ export class SmartNodeModules extends FeatureForProject {
           version: packageVersion
         });
         tempProj.npmPackages.installFromArgs('');
-        const Tnp = (Project.Tnp as Project);
+        const Tnp = (Project.Tnp);
         const toDedupe = Tnp.packageJson.data.tnp.core.dependencies.dedupe;
         toDedupe
           .filter(dedupePkgName => {

@@ -4,8 +4,7 @@ import { path } from 'tnp-core/src'
 import { _ } from 'tnp-core/src';
 import { PackagesRecognition } from '../../features/package-recognition/packages-recognition';
 //#endregion
-import type { Project } from './project';
-import { Project as $Project } from 'tnp-helpers/src';
+import { Project } from './project';
 import { Helpers } from 'tnp-helpers/src';
 import { config, ConfigModels } from 'tnp-config/src';
 
@@ -80,7 +79,7 @@ export abstract class FiredevProject {
     if (this.typeIsNot('isomorphic-lib')) {
       return false;
     }
-    return this.location === $Project.Tnp.location;
+    return this.location === Project.Tnp.location;
     //#endregion
   }
 
@@ -116,7 +115,7 @@ export abstract class FiredevProject {
         location = path.dirname(this.smartNodeModules.path);
       }
       if (this.isContainerCoreProjectTempProj) {
-        const origin = $Project.From(path.dirname(path.dirname(path.dirname(this.location)))) as Project;
+        const origin = Project.From(path.dirname(path.dirname(path.dirname(this.location)))) as Project;
         location = path.dirname(origin.smartNodeModules.path);
       }
 

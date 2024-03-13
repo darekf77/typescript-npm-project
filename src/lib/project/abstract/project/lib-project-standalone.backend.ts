@@ -236,7 +236,7 @@ export class LibProjectStandalone extends LibPorjectBase {
   //#region update core/special projects/container
   updateTnpAndCoreContainers(realCurrentProj: Project) {
     //#region @notForNpm
-    const tnpProj = Project.Tnp as Project;
+    const tnpProj = Project.Tnp;
 
     const updateLocalFiredevProjectWithOwnNodeModules = (config.frameworkName === 'tnp')
       && (realCurrentProj.name !== 'tnp')

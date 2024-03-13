@@ -9,7 +9,7 @@ import chalk from 'chalk';
 import { _ } from 'tnp-core/src';
 import { config } from 'tnp-config/src';
 import { Project } from './project';
-import { Helpers, Project as $Project } from 'tnp-helpers/src';
+import { Helpers } from 'tnp-helpers/src';
 import { CopyManager } from '../../features/copy-manager';
 
 import { CopyManagerStandalone } from '../../features/copy-manager/copy-manager-standalone.backend';
@@ -36,7 +36,7 @@ export abstract class BuildableProject {
 
   // @ts-ignore
   get trusted(this: Project): string[] {
-    const projTnp = Project.Tnp as Project;
+    const projTnp = Project.Tnp;
 
     let trusted = [];
     if (config.frameworkName === 'tnp') {
@@ -72,7 +72,7 @@ export abstract class BuildableProject {
 
   // @ts-ignore
   get trustedMaxMajorVersion(this: Project): number | undefined {
-    const projTnp = Project.Tnp as Project;
+    const projTnp = Project.Tnp;
 
     let trustedValue: number;
     if (config.frameworkName === 'tnp') {
@@ -101,7 +101,7 @@ export abstract class BuildableProject {
    */
   // @ts-ignore
   get additionalTrustedPackages(this: Project): string[] {
-    const projTnp = Project.Tnp as Project;
+    const projTnp = Project.Tnp;
 
     let trustedValue = [];
     if (config.frameworkName === 'tnp') {
@@ -211,7 +211,7 @@ export abstract class BuildableProject {
 
     if (config.frameworkName === 'tnp' && this.name !== 'tnp') {
       // tnp in tnp is not being used at all
-      independentProjects.push(Project.Tnp as Project)
+      independentProjects.push(Project.Tnp)
     }
 
     // @ts-ignore

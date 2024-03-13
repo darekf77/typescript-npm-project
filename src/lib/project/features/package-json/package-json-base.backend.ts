@@ -1,7 +1,7 @@
 import { path } from 'tnp-core/src'
 import * as semver from 'semver';
 
-import { Project } from '../../abstract';
+import { Project } from '../../abstract/project/project';
 import { Models } from 'tnp-models/src';
 import { Helpers } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
@@ -75,7 +75,7 @@ export class PackageJsonBase extends PackageJsonCore {
     }
 
     if (this.project.isStandaloneProject || this.project.isContainer) {
-      const tnp = (Project.Tnp as Project);
+      const tnp = (Project.Tnp);
       tnp.packageJson.prepareForSave(action, tnp);
     }
 

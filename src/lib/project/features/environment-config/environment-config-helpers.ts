@@ -7,7 +7,7 @@ import { fse } from 'tnp-core/src'
 import { config, ConfigModels } from 'tnp-config/src';
 import { Models } from 'tnp-models/src';
 import { Helpers } from 'tnp-helpers/src';
-import { Project } from '../../abstract';
+import { Project } from '../../abstract/project/project';
 import { config as schemaConfig } from './example-environment-config';
 import { walk } from 'lodash-walk-object/src';
 

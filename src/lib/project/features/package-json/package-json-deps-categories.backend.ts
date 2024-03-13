@@ -2,11 +2,12 @@ import { _ } from 'tnp-core/src';
 import * as JSON5 from 'json5';
 import * as inquirer from 'inquirer';
 
-import { FeatureForProject, Project } from '../../abstract';
+import { Project } from '../../abstract/project/project';
 import { getAndTravelCoreDeps } from './package-json-helpers.backend';
 import { Models } from 'tnp-models/src';
 import { Helpers } from 'tnp-helpers/src';
 import { ConfigModels, CoreLibCategoryArr } from 'tnp-config/src';
+import { FeatureForProject } from '../../abstract/feature-for-project';
 
 export type GetPkgType = { category: ConfigModels.CoreLibCategory; version: string; };
 
@@ -15,7 +16,7 @@ export class PackageJsonDepsCoreCategories extends FeatureForProject {
   protected s_onlyFor = 'onlyFor';
   protected s_common = 'common';
   private get all() {
-    return (Project.Tnp as Project).packageJson.data.tnp.core.dependencies;
+    return (Project.Tnp).packageJson.data.tnp.core.dependencies;
   }
 
   private for(libType: ConfigModels.LibType) {

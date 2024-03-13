@@ -3,10 +3,10 @@ import { crossPlatformPath, _ } from 'tnp-core/src';
 import { fse } from 'tnp-core/src'
 import { path } from 'tnp-core/src'
 import { config } from 'tnp-config/src';
-import { Project } from '../../abstract';
+import { Project } from '../../abstract/project/project';
 import { Models } from 'tnp-models/src';
 import { Helpers } from 'tnp-helpers/src';;
-import { FeatureCompilerForProject } from '../../abstract';
+import { FeatureCompilerForProject } from '../../abstract/feature-compiler-for-project.backend';
 import { CopyMangerHelpers } from './copy-manager-helpers.backend';
 import { IncCompiler } from 'incremental-compiler/src';
 import { Log } from 'ng2-logger/src';
@@ -83,8 +83,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
 
   //#region  getters / core container for project
   get coreContainerSmartNodeModulesProj() {
-    const tempCoreContainerPathForSmartNodeModules = Project
-      .From(crossPlatformPath(path.dirname(this.coreContainer.smartNodeModules.path))) as Project;
+    const tempCoreContainerPathForSmartNodeModules = Project.From(crossPlatformPath(path.dirname(this.coreContainer.smartNodeModules.path))) as Project;
     return tempCoreContainerPathForSmartNodeModules;
   }
   //#endregion

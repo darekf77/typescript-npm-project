@@ -3,7 +3,7 @@ import { _, crossPlatformPath } from 'tnp-core/src';
 import { fse } from 'tnp-core/src';
 import { path } from 'tnp-core/src';
 import { config } from 'tnp-config/src';
-import { Project } from '../../abstract';
+import { Project } from '../../abstract/project/project';
 import { Models } from 'tnp-models/src';
 import { Helpers } from 'tnp-helpers/src';;
 //#endregion
@@ -78,8 +78,8 @@ export namespace CopyMangerHelpers {
 
     // console.log(foldersToSkip)
 
-    const filter = override ? Helpers.filterOnlyCopy(sourceFolders, project)
-      : Helpers.filterDontCopy(foldersToSkip, project);
+    const filter = override ? Project.filterOnlyCopy(sourceFolders, project)
+      : Project.filterDontCopy(foldersToSkip, project);
 
     Helpers.copy(`${sourceLocation}/`, tempDestination, { filter, dereference: options.dereference });
 

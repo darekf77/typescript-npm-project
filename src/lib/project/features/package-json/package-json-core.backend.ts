@@ -8,7 +8,7 @@ import * as semver from 'semver';
 import chalk from 'chalk';
 
 import { config, ConfigModels } from 'tnp-config/src';
-import { Project } from '../../abstract';
+import { Project } from '../../abstract/project/project';
 import { Models } from 'tnp-models/src';
 import { Helpers } from 'tnp-helpers/src';
 //#endregion

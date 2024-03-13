@@ -268,7 +268,7 @@ export async function start(
     } else if (Array.isArray(argsv) && argsv.length >= 3) {
       Helpers.error(`\n${CLI.chalk.red('Not recognized arguments:')} ${CLI.chalk.bold(argsv.slice(2).join(' '))}\n`, false, true);
     } else {
-      const p = void 0; //(Project.Current as Project);
+      const p = void 0; //Project.Current;
 
       if (p) {
         // TODO console ui

@@ -62,8 +62,8 @@ async function askForWhenEmpty(): Promise<Project> {
 
 export async function $STRUCT(args: string, exit = true) {
   await askForWhenEmpty();
-  let proj = (Project.Current as Project);
-  proj = proj?.isSmartContainer ? proj : Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  let proj = Project.Current;
+  proj = proj?.isSmartContainer ? proj : Project.resolveChildProject(args);
 
   if (proj) {
     await proj.filesStructure.struct(args);
@@ -80,9 +80,9 @@ export async function STRUCTURE(args: string, exit = true) {
 
 export async function $INIT(args: string, exit = true) {
   await askForWhenEmpty();
-  let proj = (Project.Current as Project);
+  let proj = Project.Current;
 
-  proj = proj?.isSmartContainer ? proj : Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  proj = proj?.isSmartContainer ? proj : Project.resolveChildProject(args);
   if (proj) {
     await proj.filesStructure.init(args);
   }
@@ -91,7 +91,7 @@ export async function $INIT(args: string, exit = true) {
   }
 }
 export async function INIT_ALL(args: string, exit = true) {
-  const proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  const proj = Project.resolveChildProject(args);
   if (proj) {
     if (!args) {
       args = '';
@@ -107,10 +107,10 @@ export async function INIT_ALL(args: string, exit = true) {
 
 // export async function INIT_ALL(args: string, exit = true) {
 
-//   await (Project.Current as Project).filesStructure.init(args);
-//   if ((Project.Current as Project).isWorkspace || (Project.Current as Project).isContainer) {
-//     for (let index1 = 0; index1 < (Project.Current as Project).children.length; index1++) {
-//       const child1 = (Project.Current as Project).children[index1];
+//   await Project.Current.filesStructure.init(args);
+//   if (Project.Current.isWorkspace || Project.Current.isContainer) {
+//     for (let index1 = 0; index1 < Project.Current.children.length; index1++) {
+//       const child1 = Project.Current.children[index1];
 //       await child1.filesStructure.init(args);
 //       for (let index2 = 0; index2 < child1.children.length; index2++) {
 //         const child2 = child1.children[index2];
@@ -126,7 +126,7 @@ export async function INIT_ALL(args: string, exit = true) {
 // }
 
 export async function CLEAN(args: string, exit = true) {
-  const currentProj = (Project.Current as Project);
+  const currentProj = Project.Current;
 
   const clear = async (proj: Project) => {
     if (proj.isContainer) {
@@ -182,7 +182,7 @@ export const CLEAR = async (args, exit = true) => {
 }
 
 export async function CLEAN_ALL(args: string, exit = true) {
-  const proj = (Project.Current as Project);
+  const proj = Project.Current;
   if (proj.isSmartContainerChild) {
     await proj.parent.filesStructure.clear({ recrusive: true })
   } else {
@@ -197,7 +197,7 @@ export const CLEAR_ALL = CLEAN_ALL;
 
 
 export async function RESET(args: string, exit = true) {
-  await (Project.Current as Project).filesStructure.resetFromArgs(args)
+  await Project.Current.filesStructure.resetFromArgs(args)
   if (exit) {
     process.exit(0);
   }
@@ -205,7 +205,7 @@ export async function RESET(args: string, exit = true) {
 
 
 export async function RESET_ALL(args: string, exit = true) {
-  await (Project.Current as Project).filesStructure.reset({ recrusive: true })
+  await Project.Current.filesStructure.reset({ recrusive: true })
   if (exit) {
     process.exit(0);
   }
@@ -213,7 +213,7 @@ export async function RESET_ALL(args: string, exit = true) {
 
 
 function TEMPLATES_BUILDER() {
-  (Project.Current as Project).filesTemplatesBuilder.rebuild();
+  Project.Current.filesTemplatesBuilder.rebuild();
   process.exit(0)
 }
 

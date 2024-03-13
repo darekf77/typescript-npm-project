@@ -1,7 +1,7 @@
 //#region @backend
 import { _ } from 'tnp-core/src';
 import { path } from 'tnp-core/src'
-import { FeatureForProject } from '../../abstract';
+import { FeatureForProject } from '../../abstract/feature-for-project';
 import { child_process } from 'tnp-core/src';
 //#endregion
 

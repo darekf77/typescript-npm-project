@@ -1,8 +1,7 @@
 //#region @backend
 import { _, crossPlatformPath } from 'tnp-core/src';
 import { path } from 'tnp-core/src'
-import { FeatureForProject } from '../../abstract';
-import type { Project } from '../../abstract';
+import { FeatureForProject } from '../../abstract/feature-for-project';
 //#endregion
 
 import { config } from 'tnp-config/src';

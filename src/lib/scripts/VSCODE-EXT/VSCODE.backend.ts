@@ -25,21 +25,21 @@ function hidefilesfor(project: Project) {
 }
 
 export function $VSCODE_TEMP_SHOW(args: string, exit = true) {
-  showfilesfor((Project.Current as Project));
+  showfilesfor(Project.Current);
   if (exit) {
     process.exit(0);
   }
 }
 
 export function $VSCODE_TEMP_HIDE(args: string, exit = true) {
-  hidefilesfor((Project.Current as Project));
+  hidefilesfor(Project.Current);
   if (exit) {
     process.exit(0);
   }
 }
 
 export function $INIT_VSCODE() {
-  (Project.Current as Project).recreate.vscode.settings.hideOrShowFilesInVscode();
+  Project.Current.recreate.vscode.settings.hideOrShowFilesInVscode();
   process.exit(0);
 }
 
@@ -247,7 +247,7 @@ const $FILES_SHOW = (args, exit) => $VSCODE_TEMP_SHOW(args, exit);
 const $FILES_SHOW_ALL = (args, exit = true) => {
   let proj: Project;
 
-  proj = (Project.Current as Project);
+  proj = Project.Current;
 
   showfilesfor(proj);
   exit && process.exit(0);
@@ -256,7 +256,7 @@ const $FILES_SHOW_ALL = (args, exit = true) => {
 const $FILES_HIDE_ALL = (args, exit = true) => {
   let proj: Project;
 
-  proj = (Project.Current as Project);
+  proj = Project.Current;
 
   hidefilesfor(proj);
   exit && process.exit(0);

@@ -8,7 +8,7 @@ import {
   saveConfigWorkspca as saveEnvironmentConfig,
   standaloneConfigBy
 } from './environment-config-helpers';
-import { FeatureForProject } from '../../abstract';
+import { FeatureForProject } from '../../abstract/feature-for-project';
 //#endregion
 import { Helpers } from 'tnp-helpers/src';
 import { config, ConfigModels } from 'tnp-config/src';

@@ -86,7 +86,7 @@ export abstract class DependencyProject {
     // console.log('allProjectToConsider', allProjectToConsider.map(c => c.genericName).join('\n'))
 
     const result = projects.map(proj => {
-      let copyto = Helpers.deps.recrusiveFind(proj, allProjectToConsider);
+      let copyto = Project.recrusiveFind(proj, allProjectToConsider);
       // proj.name.startsWith('tnp') && Helpers.log(`copyto for ${proj.genericName}
 
       // ${copyto.sort().map(c => c.name).join('\n')}
@@ -98,7 +98,7 @@ export abstract class DependencyProject {
       return { project: proj, copyto }
     });
     // process.exit(0)
-    return Helpers.deps.sort(result);
+    return Project.sort(result);
   }
 
   projectsInOrderForBuild(this: Project, buildAppsForProjects: boolean): ProjectBuild[] {

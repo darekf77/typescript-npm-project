@@ -41,7 +41,7 @@ async function copyModuleto(args: string) {
 
 function copyToDestination(destLocaiton) {
 
-  const currentLib = (Project.Current as Project);
+  const currentLib = Project.Current;
   const destination = Project.From<Project>(destLocaiton);
   if (!destination) {
     Helpers.error(`Incorect project in: ${destLocaiton}`)
@@ -170,11 +170,11 @@ const $REINSTALL = async (args) => {
 //#region deps
 export async function $DEPS_SET_CATEGORY(args: string, exit = true) {
   let argumn: string[] = (args.trim() === '' ? [] : args.split(' ')) as any;
-  process.chdir((Project.Tnp as Project).location);
+  process.chdir((Project.Tnp).location);
   const packages = resolvePacakgesFromArgs(argumn);
   for (let index = 0; index < packages.length; index++) {
     const pkg = packages[index];
-    await (Project.Tnp as Project).packageJson.setCategoryFor(pkg);
+    await (Project.Tnp).packageJson.setCategoryFor(pkg);
   }
   if (exit) {
     process.exit(0);
@@ -193,7 +193,7 @@ export async function $DEPS_UPDATE_FROM(args: string, exit = true) {
         return path.resolve(path.join(process.cwd(), l));
       });
   }
-  (Project.Current as Project).packageJson.updateFrom(locations);
+  Project.Current.packageJson.updateFrom(locations);
 
   if (exit) {
     process.exit(0);
@@ -202,7 +202,7 @@ export async function $DEPS_UPDATE_FROM(args: string, exit = true) {
 
 function DEPS_SHOW_IF_STANDALONE(args: string) {
   Helpers.log(`Hook update start`)
-  const proj = (Project.Current as Project);
+  const proj = Project.Current;
   if (proj.isStandaloneProject) {
     Helpers.info(`Showing deps for standalone project`);
     proj.packageJson.save('is standalone show')
@@ -218,7 +218,7 @@ function $DEPS_CLEAN(args: string) {
 
 
 export async function $RESET_NPM(args: string, exit = true) {
-  await (Project.Current as Project).packageJson.reset();
+  await Project.Current.packageJson.reset();
   if (exit) {
     process.exit(0);
   }
@@ -226,7 +226,7 @@ export async function $RESET_NPM(args: string, exit = true) {
 
 
 function DEPS_SHOW(args: string) {
-  (Project.Current as Project).packageJson.showDeps('deps show')
+  Project.Current.packageJson.showDeps('deps show')
   process.exit(0)
 }
 
@@ -238,10 +238,10 @@ const SHOW = (args) => {
 };
 
 function DEPS_HIDE(args: string) {
-  if ((Project.Current as Project).isCoreProject) {
-    (Project.Current as Project).packageJson.showDeps('deps show')
+  if (Project.Current.isCoreProject) {
+    Project.Current.packageJson.showDeps('deps show')
   } else {
-    (Project.Current as Project).packageJson.hideDeps('deps hide')
+    Project.Current.packageJson.hideDeps('deps hide')
   }
   process.exit(0)
 }
@@ -274,22 +274,22 @@ function $DEPS_RESET(args) {
 
 
 function $DEDUPE(args: string) {
-  (Project.Current as Project).node_modules.dedupe(args.trim() === '' ? void 0 : args.split(' '))
+  Project.Current.node_modules.dedupe(args.trim() === '' ? void 0 : args.split(' '))
   process.exit(0)
 }
 
 function $DEDUPE_COUNT(args: string) {
-  (Project.Current as Project).node_modules.dedupeCount(args.trim() === '' ? void 0 : args.split(' '))
+  Project.Current.node_modules.dedupeCount(args.trim() === '' ? void 0 : args.split(' '))
   process.exit(0)
 }
 
 function $DEDUPE_CHECK(args: string) {
-  (Project.Current as Project).node_modules.dedupeCount(args.trim() === '' ? void 0 : args.split(' '))
+  Project.Current.node_modules.dedupeCount(args.trim() === '' ? void 0 : args.split(' '))
   process.exit(0)
 }
 
 function $DEPS_DEDUPE(args: string) {
-  (Project.Current as Project).node_modules.dedupe()
+  Project.Current.node_modules.dedupe()
   process.exit(0)
 }
 
@@ -341,7 +341,7 @@ async function $LN(args: string) {
 //#region global link
 
 async function $LINK() {
-  let project = (Project.Current as Project);
+  let project = Project.Current;
 
   if (project.isStandaloneProject) {
     // if (process.platform !== 'win32') {

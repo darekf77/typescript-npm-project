@@ -14,7 +14,7 @@ import { MagicRenamer } from 'magic-renamer/src';
  * TODO
  */
 export async function RM(args: string, exit = true) {
-  const proj = (Project.Current as Project);
+  const proj = Project.Current;
   if (proj.isContainer) {
     const levels = args.replace(/\\/g, '/').replace(/\/$/, '').split('/');
     const appNameToRemove = levels.pop();

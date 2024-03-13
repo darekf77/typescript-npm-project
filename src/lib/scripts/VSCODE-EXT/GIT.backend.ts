@@ -12,16 +12,16 @@ export type TAction = 'clone' | 'pull';
 const USE_HTTPS_INSTEAD_SSH = !os.hostname().endsWith('.local'); // TODO
 
 function $GIT_REMOVE_UNTRACKED() {
-  const gitginoredfiles = (Project.Current as Project).recreate.filesIgnoredBy.gitignore
+  const gitginoredfiles = Project.Current.recreate.filesIgnoredBy.gitignore
     .filter(f => !(f === config.folder.node_modules)) // link/unlink takes care of node_modules
   gitginoredfiles.forEach(f => {
-    const p = path.join((Project.Current as Project).location, f);
+    const p = path.join(Project.Current.location, f);
     if (fse.existsSync(p)) {
       try {
         if (fse.statSync(p).isDirectory()) {
-          (Project.Current as Project).run(`git rm -rf ${f}`).sync()
+          Project.Current.run(`git rm -rf ${f}`).sync()
         } else {
-          (Project.Current as Project).run(`git rm ${f}`).sync()
+          Project.Current.run(`git rm ${f}`).sync()
         }
       } catch (error) {
         console.log(error)
@@ -33,15 +33,15 @@ function $GIT_REMOVE_UNTRACKED() {
 }
 
 export async function $GIT_QUICK_COMMIT_AND_PUSH(args, exit = true) {
-  if ((Project.Current as Project).git.isGitRepo) {
+  if (Project.Current.git.isGitRepo) {
     global.tnpNonInteractive && PROGRESS_DATA.log({ msg: `Quick push start` })
     try {
-      (Project.Current as Project).run(`git add --all . && git commit -m "update"`).sync();
+      Project.Current.run(`git add --all . && git commit -m "update"`).sync();
       global.tnpNonInteractive && PROGRESS_DATA.log({ msg: `Adding and Commit Success` })
     } catch (e) {
       Helpers.warn(`Error adding/commiting git ${e}`, false);
     }
-    await (Project.Current as Project).git.pushCurrentBranch();
+    await Project.Current.git.pushCurrentBranch();
     global.tnpNonInteractive && PROGRESS_DATA.log({ msg: `Pushing to repository success` })
   } else {
     Helpers.warn(`This is not a git repo: ${process.cwd()}`, false)
@@ -50,11 +50,11 @@ export async function $GIT_QUICK_COMMIT_AND_PUSH(args, exit = true) {
 }
 
 export function $GIT_QUICK_RESET_HARD_AND_PULL(args, exit = true) {
-  if ((Project.Current as Project).git.isGitRepo) {
+  if (Project.Current.git.isGitRepo) {
     try {
-      (Project.Current as Project).run(`git reset --hard`).sync();
+      Project.Current.run(`git reset --hard`).sync();
     } catch (error) { }
-    (Project.Current as Project).git.pullCurrentBranch();
+    Project.Current.git.pullCurrentBranch();
   } else {
     Helpers.error(`Not able to pull and reset hard: ${process.cwd()}`);
   }
@@ -69,28 +69,28 @@ const $GIT_REMOVE_UNTRACKED_EVERYWHERE = () => {
 }
 
 export async function $PUSH(comitMessage: string, exit = true, force = false) {
-  await (Project.Current as Project).gitActions.push(comitMessage, force);
+  await Project.Current.gitActions.push(comitMessage, force);
   process.exit(0);
 }
 
 export async function $PUSH_ALL(comitMessage: string, exit = true, force = false) {
-  await (Project.Current as Project).gitActions.pushAll(comitMessage, force);
+  await Project.Current.gitActions.pushAll(comitMessage, force);
   process.exit(0);
 }
 
 
 export async function $FORCE_PUSH(comitMessage: string, exit = true, force = false) {
-  await (Project.Current as Project).gitActions.push(comitMessage, true);
+  await Project.Current.gitActions.push(comitMessage, true);
   process.exit(0);
 }
 
 export async function $PULL(args: string, exit = true) {
-  await (Project.Current as Project).gitActions.pull();
+  await Project.Current.gitActions.pull();
   process.exit(0);
 }
 
 export async function $CLEAR_PULL(args: string, exit = true) {
-  await (Project.Current as Project).gitActions.pull(true);
+  await Project.Current.gitActions.pull(true);
   process.exit(0);
 }
 
@@ -99,7 +99,7 @@ export async function $CLONE(args: string, exit = true) {
   const argsss = args.split(' ');
   const url = argsss.shift();
   const newName = argsss.shift()
-  await (Project.Current as Project).git.clone(url, newName);
+  await Project.Current.git.clone(url, newName);
   process.exit(0);
 }
 
@@ -228,7 +228,7 @@ function $LAST_TAG() {
 
 async function INFO_ANGULAR_VERS_TAGS() {
   const ngVer = Project.angularMajorVersionForCurrentCli();
-  const lastTagForVer = (Project.Current as Project).git.lastTagNameForMajorVersion(ngVer);
+  const lastTagForVer = Project.Current.git.lastTagNameForMajorVersion(ngVer);
   console.log({
     ngVer,
     lastTagForVer

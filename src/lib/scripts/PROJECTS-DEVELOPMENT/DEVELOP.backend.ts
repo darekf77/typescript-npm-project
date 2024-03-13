@@ -64,7 +64,7 @@ async function $SYNC_TO(args) {
     // });
 
     // args = commandString;
-    // const currentProj = (Project.Current as Project);
+    // const currentProj = Project.Current;
     // const toSync = [
     //   ...(currentProj.typeIsNot('unknow', 'unknow-npm-project') ? [config.folder.src] : []),
     // ];
@@ -117,7 +117,7 @@ function $SYNC_FROM(args) {
   // });
 
   // args = commandString;
-  // const currentProj = (Project.Current as Project);
+  // const currentProj = Project.Current;
   // const toSync = [
   //   ...(currentProj.typeIs('angular-lib') ? [config.folder.components] : []),
   //   ...(currentProj.typeIsNot('unknow', 'unknow-npm-project') ? [config.folder.src] : []),
@@ -268,7 +268,7 @@ export async function $INFO(args: string) {
 
   //   `)
   // } else {
-  let proj = Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  let proj = Project.resolveChildProject(args);
   // console.clear()
   console.info(`
 
@@ -348,7 +348,7 @@ based on ${githubUrl}
 
 //#region target proj update
 async function $TARGET_PROJ_UPDATE() {
-  (Project.Current as Project).targetProjects.update();
+  Project.Current.targetProjects.update();
   process.exit(0)
 }
 //#endregion

@@ -7,9 +7,10 @@ import { path } from 'tnp-core/src';
 import { config } from 'tnp-config/src';
 import { Models, PROGRESS_DATA } from 'tnp-models/src';
 import { os } from 'tnp-core/src';
-import { FeatureForProject, Project } from '../abstract';
+import {  Project } from '../abstract/project/project';
 import * as dateformat from 'dateformat';
 import { html2md } from './html-to-md';
+import { FeatureForProject } from '../abstract/feature-for-project';
 //#endregion
 
 // const USE_HTTPS_INSTEAD_SSH = !os.hostname().endsWith('.local'); // TODO

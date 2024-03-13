@@ -89,7 +89,7 @@ const $RELEASE = async (args: string) => {
   const lastReleaseProjFilePath = path.join(proj.location, 'tmp-last-released-proj')
   const lastReleaseProjContent = void 0; //  Helpers.readFile(lastReleaseProjFilePath); TODO QUICK_FIX
   const lastRelased = !!lastReleaseProjContent && Project.From(path.join(proj.location, lastReleaseProjContent))
-  //  Helpers.cliTool.resolveChildProject(args, Project.Current) as Project;
+  //  Project.resolveChildProject(args);
   // Helpers.info(`
   // lastReleaseProjFilePath: ${lastReleaseProjFilePath}
   // lastRelased: ${lastRelased?.name}
@@ -178,7 +178,7 @@ ${proj.children.map((c) => ` - @${proj.name}/${c.name} v${newVersion}`).join('\n
 
     const depsOnlyToPush = [];
 
-    const allTrusted = (Project.Current as Project).trusted;
+    const allTrusted = Project.Current.trusted;
 
     //#region filter children
     for (let index = 0; index < deps.length; index++) {
@@ -366,7 +366,7 @@ processing...
 
       proj.git.commit(`Up4date after release`);
       await proj.gitActions.push();
-      const tnpProj = (Project.Tnp as Project);
+      const tnpProj = (Project.Tnp);
       tnpProj.git.commit(`Update after release`);
       await tnpProj.gitActions.push();
       Helpers.success(`
@@ -473,7 +473,7 @@ const SET_MAJOR_VER = async (args: string) => {
     }
   }
 
-  // const all = (Project.Current as Project).trustedAllPossible;
+  // const all = Project.Current.trustedAllPossible;
   // // console.log({
   // //   all
   // // })
@@ -529,7 +529,7 @@ const $RELEASE_OBSCURED = async (args) => {
   argsObj.uglify = true;
   argsObj.prod = true;
   argsObj.args = args;
-  const proj = (Project.Current as Project);
+  const proj = Project.Current;
   proj.checkIfReadyForNpm();
   proj.packageJson.showDeps('Release');
   await proj.release(argsObj);

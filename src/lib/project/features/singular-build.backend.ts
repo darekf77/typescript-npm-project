@@ -1,7 +1,7 @@
 //#region imports
 import { crossPlatformPath, _ } from 'tnp-core/src';
 import { path } from 'tnp-core/src'
-import { FeatureForProject, Project } from '../abstract';
+import { Project } from '../abstract/project/project';
 import { appRelatedFiles, config } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
 import { Models } from 'tnp-models/src';
@@ -11,6 +11,7 @@ import { argsToClear } from '../../constants';
 import { COMPILER_POOLING, IncrementalWatcherInstance, incrementalWatcher } from 'incremental-compiler/src';
 import { CLI } from 'tnp-cli/src';
 import { recreateApp } from './inside-structures/structs/inside-struct-helpers';
+import { FeatureForProject } from '../abstract/feature-for-project';
 
 //#endregion
 

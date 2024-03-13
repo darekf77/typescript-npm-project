@@ -5,11 +5,11 @@ import * as JSON5 from 'json5';
 import { glob } from 'tnp-core/src';
 import { _ } from 'tnp-core/src';
 // local
-import { Project } from '../../abstract';
+import { Project } from '../../abstract/project/project';
 import { Models } from 'tnp-models/src';
 import { Helpers } from 'tnp-helpers/src';
 import { config, ConfigModels } from 'tnp-config/src';
-import { FeatureForProject } from '../../abstract';
+import { FeatureForProject } from '../../abstract/feature-for-project';
 import { CLI } from 'tnp-cli/src';
 
 
@@ -96,6 +96,7 @@ export class FilesRecreator extends FeatureForProject {
           config.folder.node_modules,
           'tmp*',
           'dist*',
+          'bundle*',
           'browser',
           'browser*',
           'websql',

@@ -5,7 +5,7 @@ import { path } from 'tnp-core/src';
 import { _ } from 'tnp-core/src';
 import { config, ConfigModels } from 'tnp-config/src';
 import { Project } from './project';
-import { Helpers, Project as $Project } from 'tnp-helpers/src';
+import { Helpers } from 'tnp-helpers/src';
 import { Models } from 'tnp-models/src';
 import { MESSAGES } from '../../../constants';
 const forStandAloneSrc = `${config.folder.src}-for-standalone`;
@@ -22,7 +22,7 @@ export abstract class FolderProject {
       .sort()
       .map(f => {
         const p = path.join(this.location, f);
-        const proj = $Project.From(p) as Project;
+        const proj = Project.From(p);
         return proj;
       })
       .filter(f => !!f)
@@ -137,7 +137,7 @@ export abstract class FolderProject {
     let res = subdirectories
       .map(dir => {
         // console.log('child:', dir)
-        return $Project.From<Project>(dir);
+        return Project.From<Project>(dir);
       })
       .filter(c => !!c)
 
@@ -209,7 +209,7 @@ export abstract class FolderProject {
     if (!_.isString(this.location) || this.location.trim() === '') {
       return void 0;
     }
-    const parent = $Project.From<Project>(path.join(this.location, '..'));
+    const parent = Project.From<Project>(path.join(this.location, '..'));
     // if (parent && parent.isWorkspaceChildProject && this.isWorkspaceChildProject) { // QUICK_FIX for temporary projects
     //   return parent.parent;
     // }
@@ -226,7 +226,7 @@ export abstract class FolderProject {
     if (!_.isString(this.location) || this.location.trim() === '') {
       return void 0;
     }
-    const grandpa = $Project.From<Project>(path.join(this.location, '..', '..'));
+    const grandpa = Project.From<Project>(path.join(this.location, '..', '..'));
     return grandpa;
     //#endregion
   }

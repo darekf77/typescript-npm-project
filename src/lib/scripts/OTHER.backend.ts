@@ -36,7 +36,7 @@ function INSTALL_ENV() {
 
 
 function recreate() {
-  (Project.Current as Project).recreate.gitignore();
+  Project.Current.recreate.gitignore();
   process.exit(0)
 
 }
@@ -66,7 +66,7 @@ async function version() {
   // Helpers.sleep(5);
   // global.spinner?.stop();
   // log.data('Hellleoeoeo')
-  const tnp = (Project.Tnp as Project);
+  const tnp = (Project.Tnp);
   const firedev = Project.From([fse.realpathSync(path.dirname(tnp.location)), config.frameworkNames.firedev]);
   Helpers.success(`
 
@@ -108,13 +108,13 @@ function $COMMAND(args) {
 
 
 function NPM_FIXES() {
-  console.log((Project.Current as Project).node_modules.fixesForNodeModulesPackages)
+  console.log(Project.Current.node_modules.fixesForNodeModulesPackages)
   process.exit(0)
 }
 
 
 function CIRCURAL_CHECK() {
-  (Project.Current as Project).run(`madge --circular --extensions ts ./src`).sync()
+  Project.Current.run(`madge --circular --extensions ts ./src`).sync()
   process.exit(0)
 }
 
@@ -152,24 +152,24 @@ async function $VERSIONS() {
 
 
 async function $TRUSTED() {
-  const all = (Project.Current as Project).trusted;
+  const all = Project.Current.trusted;
   console.log(all.join('\n'))
   process.exit(0)
 }
 
 async function $TRUSTED_MAX() {
-  const all = (Project.Current as Project).trustedMaxMajorVersion;
+  const all = Project.Current.trustedMaxMajorVersion;
   console.log(all);
   process.exit(0)
 }
 
 const PATH = () => {
-  console.log((Project.Tnp as Project).location);
+  console.log((Project.Tnp).location);
   process.exit(0)
 };
 
 const COPY_RESOURCES = () => {
-  const proj = (Project.Current as Project);
+  const proj = Project.Current;
   proj.checkIfReadyForNpm();
   if (proj.isStandaloneProject) {
     const distReleaseFolder = path.join(proj.location, config.folder.dist);

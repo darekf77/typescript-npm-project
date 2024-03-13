@@ -5,7 +5,7 @@ import { fse } from 'tnp-core/src'
 import { path } from 'tnp-core/src'
 import { glob } from 'tnp-core/src';
 
-import { FeatureForProject, Project } from '../../abstract';
+import { Project } from '../../abstract/project/project';
 import { BuildOptions } from 'tnp-db/src';
 import { Models } from 'tnp-models/src';
 import { config, ConfigModels } from 'tnp-config/src';
@@ -17,6 +17,7 @@ import { Morphi as Firedev } from 'morphi/src';
 import { BuildProcess, BuildProcessController } from './app/build-process';
 import { CLI } from 'tnp-cli/src';
 import { DEFAULT_PORT, PortUtils, tmpBuildPort } from '../../../constants';
+import { FeatureForProject } from '../../abstract/feature-for-project';
 // import { FiredevBinaryFile, FiredevBinaryFileController, FiredevFile, FiredevFileController, FiredevFileCss } from 'firedev-ui';
 
 const log = Log.create(__filename)

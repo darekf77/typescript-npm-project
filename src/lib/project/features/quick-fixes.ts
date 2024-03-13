@@ -3,7 +3,8 @@ import { path, _ } from 'tnp-core/src'
 import { fse, rimraf } from 'tnp-core/src'
 import { glob, crossPlatformPath } from 'tnp-core/src';
 import chalk from 'chalk';
-import { FeatureForProject, Project } from '../abstract';
+import { Project } from '../abstract/project/project';
+import { FeatureForProject } from '../abstract/feature-for-project';
 import { Helpers } from 'tnp-helpers/src';
 import { config, ConfigModels } from 'tnp-config/src';
 import { Models } from 'tnp-models/src';

@@ -93,12 +93,12 @@ async function testSelectors(watch: boolean, debug: boolean, args: string) {
 }
 
 async function mochaTests(watch: boolean, debug: boolean, args: string) {
-  const proj = (Project.Current as Project);
+  const proj = Project.Current;
   await proj.filesStructure.init(args);
   if (watch) {
-    await (Project.Current as Project).tests.startAndWatch(args.trim().split(' '), debug)
+    await Project.Current.tests.startAndWatch(args.trim().split(' '), debug)
   } else {
-    await (Project.Current as Project).tests.start(args.trim().split(' '), debug)
+    await Project.Current.tests.start(args.trim().split(' '), debug)
   }
   if (!watch) {
     process.exit(0)
@@ -107,7 +107,7 @@ async function mochaTests(watch: boolean, debug: boolean, args: string) {
 
 
 async function jestTests(watch: boolean, debug: boolean, args: string) {
-  const proj = (Project.Current as Project);
+  const proj = Project.Current;
   await proj.filesStructure.init(args);
   if (watch) {
     await proj.testsJest.startAndWatch(debug, args.trim())
@@ -121,7 +121,7 @@ async function jestTests(watch: boolean, debug: boolean, args: string) {
 
 
 async function cypressTests(watch: boolean, debug: boolean, args: string) {
-  const proj = (Project.Current as Project);
+  const proj = Project.Current;
   await proj.filesStructure.init(args);
   if (watch) {
     await proj.testsCypress.startAndWatch(args.trim().split(' '), debug)

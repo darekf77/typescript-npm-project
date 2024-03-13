@@ -6,9 +6,9 @@ import chalk from 'chalk';
 import * as semver from 'semver';
 //#endregion
 
-import type { Project } from './project';
+import { Project } from './project';
 import { Models } from 'tnp-models/src';
-import { Helpers, Project as $Project } from 'tnp-helpers/src';
+import { Helpers } from 'tnp-helpers/src';
 import { config, ConfigModels } from 'tnp-config/src';
 
 export class NpmProject {
@@ -233,7 +233,7 @@ export class NpmProject {
       return this.browser.preview as any;
     }
     //#region @backend
-    return _.isString(this.location) && $Project.From<Project>(path.join(this.location, 'preview'));
+    return _.isString(this.location) && Project.From<Project>(path.join(this.location, 'preview'));
     //#endregion
   }
 
@@ -436,7 +436,7 @@ export class NpmProject {
     return this.getDepsAsPackage(type).map(packageObj => {
       let p = path.join(contextFolder ? contextFolder : this.location, config.folder.node_modules, packageObj.name);
       if (fse.existsSync(p)) {
-        const project = $Project.From<Project>(p);
+        const project = Project.From<Project>(p);
         return project;
       }
       // warn(`Dependency '${packageObj.name}' doen't exist in ${p}`)
@@ -526,7 +526,7 @@ export class NpmProject {
     }
     return this.isomorphicPackages.map(c => {
       const p = path.join(this.location, config.folder.node_modules, c);
-      return $Project.From<Project>(p);
+      return Project.From<Project>(p);
     }).filter(f => !!f);
     //#endregion
   }

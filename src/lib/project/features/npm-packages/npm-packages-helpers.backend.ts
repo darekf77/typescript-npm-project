@@ -4,7 +4,7 @@ import { path } from 'tnp-core/src';
 import { fse } from 'tnp-core/src';
 import { _, moment } from 'tnp-core/src';
 
-import { Project } from '../../abstract';
+import { Project } from '../../abstract/project/project';
 import { Helpers } from 'tnp-helpers/src';
 import { Models } from 'tnp-models/src';
 import { config } from 'tnp-config/src';

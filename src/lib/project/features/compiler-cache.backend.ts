@@ -1,5 +1,5 @@
 import { _ } from 'tnp-core/src';
-import { FeatureForProject } from '../abstract';
+import { FeatureForProject } from '../abstract/feature-for-project';
 
 export class CompilerCache extends FeatureForProject {
   get isWatchModeAllowed() {

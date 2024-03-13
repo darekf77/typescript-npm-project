@@ -3,7 +3,7 @@ import { crossPlatformPath, os, _ } from 'tnp-core/src';
 import * as JSON5 from 'json5';
 import chalk from 'chalk';
 import * as semver from 'semver';
-import { Project } from '../../abstract';
+import { Project } from '../../abstract/project/project';
 import { Models } from 'tnp-models/src';
 import { Helpers } from 'tnp-helpers/src';
 import { config, ConfigModels } from 'tnp-config/src';
@@ -60,7 +60,7 @@ function resovleNewDepsAndOverrideForProject(project: Project) {
     project.packageJson.data.tnp.overrided.dependencies : {};
 
   let parentOverride = {};
-  const orgNewDeps = _.cloneDeep((Project.Tnp as Project).packageJson.data.dependencies);
+  const orgNewDeps = _.cloneDeep((Project.Tnp).packageJson.data.dependencies);
   let newDepsForProject = {};
 
 
@@ -163,7 +163,7 @@ function overrideInfo(deps: { orginalDependencies: any; orginalDevDependencies: 
             }
           }
           if (!versionFrom && _.isString(versionTo)) {
-            // if (!(Project.Tnp as Project).packageJson.data.tnp.core.dependencies.asDevDependencies.includes(oldDepName)) {
+            // if (!(Project.Tnp).packageJson.data.tnp.core.dependencies.asDevDependencies.includes(oldDepName)) {
             overrideMsg = `Added new package "${oldDepName}@${versionTo}"`;
             // }
           }
@@ -187,7 +187,7 @@ function overrideInfo(deps: { orginalDependencies: any; orginalDevDependencies: 
 
 //#region remove deps by type
 function removeDepsByType(deps: object, libType: ConfigModels.LibType) {
-  const depsByType = (Project.Tnp as Project).packageJson.data.tnp.core.dependencies.onlyFor[libType];
+  const depsByType = (Project.Tnp).packageJson.data.tnp.core.dependencies.onlyFor[libType];
   const names = depsByType ? Object.keys(depsByType) : [];
   names.forEach(key => {
     delete deps[key];
@@ -333,7 +333,7 @@ export function getAndTravelCoreDeps(options?: {
 
 //#region deps filters
 function filterDevDepOnly(project: Project, deps: Models.npm.DependenciesFromPackageJsonStyle) {
-  const devDeps = (Project.Tnp as Project).packageJson.data.tnp.core.dependencies.asDevDependencies;
+  const devDeps = (Project.Tnp).packageJson.data.tnp.core.dependencies.asDevDependencies;
   let onlyAsDevAllowed = (project.packageJson.data.tnp &&
     project.packageJson.data.tnp.overrided &&
     project.packageJson.data.tnp.overrided.includeAsDev) || [];
@@ -360,7 +360,7 @@ function filterDevDepOnly(project: Project, deps: Models.npm.DependenciesFromPac
 }
 
 function filterDepOnly(project: Project, deps: Models.npm.DependenciesFromPackageJsonStyle) {
-  const devDeps = (Project.Tnp as Project).packageJson.data.tnp.core.dependencies.asDevDependencies;
+  const devDeps = (Project.Tnp).packageJson.data.tnp.core.dependencies.asDevDependencies;
   let onlyAsDevAllowed = (project.packageJson.data.tnp.overrided.includeAsDev) || [];
 
   // log('d2evDeps', devDeps)
@@ -396,7 +396,7 @@ function cleanForIncludeOnly(project: Project, deps: Models.npm.DependenciesFrom
 
     let onlyAllowed = project.packageJson.data.tnp.overrided.includeOnly;
 
-    onlyAllowed = onlyAllowed.concat((Project.Tnp as Project).packageJson.data.tnp.core.dependencies.always);
+    onlyAllowed = onlyAllowed.concat((Project.Tnp).packageJson.data.tnp.core.dependencies.always);
 
     Object.keys(deps).forEach(depName => {
       if (!onlyAllowed.includes(depName)) {

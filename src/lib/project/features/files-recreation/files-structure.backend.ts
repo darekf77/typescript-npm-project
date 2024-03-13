@@ -4,13 +4,14 @@ import chalk from 'chalk';
 import { fse } from 'tnp-core/src'
 
 import { Helpers } from 'tnp-helpers/src';
-import { FeatureForProject, Project } from '../../abstract';
+import { Project } from '../../abstract/project/project';
 import { config } from 'tnp-config/src';
 import { ProjectFactory } from '../../../scripts/NEW-PROJECT_FILES_MODULES';
 import { PROGRESS_DATA } from 'tnp-models/src';
 import { Models } from 'tnp-models/src';
 import { EnvironmentConfig } from '../environment-config';
 import { argsToClear } from '../../../constants';
+import { FeatureForProject } from '../../abstract/feature-for-project';
 
 export type CleanType = 'all' | 'only_static_generated';
 export type InitOptions = {

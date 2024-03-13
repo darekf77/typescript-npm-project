@@ -7,10 +7,9 @@ import { CLI } from 'tnp-cli/src';
 import * as TerminalProgressBar from 'progress';
 
 import { PREFIXES, config } from 'tnp-config/src';
-import { Project } from '../../abstract';
+import { Project } from '../../abstract/project/project';
 import { Models } from 'tnp-models/src';
 import { Helpers } from 'tnp-helpers/src';
-import { FeatureForProject } from '../../abstract';
 import {
   dedupePackages, nodeModulesExists, addDependenceis
 } from './node-modules-helpers.backend';

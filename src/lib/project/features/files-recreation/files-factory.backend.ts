@@ -1,4 +1,4 @@
-import { FeatureForProject } from '../../abstract';
+import { FeatureForProject } from '../../abstract/feature-for-project';
 import { fse } from 'tnp-core/src'
 import { path } from 'tnp-core/src'
 import { _ } from 'tnp-core/src';
@@ -47,7 +47,7 @@ export class FilesFactory extends FeatureForProject {
     const fileNameWithoutExt = _.upperCase(_.kebabCase(name).replace(/\-/g, '_')).replace(/\s/g, '_');
     this.create(relativePath, kebebCaseName, `${fileNameWithoutExt}.ts`)
       .file(
-      `
+        `
 import { Morphi } from 'morphi/src';
 
 export interface I${fileNameWithoutExt} {
@@ -86,7 +86,7 @@ export class ${fileNameWithoutExt} extends Morphi.Base.Entity<${fileNameWithoutE
     const NameController = `${camelCaseUpperFirst}Controller`;
     this.create(relativePath, kebebCaseName, `${NameController}.ts`)
       .file(
-      `
+        `
 import { Morphi } from 'morphi/src';
 import { ${fileNameWithoutExt} } from './${fileNameWithoutExt}';
 

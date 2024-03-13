@@ -4,7 +4,7 @@ import { _ } from 'tnp-core/src';
 import { CLI } from 'tnp-cli/src';
 import { glob } from 'tnp-core/src';
 
-import { Project } from '../../abstract';
+import { Project } from '../../abstract/project/project';
 import { Models } from 'tnp-models/src';
 import { Helpers } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
@@ -12,7 +12,7 @@ import { config } from 'tnp-config/src';
 //#region dedupe packages
 export function dedupePackages(projectLocation: string, packagesNames?: string[], countOnly = false, warnings = true) {
   Helpers.taskStarted(`${countOnly ? 'Counting' : 'Fixing/removing'} duplicates ${path.basename(projectLocation)}/node_modules`)
-  // console.log('(Project.Tnp as Project).packageJson.data.tnp.core.dependencies.dedupe;',(Project.Tnp as Project).packageJson.data.tnp.core.dependencies.dedupe)
+  // console.log('(Project.Tnp).packageJson.data.tnp.core.dependencies.dedupe;',(Project.Tnp).packageJson.data.tnp.core.dependencies.dedupe)
   // console.log('packages to dedupe', packagesNames)
   // process.exit(0)
 

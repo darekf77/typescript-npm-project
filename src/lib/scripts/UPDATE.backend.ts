@@ -6,7 +6,7 @@ import { Project } from '../project/abstract/project';
 import { PackagesRecognition } from '../project/features/package-recognition/packages-recognition';
 
 function $UPDATE_ISOMORPHIC() {
-  PackagesRecognition.fromProject((Project.Current as Project)).start(true, '[update process]');
+  PackagesRecognition.fromProject(Project.Current).start(true, '[update process]');
   process.exit(0)
 }
 
@@ -122,9 +122,9 @@ async function $AUTOUPDATE(args: string) {
   }
   if (config.frameworkName === 'tnp') {
     Helpers.taskStarted('Removing old node_modules..');
-    const nm = (Project.Tnp as Project).node_modules.path;
-    const nm2 = (Project.Tnp as Project).pathFor(`tmp-${config.folder.node_modules}2`)
-    const nm1 = (Project.Tnp as Project).pathFor(`tmp-${config.folder.node_modules}1`)
+    const nm = (Project.Tnp).node_modules.path;
+    const nm2 = (Project.Tnp).pathFor(`tmp-${config.folder.node_modules}2`)
+    const nm1 = (Project.Tnp).pathFor(`tmp-${config.folder.node_modules}1`)
 
     if (process.platform !== 'win32') {
       Helpers.removeIfExists(nm2);
@@ -161,7 +161,7 @@ async function $AUTOUPDATE(args: string) {
   // switch (file) {
   //   case config.file.tmpIsomorphicPackagesJson:
   //     processing();
-  //     PackagesRecognition.fromProject((Project.Current as Project)).start(true, '[update process]');
+  //     PackagesRecognition.fromProject(Project.Current).start(true, '[update process]');
   //     break;
   //   default:
   //     Helpers.error(`Not recognized file for update`, false, true);

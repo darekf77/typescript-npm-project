@@ -6,7 +6,7 @@ import { crossPlatformPath, fse, path, _ } from "tnp-core/src";
 import { Helpers } from "tnp-helpers/src";
 import { Models } from "tnp-models/src";
 import { CLASS } from "typescript-class-helpers/src";
-import type { Project } from "../../../abstract/project";
+import { Project } from "../../../abstract/project";
 //#endregion
 
 @IncCompiler.Class({ className: 'BackendCompilation' })
@@ -103,8 +103,8 @@ export class BackendCompilation extends IncCompiler.Base {
       return;
     }
     // let id = BackendCompilation.counter++;
-    const ProjectClass = CLASS.getBy('Project') as typeof Project;
-    const project = ProjectClass.nearestTo(cwd) as Project;
+
+    const project = Project.nearestTo(cwd) as Project;
 
 
     const paramsNoWatch = [
