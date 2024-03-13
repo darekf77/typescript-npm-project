@@ -1,9 +1,6 @@
 export * from './helpers';
 export * from './constants';
 export * from './project';
-//#region @backend
-export * from './project/project-specyfic';
-//#endregion
 
 import { Morphi } from 'morphi/src';
 export import Firedev = Morphi;
