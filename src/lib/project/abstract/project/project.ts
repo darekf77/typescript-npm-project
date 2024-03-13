@@ -14,6 +14,8 @@ import { config, ConfigModels, extAllowedToReplace, TAGS } from 'tnp-config/src'
 import { Models } from 'tnp-models/src';
 import { Helpers } from 'tnp-helpers/src';
 import * as inquirer from 'inquirer';
+import { BuildOptions } from 'tnp-db/src';
+import { CLASS } from 'typescript-class-helpers/src';
 
 //#region @backend
 import { BaseProject } from './base-project';
@@ -41,7 +43,6 @@ import {
   Branding,
   DocsAppBuildConfig,
   AssetsManager,
-  BuildOptions,
 
 } from '../../features';
 import { AssetsFileListGenerator } from '../../compilers';
@@ -51,7 +52,7 @@ import { CompilerCache } from '../../features/compiler-cache.backend';
 import { SmartNodeModules } from '../../features/smart-node-modules.backend';
 import { InsideStructures } from '../../features/inside-structures/inside-structures';
 import { SingularBuild } from '../../features/singular-build.backend';
-import { CLASS } from 'typescript-class-helpers/src';
+
 import { argsToClear, DEFAULT_PORT, PortUtils } from '../../../constants';
 import { RegionRemover } from 'isomorphic-region-loader/src';
 import { IncrementalBuildProcess } from 'tnp/project/compilers/build-isomorphic-lib/compilations/incremental-build-process.backend';
@@ -301,6 +302,7 @@ export class ProjectContainer
   async buildLib() { }
 
   filesTemplates() {
+    //#region @backendFunc
     let templates = super.filesTemplates();
     if (this.isSmartContainer) {
       templates = [
@@ -309,6 +311,7 @@ export class ProjectContainer
       ]
     }
     return templates;
+    //#endregion
   }
 
   startOnCommand() {
@@ -333,7 +336,9 @@ export class ProjectContainer
   }
 
   proxyProjFor(client: string, outFolder: Models.dev.BuildDir): ProjectIsomorphicLib {
-    return Project.From(SingularBuild.getProxyProj(this, client, outFolder)) as any
+    //#region @backendFunc
+    return Project.From(SingularBuild.getProxyProj(this, client, outFolder)) as any;
+    //#endregion
   }
 
   async buildSteps(buildOptions?: BuildOptions, libBuildDone?: () => void) {
@@ -444,7 +449,9 @@ export class ProjectIsomorphicLib
   }
 
   get forAppRelaseBuild() {
-    return (this.buildOptions?.args?.trim()?.search('--forAppRelaseBuild') !== -1)
+    //#region @backendFunc
+    return (this.buildOptions?.args?.trim()?.search('--forAppRelaseBuild') !== -1);
+    //#endregion
   };
 
   //#endregion
@@ -1048,10 +1055,11 @@ export class ProjectIsomorphicLib
         //#endregion
       }
     } else {
+      //#region non watch build
       if (codeCutRelease) {
         this.cutReleaseCode();
       }
-      //#region non watch build
+
       if (productionModeButIncludePackageJsonDeps) {
         //#region release production backend build for firedev/tnp specyfic
         // console.log('k1')
@@ -1165,13 +1173,13 @@ export class ProjectIsomorphicLib
         this.backendRemoveDts(outDir);
       }
 
-      //#endregion
+
       if (codeCutRelease) {
         this.cutReleaseCodeRestore();
       }
+      //#endregion
+      //#endregion
     }
-
-
 
     //#endregion
   }
@@ -1179,10 +1187,14 @@ export class ProjectIsomorphicLib
 
   //#endregion
 
+
+  //#endregion
+
   //#region private methods
 
   //#region private methods / show message when build lib done for smart container
   private showMesageWhenBuildLibDoneForSmartContainer(args: string, watch: boolean, isInRelease: boolean) {
+    //#region @backend
     if (this.forAppRelaseBuild) {
       Helpers.logInfo('Lib build for app done...  starting app build');
       return;
@@ -1222,7 +1234,7 @@ export class ProjectIsomorphicLib
 
       ${CLI.chalk.bold(config.frameworkName + bawOrbaLong + target)}
       or
-      ${config.frameworkName} ${bawOrba} ${target}
+      ${config.frameworkame} ${bawOrba} ${target}
 
       ${withPort}
       ${config.frameworkName} ${bawOrba} ${target} ${ngserve}
@@ -1249,9 +1261,11 @@ export class ProjectIsomorphicLib
 
       `);
     }
-
+    //#endregion
   }
+
   //#endregion
+
 
   //#region private methods / fix build dirs
   private fixBuildDirs(outDir: Models.dev.BuildDir) {
@@ -1291,12 +1305,14 @@ export class ProjectIsomorphicLib
 
   //#region private methods / include node_modules in compilation
   private backendRemoveDts(outDir: Models.dev.BuildDir) {
+    //#region @backend
     Helpers
       .filesFrom([this.location, outDir, 'lib'], true)
       .filter(f => f.endsWith('.d.ts'))
       .forEach(f => Helpers.removeFileIfExists(f))
       ;
     Helpers.writeFile([this.location, outDir, 'lib/index.d.ts'], `export declare const dummy${(new Date()).getTime()};`);
+    //#endregion
   }
   //#endregion
 
@@ -1444,7 +1460,9 @@ export class ProjectIsomorphicLib
   //#region private methods / cut release code
 
   private get tmpSrcDistReleaseFolder() {
-    return `tmp-cut-relase-src-${config.folder.dist}${this.buildOptions.websql ? '-websql' : ''}`
+    //#region @backendFunc
+    return `tmp-cut-relase-src-${config.folder.dist}${this.buildOptions.websql ? '-websql' : ''}`;
+    //#endregion
   }
 
   private cutReleaseCodeRestore() {
@@ -1490,6 +1508,7 @@ export class ProjectIsomorphicLib
   //#endregion
 
   //#endregion
+
 }
 
 
@@ -1611,6 +1630,7 @@ export class ProjectVscodeExt
   }
 
   projectSpecyficFilesLinked() {
+    //#region @backendFunc
     let files = [
       'src/extension.ts',
       'src/helpers.ts',
@@ -1624,6 +1644,7 @@ export class ProjectVscodeExt
     }
 
     return files;
+    //#endregion
   }
 
 
