@@ -5,7 +5,7 @@ import { path } from 'tnp-core/src';
 // import { notify } from 'node-notifier';
 // import toast from 'powertoast';
 
-import { Project } from '../../project';
+import { Project } from '../../project/abstract/project/project';
 import { Helpers } from 'tnp-helpers/src';
 import { config, ConfigModels } from 'tnp-config/src';
 import { MESSAGES } from '../../constants';

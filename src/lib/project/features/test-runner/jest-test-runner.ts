@@ -7,7 +7,6 @@ import type { Project } from '../../abstract';
 
 import { config } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
-import type { ProjectIsomorphicLib } from '../../project-specyfic/project-isomorphic-lib';
 import { BuildOptions } from 'tnp-db/src';
 import { CLASS } from 'typescript-class-helpers/src';
 import { Models } from 'tnp-models/src';

@@ -2,7 +2,7 @@
 import { _, crossPlatformPath } from 'tnp-core/src';
 import * as express from 'express';
 import { path } from 'tnp-core/src';
-import { Project } from '../../project';
+import { Project } from '../../project/abstract/project/project';
 import { config, PREFIXES } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
 import { Models } from 'tnp-models/src';
