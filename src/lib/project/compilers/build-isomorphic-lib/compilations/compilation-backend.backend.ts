@@ -147,7 +147,7 @@ export class BackendCompilation extends IncCompiler.Base {
     };
 
     const tsconfigBackendPath = crossPlatformPath(
-      project.path(`tsconfig.backend.${outDir}.json`).absolute.normal
+      project.pathFor(`tsconfig.backend.${outDir}.json`),
     );
     tscCommands = cmd(tsconfigBackendPath)
 

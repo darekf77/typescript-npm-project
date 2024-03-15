@@ -29,10 +29,6 @@ export abstract class FolderProject {
   }
   //#endregion
 
-  hasChild(this: Project, child: Project) {
-    return !_.isUndefined(this.children.find(c => c.name === child?.name));
-  }
-
   // @ts-ignore
   get smartContainerBuildTarget(this: Project) {
     if (Helpers.isBrowser) {
@@ -70,27 +66,6 @@ export abstract class FolderProject {
     //#endregion
   }
 
-  // @ts-ignore
-  get childrenThatAreClients(this: Project): Project[] {
-    if (Helpers.isBrowser) {
-      return this.browser.childrenThatAreClients as any;
-    }
-    //#region @backend
-    if (this.typeIs('unknow')) {
-      return [];
-    }
-    return this.children.filter(c => {
-      return c.typeIs(...([
-        'isomorphic-lib',
-      ] as ConfigModels.LibType[]));
-    });
-    //#endregion
-  }
-
-
-
-
-
   addSourcesFromCore(this: Project) {
     const corePath = Project.by(this.type, this._frameworkVersion).location
 
@@ -127,70 +102,6 @@ export abstract class FolderProject {
   }
   //#endregion
 
-  //#region @backend
-  child(this: Project, name: string, errors = true): Project {
-    const c = this.children.find(c => c.name === name);
-    if (errors && !c) {
-      Helpers.warn(`Project doesnt contain child with name: ${name}`)
-    }
-    return c;
-  }
-  //#endregion
-
-  // @ts-ignore
-  get parent(this: Project): Project {
-    if (Helpers.isBrowser) {
-      return this.browser.parent as any;
-    }
-    //#region @backend
-    if (!_.isString(this.location) || this.location.trim() === '') {
-      return void 0;
-    }
-    const parent = Project.From(path.join(this.location, '..'));
-    // if (parent && parent.isWorkspaceChildProject && this.isWorkspaceChildProject) { // QUICK_FIX for temporary projects
-    //   return parent.parent;
-    // }
-    return parent;
-    //#endregion
-  }
-
-  // @ts-ignore
-  get grandpa(this: Project): Project {
-    if (Helpers.isBrowser) {
-      return this.browser.grandpa as any;
-    }
-    //#region @backend
-    if (!_.isString(this.location) || this.location.trim() === '') {
-      return void 0;
-    }
-    const grandpa = Project.From(path.join(this.location, '..', '..'));
-    return grandpa;
-    //#endregion
-  }
-
-
-  //#region @backend
-  getFolders(this: Project) {
-    const isDirectory = source => fse.lstatSync(source).isDirectory()
-    const getDirectories = source =>
-      fse.readdirSync(source).map(name => path.join(source, name)).filter(isDirectory)
-
-    let subdirectories = getDirectories(this.location)
-      .filter(f => {
-        const folderName = path.basename(f);
-        return Helpers.checkIfNameAllowedForFiredevProj(folderName);
-      })
-
-    if (this.isTnp && fse.existsSync(path.join(this.location, '../firedev-projects'))) {
-      subdirectories = subdirectories.concat(getDirectories(path.join(this.location, '../firedev-projects'))
-        .filter(f => {
-          const folderName = path.basename(f);
-          return Helpers.checkIfNameAllowedForFiredevProj(folderName);
-        }))
-    }
-    return subdirectories;
-  }
-  //#endregion
 
   //#region @backend
   public async clear(this: Project) {
@@ -204,83 +115,9 @@ export abstract class FolderProject {
   //#endregion
 
   //#region @backend
-  private _path(this: Project, relativePath: string, currentProjectLocation?: string) {
-    if (_.isUndefined(currentProjectLocation)) {
-      currentProjectLocation = this.location;
-    }
-    return {
-      /**
-       * Normal path as you expect
-       * <absolute path to project> / < relative path from param >
-       */
-      normal: crossPlatformPath(path.join(currentProjectLocation, relativePath)),
-      custom: crossPlatformPath(path.join(currentProjectLocation, config.folder.custom, relativePath)),
-      __prefixed: crossPlatformPath(path.join(currentProjectLocation, path.dirname(relativePath),
-        `__${path.basename(relativePath)}`)),
-    }
-  }
-
-  pathFor(relativePath: string | string[]) {
-    if (Array.isArray(relativePath)) {
-      relativePath = crossPlatformPath(relativePath.join('/'))
-    }
-    if (path.isAbsolute(relativePath)) {
-      Helpers.error(`Cannot join relative path with absolute: ${relativePath}`);
-    }
-    return crossPlatformPath(path.join(this.location, relativePath))
-  }
 
 
-  /**
-   * same has project.hasFile();
-   */
-  pathExists(relativePath: string | string[]): boolean {
-    return this.hasFile(relativePath);
-  }
 
-  /**
-   * same as project.pathExists();
-   */
-  hasFile(relativePath: string | string[]): boolean {
-    return Helpers.exists(this.pathFor(relativePath));
-  }
-
-  path(this: Project, relativePath: string, currentProjectLocation?: string) {
-
-    const self = this;
-    return {
-      get relative() {
-        return self._path(relativePath, '');
-      },
-      get absolute() {
-        return self._path(relativePath);
-      }
-    }
-  }
-
-  //#endregion
-
-  //#region @backend
-  containsFile(this: Project, fileRelativeToProjectPath: string) {
-    const fullPath = path.resolve(path.join(this.location, fileRelativeToProjectPath));
-    return Helpers.exists(fullPath);
-  }
-
-  removeFile(this: Project, fileRelativeToProjectPath: string) {
-    const fullPath = path.resolve(path.join(this.location, fileRelativeToProjectPath));
-    return Helpers.removeFileIfExists(fullPath);
-  }
-
-  containsFolder(this: Project, filePaht: string) {
-    let fullPath = path.resolve(path.join(this.location, filePaht));
-    let res = fse.existsSync(fullPath)
-    // if (!res && process.platform === 'darwin') {
-    //   fullPath = path.join('/private', fullPath);
-    //   res = fse.existsSync(fullPath);
-    // }
-    // log(`res: ${res} : ${fullPath}`)
-    return res;
-  }
   //#endregion
 
   //#region @backend

@@ -1,12 +1,16 @@
 //#region imports
+import { config, ConfigModels, extAllowedToReplace, TAGS } from 'tnp-config/src';
+import { Models } from 'tnp-models/src';
+import { _, crossPlatformPath } from 'tnp-core/src';
+import { Helpers, BaseProjectResolver, BaseProject } from 'tnp-helpers/src';
+import * as inquirer from 'inquirer';
+import { BuildOptions } from 'tnp-db/src';
+import { CLASS } from 'typescript-class-helpers/src';
+import { LibTypeArr } from 'tnp-config';
+import { RunOptions, ExecuteOptions } from 'tnp-core';
 //#region @backend
-import chalk from 'chalk';
-import { CoreConfig, fse } from 'tnp-core/src'
-import { path } from 'tnp-core/src'
-import { portfinder } from 'tnp-core/src';
-import * as json5 from 'json5';
-export { ChildProcess } from 'child_process';
-import { ChildProcess } from 'child_process';
+import { fse } from 'tnp-core/src';
+import { path } from 'tnp-core/src';
 import { BaseFiredevProject } from './base-project';
 import { NpmProject } from './npm-project';
 import { FeatureProject } from './feature-project';
@@ -31,7 +35,6 @@ import {
   Branding,
   DocsAppBuildConfig,
   AssetsManager,
-
 } from '../../features';
 import { AssetsFileListGenerator } from '../../compilers';
 import { CopyManager } from '../../features/copy-manager';
@@ -40,202 +43,14 @@ import { CompilerCache } from '../../features/compiler-cache.backend';
 import { SmartNodeModules } from '../../features/smart-node-modules.backend';
 import { InsideStructures } from '../../features/inside-structures/inside-structures';
 import { SingularBuild } from '../../features/singular-build.backend';
-
 import { argsToClear, DEFAULT_PORT, PortUtils } from '../../../constants';
 import { RegionRemover } from 'isomorphic-region-loader/src';
-import { IncrementalBuildProcess } from 'tnp/project/compilers/build-isomorphic-lib/compilations/incremental-build-process.backend';
-import { PackagesRecognition } from 'tnp/project/features/package-recognition/packages-recognition';
+import { IncrementalBuildProcess } from '../../../project/compilers/build-isomorphic-lib/compilations/incremental-build-process.backend';
+import { PackagesRecognition } from '../../../project/features/package-recognition/packages-recognition';
 import { CLI } from 'tnp-cli/src';
 import { glob } from 'tnp-core/src';
 //#endregion
-import { EmptyProjectStructure } from 'tnp-helpers/src';
-import { config, ConfigModels, extAllowedToReplace, TAGS } from 'tnp-config/src';
-import { Models } from 'tnp-models/src';
-import { _, crossPlatformPath } from 'tnp-core/src';
-import { Helpers, BaseProjectResolver, BaseProject } from 'tnp-helpers/src';
-import * as inquirer from 'inquirer';
-import { BuildOptions } from 'tnp-db/src';
-import { CLASS } from 'typescript-class-helpers/src';
-import { LibTypeArr } from 'tnp-config';
-//#endregion
 
-
-import { RunOptions, ExecuteOptions } from 'tnp-core';
-
-//#region  PROJECT GIT
-export abstract class ProjectGit {
-
-  //#region @backend
-
-
-  public runCommandGetString(this: Project, command: string) {
-    return Helpers.commnadOutputAsString(command, this.location, { biggerBuffer: false });
-  }
-
-  public async execute(this: Project, command: string,
-    options?: ExecuteOptions & { showCommand?: boolean }) {
-    if (_.isUndefined(options.showCommand)) {
-      options.showCommand = false;
-    }
-    if (!options) { options = {}; }
-    const cwd = this.location;
-    if (options.showCommand) {
-      Helpers.info(`[${CLI.chalk.underline('Executing shell command')}]  "${command}" in [${cwd}]`);
-    } else {
-      Helpers.log(`[${CLI.chalk.underline('Executing shell command')}]  "${command}" in [${cwd}]`);
-    }
-    return await Helpers.execute(command, cwd, options as any);
-  }
-
-  public run(this: Project, command: string, options?: RunOptions) {
-    Helpers.log(`command: ${command}`)
-    if (!options) { options = {}; }
-    if (_.isUndefined(options.showCommand)) {
-      options.showCommand = false;
-    }
-    if (!options.cwd) { options.cwd = this.location; }
-    if (options.showCommand) {
-      Helpers.info(`[${CLI.chalk.underline('Executing shell command')}]  "${command}" in [${options.cwd}]`);
-    } else {
-      Helpers.log(`[${CLI.chalk.underline('Executing shell command')}]  "${command}" in [${options.cwd}]`);
-    }
-    return Helpers.run(command, options);
-  }
-  //#endregion
-
-  //#region @backend
-  // @ts-ignore
-  public get git(this: Project) {
-    const self = this;
-    return {
-      clone(url: string, destinationFolderName = '') {
-        return Helpers.git.clone({ cwd: self.location, url, destinationFolderName });
-      },
-      restoreLastVersion(localFilePath: string) {
-        return Helpers.git.restoreLastVersion(self.location, localFilePath);
-      },
-      resetFiles(...relativePathes: string[]) {
-        return Helpers.git.resetFiles(self.location, ...relativePathes);
-      },
-      get isGitRepo() {
-        return Helpers.git.isGitRepo(self.location);
-      },
-      get isGitRoot() {
-        return Helpers.git.isGitRoot(self.location);
-      },
-      get originURL() {
-        return Helpers.git.getOriginURL(self.location);
-      },
-      async updateOrigin(askToRetry = false) {
-        await Helpers.git.pullCurrentBranch(self.location, askToRetry);
-      },
-      commit(args?: string) {
-        return Helpers.git.commit(self.location, Project as any, args);
-      },
-      pushCurrentBranch(force = false, origin = 'origin') {
-        return Helpers.git.pushCurrentBranch(self.location, force, origin);
-      },
-      pushCurrentRepoBranch(force = false, askToRetry = false, origin = 'origin') {
-        return Helpers.git.pushCurrentRepoBranch(self.location, force, askToRetry, origin);
-      },
-      get thereAreSomeUncommitedChange() {
-        return Helpers.git.checkIfthereAreSomeUncommitedChange(self.location);
-      },
-      thereAreSomeUncommitedChangeExcept(filesList: string[] = []) {
-        return Helpers.git.thereAreSomeUncommitedChangeExcept(filesList, self.location);
-      },
-      pullCurrentBranch(askToRetry = false) {
-        return Helpers.git.pullCurrentBranch(self.location, askToRetry);
-      },
-      get currentBranchName() {
-        return Helpers.git.currentBranchName(self.location);
-      },
-      getBranchesNamesBy(pattern: string | RegExp) {
-        return Helpers.git.getBranchesNames(self.location, pattern);
-      },
-      resetHard() {
-        self.run(`git reset --hard`).sync()
-      },
-      countComits() {
-        // console.log('COUNT')
-        return Helpers.git.countCommits(self.location);
-      },
-      hasAnyCommits() {
-        return Helpers.git.hasAnyCommits(self.location);
-      },
-      get isInMergeProcess() {
-        return Helpers.git.isInMergeProcess(self.location);
-      },
-      lastCommitDate() {
-        // console.log('LATS CMD ADDET')
-        return Helpers.git.lastCommitDate(self.location)
-      },
-      lastCommitHash() {
-        // console.log('LAST HASH')
-        return Helpers.git.lastCommitHash(self.location)
-      },
-      lastCommitMessage() {
-        return Helpers.git.lastCommitMessage(self.location)
-      },
-      penultimageCommitHash() {
-        return Helpers.git.penultimageCommitHash(self.location)
-      },
-      checkTagExists(tag: string) {
-        return Helpers.git.checkTagExists(tag, self.location)
-      },
-      checkout(checkoutFromBranch: string, branch: string, origin = 'origin') {
-        return Helpers.git.checkout(checkoutFromBranch, branch, origin, self.location)
-      },
-      /**
-       *
-       * @param majorVersion example: v1, v2 etc.
-       * @returns tag name
-       */
-      lastTagNameForMajorVersion(majorVersion) {
-        return Helpers.git.lastTagNameForMajorVersion(self.location, majorVersion)
-      },
-      lastTagHash() {
-        return Helpers.git.lastTagHash(self.location)
-      },
-      get remoteOriginUrl() {
-        return Helpers.git.getOriginURL(self.location);
-      },
-      get lastTagVersionName() {
-        return (Helpers.git.lastTagVersionName(self.location) || '')
-      },
-      get stagedFiles(): string[] {
-        return Helpers.git.stagedFiles(self.location);
-      },
-      /**
-       * TODO does this make any sense
-       */
-      renameOrigin(newNameOrUlr: string) {
-        if (!newNameOrUlr.endsWith('.git')) {
-          newNameOrUlr = (newNameOrUlr + '.git')
-        }
-        const oldOrigin = self.git.originURL;
-        if (!newNameOrUlr.startsWith('git@') && !newNameOrUlr.startsWith('https://')) {
-          newNameOrUlr = oldOrigin.replace(path.basename(oldOrigin), newNameOrUlr);
-        }
-
-        try {
-          self.run(`git remote rm origin`).sync();
-        } catch (error) { }
-
-        try {
-          self.run(`git remote add origin ${newNameOrUlr}`).sync();
-          Helpers.info(`Origin changed:
-        from: ${oldOrigin}
-          to: ${newNameOrUlr}\n`);
-        } catch (e) {
-          Helpers.error(`Not able to change origin.. reverting to old`, true, true);
-          self.run(`git remote add origin ${oldOrigin}`).sync();
-        }
-      },
-    }
-  }
-  //#endregion
-}
 //#endregion
 
 //#region FIREDEF PROJECT RESOLVE
@@ -419,7 +234,6 @@ export class FiredevProjectResolve extends BaseProjectResolver<Project> {
 }
 //#endregion
 
-
 //#region PROJECT
 export class Project extends BaseProject<Project>
 {
@@ -500,13 +314,34 @@ export class Project extends BaseProject<Project>
   }
   //#endregion
 
+  //#region static / angular major version for current cli
+  static angularMajorVersionForCurrentCli(): number {
+    //#region @backendFunc
+    const tnp = (Project.Tnp);
+    const angularFrameworkVersion = Number(_.first(tnp.version.replace('v', '').split('.')));
+    return angularFrameworkVersion;
+    //#endregion
+  }
+  //#endregion
+
+  //#region static / morphi tag to checkout for current cli version
+  static morphiTagToCheckoutForCurrentCliVersion(cwd: string): string {
+    //#region @backendFunc
+    const ngVer = Project.angularMajorVersionForCurrentCli();
+    const lastTagForVer = (Project.From(cwd) as Project).git.lastTagNameForMajorVersion(ngVer);
+    return lastTagForVer;
+    //#endregion
+  }
+  //#endregion
 
   //#endregion
 
+  //#region ins
   // @ts-ignore
-  public get ins(): FiredevProjectResolve<Project> {
+  public get ins(): FiredevProjectResolve {
     return Project.ins;
   };
+  //#endregion
 
   readonly type: ConfigModels.LibType;
 
@@ -514,38 +349,6 @@ export class Project extends BaseProject<Project>
   env?: EnvironmentConfig;
   //#endregion
   browser: any;
-
-  //#region @backend
-  private getAllChildren(options?: { excludeUnknowProjects: boolean; }) {
-    if (this.typeIs('unknow')) {
-      return [];
-    }
-    if (_.isUndefined(options)) {
-      options = {} as any;
-    }
-    if (_.isUndefined(options.excludeUnknowProjects)) {
-      options.excludeUnknowProjects = true;
-    }
-    const { excludeUnknowProjects } = options;
-    const subdirectories = this.getFolders();
-
-    let res = subdirectories
-      .map(dir => {
-        // console.log('child:', dir)
-        return Project.From(dir);
-      })
-      .filter(c => !!c)
-
-    if (excludeUnknowProjects) {
-      res = res.filter(c => {
-        const isNot = c.typeIsNot('unknow');
-
-        return isNot;
-      })
-    }
-    return res;
-  }
-  //#endregion
 
   get children(): Project[] {
     if (Helpers.isBrowser) {
@@ -637,25 +440,6 @@ export class Project extends BaseProject<Project>
     //#endregion
   }
 
-  location: string;
-
-  //#region @backend
-  static angularMajorVersionForCurrentCli(): number {
-    const tnp = (Project.Tnp);
-    const angularFrameworkVersion = Number(_.first(tnp.version.replace('v', '').split('.')));
-    return angularFrameworkVersion;
-  }
-  //#endregion
-
-  //#region @backend
-  static morphiTagToCheckoutForCurrentCliVersion(cwd: string): string {
-    const ngVer = Project.angularMajorVersionForCurrentCli();
-    const lastTagForVer = (Project.From(cwd) as Project).git.lastTagNameForMajorVersion(ngVer);
-    return lastTagForVer;
-  }
-  //#endregion
-
-
   get info(
     //#region @backend
     // @ts-ignore
@@ -680,8 +464,7 @@ export class Project extends BaseProject<Project>
    * DO NOT USE function isWorkspace, isWOrkspace child.. it is to expensive
    */
   constructor(location?: string) {
-    super();
-    this.location = crossPlatformPath(_.isString(location) ? location : '');
+    super(crossPlatformPath(_.isString(location) ? location : ''));
     if (!global.codePurposeBrowser) { // TODO when on weird on node 12
       this.defineProperty('compilerCache', CompilerCache);
       this.cache = {};
@@ -724,6 +507,8 @@ export class Project extends BaseProject<Project>
   //#endregion
 }
 
+//#region  classes join
+
 //#region @backend
 // @ts-ignore
 export interface Project extends
@@ -764,10 +549,9 @@ Helpers.applyMixins(Project, [
   CompilerCache
 ])
 //#endregion
-
-
 //#endregion
 
+//#endregion
 
 //#region PROJECT CONTAINER
 @CLASS.NAME('ProjectContainer')
@@ -785,7 +569,7 @@ export class ProjectContainer
 
   public addGitReposAsLinkedProjects() {
     //#region @backendFunc
-    const repoChilds = this.getFolders()
+    const repoChilds = this.getFoldersForPossibleProjectChildren()
       .sort()
       .map(c => {
         const proj = Project.From(c);
@@ -909,7 +693,6 @@ ${this.children.filter(c => c.typeIs('isomorphic-lib')).map(c => {
   }
 }
 //#endregion
-
 
 //#region PROJECT ISOMORPHIC LIB
 //#region consts
@@ -2026,7 +1809,6 @@ export class ProjectIsomorphicLib
 }
 //#endregion
 
-
 //#region PROJECT NAVI
 /**
  * DO NOT USE environment variables in this project directly
@@ -2053,7 +1835,6 @@ export class ProjectNavi extends Project {
   }
 }
 //#endregion
-
 
 //#region PROJECT SCENARIO REQ RES
 /**
@@ -2082,7 +1863,6 @@ export class ProjectScenarioReqRes extends Project {
 }
 //#endregion
 
-
 //#region UNKNOW NPM PROJEC
 /**
  * DO NOT USE environment variables in this project directly
@@ -2110,7 +1890,6 @@ export class ProjectUnknowNpm extends Project {
   }
 }
 //#endregion
-
 
 //#region VSCODE EXT PROJECT
 /**

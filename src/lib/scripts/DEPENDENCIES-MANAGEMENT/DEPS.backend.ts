@@ -362,11 +362,11 @@ async function $LINK() {
     Helpers.removeIfExists(packageInGlobalNodeModules);
     project.linkTo(packageInGlobalNodeModules);
 
-    if (!Helpers.exists(project.path(config.folder.bin).absolute.normal)) {
-      Helpers.mkdirp(project.path(config.folder.bin).absolute.normal);
+    if (!Helpers.exists(project.pathFor(config.folder.bin))) {
+      Helpers.mkdirp(project.pathFor(config.folder.bin));
     }
 
-    const pattern = `${project.path(config.folder.bin).absolute.normal}/*`;
+    const pattern = `${project.pathFor(config.folder.bin)}/*`;
     const countLinkInPackageJsonBin = glob
       .sync(pattern)
       .map(f => crossPlatformPath(f))

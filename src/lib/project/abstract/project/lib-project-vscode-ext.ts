@@ -33,7 +33,7 @@ export class LibProjectVscodeExt {
       await this.createVscePackage(false);
       // }
       Helpers.info(`Installing extension: ${vsixPackageName} `
-        + `with creation date: ${fse.lstatSync(this.lib.path(vsixPackageName).absolute.normal).birthtime}...`);
+        + `with creation date: ${fse.lstatSync(this.lib.pathFor(vsixPackageName)).birthtime}...`);
       this.lib.run(`code --install-extension ${vsixPackageName}`).sync();
     }
 
