@@ -131,11 +131,6 @@ const PSINFO = async (a) => {
 }
 
 
-function $isdistreleasemode(args) {
-  console.log('IS DIST RELEASE MODE? ', Project.isReleaseDistMode)
-  process.exit(0)
-}
-
 const $ASSETS = () => recreate();
 const $VERSION = () => version();
 
@@ -347,7 +342,7 @@ export default {
   NPM_FIXES: Helpers.CLIWRAP(NPM_FIXES, 'NPM_FIXES'),
   // $COPY_FROM(args: string) {
   //   const [from, to, pkgName] = args.trim().split(' ');
-  //   Project.From<Project>(from).node_modules.copy(pkgName).to(Project.From<Project>(to))
+  //   Project.From(from).node_modules.copy(pkgName).to(Project.From(to))
   //   process.exit()
   // },
   $COMMAND: Helpers.CLIWRAP($COMMAND, '$COMMAND'),
@@ -355,7 +350,6 @@ export default {
   $FILEINFO: Helpers.CLIWRAP($FILEINFO, '$FILEINFO'),
   RUN_PROCESS: Helpers.CLIWRAP(RUN_PROCESS, 'RUN_PROCESS'),
   PSINFO: Helpers.CLIWRAP(PSINFO, 'PSINFO'),
-  $isdistreleasemode: Helpers.CLIWRAP($isdistreleasemode, '$isdistreleasemode'),
   $ASSETS: Helpers.CLIWRAP($ASSETS, '$ASSETS'),
   $VERSION: Helpers.CLIWRAP($VERSION, '$VERSION'),
   $VERSIONS: Helpers.CLIWRAP($VERSIONS, '$VERSIONS'),

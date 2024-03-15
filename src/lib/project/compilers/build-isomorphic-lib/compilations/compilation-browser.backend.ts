@@ -75,7 +75,7 @@ export class BroswerCompilation extends BackendCompilation {
     Helpers.log(`[BroswerCompilation][constructor]
 
     compilationProject.genericName: ${compilationProject?.genericName}
-    compilationProject.type: ${compilationProject?._type}
+    compilationProject.type: ${compilationProject?.type}
     ENV?: ${!!ENV}
 
     cwd: ${cwd}
@@ -232,7 +232,7 @@ export class BroswerCompilation extends BackendCompilation {
     const ProjectClass = CLASS.getBy('Project') as typeof Project;
     let project: Project;
     if (env) {
-      project = ProjectClass.From<Project>(env.currentProjectLocation);
+      project = ProjectClass.From(env.currentProjectLocation);
     }
 
     if (compilationProject.isStandaloneProject) {

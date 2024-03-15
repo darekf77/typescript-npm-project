@@ -65,7 +65,7 @@ function resovleNewDepsAndOverrideForProject(project: Project) {
 
 
   if (project.isStandaloneProject && !project.isTnp) {
-    newDepsForProject = getAndTravelCoreDeps({ type: project._type });
+    newDepsForProject = getAndTravelCoreDeps({ type: project.type });
   } else {
     newDepsForProject = getAndTravelCoreDeps();
   }
@@ -457,7 +457,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
 
 
   if (project.frameworkVersionAtLeast('v2') && !global.actionShowingDepsForContainer) {
-    const projForVer = Project.by<Project>('container', project._frameworkVersion);
+    const projForVer = Project.by('container', project._frameworkVersion);
     if (projForVer) { // QUICK_FIX?
       global.actionShowingDepsForContainer = true;
       projForVer.packageJson.showDeps(`update deps for project ${project.genericName} in version ${project._frameworkVersion}`);
@@ -560,7 +560,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   }
 
   if (recrateInPackageJson) {
-    Helpers.log(`[package.json] save for install - ${project._type} project: "${project.name}" , [${reasonToShowPackages}]`);
+    Helpers.log(`[package.json] save for install - ${project.type} project: "${project.name}" , [${reasonToShowPackages}]`);
     if (project.isTnp) {
       project.packageJson.data.devDependencies = {};
       project.packageJson.data.dependencies = Helpers.arrays.sortKeys(newDeps);
@@ -592,7 +592,7 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     //#endregion
 
   } else {
-    Helpers.log(`[package.json] save for clean - ${project._type} project: "${project.name}" , [${reasonToHidePackages}]`);
+    Helpers.log(`[package.json] save for clean - ${project.type} project: "${project.name}" , [${reasonToHidePackages}]`);
     project.packageJson.data.devDependencies = {};
     project.packageJson.data.dependencies = {};
     if (!project.isCoreProject && !project.isVscodeExtension) {

@@ -182,7 +182,7 @@ export class FilesRecreator extends FeatureForProject {
     } else {
       try {
         Helpers.log('parsing 2...')
-        const settingFromCore = path.join(Project.by<Project>(this.project._type).location, '.vscode', 'settings.json');
+        const settingFromCore = path.join(Project.by(this.project.type).location, '.vscode', 'settings.json');
         Helpers.mkdirp(path.dirname(pathSettingsVScode));
         if (Helpers.exists(settingFromCore)) {
           var settings: ConfigModels.VSCodeSettings = JSON5.parse(Helpers.readFile(settingFromCore))
@@ -447,12 +447,12 @@ ${this.project.isVscodeExtension ? '' : coreFiles}
     let defaultProjectProptotype: Project;
 
 
-    defaultProjectProptotype = Project.by<Project>(this.project._type, this.project._frameworkVersion) as Project;
+    defaultProjectProptotype = Project.by(this.project.type, this.project._frameworkVersion) as Project;
 
     const files: Models.other.RecreateFile[] = [];
 
     if (crossPlatformPath(this.project.location) === crossPlatformPath(defaultProjectProptotype?.location)) {
-      Helpers.info(`LINKING CORE PROJCET ${this.project.name} ${this.project._type} ${this.project._frameworkVersion}`)
+      Helpers.info(`LINKING CORE PROJCET ${this.project.name} ${this.project.type} ${this.project._frameworkVersion}`)
       if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIsNot('isomorphic-lib')) {
         // nothing
       } else {
@@ -482,8 +482,8 @@ ${this.project.isVscodeExtension ? '' : coreFiles}
               path.join(linked.sourceProject.location, linked.relativePath),
               path.join(defaultProjectProptotype.location, relativeFilePath));
           } else if (defaultProjectProptotype.frameworkVersionAtLeast('v2')) {
-            const core = Project.by<Project>(
-              defaultProjectProptotype._type,
+            const core = Project.by(
+              defaultProjectProptotype.type,
               defaultProjectProptotype.frameworkVersionMinusOne
             );
             from = crossPlatformPath(path.join(core.location, relativeFilePath));
@@ -517,7 +517,7 @@ ${this.project.isVscodeExtension ? '' : coreFiles}
   }
 
   commonFiles() {
-    const wokrspace = Project.by<Project>('container', this.project._frameworkVersion);
+    const wokrspace = Project.by('container', this.project._frameworkVersion);
 
     const files = this.commonFilesForAllProjects;
     files.map(file => {

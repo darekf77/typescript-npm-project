@@ -105,7 +105,7 @@ export function saveConfigWorkspca(project: Project, projectConfig: Models.env.E
   projectConfig.currentProjectName = project.name;
   projectConfig.currentProjectGenericName = project.genericName;
   projectConfig.currentProjectTasksConfiguration = project.getTemlateOfTasksJSON(projectConfig);
-  projectConfig.currentProjectType = project._type;
+  projectConfig.currentProjectType = project.type;
   projectConfig.currentFrameworkVersion = Project.Tnp.version;
   projectConfig.currentProjectLocation = project.location;
   projectConfig.isStandaloneProject = project.isStandaloneProject;

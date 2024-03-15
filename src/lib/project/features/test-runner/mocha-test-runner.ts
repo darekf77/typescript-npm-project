@@ -42,7 +42,7 @@ export class MochaTestRunner
 
   async startAndWatch(files?: string[], debug = false) {
     if (this.project.typeIsNot('isomorphic-lib')) {
-      Helpers.error(`Tests not impolemented for ${this.project._type}`, false, true)
+      Helpers.error(`Tests not impolemented for ${this.project.type}`, false, true)
     }
 
     let command = `npm-run mocha  ${debug ? '--inspect' : ''} --require ts-node/register ${this.fileCommand(files)} `

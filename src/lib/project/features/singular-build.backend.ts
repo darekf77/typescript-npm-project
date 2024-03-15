@@ -290,7 +290,7 @@ exports.default = start;`);
     })();
     //#endregion
 
-    let smartContainerTargetProject = Project.From<Project>(smartContainerTargetProjPath);
+    let smartContainerTargetProject = Project.From(smartContainerTargetProjPath);
     parent.node_modules.linkToProject(smartContainerTargetProject);
 
     await smartContainerTargetProject.filesStructure.init(''); // THIS CAUSE NOT NICE SHIT

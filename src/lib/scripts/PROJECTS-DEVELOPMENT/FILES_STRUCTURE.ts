@@ -218,13 +218,6 @@ function TEMPLATES_BUILDER() {
 }
 
 
-const $INIT_EVERYWHERE = (args) => {
-  Project.projects.forEach(p => {
-    p.run(`${config.frameworkName} init`).sync()
-  })
-}
-
-
 // init().project();
 // init().watch.project()
 const CL = (args, exit) => CLEAN(args, exit);
@@ -245,6 +238,5 @@ export default {
   RST: Helpers.CLIWRAP(RST, 'RST'),
   RSTA: Helpers.CLIWRAP(RSTA, 'RSTA'),
   TEMPLATES_BUILDER: Helpers.CLIWRAP(TEMPLATES_BUILDER, 'TEMPLATES_BUILDER'),
-  $INIT_EVERYWHERE: Helpers.CLIWRAP($INIT_EVERYWHERE, '$INIT_EVERYWHERE'),
 }
 //#endregion

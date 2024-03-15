@@ -165,7 +165,7 @@ async function $GENERATE(args: string) {
     absPath = crossPlatformPath(path.dirname(absPath));
   }
   entityName = decodeURIComponent(entityName);
-  const nearestProj = Project.nearestTo(process.cwd()) as Project;
+  const nearestProj = Project.ins.nearestTo(process.cwd()) as Project;
   // console.log({
   //   nearestProj: nearestProj?.location
   // })

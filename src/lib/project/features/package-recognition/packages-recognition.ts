@@ -93,9 +93,9 @@ export class PackagesRecognition {
   //     // } else {
 
   //     // }
-  //     const proj = Project.From<Project>(packageInNodeModulesPath);
+  //     const proj = Project.From(packageInNodeModulesPath);
   //     if (proj) {
-  //       Helpers.log(`[${config.frameworkName}] Proj "${proj.genericName}" type ${proj._type}, standalone ${proj.isStandaloneProject}`, 1)
+  //       Helpers.log(`[${config.frameworkName}] Proj "${proj.genericName}" type ${proj.type}, standalone ${proj.isStandaloneProject}`, 1)
   //       if (proj.typeIs('isomorphic-lib')) {
   //         res = proj.isStandaloneProject;
   //       } else {

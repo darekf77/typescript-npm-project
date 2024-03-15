@@ -72,7 +72,7 @@ export class ProjectFactory {
     const argv = args.split(' ');
     const name = argv[1]
     const relativePath = argv[2]
-    Project.From<Project>(cwd).filesFactory.createModel(relativePath, name);
+    Project.From(cwd).filesFactory.createModel(relativePath, name);
     if (exit) {
       process.exit(0)
     }
@@ -269,7 +269,7 @@ git pull/push or children packages release. Normal container can wrap "standalon
 
           parentContainer.packageJson.save(`updating container: `
             + `${grandpa ? `${grandpa.name}/` : ''}${CLI.chalk.bold(parentContainer.name)}`
-            + ` linked projects for ${currentContainer.parent._type}"`);
+            + ` linked projects for ${currentContainer.parent.type}"`);
         }
         parentContainer = currentContainer;
 

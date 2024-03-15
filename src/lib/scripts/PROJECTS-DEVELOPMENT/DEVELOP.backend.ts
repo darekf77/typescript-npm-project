@@ -270,9 +270,11 @@ export async function $INFO(args: string) {
   // } else {
   let proj = Project.resolveChildProject(args);
   // console.clear()
+  // proj.lastNpmVersion
   console.info(`
 
     name: ${proj.name}
+    basename: ${proj.basename}
     version: ${proj.version}
     private: ${proj.isPrivate}
     monorepo: ${proj.isMonorepo}
@@ -286,9 +288,8 @@ export async function $INFO(args: string) {
 
     genericName: ${proj.genericName}
 
-    last npm version: ${proj.lastNpmVersion}
     frameworkVersion: ${proj._frameworkVersion}
-    type: ${proj._type}
+    type: ${proj.type}
     parent name: ${proj.parent && proj.parent.name}
     grandpa name: ${proj.grandpa && proj.grandpa.name}
     git origin: ${proj.git.originURL}

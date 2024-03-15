@@ -193,14 +193,30 @@ export class NpmProject {
       return this.browser.lastNpmVersion;
     }
     //#region @backend
-    let lastNpmVersion = void 0 as string;
-    try {
-      const ver = this.run(`npm show ${this.name} version`, { output: false }).sync().toString();
-      if (ver) {
-        lastNpmVersion = ver.trim();
-      }
-    } catch (error) { }
-    return lastNpmVersion;
+    const lastVer = 'last npm version(s): ';
+    if (this.isSmartContainer) {
+      return lastVer + this.children.map(c => {
+        let lastNpmVersion = void 0 as string;
+        try {
+          const ver = Helpers.run(`npm show @${this.name}/${c.name} version`, { output: false }).sync().toString();
+          if (ver) {
+            lastNpmVersion = ver.trim();
+          }
+        } catch (error) { }
+        return `${this.name}/${c.name}=${lastNpmVersion}`;
+      }).join(', ');
+
+    } else {
+      let lastNpmVersion = void 0 as string;
+      try {
+        const ver = this.run(`npm show ${this.name} version`, { output: false }).sync().toString();
+        if (ver) {
+          lastNpmVersion = ver.trim();
+        }
+      } catch (error) { }
+      return lastVer + lastNpmVersion;
+    }
+
     //#endregion
   }
 
@@ -233,7 +249,7 @@ export class NpmProject {
       return this.browser.preview as any;
     }
     //#region @backend
-    return _.isString(this.location) && Project.From<Project>(path.join(this.location, 'preview'));
+    return _.isString(this.location) && Project.From(path.join(this.location, 'preview'));
     //#endregion
   }
 
@@ -436,7 +452,7 @@ export class NpmProject {
     return this.getDepsAsPackage(type).map(packageObj => {
       let p = path.join(contextFolder ? contextFolder : this.location, config.folder.node_modules, packageObj.name);
       if (fse.existsSync(p)) {
-        const project = Project.From<Project>(p);
+        const project = Project.From(p);
         return project;
       }
       // warn(`Dependency '${packageObj.name}' doen't exist in ${p}`)
@@ -526,7 +542,7 @@ export class NpmProject {
     }
     return this.isomorphicPackages.map(c => {
       const p = path.join(this.location, config.folder.node_modules, c);
-      return Project.From<Project>(p);
+      return Project.From(p);
     }).filter(f => !!f);
     //#endregion
   }

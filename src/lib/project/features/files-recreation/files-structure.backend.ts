@@ -291,12 +291,12 @@ export class FilesStructure extends FeatureForProject {
     //   const siteChild = path.join(this.project.location, c.name);
     //   if (!fse.existsSync(siteChild)) {
     //     ProjectFactory.Instance.createWorksapceOrStandalone({
-    //       type: c._type,
+    //       type: c.type,
     //       name: c.name,
     //       cwd: this.project.location,
     //       basedOn: void 0
     //     });
-    //     const newChild = Project.From<Project>(siteChild);
+    //     const newChild = Project.From(siteChild);
     //     c.packageJson.copyTo(newChild);
     //     Helpers.tryRemoveDir(path.join(newChild.location, config.folder.src));
     //     Helpers.tryRemoveDir(path.join(newChild.location, config.folder.components));

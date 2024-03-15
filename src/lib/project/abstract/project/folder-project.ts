@@ -52,39 +52,6 @@ export abstract class FolderProject {
     //#endregion
   }
 
-  // @ts-ignore
-  get children(this: Project): Project[] {
-    if (Helpers.isBrowser) {
-      return this.browser.children as any;
-    }
-    //#region @backend
-
-    if (this.pathExists('taon.json')) {
-      const taonChildren = Helpers.foldersFrom(this.location)
-        .filter(f => !f.startsWith('.') && ![
-          config.folder.node_modules,
-        ].includes(path.basename(f)))
-        .map(f => Project.From(f) as Project)
-        .filter(f => !!f);
-      // console.log({
-      //   taonChildren: taonChildren.map(c => c.location)
-      // })
-      return taonChildren;
-    }
-
-    if (this.isTnp && !global.globalSystemToolMode) {
-      return [];
-    }
-    if (this.typeIs('unknow')) {
-      return [];
-    }
-    const all = this.getAllChildren();
-    // console.log({
-    //   all: all.map(c => c.location)
-    // })
-    return all;
-    //#endregion
-  }
 
   // @ts-ignore
   get childrenThatAreLibs(this: Project): Project[] {
@@ -120,42 +87,12 @@ export abstract class FolderProject {
     //#endregion
   }
 
-  //#region @backend
-  private getAllChildren(this: Project, options?: { excludeUnknowProjects: boolean; }) {
-    if (this.typeIs('unknow')) {
-      return [];
-    }
-    if (_.isUndefined(options)) {
-      options = {} as any;
-    }
-    if (_.isUndefined(options.excludeUnknowProjects)) {
-      options.excludeUnknowProjects = true;
-    }
-    const { excludeUnknowProjects } = options;
-    const subdirectories = this.getFolders();
 
-    let res = subdirectories
-      .map(dir => {
-        // console.log('child:', dir)
-        return Project.From<Project>(dir);
-      })
-      .filter(c => !!c)
-
-    if (excludeUnknowProjects) {
-      res = res.filter(c => {
-        const isNot = c.typeIsNot('unknow');
-
-        return isNot;
-      })
-    }
-    return res;
-  }
-  //#endregion
 
 
 
   addSourcesFromCore(this: Project) {
-    const corePath = Project.by(this._type, this._frameworkVersion).location
+    const corePath = Project.by(this.type, this._frameworkVersion).location
 
     const srcInCore = path.join(corePath, config.folder.src);
     const srcForStandAloenInCore = path.join(corePath, forStandAloneSrc);
@@ -209,7 +146,7 @@ export abstract class FolderProject {
     if (!_.isString(this.location) || this.location.trim() === '') {
       return void 0;
     }
-    const parent = Project.From<Project>(path.join(this.location, '..'));
+    const parent = Project.From(path.join(this.location, '..'));
     // if (parent && parent.isWorkspaceChildProject && this.isWorkspaceChildProject) { // QUICK_FIX for temporary projects
     //   return parent.parent;
     // }
@@ -226,7 +163,7 @@ export abstract class FolderProject {
     if (!_.isString(this.location) || this.location.trim() === '') {
       return void 0;
     }
-    const grandpa = Project.From<Project>(path.join(this.location, '..', '..'));
+    const grandpa = Project.From(path.join(this.location, '..', '..'));
     return grandpa;
     //#endregion
   }

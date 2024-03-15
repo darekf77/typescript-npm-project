@@ -3,30 +3,17 @@
 import chalk from 'chalk';
 import { CoreConfig, fse } from 'tnp-core/src'
 import { path } from 'tnp-core/src'
-import { _, crossPlatformPath, portfinder } from 'tnp-core/src';
+import { portfinder } from 'tnp-core/src';
 import * as json5 from 'json5';
 export { ChildProcess } from 'child_process';
 import { ChildProcess } from 'child_process';
-
-//#endregion
-import { EmptyProjectStructure } from 'tnp-helpers/src';
-import { config, ConfigModels, extAllowedToReplace, TAGS } from 'tnp-config/src';
-import { Models } from 'tnp-models/src';
-import { Helpers } from 'tnp-helpers/src';
-import * as inquirer from 'inquirer';
-import { BuildOptions } from 'tnp-db/src';
-import { CLASS } from 'typescript-class-helpers/src';
-import { LibTypeArr } from 'tnp-config';
-
-//#region @backend
-import { BaseProject } from './base-project';
+import { BaseFiredevProject } from './base-project';
 import { NpmProject } from './npm-project';
 import { FeatureProject } from './feature-project';
 import { FiredevProject } from './firedev-project';
 import { FolderProject } from './folder-project';
 import { LibProject } from './lib-project.backend';
 import { VscodeProject } from './vscode-project.backend';
-
 import { RecreatableProject } from './recreatable-project.backend';
 import { EntityProject } from './entity-projects.backend';
 import { BuildableProject } from './buildable-project.backend';
@@ -61,11 +48,21 @@ import { PackagesRecognition } from 'tnp/project/features/package-recognition/pa
 import { CLI } from 'tnp-cli/src';
 import { glob } from 'tnp-core/src';
 //#endregion
+import { EmptyProjectStructure } from 'tnp-helpers/src';
+import { config, ConfigModels, extAllowedToReplace, TAGS } from 'tnp-config/src';
+import { Models } from 'tnp-models/src';
+import { _, crossPlatformPath } from 'tnp-core/src';
+import { Helpers, BaseProjectResolver, BaseProject } from 'tnp-helpers/src';
+import * as inquirer from 'inquirer';
+import { BuildOptions } from 'tnp-db/src';
+import { CLASS } from 'typescript-class-helpers/src';
+import { LibTypeArr } from 'tnp-config';
 //#endregion
 
 
 import { RunOptions, ExecuteOptions } from 'tnp-core';
 
+//#region  PROJECT GIT
 export abstract class ProjectGit {
 
   //#region @backend
@@ -239,30 +236,13 @@ export abstract class ProjectGit {
   }
   //#endregion
 }
-
-
-
-const takenPorts = [];
-
-/**
- * @deprecated
- *
- * use BaseProject instead
- */
-export class $Project<T extends Project<any> = any>
-  //#region @backend
-  extends ProjectGit
 //#endregion
-{
-  //#region static
-  public static projects: Project<any>[] = [];
-  /**
-   * To speed up checking folder I am keeping pathes for alterdy checked folder
-   * This may break things that are creating new projects
-   */
-  public static emptyLocations: string[] = [];
 
-  static typeFrom(location: string): ConfigModels.LibType {
+//#region FIREDEF PROJECT RESOLVE
+export class FiredevProjectResolve extends BaseProjectResolver<Project> {
+
+  //#region methods / type from
+  typeFrom(location: string) {
     //#region @backendFunc
     const PackageJSON = CLASS.getBy('PackageJSON') as any;
     location = crossPlatformPath(location);
@@ -277,19 +257,18 @@ export class $Project<T extends Project<any> = any>
     return type;
     //#endregion
   }
+  //#endregion
 
-  public static unload(project: Project) {
-    Project.projects = Project.projects.filter(f => f !== project);
-  }
-
-  public static From<T = Project<any>>(locationOfProj: string | string[]): T {
+  //#region methods / from
+  /**
+   * TODO use base resolve
+   */
+  From(locationOfProj: string | string[], options?: any): Project {
     //#region @backendFunc
     if (Array.isArray(locationOfProj)) {
       locationOfProj = locationOfProj.join('/');
     }
     let location = locationOfProj.replace(/\/\//g, '/');
-
-    const PackageJSON = CLASS.getBy('PackageJSON') as any;
 
     if (!_.isString(location)) {
       Helpers.warn(`[project.from] location is not a string`)
@@ -299,27 +278,25 @@ export class $Project<T extends Project<any> = any>
       location = path.dirname(location);
     }
     location = crossPlatformPath(path.resolve(location));
-    if (Project.emptyLocations.includes(location)) {
+    if (this.emptyLocations.includes(location)) {
       if (location.search(`/${config.folder.dist}`) === -1) {
         Helpers.log(`[project.from] empty location ${location}`, 2)
         return;
       }
     }
 
-    const alreadyExist = Project.projects.find(l => l.location.trim() === location.trim());
+    const alreadyExist = this.projects.find(l => l.location.trim() === location.trim());
     if (alreadyExist) {
       return alreadyExist as any;
     }
     if (!fse.existsSync(location)) {
       Helpers.log(`[firedev-helpers][project.from] Cannot find project in location: ${location}`, 1);
-      Project.emptyLocations.push(location);
+      this.emptyLocations.push(location);
       return;
     }
     let type = this.typeFrom(location);
-    PackageJSON && checkIfTypeIsNotCorrect(type, location);
 
-    // Helpers.log(`[firedev-helpers] Type "${type}" for ${location} `)
-    let resultProject: Project<any>;
+    let resultProject: Project;
     if (type === 'isomorphic-lib') {
       resultProject = new ProjectIsomorphicLib(location);
     }
@@ -329,58 +306,19 @@ export class $Project<T extends Project<any> = any>
     if (type === 'container') {
       resultProject = new ProjectContainer(location);
     }
-    if (type === 'navi') {
-      if (['tnp', 'firedev'].includes(config.frameworkName)) {
-        Helpers.error(`
-!!!
-!!!
-       THIS SHOULD NOT BE NAVI PROJECT: ${location}
-!!!
-!!!
-       `, true, true);
-      }
-      resultProject = new (getClassFunction('ProjectNavi'))(location);
-      // resultProject = new (ProjectNavi)(location);
-    }
     if (type === 'unknow-npm-project') {
       // resultProject = new (getClassFunction('ProjectUnknowNpm'))(location);
       // const ProjectUnknowNpm = require('tnp/lib/project/abstract/project/project').ProjectUnknowNpm;
       resultProject = new ProjectUnknowNpm(location);
     }
-    if (type === 'scenario') {
-      // resultProject = new (getClassFunction('ProjectScenarioReqRes'))(location);
-      // const ProjectScenarioReqRes = require('tnp/lib/project/abstract/project/project').ProjectScenarioReqRes;
-      resultProject = new ProjectScenarioReqRes(location);
-    }
-
-    // log(resultProject ? (`PROJECT ${resultProject.type} in ${location}`)
-    //     : ('NO PROJECT FROM LOCATION ' + location))
-
-    if (resultProject) {
-      Helpers.log(`[firedev-helpers][project.from] ${CLI.chalk.bold(resultProject.name)} from ...${location.substr(location.length - 100)}`, 1);
-    } else {
-      if (PackageJSON) {
-        Helpers.log(`[firedev-helpers][project.from] project not found in ${location}`, 1);
-      } else {
-        const packagejsonpath = path.join(location, 'package.json');
-        if (fse.existsSync(packagejsonpath)) {
-          const name = Helpers.getValueFromJSON(packagejsonpath, 'name');
-          // if (name && name === path.basename(location)) { TODO think about it
-          if (name) {
-            resultProject = new Project();
-            resultProject.location = crossPlatformPath(location);
-            resultProject.name = name;
-            resultProject.type = Helpers.getValueFromJSON(path.join(location, 'package.json'), 'tnp.type');
-          }
-        }
-      }
-    }
 
     return resultProject as any;
     //#endregion
   }
+  //#endregion
 
-  public static nearestTo<T = Project>(
+  //#region methods / nearest to
+  nearestTo<T = Project>(
     absoluteLocation: string,
     options?: { type?: ConfigModels.LibType; findGitRoot?: boolean; onlyOutSideNodeModules?: boolean }): T {
     //#region @backendFunc
@@ -404,7 +342,7 @@ export class $Project<T extends Project<any> = any>
       if (onlyOutSideNodeModules && (path.basename(path.dirname(absoluteLocation)) === 'node_modules')) {
         absoluteLocation = path.dirname(path.dirname(absoluteLocation));
       }
-      project = Project.From(absoluteLocation);
+      project = this.From(absoluteLocation);
       if (_.isString(type)) {
         if (project?.typeIs(type)) {
           if (findGitRoot) {
@@ -443,235 +381,62 @@ export class $Project<T extends Project<any> = any>
     return project as any;
     //#endregion
   }
+  //#endregion
 
-  public static allProjectFrom<T = Project>(absoluteLocation: string, stopOnCwd: string = '/') {
-    //#region @backendFunc
-    const projects = {};
-    const projectsList = [];
-    let previousAbsLocation: string;
-    while (absoluteLocation.startsWith(stopOnCwd)) {
-      if (previousAbsLocation === absoluteLocation) {
-        break;
-      }
-      const proj = Project.nearestTo(absoluteLocation);
-      if (proj) {
-        if (projects[proj.location]) {
-          break;
-        }
-        projects[proj.location] = proj;
-        projectsList.push(proj);
-        previousAbsLocation = absoluteLocation;
-        absoluteLocation = path.dirname(proj.location);
-        continue;
-      }
-      break;
-    }
-    return projectsList as T[];
-    //#endregion
-  }
-
-  public static DefaultPortByType(type: ConfigModels.LibType): number {
-    if (type === 'docker') { return 5000; }
-    if (type === 'isomorphic-lib') { return 4000; }
-    if (type === 'container' || type === 'unknow-npm-project') {
-      return;
-    }
-  }
-
-  public static get isReleaseDistMode() {
-    if (Helpers.isBrowser) {
-      return true;
-    }
-    //#region @backend
-    return !(!!global[CoreConfig.message.globalSystemToolMode])
-    //#endregion
-  }
-
-  /**
-   * Resolve child project when accessing from parent container etc...
-   * @param args string or string[] from cli args
-   * @param CurrentProject project from process.cwd()
-   */
-  static resolveChildProject(args: string | string[]): Project {
-    //#region @backendFunc
-    const CurrentProject = this.Current;
-    if (!CurrentProject) {
-      return void 0 as any;
-    }
-    if (_.isString(args)) {
-      args = args.split(' ');
-    }
-    let firstArg = _.first(args);
-    if (firstArg) {
-      firstArg = firstArg.replace(/\/$/, '');
-      const child = CurrentProject.children.find(c => c.name === firstArg);
-      if (child) { // @ts-ignore
-        CurrentProject = child;
-      }
-    }
-    return CurrentProject;
-    //#endregion
-  }
-
-  static filterOnlyCopy(basePathFoldersOnlyToInclude: string[], projectOrBasepath: Project | string) {
-    //#region @backendFunc
-    return (src: string, dest: string) => {
-      src = crossPlatformPath(src);
-      const baseFolder = _.first(crossPlatformPath(src)
-        .replace(crossPlatformPath(_.isString(projectOrBasepath) ? projectOrBasepath : projectOrBasepath.location), '')
-        .replace(/^\//, '').split('/'));
-
-      if (!baseFolder || baseFolder.trim() === '') {
-        return true;
-      }
-      const isAllowed = !_.isUndefined(basePathFoldersOnlyToInclude
-        .find(f => baseFolder.startsWith(crossPlatformPath(f))));
-
-      return isAllowed;
-    };
-    //#endregion
-  }
-
-  static sort<P extends Project = Project>(deps: { project: P; copyto: P[] }[]) {
-    //#region @backendFunc
-    // return deps;
-    let last_currentProjIndex: number;
-    let last_indexToReplace: number;
-    while (true) {
-      const depsProjs = deps.map(p => p.project);
-      // Helpers.log('\n' + depsProjs.map((p, i) => `${i}. ${p.name}`).join('\n') + '\n', 1)
-      let continueAgain = false;
-      for (let currentProjIndex = 0; currentProjIndex < deps.length; currentProjIndex++) {
-        // const proj = deps[currentProjIndex].project;
-        // const copyto = deps[currentProjIndex].copyto;
-
-        const copytoIndexes = deps[currentProjIndex].copyto
-          .filter(p => p.location !== deps[currentProjIndex].project.location)
-          .map(p => depsProjs.indexOf(p));
-        const indexToReplace = copytoIndexes.filter(i => i !== currentProjIndex).find(i => {
-          const result = i < currentProjIndex;
-          Helpers.log(`${deps[i].project.name} index is less than project ${deps[currentProjIndex].project.name}`, 1)
-          return result;
-        });
-        if (_.isNumber(indexToReplace)) {
-          const v1 = deps[currentProjIndex];
-          const v2 = deps[indexToReplace];
-          if (v1.copyto.includes(v2.project) && (v2.copyto.includes(v1.project))) {
-            Helpers.warn(`Circural copyto between ${CLI.chalk.bold(v1.project.name)}(${currentProjIndex}) `
-              + ` and ${CLI.chalk.bold(v2.project.name)}(${indexToReplace})`)
-          } else {
-            // if (last_currentProjIndex === currentProjIndex && last_indexToReplace === indexToReplace) {
-            //   Helpers.warn(`Weird circural copyto between ${chalk.bold(v1.project.name)}(${currentProjIndex}) `
-            //     + ` and ${chalk.bold(v2.project.name)}(${indexToReplace})`)
-            // } else {
-            continueAgain = true;
-            // Helpers.log(`${v1.project.name}(${currentProjIndex}) should be swapped with ${v2.project.name}(${indexToReplace})`, 1);
-            deps[currentProjIndex] = v2;
-            deps[indexToReplace] = v1;
-            last_currentProjIndex = currentProjIndex;
-            last_indexToReplace = indexToReplace;
-            break;
-            // }
-          }
-
-        }
-      }
-      if (continueAgain) {
-        continue;
-      }
-      break;
-    }
-
-    const onlyWithZeros = deps.filter(c => c.copyto.length === 0);
-    const onlyNormal = deps.filter(c => c.copyto.length > 0);
-    onlyNormal.forEach(d => {
-      onlyWithZeros.forEach(b => {
-        if (!d.copyto.includes(b.project)) {
-          d.copyto.push(b.project);
-        }
-      });
-    });
-    deps = [
-      ...onlyNormal,
-      ...onlyWithZeros,
-    ];
-    return deps;
-    //#endregion
-  }
-
-  static recrusiveFind<P extends Project = Project>(
-    currentProj: P, allAvailableProjects: P[], deps: P[] = [], orgProj?: P) {
-    //#region @backendFunc
-    if (!orgProj) {
-      orgProj = currentProj;
-    }
-    const availableDeps = allAvailableProjects
-      .filter(p => !deps.includes(p))
-      ;
-
-    const depsToAppend = availableDeps.filter(p => {
-      const res = p['packageJson'].hasDependency(currentProj.name, true);
-      // if (res) {
-      //   Helpers.log(`${chalk.bold(orgProj.name + '/' + currentProj.name)} ${p.name} has dependency ${currentProj.name}`);
-      // }
-      return res;
-    })
-
-    depsToAppend.forEach(p => deps.push(p));
-    // console.log(`after appending deps ${chalk.bold(orgProj.name + '/' + currentProj.name)}`
-    //   , deps.map(d => chalk.gray(d.name)).join(','))
-
-    depsToAppend.forEach(p => {
-      Project.recrusiveFind(p, allAvailableProjects, deps, orgProj);
-    });
-    return deps;
-    //#endregion
-  }
-
-  static filterDontCopy(basePathFoldersTosSkip: string[], projectOrBasepath: Project | string) {
-    //#region @backendFunc
-    return (src: string, dest: string) => {
-      // console.log('src', src)
-      src = crossPlatformPath(src);
-      const baseFolder = _.first(crossPlatformPath(src)
-        .replace(crossPlatformPath(_.isString(projectOrBasepath) ? projectOrBasepath : projectOrBasepath.location), '')
-        .replace(/^\//, '').split('/'));
-
-      // console.log('baseFolder', baseFolder)
-      if (!baseFolder || baseFolder.trim() === '') {
-        return true;
-      }
-      const isAllowed = _.isUndefined(basePathFoldersTosSkip
-        .find(f => baseFolder.startsWith(crossPlatformPath(f))));
-
-      // console.log('isAllowed', isAllowed)
-      return isAllowed;
-    };
-    //#endregion
-  }
-
-  static get Current(): Project<any> {
-    //#region @backendFunc
-    const current = Project.From(process.cwd())
-    if (!current) {
-      Helpers.warn(`[firedev-helpers] Current location is not a ${CLI.chalk.bold(config.frameworkName)} type project.
-
-     location: "${process.cwd()}"
-
-     }`);
-      return void 0;
-    }
-    return current;
-    //#endregion
-  }
-
-
+  //#region methods / get class function
   /**
    * @deprecated
    */
-  static get Tnp(): Project<any> {
+  private getClassFunction(className) {
+    const classFN = CLASS.getBy(className) as any;
+    if (!classFN) {
+      Helpers.error(`[firedev-helpers][Project.From] cannot find class function by name ${className}`)
+    }
+    return classFN;
+  }
+  //#endregion
+
+  //#region methods / check if type is not correct
+  /**
+   * @deprecated
+   */
+  private checkIfTypeIsNotCorrect(type, location) {
+    if (_.isString(type) && !LibTypeArr.includes(type as any)) {
+      Helpers.error(`Incorrect type: "${type}"
+
+    Please use one of this: ${LibTypeArr.join(',')}
+
+    in
+    package.json > ${config.frameworkName}.type
+
+    location: ${location}
+
+    `, false, true);
+    }
+  }
+  //#endregion
+
+}
+//#endregion
+
+
+//#region PROJECT
+export class Project extends BaseProject<Project>
+{
+
+  //#region static
+
+  //#region static / instace of resolve
+  static ins = new FiredevProjectResolve(Project);
+  //#endregion
+
+  //#region static / tnp proj
+  /**
+   * @deprecated
+   */
+  static get Tnp(): Project {
     //#region @backendFunc
-    let tnpPorject = Project.From(config.pathes.tnp_folder_location);
+    let tnpPorject = this.ins.From(config.pathes.tnp_folder_location);
     Helpers.log(`Using ${config.frameworkName} path: ${config.pathes.tnp_folder_location}`, 1)
     if (!tnpPorject && !global.globalSystemToolMode) {
       Helpers.error(`Not able to find tnp project in "${config.pathes.tnp_folder_location}".`)
@@ -679,14 +444,22 @@ export class $Project<T extends Project<any> = any>
     return tnpPorject;
     //#endregion
   }
+  //#endregion
 
-  public static by<T = Project>(
+  //#region static / from
+  public static From(locationOfProject: string | string[]): Project {
+    return this.ins.From(locationOfProject)
+  }
+  //#endregion
+
+  //#region static / by
+  public static by(
     libraryType: ConfigModels.NewFactoryType,
     version: ConfigModels.FrameworkVersion
       //#region @backend
       = config.defaultFrameworkVersion
     //#endregion
-  ): T {
+  ): Project {
     //#region @backendFunc
 
     if (libraryType === 'container') {
@@ -710,181 +483,114 @@ export class $Project<T extends Project<any> = any>
 
      `, false, false);
     }
-    return Project.From<T>(projectPath);
+    return this.ins.From(projectPath);
     //#endregion
   }
   //#endregion
 
-  //#region fields & gettters
-  protected cache = {};
+  //#region static / curremt
+  public static get Current() {
+    return this.ins.Current;
+  }
+  //#endregion
 
-  /**
-   * Do use this variable for comparatios
-   * ONLY FOR VIEWING
-   */
-  public readonly _type: ConfigModels.LibType;
-  public browser: Pick<Project<any>, 'location' | 'name'> = {} as any;
-  public location: string;
-  public name: string;
-  public genericName: string;
-  public isVscodeExtension: boolean;
-  public isDocker: boolean;
-  public isCoreProject: boolean;
-  public isCommandLineToolOnly: boolean;
-  public isGeneratedForRelease: boolean;
-  public isForRecreation: boolean;
-  public isContainer: boolean;
-  public isSmartContainer: boolean;
-  public isSmartContainerChild: boolean;
-  public isContainerWithLinkedProjects: boolean;
-  public isContainerChild: boolean;
-  public isContainerCoreProject: boolean;
-  public isStandaloneProject: boolean;
-  public isMonorepo: boolean;
-  public isUnknowNpmProject: boolean;
-  public isNaviCli: boolean;
-  public useFramework: boolean;
-  public defaultPort?: number;
-  public version: string;
-  public lastNpmVersion?: string;
-  public type: ConfigModels.LibType;
-  public backupName: string;
-  public resources: string[];
-  public env?: any;
-  public allowedEnvironments: ConfigModels.EnvironmentName[];
+  //#region static / resovle child project
+  public static resolveChildProject(args: string | string[]) {
+    return this.ins.resolveChildProject(args);
+  }
+  //#endregion
 
-  public children: T[];
-  public smartContainerBuildTarget: T;
-  public grandpa: T;
-
-  public distribution: T;
-
-  public childrenThatAreLibs?: T[];
-
-  public childrenThatAreThirdPartyInNodeModules?: T[];
-
-  public parent: T;
 
   //#endregion
 
-  //#region methods
-  defineProperty<T>(variableName: keyof T, classFn: Function) {
-    //#region @backendFunc
-    const that = this;
+  // @ts-ignore
+  public get ins(): FiredevProjectResolve<Project> {
+    return Project.ins;
+  };
 
-    const className = CLASS.getName(classFn);
+  readonly type: ConfigModels.LibType;
 
-    // @ts-ignore
-    const prefixedName = `__${variableName}`
-    Object.defineProperty(this, variableName, {
-      get: function () {
-        if (!that[prefixedName]) {
-          if (className === 'CopyManager') {
-            const CopyMangerClass = CLASS.getBy('CopyManager') as any; // TODO @LAST
-            that[prefixedName] = CopyMangerClass.for(this);
-          } else {
-            if (typeof classFn === 'function') {
-              that[prefixedName] = new (classFn as any)(that);
-            } else {
-              Helpers.warn(`[firedev-helpers] Cannot create dynamic instance of class "${_.kebabCase(prefixedName.replace('__', ''))}".`)
-            }
-          }
+  //#region @backend
+  env?: EnvironmentConfig;
+  //#endregion
+  browser: any;
 
-        }
-        return that[prefixedName];
-      },
-      set: function (v) {
-        that[prefixedName] = v;
-      },
-    })
+  //#region @backend
+  private getAllChildren(options?: { excludeUnknowProjects: boolean; }) {
+    if (this.typeIs('unknow')) {
+      return [];
+    }
+    if (_.isUndefined(options)) {
+      options = {} as any;
+    }
+    if (_.isUndefined(options.excludeUnknowProjects)) {
+      options.excludeUnknowProjects = true;
+    }
+    const { excludeUnknowProjects } = options;
+    const subdirectories = this.getFolders();
+
+    let res = subdirectories
+      .map(dir => {
+        // console.log('child:', dir)
+        return Project.From(dir);
+      })
+      .filter(c => !!c)
+
+    if (excludeUnknowProjects) {
+      res = res.filter(c => {
+        const isNot = c.typeIsNot('unknow');
+
+        return isNot;
+      })
+    }
+    return res;
+  }
+  //#endregion
+
+  get children(): Project[] {
+    if (Helpers.isBrowser) {
+      return this.browser.children as any;
+    }
+    //#region @backend
+
+    if (this.pathExists('taon.json')) {
+      const taonChildren = Helpers.foldersFrom(this.location)
+        .filter(f => !f.startsWith('.') && ![
+          config.folder.node_modules,
+        ].includes(path.basename(f)))
+        .map(f => Project.From(f) as Project)
+        .filter(f => !!f);
+      // console.log({
+      //   taonChildren: taonChildren.map(c => c.location)
+      // })
+      return taonChildren;
+    }
+
+    if (this.isTnp && !global.globalSystemToolMode) {
+      return [];
+    }
+    if (this.typeIs('unknow')) {
+      return [];
+    }
+    const all = this.getAllChildren();
+    // console.log({
+    //   all: all.map(c => c.location)
+    // })
+    return all;
     //#endregion
   }
 
   public setType(this: Project, type: ConfigModels.LibType) {
     // @ts-ignore
-    this._type = type;
+    this.type = type;
   }
   public typeIs(this: Project, ...types: ConfigModels.LibType[]) {
-    return this._type && types.includes(this._type);
+    return this.type && types.includes(this.type);
   }
 
   public typeIsNot(this: Project, ...types: ConfigModels.LibType[]) {
     return !this.typeIs(...types);
   }
-
-  async assignFreePort(startFrom: number, howManyFreePortsAfterThatPort: number = 0): Promise<number> {
-    //#region @backendFunc
-    const max = 2000;
-    let i = 0;
-    while (takenPorts.includes(startFrom)) {
-      startFrom += (1 + howManyFreePortsAfterThatPort);
-    }
-    while (true) {
-      try {
-        const port = await portfinder.getPortPromise({ port: startFrom });
-        takenPorts.push(port);
-        return port;
-      } catch (err) {
-        console.log(err)
-        Helpers.warn(`Trying to assign port  :${startFrom} but already in use.`, false);
-      }
-      startFrom += 1;
-      if (i++ === max) {
-        Helpers.error(`[firedev-helpers]] failed to assign free port after ${max} trys...`);
-      }
-    }
-    //#endregion
-  }
-
-  forEmptyStructure(): EmptyProjectStructure[] {
-    //#region @backendFunc
-    return [
-      { relativePath: config.file.package_json, includeContent: true },
-      { relativePath: config.folder.src },
-    ];
-    //#endregion
-  }
-  //#endregion
-
-}
-
-
-
-//#region @backend
-function getClassFunction(className) {
-  const classFN = CLASS.getBy(className) as any;
-  if (!classFN) {
-    Helpers.error(`[firedev-helpers][Project.From] cannot find class function by name ${className}`)
-  }
-  return classFN;
-}
-
-
-function checkIfTypeIsNotCorrect(type, location) {
-  if (_.isString(type) && !LibTypeArr.includes(type as any)) {
-    Helpers.error(`Incorrect type: "${type}"
-
-    Please use one of this: ${LibTypeArr.join(',')}
-
-    in
-    package.json > ${config.frameworkName}.type
-
-    location: ${location}
-
-    `, false, true);
-  }
-}
-//#endregion
-
-
-
-
-export class Project<T = any> extends $Project<Project>
-{
-  //#region @backend
-  env?: EnvironmentConfig;
-  //#endregion
-  browser: any;
 
   private _projectInfoPort: number;
 
@@ -960,7 +666,7 @@ export class Project<T = any> extends $Project<Project>
       return this.browser.info as any;
     }
     //#region @backend
-    return `(${this._type}) ${this.genericName} `;
+    return `(${this.type}) ${this.genericName} `;
     //#endregion
   }
 
@@ -968,17 +674,6 @@ export class Project<T = any> extends $Project<Project>
     return Project.Tnp;
   }
 
-  get isReleaseDistMode() {
-    return Project.isReleaseDistMode;
-  }
-
-  removeItself(this: Project) {
-    //#region @backend
-    const location = this.location;
-    Project.projects = Project.projects.filter(p => p.location !== location);
-    Helpers.tryRemoveDir(location);
-    //#endregion
-  }
 
   //#region @backend
   /**
@@ -1006,7 +701,7 @@ export class Project<T = any> extends $Project<Project>
       this.defineProperty<Project>('tests', MochaTestRunner);
       this.defineProperty<Project>('testsJest', JestTestRunner);
       this.defineProperty<Project>('testsCypress', CypressTestRunner);
-      Project.projects.push(this);
+      Project.ins.add(this);
       this.defineProperty<Project>('env', EnvironmentConfig);
       this.defineProperty<Project>('copyManager', CopyManager);
       this.defineProperty<Project>('filesStructure', FilesStructure);
@@ -1032,7 +727,7 @@ export class Project<T = any> extends $Project<Project>
 //#region @backend
 // @ts-ignore
 export interface Project extends
-  BaseProject,
+  BaseFiredevProject,
   NpmProject,
   FeatureProject,
   FiredevProject,
@@ -1052,7 +747,7 @@ export interface Project extends
 
 //#region @backend
 Helpers.applyMixins(Project, [
-  BaseProject,
+  BaseFiredevProject,
   NpmProject,
   FeatureProject,
   FiredevProject,
@@ -1071,6 +766,10 @@ Helpers.applyMixins(Project, [
 //#endregion
 
 
+//#endregion
+
+
+//#region PROJECT CONTAINER
 @CLASS.NAME('ProjectContainer')
 export class ProjectContainer
   //#region @backend
@@ -1089,7 +788,7 @@ export class ProjectContainer
     const repoChilds = this.getFolders()
       .sort()
       .map(c => {
-        const proj = Project.From<Project>(c);
+        const proj = Project.From(c);
         if (!proj) {
           Helpers.log(`No project from ${c}`);
         }
@@ -1105,7 +804,7 @@ export class ProjectContainer
 
     // repoChilds.forEach(name => {
     //   if (_.isUndefined(this.packageJson.linkedProjects.find(p => p === name))
-    //     && Project.From<Project>(path.join(this.location, name))?.git.isGitRepo) {
+    //     && Project.From(path.join(this.location, name))?.git.isGitRepo) {
     //     chagned = true;
     //     this.packageJson.linkedProjects.push(name);
     //   }
@@ -1209,8 +908,10 @@ ${this.children.filter(c => c.typeIs('isomorphic-lib')).map(c => {
     //#endregion
   }
 }
+//#endregion
 
 
+//#region PROJECT ISOMORPHIC LIB
 //#region consts
 // const loadNvm = ''// 'echo ' // 'export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" && [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh" && nvm use v14';
 //#endregion
@@ -1350,7 +1051,7 @@ export class ProjectIsomorphicLib
 
     if (this.frameworkVersionAtLeast('v2')) {
       files.push({
-        sourceProject: Project.by<Project>(this._type, 'v1'),
+        sourceProject: Project.by(this.type, 'v1'),
         relativePath: 'webpack.backend-dist-build.js'
       });
     }
@@ -1591,7 +1292,7 @@ export class ProjectIsomorphicLib
               }
             }
           ]) as any;
-        client = Project.From<Project>(path.join(this.location, '..', answer.project));
+        client = Project.From(path.join(this.location, '..', answer.project));
       }
     }
     //#endregion
@@ -2004,9 +1705,6 @@ export class ProjectIsomorphicLib
 
   //#endregion
 
-
-  //#endregion
-
   //#region private methods
 
   //#region private methods / show message when build lib done for smart container
@@ -2082,7 +1780,6 @@ export class ProjectIsomorphicLib
   }
 
   //#endregion
-
 
   //#region private methods / fix build dirs
   private fixBuildDirs(outDir: Models.dev.BuildDir) {
@@ -2327,10 +2024,10 @@ export class ProjectIsomorphicLib
   //#endregion
 
 }
+//#endregion
 
 
-
-
+//#region PROJECT NAVI
 /**
  * DO NOT USE environment variables in this project directly
  */
@@ -2355,9 +2052,10 @@ export class ProjectNavi extends Project {
     //#endregion
   }
 }
+//#endregion
 
 
-
+//#region PROJECT SCENARIO REQ RES
 /**
  * DO NOT USE environment variables in this project directly
  */
@@ -2382,9 +2080,10 @@ export class ProjectScenarioReqRes extends Project {
     //#endregion
   }
 }
+//#endregion
 
 
-
+//#region UNKNOW NPM PROJEC
 /**
  * DO NOT USE environment variables in this project directly
  */
@@ -2395,6 +2094,7 @@ export class ProjectUnknowNpm extends Project {
   async buildLib() { }
   projectSpecyficFiles(): string[] {
     //#region @backendFunc
+    this.children
     return []
     //#endregion
   }
@@ -2409,21 +2109,17 @@ export class ProjectUnknowNpm extends Project {
     //#endregion
   }
 }
+//#endregion
 
 
-
-
+//#region VSCODE EXT PROJECT
 /**
  * DO NOT USE environment variables in this project directly
  */
 //#region @backend
 @CLASS.NAME('ProjectVscodeExt')
 //#endregion
-export class ProjectVscodeExt
-  //#region @backend
-  extends Project
-//#endregion
-{
+export class ProjectVscodeExt extends Project {
   async buildLib() { }
 
   recreateIfNotExists() {
@@ -2487,5 +2183,4 @@ export class ProjectVscodeExt
     //#endregion
   }
 }
-
-
+//#endregion

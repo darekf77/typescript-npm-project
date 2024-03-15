@@ -32,7 +32,7 @@ export class LibProjectSmartContainer extends LibPorjectBase {
         proj.packageJson.data.tnp.type = 'isomorphic-lib';
         proj.packageJson.data.tnp.version = smartContainer._frameworkVersion;
         proj.packageJson.save('updating version for publish');
-        Project.unload(proj);
+        Project.ins.unload(proj);
         proj = Project.From(absFolder) as Project;
         const child = smartContainer.children.find(c => c.name === path.basename(absFolder));
         const packgeJsonPath = proj.packageJson.path;
@@ -45,7 +45,7 @@ export class LibProjectSmartContainer extends LibPorjectBase {
         pj.engines = child.packageJson.data.engines;
         pj.homepage = child.packageJson.data.homepage;
         Helpers.writeJson(packgeJsonPath, pj);
-        Project.unload(proj);
+        Project.ins.unload(proj);
       });
 
   }

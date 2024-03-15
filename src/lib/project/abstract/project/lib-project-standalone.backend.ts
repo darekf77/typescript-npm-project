@@ -182,7 +182,7 @@ export class LibProjectStandalone extends LibPorjectBase {
 
       // publishing standalone
       try {
-        this.project.run('npm publish', {
+        Helpers.run('npm publish', {
           cwd: existedReleaseDist,
           output: true
         }).sync();

@@ -61,13 +61,6 @@ export function $GIT_QUICK_RESET_HARD_AND_PULL(args, exit = true) {
   exit && process.exit(0);
 }
 
-const $GIT_REMOVE_UNTRACKED_EVERYWHERE = () => {
-  Project.projects.forEach(p => {
-    Helpers.run(`${config.frameworkName} ${Helpers.cliTool.simplifiedCmd($GIT_REMOVE_UNTRACKED.name)}`, { cwd: p.location }).sync()
-  });
-  process.exit(0);
-}
-
 export async function $PUSH(comitMessage: string, exit = true, force = false) {
   await Project.Current.gitActions.push(comitMessage, force);
   process.exit(0);
@@ -105,7 +98,7 @@ export async function $CLONE(args: string, exit = true) {
 
 export async function $RECOMMIT(args: string, exit = true) {
   const p = Project.Current;
-  const lastMsg = p.run(`git log -1 --pretty=%B`, { output: false, cwd: p.location }).sync().toString().trim();
+  const lastMsg = p.run(`git log -1 --pretty=%B`, { output: false }).sync().toString().trim();
   p.run(`git reset --soft HEAD~1 && git add --all . && git commit -m "${lastMsg}"`).sync();
   Helpers.info(`Recomit done..msg:
         ${Helpers.terminalLine()}
@@ -246,7 +239,6 @@ export default {
   $GIT_QUICK_COMMIT_AND_PUSH: Helpers.CLIWRAP($GIT_QUICK_COMMIT_AND_PUSH, '$GIT_QUICK_COMMIT_AND_PUSH'),
   $GIT_QUICK_RESET_HARD_AND_PULL: Helpers.CLIWRAP($GIT_QUICK_RESET_HARD_AND_PULL, '$GIT_QUICK_RESET_HARD_AND_PULL'),
   $GIT_REMOVE_UNTRACKED: Helpers.CLIWRAP($GIT_REMOVE_UNTRACKED, '$GIT_REMOVE_UNTRACKED'),
-  $GIT_REMOVE_UNTRACKED_EVERYWHERE: Helpers.CLIWRAP($GIT_REMOVE_UNTRACKED_EVERYWHERE, '$GIT_REMOVE_UNTRACKED_EVERYWHERE'),
   $RENAME_ORIGIN: Helpers.CLIWRAP($RENAME_ORIGIN, '$RENAME_ORIGIN'),
   $SET_ORIGIN: Helpers.CLIWRAP($SET_ORIGIN, '$SET_ORIGIN'),
   $PUSH: Helpers.CLIWRAP($PUSH, '$PUSH'),

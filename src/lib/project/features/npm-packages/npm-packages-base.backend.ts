@@ -105,7 +105,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
 
     if (this.project.isStandaloneProject || this.project.isUnknowNpmProject || this.project.isContainer) {
 
-      this.project.packageJson.showDeps(`${this.project._type} instalation before full insall [${triggeredMsg}]`);
+      this.project.packageJson.showDeps(`${this.project.type} instalation before full insall [${triggeredMsg}]`);
 
 
       const installAllowed = (
@@ -146,7 +146,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
 
       }
 
-      this.project.packageJson.save(`${this.project._type} instalation after  [${triggeredMsg}]`);
+      this.project.packageJson.save(`${this.project.type} instalation after  [${triggeredMsg}]`);
     }
 
     if (global.tnpNonInteractive) {

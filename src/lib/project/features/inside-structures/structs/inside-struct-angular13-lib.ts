@@ -68,7 +68,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
         //#endregion
       ],
       //#endregion
-      projectType: project._type,
+      projectType: project.type,
       frameworkVersion: project._frameworkVersion,
       pathReplacements: [
         [new RegExp('^lib\\/'), ({ client }) => {

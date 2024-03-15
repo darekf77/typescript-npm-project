@@ -63,7 +63,7 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         'app/tsconfig.spec.json',
         //#endregion
       ],
-      projectType: project._type,
+      projectType: project.type,
       frameworkVersion: project._frameworkVersion,
       pathReplacements: [
         ['app/', ({ client }) => {

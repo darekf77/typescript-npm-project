@@ -143,7 +143,7 @@ export class PackageJsonBase extends PackageJsonCore {
   public updateFrom(locations: string[]) {
     for (let index = 0; index < locations.length; index++) {
       const location = locations[index];
-      const otherProj = Project.From<Project>(location);
+      const otherProj = Project.From(location);
       Helpers.log(`Updating package.json from ${otherProj.name}`)
       updaPackage(this.project, otherProj.packageJson.data.dependencies, otherProj);
       updaPackage(this.project, otherProj.packageJson.data.devDependencies, otherProj);

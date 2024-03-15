@@ -435,7 +435,7 @@ ${withoutNodeModules.map(c => `\t- ${c.name} in ${c.location}`).join('\n ')}
 
     const startCopyToManager = async () => {
       Helpers.info(`${buildOptions.watch ? 'files watch started...' : ''}`);
-      Helpers.log(`[buildable-project] Build steps ended (project type: ${this._type}) ... `);
+      Helpers.log(`[buildable-project] Build steps ended (project type: ${this.type}) ... `);
 
       if (!buildOptions.appBuild) {
         if ((this.isStandaloneProject && this.typeIs('isomorphic-lib')) || this.isSmartContainer) {

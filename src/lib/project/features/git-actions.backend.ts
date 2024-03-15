@@ -317,7 +317,7 @@ ${remotes.map((r, i) => `${i + 1}. ${r.origin} ${r.url}`).join('\n')}
     // }
 
     const location = this.project.location;
-    Project.unload(this.project);
+    Project.ins.unload(this.project);
     this.project = Project.From(location) as Project;
 
     if (this.project) {

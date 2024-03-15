@@ -78,8 +78,8 @@ export namespace CopyMangerHelpers {
 
     // console.log(foldersToSkip)
 
-    const filter = override ? Project.filterOnlyCopy(sourceFolders, project)
-      : Project.filterDontCopy(foldersToSkip, project);
+    const filter = override ? project.filterOnlyCopy(sourceFolders)
+      : project.filterDontCopy(foldersToSkip);
 
     Helpers.copy(`${sourceLocation}/`, tempDestination, { filter, dereference: options.dereference });
 

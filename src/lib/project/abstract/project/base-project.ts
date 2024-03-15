@@ -8,7 +8,7 @@ import { Helpers } from 'tnp-helpers/src';
 import { Project } from './project';
 import { config } from 'tnp-config/src';
 
-export abstract class BaseProject {
+export abstract class BaseFiredevProject {
 
   // @ts-ignore
   public get npmPackageName(this: Project): string {

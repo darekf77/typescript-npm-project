@@ -23,9 +23,9 @@ async function copyModuleto(args: string) {
       packageName = packageName.replace(`${config.folder.node_modules}/`, '')
     }
     if (!path.isAbsolute(project)) {
-      project = Project.From<Project>(path.join(process.cwd(), project)) as Project;
+      project = Project.From(path.join(process.cwd(), project));
     } else {
-      project = Project.From<Project>(project) as Project;
+      project = Project.From(project) as Project;
     }
 
     await project.node_modules.copy(packageName).to(project);
@@ -42,7 +42,7 @@ async function copyModuleto(args: string) {
 function copyToDestination(destLocaiton) {
 
   const currentLib = Project.Current;
-  const destination = Project.From<Project>(destLocaiton);
+  const destination = Project.From(destLocaiton);
   if (!destination) {
     Helpers.error(`Incorect project in: ${destLocaiton}`)
   }

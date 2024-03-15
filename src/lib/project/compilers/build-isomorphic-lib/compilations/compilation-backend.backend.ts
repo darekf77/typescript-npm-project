@@ -104,7 +104,7 @@ export class BackendCompilation extends IncCompiler.Base {
     }
     // let id = BackendCompilation.counter++;
 
-    const project = Project.nearestTo(cwd) as Project;
+    const project = Project.ins.nearestTo(cwd) as Project;
 
 
     const paramsNoWatch = [

@@ -50,7 +50,7 @@ export function dedupePackages(projectLocation: string, packagesNames?: string[]
     }
     let pathToCurrent = path.join(projectLocation, config.folder.node_modules, f, organizationProjectSeondPart);
 
-    const current = Project.From<Project>(pathToCurrent);
+    const current = Project.From(pathToCurrent);
 
     if (!current) {
       warnings && Helpers.log(`Project with name ${f} not founded`);
@@ -76,7 +76,7 @@ export function dedupePackages(projectLocation: string, packagesNames?: string[]
     if (countOnly) {
       duplicates.forEach((duplicateRelativePath, i) => {
         let p = path.join(projectLocation, duplicateRelativePath, organizationProjectSeondPart);
-        const nproj = Project.From<Project>(p);
+        const nproj = Project.From(p);
         if (!nproj) {
           // Helpers.warn(`Not able to identyfy project in ${p}`)
         } else {
@@ -90,7 +90,7 @@ export function dedupePackages(projectLocation: string, packagesNames?: string[]
     } else {
       duplicates.forEach(duplicateRelativePath => {
         const p = path.join(projectLocation, duplicateRelativePath);
-        const projRem = Project.From<Project>(p);
+        const projRem = Project.From(p);
         const versionRem = projRem && projRem.version;
 
         let parentName = path.basename(
@@ -217,7 +217,7 @@ export function addDependenceis(project: Project, context: string, allNamesBefor
 
   const projects = newNames
     .map(name => {
-      return Project.From<Project>(path.join(context, config.folder.node_modules, name))
+      return Project.From(path.join(context, config.folder.node_modules, name))
     })
     .filter(f => !!f);
 

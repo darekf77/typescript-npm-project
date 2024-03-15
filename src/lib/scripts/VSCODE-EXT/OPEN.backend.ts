@@ -36,9 +36,9 @@ function $OPEN_CORE_CONTAINER() {
 //#region open / core project
 function $OPEN_CORE_PROJECT() {
   if (Project.Current.isCoreProject && Project.Current.frameworkVersionAtLeast('v2')) {
-    Project.Current.run(`code ${Project.by<Project>(Project.Current._type, Project.Current.frameworkVersionMinusOne).location} &`).sync();
+    Project.Current.run(`code ${Project.by(Project.Current.type, Project.Current.frameworkVersionMinusOne).location} &`).sync();
   } else {
-    Project.Current.run(`code ${Project.by<Project>(Project.Current._type, Project.Current._frameworkVersion).location} &`).sync();
+    Project.Current.run(`code ${Project.by(Project.Current.type, Project.Current._frameworkVersion).location} &`).sync();
   }
   process.exit(0)
 }
@@ -66,7 +66,7 @@ async function $OPEN_UNSTAGE() {
 
 //#region open / thing..
 function openThing(fileName: string) {
-  const proj = Project.nearestTo(process.cwd()) as Project;
+  const proj = Project.ins.nearestTo(process.cwd()) as Project;
 
   const openFn = (pathToTHing) => {
     if (fileName.endsWith('.json')) {

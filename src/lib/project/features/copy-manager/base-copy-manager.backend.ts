@@ -241,7 +241,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
           generatedVer.packageJson.data.tnp.type = 'isomorphic-lib';
           generatedVer.packageJson.data.tnp.version = this.project._frameworkVersion;
           generatedVer.packageJson.save('saving proper child version');
-          Project.unload(generatedVer);
+          Project.ins.unload(generatedVer);
           generatedVer = Project.From(crossPlatformPath(path.join(destinationLocation, c.name)));
         });
       }

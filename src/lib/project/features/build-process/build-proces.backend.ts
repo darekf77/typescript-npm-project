@@ -109,7 +109,7 @@ to fix it.
 
     `)
 
-    log.data(`[build] in build of ${this.project.genericName}, type: ${this.project._type}`);
+    log.data(`[build] in build of ${this.project.genericName}, type: ${this.project.type}`);
     //#endregion
 
     this.project.buildOptions = buildOptions;
@@ -238,7 +238,7 @@ ${config.frameworkName} start
     log.data(`
 
     projec: ${this.project.genericName}
-    type: ${this.project._type}
+    type: ${this.project.type}
     `);
 
 
