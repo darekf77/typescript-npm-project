@@ -332,7 +332,7 @@ processing...
 
           break;
         } catch (error) {
-          Helpers.pressKeyAndContinue(`Not able to RELEASE your project ${chalk.bold(child.genericName)} pressa any keyt to try again..`);
+          Helpers.pressKeyAndContinue(`Not able to RELEASE your project ${chalk.bold(child.genericName)} press any key to try again..`);
         }
       }
 
