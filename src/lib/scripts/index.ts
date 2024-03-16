@@ -1,5 +1,4 @@
 //#region  @backend
-import { DB } from 'tnp-db/src';
 import DEPS from './DEPENDENCIES-MANAGEMENT/DEPS.backend';
 import NEW from './NEW-PROJECT_FILES_MODULES/NEW.backend';
 import BUILD from './PROJECTS-DEVELOPMENT/BUILD.backend';
@@ -17,7 +16,6 @@ import UPDATE from './UPDATE.backend';
 import CI from './CI.backend';
 
 export default [
-  DB,
   DEPS,
   CI,
   NEW,

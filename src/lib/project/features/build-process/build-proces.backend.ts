@@ -6,7 +6,7 @@ import { path } from 'tnp-core/src'
 import { glob } from 'tnp-core/src';
 
 import { Project } from '../../abstract/project/project';
-import { BuildOptions } from 'tnp-db/src';
+import { BuildOptions } from '../../../build-options';
 import { Models } from 'tnp-models/src';
 import { config, ConfigModels } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
@@ -62,7 +62,7 @@ export class BuildProcessFeature extends FeatureForProject {
   async startForLib(options: Models.dev.StartForOptions, exit = true) {
     options = BuildProcessFeature.prepareOptionsBuildProcess(options, this.project) as any;
     options.appBuild = false;
-    const buildOptions: BuildOptions = await BuildOptions.from(options.args, this.project as any, options, 'startForLib');
+    const buildOptions: BuildOptions = await BuildOptions.from(options.args, options, 'startForLib');
     await this.build(buildOptions, config.allowedTypes.libs, exit);
   }
 
@@ -73,7 +73,7 @@ export class BuildProcessFeature extends FeatureForProject {
   async startForApp(options: Models.dev.StartForOptions, exit = true) {
     options = BuildProcessFeature.prepareOptionsBuildProcess(options, this.project) as any;
     options.appBuild = true;
-    const buildOptions: BuildOptions = await BuildOptions.from(options.args, this.project as any, options, 'startForApp');
+    const buildOptions: BuildOptions = await BuildOptions.from(options.args, options, 'startForApp');
     await this.build(buildOptions, config.allowedTypes.app, exit);
   }
   //#endregion

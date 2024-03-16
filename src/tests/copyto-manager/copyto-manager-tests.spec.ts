@@ -10,12 +10,12 @@ import { config } from 'tnp-config/src';
 import { Project } from '../../lib/project/abstract/project/project';
 import { Helpers } from 'tnp-helpers/src';
 import { CLASS } from 'typescript-class-helpers/src';
-import { ProjectIsomorphicLib } from '../../lib/project/project-specyfic/project-isomorphic-lib';
-import { ProjectContainer } from '../../lib/project/project-specyfic/project-container';
-import { BuildOptions } from 'tnp-db/src';
+import { ProjectIsomorphicLib } from '../../lib/project/abstract/project/project';
+import { ProjectContainer } from '../../lib/project/abstract/project/project';
+import { BuildOptions } from '../../lib/build-options';
 import { PackageJSON } from '../../lib/project/features/package-json/package-json';
 import { dummyfiles } from './copyto-manager-dummy-files';
-import { ProjectUnknowNpm } from '../../lib/project/project-specyfic/project-unknow-npm';
+import { ProjectUnknowNpm } from '../../lib/project/abstract/project/project';
 
 //#endregion
 

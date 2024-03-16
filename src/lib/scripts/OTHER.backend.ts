@@ -191,80 +191,11 @@ function ENV_CHECK() {
 }
 
 
-async function $AA() {
-  console.log(CLASS.getBy('Project'))
-}
-
-// function CROP(args: string) {
-//   const argv = args.split(' ');
-//   const replacements = [
-//     ['@backe'+'ndFunc', `return (void 0);`],
-//     '@back'+'end' as any,
-//     '@notF'+'orNpm',
-//     ['@cutCod'+'eIfTrue', codeCuttFn(true)],
-//     ['@cutCode'+'IfFalse', codeCuttFn(false)]
-//   ] as Models.dev.Replacement[];
-//   let filePath = _.first(argv);
-//   if (!path.isAbsolute(filePath)) {
-//     filePath = path.join(process.cwd(), filePath);
-//   }
-//   const rm = RegionRemover.from(filePath, Helpers.readFile(filePath), replacements, Project.Current as Project);
-//   const output = rm.output;
-//   Helpers.writeFile(path.join(process.cwd(), `output-${path.basename(filePath)}`), output);
-//   Helpers.info('DONE');
-//   process.exit(0);
-// }
-
-async function $SEND_EMAIL(args: string) {
-  // Helpers.info('Send email');
-  // // Generate test SMTP service account from ethereal.email
-  // // Only needed if you don't have a real mail account for testing
-  // let testAccount = await nodemailer.createTestAccount();
-
-  // // create reusable transporter object using the default SMTP transport
-  // let transporter = nodemailer.createTransport({
-  //   host: "smtp.ethereal.email",
-  //   port: 587,
-  //   secure: false, // true for 465, false for other ports
-  //   auth: {
-  //     user: testAccount.user, // generated ethereal user
-  //     pass: testAccount.pass, // generated ethereal password
-  //   },
-  // });
-
-  // // send mail with defined transport object
-  // let info = await transporter.sendMail({
-  //   from: '"Fred Foo 👻" <foo@example.com>', // sender address
-  //   to: "darekf77@icloud.com", // list of receivers
-  //   subject: "Hello ✔", // Subject line
-  //   text: "Hello world?", // plain text body
-  //   html: "<b>Hello world?</b>", // html body
-  // });
-
-  // console.log("Message sent: %s", info.messageId);
-  // // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-  // // Preview only available when sending through an Ethereal account
-  // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-  // // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-  // process.exit(0);
-}
 
 async function $THROW_ERR() {
   Helpers.error(`Erororoororo here`, false, true);
 }
 
-async function $OUTPUT_TEST_ASCII() {
-
-  // console.log(`"${Helpers.commnadOutputAsString('date')}"`);
-  // console.log(`"${Helpers.commnadOutputAsString('date')}"`);
-  // console.log(`"${Helpers.commnadOutputAsString('${config.frameworkName} version')}"`);
-  // console.log(`version "${Helpers.commnadOutputAsString('${config.frameworkName} version')}"`);
-  // console.log(`version "${Helpers.commnadOutputAsString('navi version')}"`);
-  // console.log(`version "${await Helpers.run(`${config.frameworkName} version`, { output: true }).asyncAsPromise()}`)
-
-  process.exit(0)
-}
 
 export function $PRINT_RELATIVES(folder) {
   const base = folder;
@@ -334,10 +265,7 @@ export default {
   $MP4: Helpers.CLIWRAP($MP4, '$MP4'),
   //#endregion
   $PRINT_RELATIVES: Helpers.CLIWRAP($PRINT_RELATIVES, '$PRINT_RELATIVES'),
-  $OUTPUT_TEST_ASCII: Helpers.CLIWRAP($OUTPUT_TEST_ASCII, '$OUTPUT_TEST_ASCII'),
   $THROW_ERR: Helpers.CLIWRAP($THROW_ERR, '$THROW_ERR'),
-  $SEND_EMAIL: Helpers.CLIWRAP($SEND_EMAIL, '$SEND_EMAIL'),
-  $AA: Helpers.CLIWRAP($AA, '$AA'),
   // CROP: Helpers.CLIWRAP(CROP, 'CROP'),
   NPM_FIXES: Helpers.CLIWRAP(NPM_FIXES, 'NPM_FIXES'),
   // $COPY_FROM(args: string) {

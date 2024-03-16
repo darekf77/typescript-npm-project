@@ -10,7 +10,7 @@ import { config, ConfigModels, extAllowedToReplace, frontEndOnly, TAGS } from 't
 import { Models } from 'tnp-models/src';
 import { Helpers } from 'tnp-helpers/src';
 import type { Project } from '../../../abstract/project/project';
-import { BuildOptions } from 'tnp-db/src';
+import { BuildOptions } from '../../../../build-options';
 import { RegionRemover } from 'isomorphic-region-loader/src';
 import { MjsModule } from '../../../features/copy-manager/mjs-fesm-module-spliter.backend';
 import { CLI } from 'tnp-cli/src';

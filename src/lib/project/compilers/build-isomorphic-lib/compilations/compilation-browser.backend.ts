@@ -10,7 +10,7 @@ import { IncCompiler } from 'incremental-compiler/src';
 import { config, ConfigModels } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
 import { BackendCompilation } from './compilation-backend.backend';
-import { BuildOptions } from 'tnp-db/src';
+import { BuildOptions } from '../../../../build-options';
 import { Project } from '../../../abstract/project/project';
 import { Models } from 'tnp-models/src';
 import { JSON10 } from 'json10/src';
@@ -229,10 +229,9 @@ export class BroswerCompilation extends BackendCompilation {
     this.ENV = env;
     // console.log('here1')
 
-    const ProjectClass = CLASS.getBy('Project') as typeof Project;
     let project: Project;
     if (env) {
-      project = ProjectClass.From(env.currentProjectLocation);
+      project = Project.From(env.currentProjectLocation);
     }
 
     if (compilationProject.isStandaloneProject) {

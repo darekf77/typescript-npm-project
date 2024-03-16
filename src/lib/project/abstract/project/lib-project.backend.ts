@@ -1,5 +1,5 @@
 //#region imports
-import { BuildOptions, BuildProcessFeature, EnvironmentConfig } from '../../features';
+import { BuildProcessFeature, EnvironmentConfig } from '../../features';
 import { crossPlatformPath, fse } from 'tnp-core/src'
 import { path } from 'tnp-core/src'
 import { glob } from 'tnp-core/src';

@@ -1,6 +1,6 @@
 import { config, PREFIXES } from "tnp-config/src";
 import { crossPlatformPath, glob, path, _ } from "tnp-core/src";
-import { BuildOptions } from "tnp-db/src";
+import { BuildOptions } from "../../../build-options";
 import { Helpers } from "tnp-helpers/src";
 import { Models } from "tnp-models/src";
 import { CLASS } from "typescript-class-helpers/src";

@@ -144,6 +144,7 @@ function libs(targetClients: ProjectBuild[], targetAsLibAlso = false) {
 
 /**
  * @deprecated
+ * TODO use sort
  */
 function reorderResult(result = [] as Project[]) {
   let i = 0;

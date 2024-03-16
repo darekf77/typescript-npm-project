@@ -6,7 +6,6 @@ import { FeatureForProject } from '../../abstract/feature-for-project';
 
 import { config } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
-import { BuildOptions } from 'tnp-db/src';
 import { CLASS } from 'typescript-class-helpers/src';
 import { Models } from 'tnp-models/src';
 import { tempSourceFolder } from '../../../constants';

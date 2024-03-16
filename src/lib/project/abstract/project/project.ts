@@ -4,10 +4,10 @@ import { Models } from 'tnp-models/src';
 import { _, crossPlatformPath } from 'tnp-core/src';
 import { Helpers, BaseProjectResolver, BaseProject } from 'tnp-helpers/src';
 import * as inquirer from 'inquirer';
-import { BuildOptions } from 'tnp-db/src';
 import { CLASS } from 'typescript-class-helpers/src';
 import { LibTypeArr } from 'tnp-config';
 import { RunOptions, ExecuteOptions } from 'tnp-core';
+import { BuildOptions } from '../../../build-options';
 //#region @backend
 import { fse } from 'tnp-core/src';
 import { path } from 'tnp-core/src';
@@ -859,11 +859,11 @@ export class ProjectIsomorphicLib
   async buildSteps(buildOptions?: BuildOptions, libBuildDone?: () => void) {
     //#region @backendFunc
     this.buildOptions = buildOptions;
-    const { prod, watch, outDir, onlyWatchNoBuild, appBuild, args, forClient = [], baseHref, websql } = buildOptions;
+    const { prod, watch, outDir, onlyWatchNoBuild, appBuild, args, baseHref, websql } = buildOptions;
 
     if (!onlyWatchNoBuild) {
       if (appBuild) {
-        await this.buildApp(outDir, watch, forClient as any, buildOptions.args, baseHref, prod, websql);
+        await this.buildApp(outDir, watch, buildOptions.args, baseHref, prod, websql);
       } else {
         await this.buildLib(libBuildDone);
       }
@@ -903,7 +903,6 @@ export class ProjectIsomorphicLib
     //#region @backend
     outDir: Models.dev.BuildDir,
     watch: boolean,
-    forClient: Project[] | string[],
     args: string,
     baseHref: string,
     prod: boolean,
@@ -972,11 +971,8 @@ export class ProjectIsomorphicLib
     //   this.env.config.name === 'static' ? '--stats-json' : ''
     // ) : '');
 
-    let client = _.first(forClient as Project[]);
+
     let portAssignedToAppBuild: number;
-    if (client) {
-      webpackEnvParams = `${webpackEnvParams} --env.moduleName=${client.name}`;
-    }
 
     const argsAdditionalParams: { port: number; } = Helpers.cliTool.argsFrom(args) || {} as any;
     if (_.isNumber(argsAdditionalParams.port)) {
@@ -1054,29 +1050,6 @@ export class ProjectIsomorphicLib
       }
       command = `npm-run webpack-dev-server ${webpackEnvParams}`;
       //#endregion
-    }
-    //#endregion
-
-    //#region prepare variables / @depracated  workspace simulated app
-    if (!global.tnpNonInteractive) {
-      if (!this.isStandaloneProject && forClient.length === 0) {
-        const answer: { project: string } = await inquirer
-          .prompt([
-            {
-              type: 'list',
-              name: 'project',
-              message: 'Which project do you wanna simulate ?',
-              choices: this.parent.children
-                .filter(c => c.typeIs(...config.allowedTypes.app))
-                .filter(c => c.name !== this.name)
-                .map(c => c.name),
-              filter: function (val) {
-                return val.toLowerCase();
-              }
-            }
-          ]) as any;
-        client = Project.From(path.join(this.location, '..', answer.project));
-      }
     }
     //#endregion
 

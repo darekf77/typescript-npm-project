@@ -1,10 +1,10 @@
 import { CLI } from "tnp-cli/src";
 import { config } from "tnp-config/src";
 import { path } from "tnp-core/src";
-import { BuildOptions } from "tnp-db/src";
 import { Helpers } from "tnp-helpers/src";
 import { EXPORT_TEMPLATE } from "../../templates";
 import { FeatureForProject } from "../abstract/feature-for-project";
+import { BuildOptions } from "../../build-options";
 
 export interface WebpackBackendCompilationOpt {
   watch: boolean;

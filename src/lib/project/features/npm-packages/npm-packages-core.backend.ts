@@ -3,7 +3,7 @@ import { crossPlatformPath, moment, path } from 'tnp-core/src'
 import { fse } from 'tnp-core/src'
 import { _ } from 'tnp-core/src';
 
-import type { Project } from '../../abstract/project/project';
+import { Project } from '../../abstract/project/project';
 import { Helpers } from 'tnp-helpers/src';
 import { FeatureForProject } from '../../abstract/feature-for-project';
 import { Models } from 'tnp-models/src';
@@ -19,8 +19,8 @@ import { CLASS } from 'typescript-class-helpers/src';
 export class NpmPackagesCore extends FeatureForProject {
 
   global(globalPackageName: string, packageOnly = false) {
-    const ProjectClass = CLASS.getBy('Project') as typeof Project;
-    const oldContainer = ProjectClass.by('container', 'v1') as Project;
+
+    const oldContainer = Project.by('container', 'v1') as Project;
     if (!oldContainer.node_modules.exist) {
       Helpers.info('initing container v1 for global packages')
       oldContainer.run(`${config.frameworkName} init`).sync();
@@ -36,8 +36,7 @@ export class NpmPackagesCore extends FeatureForProject {
   }
 
   package(pacakgeName: string) {
-    const ProjectClass = CLASS.getBy('Project') as typeof Project;
-    const p = ProjectClass.From(this.project.node_modules.pathFor(pacakgeName));
+    const p = Project.From(this.project.node_modules.pathFor(pacakgeName));
     const ver = p?.version;
     const that = this;
     return {
@@ -80,7 +79,7 @@ export class NpmPackagesCore extends FeatureForProject {
       try {
         executeCommand(command, this.project);
       } catch (err) {
-        if(config.frameworkName === 'tnp') {
+        if (config.frameworkName === 'tnp') {
           console.log(err)
         }
         Helpers.error(`[${config.frameworkName}] Error during npm install... try manual installation`, false, true);

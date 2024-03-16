@@ -1,6 +1,6 @@
 //#region imports
 import { PackagesRecognition } from '../../features/package-recognition/packages-recognition';
-import { BuildOptions } from 'tnp-db/src';
+import { BuildOptions } from '../../../build-options';
 import * as inquirer from 'inquirer';
 import { crossPlatformPath, path } from 'tnp-core/src';
 import chalk from 'chalk';
