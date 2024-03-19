@@ -1,5 +1,5 @@
 import { Helpers } from "tnp-helpers/src";
-import { CommandLineFeature } from "../project/abstract/command-line-feature.backend";
+import { CommandLineFeature } from "tnp-helpers/src";
 import { Project } from "../../cli";
 
 class $CI extends CommandLineFeature {

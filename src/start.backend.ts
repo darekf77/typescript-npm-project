@@ -74,7 +74,7 @@ import { Helpers as TnpHelpers } from 'tnp-helpers/src';
 
 import { CLASS } from 'typescript-class-helpers/src';
 import { CLI } from 'tnp-cli/src';
-import type { CommandLineFeature } from './lib/project/abstract/command-line-feature.backend';
+import type { CommandLineFeature } from 'tnp-helpers/src';
 //#endregion
 
 //#region handle special args
