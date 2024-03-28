@@ -1,11 +1,10 @@
 //#region imports
 import { IncCompiler } from "incremental-compiler/src";
 import { CLI } from "tnp-cli/src";
-import { config, ConfigModels } from "tnp-config/src";
-import { crossPlatformPath, fse, path, _ } from "tnp-core/src";
+import { config } from "tnp-config/src";
+import { crossPlatformPath, fse, path, _, CoreModels } from "tnp-core/src";
 import { Helpers } from "tnp-helpers/src";
-import { Models } from "tnp-models/src";
-import { CLASS } from "typescript-class-helpers/src";
+import { Models } from "../../../../models";
 import { Project } from "../../../abstract/project";
 //#endregion
 
@@ -40,7 +39,7 @@ export class BackendCompilation extends IncCompiler.Base {
      * Output folder
      * Ex. dist
      */
-    public outFolder: ConfigModels.OutFolder,
+    public outFolder: CoreModels.OutFolder,
     /**
      * Source location
      * Ex. src | components
@@ -56,7 +55,7 @@ export class BackendCompilation extends IncCompiler.Base {
 
   ) {
     super({
-      folderPath: [path.join(cwd, srcFolder)],
+      folderPath: crossPlatformPath([cwd, srcFolder]),
       notifyOnFileUnlink: true,
       followSymlinks: true,
     });
@@ -65,19 +64,6 @@ export class BackendCompilation extends IncCompiler.Base {
 
   //#region methods
 
-  //#region methods / compile
-  async compile(watch = false) {
-
-    await this.libCompilation
-      ({
-        cwd: this.cwd,
-        watch,
-        outDir: this.outFolder as any,
-        generateDeclarations: true,
-      });
-  }
-  //#endregion
-
   //#region methods / sync action
   async syncAction(filesPathes: string[]) {
     const outDistPath = crossPlatformPath(path.join(this.cwd, this.outFolder));
@@ -85,7 +71,13 @@ export class BackendCompilation extends IncCompiler.Base {
     if (!fse.existsSync(outDistPath)) {
       fse.mkdirpSync(outDistPath);
     }
-    await this.compile(this.isWatchBuild);
+    await this.libCompilation
+      ({
+        cwd: this.cwd,
+        watch: this.isWatchBuild,
+        outDir: this.outFolder as any,
+        generateDeclarations: true,
+      });
   }
   //#endregion
 
@@ -97,7 +89,7 @@ export class BackendCompilation extends IncCompiler.Base {
     generateDeclarations = false,
     tsExe = 'npm-run tsc',
     diagnostics = false,
-  }: Models.dev.TscCompileOptions) {
+  }: Models.TscCompileOptions) {
     if (!this.isEnableCompilation) {
       Helpers.log(`Compilation disabled for ${_.startCase(BackendCompilation.name)}`)
       return;
@@ -106,7 +98,7 @@ export class BackendCompilation extends IncCompiler.Base {
 
     const project = Project.ins.nearestTo(cwd) as Project;
 
-
+    //#region prepare params
     const paramsNoWatch = [
       outDir ? ` --outDir ${outDir} ` : '',
       !watch ? ' --noEmitOnError true ' : '',
@@ -120,7 +112,9 @@ export class BackendCompilation extends IncCompiler.Base {
       // hideErrors ? '' : ` --preserveWatchOutput `,
       // hideErrors ? ' --skipLibCheck true --noEmit true ' : '',
     ];
+    //#endregion
 
+    //#region cmd
     let cmd = (specificTsconfig?: string) => {
       let commandJs, commandMaps, commandJsOrganizationInitial, commandDts;
       const nocutsrcFolder = `${project.location}/${outDir}-nocutsrc`;
@@ -141,6 +135,7 @@ export class BackendCompilation extends IncCompiler.Base {
         // commandDts
       }
     };
+    //#endregion
 
     let tscCommands = {} as {
       commandJs: string; commandJsOrganizationInitial: string, commandMaps: string;
@@ -151,22 +146,15 @@ export class BackendCompilation extends IncCompiler.Base {
     );
     tscCommands = cmd(tsconfigBackendPath)
 
-    if (global['useWebpackBackendBuild']) {
-      // project.webpackBackendBuild.run({ // TODO
-      //   buildType: 'lib',
-      //   outDir: buildOutDir as any,
-      //   watch,
-      //   // uglify,
-      // })
-    } else {
-      await this.buildStandardLibVer({
-        watch, ...tscCommands, generateDeclarations, cwd, project, outDir,
-      });
-    }
+    await this.buildStandardLibVer({
+      watch, ...tscCommands, generateDeclarations, cwd, project, outDir,
+    });
+
   }
 
   //#endregion
 
+  //#region methods / build standar lib version
   protected async buildStandardLibVer(options: {
     watch: boolean;
     commandJs: string;
@@ -175,9 +163,9 @@ export class BackendCompilation extends IncCompiler.Base {
     generateDeclarations: boolean,
     cwd: string;
     project: Project;
-    outDir: Models.dev.BuildDir;
+    outDir: 'dist';
   }) {
-
+    //#region @backendFunc
     let {
       commandJs,
       commandMaps,
@@ -187,8 +175,8 @@ export class BackendCompilation extends IncCompiler.Base {
       watch,
     } = options;
 
-    const isStandalone = (!project.isSmartContainerTarget && !project.isSmartContainerChild);
-    const parent = !isStandalone ? (project.parent || project.smartContainerTargetParentContainer) : void 0;
+    const isStandalone = (!project.__isSmartContainerTarget && !project.__isSmartContainerChild);
+    const parent = !isStandalone ? (project.parent || project.__smartContainerTargetParentContainer) : void 0;
 
     Helpers.info(`
 
@@ -300,7 +288,7 @@ Starting backend typescirpt build....
         }
       });
     Helpers.log(`* Typescirpt compilation second part done (${outDir}  build). `)
-    //#endregion
+
     if (watch) {
       // console.log(Helpers.terminalLine());
       Helpers.info(`
@@ -317,7 +305,7 @@ Starting backend typescirpt build....
     `);
       // console.log(Helpers.terminalLine());
     }
-
+    //#endregion
   }
   //#endregion
 

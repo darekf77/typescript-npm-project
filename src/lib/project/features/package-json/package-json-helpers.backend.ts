@@ -1,12 +1,12 @@
 //#region imports
-import { crossPlatformPath, os, _ } from 'tnp-core/src';
+import { crossPlatformPath, os, _, CoreModels } from 'tnp-core/src';
 import * as JSON5 from 'json5';
 import chalk from 'chalk';
 import * as semver from 'semver';
-import { Project } from '../../abstract/project/project';
-import { Models } from 'tnp-models/src';
+import { Project } from '../../abstract/project';
+import { Models } from '../../../models';
 import { Helpers } from 'tnp-helpers/src';
-import { config, ConfigModels } from 'tnp-config/src';
+import { config } from 'tnp-config/src';
 
 
 // console.log([
@@ -18,8 +18,8 @@ import { config, ConfigModels } from 'tnp-config/src';
 
 //#region clean ignored
 function clenIgnored(project: Project, deps: Object, overrided = {}) {
-  if (_.isArray(project.packageJson?.data?.tnp?.overrided?.ignoreDepsPattern)) {
-    const patterns = project.packageJson.data.tnp.overrided.ignoreDepsPattern;
+  if (_.isArray(project.__packageJson?.data?.tnp?.overrided?.ignoreDepsPattern)) {
+    const patterns = project.__packageJson.data.tnp.overrided.ignoreDepsPattern;
     patterns.forEach(p => {
       Object.keys(deps).forEach(depName => {
         Helpers.log(`checking patter: ${p} agains ${depName}`, 2);
@@ -37,9 +37,9 @@ function clenIgnored(project: Project, deps: Object, overrided = {}) {
 export function findVersionRange(rootProject: Project, dependency: Project | string) {
   let result: string;
   const name = _.isString(dependency) ? dependency : dependency.name;
-  Models.npm.ArrNpmDependencyType.find(depType => {
-    if (_.isObject(rootProject.packageJson.data[depType])) {
-      const deps = rootProject.packageJson.data[depType];
+  Models.ArrNpmDependencyType.find(depType => {
+    if (_.isObject(rootProject.__packageJson.data[depType])) {
+      const deps = rootProject.__packageJson.data[depType];
       const versionRange = deps[name];
       if (_.isString(versionRange) && semver.validRange(versionRange)) {
         Helpers.log(`[findVersionRange] valid range founded "${name}":${versionRange}`);
@@ -55,16 +55,16 @@ export function findVersionRange(rootProject: Project, dependency: Project | str
 
 //#region resolve new deps and overrride for project
 function resovleNewDepsAndOverrideForProject(project: Project) {
-  let toOverrideDependencies = (project.packageJson.data.tnp.overrided &&
-    project.packageJson.data.tnp.overrided.dependencies) ?
-    project.packageJson.data.tnp.overrided.dependencies : {};
+  let toOverrideDependencies = (project.__packageJson.data.tnp.overrided &&
+    project.__packageJson.data.tnp.overrided.dependencies) ?
+    project.__packageJson.data.tnp.overrided.dependencies : {};
 
   let parentOverride = {};
-  const orgNewDeps = _.cloneDeep((Project.Tnp).packageJson.data.dependencies);
+  const orgNewDeps = _.cloneDeep((Project.ins.Tnp).__packageJson.data.dependencies);
   let newDepsForProject = {};
 
 
-  if (project.isStandaloneProject && !project.isTnp) {
+  if (project.__isStandaloneProject && !project.__isTnp) {
     newDepsForProject = getAndTravelCoreDeps({ type: project.type });
   } else {
     newDepsForProject = getAndTravelCoreDeps();
@@ -73,10 +73,6 @@ function resovleNewDepsAndOverrideForProject(project: Project) {
   // console.log(JSON10.stringify(toOverrideDependencies))
   // try {
   _.merge(newDepsForProject, toOverrideDependencies);
-  // } catch (error) {
-  //   console.log(JSON10.stringify(toOverrideDependencies))
-  //   process.exit(0)
-  // }
 
   Object.keys(newDepsForProject).forEach(key => {
     if (_.isNull(newDepsForProject[key])) {
@@ -94,14 +90,14 @@ function resovleNewDepsAndOverrideForProject(project: Project) {
 //#endregion
 
 //#region resolve and save deps for project
-export function reolveAndSaveDeps(project: Project, action: Models.npm.SaveAction,
+export function reolveAndSaveDeps(project: Project, action: Models.SaveAction,
   reasonToHidePackages: string, reasonToShowPackages: string) {
 
-  const orginalDependencies = !project.packageJson.data.dependencies ? {}
-    : _.cloneDeep(project.packageJson.data.dependencies) as Models.npm.DependenciesFromPackageJsonStyle;
+  const orginalDependencies = !project.__packageJson.data.dependencies ? {}
+    : _.cloneDeep(project.__packageJson.data.dependencies) as Models.DependenciesFromPackageJsonStyle;
 
-  const orginalDevDependencies = !project.packageJson.data.devDependencies ? {}
-    : _.cloneDeep(project.packageJson.data.devDependencies) as Models.npm.DependenciesFromPackageJsonStyle;
+  const orginalDevDependencies = !project.__packageJson.data.devDependencies ? {}
+    : _.cloneDeep(project.__packageJson.data.devDependencies) as Models.DependenciesFromPackageJsonStyle;
 
   const { newDepsForProject, toOverrideDependencies } = resovleNewDepsAndOverrideForProject(project);
 
@@ -163,7 +159,7 @@ function overrideInfo(deps: { orginalDependencies: any; orginalDevDependencies: 
             }
           }
           if (!versionFrom && _.isString(versionTo)) {
-            // if (!(Project.Tnp).packageJson.data.tnp.core.dependencies.asDevDependencies.includes(oldDepName)) {
+            // if (!(Project.ins.Tnp).packageJson.data.tnp.core.dependencies.asDevDependencies.includes(oldDepName)) {
             overrideMsg = `Added new package "${oldDepName}@${versionTo}"`;
             // }
           }
@@ -186,8 +182,8 @@ function overrideInfo(deps: { orginalDependencies: any; orginalDevDependencies: 
 //#endregion
 
 //#region remove deps by type
-function removeDepsByType(deps: object, libType: ConfigModels.LibType) {
-  const depsByType = (Project.Tnp).packageJson.data.tnp.core.dependencies.onlyFor[libType];
+function removeDepsByType(deps: object, libType: CoreModels.LibType) {
+  const depsByType = (Project.ins.Tnp).__packageJson.data.tnp.core.dependencies.onlyFor[libType];
   const names = depsByType ? Object.keys(depsByType) : [];
   names.forEach(key => {
     delete deps[key];
@@ -197,14 +193,13 @@ function removeDepsByType(deps: object, libType: ConfigModels.LibType) {
 //#endregion
 
 //#region set dependency and save
-export function setDependencyAndSave(p: Models.npm.Package, reason: string, project: Project,) {
-  // console.log('set DEPS', p)
-  // process.exit(0)
+export function setDependencyAndSave(p: Models.Package, reason: string, project: Project,) {
+
   if (!p || !p.name) {
     Helpers.error(`Cannot set invalid dependency for project ${project.genericName}: ${JSON5.stringify(p)}`, false, true);
   }
 
-  if (project.isTnp && !_.isString(p.version)) {
+  if (project.__isTnp && !_.isString(p.version)) {
     try {
       p.version = Helpers.run(`npm show ${p.name} version`, { output: false }).sync().toString().trim();
     } catch (e) {
@@ -212,7 +207,7 @@ export function setDependencyAndSave(p: Models.npm.Package, reason: string, proj
     }
   }
 
-  if (project.isTnp) {
+  if (project.__isTnp) {
     let updated = false;
     getAndTravelCoreDeps({
       updateFn: (obj, pkgName) => {
@@ -224,46 +219,46 @@ export function setDependencyAndSave(p: Models.npm.Package, reason: string, proj
       }
     });
     if (!updated) {
-      project.packageJson.data.tnp.overrided.dependencies[p.name] = p.version;
+      project.__packageJson.data.tnp.overrided.dependencies[p.name] = p.version;
     }
   } else if (project.isUnknowNpmProject) {
     if (p.installType === '--save') {
-      if (!project.packageJson.data.dependencies) {
-        project.packageJson.data.dependencies = {};
+      if (!project.__packageJson.data.dependencies) {
+        project.__packageJson.data.dependencies = {};
       }
-      project.packageJson.data.dependencies[p.name] = p.version;
+      project.__packageJson.data.dependencies[p.name] = p.version;
     } else if (p.installType === '--save-dev') {
-      if (!project.packageJson.data.devDependencies) {
-        project.packageJson.data.devDependencies = {};
+      if (!project.__packageJson.data.devDependencies) {
+        project.__packageJson.data.devDependencies = {};
       }
-      project.packageJson.data.devDependencies[p.name] = p.version;
+      project.__packageJson.data.devDependencies[p.name] = p.version;
     }
-  } else if (project.isStandaloneProject || project.isContainer) {
+  } else if (project.__isStandaloneProject || project.__isContainer) {
 
     if (p.version) {
-      project.packageJson.data.tnp.overrided.dependencies[p.name] = p.version;
+      project.__packageJson.data.tnp.overrided.dependencies[p.name] = p.version;
     } else {
       const { parentOverride, orgNewDeps } = resovleNewDepsAndOverrideForProject(project);
       if (_.isNull(parentOverride[p.name])) {
-        project.packageJson.data.tnp.overrided.dependencies[p.name] = orgNewDeps[p.name];
+        project.__packageJson.data.tnp.overrided.dependencies[p.name] = orgNewDeps[p.name];
       } else {
-        delete project.packageJson.data.tnp.overrided.dependencies[p.name];
+        delete project.__packageJson.data.tnp.overrided.dependencies[p.name];
         Helpers.log(`Parent package version reverted`);
       }
     }
   }
-  project.packageJson.save(`[${reason}] [setDependency] name:${p && p.name}, ver:${p && p.version} in project ${project && project.genericName
+  project.__packageJson.save(`[${reason}] [setDependency] name:${p && p.name}, ver:${p && p.version} in project ${project && project.genericName
     }`);
 }
 //#endregion
 
 //#region remove dependency and save
-export function removeDependencyAndSave(p: Models.npm.Package, reason: string, project: Project) {
+export function removeDependencyAndSave(p: Models.Package, reason: string, project: Project) {
 
   if (!p || !p.name) {
     Helpers.error(`Cannot remove invalid dependency for project ${project.genericName}: ${JSON5.stringify(p)}`, false, true);
   }
-  if (project.isTnp) {
+  if (project.__isTnp) {
     getAndTravelCoreDeps({
       updateFn: (obj, pkgName) => {
         if (pkgName === p.name) {
@@ -274,28 +269,28 @@ export function removeDependencyAndSave(p: Models.npm.Package, reason: string, p
     });
   }
   if (project.isUnknowNpmProject) {
-    project.packageJson.data.dependencies[p.name] = void 0;
-    project.packageJson.data.devDependencies[p.name] = void 0;
+    project.__packageJson.data.dependencies[p.name] = void 0;
+    project.__packageJson.data.devDependencies[p.name] = void 0;
   } else {
-    if (project.isTnp) {
-      const existedOverrideVer = project.packageJson.data.tnp.overrided.dependencies[p.name];
+    if (project.__isTnp) {
+      const existedOverrideVer = project.__packageJson.data.tnp.overrided.dependencies[p.name];
       if (_.isString(existedOverrideVer) || _.isNull(existedOverrideVer)) {
-        project.packageJson.data.tnp.overrided.dependencies[p.name] = null;
+        project.__packageJson.data.tnp.overrided.dependencies[p.name] = null;
       }
     } else {
       const { newDepsForProject } = resovleNewDepsAndOverrideForProject(project);
       const parentPkg = newDepsForProject[p.name];
 
       if (_.isString(parentPkg)) {
-        project.packageJson.data.tnp.overrided.dependencies[p.name] = null;
+        project.__packageJson.data.tnp.overrided.dependencies[p.name] = null;
       }
       if (_.isNull(parentPkg) || _.isUndefined(parentPkg)) {
-        project.packageJson.data.tnp.overrided.dependencies[p.name] = void 0;
+        project.__packageJson.data.tnp.overrided.dependencies[p.name] = void 0;
       }
     }
   }
 
-  project.packageJson.save(`[${reason}] [removeDependency] name:${p && p.name} in project ${project && project.genericName
+  project.__packageJson.save(`[${reason}] [removeDependency] name:${p && p.name} in project ${project && project.genericName
     }`);
 }
 
@@ -306,9 +301,9 @@ export function removeDependencyAndSave(p: Models.npm.Package, reason: string, p
 //#region get deps by
 export function getAndTravelCoreDeps(options?: {
   updateFn?: (obj: Object, pkgName: string) => string,
-  type?: ConfigModels.LibType,
+  type?: CoreModels.LibType,
 }) {
-  const project: Project = Project.Tnp as any;
+  const project: Project = Project.ins.Tnp as any;
   if (_.isUndefined(options)) {
     options = {};
   }
@@ -316,7 +311,7 @@ export function getAndTravelCoreDeps(options?: {
   const constantTnpDeps = {};
 
   // if (project?.packageJson?.data?.tnp?.core?.dependencies) { // TODO QUICK FIX
-  const core = project.packageJson.data.tnp.core.dependencies;
+  const core = project.__packageJson.data.tnp.core.dependencies;
   travelObject(core.common, constantTnpDeps, void 0, updateFn);
   if (_.isString(type)) {
     travelObject(core.onlyFor[type], constantTnpDeps, core.onlyFor, updateFn);
@@ -332,11 +327,11 @@ export function getAndTravelCoreDeps(options?: {
 //#endregion
 
 //#region deps filters
-function filterDevDepOnly(project: Project, deps: Models.npm.DependenciesFromPackageJsonStyle) {
-  const devDeps = (Project.Tnp).packageJson.data.tnp.core.dependencies.asDevDependencies;
-  let onlyAsDevAllowed = (project.packageJson.data.tnp &&
-    project.packageJson.data.tnp.overrided &&
-    project.packageJson.data.tnp.overrided.includeAsDev) || [];
+function filterDevDepOnly(project: Project, deps: Models.DependenciesFromPackageJsonStyle) {
+  const devDeps = (Project.ins.Tnp).__packageJson.data.tnp.core.dependencies.asDevDependencies;
+  let onlyAsDevAllowed = (project.__packageJson.data.tnp &&
+    project.__packageJson.data.tnp.overrided &&
+    project.__packageJson.data.tnp.overrided.includeAsDev) || [];
 
   const allDeps = getAndTravelCoreDeps();
 
@@ -359,9 +354,9 @@ function filterDevDepOnly(project: Project, deps: Models.npm.DependenciesFromPac
   return deps;
 }
 
-function filterDepOnly(project: Project, deps: Models.npm.DependenciesFromPackageJsonStyle) {
-  const devDeps = (Project.Tnp).packageJson.data.tnp.core.dependencies.asDevDependencies;
-  let onlyAsDevAllowed = (project.packageJson.data.tnp.overrided.includeAsDev) || [];
+function filterDepOnly(project: Project, deps: Models.DependenciesFromPackageJsonStyle) {
+  const devDeps = (Project.ins.Tnp).__packageJson.data.tnp.core.dependencies.asDevDependencies;
+  let onlyAsDevAllowed = (project.__packageJson.data.tnp.overrided.includeAsDev) || [];
 
   // log('d2evDeps', devDeps)
   if (onlyAsDevAllowed !== '*') {
@@ -382,21 +377,21 @@ function filterDepOnly(project: Project, deps: Models.npm.DependenciesFromPackag
 //#endregion
 
 //#region clean for include only
-function cleanForIncludeOnly(project: Project, deps: Models.npm.DependenciesFromPackageJsonStyle,
-  overrided: Models.npm.DependenciesFromPackageJsonStyle) {
+function cleanForIncludeOnly(project: Project, deps: Models.DependenciesFromPackageJsonStyle,
+  overrided: Models.DependenciesFromPackageJsonStyle) {
   // log('overrided', overrided)
 
   deps[project.name] = undefined;
 
-  if (project.packageJson.data.tnp &&
-    project.packageJson.data.tnp.overrided &&
-    _.isArray(project.packageJson.data.tnp.overrided.includeOnly) &&
-    project.packageJson.data.tnp.overrided.includeOnly.length > 0
+  if (project.__packageJson.data.tnp &&
+    project.__packageJson.data.tnp.overrided &&
+    _.isArray(project.__packageJson.data.tnp.overrided.includeOnly) &&
+    project.__packageJson.data.tnp.overrided.includeOnly.length > 0
   ) {
 
-    let onlyAllowed = project.packageJson.data.tnp.overrided.includeOnly;
+    let onlyAllowed = project.__packageJson.data.tnp.overrided.includeOnly;
 
-    onlyAllowed = onlyAllowed.concat((Project.Tnp).packageJson.data.tnp.core.dependencies.always);
+    onlyAllowed = onlyAllowed.concat((Project.ins.Tnp).__packageJson.data.tnp.core.dependencies.always);
 
     Object.keys(deps).forEach(depName => {
       if (!onlyAllowed.includes(depName)) {
@@ -445,24 +440,24 @@ function travelObject(obj: Object, out: Object, parent: Object, updateFn?: (obj:
 //#endregion
 
 //#region before save action
-function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveOptions) {
+function beforeSaveAction(project: Project, options: Models.PackageJsonSaveOptions) {
   const { newDeps, toOverride, action, reasonToHidePackages, reasonToShowPackages } = options;
 
-  const allTrusted = project.trusted;
+  const allTrusted = project.__trusted;
 
   let recrateInPackageJson = (action === 'save' || action === 'show');
-  if (project.isTnp) {
+  if (project.__isTnp) {
     recrateInPackageJson = true;
   }
 
 
-  if (project.frameworkVersionAtLeast('v2') && !global.actionShowingDepsForContainer) {
-    const projForVer = Project.by('container', project._frameworkVersion);
+  if (project.__frameworkVersionAtLeast('v2') && !global.actionShowingDepsForContainer) {
+    const projForVer = Project.by('container', project.__frameworkVersion);
     if (projForVer) { // QUICK_FIX?
       global.actionShowingDepsForContainer = true;
-      projForVer.packageJson.showDeps(`update deps for project ${project.genericName} in version ${project._frameworkVersion}`);
+      projForVer.__packageJson.showDeps(`update deps for project ${project.genericName} in version ${project.__frameworkVersion}`);
       global.actionShowingDepsForContainer = false;
-      const depsForVer = projForVer.packageJson.data;
+      const depsForVer = projForVer.__packageJson.data;
       Object.keys(depsForVer.dependencies).forEach(pkgNameInNewVer => {
         // Helpers.log(`Change "${chalk.bold(
         // pkgNameInNewVer)}": ${newDeps[pkgNameInNewVer]} => ${depsForVer.dependencies[pkgNameInNewVer]}`)
@@ -478,28 +473,28 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
 
   let dependencies = {};
 
-  if (project.frameworkVersionEquals('v1')) {
-    devDependencies = project.isStandaloneProject ?
+  if (project.__frameworkVersionEquals('v1')) {
+    devDependencies = project.__isStandaloneProject ?
       Helpers.arrays.sortKeys(filterDevDepOnly(project, _.cloneDeep(newDeps)))
       : {};
-    dependencies = project.isStandaloneProject ?
+    dependencies = project.__isStandaloneProject ?
       Helpers.arrays.sortKeys(filterDepOnly(project, _.cloneDeep(newDeps)))
       : Helpers.arrays.sortKeys(newDeps);
   } else {
-    devDependencies = project.isStandaloneProject ?
+    devDependencies = project.__isStandaloneProject ?
       Helpers.arrays.sortKeys(_.cloneDeep(newDeps))
       : {};
-    dependencies = project.isStandaloneProject ?
+    dependencies = project.__isStandaloneProject ?
       Helpers.arrays.sortKeys(_.cloneDeep(newDeps))
       : Helpers.arrays.sortKeys(newDeps);
   }
 
-  if (!project.isTnp && !project.isContainerCoreProject) {
+  if (!project.__isTnp && !project.__isContainerCoreProject) {
     const specyficPacakges = [
       'electron-client',
       'vscode-ext',
       'chrome-ext',
-    ] as ConfigModels.LibType[];
+    ] as CoreModels.LibType[];
     specyficPacakges.forEach(s => {
       if (project.typeIsNot(s)) {
         devDependencies = removeDepsByType(devDependencies, s);
@@ -508,14 +503,14 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
     });
   }
 
-  if ((project.packageJson.data.tnp.overrided.includeAsDev as any) === '*') {
+  if ((project.__packageJson.data.tnp.overrided.includeAsDev as any) === '*') {
     devDependencies = _.merge(devDependencies, dependencies);
     dependencies = {};
     // console.log('inlcude as dev', devDependencies)
   }
 
-  const onlyAllowedInDependencies = project.packageJson.data.tnp.overrided.includeOnly || [];
-  if (project.frameworkVersionAtLeast('v2') && onlyAllowedInDependencies.length > 0) {
+  const onlyAllowedInDependencies = project.__packageJson.data.tnp.overrided.includeOnly || [];
+  if (project.__frameworkVersionAtLeast('v2') && onlyAllowedInDependencies.length > 0) {
 
     // Helpers.info(`Inlcude only: \n${onlyAllowedInDependencies.join('\n')}`);
 
@@ -543,8 +538,8 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
         }
       });
 
-    if (project.packageJson.data.tnp.overrided.includeOnly.includes('tnp')) {
-      dependencies['tnp'] = `~${Project.Tnp?.version}`;
+    if (project.__packageJson.data.tnp.overrided.includeOnly.includes('tnp')) {
+      dependencies['tnp'] = `~${Project.ins.Tnp?.version}`;
     }
 
 
@@ -561,103 +556,103 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
 
   if (recrateInPackageJson) {
     Helpers.log(`[package.json] save for install - ${project.type} project: "${project.name}" , [${reasonToShowPackages}]`);
-    if (project.isTnp) {
-      project.packageJson.data.devDependencies = {};
-      project.packageJson.data.dependencies = Helpers.arrays.sortKeys(newDeps);
-      clenIgnored(project, project.packageJson.data.dependencies, {});
+    if (project.__isTnp) {
+      project.__packageJson.data.devDependencies = {};
+      project.__packageJson.data.dependencies = Helpers.arrays.sortKeys(newDeps);
+      clenIgnored(project, project.__packageJson.data.dependencies, {});
     } else {
-      project.packageJson.data.devDependencies = devDependencies || {};
-      project.packageJson.data.dependencies = dependencies;
+      project.__packageJson.data.devDependencies = devDependencies || {};
+      project.__packageJson.data.dependencies = dependencies;
     }
     //#region  install latest version of package
 
     // TODO firedev should be handled here
-    Object.keys(project.packageJson.data.devDependencies)
+    Object.keys(project.__packageJson.data.devDependencies)
       .filter(key => allTrusted.includes(key) || key === 'typeorm')
       .forEach(packageIsomorphicName => {
-        const v = project.packageJson.data.devDependencies[packageIsomorphicName];
+        const v = project.__packageJson.data.devDependencies[packageIsomorphicName];
         if (!v?.startsWith('~') && !v?.startsWith('^')) {
-          project.packageJson.data.devDependencies[packageIsomorphicName] = `~${v}`;
+          project.__packageJson.data.devDependencies[packageIsomorphicName] = `~${v}`;
         }
       });
 
-    Object.keys(project.packageJson.data.dependencies)
+    Object.keys(project.__packageJson.data.dependencies)
       .filter(key => allTrusted.includes(key) || key === 'typeorm')
       .forEach(packageIsomorphicName => {
-        const v = project.packageJson.data.dependencies[packageIsomorphicName];
+        const v = project.__packageJson.data.dependencies[packageIsomorphicName];
         if (!v?.startsWith('~') && !v?.startsWith('^')) {
-          project.packageJson.data.dependencies[packageIsomorphicName] = `~${v}`;
+          project.__packageJson.data.dependencies[packageIsomorphicName] = `~${v}`;
         }
       });
     //#endregion
 
   } else {
     Helpers.log(`[package.json] save for clean - ${project.type} project: "${project.name}" , [${reasonToHidePackages}]`);
-    project.packageJson.data.devDependencies = {};
-    project.packageJson.data.dependencies = {};
-    if (!project.isCoreProject && !project.isVscodeExtension) {
-      project.packageJson.data.engines = void 0;
+    project.__packageJson.data.devDependencies = {};
+    project.__packageJson.data.dependencies = {};
+    if (!project.__isCoreProject && !project.__isVscodeExtension) {
+      project.__packageJson.data.engines = void 0;
     }
   }
 
-  Helpers.log(`Project: ${chalk.bold(project.genericName)}, framework verison: ${project._frameworkVersion}`);
-  if (project.isTnp) {
+  Helpers.log(`Project: ${chalk.bold(project.genericName)}, framework verison: ${project.__frameworkVersion}`);
+  if (project.__isTnp) {
     Helpers.log(`Execute ${config.frameworkName} action`);
     const keysToDelete = [];
-    Object.keys(project.packageJson.data.tnp.overrided.dependencies).forEach((pkgName) => {
-      const version = project.packageJson.data.tnp.overrided.dependencies[pkgName];
+    Object.keys(project.__packageJson.data.tnp.overrided.dependencies).forEach((pkgName) => {
+      const version = project.__packageJson.data.tnp.overrided.dependencies[pkgName];
       if (!version && !devDependencies[pkgName] && !dependencies[pkgName]) {
         keysToDelete.push(pkgName);
       }
     });
     keysToDelete.forEach(key => {
-      delete project.packageJson.data.tnp.overrided.dependencies[key];
+      delete project.__packageJson.data.tnp.overrided.dependencies[key];
     });
   }
-  if (project.frameworkVersionAtLeast('v2')) {
-    if (_.isEqual(project.packageJson.data.dependencies, project.packageJson.data.devDependencies)) {
+  if (project.__frameworkVersionAtLeast('v2')) {
+    if (_.isEqual(project.__packageJson.data.dependencies, project.__packageJson.data.devDependencies)) {
       // TODO QUICK_FIX
-      const includeAsDev = (project.packageJson.data.tnp.overrided.includeAsDev);
-      const includeOnly = (project.packageJson.data.tnp.overrided.includeOnly);
+      const includeAsDev = (project.__packageJson.data.tnp.overrided.includeAsDev);
+      const includeOnly = (project.__packageJson.data.tnp.overrided.includeOnly);
       if (
         _.isArray(includeAsDev) && includeAsDev.length === 0 &&
         _.isArray(includeOnly) && includeOnly.length === 0
       ) {
-        project.packageJson.data.devDependencies = {};
+        project.__packageJson.data.devDependencies = {};
       }
-      if (project.isVscodeExtension) {
-        project.packageJson.data.devDependencies = project.packageJson.data.dependencies;
-        project.packageJson.data.dependencies = {};
+      if (project.__isVscodeExtension) {
+        project.__packageJson.data.devDependencies = project.__packageJson.data.dependencies;
+        project.__packageJson.data.dependencies = {};
       }
     }
   }
 
-  if (project.frameworkVersionAtLeast('v3')) {
-    if (_.isArray(project.packageJson?.data?.tnp?.overrided?.ignoreDepsPattern)) {
-      const patterns = project.packageJson.data.tnp.overrided.ignoreDepsPattern;
+  if (project.__frameworkVersionAtLeast('v3')) {
+    if (_.isArray(project.__packageJson?.data?.tnp?.overrided?.ignoreDepsPattern)) {
+      const patterns = project.__packageJson.data.tnp.overrided.ignoreDepsPattern;
       patterns.forEach(patternIgnore => {
-        Object.keys(project.packageJson.data.dependencies).forEach(depName => {
+        Object.keys(project.__packageJson.data.dependencies).forEach(depName => {
           Helpers.log(`check patter: ${patternIgnore} agains ${depName}`, 2);
           const patternRegex = (new RegExp(Helpers.escapeStringForRegEx(patternIgnore)));
           if (patternRegex.test(depName)) {
-            delete project.packageJson.data.dependencies[depName];
+            delete project.__packageJson.data.dependencies[depName];
           }
         });
 
-        Object.keys(project.packageJson.data.devDependencies).forEach(depName => {
+        Object.keys(project.__packageJson.data.devDependencies).forEach(depName => {
           Helpers.log(`check patter: ${patternIgnore} agains ${depName}`, 2);
           const patternRegex = (new RegExp(Helpers.escapeStringForRegEx(patternIgnore)));
           if (patternRegex.test(depName)) {
-            delete project.packageJson.data.devDependencies[depName];
+            delete project.__packageJson.data.devDependencies[depName];
           }
         });
       });
     }
   }
 
-  const maxVersionForAngular = project.trustedMaxMajorVersion;
+  const maxVersionForAngular = project.__trustedMaxMajorVersion;
 
-  const versionForTagsPath = crossPlatformPath([Project.by('container', project._frameworkVersion).location, `../../versions-cache.json`,])
+  const versionForTagsPath = crossPlatformPath([Project.by('container', project.__frameworkVersion).location, `../../versions-cache.json`,])
   const versionForTags = Helpers.readJson(versionForTagsPath, {});
 
   const lastVerFun = (pkgNameToCheckVer) => {
@@ -680,50 +675,50 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   };
 
 
-  if (project.isContainerCoreProject) { // TODO TESTING
+  if (project.__isContainerCoreProject) { // TODO TESTING
     //#region handle container core bulk deps instatlation for all other packages
 
-    _.keys(project.packageJson.data.dependencies)
+    _.keys(project.__packageJson.data.dependencies)
       .forEach(depName => {
-        const v = project.packageJson.data.dependencies[depName];
+        const v = project.__packageJson.data.dependencies[depName];
         if (v === 'undefined') {
-          delete project.packageJson.data.dependencies[depName];
+          delete project.__packageJson.data.dependencies[depName];
         }
         if (v) {
           if (!_.isUndefined(config.packagesThat.areTrustedForPatchUpdate.find(s => {
             return depName.startsWith(s);
           }))) {
-            project.packageJson.data.dependencies[depName] = `~${v.replace('~', '').replace(`^`, '')}`;
+            project.__packageJson.data.dependencies[depName] = `~${v.replace('~', '').replace(`^`, '')}`;
           } else {
-            project.packageJson.data.dependencies[depName] = v.replace('~', '').replace(`^`, '');
+            project.__packageJson.data.dependencies[depName] = v.replace('~', '').replace(`^`, '');
           }
 
         }
       });
-    _.keys(project.packageJson.data.devDependencies)
+    _.keys(project.__packageJson.data.devDependencies)
       .forEach(depName => {
 
-        const v = project.packageJson.data.devDependencies[depName];
+        const v = project.__packageJson.data.devDependencies[depName];
         if (v === 'undefined') {
-          delete project.packageJson.data.dependencies[depName];
+          delete project.__packageJson.data.dependencies[depName];
         }
         if (v) {
           if (!_.isUndefined(config.packagesThat.areTrustedForPatchUpdate.find(s => {
             return depName.startsWith(s);
           }))) {
-            project.packageJson.data.dependencies[depName] = `~${v.replace('~', '').replace(`^`, '')}`;
+            project.__packageJson.data.dependencies[depName] = `~${v.replace('~', '').replace(`^`, '')}`;
           } else {
-            project.packageJson.data.devDependencies[depName] = v.replace('~', '').replace(`^`, '');
+            project.__packageJson.data.devDependencies[depName] = v.replace('~', '').replace(`^`, '');
           }
         }
       });
 
-    if (project.frameworkVersionAtLeast('v3') && project.isContainerCoreProject) {
-      const saveTnpFiredevVer = `^${_.first(Project.Tnp.version.split('.'))}`;
-      if ((project._frameworkVersion === config.defaultFrameworkVersion)) {
-        project.packageJson.data.dependencies['firedev'] = saveTnpFiredevVer;
+    if (project.__frameworkVersionAtLeast('v3') && project.__isContainerCoreProject) {
+      const saveTnpFiredevVer = `^${_.first(Project.ins.Tnp.version.split('.'))}`;
+      if ((project.__frameworkVersion === config.defaultFrameworkVersion)) {
+        project.__packageJson.data.dependencies['firedev'] = saveTnpFiredevVer;
       } else {
-        project.packageJson.data.dependencies['firedev'] = lastVerFun('firedev');
+        project.__packageJson.data.dependencies['firedev'] = lastVerFun('firedev');
       }
     }
 
@@ -731,31 +726,31 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   }
 
   if (project.name === 'tnp') {
-    delete project.packageJson.data.dependencies['tnp'];
-    delete project.packageJson.data.dependencies['firedev'];
+    delete project.__packageJson.data.dependencies['tnp'];
+    delete project.__packageJson.data.dependencies['firedev'];
   }
 
-  _.keys(project.packageJson.data.dependencies)
+  _.keys(project.__packageJson.data.dependencies)
     .forEach(depName => {
-      const v = project.packageJson.data.dependencies[depName];
+      const v = project.__packageJson.data.dependencies[depName];
       if (v === 'undefined') {
-        delete project.packageJson.data.dependencies[depName];
+        delete project.__packageJson.data.dependencies[depName];
       }
     });
-  _.keys(project.packageJson.data.devDependencies)
+  _.keys(project.__packageJson.data.devDependencies)
     .forEach(depName => {
-      const v = project.packageJson.data.devDependencies[depName];
+      const v = project.__packageJson.data.devDependencies[depName];
       if (v === 'undefined') {
-        delete project.packageJson.data.devDependencies[depName];
+        delete project.__packageJson.data.devDependencies[depName];
       }
     });
 
 
-  if (project.isContainerCoreProject && project.frameworkVersionEquals('v1')) {
-    project.packageJson.data.dependencies = {};
-    project.packageJson.data.dependencies['webpack'] = '3.10.0'
-    project.packageJson.data.dependencies['ts-loader'] = '9.3.1'
-    project.packageJson.data.devDependencies = {}
+  if (project.__isContainerCoreProject && project.__frameworkVersionEquals('v1')) {
+    project.__packageJson.data.dependencies = {};
+    project.__packageJson.data.dependencies['webpack'] = '3.10.0'
+    project.__packageJson.data.dependencies['ts-loader'] = '9.3.1'
+    project.__packageJson.data.devDependencies = {}
   }
 
 
@@ -766,14 +761,14 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
   // })
 
   // TODO SUPER QUICK_FIX
-  if (project.isContainerCoreProject && project.frameworkVersionAtLeast('v3') && project.frameworkVersionLessThan(config.defaultFrameworkVersion)) {
+  if (project.__isContainerCoreProject && project.__frameworkVersionAtLeast('v3') && project.__frameworkVersionLessThan(config.defaultFrameworkVersion)) {
 
     if (_.isNumber(maxVersionForAngular) && (maxVersionForAngular !== Number.POSITIVE_INFINITY)) {
       Helpers.log(`\nRebuilding old global container...`);
       allTrusted.forEach(trustedDepKey => {
 
-        const depValueVersion = project.packageJson.data.dependencies[trustedDepKey];
-        const devDepValueVersion = project.packageJson.data.devDependencies[trustedDepKey];
+        const depValueVersion = project.__packageJson.data.dependencies[trustedDepKey];
+        const devDepValueVersion = project.__packageJson.data.devDependencies[trustedDepKey];
         // console.log({
         //   depValueVersion,
         //   devDepValueVersion,
@@ -785,14 +780,14 @@ function beforeSaveAction(project: Project, options: Models.npm.PackageJsonSaveO
           const major = Number(_.first(depValueVersion.replace('~', '').replace('^', '').split('.')))
           if (major > maxVersionForAngular) {
             const overrideOldVersion = lastKnownVersion
-            project.packageJson.data.dependencies[trustedDepKey] = overrideOldVersion;
+            project.__packageJson.data.dependencies[trustedDepKey] = overrideOldVersion;
           }
         }
         if (devDepValueVersion) {
           const major = Number(_.first(devDepValueVersion.replace('~', '').replace('^', '')))
           if (major > maxVersionForAngular) {
             const overrideOldversion = lastKnownVersion;
-            project.packageJson.data.devDependencies[trustedDepKey] = overrideOldversion
+            project.__packageJson.data.devDependencies[trustedDepKey] = overrideOldversion
           }
         }
 

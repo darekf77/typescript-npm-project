@@ -1,17 +1,17 @@
 import { crossPlatformPath, _ } from 'tnp-core/src';
 import { path } from 'tnp-core/src'
 import chalk from 'chalk';
-import { Project } from '../abstract/project/project';
+import { Project } from '../abstract/project';
+import { Models } from '../../models';
 import { config } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
-import { Models } from 'tnp-models/src';
 import { CLI } from 'tnp-cli/src';
-import { FeatureForProject } from '../abstract/feature-for-project';
+import { BaseFeatureForProject } from 'tnp-helpers/src';
 
 export type OverridePacakge = { [name: string]: string | null; };
-export type PackageType = Pick<Models.npm.Package, 'name' | 'version'>;
+export type PackageType = Pick<Models.Package, 'name' | 'version'>;
 
-export class SmartNodeModules extends FeatureForProject {
+export class SmartNodeModules extends BaseFeatureForProject<Project> {
   updateFromReleaseDist(destination: Project) {
     const source = crossPlatformPath([
       destination.location,
@@ -22,9 +22,9 @@ export class SmartNodeModules extends FeatureForProject {
       `tmp-local-copyto-proj-${config.folder.dist}/${config.folder.node_modules}/${destination.name}`,
     ]);
 
-    if (destination.npmPackages.useSmartInstall) {
+    if (destination.__npmPackages.useSmartInstall) {
       (() => {
-        const dest = path.join(this.project.node_modules.path, destination.name);
+        const dest = path.join(this.project.__node_modules.path, destination.name);
         Helpers.removeIfExists(dest);
         Helpers.copy(source, dest, {
           copySymlinksAsFiles: true,
@@ -34,7 +34,7 @@ export class SmartNodeModules extends FeatureForProject {
       })();
 
       (() => {
-        const dest = path.join(this.project.smartNodeModules.path, destination.name);
+        const dest = path.join(this.project.__smartNodeModules.path, destination.name);
         Helpers.removeIfExists(dest);
         Helpers.copy(source, dest, {
           copySymlinksAsFiles: true,
@@ -44,7 +44,7 @@ export class SmartNodeModules extends FeatureForProject {
       })();
     } else {
       (() => {
-        const dest = path.join(this.project.node_modules.path, destination.name);
+        const dest = path.join(this.project.__node_modules.path, destination.name);
         Helpers.removeIfExists(dest);
         Helpers.copy(source, dest, {
           copySymlinksAsFiles: true,
@@ -67,9 +67,9 @@ export class SmartNodeModules extends FeatureForProject {
 
   //#region project from smart node_modules package
   private getAndCreateTempProjForPackage(p: PackageType): Project {
-    const dest = this.project.smartNodeModules.pathFor(p.name);
+    const dest = this.project.__smartNodeModules.pathFor(p.name);
     const pj = path.join(
-      path.dirname(this.project.smartNodeModules.pathFor(p.name)),
+      path.dirname(this.project.__smartNodeModules.pathFor(p.name)),
       config.file.package_json,
     );
     Helpers.removeIfExists(path.dirname(dest))
@@ -78,14 +78,14 @@ export class SmartNodeModules extends FeatureForProject {
       name: path.basename(path.dirname(dest)),
       dependencies: { [p.name]: p.version }
     });
-    return Project.From(path.dirname(this.project.smartNodeModules.pathFor(p.name)))
+    return Project.ins.From(path.dirname(this.project.__smartNodeModules.pathFor(p.name)))
   }
   //#endregion
 
   //#region container core project for this project
   private get containerCore() {
     Helpers.taskStarted('Preparing cointainer core ...', true)
-    const frameworkVersion = this.project._frameworkVersion;
+    const frameworkVersion = this.project.__frameworkVersion;
     const container = Project.by('container', frameworkVersion) as Project;
     if (this.project.location === container?.location) {
       Helpers.log(`Smart node modules instalation for container core..`)
@@ -124,9 +124,9 @@ export class SmartNodeModules extends FeatureForProject {
   //#endregion
 
   setToSmartContainer() {
-    this.project.packageJson.data.tnp.type = 'container';
-    this.project.packageJson.data.tnp.smart = true;
-    this.project.packageJson.save('setting container as smart')
+    this.project.__packageJson.data.tnp.type = 'container';
+    this.project.__packageJson.data.tnp.smart = true;
+    this.project.__packageJson.save('setting container as smart')
   }
 
   //#region smart node_modules exists for whole project
@@ -137,7 +137,7 @@ export class SmartNodeModules extends FeatureForProject {
 
   //#region packages to override after smart node_modules instalation
   private get toOverride(): OverridePacakge {
-    const depsToOverride = (this.project.packageJson.data?.tnp?.overrided?.dependencies || {});
+    const depsToOverride = (this.project.__packageJson.data?.tnp?.overrided?.dependencies || {});
     const keys = Object.keys(depsToOverride);
     for (let index = 0; index < keys.length; index++) {
       const key = keys[index];
@@ -151,16 +151,16 @@ export class SmartNodeModules extends FeatureForProject {
   private handlePackagesOverride() {
     const toOverride = this.toOverride;
 
-    const mainSmartNodeModulesFolder = path.dirname(path.dirname(this.project.smartNodeModules.path));
+    const mainSmartNodeModulesFolder = path.dirname(path.dirname(this.project.__smartNodeModules.path));
     Helpers.foldersFrom(mainSmartNodeModulesFolder)
       .filter(f => path.basename(f) !== this.project.name)
       .forEach(f => {
         if (path.dirname(f).startsWith('@')) {
           const orgPackage = `@${crossPlatformPath([path.basename(path.dirname(f)), path.basename(f)])}`;
-          const additonalFolderToRemove = path.join(this.project.smartNodeModules.pathFor(orgPackage))
+          const additonalFolderToRemove = path.join(this.project.__smartNodeModules.pathFor(orgPackage))
           Helpers.removeFolderIfExists(additonalFolderToRemove);
         } else {
-          const additonalFolderToRemove = path.join(this.project.smartNodeModules.pathFor(path.basename(f)))
+          const additonalFolderToRemove = path.join(this.project.__smartNodeModules.pathFor(path.basename(f)))
           Helpers.removeFolderIfExists(additonalFolderToRemove);
         }
       });
@@ -172,50 +172,50 @@ export class SmartNodeModules extends FeatureForProject {
 
       const packageVersion = toOverride[packageName];
       if (packageVersion === null) {
-        this.project.node_modules.remove(packageName);
+        this.project.__node_modules.remove(packageName);
       } else {
         //#region dedupe from temp before adding to actual node_modules
-        const tempProj = this.project.smartNodeModules.getAndCreateTempProjForPackage({
+        const tempProj = this.project.__smartNodeModules.getAndCreateTempProjForPackage({
           name: packageName,
           version: packageVersion
         });
-        tempProj.npmPackages.installFromArgs('');
-        const Tnp = (Project.Tnp);
-        const toDedupe = Tnp.packageJson.data.tnp.core.dependencies.dedupe;
+        tempProj.__npmPackages.installFromArgs('');
+        const Tnp = (Project.ins.Tnp);
+        const toDedupe = Tnp.__packageJson.data.tnp.core.dependencies.dedupe;
         toDedupe
           .filter(dedupePkgName => {
             // Helpers.log(`dedupePkgName: ${dedupePkgName}`)
             return _.isString(dedupePkgName) && !_.keys(toOverride).includes(dedupePkgName)
           })
           .forEach(dedupePkgName => {
-            const existedVersionInMainNodeModules = this.project.npmPackages.package(dedupePkgName).version;
+            const existedVersionInMainNodeModules = this.project.__npmPackages.package(dedupePkgName).version;
             if (
-              tempProj.npmPackages.package(dedupePkgName).exists &&
-              tempProj.npmPackages.package(dedupePkgName).isNotSatisfyBy(existedVersionInMainNodeModules)
+              tempProj.__npmPackages.package(dedupePkgName).exists &&
+              tempProj.__npmPackages.package(dedupePkgName).isNotSatisfyBy(existedVersionInMainNodeModules)
             ) {
-              const verrrr = tempProj.npmPackages.package(dedupePkgName);
+              const verrrr = tempProj.__npmPackages.package(dedupePkgName);
               Helpers.warn(`[override package][dedupe "${packageName}"] ${chalk.bold(dedupePkgName)}@${verrrr?.version} won't be satisfy`
                 + ` in this repository by version "${existedVersionInMainNodeModules}"`);
             }
           });
-        tempProj.node_modules.dedupe(toDedupe);
+        tempProj.__node_modules.dedupe(toDedupe);
         //#endregion
         //#region link to main repo
-        const overrideFrom = tempProj.npmPackages.package(packageName).location;
-        const overrideDest = this.project.npmPackages.package(packageName).location;
+        const overrideFrom = tempProj.__npmPackages.package(packageName).location;
+        const overrideDest = this.project.__npmPackages.package(packageName).location;
         // console.log(`overrideFrom: ${overrideFrom}`)
         // console.log(`overrideDest: ${overrideDest}`)
         Helpers.removeIfExists(overrideDest);
         if (Helpers.exists(overrideFrom)) { // TODO quick fix
           Helpers.createSymLink(overrideFrom, overrideDest); // TODO something is causing loop
 
-          Helpers.foldersFrom(tempProj.node_modules.path)
+          Helpers.foldersFrom(tempProj.__node_modules.path)
             .filter(depName => path.basename(depName) !== packageName)
             .forEach(depName => {
               depName = path.basename(depName);
-              const verrr = tempProj.npmPackages.package(depName).version;
-              const fromProj = tempProj.npmPackages.package(depName);
-              const destProj = this.project.npmPackages.package(depName);
+              const verrr = tempProj.__npmPackages.package(depName).version;
+              const fromProj = tempProj.__npmPackages.package(depName);
+              const destProj = this.project.__npmPackages.package(depName);
               if (Helpers.exists(destProj.location)) {
                 if (fromProj.isNotSatisfyBy(destProj.version)) {
                   Helpers.warn(`
@@ -255,11 +255,11 @@ export class SmartNodeModules extends FeatureForProject {
     Helpers.log(`START SMART INSTALL...  for ${this.project.genericName}`);
     if (packages.length > 0) {
       packages.forEach(p => {
-        this.project.packageJson.data.tnp.overrided.dependencies[p.name] = (action === 'uninstall')
+        this.project.__packageJson.data.tnp.overrided.dependencies[p.name] = (action === 'uninstall')
           ? void 0 : p.version;
       });
 
-      this.project.packageJson.save(`save afte smart ${action} of package(s):
+      this.project.__packageJson.save(`save afte smart ${action} of package(s):
   ${packages.map(p => {
         return `- ${p.name} @${p.version}`;
       }).join('\n')}
@@ -267,8 +267,8 @@ export class SmartNodeModules extends FeatureForProject {
     }
     const containerCore = this.containerCore;
     if (containerCore.location !== this.project.location) {
-      this.project.node_modules.remove();
-      this.project.node_modules.copyFrom(containerCore, {
+      this.project.__node_modules.remove();
+      this.project.__node_modules.copyFrom(containerCore, {
         triggerMsg: 'smart node_modules instalation'
       });
       this.handlePackagesOverride();
@@ -284,14 +284,14 @@ export class SmartNodeModules extends FeatureForProject {
 
 //#region prepare
 function prepareContainerProject(containerCoreProject: Project, currentProject: Project) {
-  const currentContainerCorePackages = _.cloneDeep(containerCoreProject.packageJson.dependencies);
+  const currentContainerCorePackages = _.cloneDeep(containerCoreProject.__packageJson.dependencies);
 
   // containerCoreProject.packageJson.save(`prepare for smart node_modules`);
   // const updartedContainerCorePackages = _.cloneDeep(containerCoreProject.packageJson.dependencies);
   // const packgesHasChanges = !_.isEqual(currentContainerCorePackages, updartedContainerCorePackages);
 
-  if (!Helpers.exists(containerCoreProject.smartNodeModules.path)) {
-    Helpers.mkdirp(path.dirname(containerCoreProject.smartNodeModules.path));
+  if (!Helpers.exists(containerCoreProject.__smartNodeModules.path)) {
+    Helpers.mkdirp(path.dirname(containerCoreProject.__smartNodeModules.path));
     [
       config.file.package_json,
       config.file.package_json__tnp_json,
@@ -299,7 +299,7 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
     ].forEach(pkgFilename => {
       const sourcePj = path.join(containerCoreProject.location, pkgFilename);
       if (Helpers.exists(sourcePj)) {
-        const destPj = path.join(path.dirname(containerCoreProject.smartNodeModules.path), pkgFilename);
+        const destPj = path.join(path.dirname(containerCoreProject.__smartNodeModules.path), pkgFilename);
         Helpers.removeFileIfExists(destPj);
         Helpers.createSymLink(
           sourcePj,
@@ -309,11 +309,11 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
     })
 
   }
-  const smartTempContainerCorePackagesProj = Project.From(path.dirname(containerCoreProject.smartNodeModules.path)) as Project;
+  const smartTempContainerCorePackagesProj = Project.ins.From(path.dirname(containerCoreProject.__smartNodeModules.path)) as Project;
   // TODO this is not available when moving things
   const reinstallForceSmartNodeModules = (
     (
-      containerCoreProject.isContainerCoreProject && (containerCoreProject.location === currentProject.location)
+      containerCoreProject.__isContainerCoreProject && (containerCoreProject.location === currentProject.location)
     )
   );
   // || packgesHasChanges;
@@ -335,12 +335,12 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
   //   `);
   // }
 
-  if (!smartTempContainerCorePackagesProj.node_modules.exist || reinstallForceSmartNodeModules) {
-    smartTempContainerCorePackagesProj.npmPackages.installFromArgs('', true);
-    smartTempContainerCorePackagesProj.node_modules.dedupe({ reason: 'smart temp container dedeupe' }); // TODO QUICK FIX
+  if (!smartTempContainerCorePackagesProj.__node_modules.exist || reinstallForceSmartNodeModules) {
+    smartTempContainerCorePackagesProj.__npmPackages.installFromArgs('', true);
+    smartTempContainerCorePackagesProj.__node_modules.dedupe({ reason: 'smart temp container dedeupe' }); // TODO QUICK FIX
   }
 
-  if (!reinstallForceSmartNodeModules && containerCoreProject.node_modules.exist) {
+  if (!reinstallForceSmartNodeModules && containerCoreProject.__node_modules.exist) {
     Helpers.log(`
 
     No need for update of node_modules links for ${CLI.chalk.bold(containerCoreProject.genericName)}
@@ -349,13 +349,13 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
     return;
   }
   Helpers.actionWrapper(() => {
-    const folders = Helpers.foldersFrom(smartTempContainerCorePackagesProj.node_modules.path);
+    const folders = Helpers.foldersFrom(smartTempContainerCorePackagesProj.__node_modules.path);
     folders.forEach(from => {
       // Helpers.info(`linking from smart to node_modules: ${path.dirname(from).startsWith('@')
       //   ? from.split('/').slice(-2).join('/')
       //   : from.split('/').slice(-1).join('/')
       //   }`)
-      const dest = path.join(containerCoreProject.node_modules.path, path.basename(from));
+      const dest = path.join(containerCoreProject.__node_modules.path, path.basename(from));
       Helpers.remove(dest, true);
       Helpers.createSymLink(from, dest);
     });

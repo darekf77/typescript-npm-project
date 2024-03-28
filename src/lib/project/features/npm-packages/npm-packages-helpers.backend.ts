@@ -4,20 +4,20 @@ import { path } from 'tnp-core/src';
 import { fse } from 'tnp-core/src';
 import { _, moment } from 'tnp-core/src';
 
-import { Project } from '../../abstract/project/project';
+import { Project } from '../../abstract/project';
+import { Models } from '../../../models';
 import { Helpers } from 'tnp-helpers/src';
-import { Models } from 'tnp-models/src';
 import { config } from 'tnp-config/src';
 //#endregion
 
 
-export function resolvePacakgesFromArgs(args: string[]): Models.npm.Package[] {
-  let installType: Models.npm.InstalationType = '--save';
+export function resolvePacakgesFromArgs(args: string[]): Models.Package[] {
+  let installType: Models.InstalationType = '--save';
   return args
     .map(p => p.trim())
     .filter(p => {
-      if (Models.npm.InstalationTypeArr.includes(p)) {
-        installType = p as Models.npm.InstalationType;
+      if (Models.InstalationTypeArr.includes(p)) {
+        installType = p as Models.InstalationType;
         return false;
       }
       if (p.endsWith('@')) {
@@ -52,18 +52,18 @@ export function executeCommand(command: string, project: Project) {
 
    `);
 
-  if (config.frameworkName === 'firedev' && project.isContainerCoreProject) {
+  if (config.frameworkName === 'firedev' && project.__isContainerCoreProject) {
     Helpers.info('This may take a long time... more than 1GB to download from npm...')
   }
 
   project.run(command, { output: (config.frameworkName === 'tnp'), biggerBuffer: true }).sync();
-  Helpers.writeFile([project.node_modules.path, '.install-date'], moment(new Date()).format('L LTS'))
+  Helpers.writeFile([project.__node_modules.path, '.install-date'], moment(new Date()).format('L LTS'))
 }
 
-export function prepareCommand(pkg: Models.npm.Package, remove: boolean, useYarn: boolean, project: Project) {
+export function prepareCommand(pkg: Models.Package, remove: boolean, useYarn: boolean, project: Project) {
   const install = (remove ? 'uninstall' : 'install');
   let command = '';
-  const noPackageLock = (project.isStandaloneProject) ? '--no-package-lock' : '';
+  const noPackageLock = (project.__isStandaloneProject) ? '--no-package-lock' : '';
 
   if (useYarn
     // || project.frameworkVersionAtLeast('v3') // yarn sucks
@@ -86,7 +86,7 @@ export function prepareCommand(pkg: Models.npm.Package, remove: boolean, useYarn
 }
 
 
-export function fixOptions(options?: Models.npm.ActualNpmInstallOptions): Models.npm.ActualNpmInstallOptions {
+export function fixOptions(options?: Models.ActualNpmInstallOptions): Models.ActualNpmInstallOptions {
   if (_.isNil(options)) {
     options = {} as any;
   }
@@ -110,8 +110,7 @@ export function fixOptions(options?: Models.npm.ActualNpmInstallOptions): Models
 
 
 
-export function fixOptionsNpmInstall(options: Models.npm.NpmInstallOptions,
-  project: Project): Models.npm.NpmInstallOptions {
+export function fixOptionsNpmInstall(options: Models.NpmInstallOptions, project: Project): Models.NpmInstallOptions {
   if (_.isNil(options)) {
     options = {};
   }

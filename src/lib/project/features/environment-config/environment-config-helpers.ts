@@ -4,15 +4,15 @@ import { crossPlatformPath, _ } from 'tnp-core/src';
 import { path } from 'tnp-core/src'
 import { fse } from 'tnp-core/src'
 
-import { config, ConfigModels } from 'tnp-config/src';
-import { Models } from 'tnp-models/src';
+import { config } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
-import { Project } from '../../abstract/project/project';
+import { Project } from '../../abstract/project';
+import { Models } from '../../../models';
 import { config as schemaConfig } from './example-environment-config';
 import { walk } from 'lodash-walk-object/src';
 
 //#region handle error
-export function handleError(workspaceConfig: Models.env.EnvConfig, fileContent: string, pathToConfig: string) {
+export function handleError(workspaceConfig: Models.EnvConfig, fileContent: string, pathToConfig: string) {
 
   let configString = fileContent ? fileContent : `
   ...
@@ -38,7 +38,7 @@ ${Helpers.terminalLine()}
 //#endregion
 
 //#region validate config
-export function validateEnvConfig(workspaceConfig: Models.env.EnvConfig, filePath: string, isStandalone = false) {
+export function validateEnvConfig(workspaceConfig: Models.EnvConfig, filePath: string, isStandalone = false) {
   if (!_.isObject(workspaceConfig)) {
     handleError(undefined, Helpers.readFile(filePath), filePath);
   }
@@ -47,8 +47,8 @@ export function validateEnvConfig(workspaceConfig: Models.env.EnvConfig, filePat
 //#endregion
 
 //#region standalone config by
-export async function standaloneConfigBy(standaloneProject: Project): Promise<Models.env.EnvConfig> {
-  let configStandaloneEnv: Models.env.EnvConfig;
+export async function standaloneConfigBy(standaloneProject: Project): Promise<Models.EnvConfig> {
+  let configStandaloneEnv: Models.EnvConfig;
 
 
   var pathToProjectEnvironment = crossPlatformPath([standaloneProject.location, config.file.environment]);
@@ -100,25 +100,22 @@ const path = require('path')
 //#endregion
 
 
-export function saveConfigWorkspca(project: Project, projectConfig: Models.env.EnvConfig) {
+export function saveConfigWorkspca(project: Project, projectConfig: Models.EnvConfig) {
 
   projectConfig.currentProjectName = project.name;
   projectConfig.currentProjectGenericName = project.genericName;
-  projectConfig.currentProjectTasksConfiguration = project.getTemlateOfTasksJSON(projectConfig);
   projectConfig.currentProjectType = project.type;
-  projectConfig.currentFrameworkVersion = Project.Tnp.version;
+  projectConfig.currentFrameworkVersion = Project.ins.Tnp.version;
   projectConfig.currentProjectLocation = project.location;
-  projectConfig.isStandaloneProject = project.isStandaloneProject;
-  projectConfig.isSmartContainer = project.isSmartContainer;
-  projectConfig.isSmartContainerTargetProject = project.isSmartContainerTarget;
-
-  projectConfig.frameworks = project.frameworks;
+  projectConfig.isStandaloneProject = project.__isStandaloneProject;
+  projectConfig.isSmartContainer = project.__isSmartContainer;
+  projectConfig.isSmartContainerTargetProject = project.__isSmartContainerTarget;
 
   let libs = Helpers.linksToFoldersFrom(path.join(project.location, config.folder.src, 'libs'));
-  const isSmartWorkspaceChild = project.isSmartContainerChild;
+  const isSmartWorkspaceChild = project.__isSmartContainerChild;
   if (isSmartWorkspaceChild) {
     libs = project.parent.children.filter(f => {
-      return f.frameworkVersionAtLeast('v3') && f.typeIs('isomorphic-lib');
+      return f.__frameworkVersionAtLeast('v3') && f.typeIs('isomorphic-lib');
     }).map(f => {
       return path.join(f.location);
     })
@@ -126,8 +123,8 @@ export function saveConfigWorkspca(project: Project, projectConfig: Models.env.E
   const customRootDir = 'customRootDir';
 
   if (libs.length > 0) {
-    const parentPath = project.isSmartContainerChild ? project.parent.location : path.join(project.location, '../../..')
-    const parent = Project.From(parentPath);
+    const parentPath = project.__isSmartContainerChild ? project.parent.location : path.join(project.location, '../../..')
+    const parent = Project.ins.From(parentPath);
     if (parent) {
       const generatedPathes = `"paths": ` + JSON.stringify((libs).reduce((a, b) => {
         if (isSmartWorkspaceChild) {
@@ -152,12 +149,12 @@ export function saveConfigWorkspca(project: Project, projectConfig: Models.env.E
       Helpers.warn(`[env config] parent not found by path ${parentPath}`);
     }
 
-  } else if (project.isStandaloneProject && !project.smartContainerBuildTarget) {
+  } else if (project.__isStandaloneProject && !project.__smartContainerBuildTarget) {
     projectConfig['pathesTsconfig'] = `"paths": ` + JSON.stringify({
       [`${project.name}`]: ["./src/lib"],
       [`${project.name}/*`]: ["./src/lib/*"]
     });
-  } else if (project.isSmartContainer) {
+  } else if (project.__isSmartContainer) {
     projectConfig['pathesTsconfig'] = `"paths": ` + JSON.stringify(project.children.reduce((a, child) => {
       return _.merge(a, {
         // [`@${project.name}/${child.name}`]: [`${child.name}/src/lib/index.ts`],
@@ -173,9 +170,9 @@ export function saveConfigWorkspca(project: Project, projectConfig: Models.env.E
     projectConfig['pathesTsconfig'] = `${projectConfig['pathesTsconfig']},`;
   }
 
-  if (project.isSmartContainerChild) {
+  if (project.__isSmartContainerChild) {
     projectConfig[customRootDir] = `"rootDir": "../",`;
-  } else if (project.isSmartContainer) {
+  } else if (project.__isSmartContainer) {
     projectConfig[customRootDir] = `"rootDir": ".",`;
     projectConfig['includeForContainer'] = (project.children.map(c => {
       return `"${c.name}/**/*"`
@@ -195,7 +192,7 @@ export function saveConfigWorkspca(project: Project, projectConfig: Models.env.E
   const tmpEnvironmentPath = path.join(project.location, config.file.tnpEnvironment_json)
   const tmpEnvironmentPathBrowser = path.join(project.location, 'tmp-environment-for-browser.json')
 
-  if (project.isStandaloneProject || project.isSmartContainer) {
+  if (project.__isStandaloneProject || project.__isSmartContainer) {
 
     Helpers.writeJson(tmpEnvironmentPath, projectConfig);
     const clonedConfig = _.cloneDeep(projectConfig);
@@ -206,7 +203,7 @@ export function saveConfigWorkspca(project: Project, projectConfig: Models.env.E
       }
     })
     Helpers.writeJson(tmpEnvironmentPathBrowser, clonedConfig);
-    Helpers.log(`config saved in ${project.isStandaloneProject ? 'standalone' : 'smart container'} `
+    Helpers.log(`config saved in ${project.__isStandaloneProject ? 'standalone' : 'smart container'} `
       + `project ${chalk.bold(project.genericName)} ${tmpEnvironmentPath}`);
 
   }

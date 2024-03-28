@@ -3,9 +3,9 @@ import { _, crossPlatformPath } from 'tnp-core/src';
 import { fse } from 'tnp-core/src';
 import { path } from 'tnp-core/src';
 import { config } from 'tnp-config/src';
-import { Project } from '../../abstract/project/project';
-import { Models } from 'tnp-models/src';
-import { Helpers } from 'tnp-helpers/src';;
+import { Project } from '../../abstract/project';
+import { Models } from '../../../models';
+import { Helpers } from 'tnp-helpers/src';
 //#endregion
 export namespace CopyMangerHelpers {
 
@@ -22,7 +22,7 @@ export namespace CopyMangerHelpers {
   export const browserwebsqlFolders = [
     config.folder.browser,
     config.folder.websql,
-  ] as Models.dev.BuildDirBrowser[];
+  ] as ('browser' | 'websql' | string)[];
   //#endregion
 
   //#region helpers / pure child name
@@ -36,7 +36,7 @@ export namespace CopyMangerHelpers {
   export function executeCopy(
     sourceLocation: string,
     destinationLocation: string,
-    options: Models.other.GenerateProjectCopyOpt,
+    options: Models.GenerateProjectCopyOpt,
     project: Project,
   ) {
     const { useTempLocation, filterForReleaseDist, ommitSourceCode, override } = options;
@@ -50,7 +50,6 @@ export namespace CopyMangerHelpers {
 
       Helpers.mkdirp(tempDestination);
       // console.log(`tempDestination: "${tempDestination}"`);
-      // process.exit(0)
     } else {
       tempDestination = destinationLocation;
     }
@@ -71,7 +70,7 @@ export namespace CopyMangerHelpers {
         '.vscode',
         ...Helpers.values(config.tempFolders),
       ] : []),
-      ...(project.projectLinkedFiles().map(c => c.relativePath)),
+      ...(project.__projectLinkedFiles().map(c => c.relativePath)),
       ...((filterForReleaseDist && ommitSourceCode) ? sourceFolders : []),
       // ...toOmmitV3,
     ];
@@ -88,11 +87,11 @@ export namespace CopyMangerHelpers {
       Helpers.remove(tempDestination);
     }
 
-    if (project.isContainer) {
+    if (project.__isContainer) {
       // console.log(`For project: ${this.project.genericName} files:
       // ${this.project.projectSourceFiles()}
       // `)
-      project.projectSourceFiles().forEach(f => {
+      project.__projectSourceFiles().forEach(f => {
         const source = crossPlatformPath(path.join(project.location, f));
         if (fse.existsSync(source)) {
           Helpers.log(`Copying file/folder to static build: ${f} `)

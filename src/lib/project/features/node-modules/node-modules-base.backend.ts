@@ -7,14 +7,14 @@ import { CLI } from 'tnp-cli/src';
 import * as TerminalProgressBar from 'progress';
 
 import { PREFIXES, config } from 'tnp-config/src';
-import { Project } from '../../abstract/project/project';
-import { Models } from 'tnp-models/src';
+import { Project } from '../../abstract/project';
 import { Helpers } from 'tnp-helpers/src';
 import {
   dedupePackages, nodeModulesExists, addDependenceis
 } from './node-modules-helpers.backend';
 import { NodeModulesCore } from './node-modules-core.backend';
 import { ONLY_COPY_ALLOWED } from '../../../constants';
+import { Models } from '../../../models';
 
 //#endregion
 
@@ -31,14 +31,14 @@ export class NodeModulesBase extends NodeModulesCore {
     Helpers.logInfo(`[node_modules] Copy instalation of npm packages from ` +
       `${CLI.chalk.bold(source.genericName)} to ${CLI.chalk.bold(this.project.genericName)} ${triggerMsg}`);
 
-    if (source.smartNodeModules.exists) {
+    if (source.__smartNodeModules.exists) {
 
-      this.project.node_modules.remove();
-      Helpers.mkdirp(this.project.node_modules.path);
+      this.project.__node_modules.remove();
+      Helpers.mkdirp(this.project.__node_modules.path);
       const packagesToLinkOrCopy = [
-        ...Helpers.foldersFrom(source.smartNodeModules.path),
-        ...Helpers.linksToFoldersFrom(source.smartNodeModules.path),
-        ...[crossPlatformPath([source.node_modules.path, '.install-date'])],
+        ...Helpers.foldersFrom(source.__smartNodeModules.path),
+        ...Helpers.linksToFoldersFrom(source.__smartNodeModules.path),
+        ...[crossPlatformPath([source.__node_modules.path, '.install-date'])],
       ].filter(f => {
         return fse.existsSync(f) &&
           !path.basename(f).startsWith(PREFIXES.RESTORE_NPM)
@@ -54,7 +54,7 @@ export class NodeModulesBase extends NodeModulesCore {
       for (let index = 0; index < packagesToLinkOrCopy.length; index++) {
         const f = packagesToLinkOrCopy[index];
         const basename = path.basename(f);
-        const destAbsPath = crossPlatformPath([this.project.node_modules.path, basename]);
+        const destAbsPath = crossPlatformPath([this.project.__node_modules.path, basename]);
         const sourceRealAbsPath = fse.realpathSync(f);
         const copyInsteadLink = ONLY_COPY_ALLOWED.includes(basename);
         if (Helpers.exists(sourceRealAbsPath)) {
@@ -79,22 +79,22 @@ export class NodeModulesBase extends NodeModulesCore {
 
 
 
-    source.packageJson.save(`instalation of packages from ${this.project.genericName} ${triggerMsg} `);
+    source.__packageJson.save(`instalation of packages from ${this.project.genericName} ${triggerMsg} `);
 
 
     // global.spinner?.start()
 
-    for (let index = 0; index < Models.npm.ArrNpmDependencyType.length; index++) {
-      const depName = Models.npm.ArrNpmDependencyType[index];
-      const deppp = source.getDepsAsProject(depName);
+    for (let index = 0; index < Models.ArrNpmDependencyType.length; index++) {
+      const depName = Models.ArrNpmDependencyType[index];
+      const deppp = source.__getDepsAsProject(depName);
       for (let index2 = 0; index2 < deppp.length; index2++) {
         const dep = deppp[index2];
-        await source.node_modules.copy(dep.name).to(this.project);
+        await source.__node_modules.copy(dep.name).to(this.project);
       }
 
     }
 
-    source.node_modules.copyBin.to(this.project);
+    source.__node_modules.copyBin.to(this.project);
     // global.spinner?.start()
 
     // const overridedDeps = this.project.getDepsAsPackage('tnp_overrided_dependencies');
@@ -103,7 +103,7 @@ export class NodeModulesBase extends NodeModulesCore {
     //   await this.project.npmPackages.install(triggerMsg, d);
     // }
 
-    this.project.node_modules.dedupe();
+    this.project.__node_modules.dedupe();
   }
 
   private get copyBin() {
@@ -128,15 +128,15 @@ export class NodeModulesBase extends NodeModulesCore {
    * @param pkg
    * @param options
    */
-  public copy(pkg: string | Models.npm.Package, options?: { override?: boolean; linkOnly?: boolean; }) {
+  public copy(pkg: string | Models.Package, options?: { override?: boolean; linkOnly?: boolean; }) {
     const self = this;
     return {
       async to(destination: Project) {
 
         const { override = false, linkOnly = false } = options || {};
 
-        const packageName = (_.isObject(pkg) ? (pkg as Models.npm.Package).name : pkg) as string;
-        let projToCopy = Project.From(path.join(self.project.location, config.folder.node_modules, packageName));
+        const packageName = (_.isObject(pkg) ? (pkg as Models.Package).name : pkg) as string;
+        let projToCopy = Project.ins.From(path.join(self.project.location, config.folder.node_modules, packageName));
         const nodeModeulesPath = path.join(destination.location, config.folder.node_modules);
         if (!fse.existsSync(nodeModeulesPath)) {
           Helpers.mkdirp(nodeModeulesPath);
@@ -147,7 +147,7 @@ export class NodeModulesBase extends NodeModulesCore {
         if (linkOnly) {
           projToCopy.linkTo(pDestPath);
         } else {
-          const addedSuccess = projToCopy.copyManager.generateSourceCopyIn(pDestPath,
+          const addedSuccess = projToCopy.__copyManager.generateSourceCopyIn(pDestPath,
             { override, filterForReleaseDist: false, showInfo: false });
           if (!addedSuccess) {
             return;
@@ -169,12 +169,12 @@ export class NodeModulesBase extends NodeModulesCore {
           // .filter(dep => dep !== self.project.name)
           .forEach(pkgName => {
             const pDestPathPackage = path.join(nodeModeulesPath, pkgName);
-            projToCopy = Project.From(path.join(self.project.location, config.folder.node_modules, pkgName));
+            projToCopy = Project.ins.From(path.join(self.project.location, config.folder.node_modules, pkgName));
             if (projToCopy) {
               if (linkOnly) {
                 projToCopy.linkTo(pDestPathPackage);
               } else {
-                projToCopy.copyManager.generateSourceCopyIn(pDestPathPackage,
+                projToCopy.__copyManager.generateSourceCopyIn(pDestPathPackage,
                   { override, filterForReleaseDist: false, showInfo: false });
               }
 

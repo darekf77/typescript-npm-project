@@ -4,17 +4,15 @@ import { _ } from 'tnp-core/src';
 import { CLI } from 'tnp-cli/src';
 import { glob } from 'tnp-core/src';
 
-import { Project } from '../../abstract/project/project';
-import { Models } from 'tnp-models/src';
+import { Project } from '../../abstract/project';
+import { Models } from '../../../models';
 import { Helpers } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
 
 //#region dedupe packages
 export function dedupePackages(projectLocation: string, packagesNames?: string[], countOnly = false, warnings = true) {
   Helpers.taskStarted(`${countOnly ? 'Counting' : 'Fixing/removing'} duplicates ${path.basename(projectLocation)}/node_modules`)
-  // console.log('(Project.Tnp).packageJson.data.tnp.core.dependencies.dedupe;',(Project.Tnp).packageJson.data.tnp.core.dependencies.dedupe)
-  // console.log('packages to dedupe', packagesNames)
-  // process.exit(0)
+
 
   const rules: { [key: string]: { ommitParents: string[]; onlyFor: string[]; } } = {};
 
@@ -50,7 +48,7 @@ export function dedupePackages(projectLocation: string, packagesNames?: string[]
     }
     let pathToCurrent = path.join(projectLocation, config.folder.node_modules, f, organizationProjectSeondPart);
 
-    const current = Project.From(pathToCurrent);
+    const current = Project.ins.From(pathToCurrent);
 
     if (!current) {
       warnings && Helpers.log(`Project with name ${f} not founded`);
@@ -71,12 +69,11 @@ export function dedupePackages(projectLocation: string, packagesNames?: string[]
       .filter(l => !l.startsWith(`${config.folder.node_modules}/${f}`))
       .filter(l => !l.startsWith(`${config.folder.node_modules}/${config.folder._bin}`))
       .filter(l => path.basename(path.dirname(l)) === config.folder.node_modules)
-    // console.log(duplicates);
-    // process.exit(0)
+
     if (countOnly) {
       duplicates.forEach((duplicateRelativePath, i) => {
         let p = path.join(projectLocation, duplicateRelativePath, organizationProjectSeondPart);
-        const nproj = Project.From(p);
+        const nproj = Project.ins.From(p);
         if (!nproj) {
           // Helpers.warn(`Not able to identyfy project in ${p}`)
         } else {
@@ -90,7 +87,7 @@ export function dedupePackages(projectLocation: string, packagesNames?: string[]
     } else {
       duplicates.forEach(duplicateRelativePath => {
         const p = path.join(projectLocation, duplicateRelativePath);
-        const projRem = Project.From(p);
+        const projRem = Project.ins.From(p);
         const versionRem = projRem && projRem.version;
 
         let parentName = path.basename(
@@ -175,12 +172,12 @@ function nodeMOdulesOK(pathToFolder: string | string[], moreThan = 1) {
 }
 
 export function nodeModulesExists(project: Project) {
-  if (project.isStandaloneProject) {
+  if (project.__isStandaloneProject) {
 
     const nodeModulesPath = path.join(project.location, config.folder.node_modules);
 
     const pathBin = path.join(nodeModulesPath, config.folder._bin);
-    const dummyPackages = config.quickFixes.missingLibs.length + 1;
+    const dummyPackages = [].length + 1;
     const fullOfPackages = nodeMOdulesOK(nodeModulesPath, dummyPackages);
     const res = Helpers.exists(pathBin) && fullOfPackages;
     return res;
@@ -190,7 +187,7 @@ export function nodeModulesExists(project: Project) {
 }
 
 export function nodeModulesHasOnlyLinks(project: Project) {
-  const links = Helpers.linksToFolderFrom(project.node_modules.path);
+  const links = Helpers.linksToFolderFrom(project.__node_modules.path);
   return links.length > 500; // TODO QUICK_FIX
 }
 
@@ -203,8 +200,8 @@ export function addDependenceis(project: Project, context: string, allNamesBefor
     newNames.push(project.name)
   }
 
-  Models.npm.ArrNpmDependencyType.forEach(depName => {
-    newNames = newNames.concat(project.getDepsAsProject(depName, context)
+  Models.ArrNpmDependencyType.forEach(depName => {
+    newNames = newNames.concat(project.__getDepsAsProject(depName, context)
       .filter(d => !allNamesBefore.includes(d.name))
       .map(d => d.name))
   });
@@ -217,7 +214,7 @@ export function addDependenceis(project: Project, context: string, allNamesBefor
 
   const projects = newNames
     .map(name => {
-      return Project.From(path.join(context, config.folder.node_modules, name))
+      return Project.ins.From(path.join(context, config.folder.node_modules, name))
     })
     .filter(f => !!f);
 
@@ -232,93 +229,3 @@ export function addDependenceis(project: Project, context: string, allNamesBefor
 }
 //#endregion
 
-//#region stuberize frontend package for backedn
-const regexForClassFunctinoInLine = new RegExp(`[a-zA-Z]+\\(`)
-const regexForClassStaticFunctinoInLine = new RegExp(`static\ +[a-zA-Z]+\\(`)
-const regexForFunctinoInLine = new RegExp(`function [a-zA-Z]+\\(`)
-const regexForGenericFunctinoInLine = new RegExp(`function [a-zA-Z]+\\<`)
-const regexIsExportedConst = new RegExp(`export\\ +const `)
-const specialFunctionEnd = `//<replace>`;
-const notAllowedFolderToCopy = [
-  'browser',
-  'dists',
-  'esm5',
-  'esm2015',
-  'fesm2022',
-  'fesm5',
-  'fesm2015',
-  'fesm2022',
-  'dist'
-];
-
-function fixPackageJson(pathToPacakgeJson: string, project: Project) {
-  const file = Helpers.readJson(pathToPacakgeJson) as Models.npm.IPackageJSON;
-  const newFile = _.pick(file, [
-    'name',
-    'version',
-    'tnp',
-    'dependencies',
-    'devDependencies',
-    'license',
-    'bin',
-  ] as (keyof Models.npm.IPackageJSON)[]);
-  newFile.tnp = {
-    version: project._frameworkVersion,
-    type: 'angular-lib',
-  } as any;
-  Helpers.writeFile(pathToPacakgeJson, newFile);
-}
-
-
-
-function createSubVersion(proj: Project, symlinkFolderFromSrcToRcreate: string[]) {
-  const projLocation = (proj.location);
-  const newStuberizedName = `${path.basename(projLocation)}${config.SUBERIZED_PREFIX}`;
-  const newProjStubLocaiton = path.join(
-    path.dirname(projLocation),
-    newStuberizedName
-  );
-  const filesAndFolderToCopy = fse
-    .readdirSync(projLocation)
-    .filter(f => ![
-      config.folder.browser,
-      config.folder._browser,
-    ].includes(f))
-
-  Helpers.removeFolderIfExists(newProjStubLocaiton);
-  filesAndFolderToCopy.forEach(fileOrFolderName => {
-    const source = path.join(projLocation, fileOrFolderName);
-    const dest = path.join(newProjStubLocaiton, fileOrFolderName);
-    if (Helpers.isFolder(source)) {
-      Helpers.copy(source, dest);
-    } else {
-      Helpers.copyFile(source, dest);
-    }
-  });
-
-  symlinkFolderFromSrcToRcreate.forEach(folderLinkName => {
-    const source = path.join(newProjStubLocaiton, config.folder.dist, folderLinkName);
-    const dest = path.join(newProjStubLocaiton, folderLinkName);
-    Helpers.createSymLink(source, dest);
-  })
-
-  Helpers.removeExcept(projLocation, [
-    config.folder._browser,
-    config.folder.browser,
-  ]);
-
-  fse.readdirSync(path.join(projLocation, config.folder.browser))
-    .forEach(fileOrFolderName => {
-      const source = path.join(path.join(projLocation, config.folder.browser, fileOrFolderName));
-      const dest = path.join(path.join(projLocation, fileOrFolderName));
-      Helpers.removeIfExists(dest);
-      if (Helpers.isFolder(source)) {
-        Helpers.copy(source, dest);
-      } else {
-        Helpers.copyFile(source, dest);
-      }
-    });
-  Helpers.removeFolderIfExists(path.join(projLocation, config.folder.browser));
-}
-
-//#endregion

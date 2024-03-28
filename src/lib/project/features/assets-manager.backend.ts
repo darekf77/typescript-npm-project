@@ -1,18 +1,18 @@
 import { config } from "tnp-config/src";
 import { crossPlatformPath, fse, path } from "tnp-core/src";
 import { Helpers } from "tnp-helpers/src";
-import { Models } from "tnp-models/src";
-import { FeatureForProject } from "../abstract/feature-for-project";
+import { BaseFeatureForProject } from "tnp-helpers/src";
+import { Project } from "../abstract/project";
 
 const assetsFor = `${config.folder.assets}-for`
 
 
-export class AssetsManager extends FeatureForProject {
+export class AssetsManager extends BaseFeatureForProject<Project> {
 
 
-  copyExternalAssets(outDir: Models.dev.BuildDir, websql: boolean) {
-    this.project.isomorphicPackages.filter(f => !f.startsWith('@')).map(pkgName => {
-      const sharedPath = this.project.node_modules.pathFor(crossPlatformPath(
+  copyExternalAssets(outDir: 'dist', websql: boolean) {
+    this.project.__isomorphicPackages.filter(f => !f.startsWith('@')).map(pkgName => {
+      const sharedPath = this.project.__node_modules.pathFor(crossPlatformPath(
         [pkgName, config.folder.assets, config.folder.shared]
       ));
 
@@ -34,9 +34,9 @@ export class AssetsManager extends FeatureForProject {
         }
       }
     });
-    this.project.isomorphicPackages.filter(f => f.startsWith('@')).map(orgPkgName => {
+    this.project.__isomorphicPackages.filter(f => f.startsWith('@')).map(orgPkgName => {
       const orgName = path.dirname(orgPkgName).replace('@', '');
-      const realPathOrg = this.project.node_modules.pathFor(crossPlatformPath(
+      const realPathOrg = this.project.__node_modules.pathFor(crossPlatformPath(
         path.dirname(orgPkgName)
       ));
 

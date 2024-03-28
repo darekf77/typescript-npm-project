@@ -1,27 +1,20 @@
-import {
-  crossPlatformPath,
-  //#region @backend
-  path,
-  //#endregion
-  _
-} from 'tnp-core/src';
-import { ConfigModels } from 'tnp-config/src';
+//#region imports
+import { crossPlatformPath, path, _ } from 'tnp-core/src';
 import { Helpers } from 'tnp-helpers/src';
-import { Project } from '../../../abstract/project/project';
+import { Project } from '../../../abstract/project';
+import { Models } from '../../../../models';
 import { config } from 'tnp-config/src';
-import { Models } from 'tnp-models/src';
-import { CLASS } from 'typescript-class-helpers/src';
 import { BaseInsideStruct } from './base-inside-struct';
 import { InsideStruct } from '../inside-struct';
 import { recreateApp, recreateIndex } from './inside-struct-helpers';
+//#endregion
 
-@CLASS.NAME('InsideStructAngular13Lib')
 export class InsideStructAngular13Lib extends BaseInsideStruct {
 
-  private constructor(project: Project, websql: boolean) {
+  constructor(project: Project, websql: boolean) {
     super(project, websql);
     //#region @backend
-    if (!project.frameworkVersionAtLeast('v3') || project.typeIsNot('isomorphic-lib')) {
+    if (!project.__frameworkVersionAtLeast('v3') || project.typeIsNot('isomorphic-lib')) {
       return
     }
     const tmpProjectsStandalone = `tmp-libs-for-{{{outFolder}}}${this.websql ? '-websql' : ''}/${project.name}`;
@@ -69,10 +62,10 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
       ],
       //#endregion
       projectType: project.type,
-      frameworkVersion: project._frameworkVersion,
+      frameworkVersion: project.__frameworkVersion,
       pathReplacements: [
         [new RegExp('^lib\\/'), ({ client }) => {
-          if (project.isStandaloneProject) {
+          if (project.__isStandaloneProject) {
             return `${tmpProjectsStandalone}/`;
           }
           return `${tmpProjects}/`;
@@ -85,19 +78,19 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
         (() => {
           const jsonPath = path.join(
             projectLocation,
-            this.project.isStandaloneProject
+            this.project.__isStandaloneProject
               ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
             config.file.package_json,
           );
 
-          const container = Project.by('container', this.project._frameworkVersion) as Project;
+          const container = Project.by('container', this.project.__frameworkVersion) as Project;
 
-          const json = Helpers.readJson(jsonPath) as Models.npm.IPackageJSON;
+          const json = Helpers.readJson(jsonPath) as Models.IPackageJSON;
 
           json.devDependencies = {};
 
-          Object.keys(container.packageJson.data.dependencies).forEach(pkgName => {
-            json.dependencies[pkgName] = container.packageJson.data.dependencies[pkgName];
+          Object.keys(container.__packageJson.data.dependencies).forEach(pkgName => {
+            json.dependencies[pkgName] = container.__packageJson.data.dependencies[pkgName];
           });
 
           // Object.keys(json.devDependencies).forEach(pkgName => {
@@ -113,7 +106,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
         (() => {
           const source = path.join(
             projectLocation,
-            this.project.isStandaloneProject
+            this.project.__isStandaloneProject
               ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
             `projects/my-lib`
           );
@@ -121,7 +114,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
 
           const dest = path.join(
             projectLocation,
-            this.project.isStandaloneProject
+            this.project.__isStandaloneProject
               ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
             `projects/${projectName}`
           );
@@ -140,7 +133,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
 
           const dest = path.join(
             projectLocation,
-            this.project.isStandaloneProject
+            this.project.__isStandaloneProject
               ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
             `projects/${projectName}/src/lib`
           );
@@ -152,7 +145,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
           //#region resolve varaibles
           const sourcePublicApi = path.join(
             projectLocation,
-            this.project.isStandaloneProject
+            this.project.__isStandaloneProject
               ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
             `projects/${projectName}/src/${config.file.public_api_ts}`,
           );
@@ -162,7 +155,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
 
           const sourceTsconfig = path.join(
             projectLocation,
-            this.project.isStandaloneProject
+            this.project.__isStandaloneProject
               ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
             `tsconfig.json`,
           );
@@ -174,9 +167,9 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
           }
           //#endregion
 
-          if (this.project.isSmartContainerTarget) {
+          if (this.project.__isSmartContainerTarget) {
             //#region fixing tsconfig pathes
-            const parent = this.project.smartContainerTargetParentContainer;
+            const parent = this.project.__smartContainerTargetParentContainer;
             const otherChildren = parent.children.filter(c => c.name !== this.project.name);
             // console.log({
             //   otherChildren: otherChildren.map(c => c.location)
@@ -225,7 +218,7 @@ export * from './lib';
 
               const assetDummyDestForLib = path.join(
                 projectLocation,
-                this.project.isStandaloneProject
+                this.project.__isStandaloneProject
                   ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
                 `projects/${projectName}/src/${config.folder.assets}`
               );
@@ -247,7 +240,7 @@ export * from './lib';
 
               const destChild = path.join(
                 projectLocation,
-                this.project.isStandaloneProject
+                this.project.__isStandaloneProject
                   ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
                 `projects/${projectName}/src/libs/${child.name}`
               );
@@ -277,28 +270,28 @@ export * from './lib';
 
         const libPackageJson = crossPlatformPath([
           projectLocation,
-          this.project.isStandaloneProject
+          this.project.__isStandaloneProject
             ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
           `projects/${projectName}/package.json`
         ]);
 
         const ngPackageJson = crossPlatformPath([
           projectLocation,
-          this.project.isStandaloneProject
+          this.project.__isStandaloneProject
             ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
           `projects/${projectName}/ng-package.json`
         ]);
 
         const angularJson = crossPlatformPath([
           projectLocation,
-          this.project.isStandaloneProject
+          this.project.__isStandaloneProject
             ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
           `angular.json`
         ]);
 
         const tsconfigJson = crossPlatformPath([
           projectLocation,
-          this.project.isStandaloneProject
+          this.project.__isStandaloneProject
             ? replacement(tmpProjectsStandalone) : replacement(tmpProjects),
           `tsconfig.json`
         ]);
@@ -342,8 +335,7 @@ export * from './lib';
 
       })
     });
-    // @ts-ignore
-    this.struct = result;
+    this.struct = result as any;
     //#endregion
   }
 

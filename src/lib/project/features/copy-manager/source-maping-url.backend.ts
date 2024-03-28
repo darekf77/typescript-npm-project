@@ -1,6 +1,6 @@
 import { crossPlatformPath, path, _ } from "tnp-core/src";
 import { Helpers } from "tnp-helpers/src";
-import { Project } from "../../abstract/project/project";
+import { Project } from "../../abstract/project";
 
 export class SourceMappingUrl {
   public static readonly SOURCEMAPDES = '//# sourceMappingURL='
@@ -46,7 +46,7 @@ export class SourceMappingUrl {
 
   process(): string {
     if (this.mappingLineIndex !== -1) {
-      if (this.projectWithBuild.isInRelaseDist) { // TODO links on windows sucks d
+      if (this.projectWithBuild.__isInRelaseDist) { // TODO links on windows sucks d
         this.contentLines[this.mappingLineIndex] = `${SourceMappingUrl.SOURCEMAPDES}${path.basename(this.absFilePath)}.map`;
       } else {
         this.contentLines[this.mappingLineIndex] = `${SourceMappingUrl.SOURCEMAPDES}${crossPlatformPath(this.absFilePath)}.map`;

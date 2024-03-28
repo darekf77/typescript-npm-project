@@ -1,29 +1,28 @@
-import { _ } from 'tnp-core/src';
+import { _, CoreModels } from 'tnp-core/src';
 import * as JSON5 from 'json5';
 import * as inquirer from 'inquirer';
 
-import { Project } from '../../abstract/project/project';
-import { getAndTravelCoreDeps } from './package-json-helpers.backend';
-import { Models } from 'tnp-models/src';
+import { Project } from '../../abstract/project';
+import { Models } from '../../../models';
 import { Helpers } from 'tnp-helpers/src';
-import { ConfigModels, CoreLibCategoryArr } from 'tnp-config/src';
-import { FeatureForProject } from '../../abstract/feature-for-project';
+import { CoreLibCategoryArr } from 'tnp-config/src';
+import { BaseFeatureForProject } from 'tnp-helpers/src';
 
-export type GetPkgType = { category: ConfigModels.CoreLibCategory; version: string; };
+export type GetPkgType = { category: CoreModels.CoreLibCategory; version: string; };
 
-export class PackageJsonDepsCoreCategories extends FeatureForProject {
+export class PackageJsonDepsCoreCategories extends BaseFeatureForProject<Project> {
 
   protected s_onlyFor = 'onlyFor';
   protected s_common = 'common';
   private get all() {
-    return (Project.Tnp).packageJson.data.tnp.core.dependencies;
+    return (Project.ins.Tnp).__packageJson.data.tnp.core.dependencies;
   }
 
-  private for(libType: ConfigModels.LibType) {
+  private for(libType: CoreModels.LibType) {
     let result = this.all[this.s_onlyFor][libType];
     _.keys(result).find(key => {
       if (key === '@') {
-        result = this.for(result[key] as ConfigModels.LibType);
+        result = this.for(result[key] as CoreModels.LibType);
         return true;
       }
       return false;
@@ -76,7 +75,7 @@ export class PackageJsonDepsCoreCategories extends FeatureForProject {
     rem(this.commonForAllLibTypes);
 
     CoreLibCategoryArr.forEach(type => {
-      const deps = this.for(type as ConfigModels.LibType);
+      const deps = this.for(type as CoreModels.LibType);
       if (deps) {
         rem(deps);
       }
@@ -85,7 +84,7 @@ export class PackageJsonDepsCoreCategories extends FeatureForProject {
 
   public getBy(name: string): GetPkgType {
 
-    function cattt(deps, cat: ConfigModels.CoreLibCategory): GetPkgType {
+    function cattt(deps, cat: CoreModels.CoreLibCategory): GetPkgType {
       if (_.isString(deps[name])) {
         return { category: cat, version: deps[name] };
       }
@@ -108,7 +107,7 @@ export class PackageJsonDepsCoreCategories extends FeatureForProject {
 
     let result: GetPkgType;
     CoreLibCategoryArr.find(type => {
-      const deps = this.for(type as ConfigModels.LibType);
+      const deps = this.for(type as CoreModels.LibType);
       if (deps) {
         result = cattt(deps, type);
         return _.isObject(result);
@@ -118,29 +117,7 @@ export class PackageJsonDepsCoreCategories extends FeatureForProject {
     return result;
   }
 
-  public async setWizard(pkg: Models.npm.Package) {
-    Helpers.info('Please select at lease one client..')
-    const { type }: { type: ConfigModels.CoreLibCategory } = await inquirer
-      .prompt([
-        {
-          type: 'list',
-          name: 'type',
-          message: 'Select lib type ',
-          choices: CoreLibCategoryArr.reverse()
-            .map(c => {
-              let name = _.startCase(c);
-              if (c === 'common') {
-                name = `<< Common for all libs >>`;
-              }
-              return { value: c, name };
-            })
-        }
-      ]) as any;
-    // TODO finish it later
-    process.exit(0)
-  }
-
-  public set(pkg: Models.npm.Package, type: ConfigModels.CoreLibCategory) {
+  public set(pkg: Models.Package, type: CoreModels.CoreLibCategory) {
 
     if (!CoreLibCategoryArr.includes(type)) {
       Helpers.error(`[depscorecategories][set] Incrorrect type ${type}`, false, true);

@@ -1,24 +1,21 @@
-//#region @backend
-import { CLASS } from 'typescript-class-helpers/src';
-import { crossPlatformPath, path, _ } from 'tnp-core/src';
-import { Models } from 'tnp-models/src';
+//#region imports
+import { crossPlatformPath, path, _, CoreModels } from 'tnp-core/src';
 import { Helpers } from 'tnp-helpers/src';
-import { Project } from '../../../abstract/project/project';
+import { Project } from '../../../abstract/project';
 import { InsideStruct } from '../inside-struct';
 import { BaseInsideStruct } from './base-inside-struct';
 import { resolvePathToAsset } from './inside-struct-helpers';
 import { config } from 'tnp-config/src';
 import { getLoader } from './loaders/loaders';
-import { ID_LOADER_PRE_BOOTSTRAP, PRE_LOADER_NG_IF_INITED } from './inside-struct-constants';
 import { imageLoader } from './loaders/image-loader';
+import { Models } from '../../../../models';
+//#endregion
 
-@CLASS.NAME('InsideStructAngular13App')
 export class InsideStructAngular13App extends BaseInsideStruct {
-
-  private constructor(project: Project, websql: boolean) {
+  constructor(project: Project, websql: boolean) {
     super(project, websql);
     //#region @backend
-    if (!project.frameworkVersionAtLeast('v3') || project.typeIsNot('isomorphic-lib')) {
+    if (!project.__frameworkVersionAtLeast('v3') || project.typeIsNot('isomorphic-lib')) {
       return
     }
     const tmpProjectsStandalone = `tmp-apps-for-{{{outFolder}}}${this.websql ? '-websql' : ''}/${project.name}`;
@@ -64,10 +61,10 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         //#endregion
       ],
       projectType: project.type,
-      frameworkVersion: project._frameworkVersion,
+      frameworkVersion: project.__frameworkVersion,
       pathReplacements: [
         ['app/', ({ client }) => {
-          if (project.isStandaloneProject) {
+          if (project.__isStandaloneProject) {
             return `${tmpProjectsStandalone}/`;
           }
           return `${tmpProjects}/`;
@@ -79,10 +76,10 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         [
           (opt) => {
             const { outFolder, projectName, client } = opt;
-            if (project.isStandaloneProject) {
+            if (project.__isStandaloneProject) {
               const standalonePath = `tmp-src-app-${outFolder}${this.websql ? '-websql' : ''}`;
-              if (client.isSmartContainerTarget) {
-                const targetProj = client.smartContainerTargetParentContainer.smartContainerBuildTarget;
+              if (client.__isSmartContainerTarget) {
+                const targetProj = client.__smartContainerTargetParentContainer.__smartContainerBuildTarget;
                 if (targetProj.name !== client.name) {
                   // console.log(`${targetProj.name} vs ${client?.name}`)
                   return `../${targetProj.name}/${standalonePath}/-/${client.name}`;
@@ -95,8 +92,8 @@ export class InsideStructAngular13App extends BaseInsideStruct {
           (opt) => {
             const { projectName, client } = opt;
             const standalonePath = `app/src/app/${projectName}`;
-            if (client.isSmartContainerTarget) {
-              const targetProj = client.smartContainerTargetParentContainer.smartContainerBuildTarget;
+            if (client.__isSmartContainerTarget) {
+              const targetProj = client.__smartContainerTargetParentContainer.__smartContainerBuildTarget;
               if (targetProj.name !== client.name) {
                 return `${standalonePath}/app`;
               }
@@ -110,10 +107,10 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         [
           (opt) => {
             const { outFolder, projectName, client } = opt;
-            if (project.isStandaloneProject) {
+            if (project.__isStandaloneProject) {
               const standalonePath = `tmp-src-${outFolder}${this.websql ? '-websql' : ''}`;
-              if (client.isSmartContainerTarget) {
-                const targetProj = client.smartContainerTargetParentContainer.smartContainerBuildTarget;
+              if (client.__isSmartContainerTarget) {
+                const targetProj = client.__smartContainerTargetParentContainer.__smartContainerBuildTarget;
                 if (targetProj.name !== client.name) {
                   // console.log(`assets  ${targetProj.name} vs ${client?.name}`)
                   return `../${targetProj.name}/${standalonePath}/assets`;
@@ -124,8 +121,8 @@ export class InsideStructAngular13App extends BaseInsideStruct {
           },
           (opt) => {
             const { projectName, client } = opt;
-            if (client.isSmartContainerTarget) {
-              const targetProj = client.smartContainerTargetParentContainer.smartContainerBuildTarget;
+            if (client.__isSmartContainerTarget) {
+              const targetProj = client.__smartContainerTargetParentContainer.__smartContainerBuildTarget;
               if (targetProj.name !== client.name) {
                 return `app/src/assets`;
               }
@@ -139,8 +136,8 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         [
           (opt) => {
             const { projectName, client, outFolder } = opt;
-            if (client.isSmartContainerTarget) {
-              const targetProj = client.smartContainerTargetParentContainer.smartContainerBuildTarget;
+            if (client.__isSmartContainerTarget) {
+              const targetProj = client.__smartContainerTargetParentContainer.__smartContainerBuildTarget;
               if (targetProj.name !== client.name) {
                 return `../${targetProj.name}/${outFolder}`;
               }
@@ -149,8 +146,8 @@ export class InsideStructAngular13App extends BaseInsideStruct {
           },
           (opt) => {
             const { projectName, client, outFolder } = opt;
-            if (client.isSmartContainerTarget) {
-              const targetProj = client.smartContainerTargetParentContainer.smartContainerBuildTarget;
+            if (client.__isSmartContainerTarget) {
+              const targetProj = client.__smartContainerTargetParentContainer.__smartContainerBuildTarget;
               if (targetProj.name !== client.name) {
                 return `${outFolder}/compiled`;
               }
@@ -167,7 +164,7 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         (() => {
           const appModuleFilePath = path.join(
             project.location,
-            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+            replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
             `/src/app/app.module.ts`
           );
 
@@ -196,7 +193,7 @@ ${appModuleFile}
         (() => {
           const appComponentFilePath = path.join(
             project.location,
-            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+            replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
             `/src/app/app.component.ts`
           );
 
@@ -231,7 +228,7 @@ ${appModuleFile}
         (() => {
           const appComponentFilePath = path.join(
             project.location,
-            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+            replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
             `/src/app/app.module.ts`
           );
 
@@ -251,7 +248,7 @@ ${appModuleFile}
         (() => {
           const appMainFilePath = path.join(
             project.location,
-            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+            replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
             `/src/main.ts`
           );
 
@@ -293,7 +290,7 @@ ${appModuleFile}
         (() => {
           const appModuleFilePath = path.join(
             project.location,
-            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+            replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
             `/src/app/app.component.html`
           );
 
@@ -312,8 +309,8 @@ ${appModuleFile}
         //#region LOADERS & BACKGROUNDS REPLACEMENT
         (() => {
           const projectTargetOrStandalone = this.project;
-          const basename = this.project.isInRelaseDist ?
-            `/${(this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name)}`
+          const basename = this.project.__isInRelaseDist ?
+            `/${(this.project.__isSmartContainerTarget ? this.project.__smartContainerTargetParentContainer.name : this.project.name)}`
             : '';
 
           // if(projectTargetOrStandalone.name === 'main') {
@@ -326,13 +323,13 @@ ${appModuleFile}
           (() => {
             const appModuleHtmlPath = path.join(
               project.location,
-              replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+              replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
               `/src/app/app.component.html`
             );
 
             let appHtmlFile = Helpers.readFile(appModuleHtmlPath);
 
-            const loaderData = projectTargetOrStandalone.env.config?.loading?.afterAngularBootstrap?.loader;
+            const loaderData = projectTargetOrStandalone.__env.config?.loading?.afterAngularBootstrap?.loader;
             const loaderIsImage = _.isString(loaderData);
 
             if (loaderIsImage) {
@@ -357,13 +354,13 @@ ${appModuleFile}
           (() => {
             const appModuleFilePath = path.join(
               project.location,
-              replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+              replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
               `/src/app/app.component.ts`
             );
 
             let appScssFile = Helpers.readFile(appModuleFilePath);
 
-            const bgColor = projectTargetOrStandalone.env.config?.loading?.afterAngularBootstrap?.background;
+            const bgColor = projectTargetOrStandalone.__env.config?.loading?.afterAngularBootstrap?.background;
             if (bgColor) {
               appScssFile = appScssFile.replace(
                 'FIREDEV_TO_REPLACE_COLOR',
@@ -378,17 +375,17 @@ ${appModuleFile}
           (() => {
             const appModuleFilePath = path.join(
               project.location,
-              replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+              replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
               `/src/index.html`
             );
 
             let indexHtmlFile = Helpers.readFile(appModuleFilePath);
 
-            const loaderData = projectTargetOrStandalone.env.config?.loading?.preAngularBootstrap?.loader;
+            const loaderData = projectTargetOrStandalone.__env.config?.loading?.preAngularBootstrap?.loader;
             const loaderIsImage = _.isString(loaderData);
 
             if (loaderIsImage) {
-              const pathToAsset = projectTargetOrStandalone.env.config?.useDomain ? '' : basename + resolvePathToAsset(projectTargetOrStandalone, loaderData, outFolder, websql);
+              const pathToAsset = projectTargetOrStandalone.__env.config?.useDomain ? '' : basename + resolvePathToAsset(projectTargetOrStandalone, loaderData, outFolder, websql);
               indexHtmlFile = indexHtmlFile.replace(
                 '<!-- <<<TO_REPLACE_LOADER>>> -->',
                 imageLoader(pathToAsset, true),
@@ -401,7 +398,7 @@ ${appModuleFile}
               );
             }
 
-            const bgColor = projectTargetOrStandalone.env.config?.loading?.preAngularBootstrap?.background;
+            const bgColor = projectTargetOrStandalone.__env.config?.loading?.preAngularBootstrap?.background;
             const bgColorStyle = bgColor ? `style="background-color: ${bgColor};"` : '';
             indexHtmlFile = indexHtmlFile.replace(
               'FIREDEV_TO_REPLACE_COLOR',
@@ -420,13 +417,13 @@ ${appModuleFile}
         (() => {
           const indexHtmlFilePath = path.join(
             project.location,
-            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+            replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
             `/src/index.html`
           );
 
           let indexHtmlFile = Helpers.readFile(indexHtmlFilePath);
 
-          const title = this.project.env.config?.title;
+          const title = this.project.__env.config?.title;
           const titleToReplace = title ? title : _.startCase(this.project.name);
           // console.log({
           //   titleToReplace
@@ -443,19 +440,19 @@ ${appModuleFile}
         (() => {
           const mainFilePath = path.join(
             project.location,
-            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+            replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
             `/src/main.ts`
           );
 
           let mainTsFile = Helpers.readFile(mainFilePath);
 
-          const basename = this.project.isInRelaseDist ?
-            `/${(this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name)}`
+          const basename = this.project.__isInRelaseDist ?
+            `/${(this.project.__isSmartContainerTarget ? this.project.__smartContainerTargetParentContainer.name : this.project.name)}`
             : '';
 
-          const projForName = project.isSmartContainerTarget ? project.smartContainerTargetParentContainer : project;
+          const projForName = project.__isSmartContainerTarget ? project.__smartContainerTargetParentContainer : project;
 
-          if (projForName.env.config?.useDomain) {
+          if (projForName.__env.config?.useDomain) {
             mainTsFile = mainTsFile.replace(
               '<<<TO_REPLACE_BASENAME>>>',
               '',
@@ -475,19 +472,19 @@ ${appModuleFile}
         (() => {
           const stylesFilePath = path.join(
             project.location,
-            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+            replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
             `/src/styles.scss`
           );
 
           let stylesScssFile = Helpers.readFile(stylesFilePath);
 
-          const basename = this.project.isInRelaseDist ?
-            `/${(this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer.name : this.project.name)}`
+          const basename = this.project.__isInRelaseDist ?
+            `/${(this.project.__isSmartContainerTarget ? this.project.__smartContainerTargetParentContainer.name : this.project.name)}`
             : '';
 
-          const projForName = project.isSmartContainerTarget ? project.smartContainerTargetParentContainer : project;
+          const projForName = project.__isSmartContainerTarget ? project.__smartContainerTargetParentContainer : project;
 
-          if (projForName.env.config?.useDomain) {
+          if (projForName.__env.config?.useDomain) {
             stylesScssFile = stylesScssFile.replace(
               '<<<TO_REPLACE_BASENAME>>>',
               '',
@@ -507,7 +504,7 @@ ${appModuleFile}
         (() => {
           const faviconPathDest = crossPlatformPath([
             project.location,
-            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
+            replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects),
             `/src/favicon.ico`
           ]);
 
@@ -525,8 +522,8 @@ ${appModuleFile}
         //#region link assets
         (() => {
 
-          if (client.isSmartContainerTarget) {
-            const targetProj = client.smartContainerTargetParentContainer.smartContainerBuildTarget;
+          if (client.__isSmartContainerTarget) {
+            const targetProj = client.__smartContainerTargetParentContainer.__smartContainerBuildTarget;
             if (targetProj.name !== client.name) {
               return;
             }
@@ -545,7 +542,7 @@ ${appModuleFile}
           const assetsDest = crossPlatformPath(path.join(
             project.location
             ,
-            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+            replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
             ,
             `/src/assets`
           ));
@@ -559,7 +556,7 @@ ${appModuleFile}
         //#region electron
         (() => {
 
-          if (client.isSmartContainerTarget) {
+          if (client.__isSmartContainerTarget) {
             return;
           }
 
@@ -575,7 +572,7 @@ ${appModuleFile}
           const compileTs = crossPlatformPath(path.join(
             project.location
             ,
-            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+            replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
             ,
             `/electron/compiled`
           ));
@@ -585,7 +582,7 @@ ${appModuleFile}
           const electronConfigPath = crossPlatformPath(path.join(
             project.location
             ,
-            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+            replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
             ,
             `/electron-builder.json`
           ));
@@ -603,7 +600,7 @@ ${appModuleFile}
           const manifestJsonPath = crossPlatformPath(path.join(
             project.location
             ,
-            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+            replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
             ,
             `/src/manifest.webmanifest`
           ));
@@ -611,20 +608,20 @@ ${appModuleFile}
           const indexHtmlPath = crossPlatformPath(path.join(
             project.location
             ,
-            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+            replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
             ,
             `/src/index.html`
           ));
           const projectTargetOrStandalone = this.project;
 
-          const manifestJson: Models.pwa.Manifest = Helpers.readJson(manifestJsonPath, {}, true);
+          const manifestJson: CoreModels.PwaManifest = Helpers.readJson(manifestJsonPath, {}, true);
           let indexHtml = Helpers.readFile(indexHtmlPath);
 
-          manifestJson.name = projectTargetOrStandalone.env.config?.pwa?.name
-            ? projectTargetOrStandalone.env.config.pwa.name : _.startCase(project.name);
+          manifestJson.name = projectTargetOrStandalone.__env.config?.pwa?.name
+            ? projectTargetOrStandalone.__env.config.pwa.name : _.startCase(project.name);
 
-          manifestJson.short_name = projectTargetOrStandalone.env.config?.pwa?.short_name
-            ? projectTargetOrStandalone.env.config.pwa.short_name : project.name;
+          manifestJson.short_name = projectTargetOrStandalone.__env.config?.pwa?.short_name
+            ? projectTargetOrStandalone.__env.config.pwa.short_name : project.name;
 
           const assetsPath = crossPlatformPath(path.join(
             project.location,
@@ -632,14 +629,14 @@ ${appModuleFile}
             config.folder.assets
           ));
 
-          if (projectTargetOrStandalone.branding.exist) {
+          if (projectTargetOrStandalone.__branding.exist) {
             //#region apply pwa generated icons
-            manifestJson.icons = projectTargetOrStandalone.branding.iconsToAdd;
+            manifestJson.icons = projectTargetOrStandalone.__branding.iconsToAdd;
             //#endregion
             indexHtml = indexHtml.replace(`<link rel="icon" type="image/x-icon" href="favicon.ico">`, '')
             indexHtml = indexHtml.replace(
-              projectTargetOrStandalone.branding.htmlIndexRepaceTag,
-              projectTargetOrStandalone.branding.htmlLinesToAdd.join('\n')
+              projectTargetOrStandalone.__branding.htmlIndexRepaceTag,
+              projectTargetOrStandalone.__branding.htmlLinesToAdd.join('\n')
             );
             indexHtml = indexHtml.replace(
               `<link rel="icon" type="image/x-icon" href="/`,
@@ -653,8 +650,8 @@ ${appModuleFile}
             ));
 
             const iconsFilesPathes = Helpers.filesFrom(iconsPath).filter(f => {
-              // @ts-ignore
-              return Models.other.ImageFileExtensionArr.includes(path.extname(f as any).replace('.', ''));
+
+              return Models.ImageFileExtensionArr.includes(path.extname(f as any).replace('.', '') as any);
             }); // glob.sync(`${iconsPath}/**/*.(png|jpeg|svg)`);
 
             manifestJson.icons = iconsFilesPathes.map(f => {
@@ -677,12 +674,12 @@ ${appModuleFile}
             return c;
           });
 
-          if (projectTargetOrStandalone.env.config?.pwa?.start_url) {
-            manifestJson.start_url = (projectTargetOrStandalone.env.config as any).pwa.start_url;
-          } else if (projectTargetOrStandalone.env.config?.useDomain) {
-            manifestJson.start_url = `https://${projectTargetOrStandalone.env.config.domain}/`
+          if (projectTargetOrStandalone.__env.config?.pwa?.start_url) {
+            manifestJson.start_url = (projectTargetOrStandalone.__env.config as any).pwa.start_url;
+          } else if (projectTargetOrStandalone.__env.config?.useDomain) {
+            manifestJson.start_url = `https://${projectTargetOrStandalone.__env.config.domain}/`
           } else {
-            const smartContainerOrStandalone = this.project.isSmartContainerTarget ? this.project.smartContainerTargetParentContainer : this.project;
+            const smartContainerOrStandalone = this.project.__isSmartContainerTarget ? this.project.__smartContainerTargetParentContainer : this.project;
             manifestJson.start_url = `/${smartContainerOrStandalone.name}/` // perfect for github.io OR when subdomain myproject.com/docs/
           }
 
@@ -727,7 +724,7 @@ ${appModuleFile}
           const tsconfigJSONpath = crossPlatformPath(path.join(
             project.location
             ,
-            replacement(project.isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+            replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
             ,
             `/tsconfig.json`
           ));
@@ -742,8 +739,8 @@ ${appModuleFile}
           let libs = Helpers.linksToFoldersFrom(libsPathes);
           const parentPath = crossPlatformPath(path.resolve(path.join(project.location, '../../..')));
 
-          const parent = Project.From(parentPath) as Project;
-          if (parent && parent.isSmartContainer && libs.length > 0 && content.compilerOptions) {
+          const parent = Project.ins.From(parentPath) as Project;
+          if (parent && parent.__isSmartContainer && libs.length > 0 && content.compilerOptions) {
 
             // console.log('tsconfigJSON', tsconfigJSONpath, content)
             // console.log('libsPathes', libsPathes)
@@ -774,14 +771,9 @@ ${appModuleFile}
         //#endregion
       })
     });
-    // @ts-ignore
+
     this.struct = result;
     //#endregion
   }
 
 }
-
-
-
-
-//#endregion

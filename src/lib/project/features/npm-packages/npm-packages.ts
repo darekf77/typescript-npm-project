@@ -12,10 +12,10 @@ export class NpmPackages extends NpmPackagesBase {
     const args = packagesNamesSpaceSeparated.split(' ').filter(a => !!a);
 
     if (args.length === 0) {
-      project.npmPackages.installProcess(`${config.frameworkName} install`, { smartInstallPreparing });
+      project.__npmPackages.installProcess(`${config.frameworkName} install`, { smartInstallPreparing });
     } else {
       const packages = resolvePacakgesFromArgs(args);
-      project.npmPackages.installProcess(`${config.frameworkName} install ${packages
+      project.__npmPackages.installProcess(`${config.frameworkName} install ${packages
         .map(p => `${p.installType}${p.version ? ` ${p.name}@${p.version}` : ''}`)
         .join(', ')} `, { npmPackages: packages, smartInstallPreparing });
     }
@@ -29,7 +29,7 @@ export class NpmPackages extends NpmPackagesBase {
       Helpers.error(`Please specify package name: ${config.frameworkName} uninstall exapmle-npm-package `, false, true)
     } else {
       const packages = resolvePacakgesFromArgs(args);
-      project.npmPackages.installProcess(`${config.frameworkName} uninstall ${packages
+      project.__npmPackages.installProcess(`${config.frameworkName} uninstall ${packages
         .map(p => `${p.installType}${p.version ? ` ${p.name}@${p.version}` : ''}`)
         .join(', ')} `, { npmPackages: packages, remove: true });
     }

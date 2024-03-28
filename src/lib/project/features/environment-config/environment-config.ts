@@ -8,19 +8,22 @@ import {
   saveConfigWorkspca as saveEnvironmentConfig,
   standaloneConfigBy
 } from './environment-config-helpers';
-import { FeatureForProject } from '../../abstract/feature-for-project';
 //#endregion
+import { BaseFeatureForProject } from 'tnp-helpers/src';
 import { Helpers } from 'tnp-helpers/src';
-import { config, ConfigModels } from 'tnp-config/src';
-import { Models } from 'tnp-models/src';
+import { config } from 'tnp-config/src';
+import type { Project } from '../../../project/abstract/project';
+import { Models } from '../../../models';
 //#endregion
 
 export class EnvironmentConfig
   //#region @backend
-  extends FeatureForProject
+  extends BaseFeatureForProject<Project>
 //#endregion
 {
+  //#region methods & getters / copy to
   coptyTo(destination: string) {
+    //#region @backend
     (() => {
       const source = path.join(this.project.location, config.file.environment_js);
       const dest = path.join(destination, config.file.environment_js);
@@ -31,13 +34,15 @@ export class EnvironmentConfig
       const dest = path.join(destination, config.file.tnpEnvironment_json);
       Helpers.copyFile(source, dest);
     })();
+    //#endregion
   }
+  //#endregion
 
   //#region @backend
-  private async updateData(configEn?: Models.env.EnvConfig) {
+  private async updateData(configEn?: Models.EnvConfig) {
 
     if (this.project.git.isGitRepo) {
-      if (!configEn && this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
+      if (!configEn && this.project.__frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
         Helpers.error(`Please build library first: ${config.frameworkName} build:dist`,)
       }
       // console.log('upppp')
@@ -45,11 +50,6 @@ export class EnvironmentConfig
         number: this.project.git.countComits(),
         date: this.project.git.lastCommitDate(),
         hash: this.project.git.lastCommitHash(),
-        options: {
-          isWebsqlBuild: this.project.buildOptions.websql,
-          isWatchBuild: this.project.buildOptions.watch,
-          outDir: this.project.buildOptions.outDir,
-        }
       };
       // console.log('upppp done')
     }
@@ -57,10 +57,10 @@ export class EnvironmentConfig
   }
 
 
-  public async init(args?: string) {
+  public async init() {
     const configResult = await standaloneConfigBy(this.project);
 
-    configResult.isCoreProject = this.project.isCoreProject;
+    configResult.isCoreProject = this.project.__isCoreProject;
 
     if (!configResult.ip) {
       configResult.ip = 'localhost'
@@ -79,21 +79,23 @@ export class EnvironmentConfig
       configResult.domain = configResult.domain.replace(/^https?:\/\//, '');
     }
 
-    configResult.packageJSON = this.project.packageJson.data;
+    configResult.packageJSON = this.project.__packageJson.data;
 
     await this.updateData(configResult);
   }
   //#endregion
 
-   /**
-    * @IMPORTANT
-   * Can be accesed only after project.env.init()
-   */
+  //#region methods & getters / config
+  /**
+   * @IMPORTANT
+  * Can be accesed only after project.env.init()
+  */
   public get config(): any {
-    //#region @backend
+    //#region @backendFunc
     const configPath = crossPlatformPath([this.project.location, config.file.tnpEnvironment_json]);
     return Helpers.readJson(configPath)
     //#endregion
   }
+  //#endregion
 
 }

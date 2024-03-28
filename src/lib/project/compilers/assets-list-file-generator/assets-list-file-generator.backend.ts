@@ -1,24 +1,24 @@
 import { crossPlatformPath, _, path } from 'tnp-core/src';
 import { config } from 'tnp-config/src'
 import { Helpers } from 'tnp-helpers/src';
-import { Models } from 'tnp-models/src';
-import { FeatureForProject } from '../../abstract/feature-for-project';
+import { BaseFeatureForProject } from 'tnp-helpers/src';
 import { folder_shared_folder_info } from '../../../constants';
 import { COMPILER_POOLING, incrementalWatcher } from 'incremental-compiler/src';
 import { IncrementalWatcherInstance } from 'incremental-compiler/src';
+import type { Project } from '../../abstract/project';
 
-export class AssetsFileListGenerator extends FeatureForProject {
+export class AssetsFileListGenerator extends BaseFeatureForProject<Project> {
 
   //#region fields & getters
   private targetProjectName: string;
-  private outFolder: Models.dev.BuildDir;
+  private outFolder: 'dist';
   private websql: boolean;
   watchers: IncrementalWatcherInstance[] = [];
   readonly filename = 'assets-list.json';
   private detectedFiles = [] as string[];
 
   get assetsFolder() {
-    if (this.project.isSmartContainer) {
+    if (this.project.__isSmartContainer) {
       // codete-ngrx-quick-start/main/src/assets/assets-for
       // return crossPlatformPath([
       //   this.project.location,
@@ -54,7 +54,7 @@ export class AssetsFileListGenerator extends FeatureForProject {
 
   //#endregion
 
-  async start(targetProjectName: string, outFolder: Models.dev.BuildDir, websql: boolean) {
+  async start(targetProjectName: string, outFolder: 'dist', websql: boolean) {
     this.targetProjectName = targetProjectName;
     this.outFolder = outFolder;
     this.websql = websql;
@@ -100,7 +100,7 @@ export class AssetsFileListGenerator extends FeatureForProject {
     // shared_folder_info.txt
   };
 
-  async startAndWatch(targetProjectName: string, outFolder: Models.dev.BuildDir, websql?: boolean) {
+  async startAndWatch(targetProjectName: string, outFolder: 'dist', websql?: boolean) {
     await this.start(targetProjectName, outFolder, websql);
     const srcPath = this.srcPath;
 

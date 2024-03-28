@@ -8,7 +8,7 @@ import {
 import { Helpers } from 'tnp-helpers/src';
 import { config, PREFIXES } from 'tnp-config/src';
 import { BrowserCodeCut } from '../../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
-import type { Project } from '../../abstract/project/project';
+import type { Project } from '../../abstract/project';
 
 const notAllowedAsPacakge = [
   config.folder.browser,
@@ -45,7 +45,6 @@ export class PackagesRecognition {
     return _.isArray(this.recognizedPackages) ? this.recognizedPackages.length : 0;
   }
 
-  // @ts-ignore
   start(force?: boolean, reasonToSearch?: string) {
     if (this.processAlreadyDone) {
       this.updateCurrentIsomorphicJsonSearchResults();
@@ -66,9 +65,9 @@ export class PackagesRecognition {
     `);
     Helpers.mesureExectionInMsSync(`Searching isomorphic packages for ${this.project.genericName}...`, () => {
       let local = [];
-      if (this.project.isSmartContainer || this.project.isSmartContainerTarget) {
-        const parent = this.project.isSmartContainer ? this.project
-          : this.project.smartContainerTargetParentContainer;
+      if (this.project.__isSmartContainer || this.project.__isSmartContainerTarget) {
+        const parent = this.project.__isSmartContainer ? this.project
+          : this.project.__smartContainerTargetParentContainer;
 
         local = [
           ...parent.children.map(c => {
@@ -93,7 +92,7 @@ export class PackagesRecognition {
   //     // } else {
 
   //     // }
-  //     const proj = Project.From(packageInNodeModulesPath);
+  //     const proj = Project.ins.From(packageInNodeModulesPath);
   //     if (proj) {
   //       Helpers.log(`[${config.frameworkName}] Proj "${proj.genericName}" type ${proj.type}, standalone ${proj.isStandaloneProject}`, 1)
   //       if (proj.typeIs('isomorphic-lib')) {
@@ -190,7 +189,7 @@ export class PackagesRecognition {
         // }
       });
     this.recognizedPackages = [
-      ...(this.project.isStandaloneProject && !this.project.isSmartContainerTarget) ? [this.project.name] : [],
+      ...(this.project.__isStandaloneProject && !this.project.__isSmartContainerTarget) ? [this.project.name] : [],
       ...folders,
       ...local,
       ...Object.values(config.frameworkNames),

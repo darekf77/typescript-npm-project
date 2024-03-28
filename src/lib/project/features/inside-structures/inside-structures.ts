@@ -1,29 +1,25 @@
 //#region @backend
 import {
   crossPlatformPath,
-  path, _
+  path, _, CoreModels
 } from 'tnp-core/src';
 //#endregion
-import { CLASS } from 'typescript-class-helpers/src';
-import { config, ConfigModels } from 'tnp-config/src';
+import { config } from 'tnp-config/src';
 
 import { Helpers } from 'tnp-helpers/src';
-import { FeatureForProject } from '../../abstract/feature-for-project';
-import { Project } from '../../abstract/project/project';
+import { BaseFeatureForProject } from 'tnp-helpers/src';
+import { Project } from '../../abstract/project';
 import { InsideStruct, Opt } from './inside-struct';
 import { InsideStructAngular13App, InsideStructAngular13Lib } from './structs';
 import { BaseInsideStruct } from './structs/base-inside-struct';
 
-const structs = {
-  InsideStructAngular13App,
-  InsideStructAngular13Lib
-};
-
-export class InsideStructures extends FeatureForProject {
+export class InsideStructures extends BaseFeatureForProject<Project> {
 
   //#region field & getters
-  readonly structures = {} as { [name in keyof typeof structs]: BaseInsideStruct; }
-  readonly structuresWebsql = {} as { [name in keyof typeof structs]: BaseInsideStruct; }
+  private insideStructAngular13AppNormal = new InsideStructAngular13App(this.project, false);
+  private insideStructAngular13LibNormal = new InsideStructAngular13Lib(this.project, false);
+  private insideStructAngular13AppWebsql = new InsideStructAngular13App(this.project, true);
+  private insideStructAngular13LibWebsql = new InsideStructAngular13Lib(this.project, true);
   protected recreatedOnce = false;
   private _gitIgnoreFiles = [];
   private _npmIgnoreFiles = [];
@@ -47,33 +43,22 @@ export class InsideStructures extends FeatureForProject {
 
   constructor(project: Project) {
     super(project);
-    //#region @backend
-
-    Object.keys(structs).forEach(s => {
-      const structFn = structs[s] as typeof BaseInsideStruct;
-      this.structures[CLASS.getName(structFn)] = new structFn(project, false);
-    });
-
-    Object.keys(structs).forEach(s => {
-      const structFn = structs[s] as typeof BaseInsideStruct;
-      this.structuresWebsql[CLASS.getName(structFn)] = new structFn(project, true);
-    });
-
-    //#endregion
   }
 
 
   //#region api
 
   //#region api / recreate
-  public async recrate(outFolder: ConfigModels.OutFolder, watchBuild = true) {
+  public async recrate(outFolder: CoreModels.OutFolder, watchBuild = true) {
     // console.log('recreate start')
     const clients: Project[] = [];
 
     const action = async (client: Project) => {
-      const structs = [
-        ...Object.values(this.structures),
-        ...Object.values(this.structuresWebsql)
+      const structs: BaseInsideStruct[] = [
+        this.insideStructAngular13AppNormal,
+        this.insideStructAngular13LibNormal,
+        this.insideStructAngular13AppWebsql,
+        this.insideStructAngular13LibWebsql,
       ];
 
       for (let index = 0; index < structs.length; index++) {
@@ -135,7 +120,7 @@ export class InsideStructures extends FeatureForProject {
           for (let index = 0; index < insideStruct.struct.linkNodeModulesTo.length; index++) {
             const f = insideStruct.struct.linkNodeModulesTo[index]
             const destPath = path.join(client.location, replacement(f));
-            this.project.node_modules.linkTo(destPath);
+            this.project.__node_modules.linkTo(destPath);
           }
         }
         //#endregion
@@ -163,7 +148,11 @@ export class InsideStructures extends FeatureForProject {
         //#endregion
 
         if (_.isFunction(insideStruct?.struct?.endAction)) {
-          await Helpers.runSyncOrAsync(insideStruct.struct.endAction, opt);
+
+          await Helpers.runSyncOrAsync({
+            functionFn: insideStruct.struct.endAction,
+            arrayOfParams: [opt]
+          });
         }
       }
     };

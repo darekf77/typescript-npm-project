@@ -4,16 +4,19 @@ import {
   path,
   fse,
   crossPlatformPath,
+  CoreModels,
 } from 'tnp-core/src';
 
-import { config, ConfigModels, extAllowedToReplace, frontEndOnly, TAGS } from 'tnp-config/src';
-import { Models } from 'tnp-models/src';
+import { config, extAllowedToReplace, frontEndOnly, TAGS } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
-import type { Project } from '../../../abstract/project/project';
+import type { Project } from '../../../abstract/project';
 import { BuildOptions } from '../../../../build-options';
+import { Models } from '../../../../models';
 import { RegionRemover } from 'isomorphic-region-loader/src';
 import { MjsModule } from '../../../features/copy-manager/mjs-fesm-module-spliter.backend';
 import { CLI } from 'tnp-cli/src';
+import { labelReplacementCode, ReplaceOptionsExtended } from 'isomorphic-region-loader/src';
+
 
 //#endregion
 
@@ -45,13 +48,9 @@ const debugFiles = [
 export class BrowserCodeCut {
 
   //#region static
-  public static readonly IsomorphicLibs = [];
+  public static IsomorphicLibs = [];
   public static resolveAndAddIsomorphicLibs(libsNames: string[]) {
-    // @ts-ignore
-    BrowserCodeCut.IsomorphicLibs = Helpers.arrays.uniqArray(BrowserCodeCut.IsomorphicLibs.concat(libsNames));
-    // console.log({
-    //   libs: BrowserCodeCut.IsomorphicLibs
-    // })
+    this.IsomorphicLibs = Helpers.arrays.uniqArray(BrowserCodeCut.IsomorphicLibs.concat(libsNames));
   }
   //#endregion
 
@@ -119,7 +118,7 @@ export class BrowserCodeCut {
     //   debugger
     // }
 
-    if (project.isStandaloneProject) {
+    if (project.__isStandaloneProject) {
       if (absSourcePathFromSrc
         .replace(crossPlatformPath([project.location, config.folder.src]), '')
         .startsWith('/assets/')
@@ -156,7 +155,7 @@ export class BrowserCodeCut {
 
   //#region methods / init and save
   private replaceAssetsPath = (absDestinationPath: string) => {
-    const isAsset = !this.project.isSmartContainerTarget && this.relativePath.startsWith(`${config.folder.assets}/`);
+    const isAsset = !this.project.__isSmartContainerTarget && this.relativePath.startsWith(`${config.folder.assets}/`);
     return isAsset ? absDestinationPath.replace('/assets/', `/assets/assets-for/${this.project.name}/`) : absDestinationPath;
   }
 
@@ -321,12 +320,12 @@ export class BrowserCodeCut {
   }
 
   private processBrowserNotCorrectImportsExports = (importOrExportLine: string) => {
-    // TODO @LAST
+    // TODO
     return importOrExportLine;
   }
 
   //#region methods / flat typescript import export
-  public FLATTypescriptImportExport(usage: ConfigModels.TsUsage) {
+  public FLATTypescriptImportExport(usage: CoreModels.TsUsage) {
 
     if (this.isAssetsFile) {
       return this;
@@ -352,9 +351,7 @@ export class BrowserCodeCut {
       let appendingToNewFlatOutput = false;
       let newFlatOutput = '';
       fileContent.split(/\r?\n/).forEach((line, index) => {
-        // if (line.trimStart().startsWith('// ') && !line.includes('@ts-ignore')) {
-        //   line = `/* ${Helpers.escapeStringForRegEx(line)} */`
-        // }
+
         const matchSingleLineExport = isExport && singleLineExport.test(line);
         const matchCommentStart = commentStart.test(line);
         const matchCommentEnd = commentEnds.test(line);
@@ -388,7 +385,7 @@ export class BrowserCodeCut {
           } else if (matchEnd) {
             appendingToNewFlatOutput = false;
             newFlatOutput += ` ${this.processBrowserNotCorrectImportsExports(line)}${_.times(toAppendLines,
-              () => `${Models.label.flatenImportExportRequred}\n`).join('')}`;
+              () => `${labelReplacementCode.flatenImportExportRequred}\n`).join('')}`; // TOOD @UNCOMMENT
             toAppendLines = 0;
           }
         } else {
@@ -434,7 +431,7 @@ export class BrowserCodeCut {
         }
         return res;
       },
-      TSimportExport(rawImport: string, usage: ConfigModels.TsUsage) {
+      TSimportExport(rawImport: string, usage: CoreModels.TsUsage) {
         // const orgImport = rawImport;
         if (usage === 'import') {
           const matches = rawImport.match(regexAsyncImport);
@@ -475,14 +472,14 @@ export class BrowserCodeCut {
 
   getParentContainer() {
     let parent: Project;
-    if (this.project.isSmartContainer) {
+    if (this.project.__isSmartContainer) {
       parent = this.project;
     }
-    if (this.project.isSmartContainerChild) {
+    if (this.project.__isSmartContainerChild) {
       parent = this.project.parent;
     }
-    if (this.project.isSmartContainerTarget) {
-      parent = this.project.smartContainerTargetParentContainer;
+    if (this.project.__isSmartContainerTarget) {
+      parent = this.project.__smartContainerTargetParentContainer;
     }
     return parent;
   }
@@ -572,7 +569,7 @@ export class BrowserCodeCut {
   //#endregion
 
   //#region methods / replace regions from ts import export
-  REPLACERegionsFromTsImportExport(usage: ConfigModels.TsUsage) {
+  REPLACERegionsFromTsImportExport(usage: CoreModels.TsUsage) {
     // const debug = filesToDebug.includes(path.basename(this.absoluteFilePath));
     // if (debug) {
     //   debugger
@@ -635,7 +632,7 @@ export class BrowserCodeCut {
   //#endregion
 
   //#region methods / replace regions for isomorphic lib
-  REPLACERegionsForIsomorphicLib(options: Models.dev.ReplaceOptionsExtended) {
+  REPLACERegionsForIsomorphicLib(options: ReplaceOptionsExtended) {
     if (this.isAssetsFile) {
       return this;
     }
@@ -647,7 +644,7 @@ export class BrowserCodeCut {
       const orgContent = this.rawContentForBrowser;
       this.rawContentForBrowser = RegionRemover.from(this.relativePath, orgContent, options.replacements, this.project).output;
 
-      if ((this.project.isStandaloneProject || this.project.isSmartContainer) && !this.isWebsqlMode) {
+      if ((this.project.__isStandaloneProject || this.project.__isSmartContainer) && !this.isWebsqlMode) {
 
         const regionsToRemove = [TAGS.BROWSER, TAGS.WEBSQL_ONLY];
 
@@ -662,8 +659,8 @@ export class BrowserCodeCut {
     }
 
 
-    if (this.project.isSmartContainerTarget) {
-      const parent = this.project.smartContainerTargetParentContainer;
+    if (this.project.__isSmartContainerTarget) {
+      const parent = this.project.__smartContainerTargetParentContainer;
       parent.children
         .filter(f => f.typeIs('isomorphic-lib'))
         .map(c => {
@@ -674,7 +671,7 @@ export class BrowserCodeCut {
             this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
           }
         })
-    } else if (this.project.isStandaloneProject) {
+    } else if (this.project.__isStandaloneProject) {
       [this.project]
         .filter(f => f.typeIs('isomorphic-lib'))
         .forEach(c => {
@@ -693,8 +690,8 @@ export class BrowserCodeCut {
   processAssetsLinksForApp() {
     this.rawContentForAPPONLYBrowser = this.rawContentForBrowser;
 
-    const pathname = this.project.isSmartContainerTarget
-      ? this.project.smartContainerTargetParentContainer.name
+    const pathname = this.project.__isSmartContainerTarget
+      ? this.project.__smartContainerTargetParentContainer.name
       : this.project.name;
 
     /**
@@ -703,8 +700,8 @@ export class BrowserCodeCut {
     // const forAppRelaseBuild = (this.buildOptions?.args?.search('--forAppRelaseBuild') !== -1)
 
 
-    let basenameWithSlash = this.project.isInRelaseDist ? `/${pathname}/` : '/';
-    if (this.project.env.config?.useDomain) {
+    let basenameWithSlash = this.project.__isInRelaseDist ? `/${pathname}/` : '/';
+    if (this.project.__env.config?.useDomain) {
       basenameWithSlash = '/';
     }
 
@@ -746,7 +743,7 @@ export class BrowserCodeCut {
         },
         /**
          *
-  // @ts-ignore
+
   import * as json1 from '/shared/src/assets/hamsters/test.json';
   console.log({ json1 }) -> WORKS NOW
          */
@@ -777,8 +774,8 @@ export class BrowserCodeCut {
     }
 
 
-    if (this.project.isSmartContainerTarget) {
-      const parent = this.project.smartContainerTargetParentContainer;
+    if (this.project.__isSmartContainerTarget) {
+      const parent = this.project.__smartContainerTargetParentContainer;
       parent.children
         .filter(f => f.typeIs('isomorphic-lib'))
         .forEach(c => {
@@ -799,7 +796,7 @@ export class BrowserCodeCut {
             }
           }
         })
-    } else if (this.project.isStandaloneProject) {
+    } else if (this.project.__isStandaloneProject) {
       [this.project]
         .filter(f => f.typeIs('isomorphic-lib'))
         .forEach(c => {
@@ -860,7 +857,7 @@ export class BrowserCodeCut {
 
 
 
-      if (this.project.isSmartContainerTarget) {
+      if (this.project.__isSmartContainerTarget) {
         const contentSmartTarget = (isEmptyModuleBackendFile && isTsFile) ? `
         export function dummy${(new Date()).getTime()}() { }
         export default function dummyDefault${(new Date()).getTime()}() { }
@@ -887,7 +884,7 @@ export class BrowserCodeCut {
       return content;
     }
 
-    if (this.project.isSmartContainerTarget
+    if (this.project.__isSmartContainerTarget
       || !(this.relativePath.startsWith('app.ts') || this.relativePath.startsWith('app/'))
     ) {
       return;
@@ -902,7 +899,7 @@ export class BrowserCodeCut {
     //   return;
     // }
 
-    const recognizeImport = (usage: ConfigModels.TsUsage) => {
+    const recognizeImport = (usage: CoreModels.TsUsage) => {
       const importRegex = new RegExp(`${usage}.+from\\s+(\\'|\\").+(\\'|\\")`, 'g');
 
       const asynMatches = (usage === 'import') ? content.match(regexAsyncImportG) : [];
@@ -915,7 +912,7 @@ export class BrowserCodeCut {
       ];
       return importsLines;
     }
-    // @ts-ignore
+
     let lines: [string, number][] = [
       ...recognizeImport('import'),
       ...recognizeImport('export')
@@ -932,7 +929,7 @@ export class BrowserCodeCut {
         return match ? [line, index] : void 0;
       }
 
-    }).filter(f => !!f);
+    }).filter(f => !!f) as any;
 
     // if(lines.length > 0) {
     //   console.log({
@@ -999,7 +996,7 @@ import { < My Stuff > } from '${this.project.name}';`, false,);
 
     let result = res.join('\n') + endOfFile;
 
-    if (this.project.isSmartContainerTarget) {
+    if (this.project.__isSmartContainerTarget) {
       // TODO @LAST check this
       // result = this.changeOrganizationBackendFileContentBeforeSave(result, absFilePath, true);
     } else {

@@ -1,8 +1,8 @@
-import { Models } from 'tnp-models/src';
+import { Models } from './models';
 
 
 declare global {
-  const ENV: Models.env.EnvConfig;
+  const ENV: Models.EnvConfig;
 }
 
 declare module "*.json" {

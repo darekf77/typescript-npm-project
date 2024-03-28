@@ -8,24 +8,23 @@ import {
 } from 'tnp-core/src';
 
 import { Helpers } from 'tnp-helpers/src';
-import { Models } from 'tnp-models/src';
 import { EXPORT_TEMPLATE } from '../../../../templates';
-import { Project } from '../../../abstract/project/project';
+import { Project } from '../../../abstract/project';
 import { DEFAULT_PORT, PortUtils } from '../../../../constants';
 
-export function resolveBrowserPathToAssetFrom(projectTargetOrStandalone: Project, absolutePath: string, outFolder: Models.dev.BuildDir, websql: boolean) {
+export function resolveBrowserPathToAssetFrom(projectTargetOrStandalone: Project, absolutePath: string, outFolder: 'dist', websql: boolean) {
   let resultBrowserPath = '';
-  if (projectTargetOrStandalone.isSmartContainerTarget) {
+  if (projectTargetOrStandalone.__isSmartContainerTarget) {
     // `tmp-src-${outFolder}${websql ? '-websql' : ''}/assets/assets-for/${projectTargetOrStandalone.name + '--' + projectTargetOrStandalone.parent.name}/`
     const relatievPath = absolutePath.replace(
-      `${projectTargetOrStandalone?.smartContainerTargetParentContainer.location}/`,
+      `${projectTargetOrStandalone?.__smartContainerTargetParentContainer.location}/`,
       ''
     );
     const client = _.first(relatievPath.split('/'));
     resultBrowserPath = `/${relatievPath.split('/').slice(1).join('/')}`;
     resultBrowserPath = resultBrowserPath.replace(
       `/${config.folder.src}/${config.folder.assets}/`,
-      `/${config.folder.assets}/${config.folder.assets}-for/${projectTargetOrStandalone.smartContainerTargetParentContainer.name + '--' + client}/`,
+      `/${config.folder.assets}/${config.folder.assets}-for/${projectTargetOrStandalone.__smartContainerTargetParentContainer.name + '--' + client}/`,
     );
   } else {
     // `tmp-src-${outFolder}${websql ? '-websql' : ''}/assets/assets-for/${projectTargetOrStandalone.name}/`
@@ -43,13 +42,13 @@ export function resolveBrowserPathToAssetFrom(projectTargetOrStandalone: Project
   return resultBrowserPath;
 }
 
-export function resolvePathToAsset(projectTargetOrStandalone: Project, relativePath: string, outFolder: Models.dev.BuildDir, websql: boolean) {
+export function resolvePathToAsset(projectTargetOrStandalone: Project, relativePath: string, outFolder: 'dist', websql: boolean) {
   const loaderRelativePath = relativePath.replace(/^\.\//, '').replace(/^\//, '');
   let absPathToAsset = '';
   let browserPath = ''
 
-  if (projectTargetOrStandalone.isSmartContainerTarget) { // stratego for smart container target project
-    absPathToAsset = crossPlatformPath([projectTargetOrStandalone.smartContainerTargetParentContainer.location, loaderRelativePath]);
+  if (projectTargetOrStandalone.__isSmartContainerTarget) { // stratego for smart container target project
+    absPathToAsset = crossPlatformPath([projectTargetOrStandalone.__smartContainerTargetParentContainer.location, loaderRelativePath]);
     if (!Helpers.exists(absPathToAsset)) {
       absPathToAsset = absPathToAsset.replace(
         loaderRelativePath,
@@ -82,11 +81,11 @@ export function recreateIndex(project: Project) {
       config.file.index_ts,
     ));
 
-    if (project.isSmartContainerTarget) {
-      const container = project.smartContainerTargetParentContainer;
+    if (project.__isSmartContainerTarget) {
+      const container = project.__smartContainerTargetParentContainer;
       if (!Helpers.exists(indexInSrcFile)) {
         const exportsContainer = container.children
-          .filter(c => c.typeIs('isomorphic-lib') && c.frameworkVersionAtLeast('v3'))
+          .filter(c => c.typeIs('isomorphic-lib') && c.__frameworkVersionAtLeast('v3'))
           .map(c => {
             return `export * from './libs/${c.name}';`
           }).join('\n');
@@ -109,8 +108,8 @@ export function recreateApp(project: Project) {
   //#region when app.ts or app is not available is not
   // console.log('TRYING ', project.location)
 
-  if (project.isSmartContainerTarget) {
-    project = project.smartContainerTargetParentContainer?.children.find(c => c.name === project.name);
+  if (project.__isSmartContainerTarget) {
+    project = project.__smartContainerTargetParentContainer?.children.find(c => c.name === project.name);
     if (!project) {
       return;
     }
@@ -152,7 +151,7 @@ export function recreateApp(project: Project) {
   if (!Helpers.exists(appHostsFile)
     // && !Helpers.exists(appFolderWithIndex) // TODO @QUESTION why not to remove this
   ) {
-    Helpers.writeFile(appHostsFile, PortUtils.instance(project.projectInfoPort).appHostTemplateFor(project));
+    Helpers.writeFile(appHostsFile, PortUtils.instance(project.__projectInfoPort).appHostTemplateFor(project));
   }
 
   if (!Helpers.exists(appElectornFile)

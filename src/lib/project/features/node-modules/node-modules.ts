@@ -18,7 +18,7 @@ export class NodeModules extends NodeModulesBase {
     //   'solutions',
     // ]
 
-    const patterns = this.project.packageJson.data.tnp.overrided['npmFixes'];
+    const patterns = this.project.__packageJson.data.tnp.overrided['npmFixes'];
     return patterns || [];
     // return this.project
     //   .getFolders()

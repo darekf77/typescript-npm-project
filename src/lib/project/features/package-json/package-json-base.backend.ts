@@ -1,8 +1,8 @@
 import { path } from 'tnp-core/src'
 import * as semver from 'semver';
 
-import { Project } from '../../abstract/project/project';
-import { Models } from 'tnp-models/src';
+import { Project } from '../../abstract/project';
+import { Models } from '../../../models';
 import { Helpers } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
 
@@ -29,7 +29,7 @@ export class PackageJsonBase extends PackageJsonCore {
         tnp: {
           resources: []
         }
-      } as Models.npm.IPackageJSON, options.data as any);
+      } as Models.IPackageJSON, options.data as any);
     }
     this.coreCategories = new PackageJsonDepsCoreCategories(this.project);
   }
@@ -74,9 +74,9 @@ export class PackageJsonBase extends PackageJsonCore {
       return;
     }
 
-    if (this.project.isStandaloneProject || this.project.isContainer) {
-      const tnp = (Project.Tnp);
-      tnp.packageJson.prepareForSave(action, tnp);
+    if (this.project.__isStandaloneProject || this.project.__isContainer) {
+      const tnp = (Project.ins.Tnp);
+      tnp.__packageJson.prepareForSave(action, tnp);
     }
 
     reolveAndSaveDeps(this.project, action, this.reasonToHidePackages, this.reasonToShowPackages);
@@ -100,11 +100,11 @@ export class PackageJsonBase extends PackageJsonCore {
 
   }
 
-  public removeDependencyAndSave = (p: Models.npm.Package, reason: string) => {
+  public removeDependencyAndSave = (p: Models.Package, reason: string) => {
     this.prepareForSave('save')
     removeDependencyAndSave(p, reason, this.project);
   }
-  public setDependencyAndSave = (p: Models.npm.Package, reason: string) => {
+  public setDependencyAndSave = (p: Models.Package, reason: string) => {
     this.prepareForSave('save')
     setDependencyAndSave(p, reason, this.project)
   }
@@ -128,7 +128,7 @@ export class PackageJsonBase extends PackageJsonCore {
   }
 
   public reset() {
-    if (this.project.isTnp) {
+    if (this.project.__isTnp) {
       Helpers.log(`Npm reset not available for Tnp project`)
       return;
     }
@@ -136,17 +136,15 @@ export class PackageJsonBase extends PackageJsonCore {
     this.save(`reset of npm`);
   }
 
-  async setCategoryFor(pkg: Models.npm.Package) {
-    await this.coreCategories.setWizard(pkg)
-  }
+
 
   public updateFrom(locations: string[]) {
     for (let index = 0; index < locations.length; index++) {
       const location = locations[index];
-      const otherProj = Project.From(location);
+      const otherProj = Project.ins.From(location);
       Helpers.log(`Updating package.json from ${otherProj.name}`)
-      updaPackage(this.project, otherProj.packageJson.data.dependencies, otherProj);
-      updaPackage(this.project, otherProj.packageJson.data.devDependencies, otherProj);
+      updaPackage(this.project, otherProj.__packageJson.data.dependencies, otherProj);
+      updaPackage(this.project, otherProj.__packageJson.data.devDependencies, otherProj);
     }
   }
 
@@ -160,7 +158,7 @@ function updaPackage(mainProj: Project, deps: Object, otherProj: Project) {
   Object.keys(deps).forEach(depName => {
     const version = deps[depName];
     if (_.isString(version)) {
-      mainProj.packageJson.setDependencyAndSave({
+      mainProj.__packageJson.setDependencyAndSave({
         name: depName,
         version
       }, `update from project: ${otherProj.name}`);

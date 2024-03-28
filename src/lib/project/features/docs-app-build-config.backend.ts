@@ -1,7 +1,8 @@
 import { crossPlatformPath } from 'tnp-core/src'
 import { _ } from 'tnp-core/src';
 import { Helpers } from 'tnp-helpers/src';
-import { FeatureForProject } from '../abstract/feature-for-project';
+import { BaseFeatureForProject } from 'tnp-helpers/src';
+import { Project } from '../abstract/project';
 
 
 export interface AppBuildConfig {
@@ -12,7 +13,7 @@ export interface AppBuildConfig {
   children?: AppBuildConfig[];
 }
 
-export class DocsAppBuildConfig extends FeatureForProject {
+export class DocsAppBuildConfig extends BaseFeatureForProject<Project> {
   private get configFileName() {
     return 'docs-app-build-config.json5';
   }
@@ -34,20 +35,20 @@ export class DocsAppBuildConfig extends FeatureForProject {
 
   private fix(cfg: AppBuildConfig): AppBuildConfig {
     if (!cfg) {
-      cfg = { build: this.project.isStandaloneProject };
+      cfg = { build: this.project.__isStandaloneProject };
     }
-    if (this.project.isStandaloneProject) {
+    if (this.project.__isStandaloneProject) {
       cfg.projName = this.project.name;
     }
-    if (this.project.isSmartContainer) {
-      cfg.projName = this.project.smartContainerBuildTarget.name;
+    if (this.project.__isSmartContainer) {
+      cfg.projName = this.project.__smartContainerBuildTarget.name;
     }
 
     cfg.build = !!cfg.build;
     cfg.prod = !!cfg.prod;
     cfg.websql = !!cfg.websql;
     cfg.children = cfg.children || [];
-    if (this.project.isSmartContainer) {
+    if (this.project.__isSmartContainer) {
       const children = this.project.children.map(c => c.name);
       cfg.children = cfg.children.filter(c => children.includes(c.projName));
     }

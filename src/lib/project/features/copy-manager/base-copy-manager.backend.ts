@@ -3,30 +3,67 @@ import { crossPlatformPath, _ } from 'tnp-core/src';
 import { fse } from 'tnp-core/src'
 import { path } from 'tnp-core/src'
 import { config } from 'tnp-config/src';
-import { Project } from '../../abstract/project/project';
-import { Models } from 'tnp-models/src';
-import { Helpers } from 'tnp-helpers/src';;
-import { FeatureCompilerForProject } from '../../abstract/feature-compiler-for-project.backend';
+import { Project } from '../../abstract/project';
+import { BaseCompilerForProject, Helpers } from 'tnp-helpers/src';
+import { Models } from '../../../models';
 import { CopyMangerHelpers } from './copy-manager-helpers.backend';
 import { IncCompiler } from 'incremental-compiler/src';
 import { Log } from 'ng2-logger/src';
 import { SourceMappingUrl } from './source-maping-url.backend';
+import { BuildOptions } from '../../../build-options';
 
 const REPLACE_INDEX_D_TS_IN_DEST_WHEN_WATCH = false;
 
 const log = Log.create(_.startCase(path.basename(__filename)));
 //#endregion
 
-export abstract class BaseCopyManger extends FeatureCompilerForProject {
+export abstract class BaseCopyManger extends BaseCompilerForProject<{}, Project> {
 
   //#region fields
-  private readonly _isomorphicPackages = [] as string[];
-  protected readonly copyto: Project[] = [];
-  protected readonly args: string;
-  readonly outDir: Models.dev.BuildDir;
-  protected readonly watch: boolean;
-  protected readonly nodts: boolean;
-  protected readonly renameDestinationFolder?: string;
+  public _isomorphicPackages = [] as string[];
+  protected buildOptions: BuildOptions;
+  protected copyto: Project[] = [];
+  protected cliBuildNoDts: boolean;
+  protected renameDestinationFolder?: string;
+
+  //#region getters & methods / select all project to copy to
+  protected async selectAllProjectCopyto() {
+    //#region  @backendFunc
+    const containerCoreProj = Project.by('container', this.project.__frameworkVersion) as Project;
+    const tempCoreContainerPathForSmartNodeModules = crossPlatformPath(path.dirname(containerCoreProj.__smartNodeModules.path));
+
+    const independentProjects = [];
+
+    Helpers.log(`[${config.frameworkName}][copytoall] UPDATING ALSO container core ${this.project.__frameworkVersion}...`)
+
+    const tmpSmartNodeModulesProj = Project.ins.From(tempCoreContainerPathForSmartNodeModules) as Project;
+    if (tmpSmartNodeModulesProj) {
+      Helpers.log(`${config.frameworkName}][copytoall] UPDATING smart node_modules for container core ${this.project.__frameworkVersion}...`)
+      independentProjects.push(tmpSmartNodeModulesProj);
+    } else {
+      Helpers.logWarn(`${config.frameworkName}][copytoall] Not able to find smart node_modules`
+        + ` by path:\n${tempCoreContainerPathForSmartNodeModules}`)
+    }
+
+    const packageName = this.project.__isSmartContainer ? ('@' + this.project.name) : this.project.name;
+    Helpers.createSymLink(
+      crossPlatformPath([containerCoreProj.__smartNodeModules.path, packageName]),
+      crossPlatformPath([containerCoreProj.__node_modules.path, packageName]),
+      { continueWhenExistedFolderDoesntExists: true }
+    );
+
+    if (config.frameworkName === 'tnp' && this.project.name !== 'tnp') {
+      // tnp in tnp is not being used at all
+      independentProjects.push(Project.ins.Tnp)
+    }
+
+    this.copyto = [
+      ...independentProjects,
+    ];
+    // console.log(this.copyto.map(c => c.genericName))
+    //#endregion
+  }
+  //#endregion
 
   get customCompilerName() {
     return `Copyto manager compilation`;
@@ -63,34 +100,34 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
 
   //#region getters / temp project name
   get tempProjName() {
-    const tempProjName = this.project.getTempProjName(this.outDir);
+    const tempProjName = this.project.__getTempProjName(this.buildOptions.outDir);
     return tempProjName;
   }
   //#endregion
 
   //#region getters / local temp proj path
   get localTempProj() {
-    let localProj = Project.From(this.localTempProjPath) as Project;
+    let localProj = Project.ins.From(this.localTempProjPath) as Project;
     return localProj;
   }
   //#endregion
 
   //#region  getters / core container for project
   get coreContainer() {
-    return Project.by('container', this.project._frameworkVersion) as Project
+    return Project.by('container', this.project.__frameworkVersion) as Project
   }
   //#endregion
 
   //#region  getters / core container for project
   get coreContainerSmartNodeModulesProj() {
-    const tempCoreContainerPathForSmartNodeModules = Project.From(crossPlatformPath(path.dirname(this.coreContainer.smartNodeModules.path))) as Project;
+    const tempCoreContainerPathForSmartNodeModules = Project.ins.From(crossPlatformPath(path.dirname(this.coreContainer.__smartNodeModules.path))) as Project;
     return tempCoreContainerPathForSmartNodeModules;
   }
   //#endregion
 
   //#region getters / project to copy to
   get projectToCopyTo() {
-    const canCopyToNodeModules = (this.outDir === 'dist');
+    const canCopyToNodeModules = (this.buildOptions.outDir === 'dist');
     let result = [];
 
     const node_modules_projs = [
@@ -98,7 +135,6 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     ];
 
     if (Array.isArray(this.copyto) && this.copyto.length > 0) {
-      // @ts-ignore
       result = [
         this.localTempProj,
         ...this.copyto,
@@ -115,7 +151,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   //#endregion
 
   get projectWithBuild() {
-    return this.project.isStandaloneProject ? this.project : this.project.smartContainerBuildTarget;
+    return this.project.__isStandaloneProject ? this.project : this.project.__smartContainerBuildTarget;
   }
 
   //#region getters / isomorphic pacakges
@@ -131,7 +167,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
 
   //#region generate source copy in
   public generateSourceCopyIn(destinationLocation: string,
-    options?: Models.other.GenerateProjectCopyOpt): boolean {
+    options?: Models.GenerateProjectCopyOpt): boolean {
     destinationLocation = crossPlatformPath(destinationLocation);
     //#region fix options
     if (_.isUndefined(options)) {
@@ -168,7 +204,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
 
     const sourceLocation = this.project.location;
     //#region modify package.json for generated
-    var packageJson: Models.npm.IPackageJSON = fse.readJsonSync(path.join(
+    var packageJson: Models.IPackageJSON = fse.readJsonSync(path.join(
       sourceLocation,
       config.file.package_json
     ), {
@@ -192,7 +228,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     //#endregion
 
     //#region handle additional package.json markings
-    if (this.project.isContainer || this.project.isVscodeExtension || options.forceCopyPackageJSON) {
+    if (this.project.__isContainer || this.project.__isVscodeExtension || options.forceCopyPackageJSON) {
       const packageJsonLocation = crossPlatformPath(path.join(destinationLocation, config.file.package_json));
       // console.log(`packageJsonLocation: ${ packageJsonLocation } `)
       // console.log('packageJson', packageJson)
@@ -215,14 +251,14 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     }
 
     //#region recrusive execution for childrens
-    if (options.regenerateProjectChilds && this.project.isContainer) {
+    if (options.regenerateProjectChilds && this.project.__isContainer) {
       let childs = this.project.children.filter(f => !['lib', 'app'].includes(path.basename(f.location)));
 
       if (options.regenerateOnlyCoreProjects) {
-        if (this.project.isCoreProject || this.project.isSmartContainer) {
-          if (this.project.isSmartContainer) {
-            childs = this.project.children.filter(c => c.typeIs('isomorphic-lib') && c.frameworkVersionAtLeast('v3'));
-          } else if (this.project.isContainer) {
+        if (this.project.__isCoreProject || this.project.__isSmartContainer) {
+          if (this.project.__isSmartContainer) {
+            childs = this.project.children.filter(c => c.typeIs('isomorphic-lib') && c.__frameworkVersionAtLeast('v3'));
+          } else if (this.project.__isContainer) {
             childs = this.project.children.filter(c => c.name === 'workspace');
           }
         } else {
@@ -232,17 +268,17 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
 
       childs.forEach(c => {
         // console.log('GENERATING CHILD ' + c.genericName)
-        c.copyManager.generateSourceCopyIn(crossPlatformPath(path.join(destinationLocation, c.name)), options);
+        c.__copyManager.generateSourceCopyIn(crossPlatformPath(path.join(destinationLocation, c.name)), options);
 
       });
-      if (this.project.isSmartContainer) {
+      if (this.project.__isSmartContainer) {
         childs.forEach(c => {
-          let generatedVer = Project.From(crossPlatformPath(path.join(destinationLocation, c.name))) as Project;
-          generatedVer.packageJson.data.tnp.type = 'isomorphic-lib';
-          generatedVer.packageJson.data.tnp.version = this.project._frameworkVersion;
-          generatedVer.packageJson.save('saving proper child version');
+          let generatedVer = Project.ins.From(crossPlatformPath(path.join(destinationLocation, c.name))) as Project;
+          generatedVer.__packageJson.data.tnp.type = 'isomorphic-lib';
+          generatedVer.__packageJson.data.tnp.version = this.project.__frameworkVersion;
+          generatedVer.__packageJson.save('saving proper child version');
           Project.ins.unload(generatedVer);
-          generatedVer = Project.From(crossPlatformPath(path.join(destinationLocation, c.name)));
+          generatedVer = Project.ins.From(crossPlatformPath(path.join(destinationLocation, c.name)));
         });
       }
     }
@@ -259,7 +295,7 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
     // console.log('async event '+ absoluteFilePath)
     SourceMappingUrl.fixContent(absoluteFilePath, this.projectWithBuild);
 
-    const outDir = this.outDir;
+    const outDir = this.buildOptions.outDir;
     let specyficFileRelativePath: string;
     let absoluteAssetFilePath: string;
     if (absoluteFilePath.startsWith(this.monitoredOutDir)) {
@@ -299,10 +335,11 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
   async syncAction(
     // files: string[]
   ) {
-    const outDir = this.outDir;
+    const outDir = this.buildOptions.outDir;
 
     const projectToCopyTo = this.projectToCopyTo;
     this.recreateProperLinksToCoreContainer();
+    // (${proj.location}/${config.folder.node_modules}/${this.rootPackageName})
 
     if (projectToCopyTo.length > 0) {
       const porjectINfo = projectToCopyTo.length === 1
@@ -312,7 +349,8 @@ export abstract class BaseCopyManger extends FeatureCompilerForProject {
       log.info(`From now... ${porjectINfo} will be updated after every change...`);
 
       Helpers.info(`[buildable-project] copying compiled code/assets to ${projectToCopyTo.length} other projects...
-${projectToCopyTo.map(proj => `- ${proj.genericName}`).join('\n')}
+${projectToCopyTo.map(proj =>
+        `- ${proj.genericName}`).join('\n')}
       `);
     }
 
@@ -332,7 +370,7 @@ ${projectToCopyTo.map(proj => `- ${proj.genericName}`).join('\n')}
 
   //#region methods / recreate proper links to core container
   private recreateProperLinksToCoreContainer() {
-    const canCopyToNodeModules = (this.outDir === 'dist');
+    const canCopyToNodeModules = (this.buildOptions.outDir === 'dist');
     // console.log({
     //   canCopyToNodeModules
     // })
@@ -379,7 +417,7 @@ ${projectToCopyTo.map(proj => `- ${proj.genericName}`).join('\n')}
     options?: {
       absoluteAssetFilePath?: string,
       specyficFileRelativePath?: string,
-      outDir?: Models.dev.BuildDir,
+      outDir?: 'dist',
       event?: any,
     }
   ) {
@@ -404,7 +442,7 @@ ${projectToCopyTo.map(proj => `- ${proj.genericName}`).join('\n')}
       this.initalFixForDestination(destination);
     }
 
-    const allFolderLinksExists = !this.watch ? true : this.linksForPackageAreOk(destination);
+    const allFolderLinksExists = !this.buildOptions.watch ? true : this.linksForPackageAreOk(destination);
 
     // if(specyficFileRelativePath) {
     //   Helpers.log(`[${destination?.name}] Specyfic file change (allFolderLinksExists=${allFolderLinksExists}) (event:${event})`
@@ -419,7 +457,7 @@ ${projectToCopyTo.map(proj => `- ${proj.genericName}`).join('\n')}
         //#region handle single file
 
         this.handleCopyOfSingleFile(destination, isTempLocalProj, specyficFileRelativePath);
-        if (REPLACE_INDEX_D_TS_IN_DEST_WHEN_WATCH && this.watch && specyficFileRelativePath.endsWith('/index.d.ts')) { // TODO could be limited more
+        if (REPLACE_INDEX_D_TS_IN_DEST_WHEN_WATCH && this.buildOptions.watch && specyficFileRelativePath.endsWith('/index.d.ts')) { // TODO could be limited more
           this.replaceIndexDtsForEntryPorjIndex(destination);
         }
         //#endregion
@@ -435,7 +473,7 @@ ${projectToCopyTo.map(proj => `- ${proj.genericName}`).join('\n')}
       this.copySourceMaps(destination, isTempLocalProj);
       this.copySharedAssets(destination, isTempLocalProj);
 
-      if (this.watch || isTempLocalProj) {
+      if (this.buildOptions.watch || isTempLocalProj) {
         log.data('addiing links')
         this.addSourceSymlinks(destination);
       } else {
@@ -443,12 +481,12 @@ ${projectToCopyTo.map(proj => `- ${proj.genericName}`).join('\n')}
         this.removeSourceSymlinks(destination)
       }
 
-      if (!this.nodts) {
+      if (!this.cliBuildNoDts) {
         this.updateBackendFullDtsFiles(destination);
         this.updateBackendFullDtsFiles(this.monitoredOutDir);
       }
 
-      if (REPLACE_INDEX_D_TS_IN_DEST_WHEN_WATCH && this.watch) {
+      if (REPLACE_INDEX_D_TS_IN_DEST_WHEN_WATCH && this.buildOptions.watch) {
         this.replaceIndexDtsForEntryPorjIndex(destination);
       }
 

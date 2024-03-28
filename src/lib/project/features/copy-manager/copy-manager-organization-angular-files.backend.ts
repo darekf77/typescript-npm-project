@@ -1,8 +1,7 @@
 import { config } from "tnp-config/src";
 import { crossPlatformPath, path, _ } from "tnp-core/src";
 import { Helpers } from "tnp-helpers/src";
-import { Models } from "tnp-models/src";
-import { Project } from "../../abstract/project/project";
+import { Project } from "../../abstract/project";
 import { MjsFesmModuleSpliter } from "./mjs-fesm-module-spliter.backend";
 import { CopyMangerHelpers } from "./copy-manager-helpers.backend";
 import type { CopyManagerOrganization } from "./copy-manager-organization.backend";
@@ -32,10 +31,6 @@ export class CopyMangerOrganizationAngularFiles {
 
   get rootPackageName() {
     return this.manager.rootPackageName;
-  }
-
-  get outDir() {
-    return this.manager.outDir;
   }
 
   get children() {
@@ -78,9 +73,9 @@ export class CopyMangerOrganizationAngularFiles {
     ) as keyof typeof CopyMangerHelpers.angularBrowserComiplationFolders;
 
     if (CopyMangerHelpers.angularBrowserComiplationFoldersArr.includes(angularCompilationFolderOrLibs)) {
-      const currentBrowserFolder: Models.dev.BuildDirBrowser = _.first(
+      const currentBrowserFolder: 'browser' | 'websql' | string = _.first(
         specyficFileRelativePath.split('/')
-      ) as Models.dev.BuildDirBrowser;
+      ) as 'browser' | 'websql' | string;
       this.actionForFolder(
         destination,
         isTempLocalProj,
@@ -101,7 +96,7 @@ export class CopyMangerOrganizationAngularFiles {
         const absSourcePath = isTempLocalProj
           ? crossPlatformPath(path.join(this.monitoredOutDir, specyficFileRelativePath))
           : crossPlatformPath(path.join(
-            this.localTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
+            this.localTempProj.__node_modules.pathFor(rootPackageNameForChildBrowser),
             relativePath,
           ));
 
@@ -110,14 +105,14 @@ export class CopyMangerOrganizationAngularFiles {
           content = this.dtsFixer.forContent(content, browserFolder);
         }
         const detinationFilePath = crossPlatformPath(path.join(
-          destination.node_modules.pathFor(rootPackageNameForChildBrowser),
+          destination.__node_modules.pathFor(rootPackageNameForChildBrowser),
           relativePath,
         ));
         Helpers.writeFile(detinationFilePath, content);
       }
     } else if (angularCompilationFolderOrLibs === config.folder.lib) {
 
-      const child = this.targetProj; // @ts-ignore
+      const child = this.targetProj;
 
       for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
         const browserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
@@ -127,7 +122,7 @@ export class CopyMangerOrganizationAngularFiles {
         const absSourcePath = isTempLocalProj
           ? crossPlatformPath(path.join(this.monitoredOutDir, specyficFileRelativePath))
           : crossPlatformPath(path.join(
-            this.localTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
+            this.localTempProj.__node_modules.pathFor(rootPackageNameForChildBrowser),
             relativePath,
           ));
 
@@ -136,7 +131,7 @@ export class CopyMangerOrganizationAngularFiles {
           content = this.dtsFixer.forContent(content, browserFolder);
         }
         const detinationFilePath = crossPlatformPath(path.join(
-          destination.node_modules.pathFor(rootPackageNameForChildBrowser),
+          destination.__node_modules.pathFor(rootPackageNameForChildBrowser),
           relativePath,
         ));
         Helpers.writeFile(detinationFilePath, content);
@@ -154,7 +149,7 @@ export class CopyMangerOrganizationAngularFiles {
   actionForFolder(
     destinationOrLocalTempProj: Project,
     isTempLocalProj: boolean,
-    currentBrowserFolder: Models.dev.BuildDirBrowser,
+    currentBrowserFolder: 'browser' | 'websql' | string | string,
     angularCompilationFolder: keyof typeof CopyMangerHelpers.angularBrowserComiplationFolders,
     options?: {
       specyficFileRelativePathForBrowserModule?: string,
@@ -176,7 +171,7 @@ export class CopyMangerOrganizationAngularFiles {
         .rootPackageNameForChildBrowser(child, currentBrowserFolder);
 
       const childBrowserOrWebsqlDestAbsPath = crossPlatformPath(path.join(
-        destinationOrLocalTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
+        destinationOrLocalTempProj.__node_modules.pathFor(rootPackageNameForChildBrowser),
         angularCompilationFolder
       ));
 
@@ -187,7 +182,7 @@ export class CopyMangerOrganizationAngularFiles {
       ));
 
       const path_InLocalTempProj = crossPlatformPath(path.join(
-        this.localTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
+        this.localTempProj.__node_modules.pathFor(rootPackageNameForChildBrowser),
         angularCompilationFolder,
       ));
 
@@ -247,12 +242,12 @@ export class CopyMangerOrganizationAngularFiles {
   //#endregion
 
   //#region api / fix angular package.json
-  fixPackageJson(child: Project, destination: Project, currentBrowserFolder?: Models.dev.BuildDirBrowser) {
+  fixPackageJson(child: Project, destination: Project, currentBrowserFolder?: 'browser' | 'websql' | string) {
     const childPackageName = crossPlatformPath(path.join(this.rootPackageName, child.name));
 
     if (currentBrowserFolder) {
       const rootPackageNameForChildBrowser = crossPlatformPath(path.join(childPackageName, currentBrowserFolder));
-      const location = destination.node_modules.pathFor(rootPackageNameForChildBrowser);
+      const location = destination.__node_modules.pathFor(rootPackageNameForChildBrowser);
       const childName = child.name;
       const pj = {
         "name": rootPackageNameForChildBrowser,
@@ -274,7 +269,7 @@ export class CopyMangerOrganizationAngularFiles {
       };
       Helpers.writeJson([location, config.file.package_json], pj);
     } else {
-      const location = destination.node_modules.pathFor(childPackageName);
+      const location = destination.__node_modules.pathFor(childPackageName);
       // const childName = child.name;
       const pj = {
         "name": childPackageName,
@@ -296,11 +291,11 @@ export class CopyMangerOrganizationAngularFiles {
   //#endregion
 
   //#region api / fix build releate files
-  fixBuildRelatedFiles(child: Project, destination: Project, currentBrowserFolder: Models.dev.BuildDirBrowser) {
+  fixBuildRelatedFiles(child: Project, destination: Project, currentBrowserFolder: 'browser' | 'websql' | string) {
 
     const childPackageName = crossPlatformPath(path.join(this.rootPackageName, child.name));
     const rootPackageNameForChildBrowser = crossPlatformPath(path.join(childPackageName, currentBrowserFolder));
-    const location = destination.node_modules.pathFor(rootPackageNameForChildBrowser);
+    const location = destination.__node_modules.pathFor(rootPackageNameForChildBrowser);
 
     //#region <child-name>.d.ts
     Helpers.writeFile([location, `${child.name}.d.ts`], `
@@ -336,7 +331,7 @@ export * from './${config.file.public_api}';
   private fixNotNeededFilesInESMforChildLocalTempProj(
     child: Project,
     angularCompilationFolder: keyof typeof CopyMangerHelpers.angularBrowserComiplationFolders,
-    currentBrowserFolder: Models.dev.BuildDirBrowser,
+    currentBrowserFolder: 'browser' | 'websql' | string,
     destinationTempProj: Project,
   ) {
 
@@ -345,25 +340,25 @@ export * from './${config.file.public_api}';
       .rootPackageNameForChildBrowser(child, currentBrowserFolder);
 
     const destinationPathMjs_publcApi = crossPlatformPath(path.join(
-      destinationTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
+      destinationTempProj.__node_modules.pathFor(rootPackageNameForChildBrowser),
       angularCompilationFolder,
       'public-api.mjs'
     ));
 
     const destinationPathLibsFolder = crossPlatformPath(path.join(
-      destinationTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
+      destinationTempProj.__node_modules.pathFor(rootPackageNameForChildBrowser),
       angularCompilationFolder,
       config.folder.libs
     ));
 
     if (child.name === this.targetProjName) {
       const libFolderPathSource = crossPlatformPath(path.join(
-        destinationTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
+        destinationTempProj.__node_modules.pathFor(rootPackageNameForChildBrowser),
         angularCompilationFolder,
         config.folder.lib
       ));
       const libFolderPathDest = crossPlatformPath(path.join(
-        destinationTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
+        destinationTempProj.__node_modules.pathFor(rootPackageNameForChildBrowser),
         angularCompilationFolder,
         config.folder.libs,
         child.name,
@@ -397,7 +392,7 @@ export * from './${config.file.public_api}';
     sourceBrowserOrWerbsqlFolderAbsPath: string,
     child: Project,
     angularCompilationFolder: keyof typeof CopyMangerHelpers.angularBrowserComiplationFolders,
-    currentBrowserFolder: Models.dev.BuildDirBrowser,
+    currentBrowserFolder: 'browser' | 'websql' | string,
     destinationTempProj: Project,
     options: {
       isMap: boolean,
@@ -416,7 +411,7 @@ export * from './${config.file.public_api}';
     ));
 
     const destinationLocationMjsFileDest = crossPlatformPath(path.join(
-      destinationTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
+      destinationTempProj.__node_modules.pathFor(rootPackageNameForChildBrowser),
       angularCompilationFolder,
       `${child.name}.mjs${isMap ? '.map' : ''}`,
     ));
@@ -427,7 +422,7 @@ export * from './${config.file.public_api}';
 
     if ((child.name !== this.targetProjName)) {
       const destinationLocationMjsFileDestTargeFileToRemove = crossPlatformPath(path.join(
-        destinationTempProj.node_modules.pathFor(rootPackageNameForChildBrowser),
+        destinationTempProj.__node_modules.pathFor(rootPackageNameForChildBrowser),
         angularCompilationFolder,
         `${this.targetProjName}.mjs${isMap ? '.map' : ''}`,
       ));
@@ -454,7 +449,7 @@ export * from './${config.file.public_api}';
   };
   //#endregion
 
-  rootPackageNameForChildBrowser(child: Project, currentBrowserFolder: Models.dev.BuildDirBrowser) {
+  rootPackageNameForChildBrowser(child: Project, currentBrowserFolder: 'browser' | 'websql' | string) {
     return this.manager.rootPackageNameForChildBrowser(child, currentBrowserFolder);
   }
 

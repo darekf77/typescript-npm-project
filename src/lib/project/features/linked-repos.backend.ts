@@ -1,12 +1,11 @@
 import { config, PREFIXES } from "tnp-config/src";
 import { path } from "tnp-core/src";
 import { Helpers } from "tnp-helpers/src";
-import { Models } from "tnp-models/src";
-import { FeatureForProject } from "../abstract/feature-for-project";
+import { BaseFeatureForProject } from "tnp-helpers/src";
 import { Project } from "../abstract/project";
+import { Models } from "../../models";
 
-
-export class LinkedRepos extends FeatureForProject {
+export class LinkedRepos extends BaseFeatureForProject<Project> {
   prefixes = {
     DELETED: PREFIXES.DELETED,
     ORIGINAL: PREFIXES.ORIGINAL
@@ -19,11 +18,11 @@ export class LinkedRepos extends FeatureForProject {
   }
 
   get all() {
-    const linkedRepos = this.project.packageJson.linkedRepos
+    const linkedRepos = this.project.__packageJson.linkedRepos
       .map(repo => {
         const { destLinkedRepos } = this.destFor(repo);
         if (this.isDestOk(destLinkedRepos)) {
-          return Project.From(destLinkedRepos);
+          return Project.ins.From(destLinkedRepos);
         }
       })
       .filter(f => !!f);
@@ -40,8 +39,8 @@ export class LinkedRepos extends FeatureForProject {
 
   async update(struct = false) {
 
-    if (this.project.packageJson.linkedRepos.length > 0 && !struct) {
-      const toClone = this.project.packageJson.linkedRepos;
+    if (this.project.__packageJson.linkedRepos.length > 0 && !struct) {
+      const toClone = this.project.__packageJson.linkedRepos;
       for (let index = 0; index < toClone.length; index++) {
         const repo = toClone[index];
         if (repo?.origin) {
@@ -50,7 +49,7 @@ export class LinkedRepos extends FeatureForProject {
           if (!Helpers.exists(path.dirname(destLinkedRepos))) {
             Helpers.mkdirp(path.dirname(destLinkedRepos));
           }
-          if (this.project.packageJson.isLink) { // link means temp folder in release
+          if (this.project.__packageJson.isLink) { // link means temp folder in release
             return;
           }
           try {
@@ -61,7 +60,7 @@ export class LinkedRepos extends FeatureForProject {
                 //   Helpers.run('git reset --hard HEAD~5', { cwd: dest }).sync();
                 // }
               } else { // TODO
-                await Helpers.git.pullCurrentBranch(destLinkedRepos, true);
+                await Helpers.git.pullCurrentBranch(destLinkedRepos);
               }
             } else {
               Helpers.git.clone({
@@ -159,7 +158,7 @@ export class LinkedRepos extends FeatureForProject {
     }
   }
 
-  private destFor(repo: Models.npm.LinkedRepo) {
+  private destFor(repo: Models.LinkedRepo) {
     const nameRepo = path.basename(repo.origin.replace('.git', ''));
     const destLinkedRepos = path.join(this.pathLinkedRepos, nameRepo);
 

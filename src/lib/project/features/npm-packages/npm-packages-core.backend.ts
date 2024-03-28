@@ -3,40 +3,39 @@ import { crossPlatformPath, moment, path } from 'tnp-core/src'
 import { fse } from 'tnp-core/src'
 import { _ } from 'tnp-core/src';
 
-import { Project } from '../../abstract/project/project';
+import { Project } from '../../abstract/project';
+import { Models } from '../../../models';
 import { Helpers } from 'tnp-helpers/src';
-import { FeatureForProject } from '../../abstract/feature-for-project';
-import { Models } from 'tnp-models/src';
+import { BaseFeatureForProject } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
 import * as semver from 'semver';
 import { PackagesRecognition } from '../package-recognition/packages-recognition';
 import {
   executeCommand, fixOptions, prepareCommand
 } from './npm-packages-helpers.backend';
-import { CLASS } from 'typescript-class-helpers/src';
 //#endregion
 
-export class NpmPackagesCore extends FeatureForProject {
+export class NpmPackagesCore extends BaseFeatureForProject<Project> {
 
   global(globalPackageName: string, packageOnly = false) {
 
     const oldContainer = Project.by('container', 'v1') as Project;
-    if (!oldContainer.node_modules.exist) {
+    if (!oldContainer.__node_modules.exist) {
       Helpers.info('initing container v1 for global packages')
       oldContainer.run(`${config.frameworkName} init`).sync();
     }
     if (packageOnly) {
-      return crossPlatformPath(path.join(oldContainer.node_modules.path, globalPackageName));
+      return crossPlatformPath(path.join(oldContainer.__node_modules.path, globalPackageName));
     }
-    return crossPlatformPath(path.join(oldContainer.node_modules.path, globalPackageName, `bin/${globalPackageName}`));
+    return crossPlatformPath(path.join(oldContainer.__node_modules.path, globalPackageName, `bin/${globalPackageName}`));
   }
 
   protected get emptyNodeModuls() {
-    return !this.project.node_modules.exist;
+    return !this.project.__node_modules.exist;
   }
 
   package(pacakgeName: string) {
-    const p = Project.From(this.project.node_modules.pathFor(pacakgeName));
+    const p = Project.ins.From(this.project.__node_modules.pathFor(pacakgeName));
     const ver = p?.version;
     const that = this;
     return {
@@ -50,7 +49,7 @@ export class NpmPackagesCore extends FeatureForProject {
         return ver;
       },
       get location() {
-        return that.project.node_modules.pathFor(pacakgeName);
+        return that.project.__node_modules.pathFor(pacakgeName);
       },
       get exists() {
         return !!p
@@ -58,8 +57,8 @@ export class NpmPackagesCore extends FeatureForProject {
     }
   }
 
-  protected actualNpmProcess(options?: Models.npm.ActualNpmInstallOptions) {
-    if (this.project.isDocker) {
+  protected actualNpmProcess(options?: Models.ActualNpmInstallOptions) {
+    if (this.project.__isDocker) {
       return;
     }
     const { generatLockFiles, useYarn, pkg, reason, remove } = fixOptions(options);

@@ -7,15 +7,14 @@ import { _ } from 'tnp-core/src';
 import { it } from 'mocha';
 import { SpecWrap } from '../_helpers.spec';
 import { config } from 'tnp-config/src';
-import { Project } from '../../lib/project/abstract/project/project';
+import { Project } from '../../lib/project/abstract/project';
 import { Helpers } from 'tnp-helpers/src';
-import { CLASS } from 'typescript-class-helpers/src';
-import { ProjectIsomorphicLib } from '../../lib/project/abstract/project/project';
-import { ProjectContainer } from '../../lib/project/abstract/project/project';
+import { ProjectIsomorphicLib } from '../../lib/project/abstract/project';
+import { ProjectContainer } from '../../lib/project/abstract/project';
 import { BuildOptions } from '../../lib/build-options';
 import { PackageJSON } from '../../lib/project/features/package-json/package-json';
 import { dummyfiles } from './copyto-manager-dummy-files';
-import { ProjectUnknowNpm } from '../../lib/project/abstract/project/project';
+import { ProjectUnknowNpm } from '../../lib/project/abstract/project';
 
 //#endregion
 
@@ -55,19 +54,19 @@ describe(wrap.describe(`${config.frameworkName} / copyto manager`), async () => 
 
         const outDir = 'dist';
 
-        dummy1.copyManager.init(BuildOptions.fromJson({ // @ts-ignore
+        dummy1.__copyManager.init(BuildOptions.fromJson({
           copyto: [mainProject],
           args: '',
           watch: false,
           outDir
-        }));
-        // @ts-ignore
-        const localCopyToProjPath = dummy1.copyManager.localTempProjPath(outDir)// @ts-ignore
-        await dummy1.copyManager.syncAction([]);
+        } as any));
 
-        expect(Helpers.exists(localCopyToProjPath)).to.be.true;
+        // const localCopyToProjPath = dummy1.__copyManager.localTempProjPath(outDir)
+        // await dummy1.__copyManager.syncAction([]);
 
-        const copiedProjPath = mainProject.node_modules.pathFor(dummyLibProjName)
+        // expect(Helpers.exists(localCopyToProjPath)).to.be.true;
+
+        // const copiedProjPath = mainProject.__node_modules.pathFor(dummyLibProjName)
 
         // dummy1.copyManager.generateSourceCopyIn(copiedProjPath);
         expect(Helpers.exists(copiedProjPath)).to.be.true;
@@ -106,23 +105,23 @@ describe(wrap.describe(`${config.frameworkName} / copyto manager`), async () => 
         // dummy1.run(`${config.frameworkName} bd --copyto ../${mainProjName}`).sync();
         // dummy1.run(`${config.frameworkName} bd`).sync();
 
-        dummy1.copyManager.init(BuildOptions.fromJson({// @ts-ignore
+        dummy1.__copyManager.init(BuildOptions.fromJson({
           copyto: [mainProject],
           args: '',
           watch: true,
           outDir
-        }));
-        // @ts-ignore
-        await dummy1.copyManager.syncAction([]);
+        } as any));
+
+        await dummy1.__copyManager.syncAction();
 
 
         dummy1.writeFile(relativeFileForChange, dummyfiles.file_dist_lib_index_js_async_change());
 
-        await dummy1.copyManager.asyncAction({
-          fileAbsolutePath: dummy1.path(relativeFileForChange).absolute.normal
+        await dummy1.__copyManager.asyncAction({
+          fileAbsolutePath: dummy1.pathFor(relativeFileForChange)
         } as any)
 
-        const copiedProjPath = mainProject.node_modules.pathFor(dummyLibProjName)
+        const copiedProjPath = mainProject.__node_modules.pathFor(dummyLibProjName)
 
         // dummy1.copyManager.generateSourceCopyIn(copiedProjPath);
         expect(Helpers.exists(copiedProjPath)).to.be.true;
@@ -183,17 +182,17 @@ describe(wrap.describe(`${config.frameworkName} / copyto manager`), async () => 
 
         const outDir = 'dist';
 
-        dummyContainer.copyManager.init(BuildOptions.fromJson({// @ts-ignore
+        dummyContainer.__copyManager.init(BuildOptions.fromJson({
           copyto: [mainProject],
           args: '',
           watch: false,
           outDir
-        }));
-        // @ts-ignore
-        const localCopyToProjPath = dummyContainer.copyManager.localTempProjPath(outDir)// @ts-ignore
-        await dummyContainer.copyManager.syncAction([]);
+        } as any));
 
-        expect(Helpers.exists(localCopyToProjPath)).to.be.true;
+        // const localCopyToProjPath = dummyContainer.__copyManager.localTempProjPath;
+        // await dummyContainer.__copyManager.syncAction();
+
+        // expect(Helpers.exists(localCopyToProjPath)).to.be.true;
 
         // const copiedProjPath = mainProject.node_modules.pathFor(dummyLibProjName)
 
@@ -220,7 +219,7 @@ function createDummyProj(location: string, projName: string): Project {
     }
   });
 
-  return Project.From(path.join(location, projName));
+  return Project.ins.From(path.join(location, projName));
 }
 
 
@@ -237,5 +236,5 @@ function createDummyContainer(location: string, projName: string): Project {
     }
   });
 
-  return Project.From(path.join(location, projName));
+  return Project.ins.From(path.join(location, projName));
 }

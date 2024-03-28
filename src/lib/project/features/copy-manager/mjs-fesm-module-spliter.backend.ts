@@ -1,8 +1,7 @@
 import { config } from 'tnp-config/src';
 import { _ } from 'tnp-core/src';
 import { Helpers } from "tnp-helpers/src";
-import { Models } from 'tnp-models/src';
-import { Project } from "../../abstract";
+import { Project } from "../../abstract/project";
 import { SourceMappingUrl } from './source-maping-url.backend';
 
 const debugMode = true;
@@ -74,7 +73,11 @@ export class MjsModule {
 export class MjsFesmModuleSpliter {
 
   //#region static
-  public static fixForTarget(smartContainerChild: Project, mjsFileAbsPath: string, buildDirBrowser: Models.dev.BuildDirBrowser) {
+  public static fixForTarget(
+    smartContainerChild: Project,
+    mjsFileAbsPath: string,
+    buildDirBrowser: 'browser' | 'websql' | string
+  ) {
     return (new MjsFesmModuleSpliter(smartContainerChild, mjsFileAbsPath, buildDirBrowser)).process();
   }
   //#endregion
@@ -122,7 +125,7 @@ export class MjsFesmModuleSpliter {
   private constructor(
     private smartContainerChild: Project,
     private mjsFileAbsPath: string,
-    private buildDirBrowser: Models.dev.BuildDirBrowser
+    private buildDirBrowser: 'browser' | 'websql' | string
   ) {
     this.content = Helpers.readFile(mjsFileAbsPath) || '';
     this.originalContent = this.content;

@@ -2,26 +2,20 @@
 import { config, PREFIXES } from "tnp-config/src";
 import { crossPlatformPath, fse, path, _ } from "tnp-core/src";
 import { BuildOptions } from "../../../../build-options";
-import { Models } from "tnp-models/src";
-import type { Project } from "../../../abstract/project/project";
-import type { BroswerCompilation } from "../compilations/compilation-browser.backend";
+import type { Project } from "../../../abstract/project";
 import { BrowserCodeCut } from "./browser-code-cut.backend";
 import { extAllowedToReplace } from "tnp-config/src";
+import { ReplaceOptionsExtended } from "isomorphic-region-loader/src";
 //#endregion
 
 export class CodeCut {
-
-  //#region fields
-  readonly browserCodeCut: BrowserCodeCut;
-  //#endregion
-
   //#region constructor
   constructor(
     /**
      * absoulte path ex: <project-path>/tmp-src-dist
      */
     protected absPathTmpSrcDistFolder: string,
-    protected options: Models.dev.ReplaceOptionsExtended,
+    protected options: ReplaceOptionsExtended,
     /**
      * it may be not available for global, for all compilatoin
      */

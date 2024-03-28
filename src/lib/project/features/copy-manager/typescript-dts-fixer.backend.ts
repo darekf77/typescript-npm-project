@@ -1,7 +1,6 @@
 import { config } from "tnp-config/src";
 import { crossPlatformPath, path } from "tnp-core/src";
 import { Helpers } from "tnp-helpers/src";
-import { Models } from "tnp-models/src";
 import { CopyMangerHelpers } from "./copy-manager-helpers.backend";
 
 export const TS_NOCHECK = '// @ts-nocheck';
@@ -34,7 +33,7 @@ export class TypescriptDtsFixer {
 
   forContent(
     content: string,
-    browserFolder: Models.dev.BuildDirBrowser,
+    browserFolder: 'browser' | 'websql' | string,
   ) {
 
     content = content ? content : '';
@@ -77,7 +76,7 @@ export class TypescriptDtsFixer {
     }
   }
 
-  processFolder(absPathLocation: string, currentBrowserFolder: Models.dev.BuildDirBrowser) {
+  processFolder(absPathLocation: string, currentBrowserFolder: 'browser' | 'websql' | string) {
 
     const browserDtsFiles = Helpers.filesFrom(absPathLocation, true)
       .filter(f => f.endsWith('.d.ts'));
@@ -93,7 +92,7 @@ export class TypescriptDtsFixer {
   //#region write fixed version of dts file
   forFile(
     dtsFileAbsolutePath: string,
-    currentBrowserFolder: Models.dev.BuildDirBrowser
+    currentBrowserFolder: 'browser' | 'websql' | string
   ) {
     if (!dtsFileAbsolutePath.endsWith('.d.ts')) {
       return;

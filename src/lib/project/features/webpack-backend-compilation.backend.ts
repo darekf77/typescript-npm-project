@@ -3,23 +3,24 @@ import { config } from "tnp-config/src";
 import { path } from "tnp-core/src";
 import { Helpers } from "tnp-helpers/src";
 import { EXPORT_TEMPLATE } from "../../templates";
-import { FeatureForProject } from "../abstract/feature-for-project";
+import { BaseFeatureForProject } from "tnp-helpers/src";
 import { BuildOptions } from "../../build-options";
+import { Project } from "../abstract/project";
 
 export interface WebpackBackendCompilationOpt {
   watch: boolean;
   buildType: 'app' | 'lib';
   outDir: 'dist';
-  uglify?: boolean;
+  cliBuildUglify?: boolean;
   buildTitle?: string;
-  includeNodeModules?: boolean;
+  cliBuildIncludeNodeModules?: boolean;
 }
 
-export class WebpackBackendCompilation extends FeatureForProject {
+export class WebpackBackendCompilation extends BaseFeatureForProject<Project> {
 
   async run(options: Pick<BuildOptions, 'watch' | 'appBuild' | 'outDir'>) {
     const { outDir, watch, appBuild } = options;
-    const webpackGlob = this.project.npmPackages.global('webpack');
+    const webpackGlob = this.project.__npmPackages.global('webpack');
 
     const webpackCommand = `node ${webpackGlob} --version && node ${webpackGlob} `
       + `--config webpack.backend-dist-build.js ${watch ? '--watch' : ''

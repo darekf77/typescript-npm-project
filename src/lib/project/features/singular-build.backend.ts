@@ -1,42 +1,35 @@
 //#region imports
 import { crossPlatformPath, _ } from 'tnp-core/src';
 import { path } from 'tnp-core/src'
-import { Project } from '../abstract/project/project';
+import { Project } from '../abstract/project';
 import { appRelatedFiles, config } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
-import { Models } from 'tnp-models/src';
-import { VscodeProject } from '../abstract/project/vscode-project.backend';
-import { BrowserCodeCut } from '../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
 import { argsToClear } from '../../constants';
 import { COMPILER_POOLING, IncrementalWatcherInstance, incrementalWatcher } from 'incremental-compiler/src';
 import { CLI } from 'tnp-cli/src';
 import { recreateApp } from './inside-structures/structs/inside-struct-helpers';
-import { FeatureForProject } from '../abstract/feature-for-project';
+import { BaseFeatureForProject } from 'tnp-helpers/src';
 
 //#endregion
 
-export class SingularBuild extends FeatureForProject {
+export class SingularBuild extends BaseFeatureForProject<Project> {
 
-  //#region static / methods / get proxy project location
-  static getProxyProj(workspaceOrContainer: Project, client: string, outFolder: Models.dev.BuildDir = 'dist') {
-    return crossPlatformPath([workspaceOrContainer.location, outFolder, workspaceOrContainer.name, client]);
-  }
-  //#endregion
+
 
   watchers: IncrementalWatcherInstance[] = [];
 
 
 
   async createSingluarTargeProjFor(options: {
-    parent: Project, client: Project, outFolder: Models.dev.BuildDir, watch?: boolean; nonClient?: boolean,
+    parent: Project, client: Project, outFolder: 'dist', watch?: boolean; nonClient?: boolean,
   }): Promise<Project> {
     const { parent, client, outFolder, watch = false, nonClient = false } = options;
 
     const children = this.project.children
-      .filter(c => (c.typeIs('isomorphic-lib')) && c.frameworkVersionAtLeast('v3'))
+      .filter(c => (c.typeIs('isomorphic-lib')) && c.__frameworkVersionAtLeast('v3'))
       ;
 
-    const smartContainerTargetProjPath = SingularBuild.getProxyProj(parent, client.name, outFolder);
+    const smartContainerTargetProjPath = parent.__getProxyProj(client.name, outFolder);
 
     Helpers.log(`dist project: ${smartContainerTargetProjPath}`);
     if (!Helpers.exists(smartContainerTargetProjPath)) {
@@ -86,7 +79,7 @@ export class SingularBuild extends FeatureForProject {
         Helpers.createSymLink(source_lib, dest_lib);
       })();
 
-      if (!nonClient && c.name !== this.project.smartContainerBuildTarget.name) {
+      if (!nonClient && c.name !== this.project.__smartContainerBuildTarget.name) {
         (() => {
           const source_lib = crossPlatformPath(path.join(c.location, config.folder.src, 'app'));
           const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, '-', c.name, 'app'));
@@ -130,7 +123,7 @@ exports.default = start;`);
     //#region copy core asset files
 
     (() => {
-      const corepro = Project.by('isomorphic-lib', client._frameworkVersion) as Project;
+      const corepro = Project.by('isomorphic-lib', client.__frameworkVersion) as Project;
       const coreAssetsPath = corepro.pathFor('app/src/assets');
       const filesToCopy = Helpers.filesFrom(coreAssetsPath, true);
       for (let index = 0; index < filesToCopy.length; index++) {
@@ -199,7 +192,7 @@ exports.default = start;`);
 
       const copySourcesToDestNonTarget = () => {
         children.forEach(c => {
-          if (!nonClient && c.name !== this.project.smartContainerBuildTarget.name) {
+          if (!nonClient && c.name !== this.project.__smartContainerBuildTarget.name) {
             for (let index = 0; index < appRelatedFiles.length; index++) {
               const appFileName = appRelatedFiles[index];
               const source = crossPlatformPath([c.location, config.folder.src, appFileName]);
@@ -290,10 +283,10 @@ exports.default = start;`);
     })();
     //#endregion
 
-    let smartContainerTargetProject = Project.From(smartContainerTargetProjPath);
-    parent.node_modules.linkToProject(smartContainerTargetProject);
+    let smartContainerTargetProject = Project.ins.From(smartContainerTargetProjPath);
+    parent.__node_modules.linkToProject(smartContainerTargetProject);
 
-    await smartContainerTargetProject.filesStructure.init(''); // THIS CAUSE NOT NICE SHIT
+    await smartContainerTargetProject.__filesStructure.init(); // THIS CAUSE NOT NICE SHIT
 
 
     return smartContainerTargetProject;
@@ -301,23 +294,23 @@ exports.default = start;`);
 
 
   //#region init
-  async init(watch: boolean, prod: boolean, outDir: Models.dev.BuildDir, args: string, _client?: string | Project) {
-    if (!this.project.isSmartContainer) {
+  async init(watch: boolean, prod: boolean, outDir: 'dist', args: string, _client?: string | Project) {
+    if (!this.project.__isSmartContainer) {
       return;
     }
 
     const children = this.project.children
-      .filter(c => (c.typeIs('isomorphic-lib')) && c.frameworkVersionAtLeast('v3'))
+      .filter(c => (c.typeIs('isomorphic-lib')) && c.__frameworkVersionAtLeast('v3'))
       ;
 
     for (let index = 0; index < children.length; index++) {
       const c = children[index];
       recreateApp(c);
-      await c.filesStructure.init('');
+      await c.__filesStructure.init();
     }
-    args = Helpers.cliTool.removeArgFromString(args, argsToClear);
+    args = Helpers.cliTool.removeArgsFromCommand(args, argsToClear);
 
-    let smartContainerBuildTarget = this.project.smartContainerBuildTarget;
+    let smartContainerBuildTarget = this.project.__smartContainerBuildTarget;
 
 
     if (!smartContainerBuildTarget && children.length > 1) {
@@ -341,8 +334,8 @@ exports.default = start;`);
 
     if (!smartContainerBuildTarget) {
       smartContainerBuildTarget = _.first(children);
-      this.project.packageJson.data.tnp.smartContainerBuildTarget = smartContainerBuildTarget.name;
-      this.project.packageJson.save('updating smart container target');
+      this.project.__packageJson.data.tnp.smartContainerBuildTarget = smartContainerBuildTarget.name;
+      this.project.__packageJson.save('updating smart container target');
     }
 
     const nonClinetCildren = children.filter(f => f.name !== smartContainerBuildTarget?.name) || [];

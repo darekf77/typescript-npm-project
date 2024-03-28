@@ -1,247 +1,166 @@
-//#region imports
-import { config } from 'tnp-config';
-import { _ } from 'tnp-core';
-import { Helpers } from 'tnp-helpers';
-import { Models } from 'tnp-models';
+import { CoreModels, _ } from 'tnp-core';
+import type { Project } from './project/abstract/project';
+import { config } from 'tnp-config/src';
+import { Models } from './models';
+import { CLASS } from 'typescript-class-helpers/src';
+
+//#region build options lib or app
+class SystemTask<T> {
+  /**
+   * watch build
+   */
+  watch: boolean;
+  constructor() {
+    this.finishCallback = () => { };
+  }
+  finishCallback: () => any;
+  public clone(override: Partial<T>): T {
+    const classFn = CLASS.getFromObject(this);
+    const result = _.merge(new (classFn)(), _.merge(_.cloneDeep(this), override));
+    // console.log({result})
+    return result;
+  }
+}
+
+class BuildOptionsLibOrApp<T> extends SystemTask<T> {
+  cliBuildNoDts: boolean;
+  cliBuildUglify: boolean;
+  cliBuildObscure: boolean;
+  cliBuildIncludeNodeModules: boolean;
+  /**
+   * Enable all production optimalization for build
+   * - minification
+   * - caches
+   * etc.
+   */
+  prod: boolean;
+  smartContainerTargetName: string;
+}
 //#endregion
 
-export class BuildOptions implements Models.dev.StartForOptions {
+//#region new options
+export class NewOptions extends SystemTask<NewOptions> {
+  branding: boolean;
+}
+//#endregion
 
-  //#region static
-
-  //#region static field & getters
-  public static PropsToOmmitWhenStringify = ['copyto'];
-  //#endregion
-
-  //#region static fields
-
-  //#region static fields / get main options
-  private static getMainOptions(args: string[]) {
-    //#region @backendFunc
-    const ars = (config.argsReplacementsBuild as { [shortBuildName in string]: string } || {});
-    const shortValuesArgs = Object.keys(ars);
-    const toCheckArgs = Object.values(ars);
-    const toCheckArgsSimplfied = Object.values(ars).map(c => Helpers.cliTool.simplifiedCmd(c));
-
-    const ind = args.findIndex((p, i) => {
-      const ends = ((config.coreBuildFrameworkNames as string[] || []).filter(c => {
-        return p.endsWith(`/${c}`) || p === c;
-      }).length > 0);
-
-      const nextArgExisted = !!args[i + 1];
-      if (nextArgExisted && shortValuesArgs.includes(args[i + 1])) {
-        args[i + 1] = ars[args[i + 1]];
-      }
-      if (nextArgExisted && toCheckArgsSimplfied.includes(Helpers.cliTool.simplifiedCmd(args[i + 1]))) {
-        // @ts-ignore
-        args[i + 1] = toCheckArgs.find(c => {
-          return Helpers.cliTool.simplifiedCmd(c) === Helpers.cliTool.simplifiedCmd(args[i + 1]);
-        });
-      }
-
-      return ends &&
-        nextArgExisted &&
-        (toCheckArgs
-          .map(c => Helpers.cliTool.simplifiedCmd(c))
-          .includes(Helpers.cliTool.simplifiedCmd(args[i + 1]))
-        );
-    });
-
-    let prod = false,
-      watch = false,
-      uglify = false,
-      obscure = false,
-      includeNodeModules = false,
-      nodts = false,
-      outDir = 'dist',
-      appBuild = false,
-      staticBuild = false,
-      ngbuildonly = false;
-
-    if (ind >= 0) {
-      const cmd = _.kebabCase(args[ind + 1]).split('-').slice(1);
-      for (let index = 0; index < cmd.length; index++) {
-        const cmdPart = cmd[index];
-        if (cmdPart === 'static') {
-          staticBuild = true;
-        }
-        if (cmdPart === 'lib') {
-          outDir = 'dist';
-        }
-        if (cmdPart === 'dist' || cmdPart === 'bundle') {
-          outDir = cmdPart;
-        }
-        if (cmdPart === 'app') {
-          appBuild = true;
-        }
-        if (cmdPart === 'prod') {
-          prod = true;
-        }
-        if (cmdPart === 'watch') {
-          watch = true;
-        }
-        if (cmdPart === 'ngbuildonly') {
-          ngbuildonly = true;
-        }
-        if (cmdPart === 'uglify') {
-          uglify = true;
-        }
-        if (cmdPart === 'obscure') {
-          obscure = true;
-        }
-        if (cmdPart === 'includeNodeModules') {
-          includeNodeModules = true;
-        }
-        if (cmdPart === 'nodts') {
-          nodts = true;
-        }
-      }
-      return { prod, watch, outDir, appBuild, staticBuild, uglify, obscure, includeNodeModules, nodts, ngbuildonly };
-    }
-    //#endregion
+//#region init options
+export class InitOptions extends SystemTask<InitOptions> {
+  readonly alreadyInitedPorjects: Project[];
+  constructor() {
+    super();
+    this.alreadyInitedPorjects = [];
   }
-  //#endregion
-
-  public static fromJson(json: Pick<BuildOptions, 'outDir' | 'websql' | 'serveApp' | 'appBuild' | 'watch' | 'prod' | 'args'>) {
-    const options = json as BuildOptions;
-    if (_.isUndefined(options.outDir)) {
-      options.outDir = 'dist';
-    }
-    if (_.isUndefined(options.prod)) {
-      options.prod = false;
-    }
-    if (_.isUndefined(options.websql)) {
-      options.websql = false;
-    }
-    if (_.isUndefined(options.serveApp)) {
-      options.serveApp = false;
-    }
-    if (_.isUndefined(options.watch)) {
-      options.watch = false;
-    }
-    if (_.isUndefined(options.appBuild)) {
-      options.appBuild = false;
-    }
-    if (_.isUndefined(options.args)) {
-      options.args = '';
-    }
-
-    delete options.copyto;
-    const buildOpt = new BuildOptions();
-    return _.merge(buildOpt, options) as BuildOptions; // TODO
-  }
-
-  //#region static fields / from
-  public static async from(
-    argsString: string,
-    mainOptions?: Partial<BuildOptions>,
-    reason?: string
-  ): Promise<BuildOptions> {
-    //#region @backendFunc
-    Helpers.log(`[buildoptions][from] ${reason}`);
-    const split = argsString.split(' ');
-    // console.log('split', split)
-    const optionsToMerge = (!!mainOptions ? mainOptions : this.getMainOptions(split)) as Partial<BuildOptions>;
-    // console.log({ optionsToMerge })
-    if (!optionsToMerge) {
-      Helpers.log(`[build-options] NO options to merge`);
-      return (void 0) as any;
-    }
-    const argsObj: Partial<BuildOptions> = require('minimist')(split);
-    // console.log({
-    //   argsObj
-    // })
-    Object.keys(argsObj).forEach(key => {
-      if (_.isString(key) && (key.length === 1) && _.isBoolean(argsObj[key])) {
-        Helpers.log(`[build-options] Removing argument: "${key}=${argsObj[key]}`);
-        delete argsObj[key];
-      }
-    });
-
-    argsObj.watch = optionsToMerge.watch;
-    argsObj.prod = optionsToMerge.prod;
-    argsObj.uglify = optionsToMerge.uglify;
-    argsObj.obscure = optionsToMerge.obscure;
-    argsObj.includeNodeModules = optionsToMerge.includeNodeModules;
-    // argsObj.websql = optionsToMerge.websql;
-    // argsObj.serveApp = optionsToMerge.serveApp;
-    argsObj.nodts = optionsToMerge.nodts;
-    argsObj.outDir = optionsToMerge.outDir as any;
-    argsObj.appBuild = optionsToMerge.appBuild;
-    argsObj.ngbuildonly = optionsToMerge.ngbuildonly;
-    argsObj.copyto = (_.isUndefined(argsObj.copyto) && _.isArray(optionsToMerge.copyto)) ?
-      optionsToMerge.copyto : argsObj.copyto;
-    argsObj.args = argsString;
-
-    if (!_.isNil(argsObj.copyto)) {
-      argsObj.copyto = (argsObj.copyto as any[]).filter(p => !!p);
-    }
-    if (!_.isArray(argsObj.copyto)) {
-      argsObj.copyto = [];
-    }
-
-    argsObj.onlyWatchNoBuild = !!argsObj.onlyWatchNoBuild;
-    argsObj.genOnlyClientCode = !!argsObj.genOnlyClientCode;
-
-    const result = _.merge(new BuildOptions(), argsObj) as BuildOptions;
-    // console.log(result)
-    return result;
-    //#endregion
-  }
-  //#endregion
-
-  //#endregion
-
-  //#endregion
-
-  //#region fields
-  prod?: boolean;
-  outDir?: Models.dev.BuildDir;
-  watch?: boolean;
-  uglify?: boolean;
-  obscure?: boolean;
-  includeNodeModules?: boolean;
-  websql?: boolean;
-  /**i n lib build serve app when possible */
-  serveApp?: boolean;
-  nodts?: boolean;
-  ngbuildonly?: boolean;
-  staticBuild?: boolean;
-  watchOnly?: boolean;
-  skipCopyToSelection?: boolean;
-  args?: string;
-  progressCallback?: (fractionValue: number) => any;
-  noConsoleClear?: boolean;
 
   /**
-   * Do not generate backend code
+   * @deprecated
    */
-  genOnlyClientCode?: boolean;
-  appBuild?: boolean;
-  buildForAllClients?: boolean;
-  baseHref?: string;
+  recrusive: boolean;
+  initiator: Project;
+  /**
+   * init only structre without deps
+   */
+  struct: boolean;
+  websql: boolean;
+  smartContainerTargetName: string;
+  branding: boolean;
 
+  public static from(options: Partial<InitOptions>): InitOptions {
+    options = options ? options : {};
+    return _.merge(new InitOptions(), _.cloneDeep(options))
+  }
+}
+//#endregion
+
+//#region build options
+export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
+  readonly outDir: 'dist';
+  readonly targetApp: 'pwa' | 'electron';
+  get appBuild() {
+    return this.buildType === 'app' || this.buildType === 'lib-app';
+  }
+  get serveApp() {
+    return this.buildType === 'lib-app';
+  }
+  get temporarySrcForReleaseCutCode() {
+    //#region @backendFunc
+    return `tmp-cut-relase-src-${config.folder.dist}${this.websql ? '-websql' : ''}`;
+    //#endregion
+  }
+
+  constructor() {
+    super();
+    this.outDir = 'dist';
+    this.targetApp = 'pwa';
+  }
+  /**
+   * ci build
+   */
+  ci: boolean;
+  /**
+   *
+   */
+  websql: boolean;
+  buildType: 'lib' | 'app' | 'lib-app';
+
+  baseHref: string;
+  /**
+   * Cut notForNpm  tag from lib build
+   */
+  codeCutRelease: boolean;
+  /**
+   * Special lib build for app (not npm lib)
+   */
+  forAppRelaseBuild: boolean;
+  /**
+ * Do not generate backend code
+ */
+  genOnlyClientCode: boolean;
   /**
    * Generate only backend, without browser version
    */
-  onlyBackend?: boolean;
-  onlyWatchNoBuild?: boolean;
-  copyto?: string[];
-  copytoAll?: boolean;
-  //#endregion
+  onlyBackend: boolean;
 
-  //#region api
-  public clone(override?: Partial<BuildOptions>) {
-    const copy = new BuildOptions();
-    Object.keys(this).forEach(key => {
-      const org = this[key];
-      copy[key] = org;
-    });
-    Object.assign(copy, override);
-    return copy as BuildOptions;
+  public static from(options: Partial<BuildOptions>): BuildOptions {
+    return _.merge(new BuildOptions(), _.cloneDeep(options))
   }
+}
+//#endregion
 
-  //#endregion
+//#region release options
+export class ReleaseOptions extends BuildOptionsLibOrApp<ReleaseOptions> {
 
+  constructor() {
+    super();
+    this.releaseType = 'patch';
+    this.resolved = [];
+  }
+  releaseType: Models.ReleaseType;
+  shouldReleaseLibrary: boolean;
+  /**
+   * build action only for specyfic framework version of prohect
+   */
+  frameworkVersion: CoreModels.FrameworkVersion;
+
+  /**
+   * Projects to release in container
+   */
+  resolved: Project[];
+  useTempFolder: boolean;
+  /**
+   * quick automatic release of lib
+   */
+  automaticRelease: boolean;
+  /**
+  * quick automatic release of docs app(s)
+  */
+  automaticReleaseDocs: boolean;
+  bumbVersionIn: string[];
+  specifiedVersion: string;
+  releaseTarget: 'lib' | 'app' | 'lib-app';
+  public static from(options: Partial<ReleaseOptions>): ReleaseOptions {
+    return _.merge(new ReleaseOptions(), _.cloneDeep(options))
+  }
 }
 
+//#endregion

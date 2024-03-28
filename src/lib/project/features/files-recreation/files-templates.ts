@@ -2,17 +2,17 @@
 import { crossPlatformPath, path } from 'tnp-core/src'
 import { fse } from 'tnp-core/src'
 import { _ } from 'tnp-core/src';
-import { FeatureForProject } from '../../abstract/feature-for-project';
-import { Models } from 'tnp-models/src';
+import { BaseFeatureForProject } from 'tnp-helpers/src';
 import { Helpers } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
 import * as JSON5 from 'json5';
-
-export class FilesTemplatesBuilder extends FeatureForProject {
+import { Project } from '../../../project/abstract/project';
+import { Models } from '../../../models';
+export class FilesTemplatesBuilder extends BaseFeatureForProject<Project> {
 
 
   get files() {
-    return this.project.filesTemplates();
+    return this.project.__filesTemplates();
   }
   rebuild(soft = false) {
     const files = this.files;
@@ -31,7 +31,7 @@ export class FilesTemplatesBuilder extends FeatureForProject {
         Helpers.warn(`[filesTemplats][rebuild] Not able to read file: ${filePath} - missing content`);
         continue;
       }
-      const env = ((this.project.env && this.project.env.config) ? this.project.env.config : {}) as any;
+      const env = ((this.project.__env && this.project.__env.config) ? this.project.__env.config : {}) as any;
       // Helpers.log(`Started for ${f}`);
       this.processFile(filePath, fileContent, env, _, soft);
       // Helpers.log(`Processed DONE for ${f}`);
@@ -51,14 +51,14 @@ export class FilesTemplatesBuilder extends FeatureForProject {
       Helpers.warn(`[filesTemplats][rebuildFile] Not able to read file: ${filePath} - problem with reading file`);
       return;
     }
-    const env = ((this.project.env && this.project.env.config) ? this.project.env.config : {}) as any;
+    const env = ((this.project.__env && this.project.__env.config) ? this.project.__env.config : {}) as any;
     this.processFile(filePath, fileContent, env, _, soft);
   }
 
   private processFile(
     orgFilePath: string,
     content: string,
-    reservedExpSec: Models.env.EnvConfig,
+    reservedExpSec: Models.EnvConfig,
     reservedExpOne: any,
     soft: boolean) { // lodash
     const filePath = orgFilePath.replace(`.${config.filesExtensions.filetemplate}`, '');

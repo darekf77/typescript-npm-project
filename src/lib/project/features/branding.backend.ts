@@ -1,25 +1,24 @@
 //#region imports
-import { crossPlatformPath, path } from 'tnp-core/src'
+import { CoreModels, crossPlatformPath, path } from 'tnp-core/src'
 import { fse } from 'tnp-core/src'
 
 import { _ } from 'tnp-core/src';
 import { Helpers } from 'tnp-helpers/src';
-import { Project } from '../../project/abstract/project/project';
+import { Project } from '../../project/abstract/project';
 import { config } from 'tnp-config/src';
-import { FeatureForProject } from '../abstract/feature-for-project';
-import { Models } from 'tnp-models/src';
- `d`
+import { BaseFeatureForProject } from 'tnp-helpers/src';
+
 const htmlBasename = 'html-pwa.html';
 const generatedPwa = [config.folder.generated, 'pwa']
 const subPath = [config.folder.src, config.folder.assets, ...generatedPwa]
 //#endregion
 
-export class Branding extends FeatureForProject {
+export class Branding extends BaseFeatureForProject<Project> {
 
   private get path() {
     let proj = this.project;
-    if (proj.isSmartContainerTarget) {
-      proj = proj.smartContainerTargetParentContainer.children.find(c => c.name == proj.name);
+    if (proj.__isSmartContainerTarget) {
+      proj = proj.__smartContainerTargetParentContainer.children.find(c => c.name == proj.name);
     };
     const dest = crossPlatformPath([proj.location, ...subPath]);
     return dest;
@@ -38,8 +37,8 @@ export class Branding extends FeatureForProject {
     return Helpers.readFile([this.path, htmlBasename]).split('\n');
   }
 
-  get iconsToAdd(): Models.pwa.ManifestIcon[] {
-    const manifeast = Helpers.readJson([this.path, config.file.manifest_webmanifest]) as Models.pwa.Manifest;
+  get iconsToAdd(): CoreModels.ManifestIcon[] {
+    const manifeast = Helpers.readJson([this.path, config.file.manifest_webmanifest]) as CoreModels.PwaManifest;
     return manifeast.icons;
   }
 
@@ -52,7 +51,7 @@ export class Branding extends FeatureForProject {
     const sourceLogoPng = crossPlatformPath([proj.location, config.file.logo_png]);
 
     if (!Helpers.exists(sourceLogoPng)) {
-      const coreLogoProj = Project.by('isomorphic-lib', this.project._frameworkVersion);
+      const coreLogoProj = Project.by('isomorphic-lib', this.project.__frameworkVersion);
       const coreLogoPath = crossPlatformPath([coreLogoProj.location, config.file.logo_png]);
       Helpers.copyFile(coreLogoPath, sourceLogoPng);
     }
@@ -71,8 +70,8 @@ export class Branding extends FeatureForProject {
     }
 
     let pathIcons = `/${['assets', 'assets-for', proj.name, ...generatedPwa].join('/')}`;
-    if (proj.isSmartContainerChild || proj.isSmartContainerTarget) {
-      const parent = proj.isSmartContainerChild ? proj.parent : proj.smartContainerTargetParentContainer;
+    if (proj.__isSmartContainerChild || proj.__isSmartContainerTarget) {
+      const parent = proj.__isSmartContainerChild ? proj.parent : proj.__smartContainerTargetParentContainer;
       pathIcons = `/${['assets', 'assets-for', parent.name + '--' + proj.name, ...generatedPwa].join('/')}`;
     }
 
@@ -131,7 +130,6 @@ export class Branding extends FeatureForProject {
     // TODO implement for sharp for firedev branding
     //#region @notForNpm
     try {
-      // @ts-ignore
       const favicons = require('favicons');
       const response = await favicons.favicons(sourceLogoPng, configuration);
 

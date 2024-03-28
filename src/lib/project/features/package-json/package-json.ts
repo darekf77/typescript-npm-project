@@ -9,7 +9,7 @@ import {
   _, Helpers
 } from 'tnp-core/src';
 import { Morphi } from 'morphi/src';
-import type { Project } from '../../abstract/project/project';
+import type { Project } from '../../abstract/project';
 import { PackageJsonFile } from './package-json-file';
 import { config } from 'tnp-config/src';
 //#endregion

@@ -1,7 +1,7 @@
 //#region @backend
-import { Models } from 'tnp-models/src';
+import { Models } from '../../../models';
 
-export const config: Models.env.EnvConfig = {
+export const config: Models.EnvConfig = {
   workspace: {
     workspace: {
       baseUrl: '/info',

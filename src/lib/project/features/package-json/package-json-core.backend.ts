@@ -3,20 +3,20 @@ import { fse, CoreConfig, crossPlatformPath } from 'tnp-core/src'
 import { path } from 'tnp-core/src'
 import * as JSON5 from 'json5';
 import * as json5Write from 'json10-writer/src';
-import { _ } from 'tnp-core/src';
+import { _, CoreModels } from 'tnp-core/src';
 import * as semver from 'semver';
 import chalk from 'chalk';
 
-import { config, ConfigModels } from 'tnp-config/src';
-import { Project } from '../../abstract/project/project';
-import { Models } from 'tnp-models/src';
+import { config } from 'tnp-config/src';
+import { Project } from '../../abstract/project';
+import { Models } from '../../../models';
 import { Helpers } from 'tnp-helpers/src';
 //#endregion
 
 const trace = !global.hideLog;
 
 export class PackageJsonCore {
-  public data: Models.npm.IPackageJSON;
+  public data: Models.IPackageJSON;
 
   constructor(
     protected readonly cwd: string,
@@ -25,7 +25,7 @@ export class PackageJsonCore {
 
   }
 
-  get type(): ConfigModels.LibType {
+  get type(): CoreModels.LibType {
     const res = this.data.tnp ? this.data.tnp.type : undefined;
     if (_.isString(res)) {
       return res;
@@ -48,7 +48,7 @@ export class PackageJsonCore {
     return [];
   }
 
-  get linkedRepos(): Models.npm.LinkedRepo[] {
+  get linkedRepos(): Models.LinkedRepo[] {
     const res = this.data.tnp ? this.data.tnp.linkedRepos : undefined;
     if (_.isArray(res)) {
       return res;
@@ -83,7 +83,7 @@ export class PackageJsonCore {
     return {};
   }
 
-  get frameworkVersion(): ConfigModels.FrameworkVersion {
+  get frameworkVersion(): CoreModels.FrameworkVersion {
     const res = this.data.tnp ? this.data.tnp.version : undefined;
     if (_.isString(res)) {
       return res;
@@ -104,15 +104,11 @@ export class PackageJsonCore {
     return !!this.data.tnp?.smart;
   }
 
-  get sshOnly(): boolean { // @ts-ignore
-    return !!this.data.tnp?.ssh;
-  }
-
   get isMonorepo(): boolean {
     return !!this.data.tnp?.monorepo;
   }
 
-  get frameworks(): ConfigModels.UIFramework[] {
+  get frameworks(): CoreModels.UIFramework[] {
     const res = this.data.tnp &&
       _.isArray(this.data.tnp.frameworks) ? this.data.tnp.frameworks : config.frameworks;
     if (res.filter(f => !config.frameworks.includes(f)).length > 0) {
@@ -156,7 +152,7 @@ export class PackageJsonCore {
     return Array.isArray(p) ? p : [];
   }
 
-  get targetProjects(): (Omit<Models.npm.TargetProject, 'path'>)[] {
+  get targetProjects(): (Omit<Models.TargetProject, 'path'>)[] {
     const p = this.data.tnp && this.data.tnp.targetProjects;
     // console.log('asdasd',this.data.tnp.targetProjects)
     return (Array.isArray(p) ? p : []);
@@ -183,11 +179,11 @@ export class PackageJsonCore {
     return _.isArray(p) ? p : [];
   }
 
-  get trusted(): Models.npm.TrustedType {
+  get trusted(): Models.TrustedType {
     return this.data.tnp?.core?.dependencies?.trusted || {} as any;
   }
 
-  get trustedMaxMajor(): { [ver in ConfigModels.FrameworkVersion]: number; } {
+  get trustedMaxMajor(): { [ver in CoreModels.FrameworkVersion]: number; } {
     return this.data.tnp?.core?.dependencies?.['trustedMaxMajor'] || {} as any;
   }
 
@@ -210,17 +206,6 @@ export class PackageJsonCore {
     return false;
   }
 
-  get isGlobalSystemTool() {
-    if (this.data.tnp && !_.isUndefined(this.data.tnp.isGlobalSystemTool)) {
-      if (_.isBoolean(this.data.tnp.isGlobalSystemTool)) {
-        return this.data.tnp.isGlobalSystemTool;
-      }
-      Helpers.error(`Bad value in package.json, tnp.isGlobalSystemTool should be boolean.`, true);
-      Helpers.error(`Location of package.json: ${this.cwd}`)
-    }
-    return false;
-  }
-
   get isCommandLineToolOnly() {
     if (this.data.tnp && !_.isUndefined(this.data.tnp.isCommandLineToolOnly)) {
       if (_.isBoolean(this.data.tnp.isCommandLineToolOnly)) {
@@ -230,21 +215,6 @@ export class PackageJsonCore {
       Helpers.error(`Location of package.json: ${this.cwd}`)
     }
     return false;
-  }
-
-  // @ts-ignore
-  get isGeneratedForRelease(this: Project) {
-    const p = path.basename(path.join(this.location, '../../..'))
-    if (p !== config.folder.tmpDistRelease) {
-      return false;
-    }
-    const orgProjPath = path.resolve(path.join(this.location, '../../../..'));
-    const proj = Project.From(orgProjPath);
-    const res = proj && (proj.name === this.name && proj.version === this.version);
-    // if (res) {
-    //   console.log('fond', this.location)
-    // }
-    return res;
   }
 
   get useFramework() {
@@ -262,7 +232,7 @@ export class PackageJsonCore {
     this.copyTo(projectOrPath);
     const dest = path.join(_.isString(projectOrPath) ? projectOrPath :
       (projectOrPath as Project).location);
-    Project.From(dest)
+    Project.ins.From(dest)
   }
 
   public copyTo(projectOrPath: Project | String) {
@@ -281,18 +251,10 @@ export class PackageJsonCore {
   }
 
   private splitAndWriteToDisc(removeFromPj = false) {
-    if ((['navi', 'scenario'] as ConfigModels.LibType[]).includes(this.type)) {
-
-      if (_.isObject(this.data) && this.data['']) {
-        delete this.data['']
-      }
-      Helpers.writeFile(this.path, _.isObject(this.data) ? this.data : {});
-      return;
-    }
     if (_.isObject(this.data) && this.data['']) {
       delete this.data['']
     }
-    const data = _.cloneDeep(this.data) as Models.npm.IPackageJSON;
+    const data = _.cloneDeep(this.data) as Models.IPackageJSON;
 
     let tnpSaved = false;
     config.packageJsonSplit.forEach(resultFileName => {
@@ -315,7 +277,7 @@ export class PackageJsonCore {
       const obj = data[property];
 
       Helpers.log(`splitPath: ${splitPath}`, 2);
-      const dataToWrite = (_.isObject(obj) ? obj : {}) as Models.npm.IPackageJSON;
+      const dataToWrite = (_.isObject(obj) ? obj : {}) as Models.IPackageJSON;
       if (resultFileName.endsWith('.json5')) {
         const current = Helpers.exists(splitPath) && Helpers.readJson(splitPath, void 0, true);
         if (current && _.keys(current).length > 0) {
@@ -359,7 +321,7 @@ export class PackageJsonCore {
       if (Helpers.isExistedSymlink(this.path)) {
         Helpers.log(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`)
       } else {
-        const d = (_.isObject(data) ? data : {}) as Models.npm.IPackageJSON;
+        const d = (_.isObject(data) ? data : {}) as Models.IPackageJSON;
         if (d.tnp?.type === 'isomorphic-lib') {
           delete d['main']; // TODO QUICK_FIX delete main from package.json
         }
@@ -369,7 +331,7 @@ export class PackageJsonCore {
       if (Helpers.isExistedSymlink(this.path)) {
         Helpers.log(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`)
       } else {
-        const d = (_.isObject(data) ? data : {}) as Models.npm.IPackageJSON;
+        const d = (_.isObject(data) ? data : {}) as Models.IPackageJSON;
         if (d.tnp?.type === 'isomorphic-lib') {
           delete d['main']; // TODO QUICK_FIX delete main from package.json
         }

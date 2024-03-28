@@ -5,24 +5,27 @@ import {
   fse,
   rimraf,
   crossPlatformPath,
+  CoreModels,
 } from 'tnp-core/src';
 import { IncCompiler } from 'incremental-compiler/src';
-import { config, ConfigModels } from 'tnp-config/src';
+import { config } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
 import { BackendCompilation } from './compilation-backend.backend';
 import { BuildOptions } from '../../../../build-options';
-import { Project } from '../../../abstract/project/project';
-import { Models } from 'tnp-models/src';
+import { Project } from '../../../abstract/project';
 import { JSON10 } from 'json10/src';
 import { CodeCut } from '../code-cut/code-cut.backend';
 import { codeCuttFn } from '../code-cut/cut-fn.backend';
-import { CLASS } from 'typescript-class-helpers/src';
 import { TAGS } from 'tnp-config/src';
+import { Models } from '../../../../models';
 //#endregion
 
 @IncCompiler.Class({ className: 'BroswerCompilation' })
 export class BroswerCompilation extends BackendCompilation {
 
+  /**
+   * @deprecated
+   */
   private static instances = {} as { [websql: string]: BroswerCompilation; }
 
   //#region fields & getters
@@ -54,7 +57,7 @@ export class BroswerCompilation extends BackendCompilation {
     isWatchBuild: boolean,
     public compilationProject: Project,
     public moduleName: string,
-    public ENV: Models.env.EnvConfig,
+    public ENV: Models.EnvConfig,
     /**
      * tmp-src-for-(dist)-browser
      */
@@ -62,7 +65,7 @@ export class BroswerCompilation extends BackendCompilation {
     /**
      * browser-for-(dist|projectName)
      */
-    outFolder: ConfigModels.OutFolder,
+    outFolder: CoreModels.OutFolder,
     location: string,
     cwd: string,
     public backendOutFolder: string,
@@ -92,7 +95,7 @@ export class BroswerCompilation extends BackendCompilation {
     // console.log('LOCATION', location)
     // console.log('MODULE NAME', moduleName)
     // console.log(Helpers.terminalLine())
-    this.project = Project.From(this.cwd) as Project;
+    this.project = Project.ins.From(this.cwd) as Project;
   }
   //#endregion
 
@@ -117,8 +120,8 @@ export class BroswerCompilation extends BackendCompilation {
     });
 
     //#region copy core asset files
-    if (!this.project.isSmartContainerTarget) {
-      const corepro = Project.by('isomorphic-lib', this.project._frameworkVersion) as Project;
+    if (!this.project.__isSmartContainerTarget) {
+      const corepro = Project.by('isomorphic-lib', this.project.__frameworkVersion) as Project;
       const coreAssetsPath = corepro.pathFor('app/src/assets');
       const filesToCopy = Helpers.filesFrom(coreAssetsPath, true);
       for (let index = 0; index < filesToCopy.length; index++) {
@@ -144,7 +147,7 @@ export class BroswerCompilation extends BackendCompilation {
     //#endregion
 
     this.codecut.files(relativePathesToProcess);
-    this.project.assetsManager.copyExternalAssets(this.buildOptions?.outDir, this.buildOptions?.websql);
+    this.project.__assetsManager.copyExternalAssets(this.buildOptions?.outDir, this.buildOptions?.websql);
   }
   //#endregion
 
@@ -219,7 +222,7 @@ export class BroswerCompilation extends BackendCompilation {
   initCodeCut() {
 
     // console.log('inside')
-    let env: Models.env.EnvConfig = this.ENV;
+    let env: Models.EnvConfig = this.ENV;
     const compilationProject: Project = this.compilationProject;
     const buildOptions = this.buildOptions;
     if (!compilationProject) {
@@ -231,10 +234,10 @@ export class BroswerCompilation extends BackendCompilation {
 
     let project: Project;
     if (env) {
-      project = Project.From(env.currentProjectLocation);
+      project = Project.ins.From(env.currentProjectLocation);
     }
 
-    if (compilationProject.isStandaloneProject) {
+    if (compilationProject.__isStandaloneProject) {
       project = compilationProject;
     }
 
@@ -266,27 +269,6 @@ export class BroswerCompilation extends BackendCompilation {
     );
   }
   //#endregion
-
-
-  // private copyTsConfig() {
-  //   //#region copy tsconfig
-  //   // const source = crossPlatformPath(path.join(this.cwd, this.tsConfigBrowserName));
-  //   // const dest = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, this.tsConfigName));
-  //   // Helpers.copyFile(source, dest);
-  //   // const ProjectClass = CLASS.getBy('Project') as typeof Project;
-  //   // const proj = ProjectClass.From(this.cwd) as Project;
-  //   this.project.quickFixes.updateTsconfigsInTmpSrcBrowserFolders();
-  //   //#endregion
-  // }
-
-
-  public isNotFromAssets(absoluteFilePath: string, base: string) {
-    absoluteFilePath = crossPlatformPath(absoluteFilePath);
-    const relativePath = absoluteFilePath.replace(`${base}/`, '');
-    // console.log({ relativePath })
-    return !relativePath.startsWith('assets/');
-  }
-
 
   //#endregion
 

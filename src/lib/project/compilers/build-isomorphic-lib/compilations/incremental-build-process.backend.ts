@@ -3,22 +3,22 @@ import { path, crossPlatformPath } from 'tnp-core/src'
 import { _ } from 'tnp-core/src';
 
 import { config } from 'tnp-config/src';
-import type { Project } from '../../../../project/abstract/project/project';
+import type { Project } from '../../../../project/abstract/project';
 import { Helpers } from 'tnp-helpers/src';
 import { BuildOptions } from '../../../../build-options';
 import { BackendCompilation } from './compilation-backend.backend';
 import { BroswerCompilation } from './compilation-browser.backend';
 import { IncCompiler } from 'incremental-compiler/src';
-import { CLI } from 'tnp-cli/src';
 //#endregion
 
 export class IncrementalBuildProcess {
 
   //#region fields & getters
-  protected compileOnce = false;
-  protected backendCompilation: BackendCompilation;
-  protected browserCompilations: BroswerCompilation[];
 
+  protected backendCompilation: BackendCompilation;
+  // protected browserCompilations: BroswerCompilation[];
+  protected broswerCompilationStandalone: BroswerCompilation;
+  protected broswerCompilationSmartContainer: BroswerCompilation;
 
   //#region constructor
   constructor(
@@ -28,7 +28,6 @@ export class IncrementalBuildProcess {
     Helpers.log(`[incremental-build-process] for project: ${project.genericName}`)
 
     //#region init variables
-    this.compileOnce = !buildOptions.watch
     const outFolder = buildOptions.outDir;
     const location = config.folder.src;
     const cwd = project.location;
@@ -39,23 +38,15 @@ export class IncrementalBuildProcess {
     //#endregion
 
     //#region int backend compilation
-    if (project.typeIs('isomorphic-lib')) {
-      this.backendCompilation = new BackendCompilation(
-        buildOptions.watch,
-        outFolder,
-        location,
-        cwd,
-        this.buildOptions.websql,
-      );
-    } else {
-      this.backendCompilation = new BackendCompilation(
-        buildOptions.watch,
-        outFolder,
-        location,
-        cwd,
-        this.buildOptions.websql,
-      );
-    }
+
+    this.backendCompilation = new BackendCompilation(
+      buildOptions.watch,
+      outFolder,
+      location,
+      cwd,
+      this.buildOptions.websql,
+    );
+
     Helpers.log(`[incremental-build-process] this.backendCompilation exists: ${!!this.backendCompilation}`);
 
     if (buildOptions.genOnlyClientCode) {
@@ -64,16 +55,14 @@ export class IncrementalBuildProcess {
       }
     }
     if (buildOptions.onlyBackend) {
-      this.browserCompilations = [];
       return;
     }
     //#endregion
 
 
-    if (project.isStandaloneProject) {
-
+    if (project.__isStandaloneProject) {
       let browserOutFolder = Helpers.getBrowserVerPath(void 0, this.buildOptions.websql);
-      this.browserCompilations = [
+      this.broswerCompilationStandalone =
         new BroswerCompilation(
           buildOptions.watch,
           this.project,
@@ -85,16 +74,16 @@ export class IncrementalBuildProcess {
           cwd,
           outFolder,
           buildOptions)
-      ]
-    } else if (project?.parent.isContainer) {
+        ;
+    } else {
       const moduleName = '';
       const envConfig = {} as any;
       let browserOutFolder = Helpers.getBrowserVerPath(moduleName, this.buildOptions.websql);
 
-      if (this.project.isInRelaseDist) { // @LAST
+      if (this.project.__isInRelaseDist) { // @LAST
         browserOutFolder = crossPlatformPath(path.join(outFolder, browserOutFolder));
       }
-      this.browserCompilations = [
+      this.broswerCompilationSmartContainer =
         new BroswerCompilation(
           buildOptions.watch,
           this.project,
@@ -106,15 +95,9 @@ export class IncrementalBuildProcess {
           cwd,
           outFolder,
           buildOptions
-        )
-      ];
+        );
     }
 
-    const compilationsInfo = this.browserCompilations
-      .map(c => `compilationProject: ${c.compilationProject?.name}, location: ${c.srcFolder}`).join('\n');
-
-    Helpers.log(`BROWSER COMPILATIONS (length: ${this.browserCompilations.length} )`
-      + `\n\n` + compilationsInfo + `\n\n`);
 
   }
   //#endregion
@@ -138,16 +121,19 @@ export class IncrementalBuildProcess {
   }
 
   async start(taskName?: string, afterInitCallBack?: () => void) {
-    if (!this.compileOnce) {
-      this.compileOnce = true;
-    }
 
-    for (let index = 0; index < this.browserCompilations.length; index++) {
-      const browserCompilation = this.browserCompilations[index];
-      await browserCompilation.start({
-        taskName: this.browserTaksName(taskName, browserCompilation),
+    if (this.project.__isStandaloneProject) {
+      await this.broswerCompilationStandalone.start({
+        taskName: this.browserTaksName(taskName, this.broswerCompilationStandalone),
         afterInitCallBack: () => {
-          this.recreateBrowserLinks(browserCompilation)
+          this.recreateBrowserLinks(this.broswerCompilationStandalone)
+        }
+      })
+    } else {
+      await this.broswerCompilationSmartContainer.start({
+        taskName: this.browserTaksName(taskName, this.broswerCompilationSmartContainer),
+        afterInitCallBack: () => {
+          this.recreateBrowserLinks(this.broswerCompilationSmartContainer)
         }
       })
     }
@@ -159,53 +145,42 @@ export class IncrementalBuildProcess {
     }
 
     if (_.isFunction(afterInitCallBack)) {
-      await Helpers.runSyncOrAsync(afterInitCallBack);
+      await Helpers.runSyncOrAsync({ functionFn: afterInitCallBack });
     }
   }
 
-  // @ts-ignore
+
   async startAndWatch(taskName?: string, options?: IncCompiler.Models.StartAndWatchOptions) {
 
     // console.log('[${config.frameworkName}][incremental-build-process] taskName' + taskName)
 
-    const { watchOnly, afterInitCallBack } = options || {};
-    if (this.compileOnce && watchOnly) {
-      console.error(`[${config.frameworkName}] Dont use "compileOnce" and "watchOnly" options together.`);
-      process.exit(0)
-    }
-    if (this.compileOnce) {
-      Helpers.log('Watch compilation single run')
-      await this.start(taskName, afterInitCallBack);
-      process.exit(0);
-    }
-    if (watchOnly) {
-      Helpers.log(CLI.chalk.gray(
-        `Watch mode only for "${taskName}"` +
-        ` -- morphi only starts starAndWatch anyway --`
-      ));
+    const { afterInitCallBack } = options || {};
+
+    if (this.project.__isStandaloneProject) {
+      await this.broswerCompilationStandalone.startAndWatch({
+        taskName: this.browserTaksName(taskName, this.broswerCompilationStandalone),
+        afterInitCallBack: () => {
+          this.recreateBrowserLinks(this.broswerCompilationStandalone)
+        }
+      })
     } else {
-      // THIS IS NOT APPLIED FOR TSC
-      // await this.start(taskName, afterInitCallBack);
+      await this.broswerCompilationSmartContainer.startAndWatch({
+        taskName: this.browserTaksName(taskName, this.broswerCompilationSmartContainer),
+        afterInitCallBack: () => {
+          this.recreateBrowserLinks(this.broswerCompilationSmartContainer)
+        }
+      })
     }
 
-    for (let index = 0; index < this.browserCompilations.length; index++) {
-      const browserCompilation = this.browserCompilations[index];
-      await browserCompilation.startAndWatch({
-        taskName: this.browserTaksName(taskName, browserCompilation),
-        afterInitCallBack: () => {
-          this.recreateBrowserLinks(browserCompilation)
-        },
-        watchOnly,
-      })
-    };
 
     if (this.backendCompilation) {
-      // @ts-ignore
-      await this.backendCompilation.startAndWatch(this.backendTaskName(taskName), { watchOnly })
+      await this.backendCompilation.startAndWatch({
+        taskName: this.backendTaskName(taskName),
+      })
     }
 
     if (_.isFunction(afterInitCallBack)) {
-      await Helpers.runSyncOrAsync(afterInitCallBack);
+      await Helpers.runSyncOrAsync({ functionFn: afterInitCallBack });
     }
   }
 

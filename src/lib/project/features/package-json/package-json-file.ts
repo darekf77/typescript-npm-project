@@ -2,10 +2,11 @@
 //#region @backend
 import { path } from 'tnp-core/src';
 //#endregion
-import { config, ConfigModels } from 'tnp-config/src';
-import { Models } from 'tnp-models/src';
+import { config } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
 import { _ } from 'tnp-core/src';
+import { Models } from '../../../models'
+import { OVERRIDE_FROM_TNP } from '../../../constants';
 //#endregion
 
 
@@ -22,7 +23,7 @@ export class PackageJsonFile {
   //#endregion
 
   //#region fields & getters
-  public get exists() { // @ts-ignore
+  public get exists() {
     return Helpers.exists(this.fullPath);
   }
 
@@ -56,7 +57,7 @@ export class PackageJsonFile {
 
   private notReadable: boolean = false;
   private additionalSaveRequired: boolean = false;
-  private readonly content: Models.npm.IPackageJSON;
+  private readonly content: Models.IPackageJSON;
   private readonly __actuallProp: string;
   //#endregion
 
@@ -64,7 +65,7 @@ export class PackageJsonFile {
     public readonly fullPath: string) {
     //#region @backend
     this.fullPath = fullPath;
-    let content = Helpers.readJson(fullPath, void 0) as Models.npm.IPackageJSON;
+    let content = Helpers.readJson(fullPath, void 0) as Models.IPackageJSON;
 
     // if (fullPath.endsWith('.json5') && ) {
     //   Helpers.warn(`
@@ -84,7 +85,7 @@ export class PackageJsonFile {
 
       content = {
         [actuallProp]: content
-      } as any as Models.npm.IPackageJSON;
+      } as any as Models.IPackageJSON;
     }
 
     if (content) {
@@ -112,8 +113,8 @@ export class PackageJsonFile {
     //#region @backend
     let additionalSaveRequired = this.additionalSaveRequired;
     //#region merging
-    const content = (this.content) as Models.npm.IPackageJSON;
-    const override = (this.content[PackageJsonFile.FRAMEWORK_KEY_OLD]) as (Models.npm.Tnp);
+    const content = (this.content) as Models.IPackageJSON;
+    const override = (this.content[PackageJsonFile.FRAMEWORK_KEY_OLD]) as (Models.Tnp);
     const allKeys = [
       ...Object.keys(content),
       ...Object.keys(override),
@@ -122,14 +123,14 @@ export class PackageJsonFile {
 
     allKeys
       .filter(key =>
-        config.OVERRIDE_FROM_TNP.includes(key)
+        OVERRIDE_FROM_TNP.includes(key)
       )
       .forEach(key => {
         const contentValue = content[key];
         const overrideValue = override[key];
 
         if (!(_.isUndefined(contentValue) && _.isUndefined(overrideValue))) {
-          if (_.isUndefined(overrideValue) && !_.isNil(contentValue) && !config.OVERRIDE_FROM_TNP.includes(key)) {
+          if (_.isUndefined(overrideValue) && !_.isNil(contentValue) && !OVERRIDE_FROM_TNP.includes(key)) {
 
             if (_.isObject(contentValue[key])) {
               override[key] = _.cloneDeep(contentValue[key]);
@@ -168,7 +169,7 @@ export class PackageJsonFile {
       Helpers.error(`Not able to merge higer priority package.json`);
     }
 
-    const contentTnp = ((this.content) as Models.npm.IPackageJSON).tnp;
+    const contentTnp = ((this.content) as Models.IPackageJSON).tnp;
     const incommingTnp = (higherPriorityPjWithOnlyTnpProps).content?.tnp;
 
     const allKeys = [
@@ -223,7 +224,7 @@ export class PackageJsonFile {
 
 //#region helpers / last fixes to package.json
 function lastFixes(
-  content: Models.npm.IPackageJSON,
+  content: Models.IPackageJSON,
   fullPath: string,
   tnpProperty: typeof PackageJsonFile.FRAMEWORK_KEY_OLD,
   additionalSaveRequired = false
@@ -231,7 +232,6 @@ function lastFixes(
   //#region @backendFunc
   if (content[tnpProperty]
     && !!content[tnpProperty].type
-    && content[tnpProperty].type !== 'navi'
   ) {
     const folderName = path.basename(path.dirname(fullPath)).toLowerCase();
     if (folderName !== content.name) {
@@ -272,7 +272,7 @@ function lastFixes(
 
 //#region helpers / props consitency fixes
 function consistencyFixes(
-  content: Models.npm.IPackageJSON,
+  content: Models.IPackageJSON,
   fullPath: string,
   tnpProperty: typeof PackageJsonFile.FRAMEWORK_KEY_OLD,
   additionalSaveRequired = false
@@ -297,11 +297,11 @@ function consistencyFixes(
     additionalSaveRequired = true;
   }
 
-  if(_.isArray(content[tnpProperty].linkedProjects)) {
+  if (_.isArray(content[tnpProperty].linkedProjects)) {
     const arr = content[tnpProperty].linkedProjects;
-    if(arr.length > 0) {
+    if (arr.length > 0) {
       const sorted = _.cloneDeep(content[tnpProperty].linkedProjects).sort();
-      if(!_.isEqual(arr,sorted)) {
+      if (!_.isEqual(arr, sorted)) {
         content[tnpProperty].linkedProjects = sorted;
         additionalSaveRequired = true;
       }
@@ -340,27 +340,27 @@ function consistencyFixes(
 
   if (_.isUndefined(content[tnpProperty].libReleaseOptions)) {
     content[tnpProperty].libReleaseOptions = {
-      nodts: false,
-      obscure: false,
+      cliBuildNoDts: false,
+      cliBuildObscure: false,
       ugly: false,
-      includeNodeModules: false,
+      cliBuildIncludeNodeModules: false,
     };
     additionalSaveRequired = true;
   }
-  if (_.isUndefined(content[tnpProperty].libReleaseOptions.nodts)) {
-    content[tnpProperty].libReleaseOptions.nodts = false;
+  if (_.isUndefined(content[tnpProperty].libReleaseOptions.cliBuildNoDts)) {
+    content[tnpProperty].libReleaseOptions.cliBuildNoDts = false;
     additionalSaveRequired = true;
   }
-  if (_.isUndefined(content[tnpProperty].libReleaseOptions.obscure)) {
-    content[tnpProperty].libReleaseOptions.obscure = false;
+  if (_.isUndefined(content[tnpProperty].libReleaseOptions.cliBuildObscure)) {
+    content[tnpProperty].libReleaseOptions.cliBuildObscure = false;
     additionalSaveRequired = true;
   }
   if (_.isUndefined(content[tnpProperty].libReleaseOptions.ugly)) {
     content[tnpProperty].libReleaseOptions.ugly = false;
     additionalSaveRequired = true;
   }
-  if (_.isUndefined(content[tnpProperty].libReleaseOptions.includeNodeModules)) {
-    content[tnpProperty].libReleaseOptions.includeNodeModules = false;
+  if (_.isUndefined(content[tnpProperty].libReleaseOptions.cliBuildIncludeNodeModules)) {
+    content[tnpProperty].libReleaseOptions.cliBuildIncludeNodeModules = false;
     additionalSaveRequired = true;
   }
   if (_.isUndefined(content[tnpProperty].overrided.linkedFolders)) {

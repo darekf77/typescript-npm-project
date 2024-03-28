@@ -1,22 +1,22 @@
 //#region @backend
-import { path, _ } from 'tnp-core/src'
+import { path, _, CoreModels } from 'tnp-core/src'
 import { fse, rimraf } from 'tnp-core/src'
 import { glob, crossPlatformPath } from 'tnp-core/src';
 import chalk from 'chalk';
-import { Project } from '../abstract/project/project';
-import { FeatureForProject } from '../abstract/feature-for-project';
+import { Project } from '../abstract/project';
+import { BaseFeatureForProject } from 'tnp-helpers/src';
 import { Helpers } from 'tnp-helpers/src';
-import { config, ConfigModels } from 'tnp-config/src';
-import { Models } from 'tnp-models/src';
+import { config } from 'tnp-config/src';
 import { folder_shared_folder_info, tempSourceFolder } from '../../constants';
+import { Models } from '../../models';
 
-export class QuickFixes extends FeatureForProject {
+export class QuickFixes extends BaseFeatureForProject<Project> {
 
   updateStanaloneProjectBeforePublishing(project: Project, realCurrentProj: Project, specyficProjectForBuild: Project) {
-    if (project.isStandaloneProject) {
+    if (project.__isStandaloneProject) {
       const distForPublishPath = crossPlatformPath([
         specyficProjectForBuild.location,
-        project.getTempProjName('dist'),
+        project.__getTempProjName('dist'),
         config.folder.node_modules,
         project.name
       ]);
@@ -37,7 +37,7 @@ export * from './lib';
         config.file.package_json,
       ]);
 
-      const pj = Helpers.readJson(pjPath) as Models.npm.IPackageJSON;
+      const pj = Helpers.readJson(pjPath) as Models.IPackageJSON;
       if (realCurrentProj.name === 'tnp') {
         pj.devDependencies = {};
         pj.dependencies = {}; // tnp is not going to be use in any other project
@@ -50,11 +50,11 @@ export * from './lib';
   }
 
   updateContainerProjectBeforePublishing(project: Project, realCurrentProj: Project, specyficProjectForBuild: Project) {
-    if (project.isSmartContainer) {
+    if (project.__isSmartContainer) {
 
       const base = path.join(
         specyficProjectForBuild.location,
-        specyficProjectForBuild.getTempProjName('dist'),
+        specyficProjectForBuild.__getTempProjName('dist'),
         config.folder.node_modules,
         `@${realCurrentProj.name}`,
       );
@@ -76,7 +76,7 @@ export * from './lib';
     }
   }
 
-  recreateTempSourceNecessaryFiles(outDir: Models.dev.BuildDir) {
+  recreateTempSourceNecessaryFiles(outDir: 'dist') {
     if (this.project.typeIsNot('isomorphic-lib')) {
       return;
     }
@@ -239,7 +239,7 @@ Object.defineProperty(document.body.style, 'transform', {
         'tnp',
       ]);
       // TODO only tnp can release tnp (for @vercel/ncc builder)
-      if ((config.frameworkName === 'tnp') && (this.project.name === 'tnp') && this.project.isInRelaseDist) {
+      if ((config.frameworkName === 'tnp') && (this.project.name === 'tnp') && this.project.__isInRelaseDist) {
         Helpers.remove(folderToDelete);
       }
     }
@@ -248,12 +248,12 @@ Object.defineProperty(document.body.style, 'transform', {
 
   public missingAngularLibFiles() {
     Helpers.taskStarted(`[quick fixes] missing angular lib fles start`, true);
-    if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
+    if (this.project.__frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
 
       (() => {
         if (
-          (this.project.isStandaloneProject && !this.project.isSmartContainerTarget)
-          || this.project.isSmartContainerChild
+          (this.project.__isStandaloneProject && !this.project.__isSmartContainerTarget)
+          || this.project.__isSmartContainerChild
         ) {
           const indexTs = crossPlatformPath(path.join(this.project.location, config.folder.src, 'lib/index.ts'));
           if (!Helpers.exists(indexTs)) {
@@ -277,7 +277,7 @@ Object.defineProperty(document.body.style, 'transform', {
         Helpers.writeFile(shared_folder_info, `
 THIS FILE IS GENERATED. THIS FILE IS GENERATED. THIS FILE IS GENERATED.
 
-Assets from this folder are being shipped with this npm package (${this.project.npmPackageNameAndVersion})
+Assets from this folder are being shipped with this npm package (${this.project.__npmPackageNameAndVersion})
 created from this project.
 
 THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
@@ -389,7 +389,7 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
 
   badTypesInNodeModules() {
 
-    if (this.project.frameworkVersionAtLeast('v2')) {
+    if (this.project.__frameworkVersionAtLeast('v2')) {
       [
         '@types/prosemirror-*',
         '@types/mocha',
@@ -402,7 +402,7 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
         '@types/eslint-scope',
         '@types/inquirer',
       ].forEach(name => {
-        Helpers.remove(path.join(this.project.node_modules.path, name));
+        Helpers.remove(path.join(this.project.__node_modules.path, name));
       });
     }
     // if (this.project.isVscodeExtension) {
@@ -417,8 +417,8 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
 
   public overritenBadNpmPackages() {
     Helpers.log(`Fixing bad npm packages - START for ${this.project.genericName}`);
-    if (this.project.isTnp || this.project.isContainerCoreProject) { // TODO for all packages ???
-      this.project.node_modules.fixesForNodeModulesPackages
+    if (this.project.__isTnp || this.project.__isContainerCoreProject) { // TODO for all packages ???
+      this.project.__node_modules.fixesForNodeModulesPackages
         .forEach(f => {
           const source = path.join(this.project.location, f);
           const dest = path.join(this.project.location, config.folder.node_modules, f);
@@ -431,13 +431,13 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
   }
 
   public missingLibs(missingLibsNames: string[] = []) {
-    if (this.project.isContainer) {
+    if (this.project.__isContainer) {
       return;
     }
     missingLibsNames.forEach(missingLibName => {
       const pathInProjectNodeModules = path.join(this.project.location, config.folder.node_modules, missingLibName)
       if (fse.existsSync(pathInProjectNodeModules)) {
-        if (this.project.isStandaloneProject) {
+        if (this.project.__isStandaloneProject) {
           Helpers.warn(`Package "${missingLibName}" will replaced with empty package mock. ${this.project.genericName}`)
         }
       }
@@ -457,21 +457,21 @@ export default _default;
       Helpers.writeFile(path.join(pathInProjectNodeModules, config.file.package_json), {
         name: missingLibName,
         version: "0.0.0"
-      } as Models.npm.IPackageJSON);
+      } as Models.IPackageJSON);
 
     })
   }
 
 
   public missingSourceFolders() { /// QUCIK_FIX make it more generic
-    if (this.project.frameworkVersionEquals('v1')) {
+    if (this.project.__frameworkVersionEquals('v1')) {
       return;
     }
     Helpers.taskStarted(`[quick fixes] missing source folder start`, true)
     if (!fse.existsSync(this.project.location)) {
       return;
     }
-    if (this.project.isStandaloneProject && !this.project.isSmartContainerTarget) {
+    if (this.project.__isStandaloneProject && !this.project.__isSmartContainerTarget) {
       const srcFolder = path.join(this.project.location, config.folder.src);
 
       if (!fse.existsSync(srcFolder)) {

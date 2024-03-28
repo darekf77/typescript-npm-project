@@ -50,12 +50,6 @@ export class BuildProcess extends Firedev.Base.Entity<any> {
 
   //#endregion
 
-  //#region constructor
-  private constructor(...args) { // @ts-ignore
-    super(...args);
-  }
-  //#endregion
-
   //#region fields & getters
   ctrl: BuildProcessController;
 

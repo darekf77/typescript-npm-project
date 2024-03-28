@@ -1,9 +1,8 @@
-import { ConfigModels } from 'tnp-config/src';
-import { Models } from 'tnp-models/src';
-import { Project } from '../../abstract/project/project';
+import { CoreModels } from 'tnp-core/src';
+import { Project } from '../../abstract/project';
 
 export type Opt = {
-  outFolder?: Models.dev.BuildDir;
+  outFolder?: 'dist';
   projectName?: string;
   projectLocation?: string;
   client?: Project;
@@ -16,6 +15,7 @@ export type LinkTypePathRep = (options: Omit<Opt, 'replacement'>) => string;
 export type EndAction = (options: Opt) => void;
 
 /**
+ * @deprecated
  * This class will exectute algorithm
  * 1. Copy replative pathes to proper destination files/folders
  * 2. Link node_modules to desitnation projects
@@ -37,8 +37,8 @@ export class InsideStruct {
 
   private constructor(
     public relateivePathesFromContainer?: string[],
-    public projectType?: ConfigModels.NewFactoryType,
-    public frameworkVersion?: ConfigModels.FrameworkVersion,
+    public projectType?: CoreModels.NewFactoryType,
+    public frameworkVersion?: CoreModels.FrameworkVersion,
     /**
      * Replace pathes while copying relateivePathesFromContainer
      * to destination project
@@ -64,7 +64,7 @@ export class InsideStruct {
     return Project.by(this.projectType, this.frameworkVersion) as Project;
   }
 
-  recreate(outFolder: ConfigModels.OutFolder = 'dist') {
+  recreate(outFolder: CoreModels.OutFolder = 'dist') {
 
   }
 

@@ -3,14 +3,13 @@ import { glob } from 'tnp-core/src';
 import { path } from 'tnp-core/src'
 import { fse } from 'tnp-core/src'
 import chalk from 'chalk';
-import { Models } from 'tnp-models/src';
 import { config } from 'tnp-config/src';
-import { FeatureForProject } from '../abstract/feature-for-project';
+import { BaseFeatureForProject } from 'tnp-helpers/src';
 import { Helpers } from 'tnp-helpers/src';
-import { Project } from '../abstract/project/project';
+import { Project } from '../abstract/project';
+import { Models } from '../../models';
 
-
-export class TargetProject extends FeatureForProject {
+export class TargetProject extends BaseFeatureForProject<Project> {
   //#region @backend
 
   public get exists() {
@@ -18,8 +17,8 @@ export class TargetProject extends FeatureForProject {
   }
 
   private get all() {
-    return _.cloneDeep(this.project.packageJson.targetProjects).map((p: any) => {
-      const res = p as Models.npm.TargetProject;
+    return _.cloneDeep(this.project.__packageJson.targetProjects).map((p: any) => {
+      const res = p as Models.TargetProject;
       res.path = path.join(
         this.project.location,
         config.folder.targetProjects.DEFAULT_PATH_GENERATED,
@@ -47,8 +46,8 @@ export class TargetProject extends FeatureForProject {
 }
 
 
-async function generate(project: Project, t: Models.npm.TargetProject) {
-  project.packageJson.showDeps('taget project generation');
+async function generate(project: Project, t: Models.TargetProject) {
+  project.__packageJson.showDeps('taget project generation');
   if (!Helpers.exists(path.dirname(t.path))) {
     Helpers.mkdirp(path.dirname(t.path));
   }
@@ -99,7 +98,7 @@ async function generate(project: Project, t: Models.npm.TargetProject) {
     config.folder.components,
     config.folder.src,
     config.file.package_json,
-    ...project.resources,
+    ...project.__resources,
     config.file.index_js,
     config.file.index_js_map,
     config.file.index_d_ts,

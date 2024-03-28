@@ -4,52 +4,18 @@ import chalk from 'chalk';
 import { fse } from 'tnp-core/src'
 
 import { Helpers } from 'tnp-helpers/src';
-import { Project } from '../../abstract/project/project';
+import { Project } from '../../abstract/project';
 import { config } from 'tnp-config/src';
-import { ProjectFactory } from '../../../scripts/NEW-PROJECT_FILES_MODULES';
-import { PROGRESS_DATA } from 'tnp-models/src';
-import { Models } from 'tnp-models/src';
-import { EnvironmentConfig } from '../environment-config';
 import { argsToClear } from '../../../constants';
-import { FeatureForProject } from '../../abstract/feature-for-project';
+import { InitOptions } from '../../../build-options';
+import { Models } from '../../../models';
+import { BaseFeatureForProject } from 'tnp-helpers/src';
 
 export type CleanType = 'all' | 'only_static_generated';
-export type InitOptions = {
-  watch: boolean;
-  watchOnly?: boolean;
-  alreadyInitedPorjects?: Project[];
-  initiator?: Project;
-  struct?: boolean;
-  // initiator: Project;
-}
 
-export class FilesStructure extends FeatureForProject {
 
-  private fixOptionsArgs(options: InitOptions) {
-    if (_.isUndefined(options)) {
-      options = {} as any;
-    }
-    if (_.isUndefined(options.alreadyInitedPorjects)) {
-      options.alreadyInitedPorjects = [];
-    }
-    if (_.isUndefined(options.watch)) {
-      options.watch = false;
-    }
-    // if (_.isUndefined(options.initiator)) {
-    //   options.initiator = this.project;
-    // }
-    return options;
-  }
+export class FilesStructure extends BaseFeatureForProject<Project> {
 
-  private get taskNames() {
-    return {
-      sourceModifir: `[filestructure] (${chalk.bold(this.project.genericName)
-        }) Client source modules pathes modifier `,
-      frameworkFileGenerator: `[filestructure] (${chalk.bold(this.project.genericName)
-        }) Files generator: entites.ts, controllers.ts`,
-      joinMerge: `[filestructure] Join project ${this.project.genericName}`,
-    };
-  }
 
   public async struct(args?: string) {
     if (!args) {
@@ -57,49 +23,29 @@ export class FilesStructure extends FeatureForProject {
     }
     args += ' --struct';
     Helpers.removeIfExists(path.join(this.project.location, config.file.tnpEnvironment_json));
-    await this.init(args);
+    await this.init(InitOptions.from({ struct: true }));
   }
 
   static INITED_PROECT_SHOW_LOG = {};
-  public async init(args: string, options?: InitOptions) {
-    if (!args) {
-      args = '';
-    }
-    options = this.fixOptionsArgs(options);
+  public async init(options?: InitOptions) {
+    options = InitOptions.from(options);
 
     if (!options.initiator) {
       options.initiator = this.project;
     }
-    const { alreadyInitedPorjects, watch, watchOnly } = options;
-    let {
-      skipNodeModules, websql, recrusive, env, struct, skipSmartContainerDistInit, branding
-    }: Models.dev.InitArgOptions = require('minimist')(args.split(' '));
-    args = Helpers.cliTool.removeArgFromString(args, argsToClear);
+    const { alreadyInitedPorjects, watch, smartContainerTargetName, struct, branding, websql } = options;
+
+
 
     // THIS IS SLOW... BUT I CAN AFORD IT HERE
     if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {
       this.project.quickFixes.missingSourceFolders();
-      if (this.project.isStandaloneProject && this.project.packageJson) {
-        this.project.packageJson.updateHooks()
-      }
-      this.project.notAllowedFiles().forEach(f => {
-        // Helpers.log(`[init] removing not allowed ${ path.basename(f) } `)
-        Helpers.removeFileIfExists(path.join(this.project.location, f));
-      });
-    }
-
-    if (struct) {
-      skipNodeModules = true;
-      if (_.isUndefined(options.struct)) {
-        options.struct = true;
+      if (this.project.__isStandaloneProject && this.project.__packageJson) {
+        this.project.__packageJson.updateHooks()
       }
     }
 
-    Helpers.log(`[init] __initProcedure start for  ${this.project.genericName} `)
-    await this.project.__initProcedure();
-    Helpers.log(`[init] __initProcedure end for  ${this.project.genericName} `)
-
-    await this.project.linkedRepos.update(struct);
+    await this.project.__linkedRepos.update(struct);
 
 
 
@@ -114,42 +60,32 @@ export class FilesStructure extends FeatureForProject {
 
     this.project.quickFixes.missingSourceFolders();
 
-    if (this.project.isSmartContainer) {
+    if (this.project.__isSmartContainer) {
       const children = this.project.children;
       for (let index = 0; index < children.length; index++) {
         const child = children[index];
-        if (child._frameworkVersion !== this.project._frameworkVersion) {
-          await child.setFramworkVersion(this.project._frameworkVersion);
+        if (child.__frameworkVersion !== this.project.__frameworkVersion) {
+          await child.__setFramworkVersion(this.project.__frameworkVersion);
         }
       }
     }
 
-    if (this.project.isStandaloneProject || this.project.isSmartContainerChild) {
-      await this.project.branding.apply(!!branding);
+    if (this.project.__isStandaloneProject || this.project.__isSmartContainerChild) {
+      await this.project.__branding.apply(!!branding);
     }
 
     this.project.quickFixes.missingAngularLibFiles();
-    if (this.project.isTnp) { // TODO make it for standalone
+    if (this.project.__isTnp) { // TODO make it for standalone
       this.project.quickFixes.overritenBadNpmPackages();
 
     }
-    if (this.project.isStandaloneProject || this.project.isContainer) {
-      this.project.quickFixes.missingLibs(config.quickFixes.missingLibs)
+    if (this.project.__isStandaloneProject || this.project.__isContainer) {
+      this.project.quickFixes.missingLibs([])
     }
 
-    if (this.project.isStandaloneProject) {
+    if (this.project.__isStandaloneProject) {
 
-      //#region TODO BIG QUICK_FIX
-
-      if (!FilesStructure.INITED_PROECT_SHOW_LOG[this.project.name]) { // TODO QUICK
-        Helpers.taskStarted(`Initing project: ${chalk.bold(this.project.genericName)}`);
-        FilesStructure.INITED_PROECT_SHOW_LOG[this.project.name] = true;
-      } else {
-        Helpers.log(`Initing project: ${chalk.bold(this.project.genericName)}`);
-      }
-
-      //#endregion
-
+      Helpers.taskStarted(`Initing project: ${chalk.bold(this.project.genericName)}`);
       Helpers.log(` (from locaiton: ${this.project.location})`);
       Helpers.log(`Init mode: ${websql ? '[WEBSQL]' : ''}`)
     }
@@ -158,10 +94,10 @@ export class FilesStructure extends FeatureForProject {
     Helpers.log(`Push to alread inited ${this.project.genericName} from ${this.project.location} `)
 
     //#region handle init of container
-    if (this.project.isContainer) {
-      await this.project.recreate.init();
+    if (this.project.__isContainer) {
+      await this.project.__recreate.init();
 
-      if (!this.project.isContainerOrWorkspaceWithLinkedProjects) {
+      if (!this.project.__isContainerWithLinkedProjects) {
         const containerChildren = this.project.children.filter(c => {
           Helpers.log('checking if git repo')
           if (c.git.isGitRepo) {
@@ -173,11 +109,11 @@ export class FilesStructure extends FeatureForProject {
         })
         for (let index = 0; index < containerChildren.length; index++) {
           const containerChild = containerChildren[index];
-          await containerChild.filesStructure.init(args, options);
+          await containerChild.__filesStructure.init(options);
           const containerChildChildren = containerChild.children;
           for (let indexChild = 0; indexChild < containerChildChildren.length; indexChild++) {
             const workspaceChild = containerChildChildren[indexChild];
-            await workspaceChild.filesStructure.init(args, options)
+            await workspaceChild.__filesStructure.init(options)
           }
         }
       }
@@ -185,31 +121,21 @@ export class FilesStructure extends FeatureForProject {
     }
     //#endregion
 
+    await this.project.__recreate.init();
+    this.project.__recreate.vscode.settings.toogleHideOrShowDeps();
 
-    //#region report progress initing project
-    if (global.tnpNonInteractive) {
-      PROGRESS_DATA.log({ msg: `Initing project: "${this.project.genericName}" started` });
-    }
-    //#endregion
-
-    await this.project.recreate.init();
-    this.project.recreate.vscode.settings.toogleHideOrShowDeps();
-
-    if (this.project.isStandaloneProject || this.project.isSmartContainer) {
-      if (_.isNil(this.project.buildOptions)) { // TODO QUICK_FIX
-        this.project.buildOptions = {} as any;
-      }
-      await this.project.env.init(args);
-      this.project.filesTemplatesBuilder.rebuild();
+    if (this.project.__isStandaloneProject || this.project.__isSmartContainer) {
+      await this.project.__env.init();
+      this.project.__filesTemplatesBuilder.rebuild();
     }
 
-    if (!this.project.node_modules.exist && !skipNodeModules) {
-      await this.project.npmPackages.installProcess(`inti procedure of ${this.project.name} `);
+    if (!this.project.__node_modules.exist && !struct) {
+      await this.project.__npmPackages.installProcess(`inti procedure of ${this.project.name} `);
     }
-    this.project.packageJson.showDeps(`Show new deps for ${this.project._frameworkVersion} `);
+    this.project.__packageJson.showDeps(`Show new deps for ${this.project.__frameworkVersion} `);
     //#region handle node modules instalation
-    if (!this.project.isDocker) {
-      if (this.project.isContainerCoreProject && this.project.frameworkVersionEquals('v1')) {
+    if (!this.project.__isDocker) {
+      if (this.project.__isContainerCoreProject && this.project.__frameworkVersionEquals('v1')) {
         this.project.quickFixes.overritenBadNpmPackages();
       }
     }
@@ -217,102 +143,32 @@ export class FilesStructure extends FeatureForProject {
 
     this.project.quickFixes.removeTnpFromItself();
 
-    let client = Helpers.removeSlashAtEnd(_.first((args || '').split(' '))) as any;
     const smartContainerBuildTarget = (
-      this.project.isSmartContainerChild
-        ? this.project?.parent.smartContainerBuildTarget
-        : (this.project.isSmartContainer ? this.project.smartContainerBuildTarget : void 0)
+      this.project.__isSmartContainerChild
+        ? this.project?.parent.__smartContainerBuildTarget
+        : (this.project.__isSmartContainer ? this.project.__smartContainerBuildTarget : void 0)
     )
 
-    if (!client && smartContainerBuildTarget) {
-      client = smartContainerBuildTarget.name;
-    }
-    if (!client) {
-      const fisrtChild = _.first(this.project.isSmartContainer ? this.project.children : this.project.parent?.children);
-      if (fisrtChild) {
-        client = fisrtChild.name;
-      }
-    }
 
-
-    if (this.project.isSmartContainer && !skipSmartContainerDistInit) {
+    if (this.project.__isSmartContainer) {
       //#region handle smart container
       Helpers.writeFile([this.project.location, 'angular.json'], this.angularJsonContainer);
-      await this.project.recreate.init();
-      await this.project.singluarBuild.init(watch, false, 'dist', args, client);
+      await this.project.__recreate.init();
+      await this.project.__singluarBuild.init(watch, false, 'dist', smartContainerTargetName);
       //#endregion
     }
 
     this.project.quickFixes.missingSourceFolders();
 
     this.project.quickFixes.badTypesInNodeModules();
-
-    if (!this.project.isDocker && !this.project.isVscodeExtension) {
-      if (this.project.isStandaloneProject) {
-        if (watch) {
-          // await this.project.frameworkFileGenerator.startAndWatch(
-          //   {
-          //     taskName: this.taskNames.frameworkFileGenerator,
-          //     watchOnly,
-          //     afterInitCallBack: async () => {
-          //       await this.project.compilerCache.setUpdatoDate.frameworkFileGenerator();
-          //     }
-          //   });
-          // if (!this.project) {
-          //   console.trace('HERE')
-          // }
-          // await this.project.sourceModifier.startAndWatch({
-          //   taskName: this.taskNames.sourceModifir,
-          //   watchOnly,
-          //   afterInitCallBack: async () => {
-          //     await this.project.compilerCache.setUpdatoDate.sourceModifier();
-          //   }
-          // });
-        } else {
-          // await this.project.frameworkFileGenerator.start({ taskName: this.taskNames.frameworkFileGenerator });
-          // if (!this.project) {
-          //   console.trace('HERE')
-          // }
-          // await this.project.sourceModifier.start({ taskName: this.taskNames.sourceModifir });
-        }
-        // process.exit(0)
-      }
-    }
     Helpers.log(`Init DONE for project: ${chalk.bold(this.project.genericName)} `);
   }
 
-
-
-  recreateSiteChildren() {
-    const newChilds: Project[] = []
-    // TODO UNCOMMENT when workspace ready someday
-    // const baseline = this.project.baseline;
-    // baseline.children.forEach(c => {
-    //   const siteChild = path.join(this.project.location, c.name);
-    //   if (!fse.existsSync(siteChild)) {
-    //     ProjectFactory.Instance.createWorksapceOrStandalone({
-    //       type: c.type,
-    //       name: c.name,
-    //       cwd: this.project.location,
-    //       basedOn: void 0
-    //     });
-    //     const newChild = Project.From(siteChild);
-    //     c.packageJson.copyTo(newChild);
-    //     Helpers.tryRemoveDir(path.join(newChild.location, config.folder.src));
-    //     Helpers.tryRemoveDir(path.join(newChild.location, config.folder.components));
-    //     newChild.recreate.vscode.settings.colorsFromWorkspace();
-    //     newChilds.push(newChild);
-    //   }
-    // });
-    return newChilds;
-  }
 
   private async recrusiveOperation(proj: Project, recrusive = false, type: keyof Project) {
 
     if (type === 'clear') {
       await proj.clear()
-    } else if (type === 'reset') {
-      await proj.reset()
     }
     if (recrusive) {
       for (let index = 0; index < proj.children.length; index++) {
@@ -322,20 +178,12 @@ export class FilesStructure extends FeatureForProject {
     }
   }
 
-  public async reset(options?: { recrusive: boolean; }) {
-    let { recrusive = false } = options || {};
-    if (this.project.isSmartContainer) {
-      recrusive = true;
-    }
-    await this.recrusiveOperation(this.project, recrusive, 'reset')
-  }
-
   public async clear(options?: { recrusive: boolean; }) {
-    if (this.project.isVscodeExtension) {
+    if (this.project.__isVscodeExtension) {
       Helpers.remove(this.project.pathFor('out'), true)
     }
     let { recrusive = false } = options || {};
-    if (this.project.isSmartContainer) {
+    if (this.project.__isSmartContainer) {
       recrusive = true;
     }
     await this.recrusiveOperation(this.project, recrusive, 'clear')
@@ -347,14 +195,11 @@ export class FilesStructure extends FeatureForProject {
     return { recrusive }
   }
 
-  async resetFromArgs(args) {
-    const { recrusive } = this.resolveArgs(args)
-    await this.reset({ recrusive })
-  }
+
 
   async clearFromArgs(args) {
     const { recrusive } = this.resolveArgs(args);
-    if (this.project.npmPackages.useSmartInstall) {
+    if (this.project.__npmPackages.useSmartInstall) {
       await this.clear({ recrusive });
     } else {
       await Helpers.questionYesNo(`Do you wanna delete node_modules and reset ${recrusive ? 'project(s) recursively' : 'project(s)'} ?`, async () => {

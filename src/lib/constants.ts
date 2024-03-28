@@ -1,11 +1,43 @@
-import { Models } from "tnp-models/src";
-import type { Project } from "./project/abstract";
+import type { Project } from "./project/abstract/project";
+
+import {
+  crossPlatformPath, path,
+  //#region @backend
+  os
+  //#endregion
+} from "tnp-core/src";
+
+export const firedevFrameworkName = 'firedev';
+export const morphiFrameworkName = 'morphi';
+
+export const OVERRIDE_FROM_TNP = [
+  'scripts',
+  'description',
+  'license',
+  'private',
+  'author',
+  'homepage',
+  'main',
+  'engines',
+  'categories',
+  'keywords',
+  'activationEvents',
+];
+
+export const UNIT_TEST_TIMEOUT = 30000;
+export const INTEGRATION_TEST_TIMEOUT = 30000;
+export const BACKEND_HTTP_REQUEST_TIMEOUT = 3000;
+
+export let morphiPathUserInUserDir: string
+  //#region @backend
+  = path.join(crossPlatformPath(os.homedir()), '.firedev', morphiFrameworkName);
+//#endregion
+
 
 export const argsToClear = [
   'websql',
   'serveApp',
   'skipNodeModules',
-  'skipCopyToSelection',
   'skipSmartContainerDistInit',
   'copyto',
   'port',
@@ -66,17 +98,17 @@ export class PortUtils {
 
   calculateServerPortFor(project: Project): number {
     //#region @backendFunc
-    if (project.isContainer) {
+    if (project.__isContainer) {
       return;
     }
-    if (project.isSmartContainerTarget) {
-      project = project.smartContainerTargetParentContainer.children.find(c => c.name === project.name);
+    if (project.__isSmartContainerTarget) {
+      project = project.__smartContainerTargetParentContainer.children.find(c => c.name === project.name);
     }
-    if (project.isSmartContainerChild) {
+    if (project.__isSmartContainerChild) {
       const index = project.parent.children.indexOf(project);
       return this.calculateForContainerServer(index);
     }
-    if (project.isStandaloneProject) {
+    if (project.__isStandaloneProject) {
       return this.calculateForStandaloneServer();
     }
     //#endregion
@@ -84,17 +116,17 @@ export class PortUtils {
 
   calculateClientPortFor(project: Project, { websql }: { websql: boolean }): number {
     //#region @backendFunc
-    if (project.isContainer) {
+    if (project.__isContainer) {
       return;
     }
-    if (project.isSmartContainerTarget) {
-      project = project.smartContainerTargetParentContainer.children.find(c => c.name === project.name);
+    if (project.__isSmartContainerTarget) {
+      project = project.__smartContainerTargetParentContainer.children.find(c => c.name === project.name);
     }
-    if (project.isSmartContainerChild) {
+    if (project.__isSmartContainerChild) {
       const index = project.parent.children.indexOf(project);
       return this.calculateForContainerClient(index, { websql });
     }
-    if (project.isStandaloneProject) {
+    if (project.__isStandaloneProject) {
       return this.calculateForStandaloneClient({ websql });
     }
     //#endregion
@@ -127,9 +159,9 @@ export class PortUtils {
     const backendPort = this.calculateServerPortFor(project);
 
     //#region @backendFunc
-    const clientPorts = (project.isStandaloneProject && !project.isSmartContainerTarget) ? `
-export const CLIENT_DEV_NORMAL_APP_PORT = ${project.standaloneNormalAppPort};
-export const CLIENT_DEV_WEBSQL_APP_PORT = ${project.standaloneWebsqlAppPort};
+    const clientPorts = (project.__isStandaloneProject && !project.__isSmartContainerTarget) ? `
+export const CLIENT_DEV_NORMAL_APP_PORT = ${project.__standaloneNormalAppPort};
+export const CLIENT_DEV_WEBSQL_APP_PORT = ${project.__standaloneWebsqlAppPort};
     `: ''
 
     return `
@@ -139,8 +171,8 @@ export const HOST_BACKEND_PORT = ${backendPort};
 ${clientPorts}
 
 // Check yout build info here http://localhost:${this.basePort}
-// NORMAL APP: http://localhost:${project.standaloneNormalAppPort}
-// WEBSQL APP: http://localhost:${project.standaloneWebsqlAppPort}
+// NORMAL APP: http://localhost:${project.__standaloneNormalAppPort}
+// WEBSQL APP: http://localhost:${project.__standaloneWebsqlAppPort}
 
 // THIS FILE IS GENERATED - DO NOT MODIFY
 `.trim()
@@ -168,7 +200,7 @@ export const notAllowedProjectNames = [
 ]
 
 
-export function tempSourceFolder(outDir: Models.dev.BuildDir, appForLib: boolean, websql: boolean) {
+export function tempSourceFolder(outDir: 'dist', appForLib: boolean, websql: boolean) {
   return `tmp-src-${appForLib ? 'app-' : ''}${outDir}${websql ? '-websql' : ''}`
 }
 

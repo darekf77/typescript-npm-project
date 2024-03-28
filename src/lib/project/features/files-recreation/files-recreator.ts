@@ -1,21 +1,21 @@
 //#region @backend
-import { fse, crossPlatformPath } from 'tnp-core/src'
+import { fse, crossPlatformPath, CoreModels } from 'tnp-core/src'
 import { path } from 'tnp-core/src'
 import * as JSON5 from 'json5';
 import { glob } from 'tnp-core/src';
 import { _ } from 'tnp-core/src';
 // local
-import { Project } from '../../abstract/project/project';
-import { Models } from 'tnp-models/src';
+import { Project } from '../../abstract/project';
+import { Models } from '../../../models';
 import { Helpers } from 'tnp-helpers/src';
-import { config, ConfigModels } from 'tnp-config/src';
-import { FeatureForProject } from '../../abstract/feature-for-project';
+import { config } from 'tnp-config/src';
+import { BaseFeatureForProject } from 'tnp-helpers/src';
 import { CLI } from 'tnp-cli/src';
 
 
 
 function getVscodeSettingsFrom(project: Project) {
-  let settings: ConfigModels.VSCodeSettings;
+  let settings: CoreModels.VSCodeSettings;
   const pathSettingsVScode = path.join(project.location, '.vscode', 'settings.json')
   if (Helpers.exists(pathSettingsVScode)) {
     settings = JSON5.parse(Helpers.readFile(pathSettingsVScode))
@@ -25,7 +25,7 @@ function getVscodeSettingsFrom(project: Project) {
 
 
 
-export class FilesRecreator extends FeatureForProject {
+export class FilesRecreator extends BaseFeatureForProject<Project> {
 
   public async init() {
     Helpers.log(`recreation init of ${CLI.chalk.bold(this.project.genericName)}`)
@@ -35,8 +35,8 @@ export class FilesRecreator extends FeatureForProject {
       return;
     }
 
-    if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib') && !this.project?.parent?.isSmartContainer) {
-      await this.project.insideStructure.recrate('dist');
+    if (this.project.__frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib') && !this.project?.parent?.__isSmartContainer) {
+      await this.project.__insideStructure.recrate('dist');
     }
 
     this.handleProjectSpecyficFiles();
@@ -114,26 +114,26 @@ export class FilesRecreator extends FeatureForProject {
           '.sass-cache',
           '.sourcemaps'
         ])
-          .concat(self.project.filesTemplates().map(f => f.replace('.filetemplate', '')))
-          .concat(self.project.linkedFolders
+          .concat(self.project.__filesTemplates().map(f => f.replace('.filetemplate', '')))
+          .concat(self.project.__linkedFolders
             .map(l => l.to?.replace(/^\.\//, ''))
             .filter(f => !!f)
           ))
           .concat( // common files for all project
-            self.project.isCoreProject ? [] : self.commonFilesForAllProjects
+            self.project.__isCoreProject ? [] : self.commonFilesForAllProjects
           ).concat( // core files of projects types
-            self.project.isCoreProject ? [] : self.project.projectSpecyficFiles().filter(relativeFilePath => {
-              return !self.project.recreateIfNotExists().includes(relativeFilePath);
+            self.project.__isCoreProject ? [] : self.project.__projectSpecyficFiles().filter(relativeFilePath => {
+              return !self.project.__recreateIfNotExists().includes(relativeFilePath);
             })
           ).concat( // core files of projects types
-            !self.project.isCoreProject ? [] : [
+            !self.project.__isCoreProject ? [] : [
               config.folder.src,
               config.folder.components,
             ].map(f => `${f}-for-stanalone`)
           )
-          .concat((!self.project.isStandaloneProject && !self.project.isCoreProject)
-            ? self.project.projectSpecyficIgnoredFiles() : [])
-          .concat(self.project.isTnp ? ['projects/tmp*'] : [])
+          .concat((!self.project.__isStandaloneProject && !self.project.__isCoreProject)
+            ? self.project.__projectSpecyficFiles() : [])
+          .concat(self.project.__isTnp ? ['projects/tmp*'] : [])
           .concat([
             'tsconfig.backend.dist.json'
           ])
@@ -146,7 +146,7 @@ export class FilesRecreator extends FeatureForProject {
         return gitignoreFiles.map(f => `/${crossPlatformPath(f)}`)
       },
       get npmignore() {
-        const allowedProject: ConfigModels.LibType[] = ['isomorphic-lib']
+        const allowedProject: CoreModels.LibType[] = ['isomorphic-lib']
         const canBeUseAsNpmPackage = self.project.typeIs(...allowedProject);
         const npmignoreFiles = [
           '.vscode',
@@ -166,14 +166,14 @@ export class FilesRecreator extends FeatureForProject {
 
 
 
-  private modifyVscode(modifyFN: (settings: ConfigModels.VSCodeSettings, project?: Project) => ConfigModels.VSCodeSettings) {
+  private modifyVscode(modifyFN: (settings: CoreModels.VSCodeSettings, project?: Project) => CoreModels.VSCodeSettings) {
     const pathSettingsVScode = path.join(this.project.location, '.vscode', 'settings.json');
 
     Helpers.log('[modifyVscode] setting things...')
     if (Helpers.exists(pathSettingsVScode)) {
       try {
         Helpers.log('parsing 1 ...')
-        let settings: ConfigModels.VSCodeSettings = JSON5.parse(Helpers.readFile(pathSettingsVScode))
+        let settings: CoreModels.VSCodeSettings = JSON5.parse(Helpers.readFile(pathSettingsVScode))
         settings = modifyFN(settings, this.project);
         Helpers.writeFile(pathSettingsVScode, settings);
       } catch (e) {
@@ -185,7 +185,7 @@ export class FilesRecreator extends FeatureForProject {
         const settingFromCore = path.join(Project.by(this.project.type).location, '.vscode', 'settings.json');
         Helpers.mkdirp(path.dirname(pathSettingsVScode));
         if (Helpers.exists(settingFromCore)) {
-          var settings: ConfigModels.VSCodeSettings = JSON5.parse(Helpers.readFile(settingFromCore))
+          var settings: CoreModels.VSCodeSettings = JSON5.parse(Helpers.readFile(settingFromCore))
           settings = modifyFN(settings, this.project);
           Helpers.writeFile(pathSettingsVScode, settings)
         }
@@ -255,14 +255,14 @@ export class FilesRecreator extends FeatureForProject {
                 s['files.exclude']['tsconfig.backend.dist.json'] = true;
                 s['files.exclude']['tsconfig.backend.dist.json.filetemplate'] = true;
 
-                if (project.isVscodeExtension) {
+                if (project.__isVscodeExtension) {
                   s['files.exclude']["out"] = true;
                   s['files.exclude']["update-proj.js"] = true;
                   s['files.exclude'][".vscodeignore"] = true;
                   s['files.exclude']["*.vsix"] = true;
                 }
-                if (project.isTnp) {
-                  project.node_modules.fixesForNodeModulesPackages.forEach(p => {
+                if (project.__isTnp) {
+                  project.__node_modules.fixesForNodeModulesPackages.forEach(p => {
                     s['files.exclude'][p] = true;
                   })
                   // s['files.exclude']["*.js"] = true;
@@ -272,7 +272,7 @@ export class FilesRecreator extends FeatureForProject {
                   s['files.exclude']["scripts"] = true;
                   // s['files.exclude']["bin"] = true;
                 }
-                project.projectLinkedFiles().forEach(({ relativePath }) => {
+                project.__projectLinkedFiles().forEach(({ relativePath }) => {
                   s['files.exclude'][relativePath] = true;
                 }),
                   [
@@ -285,7 +285,7 @@ export class FilesRecreator extends FeatureForProject {
                   ].map(f => {
                     s['files.exclude'][f] = true;
                   })
-                if (project.isCoreProject) {
+                if (project.__isCoreProject) {
                   s['files.exclude']["**/*.filetemplate"] = true;
                   s['files.exclude']["**/tsconfig.*"] = true;
                   s['files.exclude']["tslint.*"] = true;
@@ -294,7 +294,7 @@ export class FilesRecreator extends FeatureForProject {
                   s['files.exclude']["protractor.conf.js"] = true;
                   s['files.exclude']["karma.conf.js"] = true;
                   s['files.exclude'][".editorconfig"] = true;
-                  project.vscodeFileTemplates.forEach(f => {
+                  project.__vscodeFileTemplates.forEach(f => {
                     s['files.exclude'][f.replace('.filetemplate', '')] = false;
                   });
                 }
@@ -303,9 +303,9 @@ export class FilesRecreator extends FeatureForProject {
 
               if (hide) {
                 settings = getSettingsFor(self.project, settings) as any;
-                if (self.project.isSmartContainer) {
+                if (self.project.__isSmartContainer) {
 
-                  if (self.project.isSmartContainer) {
+                  if (self.project.__isSmartContainer) {
                     settings['files.exclude'][`recent.json`] = true;
                     settings['files.exclude'][`angular.json`] = true;
                     // settings['files.exclude'][`src/lib`] = true;
@@ -330,7 +330,7 @@ export class FilesRecreator extends FeatureForProject {
                     // settings['files.exclude'][`${c.name}/README.md`] = true;
                     settings['files.exclude'][`${c.name}/karma.conf.js*`] = true;
                     settings['files.exclude'][`${c.name}/protractor.conf.js*`] = true;
-                    c.filesTemplates().forEach(t => {
+                    c.__filesTemplates().forEach(t => {
                       settings['files.exclude'][`${c.name}/${t}`] = true;
                       settings['files.exclude'][`${c.name}/${t.replace('.filetemplate', '')}`] = true;
                     });
@@ -360,7 +360,7 @@ export class FilesRecreator extends FeatureForProject {
 
   gitignore() {
 
-    const coreFiles = !this.project.isCoreProject ? [] : this.project.projectLinkedFiles()
+    const coreFiles = !this.project.__isCoreProject ? [] : this.project.__projectLinkedFiles()
       .map(({ relativePath }) => {
         return `/${relativePath}`;
       })
@@ -369,7 +369,7 @@ export class FilesRecreator extends FeatureForProject {
     const ignoredByGit = this.filesIgnoredBy
       .gitignore
       .filter(f => {
-        if (this.project.isCoreProject && f.endsWith('.filetemplate')) {
+        if (this.project.__isCoreProject && f.endsWith('.filetemplate')) {
           return false;
         }
         return true;
@@ -391,8 +391,8 @@ yarn-error.log
 testem.log
 /typings
 app.hosts.ts
-${this.project.linkedRepos.git.ignored()}
-${this.project.isStandaloneProject ? `/${config.folder.testsEnvironments}` : ''}
+${this.project.__linkedRepos.git.ignored()}
+${this.project.__isStandaloneProject ? `/${config.folder.testsEnvironments}` : ''}
 /src/lib/lib-info.md
 /src/migrations/migrations-info.md
 /src/tests/mocha-tests-info.md
@@ -401,21 +401,21 @@ ${this.project.isStandaloneProject ? `/${config.folder.testsEnvironments}` : ''}
 # System Files
 .DS_Store
 Thumbs.db
-${this.project.isVscodeExtension ? '/*.vsix' : ''}
-${this.project.isVscodeExtension ? '/out' : ''}
+${this.project.__isVscodeExtension ? '/*.vsix' : ''}
+${this.project.__isVscodeExtension ? '/out' : ''}
 `+ ignoredByGit + `
-${(this.project.isTnp || this.project.isVscodeExtension) ? '!tsconfig*' : ''}
-${this.project.isTnp ? 'webpack.*' : ''}
-${this.project.isContainerOrWorkspaceWithLinkedProjects ? `
+${(this.project.__isTnp || this.project.__isVscodeExtension) ? '!tsconfig*' : ''}
+${this.project.__isTnp ? 'webpack.*' : ''}
+${this.project.__isContainerWithLinkedProjects ? `
 # container/workspace git projects
-${this.project.isMonorepo ? [] : this.project.packageJson.linkedProjects.map(c => `/${crossPlatformPath(c)}`).join('\n')}
+${this.project.__isMonorepo ? [] : this.project.__packageJson.linkedProjects.map(c => `/${crossPlatformPath(c)}`).join('\n')}
 ` : []}
 # =====================
-${this.project.isCoreProject ? '!*.filetemplate' : '*.filetemplate'}
-${this.project.isDocker ? '!Dockerfile.filetemplate' : ''}
-${this.project.isSmartContainer ? '/angular.json' : ''}
-${this.project.isVscodeExtension ? '' : coreFiles}
-/.vscode/launch.json
+${this.project.__isCoreProject ? '!*.filetemplate' : '*.filetemplate'}
+${this.project.__isDocker ? '!Dockerfile.filetemplate' : ''}
+${this.project.__isSmartContainer ? '/angular.json' : ''}
+${this.project.__isVscodeExtension ? '' : coreFiles}
+${this.project.__isCoreProject ? '' : '/.vscode/launch.json'}
 
 `.trimRight() + '\n');
 
@@ -426,7 +426,7 @@ ${this.project.isVscodeExtension ? '' : coreFiles}
 
   handleProjectSpecyficFiles() {
 
-    const linkedFolder = this.project.linkedFolders;
+    const linkedFolder = this.project.__linkedFolders;
     linkedFolder.forEach((c) => {
       const from = crossPlatformPath(path.resolve(path.join(this.project.location, c.from)));
       const to = crossPlatformPath(path.resolve(path.join(this.project.location, c.to)));
@@ -447,24 +447,24 @@ ${this.project.isVscodeExtension ? '' : coreFiles}
     let defaultProjectProptotype: Project;
 
 
-    defaultProjectProptotype = Project.by(this.project.type, this.project._frameworkVersion) as Project;
+    defaultProjectProptotype = Project.by(this.project.type, this.project.__frameworkVersion) as Project;
 
-    const files: Models.other.RecreateFile[] = [];
+    const files: Models.RecreateFile[] = [];
 
     if (crossPlatformPath(this.project.location) === crossPlatformPath(defaultProjectProptotype?.location)) {
-      Helpers.info(`LINKING CORE PROJCET ${this.project.name} ${this.project.type} ${this.project._frameworkVersion}`)
-      if (this.project.frameworkVersionAtLeast('v3') && this.project.typeIsNot('isomorphic-lib')) {
+      Helpers.info(`LINKING CORE PROJCET ${this.project.name} ${this.project.type} ${this.project.__frameworkVersion}`)
+      if (this.project.__frameworkVersionAtLeast('v3') && this.project.typeIsNot('isomorphic-lib')) {
         // nothing
       } else {
-        const toLink = defaultProjectProptotype.projectLinkedFiles()
+        const toLink = defaultProjectProptotype.__projectLinkedFiles()
         toLink.forEach(c => {
           Helpers.info(`[LINKING] ${c.relativePath} from ${c.sourceProject.location}  `);
           Helpers.createSymLink(path.join(c.sourceProject.location, c.relativePath), path.join(this.project.location, c.relativePath));
         });
       }
     } else if (defaultProjectProptotype) {
-      const projectSpecyficFilesLinked = this.project.projectSpecyficFilesLinked();
-      const projectSpecyficFiles = this.project.projectSpecyficFiles();
+      const projectSpecyficFilesLinked = this.project.__projectSpecyficFilesLinked();
+      const projectSpecyficFiles = this.project.__projectSpecyficFiles();
       // console.log({
       //   projectSpecyficFiles,
       //   project: this.project.genericName
@@ -475,16 +475,16 @@ ${this.project.isVscodeExtension ? '' : coreFiles}
 
         if (!Helpers.exists(from)) {
 
-          const linked = defaultProjectProptotype.projectLinkedFiles().find(a => a.relativePath === relativeFilePath);
+          const linked = defaultProjectProptotype.__projectLinkedFiles().find(a => a.relativePath === relativeFilePath);
           if (linked) {
             Helpers.warn(`[firedev]]FIXING LINKED projects`);
             Helpers.createSymLink(
               path.join(linked.sourceProject.location, linked.relativePath),
               path.join(defaultProjectProptotype.location, relativeFilePath));
-          } else if (defaultProjectProptotype.frameworkVersionAtLeast('v2')) {
+          } else if (defaultProjectProptotype.__frameworkVersionAtLeast('v2')) {
             const core = Project.by(
               defaultProjectProptotype.type,
-              defaultProjectProptotype.frameworkVersionMinusOne
+              defaultProjectProptotype.__frameworkVersionMinusOne
             );
             from = crossPlatformPath(path.join(core.location, relativeFilePath));
           }
@@ -493,7 +493,7 @@ ${this.project.isVscodeExtension ? '' : coreFiles}
 
         const where = crossPlatformPath(path.join(this.project.location, relativeFilePath));
 
-        if (this.project.recreateIfNotExists().includes(relativeFilePath) && Helpers.exists(where)) {
+        if (this.project.__recreateIfNotExists().includes(relativeFilePath) && Helpers.exists(where)) {
           return;
         }
 
@@ -517,7 +517,7 @@ ${this.project.isVscodeExtension ? '' : coreFiles}
   }
 
   commonFiles() {
-    const wokrspace = Project.by('container', this.project._frameworkVersion);
+    const wokrspace = Project.by('container', this.project.__frameworkVersion);
 
     const files = this.commonFilesForAllProjects;
     files.map(file => {

@@ -10,9 +10,7 @@ import { IBuildProcess } from './build-process.models';
 //#region @websql
 import { BUILD_PROCESS } from './build-process.models';
 import { BuildProcessBackend } from './backend/build-process-backend';
-import type { BuildProcessFeature } from '../../build-proces.backend';
 import { Project } from '../../../../abstract/project';
-import { DEFAULT_PORT, PortUtils } from '../../../../../constants';
 
 //#endregion
 //#endregion
@@ -43,16 +41,15 @@ export class BuildProcessController extends Firedev.Base.Controller<any> {
       return `
 
 
-      currentPorts.NORMAL_APP ${this.project.standaloneNormalAppPort} <br>
-      currentPorts.WEBSQL_APP ${this.project.standaloneWebsqlAppPort} <br>
+      currentPorts.NORMAL_APP ${this.project.__standaloneNormalAppPort} <br>
+      currentPorts.WEBSQL_APP ${this.project.__standaloneWebsqlAppPort} <br>
 
       `;
     }
   }
 
-  private readonly project: Project;
+  private project: Project;
   async initialize(project: Project) {
-    // @ts-ignore
     this.project = project;
   }
 

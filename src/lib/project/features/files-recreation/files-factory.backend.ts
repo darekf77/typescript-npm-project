@@ -1,11 +1,12 @@
-import { FeatureForProject } from '../../abstract/feature-for-project';
+import { BaseFeatureForProject } from 'tnp-helpers/src';
 import { fse } from 'tnp-core/src'
 import { path } from 'tnp-core/src'
 import { _ } from 'tnp-core/src';
 import { Helpers } from 'tnp-helpers/src';
+import { Project } from '../../../project/abstract/project';
 
 
-export class FilesFactory extends FeatureForProject {
+export class FilesFactory extends BaseFeatureForProject<Project> {
 
 
   createFile(pathToFile: string, content?: string | JSON) {

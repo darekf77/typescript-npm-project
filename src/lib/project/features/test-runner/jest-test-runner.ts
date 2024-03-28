@@ -1,19 +1,16 @@
 //#region @backend
 import { _, crossPlatformPath } from 'tnp-core/src';
 import { path } from 'tnp-core/src'
-import { FeatureForProject } from '../../abstract/feature-for-project';
+import { BaseFeatureForProject } from 'tnp-helpers/src';
 //#endregion
 
-import { config } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
-import { CLASS } from 'typescript-class-helpers/src';
-import { Models } from 'tnp-models/src';
 import { tempSourceFolder } from '../../../constants';
+import { Project } from '../../abstract/project';
 
-@CLASS.NAME('JestTestRunner')
 export class JestTestRunner
   //#region @backend
-  extends FeatureForProject
+  extends BaseFeatureForProject<Project>
 //#endregion
 {
 
@@ -30,7 +27,7 @@ export class JestTestRunner
   getCWD(args: string,): string {
 
     const websql: boolean = true;
-    const outDir: Models.dev.BuildDir = 'dist';
+    const outDir: 'dist' = 'dist';
 
     const projCwd = crossPlatformPath([
       this.project.location,
@@ -53,7 +50,6 @@ export class JestTestRunner
     command = Helpers._fixCommand(command);
 
     Helpers.run(command, { output: true, cwd: this.getCWD(args) }).sync()
-    process.exit(0);
   }
 
   async startAndWatch(debug: boolean, args: string) {
@@ -65,8 +61,7 @@ export class JestTestRunner
     Helpers.run(command, {
       stdio: ['pipe', 'pipe', 'pipe'],
       cwd: this.getCWD(args)
-    }).async()
-    process.stdin.resume();
+    }).async();
   }
   //#endregion
 
