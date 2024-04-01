@@ -245,7 +245,7 @@ export class CopyManagerStandalone extends CopyManager {
       if (json) {
         json.sources = (json.sources || []).map((p: string) => {
 
-          if (this.project.__isInRelaseDist) {
+          if (this.project.isInCiReleaseProject) {
             return '';
           }
 

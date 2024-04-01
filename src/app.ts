@@ -1,220 +1,125 @@
-// //#region @notForNpm
-// import 'core-js/proposals/reflect-metadata';
-// import 'core-js/es';
+//#region imports
+import { Firedev } from 'firedev/src';
+import { Observable, map, BehaviorSubject, combineLatest, switchMap } from 'rxjs';
+import {
+  FiredevFileController,
+  FiredevBinaryFileController,
+  FiredevFile,
+  FiredevFileCss,
+  FiredevBinaryFile,
+} from 'firedev-ui'; // TODO LAST WHY CLASS NAME DOES NOT WORK
+import { HOST_BACKEND_PORT } from './app.hosts';
+import { _ } from 'tnp-core';
+//#region @browser
+import { NgModule } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+//#endregion
+//#endregion
 
-// //#region @backend
-// /**
-//  * This quick fix if somhow I am using on backend document and localstorage
-//  */
-// Morphi.setIsBackend();
-// if (typeof localStorage === "undefined" || localStorage === null) {
-//   const LocalStorage = require('node-localstorage').LocalStorage;
-//   global['localStorage'] = new LocalStorage('./tmp-local-storage');
-//   global['sessionStorage'] = new LocalStorage('./tmp-session-storage');
-// }
+//#region @browser
+@Component({
+  selector: 'app-tnp',
+  template: `hello from tnp<br>
+    <br>
+    users from backend
+    <ul>
+      <li *ngFor="let user of (users$ | async)"> {{ user | json }} </li>
+    </ul>
+    <button (click)="add()" >add and refresh</button>
+  `,
+  styles: [` body { margin: 0px !important; } `],
+})
+export class TnpComponent implements OnInit {
+  trigger = new BehaviorSubject<void>(void 0);
+  users$: Observable<User[]> = this.trigger.asObservable()
+    .pipe(switchMap(() => User.ctrl.getAll().received.observable), map((data) => data.body.json));
 
-// if (typeof document === "undefined" || document === null) {
-//   const jsdom = require('jsdom');
-//   const { JSDOM } = jsdom;
-//   const window = (new JSDOM(``)).window;
-//   global['window'] = window;
-//   const { document } = window;
-//   global['document'] = document;
-// }
+  async add() {
+    await User.ctrl.create(User.from({ name: 'franek' + (new Date().getTime()) }));
+    await this.trigger.next();
+  }
 
-// if (typeof global['Zone'] === "undefined" || global['Zone'] === null) {
-//   global['Zone'] = {
-//     __load_patch: () => { },
-//     __symbol__: () => { }
-//   };
-// }
-// //#endregion
+  constructor() { }
+  ngOnInit() { }
+}
 
-// //#region isomorphic imports
-// import { DraggablePopupComponent, DraggablePopupModule } from 'tnp-ui';
-// import { Log, Level } from 'ng2-logger';
-// const log = Log.create(`app`, Level.__NOTHING);
-// //#endregion
+@NgModule({
+  imports: [CommonModule],
+  exports: [TnpComponent],
+  declarations: [TnpComponent],
+  providers: [],
+})
+export class TnpModule { }
+//#endregion
 
-// log.d(`Morphi.isBrowser: ${Morphi.isBrowser}, Morphi.isNode: ${Morphi.isNode}`)
+@Firedev.Entity({ className: 'User' })
+class User extends Firedev.Base.Entity {
+  public static ctrl?: UserController;
+  public static from(user: Partial<User>) {
+    return _.merge(new User(), _.cloneDeep(user))
+  }
+  //#region @websql
+  @Firedev.Orm.Column.Generated()
+  //#endregion
+  id?: string | number;
 
-// if (Morphi.isBrowser) {
-//   require('zone.js/dist/zone');
-//   require('@angular/material/prebuilt-themes/indigo-pink.css');
-// }
+  //#region @websql
+  @Firedev.Orm.Column.Custom({ type: 'varchar', length: '100', nullable: true })
+  //#endregion
+  name?: string | number;
 
+}
 
-// //#region angular
-// import { Component, NgModule, ApplicationRef } from '@angular/core';
-// import { enableProdMode } from '@angular/core';
-// import { BrowserModule } from '@angular/platform-browser';
-// // import { HttpModule } from '@angular/http';
-// import { FormsModule } from '@angular/forms';
-// import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-// import { MatCardModule } from '@angular/material/card';
-// import { WebStorageModule } from 'ngx-store';
-// // import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-// import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-// //#endregion
+@Firedev.Controller({ className: 'UserController', entity: User })
+class UserController extends Firedev.Base.Controller<User> {
 
-// //#region local imports
-// import { PROCESS, ProcessModule, ProcessController } from './lib/apps/process';
-// import { PROJECT, ProjectModule, ProjectController } from './lib/apps/project';
-// import { Subscriber } from 'rxjs/internal/Subscriber';
-// //#endregion
+  //#region @websql
+  async initExampleDbData(): Promise<void> {
+    //#region @backendFunc
+    await this.repository.save(new User());
+    //#endregion
+  }
+  //#endregion
+}
 
+async function start() {
+  console.log('hello world');
+  console.log('Your server will start on port ' + HOST_BACKEND_PORT);
+  const host = 'http://localhost:' + HOST_BACKEND_PORT;
 
-// const controllers = [
-//   ProjectController,
-//   ProcessController
-// ];
+  const context = await Firedev.init({
+    host,
+    controllers: [
+      UserController,
+      FiredevFileController,
+      FiredevBinaryFileController,
+      // PUT FIREDEV CONTORLLERS HERE
+    ],
+    entities: [
+      User,
+      FiredevFile,
+      FiredevFileCss,
+      FiredevBinaryFile,
+      // PUT FIREDEV ENTITIES HERE
+    ],
+    //#region @websql
+    config: {
+      type: 'better-sqlite3',
+      database: 'tmp-db.sqlite',
+      logging: false,
+    }
+    //#endregion
+  });
 
-// const host = 'http://localhost:3333';
+  if (Firedev.isBrowser) {
+    //#region @browser
+    const users = (await User.ctrl.getAll().received).body.json;
+    console.log({
+      'users from backend': users
+    });
+    //#endregion
+  }
+}
 
-// @Component({
-//   selector: 'my-app', // <my-app></my-app>
-//   template: `
-//   <h1> Hello from component! </h1>
-//   <mat-card>
-//   Simple card
-//   <span class="iconify" data-icon="ic-baseline-pin" data-inline="false"></span>
-//   </mat-card>
-//   <mat-card>
-//   <mat-card-title>
-//   Processes
-//   </mat-card-title>
-//   <mat-card-subtitle  *ngIf="!processes">
-//     ...loading
-//   </mat-card-subtitle>
-//   <mat-card-content>
-
-//   <ng-template #popupContent>
-//   Hello content
-//   </ng-template>
-
-//   <app-draggable-popup
-//   [title]="'awesome'" >
-
-//   </app-draggable-popup>
-//   processes preview
-//   <div *ngFor="let p of processes" >
-//     <app-process-logger [model]="p"></app-process-logger>
-//   </div>
-
-//   </mat-card-content>
-
-//   </mat-card>
-//   `,
-// })
-// export class AppComponent {
-
-
-//   processes: PROCESS[];
-//   async ngOnInit() {
-//     const processes = await PROCESS.getAll();
-//     log.d(`processes`, processes);
-//     this.processes = processes;
-//   }
-// }
-
-// //#region angular module
-// @NgModule({
-//   imports: [
-//     BrowserModule,
-//     // HttpModule,
-//     BrowserAnimationsModule,
-//     FormsModule,
-//     ...[
-//       MatCardModule,
-//     ],
-//     ProjectModule,
-//     ProcessModule,
-//     DraggablePopupModule,
-//     WebStorageModule,
-//   ],
-//   declarations: [
-//     AppComponent,
-//   ],
-//   providers: [
-//     ...controllers
-//   ],
-//   bootstrap: [AppComponent]
-// })
-// export class AppModule { }
-
-// // depending on the env mode, enable prod mode or add debugging modules
-// // if (ENV.isBUild === 'build') {
-// //   enableProdMode();
-// // }
-
-// export function main() {
-//   return platformBrowserDynamic().bootstrapModule(AppModule);
-// }
-
-// //#endregion
-
-
-// async function start() {
-
-//   //#region @backend
-//   const config = {
-//     type: "sqlite",
-//     database: 'tmp-db.sqlite',
-//     synchronize: true,
-//     dropSchema: true,
-//     logging: false
-//   };
-//   //#endregion
-
-//   const context = await Morphi.init({
-//     host,
-//     controllers,
-//     entities: [
-//       PROJECT, PROCESS
-//     ],
-//     //#region @backend
-//     config: config as any
-//     //#endregion
-//   });
-//   log.d(`context`, context);
-
-//   if (Morphi.isBrowser) {
-
-//     const head: HTMLElement = document.getElementsByTagName('head')[0];
-//     head.innerHTML = head.innerHTML +
-//       `<link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=block" rel="stylesheet">`
-//     const body: HTMLElement = document.getElementsByTagName('body')[0];
-//     body.innerHTML = `
-//     <style>
-
-//     [mat-dialog-title] {
-//       margin: -24px -24px 0px -24px !important;
-//       padding: 10px 24px;
-//       background: gray;
-//       color: #fff;
-//       cursor: move;
-//     }
-
-
-//     .resizable-modal {
-//       mat-dialog-container {
-//         resize: both;
-//       }
-//     }
-
-//     </style>
-//     <my-app>Loading...</my-app>`;
-//     if (document.readyState === 'complete') {
-//       main();
-//     } else {
-//       document.addEventListener('DOMContentLoaded', main);
-//     }
-//   }
-// }
-
-// if (Morphi.isBrowser) {
-//   start();
-// }
-
-// export default start;
-// //#endregion
+export default start;

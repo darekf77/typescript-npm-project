@@ -12,6 +12,7 @@ import { Models } from '../../models';
 import * as  psList from 'ps-list';
 import { MESSAGES, morphiPathUserInUserDir } from '../../constants';
 import { MagicRenamer } from "magic-renamer/src";
+declare const ENV: any;
 //#endregion
 
 class $Global extends BaseCommandLine<{}, Project> {
@@ -220,7 +221,7 @@ class $Global extends BaseCommandLine<{}, Project> {
   //#region move js to ts
   $MOVE_JS_TO_TS(args) {
     Helpers
-      .filesFrom(crossPlatformPath([process.cwd(), args]), true)
+      .filesFrom(crossPlatformPath([this.cwd, args]), true)
       .forEach(f => {
         if (path.extname(f) === '.js') {
           Helpers.move(f, crossPlatformPath([path.dirname(f), path.basename(f).replace('.js', '.ts')]))
@@ -234,7 +235,7 @@ class $Global extends BaseCommandLine<{}, Project> {
   //#region show messages
   ASYNC_PROC = async (args) => {
     global.tnpShowProgress = true;
-    let p = Helpers.run(`${config.frameworkName} show:loop ${args}`, { output: false, cwd: process.cwd() }).async()
+    let p = Helpers.run(`${config.frameworkName} show:loop ${args}`, { output: false, cwd: this.cwd }).async()
     p.stdout.on('data', (chunk) => {
       console.log('prod:' + chunk)
     })
@@ -248,7 +249,7 @@ class $Global extends BaseCommandLine<{}, Project> {
   SYNC_PROC = async (args) => {
     global.tnpShowProgress = true;
     try {
-      let p = Helpers.run(`${config.frameworkName} show:loop ${args}`, { output: false, cwd: process.cwd() }).sync()
+      let p = Helpers.run(`${config.frameworkName} show:loop ${args}`, { output: false, cwd: this.cwd }).sync()
       this._exit()
     } catch (err) {
       console.log('Erroroejk')
@@ -566,7 +567,7 @@ class $Global extends BaseCommandLine<{}, Project> {
           if (path.isAbsolute(l)) {
             return path.resolve(l);
           }
-          return path.resolve(path.join(process.cwd(), l));
+          return path.resolve(path.join(this.cwd, l));
         });
     }
     this.project.__packageJson.updateFrom(locations);
@@ -579,7 +580,7 @@ class $Global extends BaseCommandLine<{}, Project> {
    * generate deps json
    */
   DEPS_JSON() {
-    const node_moduels = path.join(process.cwd(), config.folder.node_modules);
+    const node_moduels = path.join(this.cwd, config.folder.node_modules);
     const result = {};
     Helpers
       .foldersFrom(node_moduels)
@@ -600,7 +601,7 @@ class $Global extends BaseCommandLine<{}, Project> {
         }
 
       });
-    Helpers.writeJson(path.join(process.cwd(), config.file.result_packages_json), result);
+    Helpers.writeJson(path.join(this.cwd, config.file.result_packages_json), result);
     this._exit();
   }
   //#endregion
@@ -650,7 +651,7 @@ class $Global extends BaseCommandLine<{}, Project> {
 
   //#region file info
   FILEINFO = (args) => {
-    console.log(Helpers.getMostRecentFilesNames(crossPlatformPath(process.cwd())))
+    console.log(Helpers.getMostRecentFilesNames(crossPlatformPath(this.cwd)))
 
     this._exit()
   }
@@ -825,7 +826,7 @@ class $Global extends BaseCommandLine<{}, Project> {
         // Helpers.remove(dest)
         Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
       }
-      await projectToInit.__filesStructure.struct();
+      await projectToInit.struct();
     }
     Helpers.taskDone('DONE');
     this._exit()
@@ -980,7 +981,7 @@ class $Global extends BaseCommandLine<{}, Project> {
       absPath = crossPlatformPath(path.dirname(absPath));
     }
     entityName = decodeURIComponent(entityName);
-    const nearestProj = Project.ins.nearestTo(process.cwd()) as Project;
+    const nearestProj = Project.ins.nearestTo(this.cwd) as Project;
     // console.log({
     //   nearestProj: nearestProj?.location
     // })
@@ -1078,7 +1079,7 @@ class $Global extends BaseCommandLine<{}, Project> {
 
   //#region update
   async UPDATE() {
-    const cwd = crossPlatformPath(process.cwd());
+    const cwd = crossPlatformPath(this.cwd);
 
     const proj = Project.ins.From(cwd) as Project;
 
@@ -1162,61 +1163,13 @@ class $Global extends BaseCommandLine<{}, Project> {
   //#endregion
 
   //#region clear
-  async CLEAN(args: string) {
-    const currentProj = Project.ins.Current;
-
-    const clear = async (proj: Project) => {
-      if (proj.__isContainer) {
-        if (proj.__isSmartContainer) {
-          while (true) {
-            try {
-              proj.__node_modules.remove();
-              proj.__smartNodeModules.remove();
-              Helpers.remove(crossPlatformPath([proj.location, 'tmp-*']));
-              proj.removeFolderByRelativePath(config.folder.dist);
-              proj.removeFolderByRelativePath(config.folder.dist + '-app');
-              proj.removeFolderByRelativePath(config.folder.tmpDistRelease);
-              break;
-            } catch (error) {
-              // notify({
-              //   title: '[User action required]',
-              //   message: 'Please check your firedev build log...',
-              // }).notify({
-              //   title: '[User action required]',
-              //   message: 'Please check your firedev build log...',
-              // })
-              Helpers.pressKeyAndContinue(MESSAGES.SHUT_DOWN_FOLDERS_AND_DEBUGGERS)
-            }
-          }
-
-        }
-        // await clear(proj);
-        const children = proj.children.filter(c => (c.typeIs('isomorphic-lib') || c.__isSmartContainer)
-          && c.__frameworkVersionAtLeast('v3') && c.__npmPackages.useSmartInstall);
-        for (let index = 0; index < children.length; index++) {
-          const c = children[index];
-          await clear(c);
-        }
-      } else if (proj.__isStandaloneProject) {
-        await proj.__filesStructure.clearFromArgs(args);
-        Helpers.remove(crossPlatformPath([proj.location, 'tmp-*']));
-        Helpers.removeFileIfExists(crossPlatformPath([proj.location, 'src/app.hosts.ts']));
-      }
-    };
-
-    await clear(currentProj);
-
-
-    this._exit();
-
-  }
-
-  CLEAR = async () => {
-    await this.CLEAN(this.args.join(' '));
+  async CLEAN() {
+    await this.project.clear();
     this._exit();
   }
 
-  CL = () => this.CLEAN(this.args.join(' '));
+  CLEAR = () => this.CLEAN();
+  CL = () => this.CLEAN();
   //#endregion
 }
 

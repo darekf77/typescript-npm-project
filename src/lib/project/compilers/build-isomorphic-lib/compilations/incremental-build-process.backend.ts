@@ -80,7 +80,7 @@ export class IncrementalBuildProcess {
       const envConfig = {} as any;
       let browserOutFolder = Helpers.getBrowserVerPath(moduleName, this.buildOptions.websql);
 
-      if (this.project.__isInRelaseDist) { // @LAST
+      if (this.project.isInCiReleaseProject) { // @LAST
         browserOutFolder = crossPlatformPath(path.join(outFolder, browserOutFolder));
       }
       this.broswerCompilationSmartContainer =

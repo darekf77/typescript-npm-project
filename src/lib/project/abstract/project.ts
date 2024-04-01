@@ -44,6 +44,7 @@ import { BuildProcess, BuildProcessController } from '../features/build-process/
 import { EnvironmentConfig } from '../features/environment-config/environment-config';
 //#endregion
 
+
 export class FiredevProjectResolve extends BaseProjectResolver<Project> {
 
   //#region methods / type from
@@ -659,15 +660,34 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   }
   //#endregion
 
+  //#region getters & methods / clear Process
+
+  //#endregion
+
   //#region getters & methods / clear
-  public async clear() {
+  public async clear(options: { recrusive?: boolean, resetOnly?: boolean; } = {}) {
     //#region @backend
+    Helpers.removeIfExists(path.join(this.location, config.file.tnpEnvironment_json));
+    const { recrusive, resetOnly } = options || {};
     if (this.typeIs('unknow')) {
       return;
     }
     Helpers.info(`Cleaning project: ${this.genericName}`);
-    this.__node_modules.remove();
+    if (!resetOnly) {
+      this.__node_modules.remove();
+      while (true) {
+        try {
+          this.__node_modules.remove();
+          this.__smartNodeModules.remove();
+          break;
+        } catch (error) {
+          Helpers.pressKeyAndContinue(MESSAGES.SHUT_DOWN_FOLDERS_AND_DEBUGGERS)
+        }
+      }
 
+    }
+
+    Helpers.remove(crossPlatformPath([this.location, 'tmp-*']));
     this.quickFixes.removeUncessesaryFiles();
 
     glob.sync(`${this.location}/*.filetemplate`).forEach(fileTemplate => {
@@ -724,13 +744,24 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
 
       }
     }
-    if (this.__isCoreProject) {
-      Helpers.remove(`${this.location}/tmp*`);
-      Helpers.remove(`${this.location}/browser-*`);
-      Helpers.remove(`${this.location}/dist`);
-    }
+
+    Helpers.remove(`${this.location}/tmp*`);
+    Helpers.remove(`${this.location}/browser-*`);
+    Helpers.remove(`${this.location}/dist`);
+
     this.__clearNodeModulesFromLinks();
     this.quickFixes.missingSourceFolders()
+    if (recrusive) {
+      for (const child of this.children) {
+        await child.clear(options);
+      }
+    }
+    const children = this.children.filter(c => (c.typeIs('isomorphic-lib') || c.__isSmartContainer)
+      && c.__frameworkVersionAtLeast('v3') && c.__npmPackages.useSmartInstall);
+    for (let index = 0; index < children.length; index++) {
+      const c = children[index];
+      await this.clear(options);
+    }
     //#endregion
   }
   //#endregion
@@ -1290,9 +1321,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   //#endregion
 
   //#region getters & methods / is in release dist
-  public get __isInRelaseDist() {
+  public get isInCiReleaseProject() {
     //#region @backendFunc
-    return this.location.includes('tmp-dist-release/dist');
+    return this.location.includes(crossPlatformPath([config.folder.tmpDistRelease, config.folder.dist, 'project']));
     //#endregion
   };
   //#endregion
@@ -1300,6 +1331,8 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   //#region getters & methods / release
   public async release(releaseOptions: ReleaseOptions) {
     //#region @backendFunc
+
+    //#region prepare params
     if (releaseOptions.automaticRelease) {
       global.tnpNonInteractive = true;
     }
@@ -1341,20 +1374,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
     if (!global.tnpNonInteractive) {
       Helpers.clearConsole();
     }
+    //#endregion
 
-
-    /**
-     * TODO this is not helpfull...
-     */
-    const lastReleaseProjFilePath = path.join(this.location, 'tmp-last-released-proj')
-    const lastReleaseProjContent = void 0; //  Helpers.readFile(lastReleaseProjFilePath); TODO QUICK_FIX
-    const lastRelased = !!lastReleaseProjContent && Project.ins.From(path.join(this.location, lastReleaseProjContent))
-
-    if (!lastRelased) {
-      Helpers.removeFileIfExists(lastReleaseProjFilePath);
-    }
-
-
+    //#region resolve ishould release library
     if (releaseOptions.shouldReleaseLibrary) {
       if (releaseOptions.releaseType === 'major') {
         const newVersion = this.__versionMajorPlusWithZeros;
@@ -1370,17 +1392,15 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
         this.__packageJson.save(`${releaseOptions.releaseType} version up`);
       }
     }
+    //#endregion
 
     this.__packageJson.showDeps('Release');
 
     if (this.__isContainer && !this.__isSmartContainer) {
       //#region container release
 
-
+      //#region resolve deps
       releaseOptions.resolved = releaseOptions.resolved.filter(f => f.location !== this.location);
-
-
-
       const depsOfResolved = Project.sortGroupOfProject<Project>(releaseOptions.resolved, (proj) => proj.__packageJson.data?.tnp?.overrided?.includeOnly || [], proj => proj.name)
         .filter(d => d.name !== this.name);
 
@@ -1392,9 +1412,8 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
         ...depsOfResolved,
         ...otherDeps,
       ];
-
       const depsOnlyToPush = [];
-
+      //#endregion
 
       //#region filter children
       for (let index = 0; index < deps.length; index++) {
@@ -1462,30 +1481,13 @@ processing...
 
         const child = deps[index] as Project;
 
-        Helpers.writeFile(lastReleaseProjFilePath, child.name);
-
         if (index === 0) {
-
-          if (lastRelased && lastRelased.name !== child.name) {
-            var startFromLast = (releaseOptions.resolved.length === 0) && await Helpers.questionYesNo(`Start release from last project: ${chalk.bold(lastRelased.genericName)} ?`)
-            if (!startFromLast) {
-              Helpers.removeFileIfExists(lastReleaseProjFilePath);
-            }
-          }
           global.tnpNonInteractive = (releaseOptions.resolved.length === 0);
           // Helpers.info(`
           // to relase
           // ${depsOfResolved.map((d, i) => i + '.' + d.name).join('\n')}
           // `)
 
-        }
-
-        if (startFromLast) {
-          if (child.name === lastRelased.name) {
-            startFromLast = false;
-          } else {
-            continue;
-          }
         }
 
         const exitBecouseNotInResolved = (
@@ -1499,8 +1501,6 @@ processing...
 
         Helpers.clearConsole();
         Helpers.info(projsTemplate(child));
-
-
 
         const tryReleaseProject = async () => {
           while (true) {
@@ -1517,7 +1517,6 @@ processing...
           }
         };
 
-
         while (true) {
           await tryReleaseProject();
           try {
@@ -1533,7 +1532,6 @@ processing...
       }
       //#endregion
 
-      Helpers.removeFileIfExists(lastReleaseProjFilePath);
       Helpers.clearConsole();
       Helpers.info(projsTemplate());
 
@@ -1603,31 +1601,25 @@ processing...
     //#region @backendFunc
     const { prod = false, shouldReleaseLibrary, automaticReleaseDocs, automaticRelease } = releaseOptions;
 
-
-    if (await this.__createTempProject(releaseOptions, automaticRelease)) {
+    if (!this.isInCiReleaseProject) {
+      const tempGeneratedCiReleaseProject = await this.__createTempCiReleaseProject();
+      await tempGeneratedCiReleaseProject.__release(releaseOptions);
       return;
     }
 
     Helpers.log(`automaticRelease=${automaticRelease}`);
     Helpers.log(`global.tnpNonInteractive=${global.tnpNonInteractive}`);
 
-    const realCurrentProjLocation = (!releaseOptions.useTempFolder && (this.__isStandaloneProject || this.__isSmartContainer)) ?
-      path.resolve(path.join(this.location, '..', '..', '..', '..')) : this.location;
+    const realCurrentProj = this.__releaseCiProjectParent;
 
-
-    const realCurrentProj = Project.ins.From(realCurrentProjLocation) as Project;
     let specyficProjectForBuild: Project;
 
     if (shouldReleaseLibrary && !automaticReleaseDocs) {
-
-
+      //#region publish lib process
       var newVersion = realCurrentProj.version;
 
       this.checkIfLogginInToNpm();
-
       this.__checkIfReadyForNpm();
-
-
 
       if (this.__isStandaloneProject) {
         await this.__libStandalone.bumpVersionInOtherProjects(newVersion, true)
@@ -1638,7 +1630,9 @@ processing...
       this.__packageJson.data.version = newVersion;
       this.__packageJson.save('show for release')
 
-      specyficProjectForBuild = await this.relaseBuildCommitProcess(newVersion, realCurrentProj, releaseOptions, false);
+      specyficProjectForBuild = await this.__releaseBuildProcess({
+        realCurrentProj, releaseOptions, cutNpmPublishLibReleaseCode: true
+      });
 
       if (this.__isSmartContainer) {
         specyficProjectForBuild.__libSmartcontainer.preparePackage(this, newVersion);
@@ -1700,9 +1694,8 @@ processing...
         Helpers.info('Omitting npm publish...')
       }
 
-
+      //#endregion
     }
-
 
     //#region build docs
     if (!global.tnpNonInteractive || automaticReleaseDocs) {
@@ -1710,19 +1703,27 @@ processing...
 
       if (this.__isStandaloneProject) {
         await this.__libStandalone.buildDocs(prod, realCurrentProj, automaticReleaseDocs, async () => {
-          specyficProjectForBuild = await this.relaseBuildCommitProcess(newVersion, realCurrentProj, releaseOptions, true);
+          specyficProjectForBuild = await this.__releaseBuildProcess({
+            realCurrentProj, releaseOptions, cutNpmPublishLibReleaseCode: false
+          });
         });
       }
 
       if (this.__isSmartContainer) {
         await this.__libSmartcontainer.buildDocs(prod, realCurrentProj, automaticReleaseDocs, async () => {
-          specyficProjectForBuild = await this.relaseBuildCommitProcess(newVersion, realCurrentProj, releaseOptions, true);
+          specyficProjectForBuild = await this.__releaseBuildProcess({
+            realCurrentProj, releaseOptions, cutNpmPublishLibReleaseCode: false
+          });
         });
       }
+
+
+      this.__commitRelease(newVersion);
+
     }
     //#endregion
 
-
+    //#region push code to repo
     const docsCwd = realCurrentProj.pathFor('docs');
 
 
@@ -1735,6 +1736,8 @@ processing...
     if (!automaticReleaseDocs && Helpers.exists(docsCwd)) {
       await Helpers.killProcessByPort(DEFAULT_PORT.DIST_SERVER_DOCS)
     }
+    //#endregion
+
     Helpers.info('RELEASE DONE');
     //#endregion
   }
@@ -1785,106 +1788,99 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   }
   //#endregion
 
+  //#region getters & methods / recreate release project
+  public async recreateReleaseProject() {
+    this.remove(config.folder.tmpDistRelease);
+    await this.__createTempCiReleaseProject()
+  }
+  //#endregion
+
   //#region getters & methods / create temp project
-  private async __createTempProject(releaseOptions?: ReleaseOptions, automaticRelease = false): Promise<boolean> {
+  private async __createTempCiReleaseProject(): Promise<Project> {
     //#region @backendFunc
-    if (_.isUndefined(releaseOptions.useTempFolder)) {
-      if (!this.__checkIfReadyForNpm(true)) {
-        Helpers.error(`Project "${this.name}" is not ready for npm release`, false, true)
-      }
-      // if (this.isPrivate) {
-      //   Helpers.warn(`Cannot release private project ${chalk.bold(this.genericName)}`)
-      //   return;
-      // }
-      if (this.__targetProjects.exists) {
-        if (global.tnpNonInteractive) {
-          Helpers.warn(`Ommiting relese for project with "target projects"`);
-          Helpers.sleep(3);
-          return true;
-        }
-        Helpers.error(`You can't release project with target projects`, false, true);
-      }
-      releaseOptions.useTempFolder = true;
+    const absolutePathReleaseProject = this.__releaseCiProjectPath;
+
+    if (!this.__checkIfReadyForNpm(true)) {
+      Helpers.error(`Project "${this.name}" is not ready for npm release`, false, true)
     }
 
-    const baseFolder = path.join(this.location, config.folder.tmpDistRelease);
-    const absolutePathReleaseProject = path.join(baseFolder, config.folder.dist, 'project', this.name);
-
     if (this.__isStandaloneProject || this.__isSmartContainer) {
-      if (releaseOptions.useTempFolder) {
+      Helpers.removeFolderIfExists(this.pathFor(config.folder.tmpDistRelease));
 
-        Helpers.removeFolderIfExists(baseFolder);
+      const browserFolder = path.join(this.location, config.folder.browser);
 
-        const browserFolder = path.join(this.location, config.folder.browser);
-
-        if (!Helpers.exists(browserFolder)) {
-          Helpers.remove(browserFolder);
-        }
-
-        const websqlFolder = path.join(this.location, config.folder.websql);
-
-        if (!Helpers.exists(websqlFolder)) {
-          Helpers.remove(websqlFolder);
-        }
-
-        Helpers.removeFolderIfExists(absolutePathReleaseProject);
-        Helpers.mkdirp(absolutePathReleaseProject);
-        this.__copyManager.generateSourceCopyIn(absolutePathReleaseProject, {
-          useTempLocation: true, // TODO not needed
-          forceCopyPackageJSON: true, // TODO not needed
-          dereference: true,
-          regenerateProjectChilds: this.__isSmartContainer,
-        });
-
-        this.__packageJson.linkTo(absolutePathReleaseProject);
-        if (this.__isStandaloneProject) {
-          await this.__env.init();
-          (this.__env as any as EnvironmentConfig).coptyTo(absolutePathReleaseProject)
-        }
-
-        if (this.__isSmartContainer) {
-          const children = this.children;
-          for (let index = 0; index < children.length; index++) {
-            const child = children[index] as Project;
-            await child.__env.init();
-            (child.__env as any as EnvironmentConfig).coptyTo(crossPlatformPath([absolutePathReleaseProject, child.name]))
-          }
-
-        }
-
-        const generatedProject = Project.ins.From(absolutePathReleaseProject) as Project;
-        this.__allResources.forEach(relPathResource => {
-          const source = path.join(this.location, relPathResource);
-          const dest = path.join(absolutePathReleaseProject, relPathResource);
-          if (Helpers.exists(source)) {
-            if (Helpers.isFolder(source)) {
-              Helpers.copy(source, dest, { recursive: true });
-            } else {
-              Helpers.copyFile(source, dest);
-            }
-          }
-        })
-
-        // this.linkedRepos.linkToProject(generatedProject as Project)
-        this.__node_modules.linkToProject(generatedProject as Project);
-        releaseOptions.useTempFolder = false;
-        const vscodeFolder = path.join(generatedProject.location, config.folder._vscode);
-        Helpers.removeFolderIfExists(vscodeFolder);
-        await generatedProject.__insideStructure.recrate('dist')
-        await generatedProject.__release(releaseOptions);
-        return true;
+      if (!Helpers.exists(browserFolder)) {
+        Helpers.remove(browserFolder);
       }
+
+      const websqlFolder = path.join(this.location, config.folder.websql);
+
+      if (!Helpers.exists(websqlFolder)) {
+        Helpers.remove(websqlFolder);
+      }
+
+      Helpers.removeFolderIfExists(absolutePathReleaseProject);
+      Helpers.mkdirp(absolutePathReleaseProject);
+      this.__copyManager.generateSourceCopyIn(absolutePathReleaseProject, {
+        useTempLocation: true, // TODO not needed
+        forceCopyPackageJSON: true, // TODO not needed
+        dereference: true,
+        regenerateProjectChilds: this.__isSmartContainer,
+      });
+
+      this.__packageJson.linkTo(absolutePathReleaseProject);
+      if (this.__isStandaloneProject) {
+        await this.__env.init();
+        (this.__env as any as EnvironmentConfig).coptyTo(absolutePathReleaseProject)
+      }
+
+      if (this.__isSmartContainer) {
+        const children = this.children;
+        for (let index = 0; index < children.length; index++) {
+          const child = children[index] as Project;
+          await child.__env.init();
+          (child.__env as any as EnvironmentConfig).coptyTo(crossPlatformPath([absolutePathReleaseProject, child.name]))
+        }
+
+      }
+
+      const generatedProject = Project.ins.From(absolutePathReleaseProject) as Project;
+      this.__allResources.forEach(relPathResource => {
+        const source = path.join(this.location, relPathResource);
+        const dest = path.join(absolutePathReleaseProject, relPathResource);
+        if (Helpers.exists(source)) {
+          if (Helpers.isFolder(source)) {
+            Helpers.copy(source, dest, { recursive: true });
+          } else {
+            Helpers.copyFile(source, dest);
+          }
+        }
+      })
+
+      // this.linkedRepos.linkToProject(generatedProject as Project)
+      this.__node_modules.linkToProject(generatedProject as Project);
+
+      const vscodeFolder = path.join(generatedProject.location, config.folder._vscode);
+      Helpers.removeFolderIfExists(vscodeFolder);
+      await generatedProject.__insideStructure.recrate('dist');
+      return generatedProject;
+
     }
     //#endregion
   }
   //#endregion
 
   //#region getters & methods / release build
-  private async relaseBuildCommitProcess(newVersion: string, realCurrentProj: Project, releaseOptions: ReleaseOptions, forAppRelaseBuild: boolean) {
+  private async __releaseBuildProcess({
+    realCurrentProj, releaseOptions, cutNpmPublishLibReleaseCode
+  }: { realCurrentProj: Project; releaseOptions: ReleaseOptions; cutNpmPublishLibReleaseCode: boolean; }) {
     //#region @backendFunc
     const { prod, cliBuildObscure, cliBuildIncludeNodeModules, cliBuildNoDts, cliBuildUglify } = releaseOptions;
 
-    this.run(`${config.frameworkName} init ${this.__isStandaloneProject ? '' : this.__smartContainerBuildTarget.name}`).sync();
+    // TODO  - only here so  __smartContainerBuildTarget is available
+    await this.init(InitOptions.from({
+      smartContainerTargetName: this.__isStandaloneProject ? void 0 : this.__smartContainerBuildTarget.name
+    }));
 
     const specyficProjectForBuild = this.__isStandaloneProject ? this : Project.ins.From(crossPlatformPath(path.join(
       this.location,
@@ -1893,26 +1889,25 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       this.__smartContainerBuildTarget.name,
     ))) as Project;
 
-
     await this.build(BuildOptions.from({
       buildType: 'lib',
+      prod,
       cliBuildObscure,
       cliBuildIncludeNodeModules,
       cliBuildNoDts,
       cliBuildUglify,
-      forAppRelaseBuild,
-      codeCutRelease: !forAppRelaseBuild,
+      cutNpmPublishLibReleaseCode,
     }));
 
-
-    // Helpers.move(browserDist, websqlDistTemp);
-    // Helpers.move(browserDistTemp, browserDist);
-
+    //#region prepare release resources
     const dists = [
       crossPlatformPath([specyficProjectForBuild.location, config.folder.dist]),
-      crossPlatformPath([specyficProjectForBuild.location,
-      specyficProjectForBuild.__getTempProjName('dist'),
-      config.folder.node_modules, realCurrentProj.name]),
+      crossPlatformPath([
+        specyficProjectForBuild.location,
+        specyficProjectForBuild.__getTempProjName('dist'),
+        config.folder.node_modules,
+        realCurrentProj.name,
+      ]),
     ];
 
     if (realCurrentProj.__isStandaloneProject) {
@@ -1949,10 +1944,8 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         child.__packResourceInReleaseDistResources(releaseDistFolder);
       }
     }
+    //#endregion
 
-    if (!forAppRelaseBuild) {
-      this.__commitRelease(newVersion);
-    }
 
     return specyficProjectForBuild;
 
@@ -1969,7 +1962,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       //#region preparing variables
 
       //#region preparing variables & fixing things
-      const { outDir, watch, codeCutRelease } = buildOptions;
+      const { outDir, watch, cutNpmPublishLibReleaseCode } = buildOptions;
 
       this.__fixBuildDirs(outDir);
 
@@ -1982,7 +1975,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       const productionModeButIncludePackageJsonDeps = (cliBuildObscure || cliBuildUglify) && !cliBuildIncludeNodeModules;
 
 
-      if (this.__isInRelaseDist && (cliBuildObscure || cliBuildUglify)) {
+      if (this.isInCiReleaseProject && (cliBuildObscure || cliBuildUglify)) {
         this.quickFixes.overritenBadNpmPackages();
       }
       //#endregion
@@ -2086,11 +2079,11 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
           Helpers.info(`Starting watch dist release build for fast cli.. `);
 
           try {
-            await this.__webpackBackendBuild.run({
-              appBuild: false,
+            await this.__webpackBackendBuild.run(BuildOptions.from({
+              buildType: 'lib',
               outDir,
               watch,
-            });
+            }));
           } catch (er) {
             Helpers.error(`WATCH ${outDir.toUpperCase()} build failed`, false, true);
           }
@@ -2147,7 +2140,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         }
       } else {
         //#region non watch build
-        if (codeCutRelease) {
+        if (cutNpmPublishLibReleaseCode) {
           this.__cutReleaseCodeFromSrc(buildOptions);
         }
 
@@ -2158,11 +2151,11 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
           await incrementalBuildProcessWebsql.start('isomorphic compilation (only browser) [WEBSQL] ');
 
           try {
-            await this.__webpackBackendBuild.run({
-              appBuild: false,
+            await this.__webpackBackendBuild.run(BuildOptions.from({
+              buildType: 'lib',
               outDir,
               watch,
-            });
+            }));
           } catch (er) {
             Helpers.error(`${outDir.toUpperCase()} (single file compilation) build failed`, false, true);
           }
@@ -2242,11 +2235,14 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
         if (cliBuildIncludeNodeModules) {
           const cliJsFile = 'cli.js';
-          this.__backendIncludeNodeModulesInCompilation(
-            outDir,
-            false, // cliBuildUglify,
-            cliJsFile,
-          );
+          this.quickFixes.removeTnpFromItself(async () => {
+            this.__backendIncludeNodeModulesInCompilation(
+              outDir,
+              false, // cliBuildUglify,
+              cliJsFile,
+            );
+          });
+
           if (cliBuildUglify) {
             this.__backendUglifyCode(outDir, config.reservedArgumentsNamesUglify, cliJsFile)
           };
@@ -2265,7 +2261,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         }
 
 
-        if (codeCutRelease) {
+        if (cutNpmPublishLibReleaseCode) {
           this.__restoreCuttedReleaseCodeFromSrc(buildOptions);
         }
         //#endregion
@@ -2291,7 +2287,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       this.__copyWhenExist(config.file.tnpEnvironment_json, destinations);
     }
 
-    if (this.__isInRelaseDist) { // @LAST probably something else
+    if (this.isInCiReleaseProject) { // @LAST probably something else
       this.__copyWhenExist(config.file.package_json, destinations);
       this.__linkWhenExist(config.folder.node_modules, destinations);
       this.__copyWhenExist('package.json', destinations.map(d => crossPlatformPath([d, config.folder.client])));
@@ -2838,7 +2834,7 @@ to fix it.
     }
     //#endregion
 
-    if (!buildOptions.appBuild && !buildOptions?.forAppRelaseBuild) {
+    if (!buildOptions.appBuild) {
       //#region main lib code build ports assignations
       const projectInfoPort = await this.assignFreePort(4100);
       this.__setProjectInfoPort(projectInfoPort);
@@ -2892,33 +2888,31 @@ to fix it.
     }
 
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
+      //#region initializae client app remote connection to build server
+      const projectInfoPortFromFile = Number(Helpers.readFile(this.pathFor(tmpBuildPort)));
+      this.__setProjectInfoPort(projectInfoPortFromFile);
 
-      if (!buildOptions?.forAppRelaseBuild) {
-        //#region initializae client app remote connection to build server
-        const projectInfoPortFromFile = Number(Helpers.readFile(this.pathFor(tmpBuildPort)));
-        this.__setProjectInfoPort(projectInfoPortFromFile);
-
-        const host = `http://localhost:${projectInfoPortFromFile}`;
-        try {
-          const context = await Firedev.init({
-            mode: 'remote-backend',
-            host,
-            controllers: [
-              BuildProcessController,
-            ],
-            entities: [
-              BuildProcess,
-            ]
-          });
-          const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
-          await controller.initialize(this);
-        } catch (error) {
-          console.error(error);
-          Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
-        }
-        this.__saveLaunchJson(projectInfoPortFromFile);
-        //#endregion
+      const host = `http://localhost:${projectInfoPortFromFile}`;
+      try {
+        const context = await Firedev.init({
+          mode: 'remote-backend',
+          host,
+          controllers: [
+            BuildProcessController,
+          ],
+          entities: [
+            BuildProcess,
+          ]
+        });
+        const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
+        await controller.initialize(this);
+      } catch (error) {
+        console.error(error);
+        Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
       }
+      this.__saveLaunchJson(projectInfoPortFromFile);
+      //#endregion
+
 
       if (!this.__node_modules.exist) {
         //#region prevent empty node_modules
@@ -3018,7 +3012,7 @@ ${config.frameworkName} start
   }
   //#endregion
 
-  //#region getters & methods / build
+  //#region getters & methods / info
   async info() {
     //#region @backendFunc
     console.info(`
@@ -3070,9 +3064,9 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
       // console.log(settings)
       Object.keys(settings)
         .filter(key => {
-          const start = key.startsWith('workbench');
+          const isWorkbenchKey = key.startsWith('workbench');
           // console.log(`${key} ${start}`)
-          return start;
+          return isWorkbenchKey;
         })
         .forEach(key => {
           configSettings[key] = settings[key];
@@ -3283,6 +3277,28 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
       };
       //#endregion
 
+      //#region electron
+      const startElectronServeTemplate = (servePort: number, workspaceChild: Project, workspaceLevel: boolean) => {
+        return {
+          "name": "Start electron app debug",
+          "type": "node",
+          "request": "launch",
+          "protocol": "inspector",
+          "cwd": "${workspaceFolder}",
+          "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+          "trace": "verbose",
+          "runtimeArgs": [
+            "--serve",
+            ".",
+            "--remote-debugging-port=9876"
+          ],
+          "windows": {
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+          }
+        }
+      }
+      //#endregion
+
       //#region handle standalone or worksapce child
       if (this.typeIs('isomorphic-lib')) {
         configurations = [
@@ -3291,6 +3307,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
         if (this.__isStandaloneProject) {
           configurations.push(templateForServer(this, this, false));
           configurations.push(startNgServeTemplate(9000, void 0, false));
+          configurations.push(startElectronServeTemplate(9000, void 0, false))
           compounds.push({
             name: 'Debug backend/frontend',
             configurations: [
@@ -3747,11 +3764,10 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
   //#endregion
 
   //#region getters & methods / get proxy ng projects
-  private __getProxyNgProj(buildOptions: BuildOptions, type: 'app' | 'lib' = 'app') {
+  private __getProxyNgProj(buildOptions: BuildOptions, type: 'app' | 'lib' = 'app'): Project {
     const project: Project = this;
     //#region @backendFunc
     const projepath = crossPlatformPath(path.join(this.location, project.__angularProjProxyPath(
-      buildOptions.outDir as any,
       void 0, // TODO
       buildOptions.websql,
       type
@@ -3764,14 +3780,14 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
 
   //#region getters & methods / angular proj proxy path
   public __angularProjProxyPath(
-    outFolder?: CoreModels.OutFolder,
     client?: string,
     websql?: boolean,
     type: 'app' | 'lib' = 'app'
   ) {
     //#region @backendFunc
     const project = this;
-    const pref = ((type === 'app') ? 'apps' : 'libs')
+    const pref = ((type === 'app') ? 'apps' : 'libs');
+    const outFolder = config.folder.dist;
 
     const tmpProjectsStandalone = `tmp-${pref}-for-{{{outFolder}}}${websql ? '-websql' : ''}/${project.name}`;
     const tmpProjects = `tmp-${pref}-for-{{{outFolder}}}${websql ? '-websql' : ''}/${project.name}--for--{{{client}}}`;
@@ -3788,6 +3804,38 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
     //#endregion
   }
   //#endregion
+
+  get __releaseCiProjectParent() {
+    return Project.ins.From(this.__releaseCiProjectParentPath);
+  }
+
+  get __releaseCiProjectParentPath() {
+    return (this.isInCiReleaseProject && (this.__isStandaloneProject || this.__isSmartContainer)) ?
+      path.resolve(path.join(this.location,
+        '..', // project
+        '..', // dist
+        '..', // tmp-dist-release
+        '..' // location of base proj
+      )) : void 0;
+  }
+
+  //#region getters & methods / releas pproject path
+  get __releaseCiProjectPath() {
+    //#region @backendFunc
+    const absolutePathReleaseProject = this.pathFor([config.folder.tmpDistRelease, config.folder.dist, 'project', this.name]);
+    return absolutePathReleaseProject;
+    //#endregion
+  }
+  //#endregion
+
+  //#region getters & methods / releas pproject path
+  get releaseCiProject() {
+    //#region @backendFunc
+    return Project.ins.From(this.__releaseCiProjectPath);
+    //#endregion
+  }
+  //#endregion
+
 
   //#region getters & methods / ignore from v3 framework version
   get __ignoreInV3() {
@@ -3808,7 +3856,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
   __startOnCommand(args: string) {
     //#region @backendFunc
     if (this.typeIs('isomorphic-lib')) {
-      const command = `ts-node run.js ${args}`;
+      const command = `npm-run ts-node run.js ${args}`;
       return command;
     }
     //#endregion
@@ -3827,7 +3875,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
     const isSmartContainerTargetNonClient = this.__isSmartContainerTargetNonClient;
 
     let basename = ''
-    if (this.__isInRelaseDist) {
+    if (this.isInCiReleaseProject) {
       if (!this.__env.config?.useDomain) {
         basename = `--base-href /${isSmartContainerTarget ? this.__smartContainerTargetParentContainer.name : this.name}/`;
         if (isSmartContainerTargetNonClient) {
@@ -3847,7 +3895,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
     const backeFromRelase = `../../../../`;
     const backeFromContainerTarget = `../../../`;
     let back = backAppTmpFolders;
-    if (this.__isInRelaseDist) {
+    if (this.isInCiReleaseProject) {
       if (isSmartContainerTarget) {
         back = `${backAppTmpFolders}${backeFromContainerTarget}${backeFromRelase}`;
       } else {
@@ -3859,7 +3907,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
       }
     }
 
-    let outDirApp = this.__isInRelaseDist ? config.folder.docs : `${buildOptions.outDir}-app${buildOptions.websql ? '-websql' : ''}`;
+    let outDirApp = this.isInCiReleaseProject ? config.folder.docs : `${buildOptions.outDir}-app${buildOptions.websql ? '-websql' : ''}`;
     if (isSmartContainerTargetNonClient) {
       outDirApp = `${outDirApp}/-/${this.name}`;
     }
@@ -3869,12 +3917,6 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
     //#endregion
 
     //#region prepare variables / general variables
-
-    // TODO ?
-    // const statsCommand = (!this.isStandaloneProject ? (
-    //   this.env.config.name === 'static' ? '--stats-json' : ''
-    // ) : '');
-
 
     let portAssignedToAppBuild: number;
 
@@ -3892,7 +3934,6 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
 
 
     const isStandalone = (this.__isStandaloneProject && !isSmartContainerTarget);
-    // console.log({ isStandalone, 'this.name': this.name });
 
     const buildOutDir = buildOptions.outDir;
     const parent = (!isStandalone
@@ -3918,55 +3959,32 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
     };
     //#endregion
 
-    //#region prepare variables / command
-    let command: string;
-    if (this.__frameworkVersionAtLeast('v3')) {
-      //#region prepare angular variables for new v3 inside structure build
-      const portAssignedToAppBuildCommandPart = _.isNumber(portAssignedToAppBuild) ? `--port=${portAssignedToAppBuild}` : '';
+    //#region prepare variables / prepare angular command
+    let angularBuildAppCmd: string;
+    const portAssignedToAppBuildCommandPart = _.isNumber(portAssignedToAppBuild) ? `--port=${portAssignedToAppBuild}` : '';
 
-      // const ngBuildCmd = // TODO LOAD NVME HERE
-      const ngBuildCmd = `npm-run ng build app`
+    if (buildOptions.watch) {
+      const isElectron = false;
+      angularBuildAppCmd = `${this.__npmRunNg} serve ${isElectron ? 'angular-electron' : 'app'} `
+        + ` ${portAssignedToAppBuildCommandPart} ${buildOptions.prod ? '--prod' : ''}`;
 
+    } else {
+      angularBuildAppCmd = `${this.__npmRunNg} build app`
         + `${buildOptions.prod ? '--configuration production' : ''} `
         + `${buildOptions.watch ? '--watch' : ''}`
-        + `${outPutPathCommand} `
-
-      if (buildOptions.watch) {
-
-        // command = `${loadNvm} && ${this.npmRunNg} serve ${portToServe} ${prod ? '--prod' : ''}`;
-        const isElectron = false;
-        command = `${this.__npmRunNg} serve ${isElectron ? 'angular-electron' : 'app'}  ${portAssignedToAppBuildCommandPart} ${buildOptions.prod ? '--prod' : ''}`;
-
-      } else {
-        command = ngBuildCmd;
-      }
-      //#endregion
-    } else {
-      //#region @deprecated prepare webpack variables
-      if (_.isNumber(portAssignedToAppBuild)) {
-        webpackEnvParams = `${webpackEnvParams} --env.port=${portAssignedToAppBuild}`;
-      }
-      command = `npm-run webpack-dev-server ${webpackEnvParams}`;
-      //#endregion
+        + `${outPutPathCommand} `;
     }
     //#endregion
 
-    //#region prepare variables / proper project variable
-    let proj: Project;
-    if (this.__frameworkVersionAtLeast('v3')) {
-      proj = this.__getProxyNgProj(buildOptions);
-    } else {
-      proj = this;
-    }
-    //#endregion
+    const angularTempProj = this.__getProxyNgProj(buildOptions);
 
     //#region prepare variables / angular info
     const showInfoAngular = () => {
       Helpers.log(`
 
-  ANGULAR BUILD APP COMMAND: ${command}
+  ANGULAR BUILD APP COMMAND: ${angularBuildAppCmd}
 
-  inside: ${proj.location}
+  inside: ${angularTempProj.location}
 
   `);
     };
@@ -3976,7 +3994,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
 
     showInfoAngular();
 
-    await proj.execute(command, {
+    await angularTempProj.execute(angularBuildAppCmd, {
       resolvePromiseMsg: {
         stdout: 'Compiled successfully'
       },
@@ -4029,12 +4047,8 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
   //#region getters & methods / show message when build lib done for smart container
   private __showMesageWhenBuildLibDoneForSmartContainer(buildOptions: BuildOptions) {
     //#region @backend
-    if (buildOptions.forAppRelaseBuild) {
-      Helpers.logInfo('Lib build for app done...  starting app build');
-      return;
-    }
-    if (this.__isInRelaseDist) {
-      Helpers.logInfo('Release lib build done... ');
+    if (this.isInCiReleaseProject) {
+      Helpers.logInfo('Lib build part done...  ');
       return;
     }
     const buildLibDone = `LIB BUILD DONE.. `;
@@ -4310,15 +4324,17 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
   //#region getters & methods / init
   async init(initOptions?: InitOptions) {
     //#region @backendFunc
+    Helpers.removeIfExists(path.join(this.location, config.file.tnpEnvironment_json));
     initOptions = InitOptions.from(initOptions);
     await this.__filesStructure.init(initOptions);
+
     initOptions.finishCallback();
     //#endregion
   }
   //#endregion
 
   //#region getters & methods / struct
-  async struct(initOptions?: InitOptions) {
+  async struct() {
     await this.init(InitOptions.from({ struct: true }));
   }
   //#endregion

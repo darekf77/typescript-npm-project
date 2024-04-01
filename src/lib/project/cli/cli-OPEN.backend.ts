@@ -9,7 +9,7 @@ import { config } from "tnp-config/src";
 
 export class $Open extends CommandLineFeature<{}, Project> {
   public _() {
-    Helpers.openFolderInFileExploer(process.cwd());
+    Helpers.openFolderInFileExploer(this.cwd);
     this._exit();
   }
 

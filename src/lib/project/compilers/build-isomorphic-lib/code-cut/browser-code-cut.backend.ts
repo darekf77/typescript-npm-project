@@ -694,13 +694,7 @@ export class BrowserCodeCut {
       ? this.project.__smartContainerTargetParentContainer.name
       : this.project.name;
 
-    /**
-     * lib code for app build before release
-     */
-    // const forAppRelaseBuild = (this.buildOptions?.args?.search('--forAppRelaseBuild') !== -1)
-
-
-    let basenameWithSlash = this.project.__isInRelaseDist ? `/${pathname}/` : '/';
+    let basenameWithSlash = this.project.isInCiReleaseProject ? `/${pathname}/` : '/';
     if (this.project.__env.config?.useDomain) {
       basenameWithSlash = '/';
     }

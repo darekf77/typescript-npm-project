@@ -17,8 +17,12 @@ export class $Init extends CommandLineFeature<InitOptions, Project> {
 
 
   public async _() {
+
     await this.project.init(InitOptions.from({
-      finishCallback: () => this._exit()
+      finishCallback: () => {
+        console.log('DONE!')
+        this._exit();
+      }
     }));
   }
 
@@ -56,8 +60,8 @@ export class $Init extends CommandLineFeature<InitOptions, Project> {
       if (responseProjectType === 'container') {
         smart = await Helpers.consoleGui.question.yesNo('Do you wanna use smart container for organization project ?');
         monorepo = await Helpers.consoleGui.question.yesNo('Do you want your container to be monorepo ?');
-        Helpers.writeFile([crossPlatformPath(process.cwd()), config.file.package_json], {
-          name: crossPlatformPath(path.basename(crossPlatformPath(process.cwd()))),
+        Helpers.writeFile([crossPlatformPath(this.cwd), config.file.package_json], {
+          name: crossPlatformPath(path.basename(crossPlatformPath(this.cwd))),
           version: '0.0.0',
           tnp: {
             type: responseProjectType,
@@ -67,8 +71,8 @@ export class $Init extends CommandLineFeature<InitOptions, Project> {
           }
         });
       } else {
-        Helpers.writeFile([crossPlatformPath(process.cwd()), config.file.package_json], {
-          name: crossPlatformPath(path.basename(crossPlatformPath(process.cwd()))),
+        Helpers.writeFile([crossPlatformPath(this.cwd), config.file.package_json], {
+          name: crossPlatformPath(path.basename(crossPlatformPath(this.cwd))),
           version: '0.0.0',
           tnp: {
             type: responseProjectType,
@@ -77,7 +81,7 @@ export class $Init extends CommandLineFeature<InitOptions, Project> {
         });
       }
 
-      proj = Project.ins.From(crossPlatformPath(process.cwd())) as Project;
+      proj = Project.ins.From(crossPlatformPath(this.cwd)) as Project;
       this.project = proj;
     }
     this.project = proj;

@@ -279,7 +279,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       if (json) {
 
         json.sources = (json.sources || []).map((pathToJoin: string) => {
-          if (this.targetProj.__isInRelaseDist) {
+          if (this.targetProj.isInCiReleaseProject) {
             return '';
           }
 

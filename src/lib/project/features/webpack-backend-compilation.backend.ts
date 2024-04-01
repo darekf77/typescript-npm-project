@@ -18,7 +18,7 @@ export interface WebpackBackendCompilationOpt {
 
 export class WebpackBackendCompilation extends BaseFeatureForProject<Project> {
 
-  async run(options: Pick<BuildOptions, 'watch' | 'appBuild' | 'outDir'>) {
+  async run(options: BuildOptions) {
     const { outDir, watch, appBuild } = options;
     const webpackGlob = this.project.__npmPackages.global('webpack');
 

@@ -230,18 +230,35 @@ Object.defineProperty(document.body.style, 'transform', {
     ]
   }
 
-  public removeTnpFromItself() {
+  /**
+   * something wrong when minifying cli
+   */
+  public async removeTnpFromItself(actionwhenNotInNodeModules: () => {
+
+  }) {
     //#region @backend
+    if (!((this.project.name === 'tnp') && this.project.isInCiReleaseProject)) {
+      await Helpers.runSyncOrAsync({
+        functionFn: actionwhenNotInNodeModules,
+      });
+    }
     const nodeMOdules = crossPlatformPath(path.join(this.project.location, config.folder.node_modules));
     if (Helpers.exists(nodeMOdules)) {
-      const folderToDelete = crossPlatformPath([
+      const folderToMove = crossPlatformPath([
         crossPlatformPath(fse.realpathSync(nodeMOdules)),
         'tnp',
       ]);
-      // TODO only tnp can release tnp (for @vercel/ncc builder)
-      if ((config.frameworkName === 'tnp') && (this.project.name === 'tnp') && this.project.__isInRelaseDist) {
-        Helpers.remove(folderToDelete);
-      }
+
+      const folderTemp = crossPlatformPath([
+        crossPlatformPath(fse.realpathSync(nodeMOdules)),
+        'temp-location-tnp',
+      ]);
+
+      Helpers.move(folderToMove, folderTemp);
+      await Helpers.runSyncOrAsync({
+        functionFn: actionwhenNotInNodeModules,
+      });
+      Helpers.move(folderTemp, folderToMove);
     }
     //#endregion
   }

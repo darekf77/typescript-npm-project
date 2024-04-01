@@ -36,6 +36,13 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
   async app() {
     await this.project.build(BuildOptions.from({
       buildType: 'app',
+      finishCallback: () => this._exit()
+    }));
+  }
+
+  async appWatch() {
+    await this.project.build(BuildOptions.from({
+      buildType: 'app',
       watch: true,
     }));
   }
@@ -46,23 +53,6 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
       watch: true,
     }));
   }
-
-  async electron() {
-    await this.project.build(BuildOptions.from({
-      buildType: 'app',
-      targetApp: 'electron',
-      finishCallback: () => this._exit()
-    }));
-  }
-
-  async electronWatch() {
-    await this.project.build(BuildOptions.from({
-      buildType: 'app',
-      targetApp: 'electron',
-      watch: true,
-    }));
-  }
-
 
   async mkdocs() {
 
@@ -94,7 +84,7 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
       value: {
         command: `python -m mkdocs build --site-dir ../../firedev-projects/www-firedev-io/docs/documentation`,
         action: async () => {
-          const firedevProj = Project.ins.From([process.cwd(), '../../firedev-projects/www-firedev-io']);
+          const firedevProj = Project.ins.From([this.cwd, '../../firedev-projects/www-firedev-io']);
           if (await Helpers.questionYesNo('Push and commit docs update ?')) {
             firedevProj.git.addAndCommit('update docs');
             await firedevProj.git.pushCurrentBranch()

@@ -309,7 +309,7 @@ ${appModuleFile}
         //#region LOADERS & BACKGROUNDS REPLACEMENT
         (() => {
           const projectTargetOrStandalone = this.project;
-          const basename = this.project.__isInRelaseDist ?
+          const basename = this.project.isInCiReleaseProject ?
             `/${(this.project.__isSmartContainerTarget ? this.project.__smartContainerTargetParentContainer.name : this.project.name)}`
             : '';
 
@@ -446,7 +446,7 @@ ${appModuleFile}
 
           let mainTsFile = Helpers.readFile(mainFilePath);
 
-          const basename = this.project.__isInRelaseDist ?
+          const basename = this.project.isInCiReleaseProject ?
             `/${(this.project.__isSmartContainerTarget ? this.project.__smartContainerTargetParentContainer.name : this.project.name)}`
             : '';
 
@@ -478,7 +478,7 @@ ${appModuleFile}
 
           let stylesScssFile = Helpers.readFile(stylesFilePath);
 
-          const basename = this.project.__isInRelaseDist ?
+          const basename = this.project.isInCiReleaseProject ?
             `/${(this.project.__isSmartContainerTarget ? this.project.__smartContainerTargetParentContainer.name : this.project.name)}`
             : '';
 

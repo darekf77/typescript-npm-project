@@ -26,7 +26,7 @@ export const OVERRIDE_FROM_TNP = [
 
 export const UNIT_TEST_TIMEOUT = 30000;
 export const INTEGRATION_TEST_TIMEOUT = 30000;
-export const BACKEND_HTTP_REQUEST_TIMEOUT = 3000;
+
 
 export let morphiPathUserInUserDir: string
   //#region @backend

@@ -1,6 +1,5 @@
 import { ConnectionOptions } from "firedev-typeorm/src";
 import { CoreModels, _ } from "tnp-core/src";
-import { CLASS } from "typescript-class-helpers";
 
 export namespace Models {
   export type ReleaseType = 'major' | 'minor' | 'patch';
@@ -446,7 +445,6 @@ export namespace Models {
 
   export type ModifiedFiles = { modifiedFiles: string[] };
 
-  @CLASS.NAME('Range')
   export class Range {
 
     static clone(r: Range) {

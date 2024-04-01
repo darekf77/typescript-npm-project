@@ -4,13 +4,14 @@ import { fse } from 'tnp-core/src'
 import { path } from 'tnp-core/src'
 import { config } from 'tnp-config/src';
 import { Project } from '../../abstract/project';
-import { BaseCompilerForProject, Helpers } from 'tnp-helpers/src';
+import { BaseCompilerForProject } from '../../abstract/base-compiler-for-project.backend';
 import { Models } from '../../../models';
 import { CopyMangerHelpers } from './copy-manager-helpers.backend';
 import { IncCompiler } from 'incremental-compiler/src';
 import { Log } from 'ng2-logger/src';
 import { SourceMappingUrl } from './source-maping-url.backend';
 import { BuildOptions } from '../../../build-options';
+import { Helpers } from 'tnp-helpers/src';
 
 const REPLACE_INDEX_D_TS_IN_DEST_WHEN_WATCH = false;
 
@@ -60,7 +61,7 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<{}, Project>
     this.copyto = [
       ...independentProjects,
     ];
-    // console.log(this.copyto.map(c => c.genericName))
+    // console.log(this.copyto.map(c => 'COPYTO ' + c.__node_modules.path))
     //#endregion
   }
   //#endregion
@@ -289,7 +290,7 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<{}, Project>
   //#endregion
 
   //#region async action
-  @IncCompiler.methods.AsyncAction()
+  @IncCompiler.methods.AsyncAction() // @ts-ignore
   async asyncAction(event: IncCompiler.Change) {
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
     // console.log('async event '+ absoluteFilePath)

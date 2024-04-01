@@ -8,6 +8,7 @@ import { LibPorjectBase } from "./lib-project-base.backend";
 import { Project } from "../../abstract/project";
 import { Models } from "../../../models";
 import { TEMP_DOCS } from "../../../constants";
+import { BuildOptions } from "../../../../cli";
 //#endregion
 
 export class LibProjectStandalone extends LibPorjectBase {
@@ -74,11 +75,15 @@ export class LibProjectStandalone extends LibPorjectBase {
 
   //#region build docs
   async buildDocs(prod: boolean, realCurrentProj: Project, automaticReleaseDocs: boolean, libBuildCallback: (websql: boolean, prod: boolean) => any): Promise<boolean> {
-    return await Helpers.questionYesNo(this.messages.docsBuildQuesions, async () => {
-      const mainProjectName = realCurrentProj.name;
-      //#region questions
-      let appBuildOptions = { docsAppInProdMode: prod, websql: false };
 
+    //#region resovle variables
+    const mainProjectName = realCurrentProj.name;
+    let appBuildOptions = { docsAppInProdMode: prod, websql: false };
+    //#endregion
+
+    return await Helpers.questionYesNo(this.messages.docsBuildQuesions, async () => {
+
+      //#region questions
       if (automaticReleaseDocs) {
         appBuildOptions = {
           docsAppInProdMode: realCurrentProj.__docsAppBuild.config.prod,
@@ -117,17 +122,15 @@ export class LibProjectStandalone extends LibPorjectBase {
       `);
       //#endregion
 
-
       await Helpers.runSyncOrAsync({ functionFn: libBuildCallback });
 
-      const libBuildCommand = ''; // `${config.frameworkName} build:${config.folder.dist} ${global.hideLog ? '' : '-verbose'} && `
-      await this.project.run(`${libBuildCommand}`
-        + `${config.frameworkName} build:app:${appBuildOptions.docsAppInProdMode ? 'prod' : ''} `
-        + `${appBuildOptions.websql ? '--websql' : ''} ${global.hideLog ? '' : '-verbose'} --forAppRelaseBuild`).sync();
+      await this.project.build(BuildOptions.from({
+        buildType: 'app',
+        prod: appBuildOptions.docsAppInProdMode,
+        websql: appBuildOptions.websql,
+      }));
 
-      try {
-        realCurrentProj.run('git checkout docs/CNAME').sync();
-      } catch (error) { }
+      realCurrentProj.git.revertFileChanges('docs/CNAME');
 
       const tempDocs = realCurrentProj.pathFor(TEMP_DOCS);
       const docsIndocs = realCurrentProj.pathFor('docs/documentation');

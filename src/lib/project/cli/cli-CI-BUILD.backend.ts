@@ -5,16 +5,48 @@ import { CommandLineFeature } from "tnp-helpers/src";
 import { Project } from "../abstract/project";
 import { BuildOptions } from "../../build-options";
 import { TEMP_DOCS } from "../../constants";
+import { config } from "tnp-config";
 
 
 class $CiBuild extends CommandLineFeature<BuildOptions, Project> {
   protected async __initialize__() {
     this.params = BuildOptions.from(this.params);
+    await this.project.recreateReleaseProject();
   }
 
   public async _() {
+    Helpers.error(`
+    Please select proper command
 
+    ${config.frameworkName} ci:build
+    ${config.frameworkName} ci:build --env
+    ${config.frameworkName} ci:start
+    ${config.frameworkName} ci:start --port
+    ${config.frameworkName} ci:start --domain
+
+    `, false, true);
   }
+
+  async build(prod = false) {
+    await this.project.releaseCiProject.build(BuildOptions.from({
+      prod,
+      finishCallback: () => this._exit()
+    }));
+    this._exit();
+  }
+
+  async buildWatch(prod = false) {
+    await this.project.releaseCiProject.build(BuildOptions.from({
+      prod,
+      watch: true,
+    }));
+    this._exit();
+  }
+
+  async buildProd() {
+    await this.build(true);
+  }
+
 
 
 }

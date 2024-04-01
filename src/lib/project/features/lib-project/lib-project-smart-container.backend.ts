@@ -8,6 +8,7 @@ import { Models } from "../../../models";
 import { LibPorjectBase } from "./lib-project-base.backend";
 
 import { Project } from "../../abstract/project";
+import { BuildOptions } from "../../../../cli";
 //#endregion
 
 export class LibProjectSmartContainer extends LibPorjectBase {
@@ -102,8 +103,8 @@ export class LibProjectSmartContainer extends LibPorjectBase {
 
   //#region build docs
   async buildDocs(prod: boolean, realCurrentProj: Project, automaticReleaseDocs: boolean, libBuildCallback: (websql: boolean, prod: boolean) => any): Promise<boolean> {
-    // TODO
 
+    //#region resolve variables
     const smartContainer = this.project;
     const mainProjectName = smartContainer.__smartContainerBuildTarget.name
     const otherProjectNames = this.project
@@ -121,10 +122,11 @@ Smart container routes for project:
 + ${CLI.chalk.bold(mainProjectName)} => /${mainProjectName}
 ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${c}`).join('\n')}
         `);
-
+    //#endregion
 
     return await Helpers.questionYesNo(this.messages.docsBuildQuesions, async () => {
 
+      //#region questions
       const returnFun = (childName: string) => {
         if (childName === mainProjectName) {
           return {
@@ -137,7 +139,6 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
           value: childName,
         };
       }
-
 
       const toBuildWebsqlCFG = [
         ...((realCurrentProj.__docsAppBuild.config.build && realCurrentProj.__docsAppBuild.config.websql) ? [mainProjectName] : []),
@@ -156,8 +157,6 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
           }
         }).filter(f => !!f)),
       ];
-
-
 
       let toBuildWebsql = automaticReleaseDocs ? toBuildWebsqlCFG : (await Helpers
         .consoleGui
@@ -214,6 +213,7 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
       };
 
       realCurrentProj.__docsAppBuild.save(cfg)
+      //#endregion
 
       // await Helpers.questionYesNo(`Do you wanna use websql mode ?`, () => {
       //   appBuildOptions.websql = true;
@@ -230,22 +230,13 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
 
       await Helpers.runSyncOrAsync({ functionFn: libBuildCallback });
 
-      // (() => {
-      //   const libBuildCOmmand = `${config.frameworkName} build:${config.folder.dist} ${global.hideLog ? '' : '-verbose'}`;
-      //   smartContainer.run(libBuildCOmmand).sync();
-      // })();
-
-
-      const cmd = (childProjName: string, productinoBuild: boolean, websqlBuild: boolean, isMainTarget = false) => {
-        const commandToBuildDOcs = `${config.frameworkName} `
-          + `build:app:${productinoBuild ? 'prod' : ''} ${childProjName} `
-          + `  ${websqlBuild ? '--websql' : ''}         ${global.hideLog ? '' : '-verbose'}`
-
-        // console.log({
-        //   commandToBuildDOcs
-        // })
-
-        this.project.run(commandToBuildDOcs).sync();
+      const docsBuild = async (childProjName: string, productinoBuild: boolean, websqlBuild: boolean, isMainTarget = false) => {
+        await this.project.build(BuildOptions.from({
+          buildType: 'app',
+          prod: productinoBuild,
+          websql: websqlBuild,
+          smartContainerTargetName: childProjName,
+        }))
 
         const assetsListPathSourceMain = crossPlatformPath([
           crossPlatformPath(path.resolve(path.join(this.project.location, '..'))),
@@ -266,28 +257,19 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
           config.folder.assets,
           realCurrentProj.__assetsFileListGenerator.filename,
         ]);
-        // console.log({
-        //   assetsListPathSourceMain,
-        //   assetsListPathDestMain,
-        // })
+
         Helpers.copyFile(assetsListPathSourceMain, assetsListPathDestMain);
-      }
+      };
 
-      cmd(cfg.projName, cfg.prod, cfg.websql, true);
-
-
+      await docsBuild(cfg.projName, cfg.prod, cfg.websql, true);
 
       const children = cfg.children || [];
       for (let index = 0; index < children.length; index++) {
         const { websql, prod, projName } = children[index];
-        cmd(projName, prod, websql);
+        await docsBuild(projName, prod, websql);
       }
 
-      try {
-        realCurrentProj.run('git checkout docs/CNAME').sync();
-      } catch (error) { }
-
-
+      realCurrentProj.git.revertFileChanges('docs/CNAME');
       Helpers.log(this.messages.docsBuildDone);
     });
   }

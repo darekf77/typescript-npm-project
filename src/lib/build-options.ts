@@ -10,9 +10,7 @@ class SystemTask<T> {
    * watch build
    */
   watch: boolean;
-  constructor() {
-    this.finishCallback = () => { };
-  }
+  protected constructor() { }
   finishCallback: () => any;
   public clone(override: Partial<T>): T {
     const classFn = CLASS.getFromObject(this);
@@ -47,7 +45,7 @@ export class NewOptions extends SystemTask<NewOptions> {
 //#region init options
 export class InitOptions extends SystemTask<InitOptions> {
   readonly alreadyInitedPorjects: Project[];
-  constructor() {
+  private constructor() {
     super();
     this.alreadyInitedPorjects = [];
   }
@@ -66,8 +64,7 @@ export class InitOptions extends SystemTask<InitOptions> {
   branding: boolean;
 
   public static from(options: Partial<InitOptions>): InitOptions {
-    options = options ? options : {};
-    return _.merge(new InitOptions(), _.cloneDeep(options))
+    return from(options, InitOptions);
   }
 }
 //#endregion
@@ -88,15 +85,11 @@ export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
     //#endregion
   }
 
-  constructor() {
+  private constructor() {
     super();
     this.outDir = 'dist';
     this.targetApp = 'pwa';
   }
-  /**
-   * ci build
-   */
-  ci: boolean;
   /**
    *
    */
@@ -105,13 +98,9 @@ export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
 
   baseHref: string;
   /**
-   * Cut notForNpm  tag from lib build
+   * Cut <@>notForNpm  tag from lib build
    */
-  codeCutRelease: boolean;
-  /**
-   * Special lib build for app (not npm lib)
-   */
-  forAppRelaseBuild: boolean;
+  cutNpmPublishLibReleaseCode: boolean;
   /**
  * Do not generate backend code
  */
@@ -121,8 +110,8 @@ export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
    */
   onlyBackend: boolean;
 
-  public static from(options: Partial<BuildOptions>): BuildOptions {
-    return _.merge(new BuildOptions(), _.cloneDeep(options))
+  public static from(options: Omit<Partial<BuildOptions>, 'appBuild' | 'serveApp'>): BuildOptions {
+    return from(options, BuildOptions);
   }
 }
 //#endregion
@@ -130,7 +119,7 @@ export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
 //#region release options
 export class ReleaseOptions extends BuildOptionsLibOrApp<ReleaseOptions> {
 
-  constructor() {
+  private constructor() {
     super();
     this.releaseType = 'patch';
     this.resolved = [];
@@ -146,7 +135,6 @@ export class ReleaseOptions extends BuildOptionsLibOrApp<ReleaseOptions> {
    * Projects to release in container
    */
   resolved: Project[];
-  useTempFolder: boolean;
   /**
    * quick automatic release of lib
    */
@@ -159,8 +147,20 @@ export class ReleaseOptions extends BuildOptionsLibOrApp<ReleaseOptions> {
   specifiedVersion: string;
   releaseTarget: 'lib' | 'app' | 'lib-app';
   public static from(options: Partial<ReleaseOptions>): ReleaseOptions {
-    return _.merge(new ReleaseOptions(), _.cloneDeep(options))
+    return from(options, ReleaseOptions);
   }
 }
 
 //#endregion
+
+function from(options: Partial<InitOptions | BuildOptions | ReleaseOptions>, classFn: Function) {
+  const orgFinishCallback = options?.finishCallback;
+  options = (options ? options : {}) as any;
+  const res = _.merge(new (classFn as any)(), _.cloneDeep(options));
+  if (orgFinishCallback) {
+    res.finishCallback = orgFinishCallback;
+  } else {
+    res.finishCallback = () => { }
+  }
+  return res;
+}
