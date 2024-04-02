@@ -102,7 +102,7 @@ export class NodeModulesCore extends BaseFeatureForProject<Project> {
       Helpers.error(`[linkTo] taget path is not absolute "${target}"`)
     }
     if (!this.project.__node_modules.exist) { // TODO QUICK_FIX make it async install
-      this.project.run(`${config.frameworkName} install`).sync();
+      this.project.installNpmPackages();
     }
     Helpers.remove(path.join(target, config.folder.node_modules));
     Helpers.createSymLink(this.path, target, { continueWhenExistedFolderDoesntExists: true })

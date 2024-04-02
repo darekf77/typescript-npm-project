@@ -519,6 +519,12 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   }
   //#endregion
 
+  installNpmPackages() {
+    //#region @backendFunc
+    this.__npmPackages.installFromArgs('');
+    //#endregion
+  }
+
   useGitBranchesAsMetadataForCommits() {
     return false;
   }
@@ -755,12 +761,13 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       for (const child of this.children) {
         await child.clear(options);
       }
+      return;
     }
     const children = this.children.filter(c => (c.typeIs('isomorphic-lib') || c.__isSmartContainer)
       && c.__frameworkVersionAtLeast('v3') && c.__npmPackages.useSmartInstall);
     for (let index = 0; index < children.length; index++) {
       const c = children[index];
-      await this.clear(options);
+      await c.clear(options);
     }
     //#endregion
   }
@@ -2120,21 +2127,6 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
               }
 
             }
-
-            // console.log({
-            //   libBuildDone,
-            //   serveApp,
-            // })
-            if (libBuildDone) {
-              await Helpers.runSyncOrAsync({ functionFn: libBuildDone });
-            }
-
-            if (buildOptions.serveApp) {
-              const appBuildOpt = buildOptions.clone({});
-              await this.__buildSteps(appBuildOpt);
-            } else {
-              this.__showMesageWhenBuildLibDoneForSmartContainer(buildOptions);
-            }
           }
           //#endregion
         }
@@ -2266,6 +2258,11 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         }
         //#endregion
         //#endregion
+      }
+
+      this.__showMesageWhenBuildLibDoneForSmartContainer(buildOptions);
+      if (libBuildDone) {
+        await Helpers.runSyncOrAsync({ functionFn: libBuildDone });
       }
     }
     //#endregion
@@ -2736,50 +2733,17 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       }
       let { outDir, smartContainerTargetName } = buildOptions;
 
-      const proxyForTarget = this.__proxyProjFor(this.__smartContainerBuildTarget?.name, outDir);
-      if (!proxyForTarget) {
-        Helpers.error(`Please start lib build for smart container:
-     ${config.frameworkName} build:dist:watch
-     or
-     ${config.frameworkName} dev
-     or
-     ${config.frameworkName} build:watch # for global build
-
-      `, false, true)
-      }
-
       let proxy = this.__proxyProjFor(smartContainerTargetName, outDir);
-
-      if (!proxy && this.__isSmartContainer) {
-        const tmp = (c) => `${config.frameworkName} build:app:watch ${c}`;
-        Helpers.error(`
-
-      Please provide target for angular build:
-
-${this.children.filter(c => c.typeIs('isomorphic-lib')).map(c => {
-          return tmp(c.name);
-        }).join('\n')}
-
-      or please update:
-      ...
-      linkedProjects: [ ... ]
-      ...
-      in you configuraiton and run: firedev init
-
-
-      `, false, true);
-      }
       await proxy.__buildSteps(buildOptions, libBuildDone);
       //#endregion
     }
     if (this.__isIsomorphicLib) {
-
-      if (buildOptions.appBuild) {
-        await this.__buildApp(buildOptions);
-      } else {
+      if (buildOptions.libBuild) {
         await this.__buildLib(buildOptions, libBuildDone);
       }
-
+      if (buildOptions.appBuild) {
+        await this.__buildApp(buildOptions);
+      }
     }
     //#endregion
   }
@@ -2834,28 +2798,33 @@ to fix it.
     }
     //#endregion
 
-    if (!buildOptions.appBuild) {
+    let libContext: Firedev.FrameworkContext;
+
+    if (buildOptions.libBuild) {
       //#region main lib code build ports assignations
       const projectInfoPort = await this.assignFreePort(4100);
       this.__setProjectInfoPort(projectInfoPort);
       Helpers.writeFile(this.pathFor(tmpBuildPort), projectInfoPort?.toString());
 
-      const host = `http://localhost:${projectInfoPort}`;
+      const hostForBuild = `http://localhost:${projectInfoPort}`;
+      //#region check build message
       Helpers.info(`
 
 
 
-  You can check info about build in ${CLI.chalk.bold(host)}
+  You can check info about build in ${CLI.chalk.bold(hostForBuild)}
 
 
 
-        `)
-      Helpers.taskStarted(`starting project service... ${host}`)
+        `);
+      //#endregion
+
+      Helpers.taskStarted(`starting project service... ${hostForBuild}`)
       try {
         // TOOD @UNCOMMEND
         const context = await Firedev.init({
           mode: 'backend/frontend-worker',
-          host,
+          host: hostForBuild,
           controllers: [
             BuildProcessController,
           ],
@@ -2876,6 +2845,7 @@ to fix it.
         });
         const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
         await controller.initialize(this);
+        libContext = context;
       } catch (error) {
         console.error(error);
         Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
@@ -2885,32 +2855,43 @@ to fix it.
       Helpers.taskDone('project service started')
       // console.log({ context })
       //#endregion
+
+      //#region normal/watch lib build
+      if (buildOptions.watch) {
+        await this.__filesStructure.init(InitOptions.from({ watch: true, smartContainerTargetName: buildOptions.smartContainerTargetName }));
+      } else {
+        await this.__filesStructure.init(InitOptions.from({ smartContainerTargetName: buildOptions.smartContainerTargetName }));
+      }
+      //#endregion
     }
 
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
       //#region initializae client app remote connection to build server
-      const projectInfoPortFromFile = Number(Helpers.readFile(this.pathFor(tmpBuildPort)));
-      this.__setProjectInfoPort(projectInfoPortFromFile);
+      if (!libContext) {
+        const projectInfoPortFromFile = Number(Helpers.readFile(this.pathFor(tmpBuildPort)));
+        this.__setProjectInfoPort(projectInfoPortFromFile);
 
-      const host = `http://localhost:${projectInfoPortFromFile}`;
-      try {
-        const context = await Firedev.init({
-          mode: 'remote-backend',
-          host,
-          controllers: [
-            BuildProcessController,
-          ],
-          entities: [
-            BuildProcess,
-          ]
-        });
-        const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
-        await controller.initialize(this);
-      } catch (error) {
-        console.error(error);
-        Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
+        const hostForAppWorker = `http://localhost:${projectInfoPortFromFile}`;
+        // console.log({ hostForAppWorker })
+        try {
+          const context = await Firedev.init({
+            mode: 'remote-backend',
+            host: hostForAppWorker,
+            controllers: [
+              BuildProcessController,
+            ],
+            entities: [
+              BuildProcess,
+            ]
+          });
+          const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
+          await controller.initialize(this);
+        } catch (error) {
+          console.error(error);
+          Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
+        }
+        this.__saveLaunchJson(projectInfoPortFromFile);
       }
-      this.__saveLaunchJson(projectInfoPortFromFile);
       //#endregion
 
 
@@ -2927,15 +2908,6 @@ ${config.frameworkName} start
         //#endregion
       }
 
-    } else {
-      //#region normal/watch lib build
-      if (buildOptions.watch) {
-
-        await this.__filesStructure.init(InitOptions.from({ watch: true }));
-      } else {
-        await this.__filesStructure.init();
-      }
-      //#endregion
     }
 
     if (!this.__isVscodeExtension) {
@@ -2985,18 +2957,12 @@ ${config.frameworkName} start
     //#region start build
 
     // console.log('before build steps')
-    if (buildOptions.serveApp) {
-      await this.__buildSteps(buildOptions, async () => {
-        await buildAssetsFile();
-        await startCopyToManager();
-      });
-    } else {
-      await this.__buildSteps(buildOptions);
+    await this.__buildSteps(buildOptions, async () => {
       if (buildOptions.appBuild) {
         await buildAssetsFile();
       }
       await startCopyToManager();
-    }
+    });
     //#endregion
 
     const msg = (buildOptions.watch ? `

@@ -1168,8 +1168,13 @@ class $Global extends BaseCommandLine<{}, Project> {
     this._exit();
   }
 
-  CLEAR = () => this.CLEAN();
-  CL = () => this.CLEAN();
+  CLEAR() {
+    this.CLEAN()
+  }
+
+  CL() {
+    this.CLEAN()
+  }
   //#endregion
 }
 

@@ -21,9 +21,9 @@ export class SingularBuild extends BaseFeatureForProject<Project> {
 
 
   async createSingluarTargeProjFor(options: {
-    parent: Project, client: Project, outFolder: 'dist', watch?: boolean; nonClient?: boolean,
+    parent: Project, targetWorkspaceProject: Project, outFolder: 'dist', watch?: boolean; nonClient?: boolean,
   }): Promise<Project> {
-    const { parent, client, outFolder, watch = false, nonClient = false } = options;
+    const { parent, targetWorkspaceProject: client, outFolder, watch = false, nonClient = false } = options;
 
     const children = this.project.children
       .filter(c => (c.typeIs('isomorphic-lib')) && c.__frameworkVersionAtLeast('v3'))
@@ -294,7 +294,7 @@ exports.default = start;`);
 
 
   //#region init
-  async init(watch: boolean, prod: boolean, outDir: 'dist', args: string, _client?: string | Project) {
+  async init(watch: boolean, prod: boolean, outDir: 'dist', smartContainerTargetName?: string) {
     if (!this.project.__isSmartContainer) {
       return;
     }
@@ -308,42 +308,13 @@ exports.default = start;`);
       recreateApp(c);
       await c.__filesStructure.init();
     }
-    args = Helpers.cliTool.removeArgsFromCommand(args, argsToClear);
 
-    let smartContainerBuildTarget = this.project.__smartContainerBuildTarget;
+    const nonClinetCildren = children.filter(f => f.name !== smartContainerTargetName) || [];
+    const smartContainerBuildTarget = this.project.getChildBy(smartContainerTargetName);
 
-
-    if (!smartContainerBuildTarget && children.length > 1) {
-      Helpers.logError(`
-
-    Please specify in your configuration proper ${CLI.chalk.bold('smartContainerBuildTarget')}:
-
-    file: ${config.file.package_json__tnp_json5}
-
-      ...
-        smartContainerBuildTarget: <name of main project>
-      ...
-
-
-
-          `, false, false);
-    }
-
-    Helpers.log(`[singularbuildcontainer] children for build: \n\n${children.map(c => c.name)}\n\n`);
-
-
-    if (!smartContainerBuildTarget) {
-      smartContainerBuildTarget = _.first(children);
-      this.project.__packageJson.data.tnp.smartContainerBuildTarget = smartContainerBuildTarget.name;
-      this.project.__packageJson.save('updating smart container target');
-    }
-
-    const nonClinetCildren = children.filter(f => f.name !== smartContainerBuildTarget?.name) || [];
-
-    const singularWatchProj = await this.createSingluarTargeProjFor({ parent: this.project, client: smartContainerBuildTarget, outFolder: outDir, watch });
+    const singularWatchProj = await this.createSingluarTargeProjFor({ parent: this.project, targetWorkspaceProject: smartContainerBuildTarget, outFolder: outDir, watch });
     for (let index = 0; index < nonClinetCildren.length; index++) {
-      const c = nonClinetCildren[index];
-      await this.createSingluarTargeProjFor({ parent: this.project, client: c, outFolder: outDir, watch: false, nonClient: true });
+      await this.createSingluarTargeProjFor({ parent: this.project, targetWorkspaceProject: nonClinetCildren[index], outFolder: outDir, watch: false, nonClient: true });
     }
 
     Helpers.log(`[singular build] init structure ${!!singularWatchProj}`);

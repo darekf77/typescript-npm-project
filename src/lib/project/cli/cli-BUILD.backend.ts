@@ -1,26 +1,65 @@
 //#region @backend
-import { _ } from "tnp-core/src";
+import { _, chalk } from "tnp-core/src";
 import { Helpers } from "tnp-helpers/src";
 import { CommandLineFeature } from "tnp-helpers/src";
 import { Project } from "../abstract/project";
 import { BuildOptions } from "../../build-options";
 import { TEMP_DOCS } from "../../constants";
+import { config } from "tnp-config/src";
 
 
 class $Build extends CommandLineFeature<BuildOptions, Project> {
   protected async __initialize__() {
     this.params = BuildOptions.from(this.params);
+    //#region resolve smart containter
+    this._tryResolveChildIfInsideArg();
+    if (this.project.__isSmartContainerChild) {
+      this.params.smartContainerTargetName = this.project.name;
+      this.project = this.project.parent;
+    } else if (this.project.__isSmartContainer) {
+      if (this.project.__smartContainerBuildTarget) {
+        this.params.smartContainerTargetName = this.project.__smartContainerBuildTarget.name;
+      } else {
+        if (this.project.children.length === 1) {
+          this.project.__packageJson.data.tnp.smartContainerBuildTarget = _.first(this.project.children).name;
+          this.project.__packageJson.save('updating smart container target');
+          this.params.smartContainerTargetName = this.project.__smartContainerBuildTarget.name;
+        } else {
+          //#region display update messge for container build
+          Helpers.logError(`
+
+          Please specify in your configuration proper ${chalk.bold('smartContainerBuildTarget')}:
+
+          file: ${config.file.package_json__tnp_json5}
+
+            ...
+              smartContainerBuildTarget: <name of main project>
+            ...
+
+
+
+                `, false, false);
+
+          Helpers.log(`[singularbuildcontainer] children for build: \n\n${this.project.children.map(c => c.name)}\n\n`);
+          //#endregion
+        }
+      }
+    }
+    //#endregion
+    // console.log(this.params)
   }
 
   public async _() {
     await this.project.build(BuildOptions.from({
+      ...this.params,
       buildType: 'lib',
-      finishCallback: () => this._exit()
+      finishCallback: () => this._exit(),
     }));
   }
 
   async watch() {
     await this.project.build(BuildOptions.from({
+      ...this.params,
       buildType: 'lib',
       watch: true,
     }));
@@ -28,6 +67,7 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
 
   async default() {
     await this.project.build(BuildOptions.from({
+      ...this.params,
       buildType: 'lib',
       watch: true,
     }));
@@ -35,6 +75,7 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
 
   async app() {
     await this.project.build(BuildOptions.from({
+      ...this.params,
       buildType: 'app',
       finishCallback: () => this._exit()
     }));
@@ -42,6 +83,7 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
 
   async appWatch() {
     await this.project.build(BuildOptions.from({
+      ...this.params,
       buildType: 'app',
       watch: true,
     }));
@@ -49,6 +91,7 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
 
   async start() {
     await this.project.build(BuildOptions.from({
+      ...this.params,
       buildType: 'lib-app',
       watch: true,
     }));

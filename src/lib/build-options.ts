@@ -76,9 +76,10 @@ export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
   get appBuild() {
     return this.buildType === 'app' || this.buildType === 'lib-app';
   }
-  get serveApp() {
-    return this.buildType === 'lib-app';
+  get libBuild() {
+    return this.buildType === 'lib' || this.buildType === 'lib-app';
   }
+
   get temporarySrcForReleaseCutCode() {
     //#region @backendFunc
     return `tmp-cut-relase-src-${config.folder.dist}${this.websql ? '-websql' : ''}`;
