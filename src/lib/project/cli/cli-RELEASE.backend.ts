@@ -64,6 +64,14 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
   }
   //#endregion
 
+  async auto() {
+    await this.start('patch', true);
+  }
+
+  async autoDocs() {
+
+  }
+
   //#region major
   async major() {
     await this.start('major');
@@ -143,11 +151,12 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
   //#endregion
 
   //#region start
-  private async start(releaseType: Models.ReleaseType = 'patch') {
+  private async start(releaseType: Models.ReleaseType = 'patch', automaticRelease: boolean = false) {
 
     const releaseOptions = ReleaseOptions.from({
       resolved: this.resolved,
       releaseType,
+      automaticRelease,
     });
     releaseOptions.specifiedVersion = this.args.find(k => k.startsWith('v') && Number(k.replace('v', '')) >= 3) || '';
     releaseOptions.shouldReleaseLibrary = await shouldReleaseLibMessage(releaseOptions, this.project);

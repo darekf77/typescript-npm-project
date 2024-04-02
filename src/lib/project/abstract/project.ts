@@ -4422,7 +4422,7 @@ ${shouldBeProjectArr.map((p, index) => `- ${index + 1}. ${p}`).join('\n')}
   //#region getters & methods / before pull action
   protected async _beforePullProcessAction() {
     //#region @backendFunc
-    await Helpers.killAllNodeExceptCurrentProcess();
+    // await Helpers.killAllNodeExceptCurrentProcess();
     //#endregion
   }
   //#endregion
