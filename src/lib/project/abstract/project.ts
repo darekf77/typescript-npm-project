@@ -1409,23 +1409,14 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       //#region resolve deps
       releaseOptions.resolved = releaseOptions.resolved.filter(f => f.location !== this.location);
 
-      const otherDeps = this.children.filter(c => {
-        return !releaseOptions.resolved.includes(c);
-      });
-
-      let deps = Project.sortGroupOfProject<Project>([
-        ...releaseOptions.resolved,
-        ...otherDeps,
-      ], (proj) => proj.__packageJson.data?.tnp?.overrided?.includeOnly || [], proj => proj.name)
-        .filter(d => d.name !== this.name);
 
 
       const depsOnlyToPush = [];
       //#endregion
 
       //#region filter children
-      for (let index = 0; index < deps.length; index++) {
-        const child = deps[index];
+      for (let index = 0; index < releaseOptions.resolved.length; index++) {
+        const child = releaseOptions.resolved[index];
 
 
         const lastBuildHash = child.__packageJson.getBuildHash();
@@ -1434,7 +1425,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
           ? child.__frameworkVersionAtLeast(releaseOptions.specifiedVersion as any) : true;
 
         const shouldRelease = (
-          (!child.__isSmartContainer && !child.__isSmartContainerChild)
+          (!child.__isSmartContainerChild)
           && versionIsOk
           && !child.__shouldBeOmmitedInRelease
           && !child.__targetProjects.exists
@@ -1452,10 +1443,10 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
           // await child.git.pushCurrentBranch();
 
           depsOnlyToPush.push(child);
-          deps[index] = void 0;
+          releaseOptions.resolved[index] = void 0;
         }
       }
-      deps = deps.filter(f => !!f);
+      releaseOptions.resolved = releaseOptions.resolved.filter(f => !!f);
       //#endregion
 
       //#region projs tempalte
@@ -1465,7 +1456,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
     PROJECTS FOR RELEASE CHAIN: ${releaseOptions.specifiedVersion
             ? ('(only framework version = ' + releaseOptions.specifiedVersion + ' )') : ''}
 
-${deps.filter(p => {
+${releaseOptions.resolved.filter(p => {
               if (releaseOptions.resolved.length > 0) {
                 return releaseOptions.resolved.includes(p)
               }
@@ -1485,9 +1476,9 @@ processing...
       //#endregion
 
       //#region release loop
-      for (let index = 0; index < deps.length; index++) {
+      for (let index = 0; index < releaseOptions.resolved.length; index++) {
 
-        const child = deps[index] as Project;
+        const child = releaseOptions.resolved[index] as Project;
 
         if (index === 0) {
           global.tnpNonInteractive = (releaseOptions.resolved.length === 0);

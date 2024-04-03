@@ -48,10 +48,11 @@ ${project.children.map((c) => ` - @${project.name}/${c.name} v${newVersion}`).jo
 //#endregion
 
 class $Release extends CommandLineFeature<ReleaseOptions, Project> {
-  private resolved: Project[];
+  resolved: Project[];
   __initialize__() {
     //#region resolve smart containter
-    debugger
+    let resolved = [];
+
     this._tryResolveChildIfInsideArg();
     if (this.project.__isSmartContainerChild) {
       this.params.smartContainerTargetName = this.project.name;
@@ -84,14 +85,24 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
           //#endregion
         }
       }
+    } else if (this.project.__isContainer) {
+      resolved = Helpers.cliTool.resolveItemsFromArgsBegin<Project>(this.args, (a) => {
+        return Project.ins.From(path.join(this.project.location, a));
+      })?.allResolved;
+
+      const otherDeps = this.project.children.filter(c => {
+        return !resolved.includes(c);
+      });
+
+      resolved = Project.sortGroupOfProject<Project>([
+        ...resolved,
+        ...otherDeps,
+      ], (proj) => proj.__packageJson.data?.tnp?.overrided?.includeOnly || [], proj => proj.name)
+        .filter(d => d.name !== this.project.name);
+
     }
+    this.params = ReleaseOptions.from({ ...this.params, resolved });
     //#endregion
-
-    this.resolved = Helpers.cliTool.resolveItemsFromArgsBegin<Project>(this.args, (a) => {
-      return Project.ins.From(path.join(this.project.location, a));
-    })?.allResolved;
-
-    this.params = ReleaseOptions.from(this.params);
   }
 
   //#region _
