@@ -209,9 +209,11 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
 
     const releaseOptions = ReleaseOptions.from({
       ...this.params,
-      resolved: this.resolved,
       releaseType,
       automaticRelease,
+      finishCallback: () => {
+        this._exit();
+      }
     });
     releaseOptions.specifiedVersion = this.args.find(k => k.startsWith('v') && Number(k.replace('v', '')) >= 3) || '';
     releaseOptions.shouldReleaseLibrary = await shouldReleaseLibMessage(releaseOptions, this.project);

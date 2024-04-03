@@ -1428,7 +1428,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
           (!child.__isSmartContainerChild)
           && versionIsOk
           && !child.__shouldBeOmmitedInRelease
-          && !child.__targetProjects.exists
+          && !child.__targetProjects?.exists
         );
         Helpers.log(`ACTUALL RELEASE ${child.name}: ${shouldRelease}
       lastBuildHash: ${lastBuildHash}
@@ -1446,7 +1446,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
           releaseOptions.resolved[index] = void 0;
         }
       }
-      releaseOptions.resolved = releaseOptions.resolved.filter(f => !!f);
+      releaseOptions.resolved = releaseOptions.resolved.filter(f => !!f).map(c => Project.ins.From(c.location));
       //#endregion
 
       //#region projs tempalte
@@ -1476,9 +1476,12 @@ processing...
       //#endregion
 
       //#region release loop
+
+
       for (let index = 0; index < releaseOptions.resolved.length; index++) {
 
         const child = releaseOptions.resolved[index] as Project;
+        console.log({ child })
 
         if (index === 0) {
           global.tnpNonInteractive = (releaseOptions.resolved.length === 0);
@@ -1511,7 +1514,10 @@ processing...
               await child.init();
               break;
             } catch (error) {
-              Helpers.pressKeyAndContinue(`Not able to INIT your project ${chalk.bold(child.genericName)} pressa any key to try again..`);
+              console.error(error)
+              if (!(await Helpers.consoleGui.question.yesNo(`Not able to INIT your project ${chalk.bold(child.genericName)} try again..`))) {
+                releaseOptions?.finishCallback()
+              }
             }
           }
         };
@@ -1547,8 +1553,9 @@ processing...
 
           if (depForPush.typeIs('isomorphic-lib') && depForPush.__isSmartContainer) {
             try {
-              await depForPush.__filesStructure.init(InitOptions.from({ smartContainerTargetName: releaseOptions.smartContainerTargetName }))
+              await depForPush.init(InitOptions.from({ smartContainerTargetName: releaseOptions.smartContainerTargetName }))
             } catch (error) {
+              console.error(error)
               Helpers.info(`Not able to init fully...`);
             }
           }
