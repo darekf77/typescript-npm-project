@@ -288,6 +288,11 @@ Starting backend typescirpt build....
         }
       });
     Helpers.log(`* Typescirpt compilation second part done (${outDir}  build). `)
+    Helpers.info(`
+
+    Backend Typescirpt build done....
+
+        `)
 
     if (watch) {
       // console.log(Helpers.terminalLine());

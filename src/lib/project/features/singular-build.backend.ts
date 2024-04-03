@@ -23,13 +23,14 @@ export class SingularBuild extends BaseFeatureForProject<Project> {
   async createSingluarTargeProjFor(options: {
     parent: Project, targetWorkspaceProject: Project, outFolder: 'dist', watch?: boolean; nonClient?: boolean,
   }): Promise<Project> {
-    const { parent, targetWorkspaceProject: client, outFolder, watch = false, nonClient = false } = options;
+
+    const { parent, targetWorkspaceProject, outFolder, watch = false, nonClient = false } = options;
 
     const children = this.project.children
       .filter(c => (c.typeIs('isomorphic-lib')) && c.__frameworkVersionAtLeast('v3'))
       ;
 
-    const smartContainerTargetProjPath = parent.__getProxyProj(client.name, outFolder);
+    const smartContainerTargetProjPath = parent.__getProxyProj(targetWorkspaceProject.name, outFolder);
 
     Helpers.log(`dist project: ${smartContainerTargetProjPath}`);
     if (!Helpers.exists(smartContainerTargetProjPath)) {
@@ -44,7 +45,7 @@ export class SingularBuild extends BaseFeatureForProject<Project> {
         config.file.environment_js,
         config.file.tnpEnvironment_json,
       ].forEach(fileOrFolder => {
-        const source = path.join(client.location, fileOrFolder);
+        const source = path.join(targetWorkspaceProject.location, fileOrFolder);
         const dest = path.join(smartContainerTargetProjPath, fileOrFolder);
         Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
       });
@@ -58,7 +59,7 @@ export class SingularBuild extends BaseFeatureForProject<Project> {
         'app',
         'lib',
       ].forEach(f => {
-        const source = crossPlatformPath(path.join(client.location, config.folder.src, f));
+        const source = crossPlatformPath(path.join(targetWorkspaceProject.location, config.folder.src, f));
         const dest = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, f));
         // console.log({ dest })
         if (!Helpers.exists(source)) {
@@ -123,7 +124,7 @@ exports.default = start;`);
     //#region copy core asset files
 
     (() => {
-      const corepro = Project.by('isomorphic-lib', client.__frameworkVersion) as Project;
+      const corepro = Project.by('isomorphic-lib', targetWorkspaceProject.__frameworkVersion) as Project;
       const coreAssetsPath = corepro.pathFor('app/src/assets');
       const filesToCopy = Helpers.filesFrom(coreAssetsPath, true);
       for (let index = 0; index < filesToCopy.length; index++) {
@@ -210,8 +211,8 @@ exports.default = start;`);
       const copySourcesToDestTarget = () => {
         for (let index = 0; index < appRelatedFiles.length; index++) {
           const appFileName = appRelatedFiles[index];
-          const source = crossPlatformPath(path.join(client.location, config.folder.src, appFileName))
-          const relativeAfile = source.replace(`${crossPlatformPath([client.location, config.folder.src])}/`, '',);
+          const source = crossPlatformPath(path.join(targetWorkspaceProject.location, config.folder.src, appFileName))
+          const relativeAfile = source.replace(`${crossPlatformPath([targetWorkspaceProject.location, config.folder.src])}/`, '',);
           filesToWatch.push(source);
           const appFileCopyDestination = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, relativeAfile));
           // console.log({
@@ -244,7 +245,7 @@ exports.default = start;`);
           const toReplace = crossPlatformPath([containerLocaiton, childName, config.folder.src,])
 
           const relative = f.replace(toReplace + '/', '');
-          const isTarget = (childName === client.name);
+          const isTarget = (childName === targetWorkspaceProject.name);
 
           const dest = isTarget
             ? crossPlatformPath([smartContainerTargetProjPath, config.folder.src, relative])

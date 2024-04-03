@@ -6,6 +6,7 @@ import { Project } from "../abstract/project";
 import { BuildOptions, InitOptions } from "../../build-options";
 import { MESSAGES, TEMP_DOCS } from "../../constants";
 import { config } from "tnp-config/src";
+import { VpnSplit } from 'vpn-split/src';
 
 export class $Open extends CommandLineFeature<{}, Project> {
   public _() {
@@ -55,6 +56,12 @@ export class $Open extends CommandLineFeature<{}, Project> {
 
   ROUTES() {
     this._openThing('tmp-routes.json');
+  }
+
+
+  HOSTS() {
+    Helpers.run(`code ${crossPlatformPath(VpnSplit.HOST_FILE_PATH)}`).sync();
+    process.exit(0)
   }
 
   private _openThing(fileName: string) {

@@ -1,9 +1,10 @@
-import { CoreModels, _, path } from "tnp-core/src";
+import { CoreModels, _, chalk, path } from "tnp-core/src";
 import { Helpers } from "tnp-helpers/src";
 import { CommandLineFeature } from "tnp-helpers/src";
 import { Project } from "../abstract/project";
 import { BuildOptions, ReleaseOptions } from "../../build-options";
 import { Models } from "../../models";
+import { config } from "tnp-config/src";
 
 //#region should release lib
 const shouldReleaseLibMessage = async (
@@ -35,20 +36,62 @@ ${project.children.map((c) => ` - @${project.name}/${c.name} v${newVersion}`).jo
     return await Helpers.questionYesNo(message);
   }
 
-
-  const message = `Proceed with release of new version: ${newVersion} ?`;
-  return await Helpers.questionYesNo(message);
+  if (project.__isContainer && !project.__isSmartContainer) {
+    const message = `Proceed with release of packages from ${project.genericName} ?`;
+    return await Helpers.questionYesNo(message);
+  } else {
+    const message = `Proceed with release of new version: ${newVersion} ?`;
+    return await Helpers.questionYesNo(message);
+  }
   //#endregion
 };
 //#endregion
 
 class $Release extends CommandLineFeature<ReleaseOptions, Project> {
   private resolved: Project[];
-  __transformParams(params: ReleaseOptions): ReleaseOptions {
+  __initialize__() {
+    //#region resolve smart containter
+    debugger
+    this._tryResolveChildIfInsideArg();
+    if (this.project.__isSmartContainerChild) {
+      this.params.smartContainerTargetName = this.project.name;
+      this.project = this.project.parent;
+    } else if (this.project.__isSmartContainer) {
+      if (this.project.__smartContainerBuildTarget) {
+        this.params.smartContainerTargetName = this.project.__smartContainerBuildTarget.name;
+      } else {
+        if (this.project.children.length === 1) {
+          this.project.__packageJson.data.tnp.smartContainerBuildTarget = _.first(this.project.children).name;
+          this.project.__packageJson.save('updating smart container target');
+          this.params.smartContainerTargetName = this.project.__smartContainerBuildTarget.name;
+        } else {
+          //#region display update messge for container build
+          Helpers.logError(`
+
+          Please specify in your configuration proper ${chalk.bold('smartContainerBuildTarget')}:
+
+          file: ${config.file.package_json__tnp_json5}
+
+            ...
+              smartContainerBuildTarget: <name of main project>
+            ...
+
+
+
+                `, false, false);
+
+          Helpers.log(`[singularbuildcontainer] children for build: \n\n${this.project.children.map(c => c.name)}\n\n`);
+          //#endregion
+        }
+      }
+    }
+    //#endregion
+
     this.resolved = Helpers.cliTool.resolveItemsFromArgsBegin<Project>(this.args, (a) => {
       return Project.ins.From(path.join(this.project.location, a));
     })?.allResolved;
-    return ReleaseOptions.from(params);
+
+    this.params = ReleaseOptions.from(this.params);
   }
 
   //#region _
@@ -154,6 +197,7 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
   private async start(releaseType: Models.ReleaseType = 'patch', automaticRelease: boolean = false) {
 
     const releaseOptions = ReleaseOptions.from({
+      ...this.params,
       resolved: this.resolved,
       releaseType,
       automaticRelease,

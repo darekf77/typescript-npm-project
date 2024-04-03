@@ -1408,17 +1408,18 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
 
       //#region resolve deps
       releaseOptions.resolved = releaseOptions.resolved.filter(f => f.location !== this.location);
-      const depsOfResolved = Project.sortGroupOfProject<Project>(releaseOptions.resolved, (proj) => proj.__packageJson.data?.tnp?.overrided?.includeOnly || [], proj => proj.name)
-        .filter(d => d.name !== this.name);
 
       const otherDeps = this.children.filter(c => {
-        return !depsOfResolved.includes(c);
+        return !releaseOptions.resolved.includes(c);
       });
 
-      let deps = [
-        ...depsOfResolved,
+      let deps = Project.sortGroupOfProject<Project>([
+        ...releaseOptions.resolved,
         ...otherDeps,
-      ];
+      ], (proj) => proj.__packageJson.data?.tnp?.overrided?.includeOnly || [], proj => proj.name)
+        .filter(d => d.name !== this.name);
+
+
       const depsOnlyToPush = [];
       //#endregion
 
@@ -1466,7 +1467,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
 
 ${deps.filter(p => {
               if (releaseOptions.resolved.length > 0) {
-                return depsOfResolved.includes(p)
+                return releaseOptions.resolved.includes(p)
               }
               return true;
             })
@@ -1499,7 +1500,7 @@ processing...
 
         const exitBecouseNotInResolved = (
           releaseOptions.resolved.length > 0
-          && _.isUndefined(depsOfResolved.find(c => c.location === child.location))
+          && _.isUndefined(releaseOptions.resolved.find(c => c.location === child.location))
         );
 
         if (exitBecouseNotInResolved) {
@@ -1555,7 +1556,7 @@ processing...
 
           if (depForPush.typeIs('isomorphic-lib') && depForPush.__isSmartContainer) {
             try {
-              await depForPush.__filesStructure.init()
+              await depForPush.__filesStructure.init(InitOptions.from({ smartContainerTargetName: releaseOptions.smartContainerTargetName }))
             } catch (error) {
               Helpers.info(`Not able to init fully...`);
             }
@@ -1904,6 +1905,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       cliBuildNoDts,
       cliBuildUglify,
       cutNpmPublishLibReleaseCode,
+      smartContainerTargetName: releaseOptions.smartContainerTargetName,
     }));
 
     //#region prepare release resources
