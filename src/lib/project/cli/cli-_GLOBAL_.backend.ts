@@ -607,14 +607,14 @@ class $Global extends BaseCommandLine<{}, Project> {
   //#endregion
 
   //#region reinstall
-  REINSTALL = async () => {
+  async REINSTALL() {
     const proj = this.project;
 
     if (proj.__isContainer) {
       if (proj.__isContainerCoreProject) {
         proj.__node_modules.remove();
         proj.__smartNodeModules.remove();
-        proj.run(`${config.frameworkName} install`).sync();
+        proj.__npmPackages.installFromArgs('');
         Helpers.info(`Reinstal done for core container`);
       } else {
         // smart container or normal container
@@ -630,7 +630,7 @@ class $Global extends BaseCommandLine<{}, Project> {
     } else if (proj.__isStandaloneProject && proj.__npmPackages.useSmartInstall) {
       proj.__node_modules.remove();
       proj.__smartNodeModules.remove();
-      proj.run(`${config.frameworkName} install`).sync();
+      proj.__npmPackages.installFromArgs('')
       Helpers.info(`Reinstal done for core standalone project`);
     } else {
       Helpers.error(`[${config.frameworkName}] This project does not support reinsall.
