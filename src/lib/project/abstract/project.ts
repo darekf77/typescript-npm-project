@@ -4119,7 +4119,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
       ? 'ng serve'
       : 'ng build (for application - not lib)'
       }.`;
-    const bawOrba = buildOptions.watch ? 'baw' : 'ba';
+    // const bawOrba = buildOptions.watch ? 'baw' : 'ba';
     const bawOrbaLong = buildOptions.watch ? ' build:app:watch ' : ' build:app ';
     const bawOrbaLongWebsql = buildOptions.watch ? 'build:app:watch --websql' : 'build:app --websql';
     const withPort = '(with custom port - otherwise automatically selected)';
@@ -4142,13 +4142,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
 
       ${chalk.bold(config.frameworkName + bawOrbaLong + target)}
       or
-      ${config.frameworkName} ${bawOrba} ${target}
-
-      ${withPort}
-      ${config.frameworkName} ${bawOrba} ${target} ${ngserve}
-
-      ${orIfWebsql}
-      ${config.frameworkName} ${bawOrbaLongWebsql}
+      ${config.frameworkName} ${bawOrbaLongWebsql} ${target}
 
             `);
     } else if (this.__isStandaloneProject) {
@@ -4159,14 +4153,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
 
       ${chalk.bold(config.frameworkName + bawOrbaLong)}
       or
-      ${config.frameworkName} ${bawOrba}
-
-      ${withPort}
-      ${config.frameworkName} ${bawOrba} ${ngserve}
-
-      ${orIfWebsql}
-      ${bawOrbaLongWebsql}
-
+      ${config.frameworkName} ${bawOrbaLongWebsql}
       `);
     }
     //#endregion
