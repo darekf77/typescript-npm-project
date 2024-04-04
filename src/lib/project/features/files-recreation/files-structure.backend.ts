@@ -16,7 +16,8 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
     if (!options.initiator) {
       options.initiator = this.project;
     }
-    const { alreadyInitedPorjects, watch, smartContainerTargetName, struct, branding, websql } = options;
+    const { alreadyInitedPorjects, watch, struct, branding, websql } = options;
+    const smartContainerTargetName = this.project.__smartContainerBuildTarget?.name;
 
     // THIS IS SLOW... BUT I CAN AFORD IT HERE
     if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {

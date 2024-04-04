@@ -13,40 +13,7 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
   __initialize__() {
     //#region resolve smart containter
     let resolved = [];
-
-    this._tryResolveChildIfInsideArg();
-    if (this.project.__isSmartContainerChild) {
-      this.params.smartContainerTargetName = this.project.name;
-      this.project = this.project.parent;
-    } else if (this.project.__isSmartContainer) {
-      if (this.project.__smartContainerBuildTarget) {
-        this.params.smartContainerTargetName = this.project.__smartContainerBuildTarget.name;
-      } else {
-        if (this.project.children.length === 1) {
-          this.project.__packageJson.data.tnp.smartContainerBuildTarget = _.first(this.project.children).name;
-          this.project.__packageJson.save('updating smart container target');
-          this.params.smartContainerTargetName = this.project.__smartContainerBuildTarget.name;
-        } else {
-          //#region display update messge for container build
-          Helpers.logError(`
-
-          Please specify in your configuration proper ${chalk.bold('smartContainerBuildTarget')}:
-
-          file: ${config.file.package_json__tnp_json5}
-
-            ...
-              smartContainerBuildTarget: <name of main project>
-            ...
-
-
-
-                `, false, false);
-
-          Helpers.log(`[singularbuildcontainer] children for build: \n\n${this.project.children.map(c => c.name)}\n\n`);
-          //#endregion
-        }
-      }
-    } else if (this.project.__isContainer) {
+    if (this.project.__isContainer) {
 
       resolved = Helpers.cliTool.resolveItemsFromArgsBegin<Project>(this.args, (a) => {
         return Project.ins.From(path.join(this.project.location, a));

@@ -16,7 +16,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
    * target name for organizaiton (smart container) build
    */
   get targetProjName() {
-    return this.buildOptions.smartContainerTargetName;
+    return this.project.__smartContainerBuildTarget.name;
   }
   //#endregion
 

@@ -590,8 +590,43 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   //#endregion
 
   //#region getters & methods / smart container build target
-  get __smartContainerBuildTarget() {
+  get __smartContainerBuildTarget(): Project {
     //#region @backendFunc
+    if (this.__isSmartContainerChild) {
+      return this.parent.__smartContainerBuildTarget;
+    }
+
+    if (this.__isSmartContainerTarget) {
+      return this.__smartContainerTargetParentContainer.__smartContainerBuildTarget;
+    }
+
+    if (!this.__packageJson.smartContainerBuildTarget) {
+      if (this.children.length === 1) {
+        this.__packageJson.data.tnp.smartContainerBuildTarget = _.first(this.children).name;
+      } else {
+        if (this.__isSmartContainerChild || this.__isSmartContainer) {
+          //#region display update messge for container build
+          Helpers.logError(`
+
+ Please specify in your configuration proper ${chalk.bold('smartContainerBuildTarget')}:
+
+ file: ${config.file.package_json__tnp_json5}
+
+   ...
+     smartContainerBuildTarget: <name of main project>
+   ...
+
+
+
+       `, false, false);
+
+          Helpers.log(`[singularbuildcontainer] children for build: \n\n${this.children.map(c => c.name)}\n\n`);
+          //#endregion
+
+        }
+      }
+    }
+
     const children = this.children;
     let target = children
       .filter(c => c.typeIs('isomorphic-lib'))
@@ -1529,7 +1564,7 @@ processing...
 
           if (depForPush.typeIs('isomorphic-lib') && depForPush.__isSmartContainer) {
             try {
-              await depForPush.init(InitOptions.from({ smartContainerTargetName: releaseOptions.smartContainerTargetName }))
+              await depForPush.init(InitOptions.from({}))
             } catch (error) {
               console.error(error)
               Helpers.info(`Not able to init fully...`);
@@ -1580,7 +1615,7 @@ processing...
                 this.__node_modules.remove();
                 this.__smartNodeModules.install('install');
               }
-              await this.init();
+              await this.init(); // TODO not needed build includes init
               break;
             } catch (error) {
               console.error(error)
@@ -1902,9 +1937,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     const { prod, cliBuildObscure, cliBuildIncludeNodeModules, cliBuildNoDts, cliBuildUglify } = releaseOptions;
 
     // TODO  - only here so  __smartContainerBuildTarget is available
-    await this.init(InitOptions.from({
-      smartContainerTargetName: this.__isStandaloneProject ? void 0 : this.__smartContainerBuildTarget.name
-    }));
+    await this.init(InitOptions.from({}));
 
     const specyficProjectForBuild = this.__isStandaloneProject ? this : Project.ins.From(crossPlatformPath(path.join(
       this.location,
@@ -1921,7 +1954,6 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       cliBuildNoDts,
       cliBuildUglify,
       cutNpmPublishLibReleaseCode,
-      smartContainerTargetName: releaseOptions.smartContainerTargetName,
       skipProjectProcess: true,
       buildForRelease: true,
     }));
@@ -2769,7 +2801,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       }
       let { outDir, smartContainerTargetName } = buildOptions;
 
-      let proxy = this.__proxyProjFor(smartContainerTargetName, outDir);
+      let proxy = this.__proxyProjFor(smartContainerTargetName || this.__smartContainerBuildTarget?.name, outDir);
       await proxy.__buildSteps(buildOptions, libBuildDone);
       //#endregion
     }
@@ -2899,9 +2931,9 @@ to fix it.
 
       //#region normal/watch lib build
       if (buildOptions.watch) {
-        await this.__filesStructure.init(InitOptions.from({ watch: true, smartContainerTargetName: buildOptions.smartContainerTargetName }));
+        await this.__filesStructure.init(InitOptions.from({ watch: true }));
       } else {
-        await this.__filesStructure.init(InitOptions.from({ smartContainerTargetName: buildOptions.smartContainerTargetName }));
+        await this.__filesStructure.init(InitOptions.from({}));
       }
       //#endregion
     }
@@ -2969,9 +3001,9 @@ ${config.frameworkName} start
       // console.log({ shouldGenerateAssetsList })
       if (shouldGenerateAssetsList) {
         if (buildOptions.watch) {
-          await this.__assetsFileListGenerator.startAndWatch(buildOptions.smartContainerTargetName, buildOptions.outDir, buildOptions.websql);
+          await this.__assetsFileListGenerator.startAndWatch(this.__smartContainerBuildTarget.name, buildOptions.outDir, buildOptions.websql);
         } else {
-          await this.__assetsFileListGenerator.start(buildOptions.smartContainerTargetName, buildOptions.outDir, buildOptions.websql);
+          await this.__assetsFileListGenerator.start(this.__smartContainerBuildTarget.name, buildOptions.outDir, buildOptions.websql);
         }
       }
     };
@@ -4098,7 +4130,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
 
     if (this.__isSmartContainerTarget) {
       const parent = this.__smartContainerTargetParentContainer;
-      const target = buildOptions.smartContainerTargetName;
+      const target = buildOptions.smartContainerTargetName || this.__smartContainerBuildTarget.name;
 
       Helpers.taskDone(`${CLI.chalk.underline(`
 

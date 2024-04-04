@@ -311,9 +311,7 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
       lastContainer.__smartNodeModules.setToSmartContainer();
     }
 
-    await appProj.__filesStructure.init(InitOptions.from({
-      smartContainerTargetName: appProj.name
-    }));
+    await appProj.__filesStructure.init(InitOptions.from({}));
 
     if (lastContainer?.__isSmartContainer) {
       appProj.__removeStandaloneSources();

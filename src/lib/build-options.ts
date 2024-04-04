@@ -32,7 +32,6 @@ class BuildOptionsLibOrApp<T> extends SystemTask<T> {
    * etc.
    */
   prod: boolean;
-  smartContainerTargetName: string;
 }
 //#endregion
 
@@ -60,7 +59,6 @@ export class InitOptions extends SystemTask<InitOptions> {
    */
   struct: boolean;
   websql: boolean;
-  smartContainerTargetName: string;
   branding: boolean;
 
   public static from(options: Partial<InitOptions>): InitOptions {
@@ -121,6 +119,11 @@ export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
    * Generate only backend, without browser version
    */
   onlyBackend: boolean;
+  /**
+   * Optionally we can start build of smart container
+   * with different app
+   */
+  smartContainerTargetName: string;
 
   public static from(options: Omit<Partial<BuildOptions>, 'appBuild' | 'serveApp'>): BuildOptions {
     return from(options, BuildOptions);

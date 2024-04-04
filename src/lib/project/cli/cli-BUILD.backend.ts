@@ -17,33 +17,7 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
       this.params.smartContainerTargetName = this.project.name;
       this.project = this.project.parent;
     } else if (this.project.__isSmartContainer) {
-      if (this.project.__smartContainerBuildTarget) {
-        this.params.smartContainerTargetName = this.project.__smartContainerBuildTarget.name;
-      } else {
-        if (this.project.children.length === 1) {
-          this.project.__packageJson.data.tnp.smartContainerBuildTarget = _.first(this.project.children).name;
-          this.project.__packageJson.save('updating smart container target');
-          this.params.smartContainerTargetName = this.project.__smartContainerBuildTarget.name;
-        } else {
-          //#region display update messge for container build
-          Helpers.logError(`
-
-          Please specify in your configuration proper ${chalk.bold('smartContainerBuildTarget')}:
-
-          file: ${config.file.package_json__tnp_json5}
-
-            ...
-              smartContainerBuildTarget: <name of main project>
-            ...
-
-
-
-                `, false, false);
-
-          Helpers.log(`[singularbuildcontainer] children for build: \n\n${this.project.children.map(c => c.name)}\n\n`);
-          //#endregion
-        }
-      }
+      this.params.smartContainerTargetName = this.project.__smartContainerBuildTarget?.name;
     }
     //#endregion
     // console.log(this.params)
