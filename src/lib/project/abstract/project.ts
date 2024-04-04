@@ -1598,7 +1598,7 @@ processing...
             break;
           } catch (error) {
             Helpers.error(`Not able to RELEASE your project ${chalk.bold(this.genericName)}`, true, true);
-            if (!(await Helpers.consoleGui.question.yesNo(`Try again ? (or exit proces)`))) {
+            if (!(await Helpers.questionYesNo(`Try again ? (or exit proces)`, void 0, void 0, true, true))) {
               process.exit(0)
             }
           }
