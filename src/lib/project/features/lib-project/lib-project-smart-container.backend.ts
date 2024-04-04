@@ -1,7 +1,6 @@
 //#region imports
-import { CLI } from "tnp-cli/src";
 import { config } from "tnp-config/src";
-import { crossPlatformPath, path } from "tnp-core/src";
+import { chalk, crossPlatformPath, path } from "tnp-core/src";
 import { Helpers } from "tnp-helpers/src";
 import { AppBuildConfig } from "../../features/docs-app-build-config.backend";
 import { Models } from "../../../models";
@@ -119,8 +118,8 @@ export class LibProjectSmartContainer extends LibPorjectBase {
 
     Helpers.info(`
 Smart container routes for project:
-+ ${CLI.chalk.bold(mainProjectName)} => /${mainProjectName}
-${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${c}`).join('\n')}
++ ${chalk.bold(mainProjectName)} => /${mainProjectName}
+${otherProjectNames.map(c => `+ ${chalk.bold(c)} => /${mainProjectName}/-/${c}`).join('\n')}
         `);
     //#endregion
 
@@ -130,12 +129,12 @@ ${otherProjectNames.map(c => `+ ${CLI.chalk.bold(c)} => /${mainProjectName}/-/${
       const returnFun = (childName: string) => {
         if (childName === mainProjectName) {
           return {
-            name: childName, // + CLI.chalk.gray(`\t\t<url>/${mainProjectName}`),
+            name: childName, // + chalk.gray(`\t\t<url>/${mainProjectName}`),
             value: childName,
           };
         }
         return {
-          name: childName, // + CLI.chalk.gray(`\t\t<url>/${mainProjectName}/-/${childName}`),
+          name: childName, // + chalk.gray(`\t\t<url>/${mainProjectName}/-/${childName}`),
           value: childName,
         };
       }

@@ -1,8 +1,6 @@
-import { path } from 'tnp-core/src'
+import { chalk, path } from 'tnp-core/src'
 import { fse } from 'tnp-core/src'
 import { _ } from 'tnp-core/src';
-import { CLI } from 'tnp-cli/src';
-import { glob } from 'tnp-core/src';
 
 import { Project } from '../../abstract/project';
 import { Models } from '../../../models';
@@ -78,7 +76,7 @@ export function dedupePackages(projectLocation: string, packagesNames?: string[]
           // Helpers.warn(`Not able to identyfy project in ${p}`)
         } else {
           p = p.replace(path.join(projectLocation, config.folder.node_modules), '');
-          Helpers.info(`${i + 1}. Duplicate "${nproj.name}@${nproj.version}" in:\n\t ${CLI.chalk.bold(p)}\n`);
+          Helpers.info(`${i + 1}. Duplicate "${nproj.name}@${nproj.version}" in:\n\t ${chalk.bold(p)}\n`);
         }
       });
       if (duplicates.length === 0) {
@@ -108,19 +106,19 @@ export function dedupePackages(projectLocation: string, packagesNames?: string[]
           if (_.isArray(r.ommitParents) && (r.ommitParents.includes(parentName)
             || _.isObject(r.ommitParents.find(o => o.startsWith(parentName.replace('*', '')))))) {
             Helpers.logWarn(`[excluded] Ommiting duplicate of `
-              + `${parentLabel}${current.name}@${versionRem} inside ${CLI.chalk.bold(parentName)}`)
+              + `${parentLabel}${current.name}@${versionRem} inside ${chalk.bold(parentName)}`)
             return
           }
           if (_.isArray(r.onlyFor) && !r.onlyFor.includes(parentName)) {
             Helpers.logWarn(`[not included] Ommiting duplicate of `
-              + `${parentLabel}${current.name}@${versionRem} inside ${CLI.chalk.bold(parentName)}`)
+              + `${parentLabel}${current.name}@${versionRem} inside ${chalk.bold(parentName)}`)
             return
           }
         }
 
         Helpers.remove(p, true)
         Helpers.logWarn(`Duplicate of ${parentLabel}${current.name}@${versionRem}`
-          + ` removed from ${CLI.chalk.bold(parentName)}`)
+          + ` removed from ${chalk.bold(parentName)}`)
       });
     }
 

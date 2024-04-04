@@ -1,8 +1,7 @@
 //#region imports
 import { IncCompiler } from "incremental-compiler/src";
-import { CLI } from "tnp-cli/src";
 import { config } from "tnp-config/src";
-import { crossPlatformPath, fse, path, _, CoreModels } from "tnp-core/src";
+import { crossPlatformPath, fse, path, _, CoreModels, chalk } from "tnp-core/src";
 import { Helpers } from "tnp-helpers/src";
 import { Models } from "../../../../models";
 import { Project } from "../../../abstract/project";
@@ -307,7 +306,7 @@ Starting backend typescirpt build....
 
 
 
-    ${CLI.chalk.bold('YOU CAN ATTACH YOUR BACKEND/NODEJS CODE DEBUGGER NOW')}
+    ${chalk.bold('YOU CAN ATTACH YOUR BACKEND/NODEJS CODE DEBUGGER NOW')}
 
 
 

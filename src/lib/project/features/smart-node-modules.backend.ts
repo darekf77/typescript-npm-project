@@ -5,7 +5,6 @@ import { Project } from '../abstract/project';
 import { Models } from '../../models';
 import { config } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
-import { CLI } from 'tnp-cli/src';
 import { BaseFeatureForProject } from 'tnp-helpers/src';
 
 export type OverridePacakge = { [name: string]: string | null; };
@@ -343,7 +342,7 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
   if (!reinstallForceSmartNodeModules && containerCoreProject.__node_modules.exist) {
     Helpers.log(`
 
-    No need for update of node_modules links for ${CLI.chalk.bold(containerCoreProject.genericName)}
+    No need for update of node_modules links for ${chalk.bold(containerCoreProject.genericName)}
 
     `);
     return;
@@ -359,7 +358,7 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
       Helpers.remove(dest, true);
       Helpers.createSymLink(from, dest);
     });
-  }, `updating node_modules links for ${CLI.chalk.bold(containerCoreProject.genericName)} `);
+  }, `updating node_modules links for ${chalk.bold(containerCoreProject.genericName)} `);
 }
 //#endregion
 

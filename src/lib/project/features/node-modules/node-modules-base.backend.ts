@@ -1,9 +1,8 @@
 //#region imports
-import { crossPlatformPath, path } from 'tnp-core/src';
+import { chalk, crossPlatformPath, path } from 'tnp-core/src';
 import { fse } from 'tnp-core/src';
 import { _ } from 'tnp-core/src';
-import { glob } from 'tnp-core/src';
-import { CLI } from 'tnp-cli/src';
+
 import * as TerminalProgressBar from 'progress';
 
 import { PREFIXES, config } from 'tnp-config/src';
@@ -29,7 +28,7 @@ export class NodeModulesBase extends NodeModulesCore {
     const { triggerMsg } = options || {};
 
     Helpers.logInfo(`[node_modules] Copy instalation of npm packages from ` +
-      `${CLI.chalk.bold(source.genericName)} to ${CLI.chalk.bold(this.project.genericName)} ${triggerMsg}`);
+      `${chalk.bold(source.genericName)} to ${chalk.bold(this.project.genericName)} ${triggerMsg}`);
 
     if (source.__smartNodeModules.exists) {
 

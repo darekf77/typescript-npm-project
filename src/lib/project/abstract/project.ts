@@ -33,7 +33,6 @@ import { argsToClear, DEFAULT_PORT, PortUtils } from '../../constants';
 import { RegionRemover } from 'isomorphic-region-loader/src';
 import { IncrementalBuildProcess } from '../../project/compilers/build-isomorphic-lib/compilations/incremental-build-process.backend';
 import { PackagesRecognition } from '../../project/features/package-recognition/packages-recognition';
-import { CLI } from 'tnp-cli/src';
 import { glob } from 'tnp-core/src';
 import { LibProjectStandalone } from '../features/lib-project/lib-project-standalone.backend';
 import { LibProjectSmartContainer } from '../features/lib-project/lib-project-smart-container.backend';
@@ -2883,7 +2882,7 @@ to fix it.
 
 
 
-      You can check info about build in ${CLI.chalk.bold(hostForBuild)}
+      You can check info about build in ${chalk.bold(hostForBuild)}
 
 
 
@@ -4132,7 +4131,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
       const parent = this.__smartContainerTargetParentContainer;
       const target = buildOptions.smartContainerTargetName || this.__smartContainerBuildTarget.name;
 
-      Helpers.taskDone(`${CLI.chalk.underline(`
+      Helpers.taskDone(`${chalk.underline(`
 
       ${buildLibDone}... for target project "`
         + `${parent ? (parent.name + '/') : ''}${target}"`)}`)
@@ -4141,7 +4140,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
 
       ${ifapp}
 
-      ${CLI.chalk.bold(config.frameworkName + bawOrbaLong + target)}
+      ${chalk.bold(config.frameworkName + bawOrbaLong + target)}
       or
       ${config.frameworkName} ${bawOrba} ${target}
 
@@ -4153,12 +4152,12 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
 
             `);
     } else if (this.__isStandaloneProject) {
-      Helpers.taskDone(`${CLI.chalk.underline(`${buildLibDone}...`)}`)
+      Helpers.taskDone(`${chalk.underline(`${buildLibDone}...`)}`)
       Helpers.success(`
 
       ${ifapp}
 
-      ${CLI.chalk.bold(config.frameworkName + bawOrbaLong)}
+      ${chalk.bold(config.frameworkName + bawOrbaLong)}
       or
       ${config.frameworkName} ${bawOrba}
 

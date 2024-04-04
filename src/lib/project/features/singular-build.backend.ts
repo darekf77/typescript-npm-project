@@ -6,7 +6,6 @@ import { appRelatedFiles, config } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
 import { argsToClear } from '../../constants';
 import { COMPILER_POOLING, IncrementalWatcherInstance, incrementalWatcher } from 'incremental-compiler/src';
-import { CLI } from 'tnp-cli/src';
 import { recreateApp } from './inside-structures/structs/inside-struct-helpers';
 import { BaseFeatureForProject } from 'tnp-helpers/src';
 

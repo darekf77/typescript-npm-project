@@ -1,5 +1,5 @@
 //#region @backend
-import { fse, crossPlatformPath, CoreModels } from 'tnp-core/src'
+import { fse, crossPlatformPath, CoreModels, chalk } from 'tnp-core/src'
 import { path } from 'tnp-core/src'
 import * as JSON5 from 'json5';
 import { glob } from 'tnp-core/src';
@@ -10,8 +10,6 @@ import { Models } from '../../../models';
 import { Helpers } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
 import { BaseFeatureForProject } from 'tnp-helpers/src';
-import { CLI } from 'tnp-cli/src';
-
 
 
 function getVscodeSettingsFrom(project: Project) {
@@ -28,7 +26,7 @@ function getVscodeSettingsFrom(project: Project) {
 export class FilesRecreator extends BaseFeatureForProject<Project> {
 
   public async init() {
-    Helpers.log(`recreation init of ${CLI.chalk.bold(this.project.genericName)}`)
+    Helpers.log(`recreation init of ${chalk.bold(this.project.genericName)}`)
     if (this.project.typeIs('container')) {
       this.gitignore();
       this.handleProjectSpecyficFiles();

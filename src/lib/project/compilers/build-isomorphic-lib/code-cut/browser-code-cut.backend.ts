@@ -5,6 +5,7 @@ import {
   fse,
   crossPlatformPath,
   CoreModels,
+  chalk,
 } from 'tnp-core/src';
 
 import { config, extAllowedToReplace, frontEndOnly, TAGS } from 'tnp-config/src';
@@ -14,7 +15,6 @@ import { BuildOptions } from '../../../../build-options';
 import { Models } from '../../../../models';
 import { RegionRemover } from 'isomorphic-region-loader/src';
 import { MjsModule } from '../../../features/copy-manager/mjs-fesm-module-spliter.backend';
-import { CLI } from 'tnp-cli/src';
 import { labelReplacementCode, ReplaceOptionsExtended } from 'isomorphic-region-loader/src';
 
 
@@ -935,8 +935,8 @@ export class BrowserCodeCut {
     for (let index = 0; index < lines.length; index++) {
       const [wrongImport, lineindex] = lines[index];
       Helpers.warn(`
-${CLI.chalk.bold('WARNING')}: ${CLI.chalk.underline('./src/' + this.relativePath + `:${lineindex + 2}:1`)} Don't import things from lib like that (it may not work in your ${this.project.name}/src/app project);
-${CLI.chalk.bold(wrongImport)};
+${chalk.bold('WARNING')}: ${chalk.underline('./src/' + this.relativePath + `:${lineindex + 2}:1`)} Don't import things from lib like that (it may not work in your ${this.project.name}/src/app project);
+${chalk.bold(wrongImport)};
 Please use version compiled in node_modules:
 import { < My Stuff > } from '${this.project.name}';`, false,);
     }

@@ -1,6 +1,5 @@
-import { CLI } from "tnp-cli/src";
 import { config } from "tnp-config/src";
-import { path } from "tnp-core/src";
+import { chalk, path } from "tnp-core/src";
 import { Helpers } from "tnp-helpers/src";
 import { EXPORT_TEMPLATE } from "../../templates";
 import { BaseFeatureForProject } from "tnp-helpers/src";
@@ -57,7 +56,7 @@ export class WebpackBackendCompilation extends BaseFeatureForProject<Project> {
       Helpers.error(`
 
       Webpack build fail...
-  outdir: ${CLI.chalk(outDir)}, build type: ${CLI.chalk(appBuild ? 'app' : 'lib')}
+  outdir: ${chalk(outDir)}, build type: ${chalk(appBuild ? 'app' : 'lib')}
 
 `, false, true);
     }

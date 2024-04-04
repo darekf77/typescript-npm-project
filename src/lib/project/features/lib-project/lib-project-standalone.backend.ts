@@ -1,7 +1,6 @@
 //#region imports
-import { CLI } from "tnp-cli/src";
 import { config } from "tnp-config/src";
-import { crossPlatformPath, path, _ } from "tnp-core/src";
+import { crossPlatformPath, path, _, chalk } from "tnp-core/src";
 import { Helpers } from "tnp-helpers/src";
 import { AppBuildConfig } from "../../features/docs-app-build-config.backend";
 import { LibPorjectBase } from "./lib-project-base.backend";
@@ -219,7 +218,7 @@ export class LibProjectStandalone extends LibPorjectBase {
         try {
           if (!global.tnpNonInteractive) {
             Helpers.run(`code ${additionBase}`).sync();
-            Helpers.info(`Check you additional dist for ${CLI.chalk.bold(c)} and press any key to publish...`);
+            Helpers.info(`Check you additional dist for ${chalk.bold(c)} and press any key to publish...`);
             Helpers.pressKeyAndContinue();
           }
           Helpers.run('npm publish', { cwd: additionBase }).sync();

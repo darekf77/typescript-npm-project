@@ -1,6 +1,5 @@
-import { CLI } from "tnp-cli/src";
 import { config } from "tnp-config/src";
-import { crossPlatformPath, fse, path, _ } from "tnp-core/src";
+import { crossPlatformPath, fse, path, _, chalk } from "tnp-core/src";
 import { BaseFeatureForProject, Helpers } from "tnp-helpers/src";
 import { Project } from "../../abstract/project";
 import { Models } from "../../../models";
@@ -40,9 +39,9 @@ export class LibProjectVscodeExt extends BaseFeatureForProject<Project> {
     try {
       await Helpers.actionWrapper(() => {
         this.project.run(`firedev-vsce package`).sync();
-      }, `Building vsix package ` + CLI.chalk.bold(vsixPackageName) + `... `);
+      }, `Building vsix package ` + chalk.bold(vsixPackageName) + `... `);
       if (showInfo) {
-        const commandInstall = CLI.chalk.bold(`${config.frameworkName} install:locally`);
+        const commandInstall = chalk.bold(`${config.frameworkName} install:locally`);
         Helpers.info(`
 
         Please use command: ${commandInstall} # or ${config.frameworkName} il
