@@ -77,6 +77,7 @@ class UserController extends Firedev.Base.Controller<User> {
   //#region @websql
   async initExampleDbData(): Promise<void> {
     //#region @backendFunc
+    // @ts-ignore
     await this.repository.save(new User());
     //#endregion
   }
