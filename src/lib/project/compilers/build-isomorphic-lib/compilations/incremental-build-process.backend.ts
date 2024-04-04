@@ -40,6 +40,7 @@ export class IncrementalBuildProcess {
     //#region int backend compilation
 
     this.backendCompilation = new BackendCompilation(
+      buildOptions,
       buildOptions.watch,
       outFolder,
       location,

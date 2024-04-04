@@ -6,6 +6,7 @@ import { crossPlatformPath, fse, path, _, CoreModels } from "tnp-core/src";
 import { Helpers } from "tnp-helpers/src";
 import { Models } from "../../../../models";
 import { Project } from "../../../abstract/project";
+import { BuildOptions } from "../../../../build-options";
 //#endregion
 
 @IncCompiler.Class({ className: 'BackendCompilation' })
@@ -16,7 +17,6 @@ export class BackendCompilation extends IncCompiler.Base {
   //#endregion
 
   //#region fields & getters
-  CompilationWrapper = Helpers.compilationWrapper as any;
   public isEnableCompilation = true;
   protected compilerName = 'Backend Compiler';
   get tsConfigName() {
@@ -34,6 +34,7 @@ export class BackendCompilation extends IncCompiler.Base {
 
   //#region constructor
   constructor(
+    public buildOptions: BuildOptions,
     public isWatchBuild: boolean,
     /**
      * Output folder
@@ -72,7 +73,7 @@ export class BackendCompilation extends IncCompiler.Base {
       fse.mkdirpSync(outDistPath);
     }
     await this.libCompilation
-      ({
+      (this.buildOptions, {
         cwd: this.cwd,
         watch: this.isWatchBuild,
         outDir: this.outFolder as any,
@@ -82,7 +83,7 @@ export class BackendCompilation extends IncCompiler.Base {
   //#endregion
 
   //#region methods / lib compilation
-  async libCompilation({
+  async libCompilation(buildOptions: BuildOptions, {
     cwd,
     watch = false,
     outDir,
@@ -146,7 +147,7 @@ export class BackendCompilation extends IncCompiler.Base {
     );
     tscCommands = cmd(tsconfigBackendPath)
 
-    await this.buildStandardLibVer({
+    await this.buildStandardLibVer(buildOptions, {
       watch, ...tscCommands, generateDeclarations, cwd, project, outDir,
     });
 
@@ -155,7 +156,7 @@ export class BackendCompilation extends IncCompiler.Base {
   //#endregion
 
   //#region methods / build standar lib version
-  protected async buildStandardLibVer(options: {
+  protected async buildStandardLibVer(buildOptions: BuildOptions, options: {
     watch: boolean;
     commandJs: string;
     commandMaps: string;
@@ -216,10 +217,14 @@ Starting backend typescirpt build....
 
     await Helpers.execute(commandJs, cwd,
       {
-        exitOnError: true,
         exitOnErrorCallback: async (code) => {
-          Helpers.error(`[${config.frameworkName}] Typescript compilation (backend) error (code=${code})`
-            , false, true);
+          if (buildOptions.buildForRelease && !global.tnpNonInteractive) {
+            throw 'Typescript compilation (backend)';
+          } else {
+            Helpers.error(`[${config.frameworkName}] Typescript compilation (backend) error (code=${code})`
+              , false, true);
+          }
+
         },
         outputLineReplace: (line: string) => {
           if (isStandalone) {
@@ -275,13 +280,14 @@ Starting backend typescirpt build....
         }
       });
 
-    Helpers.log(`* Typescirpt compilation first part done (${outDir} build)`)
+    Helpers.logInfo(`* Typescirpt compilation first part done`)
 
     await Helpers.execute(commandMaps, cwd,
       {
         hideOutput: {
           stderr: true,
           stdout: true,
+          acceptAllExitCodeAsSuccess: true,
         },
         resolvePromiseMsg: {
           stdout: ['Watching for file changes.']

@@ -6,49 +6,10 @@ import { BuildOptions, ReleaseOptions } from "../../build-options";
 import { Models } from "../../models";
 import { config } from "tnp-config/src";
 
-//#region should release lib
-const shouldReleaseLibMessage = async (
-  releaseOptions: ReleaseOptions,
-  project: Project,
-) => {
-  //#region @backendFunc
-  if (releaseOptions.automaticReleaseDocs) {
-    return false;
-  }
-  let newVersion;
-  if (releaseOptions.releaseType === 'major') {
-    newVersion = project.__versionMajorPlusWithZeros
-  } else if (releaseOptions.releaseType === 'minor') {
-    newVersion = project.__versionMinorPlusWithZeros;
-  } else if (releaseOptions.releaseType === 'patch') {
-    newVersion = project.__versionPatchedPlusOne;
-  }
 
-  // TODO detecting changes for children when start container
-
-  if (project.__isSmartContainer) {
-    Helpers.info(`Pacakges available for new version release:
-
-${project.children.map((c) => ` - @${project.name}/${c.name} v${newVersion}`).join('\n')}
-`);
-    const message = 'Proceed with lib release ?';
-
-    return await Helpers.questionYesNo(message);
-  }
-
-  if (project.__isContainer && !project.__isSmartContainer) {
-    const message = `Proceed with release of packages from ${project.genericName} ?`;
-    return await Helpers.questionYesNo(message);
-  } else {
-    const message = `Proceed with release of new version: ${newVersion} ?`;
-    return await Helpers.questionYesNo(message);
-  }
-  //#endregion
-};
-//#endregion
 
 class $Release extends CommandLineFeature<ReleaseOptions, Project> {
-  resolved: Project[];
+
   __initialize__() {
     //#region resolve smart containter
     let resolved = [];
@@ -86,6 +47,7 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
         }
       }
     } else if (this.project.__isContainer) {
+
       resolved = Helpers.cliTool.resolveItemsFromArgsBegin<Project>(this.args, (a) => {
         return Project.ins.From(path.join(this.project.location, a));
       })?.allResolved;
@@ -205,23 +167,73 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
   //#endregion
 
   //#region start
-  private async start(releaseType: Models.ReleaseType = 'patch', automaticRelease: boolean = false) {
-
+  private async start(releaseType: CoreModels.ReleaseType = 'patch', automaticRelease: boolean = false) {
+    Helpers.clearConsole();
     const releaseOptions = ReleaseOptions.from({
       ...this.params,
       releaseType,
       automaticRelease,
+      skipProjectProcess: true,
       finishCallback: () => {
         this._exit();
       }
     });
     releaseOptions.specifiedVersion = this.args.find(k => k.startsWith('v') && Number(k.replace('v', '')) >= 3) || '';
-    releaseOptions.shouldReleaseLibrary = await shouldReleaseLibMessage(releaseOptions, this.project);
+    releaseOptions.shouldReleaseLibrary = await this.shouldReleaseLibMessage(releaseOptions, this.project);
     await this.project.release(releaseOptions);
     this._exit();
   }
   //#endregion
 
+  //#region should release lib
+  async shouldReleaseLibMessage(
+    releaseOptions: ReleaseOptions,
+    project: Project,
+  ) {
+    //#region @backendFunc
+    if (releaseOptions.automaticReleaseDocs) {
+      return false;
+    }
+    let newVersion;
+    if (releaseOptions.releaseType === 'major') {
+      newVersion = project.__versionMajorPlusWithZeros
+    } else if (releaseOptions.releaseType === 'minor') {
+      newVersion = project.__versionMinorPlusWithZeros;
+    } else if (releaseOptions.releaseType === 'patch') {
+      newVersion = project.__versionPatchedPlusOne;
+    }
+
+    // TODO detecting changes for children when start container
+
+    if (project.__isSmartContainer) {
+      Helpers.info(`Pacakges available for new version release:
+
+${project.children.map((c) => ` - @${project.name}/${c.name} v${newVersion}`).join('\n')}
+`);
+      const message = 'Proceed with lib release ?';
+
+      return await Helpers.questionYesNo(message);
+    }
+
+    if (project.__isContainer && !project.__isSmartContainer) {
+      Helpers.info(`Pacakges available for new version release:
+
+    ${(releaseOptions.resolved || []).map((c, index) => `(${index + 1}) `
+        + `${c.__isSmartContainer ? '@' + c.name + `/(${c.children.map(l => l.name).join(',')})` : c.name}` +
+        `@${c.getVersionFor(releaseOptions.releaseType)}`).join(', ')}
+    `);
+      const message = `Proceed ${releaseOptions.automaticRelease ? '(automatic)' : ''} release of packages from ${project.genericName} ?`;
+      if (!(await Helpers.questionYesNo(message))) {
+        this._exit()
+      }
+      return true;
+    } else {
+      const message = `Proceed with release of new version: ${newVersion} ?`;
+      return await Helpers.questionYesNo(message);
+    }
+    //#endregion
+  };
+  //#endregion
 }
 
 export default {

@@ -30,6 +30,7 @@ export async function start(
       //#region short args replacement
       'app': 'build:app:watch', // should be console menu
       'ba': 'build:app',
+      'b': 'build',
       'baw': 'build:app:watch',
       'bw': 'build:watch',
       's': 'build:start',

@@ -290,7 +290,7 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<{}, Project>
   //#endregion
 
   //#region async action
-  @IncCompiler.methods.AsyncAction() // @ts-ignore
+  @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
     // console.log('async event '+ absoluteFilePath)
@@ -356,6 +356,7 @@ ${projectToCopyTo.map(proj =>
     }
 
 
+
     for (let index = 0; index < projectToCopyTo.length; index++) {
       const projectToCopy = projectToCopyTo[index];
       log.data(`copying to ${projectToCopy?.name}`)
@@ -364,6 +365,12 @@ ${projectToCopyTo.map(proj =>
           outDir: outDir as any,
         }
       );
+      // if (this.buildOptions.buildForRelease && !global.tnpNonInteractive) {
+      //   Helpers.info('Things copied to :' + projectToCopy?.name);
+      //   if (!(await Helpers.consoleGui.question.yesNo('Is there everywthing ok with build ?'))) {
+      //     process.exit(0)
+      //   }
+      // }
       log.data('copy done...')
     }
   }
@@ -474,13 +481,8 @@ ${projectToCopyTo.map(proj =>
       this.copySourceMaps(destination, isTempLocalProj);
       this.copySharedAssets(destination, isTempLocalProj);
 
-      if (this.buildOptions.watch || isTempLocalProj) {
-        log.data('addiing links')
-        this.addSourceSymlinks(destination);
-      } else {
-        log.data('removing links');
-        this.removeSourceSymlinks(destination)
-      }
+      this.removeSourceSymlinks(destination);
+      this.addSourceSymlinks(destination);
 
       if (!this.cliBuildNoDts) {
         this.updateBackendFullDtsFiles(destination);

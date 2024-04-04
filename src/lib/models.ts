@@ -2,7 +2,7 @@ import { ConnectionOptions } from "firedev-typeorm/src";
 import { CoreModels, _ } from "tnp-core/src";
 
 export namespace Models {
-  export type ReleaseType = 'major' | 'minor' | 'patch';
+
   export type TestTypeFiredev = 'mocha' | 'jest' | 'cypress';
   export const TestTypeFiredevArr = ['mocha', 'jest', 'cypress'] as TestTypeFiredev[];
 

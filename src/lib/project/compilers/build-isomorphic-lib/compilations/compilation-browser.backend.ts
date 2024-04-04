@@ -48,7 +48,6 @@ export class BroswerCompilation extends BackendCompilation {
     return `Browser compilation`;
   }
 
-  CompilationWrapper = Helpers.compilationWrapper as any;
   //#endregion
 
   //#region constructor
@@ -71,7 +70,7 @@ export class BroswerCompilation extends BackendCompilation {
     public backendOutFolder: string,
     public buildOptions: BuildOptions
   ) {
-    super(isWatchBuild, outFolder, location, cwd, buildOptions.websql);
+    super(buildOptions, isWatchBuild, outFolder, location, cwd, buildOptions.websql);
     BroswerCompilation.instances[String(!!buildOptions.websql)] = this;
     this.compilerName = this.customCompilerName;
 

@@ -1378,9 +1378,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
     }
 
 
-    if (!global.tnpNonInteractive) {
-      Helpers.clearConsole();
-    }
+    // if (!global.tnpNonInteractive) {
+    //   Helpers.clearConsole();
+    // }
     //#endregion
 
     //#region resolve ishould release library
@@ -1453,7 +1453,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       const projsTemplate = (child?: Project) => {
         return `
 
-    PROJECTS FOR RELEASE CHAIN: ${releaseOptions.specifiedVersion
+    PROJECTS FOR RELEASE: ${releaseOptions.specifiedVersion
             ? ('(only framework version = ' + releaseOptions.specifiedVersion + ' )') : ''}
 
 ${releaseOptions.resolved.filter(p => {
@@ -1504,35 +1504,11 @@ processing...
         Helpers.clearConsole();
         Helpers.info(projsTemplate(child));
 
-        const tryReleaseProject = async () => {
-          while (true) {
-            try {
-              if (child.__npmPackages.useSmartInstall) {
-                child.__node_modules.remove();
-                child.__smartNodeModules.install('install');
-              }
-              await child.init();
-              break;
-            } catch (error) {
-              console.error(error)
-              if (!(await Helpers.consoleGui.question.yesNo(`Not able to INIT your project ${chalk.bold(child.genericName)} try again..`))) {
-                releaseOptions?.finishCallback()
-              }
-            }
-          }
-        };
+        await child.release(releaseOptions.clone({
+          resolved: [],
+          skipProjectProcess: releaseOptions.skipProjectProcess,
+        }));
 
-        while (true) {
-          await tryReleaseProject();
-          try {
-            await child.release(releaseOptions.clone({
-              resolved: [],
-            }))
-            break;
-          } catch (error) {
-            Helpers.pressKeyAndContinue(`Not able to RELEASE your project ${chalk.bold(child.genericName)} press any key to try again..`);
-          }
-        }
 
       }
       //#endregion
@@ -1596,7 +1572,37 @@ processing...
         if (!this.__node_modules.exist) {
           this.__npmPackages.installFromArgs('');
         }
-        await this.__release(releaseOptions);
+
+        const tryReleaseProject = async () => {
+          while (true) {
+            try {
+              if (this.__npmPackages.useSmartInstall) {
+                this.__node_modules.remove();
+                this.__smartNodeModules.install('install');
+              }
+              await this.init();
+              break;
+            } catch (error) {
+              console.error(error)
+              if (!(await Helpers.consoleGui.question.yesNo(`Not able to INIT your project ${chalk.bold(this.genericName)} try again..`))) {
+                releaseOptions?.finishCallback()
+              }
+            }
+          }
+        };
+
+        while (true) {
+          await tryReleaseProject();
+          try {
+            await this.__release(releaseOptions);
+            break;
+          } catch (error) {
+            Helpers.error(`Not able to RELEASE your project ${chalk.bold(this.genericName)}`, true, true);
+            if (!(await Helpers.consoleGui.question.yesNo(`Try again ? (or exit proces)`))) {
+              process.exit(0)
+            }
+          }
+        }
       }
       //#endregion
     }
@@ -1706,23 +1712,35 @@ processing...
     //#region build docs
     if (!global.tnpNonInteractive || automaticReleaseDocs) {
       // Helpers.clearConsole();
+      await new Promise<void>(async (resolve, reject) => {
+        if (this.__isStandaloneProject) {
+          await this.__libStandalone.buildDocs(prod, realCurrentProj, automaticReleaseDocs, async () => {
+            try {
+              specyficProjectForBuild = await this.__releaseBuildProcess({
+                realCurrentProj, releaseOptions, cutNpmPublishLibReleaseCode: false
+              });
+              resolve()
+            } catch (error) {
+              reject(error)
+            }
 
-      if (this.__isStandaloneProject) {
-        await this.__libStandalone.buildDocs(prod, realCurrentProj, automaticReleaseDocs, async () => {
-          specyficProjectForBuild = await this.__releaseBuildProcess({
-            realCurrentProj, releaseOptions, cutNpmPublishLibReleaseCode: false
           });
-        });
-      }
+        }
 
-      if (this.__isSmartContainer) {
-        await this.__libSmartcontainer.buildDocs(prod, realCurrentProj, automaticReleaseDocs, async () => {
-          specyficProjectForBuild = await this.__releaseBuildProcess({
-            realCurrentProj, releaseOptions, cutNpmPublishLibReleaseCode: false
+        if (this.__isSmartContainer) {
+          await this.__libSmartcontainer.buildDocs(prod, realCurrentProj, automaticReleaseDocs, async () => {
+            try {
+              specyficProjectForBuild = await this.__releaseBuildProcess({
+                realCurrentProj, releaseOptions, cutNpmPublishLibReleaseCode: false
+              });
+              resolve()
+            } catch (error) {
+              reject(error)
+            }
+
           });
-        });
-      }
-
+        }
+      });
 
       this.__commitRelease(newVersion);
 
@@ -1904,6 +1922,8 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       cliBuildUglify,
       cutNpmPublishLibReleaseCode,
       smartContainerTargetName: releaseOptions.smartContainerTargetName,
+      skipProjectProcess: true,
+      buildForRelease: true,
     }));
 
     //#region prepare release resources
@@ -2019,10 +2039,14 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
       const sharedOptions = () => {
         return {
-          exitOnError: true,
+          // askToTryAgainOnError: true,
           exitOnErrorCallback: async (code) => {
-            Helpers.error(`[${config.frameworkName}] Typescript compilation lib error (code=${code})`
-              , false, true);
+            if (buildOptions.buildForRelease && !global.tnpNonInteractive) {
+              throw 'Typescript compilation lib error';
+            } else {
+              Helpers.error(`[${config.frameworkName}] Typescript compilation lib error (code=${code})`
+                , false, true);
+            }
           },
           outputLineReplace: (line: string) => {
             if (isStandalone) {
@@ -2079,8 +2103,20 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         if (productionModeButIncludePackageJsonDeps) {
           //#region webpack dist release build
           console.log('Startomg build')
-          await incrementalBuildProcess.startAndWatch(`isomorphic compilation (only browser) `);
-          await incrementalBuildProcessWebsql.startAndWatch(`isomorphic compilation (only browser) [WEBSQL]`);
+          try {
+            await incrementalBuildProcess.startAndWatch(`isomorphic compilation (only browser) `);
+
+          } catch (error) {
+            console.log('CATCH INCE normal');
+
+          }
+
+          try {
+            await incrementalBuildProcessWebsql.startAndWatch(`isomorphic compilation (only browser) [WEBSQL]`);
+          } catch (error) {
+            console.log('CATCH INCE webcsal');
+          }
+
           // Helpers.error(`Watch build not available for dist release build`, false, true);
           // Helpers.info(`Starting watch dist release build for fast cli.. ${this.buildOptions.websql ? '[WEBSQL]' : ''}`);
           Helpers.info(`Starting watch dist release build for fast cli.. `);
@@ -2565,7 +2601,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
       Helpers.log('Pushing to git repository... ')
       Helpers.log(`Git branch: ${realCurrentProj.git.currentBranchName}`);
-      await realCurrentProj.git.pushCurrentBranch();
+      await realCurrentProj.git.pushCurrentBranch({ askToRetry: true });
       Helpers.info('Pushing to git repository done.');
     };
 
@@ -2807,49 +2843,54 @@ to fix it.
       Helpers.writeFile(this.pathFor(tmpBuildPort), projectInfoPort?.toString());
 
       const hostForBuild = `http://localhost:${projectInfoPort}`;
-      //#region check build message
-      Helpers.info(`
+
+      // Firedev.destroyContext(hostForBuild);
+      if (!buildOptions?.skipProjectProcess) {
+        //#region check build message
+        Helpers.info(`
 
 
 
-  You can check info about build in ${CLI.chalk.bold(hostForBuild)}
+      You can check info about build in ${CLI.chalk.bold(hostForBuild)}
 
 
 
-        `);
-      //#endregion
+            `);
+        //#endregion
 
-      Helpers.taskStarted(`starting project service... ${hostForBuild}`)
-      try {
-        // TOOD @UNCOMMEND
-        const context = await Firedev.init({
-          mode: 'backend/frontend-worker',
-          host: hostForBuild,
-          controllers: [
-            BuildProcessController,
-          ],
-          entities: [
-            BuildProcess,
-          ],
-          //#region @websql
-          config: {
-            type: 'better-sqlite3',
-            database:
-              //  config.frameworkName === 'firedev' ?
-              ':memory:'
-            //  as any : this.pathFor(`tmp-build-process.sqlite`)
-            ,
-            logging: false,
-          }
-          //#endregion
-        });
-        const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
-        await controller.initialize(this);
-        libContext = context;
-      } catch (error) {
-        console.error(error);
-        Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
+        Helpers.taskStarted(`starting project service... ${hostForBuild}`);
+        try {
+          // TOOD @UNCOMMEND
+          const context = await Firedev.init({
+            mode: 'backend/frontend-worker',
+            host: hostForBuild,
+            controllers: [
+              BuildProcessController,
+            ],
+            entities: [
+              BuildProcess,
+            ],
+            //#region @websql
+            config: {
+              type: 'better-sqlite3',
+              database:
+                //  config.frameworkName === 'firedev' ?
+                ':memory:'
+              //  as any : this.pathFor(`tmp-build-process.sqlite`)
+              ,
+              logging: false,
+            }
+            //#endregion
+          });
+          const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
+          await controller.initialize(this);
+          libContext = context;
+        } catch (error) {
+          console.error(error);
+          Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
+        }
       }
+
 
       this.__saveLaunchJson(projectInfoPort);
       Helpers.taskDone('project service started')
@@ -2873,24 +2914,27 @@ to fix it.
 
         const hostForAppWorker = `http://localhost:${projectInfoPortFromFile}`;
         // console.log({ hostForAppWorker })
-        try {
-          const context = await Firedev.init({
-            mode: 'remote-backend',
-            host: hostForAppWorker,
-            controllers: [
-              BuildProcessController,
-            ],
-            entities: [
-              BuildProcess,
-            ]
-          });
-          const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
-          await controller.initialize(this);
-        } catch (error) {
-          console.error(error);
-          Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
+        if (!buildOptions?.skipProjectProcess) {
+          try {
+            Firedev.destroyContext(hostForAppWorker);
+            const context = await Firedev.init({
+              mode: 'remote-backend',
+              host: hostForAppWorker,
+              controllers: [
+                BuildProcessController,
+              ],
+              entities: [
+                BuildProcess,
+              ]
+            });
+            const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
+            await controller.initialize(this);
+          } catch (error) {
+            console.error(error);
+            Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
+          }
+          this.__saveLaunchJson(projectInfoPortFromFile);
         }
-        this.__saveLaunchJson(projectInfoPortFromFile);
       }
       //#endregion
 
@@ -2935,6 +2979,7 @@ ${config.frameworkName} start
 
     //#region start copy to manager function
     const startCopyToManager = async () => {
+
       Helpers.info(`${buildOptions.watch ? 'files watch started...' : ''}`);
       Helpers.log(`[buildable-project] Build steps ended (project type: ${this.type}) ... `);
 
@@ -3472,6 +3517,20 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
   }
   //#endregion
 
+  getVersionFor(releaseType: CoreModels.ReleaseType): string {
+    //#region @backendFunc
+    if (releaseType === 'patch') {
+      return this.__versionPatchedPlusOne;
+    }
+    if (releaseType === 'minor') {
+      return this.__versionMinorPlusWithZeros;
+    }
+    if (releaseType === 'major') {
+      return this.__versionMajorPlusWithZeros;
+    }
+    //#endregion
+  }
+
   //#region getters & methods / version patched plus one
   get __versionPatchedPlusOne() {
     //#region @backendFunc
@@ -3965,10 +4024,15 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
         stdout: 'Compiled successfully'
       },
       //#region command execute params
-      exitOnError: true,
       exitOnErrorCallback: async (code) => {
-        Helpers.error(`[${config.frameworkName}] Typescript compilation error (code=${code})`
-          , false, true);
+
+        if (buildOptions.buildForRelease && !global.tnpNonInteractive) {
+          throw 'Angular compilation lib error!!!asd';
+        } else {
+          Helpers.error(`[${config.frameworkName}] Typescript compilation error (code=${code})`
+            , false, true);
+        }
+
       },
       outputLineReplace: (line: string) => {
         //#region replace outut line for better debugging
@@ -4377,6 +4441,7 @@ ${shouldBeProjectArr.map((p, index) => `- ${index + 1}. ${p}`).join('\n')}
     ];
 
     childrenToPush = childrenToPush.filter(f => !!f);
+
     return Helpers.arrays.uniqArray<Project>(childrenToPush, 'location') as any;
     //#endregion
   }

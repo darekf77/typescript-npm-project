@@ -96,7 +96,14 @@ export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
    */
   websql: boolean;
   buildType: 'lib' | 'app' | 'lib-app';
-
+  /**
+   * Skip project process for assigning automatic ports
+   */
+  skipProjectProcess: boolean;
+  /**
+   * build executed druring lib release
+   */
+  buildForRelease: boolean;
   baseHref: string;
   /**
    * Cut <@>notForNpm  tag from lib build
@@ -125,13 +132,13 @@ export class ReleaseOptions extends BuildOptionsLibOrApp<ReleaseOptions> {
     this.releaseType = 'patch';
     this.resolved = [];
   }
-  releaseType: Models.ReleaseType;
+  releaseType: CoreModels.ReleaseType;
   shouldReleaseLibrary: boolean;
   /**
    * build action only for specyfic framework version of prohect
    */
   frameworkVersion: CoreModels.FrameworkVersion;
-
+  skipProjectProcess: boolean;
   /**
    * Projects to release in container
    */
@@ -145,6 +152,9 @@ export class ReleaseOptions extends BuildOptionsLibOrApp<ReleaseOptions> {
   */
   automaticReleaseDocs: boolean;
   bumbVersionIn: string[];
+  /**
+   * @deprecated
+   */
   specifiedVersion: string;
   releaseTarget: 'lib' | 'app' | 'lib-app';
   public static from(options: Partial<ReleaseOptions>): ReleaseOptions {
