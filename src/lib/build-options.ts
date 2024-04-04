@@ -104,6 +104,10 @@ export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
    * build executed druring lib release
    */
   buildForRelease: boolean;
+  /**
+   * build on remote server (user cannot interfere with console)
+   */
+  ci: boolean;
   baseHref: string;
   /**
    * Cut <@>notForNpm  tag from lib build

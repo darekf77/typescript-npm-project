@@ -218,7 +218,7 @@ Starting backend typescirpt build....
     await Helpers.execute(commandJs, cwd,
       {
         exitOnErrorCallback: async (code) => {
-          if (buildOptions.buildForRelease && !global.tnpNonInteractive) {
+          if (buildOptions.buildForRelease && !buildOptions.ci) {
             throw 'Typescript compilation (backend)';
           } else {
             Helpers.error(`[${config.frameworkName}] Typescript compilation (backend) error (code=${code})`

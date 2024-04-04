@@ -2041,7 +2041,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         return {
           // askToTryAgainOnError: true,
           exitOnErrorCallback: async (code) => {
-            if (buildOptions.buildForRelease && !global.tnpNonInteractive) {
+            if (buildOptions.buildForRelease && !buildOptions.ci) {
               throw 'Typescript compilation lib error';
             } else {
               Helpers.error(`[${config.frameworkName}] Typescript compilation lib error (code=${code})`
@@ -4026,7 +4026,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
       //#region command execute params
       exitOnErrorCallback: async (code) => {
 
-        if (buildOptions.buildForRelease && !global.tnpNonInteractive) {
+        if (buildOptions.buildForRelease && !buildOptions.ci) {
           throw 'Angular compilation lib error!!!asd';
         } else {
           Helpers.error(`[${config.frameworkName}] Typescript compilation error (code=${code})`
