@@ -4372,6 +4372,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
   //#region getters & methods / init
   async init(initOptions?: InitOptions) {
     //#region @backendFunc
+    this.__saveLaunchJson(4000);
     Helpers.removeIfExists(path.join(this.location, config.file.tnpEnvironment_json));
     initOptions = InitOptions.from(initOptions);
     await this.__filesStructure.init(initOptions);
