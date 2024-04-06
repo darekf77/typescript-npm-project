@@ -109,5 +109,5 @@ async function startElectron() {
   }
 }
 
-export default startElectron;
+startElectron();
 //#endregion

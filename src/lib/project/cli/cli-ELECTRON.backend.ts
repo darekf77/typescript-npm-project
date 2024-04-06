@@ -25,6 +25,7 @@ class $Electron extends CommandLineFeature<BuildOptions, Project> {
 
   async watch() {
     await this.project.build(BuildOptions.from({
+      ...this.params,
       buildType: 'app',
       targetApp: 'electron',
       watch: true,

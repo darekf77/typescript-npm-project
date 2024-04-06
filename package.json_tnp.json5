@@ -51,9 +51,6 @@
     cliBuildUglify: false,
     cliBuildIncludeNodeModules: true,
     ugly: false,
-    nodts: false,
-    obscure: false,
-    includeNodeModules: false,
   },
 
   type: "isomorphic-lib",

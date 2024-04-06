@@ -48,10 +48,7 @@
       "cliBuildObscure": false,
       "cliBuildUglify": false,
       "cliBuildIncludeNodeModules": true,
-      "ugly": false,
-      "nodts": false,
-      "obscure": false,
-      "includeNodeModules": false
+      "ugly": false
     },
     "type": "isomorphic-lib",
     "version": "v4",
@@ -856,5 +853,6 @@
   },
   "license": "MIT",
   "private": false,
-  "devDependencies": {}
+  "devDependencies": {},
+  "main": "dist/app.electron.js"
 }

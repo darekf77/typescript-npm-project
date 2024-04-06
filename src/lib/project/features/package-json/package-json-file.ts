@@ -261,9 +261,14 @@ function lastFixes(
       content.version = '0.0.0';
     }
 
+    if (!content.main) {
+      content.main = "dist/app.electron.js";
+      additionalSaveRequired = true;
+    }
   }
   delete content['husky']; // TODO QUICK_FIX annyoning shit
   delete content['recreatedFrom'];
+
 
   return { additionalSaveRequired };
   //#endregion
@@ -342,7 +347,7 @@ function consistencyFixes(
     content[tnpProperty].libReleaseOptions = {
       cliBuildNoDts: false,
       cliBuildObscure: false,
-      ugly: false,
+      cliBuildUglify: false,
       cliBuildIncludeNodeModules: false,
     };
     additionalSaveRequired = true;
@@ -355,8 +360,8 @@ function consistencyFixes(
     content[tnpProperty].libReleaseOptions.cliBuildObscure = false;
     additionalSaveRequired = true;
   }
-  if (_.isUndefined(content[tnpProperty].libReleaseOptions.ugly)) {
-    content[tnpProperty].libReleaseOptions.ugly = false;
+  if (_.isUndefined(content[tnpProperty].libReleaseOptions.cliBuildUglify)) {
+    content[tnpProperty].libReleaseOptions.cliBuildUglify = false;
     additionalSaveRequired = true;
   }
   if (_.isUndefined(content[tnpProperty].libReleaseOptions.cliBuildIncludeNodeModules)) {

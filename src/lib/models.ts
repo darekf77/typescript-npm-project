@@ -281,7 +281,7 @@ export namespace Models {
     workerPlugins?: { [pathOrName in string]: string };
     libReleaseOptions: {
       cliBuildObscure?: boolean;
-      ugly?: boolean;
+      cliBuildUglify?: boolean;
       cliBuildNoDts?: boolean;
       cliBuildIncludeNodeModules?: boolean;
     },

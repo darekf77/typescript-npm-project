@@ -332,9 +332,6 @@ export class PackageJsonCore {
         Helpers.log(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`)
       } else {
         const d = (_.isObject(data) ? data : {}) as Models.IPackageJSON;
-        if (d.tnp?.type === 'isomorphic-lib') {
-          delete d['main']; // TODO QUICK_FIX delete main from package.json
-        }
         Helpers.writeFile(this.path, d);
       }
     }

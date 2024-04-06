@@ -1380,7 +1380,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
     if (this.__packageJson.libReleaseOptions.cliBuildObscure) {
       releaseOptions.cliBuildObscure = true;
     }
-    if (this.__packageJson.libReleaseOptions.ugly) {
+    if (this.__packageJson.libReleaseOptions.cliBuildUglify) {
       releaseOptions.cliBuildUglify = true;
     }
     if (this.__packageJson.libReleaseOptions.cliBuildNoDts) {
@@ -2012,7 +2012,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   //#endregion
 
   //#region getters & methods / build lib placeholder
-  private async __buildLib(buildOptions: BuildOptions, libBuildDone?: () => void) {
+  private async __buildLib(buildOptions: BuildOptions) {
     //#region @backendFunc
     Helpers.log(`[buildLib] called buildLib not implemented`);
     if (this.__isIsomorphicLib) {
@@ -2328,9 +2328,6 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       }
 
       this.__showMesageWhenBuildLibDoneForSmartContainer(buildOptions);
-      if (libBuildDone) {
-        await Helpers.runSyncOrAsync({ functionFn: libBuildDone });
-      }
     }
     //#endregion
   }
@@ -2806,8 +2803,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     }
     if (this.__isIsomorphicLib) {
       if (buildOptions.libBuild) {
-        await this.__buildLib(buildOptions, libBuildDone);
+        await this.__buildLib(buildOptions);
       }
+      await Helpers.runSyncOrAsync({ functionFn: libBuildDone });
       if (buildOptions.appBuild) {
         await this.__buildApp(buildOptions);
       }
@@ -3000,9 +2998,9 @@ ${config.frameworkName} start
       // console.log({ shouldGenerateAssetsList })
       if (shouldGenerateAssetsList) {
         if (buildOptions.watch) {
-          await this.__assetsFileListGenerator.startAndWatch(this.__smartContainerBuildTarget.name, buildOptions.outDir, buildOptions.websql);
+          await this.__assetsFileListGenerator.startAndWatch(this.__smartContainerBuildTarget?.name, buildOptions.outDir, buildOptions.websql);
         } else {
-          await this.__assetsFileListGenerator.start(this.__smartContainerBuildTarget.name, buildOptions.outDir, buildOptions.websql);
+          await this.__assetsFileListGenerator.start(this.__smartContainerBuildTarget?.name, buildOptions.outDir, buildOptions.websql);
         }
       }
     };
@@ -3037,7 +3035,9 @@ ${config.frameworkName} start
       if (buildOptions.appBuild) {
         await buildAssetsFile();
       }
-      await startCopyToManager();
+      if (buildOptions.libBuild) {
+        await startCopyToManager();
+      }
     });
     //#endregion
 
@@ -3266,61 +3266,64 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
       //#endregion
 
       //#region tempalte start nodemon nodejs server
-      const startNodemonServer = () => {
-        const result = {
-          'type': 'node',
-          'request': 'launch',
-          'remoteRoot': '${workspaceRoot}',
-          'localRoot': '${workspaceRoot}',
-          'name': 'Launch Nodemon server',
-          'runtimeExecutable': 'nodemon',
-          'program': '${workspaceFolder}/run.js',
-          'restart': true,
-          'sourceMaps': true,
-          'console': 'internalConsole',
-          'internalConsoleOptions': 'neverOpen',
-          runtimeArgs: this.__vscodeLaunchRuntimeArgs
-        };
-        return result;
-      }
+      // const startNodemonServer = () => {
+      //   const result = {
+      //     'type': 'node',
+      //     'request': 'launch',
+      //     'remoteRoot': '${workspaceRoot}',
+      //     'localRoot': '${workspaceRoot}',
+      //     'name': 'Launch Nodemon server',
+      //     'runtimeExecutable': 'nodemon',
+      //     'program': '${workspaceFolder}/run.js',
+      //     'restart': true,
+      //     'sourceMaps': true,
+      //     'console': 'internalConsole',
+      //     'internalConsoleOptions': 'neverOpen',
+      //     runtimeArgs: this.__vscodeLaunchRuntimeArgs
+      //   };
+      //   return result;
+      // }
       //#endregion
 
       //#region  tempalte start ng serve
 
-      const startNgServeTemplate = (servePort: number, workspaceChild: Project, workspaceLevel: boolean) => {
-        const result = {
-          'name': 'Debugger with ng serve',
-          'type': 'chrome',
-          'request': 'launch',
-          cwd: void 0,
-          // "userDataDir": false,
-          'preLaunchTask': 'Ng Serve',
-          'postDebugTask': 'terminateall',
-          'sourceMaps': true,
-          // "url": `http://localhost:${!isNaN(servePort) ? servePort : 4200}/#`,
-          'webRoot': '${workspaceFolder}',
-          'sourceMapPathOverrides': {
-            'webpack:/*': '${webRoot}/*',
-            '/./*': '${webRoot}/*',
-            '/tmp-src/*': '${webRoot}/*',
-            '/*': '*',
-            '/./~/*': '${webRoot}/node_modules/*'
-          }
-        }
-        if (workspaceChild) {
-          result.cwd = '${workspaceFolder}' + `/${workspaceChild.name}`;
-          result.webRoot = '${workspaceFolder}' + `/${workspaceChild.name}`;
-          result.name = `${result.name} for ${workspaceChild.name}`
-        }
-        if (workspaceLevel) {
-          result.preLaunchTask = `${result.preLaunchTask} for ${workspaceChild.name}`;
-        }
-        return result;
-      };
+      // /**
+      //  * @deprecated
+      //  */
+      // const startNgServeTemplate = (servePort: number, workspaceChild: Project, workspaceLevel: boolean) => {
+      //   const result = {
+      //     'name': 'Debugger with ng serve',
+      //     'type': 'chrome',
+      //     'request': 'launch',
+      //     cwd: void 0,
+      //     // "userDataDir": false,
+      //     'preLaunchTask': 'Ng Serve',
+      //     'postDebugTask': 'terminateall',
+      //     'sourceMaps': true,
+      //     // "url": `http://localhost:${!isNaN(servePort) ? servePort : 4200}/#`,
+      //     'webRoot': '${workspaceFolder}',
+      //     'sourceMapPathOverrides': {
+      //       'webpack:/*': '${webRoot}/*',
+      //       '/./*': '${webRoot}/*',
+      //       '/tmp-src/*': '${webRoot}/*',
+      //       '/*': '*',
+      //       '/./~/*': '${webRoot}/node_modules/*'
+      //     }
+      //   }
+      //   if (workspaceChild) {
+      //     result.cwd = '${workspaceFolder}' + `/${workspaceChild.name}`;
+      //     result.webRoot = '${workspaceFolder}' + `/${workspaceChild.name}`;
+      //     result.name = `${result.name} for ${workspaceChild.name}`
+      //   }
+      //   if (workspaceLevel) {
+      //     result.preLaunchTask = `${result.preLaunchTask} for ${workspaceChild.name}`;
+      //   }
+      //   return result;
+      // };
       //#endregion
 
       //#region electron
-      const startElectronServeTemplate = (servePort: number, workspaceChild: Project, workspaceLevel: boolean) => {
+      const startElectronServeTemplate = (remoteDebugElectronPort: number) => {
         return {
           "name": "Start electron app debug",
           "type": "node",
@@ -3332,7 +3335,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
           "runtimeArgs": [
             "--serve",
             ".",
-            "--remote-debugging-port=9876"
+            `--remote-debugging-port=${remoteDebugElectronPort}`// 9876
           ],
           "windows": {
             "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
@@ -3348,10 +3351,10 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
         ];
         if (this.__isStandaloneProject) {
           configurations.push(templateForServer(this, this, false));
-          configurations.push(startNgServeTemplate(9000, void 0, false));
-          configurations.push(startElectronServeTemplate(9000, void 0, false))
+          // configurations.push(startNgServeTemplate(9000, void 0, false));
+          configurations.push(startElectronServeTemplate(PortUtils.instance(basePort).calculatePortForElectronDebugging(this)))
           compounds.push({
-            name: 'Debug backend/frontend',
+            name: 'Debug Server + Electron App',
             configurations: [
               ...configurations.map(c => c.name)
             ]

@@ -22,7 +22,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-tnp',
   template: `hello from tnp<br>
     <br>
-    users from backend
+     from backend
     <ul>
       <li *ngFor="let user of (users$ | async)"> {{ user | json }} </li>
     </ul>

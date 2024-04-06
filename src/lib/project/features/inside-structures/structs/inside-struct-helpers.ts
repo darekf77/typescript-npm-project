@@ -371,6 +371,6 @@ try {
 }
 }
 
-export default startElectron;
+startElectron();
 ${'//#end' + 'region'}  `
 }

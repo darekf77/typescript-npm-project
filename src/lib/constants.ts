@@ -96,6 +96,13 @@ export class PortUtils {
    */
   private max = 20;
 
+  calculatePortForElectronDebugging(project: Project): number {
+    if (!project.__isIsomorphicLib) {
+      return;
+    }
+    return 9876 + this.n;
+  }
+
   calculateServerPortFor(project: Project): number {
     //#region @backendFunc
     if (project.__isContainer) {
