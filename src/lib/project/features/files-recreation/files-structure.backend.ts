@@ -63,11 +63,9 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
       this.project.quickFixes.missingLibs([])
     }
 
-    if (this.project.__isStandaloneProject) {
-      Helpers.taskStarted(`Initing project: ${chalk.bold(this.project.genericName)}`);
-      Helpers.log(` (from locaiton: ${this.project.location})`);
-      Helpers.log(`Init mode: ${websql ? '[WEBSQL]' : ''}`)
-    }
+
+    Helpers.taskStarted(`Initing project: ${chalk.bold(this.project.genericName)} ${struct ? '(without packages install)' : ''} ${omitChildren ? '(ommiting children)' : ''}`);
+
 
     alreadyInitedPorjects.push(this.project)
     Helpers.log(`Push to alread inited ${this.project.genericName} from ${this.project.location} `)
