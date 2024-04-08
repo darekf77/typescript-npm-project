@@ -15,7 +15,7 @@ export class InsideStructAngular13App extends BaseInsideStruct {
   constructor(project: Project, websql: boolean) {
     super(project, websql);
     //#region @backend
-    if (!project.__frameworkVersionAtLeast('v3') || project.typeIsNot('isomorphic-lib')) {
+    if (!project.__frameworkVersionAtLeast('v4') || project.typeIsNot('isomorphic-lib')) {
       return
     }
     const tmpProjectsStandalone = `tmp-apps-for-{{{outFolder}}}${this.websql ? '-websql' : ''}/${project.name}`;
