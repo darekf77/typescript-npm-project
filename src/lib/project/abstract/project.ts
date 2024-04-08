@@ -4422,7 +4422,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
       Helpers.warn(`Not initing ${this.genericName}`);
       return;
     }
-    await this.init(InitOptions.from({ struct: true }));
+    await this.init(InitOptions.from({ struct: true, omitChildren: true }));
   }
   //#endregion
 

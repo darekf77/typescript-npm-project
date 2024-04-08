@@ -48,11 +48,7 @@ export class InitOptions extends SystemTask<InitOptions> {
     super();
     this.alreadyInitedPorjects = [];
   }
-
-  /**
-   * @deprecated
-   */
-  recrusive: boolean;
+  omitChildren: boolean;
   initiator: Project;
   /**
    * init only structre without deps

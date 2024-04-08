@@ -16,7 +16,7 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
     if (!initOptions.initiator) {
       initOptions.initiator = this.project;
     }
-    const { alreadyInitedPorjects, watch, struct, branding, websql } = initOptions;
+    const { alreadyInitedPorjects, watch, struct, branding, websql, omitChildren } = initOptions;
     const smartContainerTargetName = this.project.__smartContainerBuildTarget?.name;
 
     // THIS IS SLOW... BUT I CAN AFORD IT HERE
@@ -40,7 +40,7 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
 
     this.project.quickFixes.missingSourceFolders();
 
-    if (this.project.__isSmartContainer) {
+    if (!omitChildren && this.project.__isSmartContainer) {
       const children = this.project.children;
       for (let index = 0; index < children.length; index++) {
         const child = children[index];
@@ -64,7 +64,6 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
     }
 
     if (this.project.__isStandaloneProject) {
-
       Helpers.taskStarted(`Initing project: ${chalk.bold(this.project.genericName)}`);
       Helpers.log(` (from locaiton: ${this.project.location})`);
       Helpers.log(`Init mode: ${websql ? '[WEBSQL]' : ''}`)
@@ -77,7 +76,7 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
     if (this.project.__isContainer) {
       await this.project.__recreate.init(initOptions);
 
-      if (!this.project.__isContainerWithLinkedProjects) {
+      if (!omitChildren && !this.project.__isContainerWithLinkedProjects) {
         const containerChildren = this.project.children.filter(c => {
           Helpers.log('checking if git repo')
           if (c.git.isGitRepo) {
@@ -124,7 +123,9 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
       //#region handle smart container
 
       await this.project.__recreate.init(initOptions);
-      await this.project.__singluarBuild.init(watch, false, 'dist', smartContainerTargetName);
+      if (!omitChildren) {
+        await this.project.__singluarBuild.init(watch, false, 'dist', smartContainerTargetName);
+      }
       //#endregion
     }
 
