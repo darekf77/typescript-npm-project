@@ -2575,7 +2575,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   private __commitRelease(newVer?: string, message = 'new version') {
     //#region @backendFunc
     if (newVer) {
-      this.git.stageAllAndCommit(`${message} ${newVer}`);
+      this.git.stageAllAndCommit(`${message} v${newVer}`);
     } else {
       this.git.stageAllAndCommit('relese update')
     }
@@ -2632,7 +2632,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         const lastCommitHash = realCurrentProj.git.lastCommitHash();
         realCurrentProj.__packageJson.setBuildHash(lastCommitHash);
         realCurrentProj.__packageJson.save('updating hash');
-        realCurrentProj.__commitRelease(newVersion, `build hash update`);
+        realCurrentProj.__commitRelease(newVersion, `release: `);
       } else {
         realCurrentProj.__commitRelease();
       }

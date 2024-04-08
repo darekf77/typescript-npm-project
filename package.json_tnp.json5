@@ -8,7 +8,7 @@
       // or generate icons with jimp directly
       favicons: "~7.1.2",
 
-      "ng2-rest-swagger-generator": '16.5.16',
+      "ng2-rest-swagger-generator": '16.5.17',
     },
     npmFixes: ["json5-writer", "lowdb", "misc-utils-of-mine-generic"],
     ignoreDepsPattern: [
@@ -276,9 +276,9 @@
         "firedev-crud": '16.5.65',
         "firedev-ports": '16.5.21',
         "firedev-crud-deamon": '16.5.19',
-        "firedev-ui": '16.5.17',
+        "firedev-ui": '16.5.18',
         "tnp-core": '16.6.32',
-        "tnp-cli": '16.5.16',
+        "tnp-cli": '16.5.17',
         "tnp-tools": "0.0.58",
         "any-project-cli": '16.5.25',
         "@types/node": "10.12.30",
@@ -286,17 +286,17 @@
         gulp: "^3.9.1",
         "ng2-logger": '16.5.27',
         "ng2-rest": '16.5.17',
-        "record-replay-req-res-scenario": '16.5.16',
+        "record-replay-req-res-scenario": '16.5.17',
         randomcolor: "^0.5.3",
         uuid: "^8.3.2",
         "buffer-shims": "^1.0.0",
         "content-type": "^1.0.4",
         // isomorphic http requests
         axios: "^0.17.1",
-        "ng-talkback": '16.5.17',
+        "ng-talkback": '16.5.18',
         "magic-renamer": '16.5.18',
-        "vpn-split": '16.5.19',
-        "node-cli-tester": '16.5.16',
+        "vpn-split": '16.5.20',
+        "node-cli-tester": '16.5.18',
         strings: {
           "@types/diff": "^3.2.2",
           diff: "^3.2.0",
@@ -433,9 +433,9 @@
         },
         "angular-client": {
           essentials: {
-            "static-columns": '16.5.20',
+            "static-columns": '16.5.21',
             "ngx-store": "2.1.0",
-            "firedev-storage": '16.5.16',
+            "firedev-storage": '16.5.17',
             "node-localstorage": "2.1.6",
             hammerjs: "^2.0.8",
           },
