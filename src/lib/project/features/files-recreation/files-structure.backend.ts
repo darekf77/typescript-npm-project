@@ -10,13 +10,13 @@ export type CleanType = 'all' | 'only_static_generated';
 
 export class FilesStructure extends BaseFeatureForProject<Project> {
 
-  public async init(options?: InitOptions) {
-    options = InitOptions.from(options);
+  public async init(initOptions?: InitOptions) {
+    initOptions = InitOptions.from(initOptions);
 
-    if (!options.initiator) {
-      options.initiator = this.project;
+    if (!initOptions.initiator) {
+      initOptions.initiator = this.project;
     }
-    const { alreadyInitedPorjects, watch, struct, branding, websql } = options;
+    const { alreadyInitedPorjects, watch, struct, branding, websql } = initOptions;
     const smartContainerTargetName = this.project.__smartContainerBuildTarget?.name;
 
     // THIS IS SLOW... BUT I CAN AFORD IT HERE
@@ -75,7 +75,7 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
 
     //#region handle init of container
     if (this.project.__isContainer) {
-      await this.project.__recreate.init();
+      await this.project.__recreate.init(initOptions);
 
       if (!this.project.__isContainerWithLinkedProjects) {
         const containerChildren = this.project.children.filter(c => {
@@ -89,11 +89,11 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
         })
         for (let index = 0; index < containerChildren.length; index++) {
           const containerChild = containerChildren[index];
-          await containerChild.__filesStructure.init(options);
+          await containerChild.__filesStructure.init(initOptions);
           const containerChildChildren = containerChild.children;
           for (let indexChild = 0; indexChild < containerChildChildren.length; indexChild++) {
             const workspaceChild = containerChildChildren[indexChild];
-            await workspaceChild.__filesStructure.init(options)
+            await workspaceChild.__filesStructure.init(initOptions)
           }
         }
       }
@@ -101,7 +101,7 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
     }
     //#endregion
 
-    await this.project.__recreate.init();
+    await this.project.__recreate.init(initOptions);
     this.project.__recreate.vscode.settings.toogleHideOrShowDeps();
 
     if (this.project.__isStandaloneProject || this.project.__isSmartContainer) {
@@ -123,7 +123,7 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
     if (this.project.__isSmartContainer) {
       //#region handle smart container
 
-      await this.project.__recreate.init();
+      await this.project.__recreate.init(initOptions);
       await this.project.__singluarBuild.init(watch, false, 'dist', smartContainerTargetName);
       //#endregion
     }

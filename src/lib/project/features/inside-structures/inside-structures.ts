@@ -12,6 +12,7 @@ import { Project } from '../../abstract/project';
 import { InsideStruct, Opt } from './inside-struct';
 import { InsideStructAngular13App, InsideStructAngular13Lib } from './structs';
 import { BaseInsideStruct } from './structs/base-inside-struct';
+import { InitOptions } from '../../../build-options';
 
 export class InsideStructures extends BaseFeatureForProject<Project> {
 
@@ -49,8 +50,9 @@ export class InsideStructures extends BaseFeatureForProject<Project> {
   //#region api
 
   //#region api / recreate
-  public async recrate(outFolder: CoreModels.OutFolder, watchBuild = true) {
-    // console.log('recreate start')
+  public async recrate(initOptions: InitOptions, watchBuild = true) {
+    initOptions = InitOptions.from(initOptions);
+    const outFolder = 'dist';
     const clients: Project[] = [];
 
     const action = async (client: Project) => {
@@ -116,7 +118,7 @@ export class InsideStructures extends BaseFeatureForProject<Project> {
         //#endregion
 
         //#region linking node_modules
-        if (insideStruct?.struct?.linkNodeModulesTo) {
+        if (insideStruct?.struct?.linkNodeModulesTo && !initOptions.struct) {
           for (let index = 0; index < insideStruct.struct.linkNodeModulesTo.length; index++) {
             const f = insideStruct.struct.linkNodeModulesTo[index]
             const destPath = path.join(client.location, replacement(f));

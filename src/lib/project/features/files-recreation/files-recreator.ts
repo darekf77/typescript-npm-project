@@ -10,6 +10,7 @@ import { Models } from '../../../models';
 import { Helpers } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
 import { BaseFeatureForProject } from 'tnp-helpers/src';
+import { InitOptions } from '../../../build-options';
 
 
 function getVscodeSettingsFrom(project: Project) {
@@ -25,7 +26,7 @@ function getVscodeSettingsFrom(project: Project) {
 
 export class FilesRecreator extends BaseFeatureForProject<Project> {
 
-  public async init() {
+  public async init(initOptions: InitOptions) {
     Helpers.log(`recreation init of ${chalk.bold(this.project.genericName)}`)
     if (this.project.typeIs('container')) {
       this.gitignore();
@@ -37,7 +38,7 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
     }
 
     if (this.project.__frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib') && !this.project?.parent?.__isSmartContainer) {
-      await this.project.__insideStructure.recrate('dist');
+      await this.project.__insideStructure.recrate(initOptions);
     }
 
 

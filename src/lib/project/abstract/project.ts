@@ -1920,7 +1920,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
       const vscodeFolder = path.join(generatedProject.location, config.folder._vscode);
       Helpers.removeFolderIfExists(vscodeFolder);
-      await generatedProject.__insideStructure.recrate('dist');
+      await generatedProject.__insideStructure.recrate(InitOptions.from({}));
       return generatedProject;
 
     }
