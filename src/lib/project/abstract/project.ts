@@ -2835,6 +2835,13 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
           elecProj.run(`npm-run  electron . --serve ${buildOptions.websql ? '--websql' : ''}`).async();
         } else {
           if (buildOptions.buildForRelease) {
+
+            if (!this.isInCiReleaseProject) {
+              const tempGeneratedCiReleaseProject = await this.__createTempCiReleaseProject();
+              await tempGeneratedCiReleaseProject.build(buildOptions);
+              return;
+            }
+
             // if (!this.pathExists(`tmp-apps-for-dist/${this.name}/electron/compiled/app.electron.js`)) {
             //   // await this.build(buildOptions.clone({
             //   //   buildForRelease: false,
@@ -4411,6 +4418,10 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
 
   //#region getters & methods / struct
   async struct() {
+    if (!((this.__isIsomorphicLib || this.__isContainer) && this.__frameworkVersionAtLeast('v2'))) {
+      Helpers.warn(`Not initing ${this.genericName}`);
+      return;
+    }
     await this.init(InitOptions.from({ struct: true }));
   }
   //#endregion

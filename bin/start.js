@@ -1,5 +1,4 @@
 //#region @backend
-
 //#region quick fixes
 Error.stackTraceLimit = 100;
 global.i0 = {
@@ -82,6 +81,7 @@ if (verbose || frameworkName === 'tnp' || global.skipCoreCheck) {
 //#endregion
 
 const path = require('path');
+
 
 if (procType === 'child-of-root') {
   global.spinner = {
@@ -176,7 +176,7 @@ if (startSpinner) {
 
   // global.start = start;
   process.argv = process.argv.filter(f => !!f);
-  start(process.argv?.slice(2), global.frameworkName, mode);
+  start(process.argv, global.frameworkName, mode);
   //#endregion
 }
 

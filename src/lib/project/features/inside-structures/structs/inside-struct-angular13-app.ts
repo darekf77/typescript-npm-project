@@ -600,6 +600,16 @@ ${appModuleFile}
             `/${config.file.package_json}`
           )), 'name', this.project.name);
 
+          if (this.project.isInCiReleaseProject) {
+            Helpers.setValueToJSON(crossPlatformPath(path.join(
+              project.location
+              ,
+              replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+              ,
+              `/${config.file.package_json}`
+            )), 'main', 'electron/bundled/index.js');
+          }
+
           Helpers.setValueToJSON(crossPlatformPath(path.join(
             project.location
             ,
