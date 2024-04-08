@@ -26,7 +26,7 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
       resolved = Project.sortGroupOfProject<Project>([
         ...resolved,
         ...otherDeps,
-      ], (proj) => proj.__packageJson.data?.tnp?.overrided?.includeOnly || [], proj => proj.name)
+      ], (proj) => proj.__includeOnlyForRelease || [], proj => proj.name)
         .filter(d => d.name !== this.project.name);
 
     }

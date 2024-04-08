@@ -518,6 +518,16 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   }
   //#endregion
 
+  get __includeOnlyForRelease() {
+    //#region @backendFunc
+    const result = this.__packageJson?.data?.tnp?.overrided?.includeOnly;
+    if (this.name === config.frameworkNames.tnp) {
+      result.push('morphi'); // TODO QUICK_FIX
+    }
+    return result;
+    //#endregion
+  }
+
   installNpmPackages() {
     //#region @backendFunc
     this.__npmPackages.installFromArgs('');
