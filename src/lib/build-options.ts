@@ -94,10 +94,19 @@ export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
    */
   websql: boolean;
   buildType: 'lib' | 'app' | 'lib-app';
+  private _skipProjectProcess: boolean;
   /**
    * Skip project process for assigning automatic ports
    */
-  skipProjectProcess: boolean;
+  get skipProjectProcess() {
+    if (process.platform === 'darwin') {
+      return true; // TODO QUICK_FIX @LAST
+    }
+    return this._skipProjectProcess;
+  }
+  set skipProjectProcess(value) {
+    this._skipProjectProcess = value;
+  }
   /**
    * build executed druring lib release
    */

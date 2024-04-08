@@ -50,6 +50,7 @@ export class InsideStructAngular13App extends BaseInsideStruct {
         'app/angular.json',
         'app/jest.config.js',
         'app/electron-builder.json',
+        'app/angular.webpack.js',
         'app/electron/main.js',
         'app/electron/package.json',
         'app/karma.conf.js',
@@ -588,8 +589,24 @@ ${appModuleFile}
           ));
 
           const electronConfig = Helpers.readJson(electronConfigPath);
-          electronConfig.directories.output = replacement(`../../tmp-electron-release/{{{outFolder}}}${this.websql ? '-websql' : ''}/`);
+          electronConfig.directories.output = `../../${this.project.__getElectronAppRelativePath({ websql: this.websql })}/`;
           Helpers.writeJson(electronConfigPath, electronConfig);
+
+          Helpers.setValueToJSON(crossPlatformPath(path.join(
+            project.location
+            ,
+            replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+            ,
+            `/${config.file.package_json}`
+          )), 'name', this.project.name);
+
+          Helpers.setValueToJSON(crossPlatformPath(path.join(
+            project.location
+            ,
+            replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
+            ,
+            `/${config.file.package_json}`
+          )), 'version', this.project.version);
 
         })();
         //#endregion

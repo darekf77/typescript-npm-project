@@ -10,7 +10,15 @@ import { VpnSplit } from 'vpn-split/src';
 
 export class $Open extends CommandLineFeature<{}, Project> {
   public _() {
-    Helpers.openFolderInFileExploer(this.cwd);
+    Helpers.info('Opening folder...')
+    let pathToFolder = this.firstArg;
+    if (!pathToFolder) {
+      pathToFolder = this.cwd;
+    }
+    if (!path.isAbsolute(pathToFolder)) {
+      pathToFolder = this.project.pathFor(pathToFolder);
+    }
+    Helpers.openFolderInFileExploer(pathToFolder);
     this._exit();
   }
 

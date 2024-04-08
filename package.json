@@ -105,6 +105,7 @@
           "@angular-devkit/schematics",
           "@angular/cli",
           "@angular/compiler-cli",
+          "@angular-builders/custom-webpack",
           "@angular/language-service",
           "ts-node",
           "tslint",

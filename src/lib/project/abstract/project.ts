@@ -2814,6 +2814,10 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   }
   //#endregion
 
+  __getElectronAppRelativePath({ websql }: { websql: boolean; }) {
+    return `tmp-build/electron-app-dist${websql ? '-websql' : ''}`
+  }
+
   //#region getters & methods / build
   async build(buildOptions?: BuildOptions) {
     //#region @backendFunc
@@ -2821,21 +2825,41 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     //#region handle electron
     if (buildOptions.targetApp === 'electron') {
       if (this.__isStandaloneProject) {
+        const elecProj = Project.ins.From(this.pathFor([
+          `tmp-apps-for-${config.folder.dist}${buildOptions.websql ? '-websql' : ''}`
+          , this.name,
+        ]));
+        Helpers.info('Starting electron...')
 
         if (buildOptions.watch) {
-          const elecProj = Project.ins.From(this.pathFor([`tmp-apps-for-${config.folder.dist}${buildOptions.websql ? '-websql' : ''}`
-            , this.name]));
-          Helpers.info('Starting electron...')
           elecProj.run(`npm-run  electron . --serve ${buildOptions.websql ? '--websql' : ''}`).async();
         } else {
-          const elecProj = Project.ins.From(this.pathFor([`tmp-apps-for-dist${buildOptions.websql ? '-websql' : ''}`
-            , this.name]));
-          elecProj.run(`npm-run electron-builder build --publish=never`).async();
+          if (buildOptions.buildForRelease) {
+            // if (!this.pathExists(`tmp-apps-for-dist/${this.name}/electron/compiled/app.electron.js`)) {
+            //   // await this.build(buildOptions.clone({
+            //   //   buildForRelease: false,
+            //   //   watch: false
+            //   // }))
+            // } else {
+            //   Helpers.info('Initing before release build...')
+            await this.init();
+            // }
+
+            const elecProj = Project.ins.From(this.pathFor([`tmp-apps-for-dist${buildOptions.websql ? '-websql' : ''}`
+              , this.name]));
+            elecProj.run('npm-run ng build angular-electron').sync();
+            elecProj.run('npm-run ncc build electron/main.js -o electron/bundled  --no-cache').sync();
+            elecProj.run(`npm-run electron-builder build --publish=never`).sync();
+            this.openLocation(this.__getElectronAppRelativePath({ websql: buildOptions.websql }))
+          } else {
+            // TODO
+          }
         }
         return;
       } else {
         Helpers.error(`Electron apps compilation only for standalone projects`, false, true);
       }
+      buildOptions.finishCallback();
     }
     //#endregion
 
