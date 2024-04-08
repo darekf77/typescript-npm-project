@@ -4,6 +4,8 @@ Error.stackTraceLimit = 100;
 global.i0 = {
   defineInjectable: function () { }
 }
+const process= require('process');
+process.removeAllListeners('warning');
 //#endregion
 
 //#region resolve constants
