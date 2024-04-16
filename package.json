@@ -567,7 +567,7 @@
     "private": false
   },
   "name": "tnp",
-  "version": "16.5.29",
+  "version": "16.5.30",
   "bin": {
     "t": "bin/t",
     "t-debug": "bin/t-debug",
@@ -860,7 +860,7 @@
     "yup": "1.1.1",
     "zone.js": "~0.13.0"
   },
-  "lastBuildTagHash": "00215b7d61cdc456ab6fd1693f88774ea8373be4",
+  "lastBuildTagHash": "338ad9058e32dc7a59549264c55714b9deb861f2",
   "scripts": {
     "activate": "npm i --force && firedev dedupe && npx tsc && firedev link && tnp bd"
   },

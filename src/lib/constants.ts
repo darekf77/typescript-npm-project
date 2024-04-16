@@ -27,7 +27,7 @@ export const UNIT_TEST_TIMEOUT = 30000;
 export const INTEGRATION_TEST_TIMEOUT = 30000;
 
 
-export let morphiPathUserInUserDir: string
+export let firedevRepoPathUserInUserDir: string
   //#region @backend
   = path.join(crossPlatformPath(os.homedir()), '.firedev', firedevFrameworkName);
 //#endregion

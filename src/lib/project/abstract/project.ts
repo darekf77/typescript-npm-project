@@ -6,7 +6,7 @@ import { LibTypeArr } from 'tnp-config';
 import { CoreConfig } from 'tnp-core';
 import { BuildOptions, InitOptions, ReleaseOptions } from '../../build-options';
 import { Models } from '../../models';
-import { firedevFrameworkName, MESSAGES, morphiPathUserInUserDir, tmpBuildPort } from '../../constants';
+import { firedevFrameworkName, MESSAGES, firedevRepoPathUserInUserDir, tmpBuildPort } from '../../constants';
 //#region @backend
 import { fse, json5, os } from 'tnp-core/src';
 import { child_process, } from 'tnp-core/src';
@@ -234,11 +234,11 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
 
       } else {
 
-        const morhiVscode = path.join(path.dirname(morphiPathUserInUserDir), 'firedev/.vscode');
+        const morhiVscode = path.join(path.dirname(firedevRepoPathUserInUserDir), 'firedev/.vscode');
 
-        if (!fse.existsSync(morphiPathUserInUserDir) && !global.skipCoreCheck) {
-          if (!fse.existsSync(path.dirname(morphiPathUserInUserDir))) {
-            fse.mkdirpSync(path.dirname(morphiPathUserInUserDir));
+        if (!fse.existsSync(firedevRepoPathUserInUserDir) && !global.skipCoreCheck) {
+          if (!fse.existsSync(path.dirname(firedevRepoPathUserInUserDir))) {
+            fse.mkdirpSync(path.dirname(firedevRepoPathUserInUserDir));
           }
 
           try {
@@ -249,13 +249,13 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
 
           try {
             child_process.execSync(`git clone ${config.urlRepoFiredev}`, {
-              cwd: path.dirname(morphiPathUserInUserDir),
+              cwd: path.dirname(firedevRepoPathUserInUserDir),
               stdio: [0, 1, 2],
             });
             Helpers.remove(morhiVscode);
           } catch (error) {
             Helpers.error(`[${config.frameworkName}][config] Not able to clone repository: ${config.urlRepoFiredev} in:
-           ${morphiPathUserInUserDir}`, false, true);
+           ${firedevRepoPathUserInUserDir}`, false, true);
           }
 
           try {
@@ -355,6 +355,71 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
     //#endregion
   }
   //#endregion
+
+  static sync(noExit = false, useLatestTag = false) {
+    //#region @backendFunc
+    const cwd = firedevRepoPathUserInUserDir;
+    Helpers.info(`Fetching git data... `);
+    try {
+      Helpers.run(`git reset --hard && git clean -df && git fetch`, { cwd, output: false }).sync();
+    } catch (error) {
+      Helpers.error(`[${config.frameworkName} Not ablt to reset origin of  firedev: ${config.urlRepoFiredev} in: ${cwd}`, false, true);
+    }
+
+    try {
+      Helpers.run(`git checkout master`, { cwd, output: false }).sync();
+      Helpers.log('DONE CHECKING OUT MASTER')
+    } catch (error) {
+      Helpers.log(error)
+      Helpers.error(`[${config.frameworkName} Not ablt to checkout master branch for :${config.urlRepoFiredev} in: ${cwd}`, false, true);
+    }
+
+    try {
+      Helpers.run(`git pull --tags origin master`, { cwd, output: false }).sync();
+      Helpers.log('DONE PULLING MASTER')
+    } catch (error) {
+      Helpers.log(error)
+      Helpers.error(`[${config.frameworkName} Not ablt to checkout master branch for :${config.urlRepoFiredev} in: ${cwd}`, false, true);
+    }
+
+    if (useLatestTag) {
+      // TODO  SPLIT TO SEPARATED CONTAINERS
+      const tagToCheckout = Project.morphiTagToCheckoutForCurrentCliVersion(cwd);
+      const currentBranch = Helpers.git.currentBranchName(cwd);
+      Helpers.taskStarted(`Checking out lastest tag ${tagToCheckout} for firedev framework...`);
+      if (currentBranch !== tagToCheckout) {
+        try {
+          Helpers.run(`git reset --hard && git clean -df && git checkout ${tagToCheckout}`, { cwd }).sync()
+        } catch (error) {
+          console.log(error)
+          Helpers.warn(`[${config.frameworkName} Not ablt to checkout latest tag of firedev framework (moprhi project) : ${config.urlRepoFiredev} in: ${cwd}`, false);
+        }
+      }
+      try {
+        Helpers.run(`git pull origin ${tagToCheckout}`, { cwd }).sync()
+      } catch (error) {
+        console.log(error)
+        Helpers.warn(`[${config.frameworkName} Not ablt to pull latest tag of firedev framework (moprhi project) : ${config.urlRepoFiredev} in: ${cwd}`, false);
+      }
+    }
+
+
+    try {
+      Helpers.run('rimraf .vscode', { cwd }).sync();
+    } catch (error) { }
+
+    const arrActive = config.activeFramewrokVersions;
+    for (let index = 0; index < arrActive.length; index++) {
+      const defaultFrameworkVersionForSpecyficContainer = arrActive[index];
+      Helpers.info(`Installing new versions of packages for global container-${defaultFrameworkVersionForSpecyficContainer}`)
+      const container = Project.by('container', defaultFrameworkVersionForSpecyficContainer);
+      container.run('firedev reinstall').sync();
+      Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
+    }
+
+    Helpers.success('firedev-framework synced ok');
+    //#endregion
+  }
 
   //#endregion
 

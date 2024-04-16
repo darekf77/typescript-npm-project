@@ -121,6 +121,7 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<{}, Project>
 
   //#region  getters / core container for project
   get coreContainerSmartNodeModulesProj() {
+    console.log('path', path.dirname(this.coreContainer.__smartNodeModules.path))
     const tempCoreContainerPathForSmartNodeModules = Project.ins.From(crossPlatformPath(path.dirname(this.coreContainer.__smartNodeModules.path))) as Project;
     return tempCoreContainerPathForSmartNodeModules;
   }

@@ -10,7 +10,7 @@ import { BrowserCodeCut } from "../compilers/build-isomorphic-lib/code-cut/brows
 import { CLI } from "tnp-cli/src";
 import { Models } from '../../models';
 import * as  psList from 'ps-list';
-import { MESSAGES, morphiPathUserInUserDir } from '../../constants';
+import { MESSAGES, firedevRepoPathUserInUserDir } from '../../constants';
 import { MagicRenamer } from "magic-renamer/src";
 declare const ENV: any;
 //#endregion
@@ -836,56 +836,7 @@ class $Global extends BaseCommandLine<{}, Project> {
 
   //#region sync core repositories
   SYNC(noExit = false, useLatestTag = false) {
-    const cwd = morphiPathUserInUserDir;
-    Helpers.info(`Fetching git data... `);
-    try {
-      Helpers.run(`git reset --hard && git clean -df && git fetch`, { cwd, output: false }).sync();
-    } catch (error) {
-      Helpers.error(`[${config.frameworkName} Not ablt to reset origin of  firedev: ${config.urlRepoFiredev} in: ${cwd}`, false, true);
-    }
-
-    try {
-      Helpers.run(`git checkout master`, { cwd, output: false }).sync();
-      Helpers.log('DONE CHECKING OUT MASTER')
-    } catch (error) {
-      Helpers.log(error)
-      Helpers.error(`[${config.frameworkName} Not ablt to checkout master branch for :${config.urlRepoFiredev} in: ${cwd}`, false, true);
-    }
-
-    try {
-      Helpers.run(`git pull --tags origin master`, { cwd, output: false }).sync();
-      Helpers.log('DONE PULLING MASTER')
-    } catch (error) {
-      Helpers.log(error)
-      Helpers.error(`[${config.frameworkName} Not ablt to checkout master branch for :${config.urlRepoFiredev} in: ${cwd}`, false, true);
-    }
-
-    if (useLatestTag) {
-      // TODO  SPLIT TO SEPARATED CONTAINERS
-      const tagToCheckout = Project.morphiTagToCheckoutForCurrentCliVersion(cwd);
-      const currentBranch = Helpers.git.currentBranchName(cwd);
-      Helpers.taskStarted(`Checking out lastest tag ${tagToCheckout} for firedev framework...`);
-      if (currentBranch !== tagToCheckout) {
-        try {
-          Helpers.run(`git reset --hard && git clean -df && git checkout ${tagToCheckout}`, { cwd }).sync()
-        } catch (error) {
-          console.log(error)
-          Helpers.warn(`[${config.frameworkName} Not ablt to checkout latest tag of firedev framework (moprhi project) : ${config.urlRepoFiredev} in: ${cwd}`, false);
-        }
-      }
-      try {
-        Helpers.run(`git pull origin ${tagToCheckout}`, { cwd }).sync()
-      } catch (error) {
-        console.log(error)
-        Helpers.warn(`[${config.frameworkName} Not ablt to pull latest tag of firedev framework (moprhi project) : ${config.urlRepoFiredev} in: ${cwd}`, false);
-      }
-    }
-
-
-    try {
-      Helpers.run('rimraf .vscode', { cwd }).sync();
-    } catch (error) { }
-    Helpers.success('firedev-framework synced ok')
+    Project.sync(noExit, useLatestTag);
     if (!noExit) {
       this._exit();
     }
@@ -893,20 +844,10 @@ class $Global extends BaseCommandLine<{}, Project> {
   //#endregion
 
   //#region autoupdate
-  async AU() {
-
+  async autoupdate() {
     if (config.frameworkName === 'firedev') {
       if (await Helpers.questionYesNo(`Proceed with ${config.frameworkName} auto-update ?`)) {
-        Helpers.run('npm i -g firedev --force').sync();
         await this.SYNC(true, true)
-        const arrActive = config.activeFramewrokVersions;
-        for (let index = 0; index < arrActive.length; index++) {
-          const defaultFrameworkVersionForSpecyficContainer = arrActive[index];
-          Helpers.info(`Installing new versions of packages for global container-${defaultFrameworkVersionForSpecyficContainer}`)
-          const container = Project.by('container', defaultFrameworkVersionForSpecyficContainer);
-          container.run('firedev reinstall').sync();
-          Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
-        }
       }
     }
     if (config.frameworkName === 'tnp') {
