@@ -105,7 +105,7 @@ async function start() {
   const body: HTMLElement = document.getElementsByTagName('body')[0];
   body.innerHTML = `<my-app>Loading...</my-app>`;
 
-  if (Morphi.isBrowser) {
+  if (Firedev.isBrowser) {
     if (document.readyState === 'complete') {
       main();
     } else {
@@ -114,7 +114,7 @@ async function start() {
   }
 }
 
-if (Morphi.isBrowser) {
+if (Firedev.isBrowser) {
   start();
 }
 
@@ -134,7 +134,7 @@ export default start;
 import { Firedev } from 'firedev';
 // import 'core-js/client/shim';
 // import 'reflect-metadata';
-if (Morphi.isBrowser) {
+if (Firedev.isBrowser) {
   require('zone.js/dist/zone');
 }
 
@@ -150,8 +150,8 @@ const host = 'http://localhost:3333';
 
 
 
-@Morphi.Entity({ className: 'Book' })
-class Book extends Morphi.Base.Entity<any> {
+@Firedev.Entity({ className: 'Book' })
+class Book extends Firedev.Base.Entity<any> {
   static from(name: string) {
     const b = new Book();
     b.name = name;
@@ -159,12 +159,12 @@ class Book extends Morphi.Base.Entity<any> {
   }
 
   //#region @backend
-  @Morphi.Orm.Column.Custom('varchar')
+  @Firedev.Orm.Column.Custom('varchar')
   //#endregion
   public name: string
 
   //#region @backend
-  @Morphi.Orm.Column.Generated()
+  @Firedev.Orm.Column.Generated()
   //#endregion
   public id: number
 
@@ -172,8 +172,8 @@ class Book extends Morphi.Base.Entity<any> {
 
 
 
-@Morphi.Controller({ className: 'BookCtrl', entity: Book })
-class BookCtrl extends Morphi.Base.Controller<any> {
+@Firedev.Controller({ className: 'BookCtrl', entity: Book })
+class BookCtrl extends Firedev.Base.Controller<any> {
   //#region @backend
   async initExampleDbData() {
     const db = await this.connection.getRepository(Book);
@@ -245,7 +245,7 @@ async function start() {
   };
   //#endregion
 
-  const context = await Morphi.init({
+  const context = await Firedev.init({
     host,
     controllers: [BookCtrl],
     entities: [Book],
@@ -255,7 +255,7 @@ async function start() {
   });
   console.log(context);
 
-  if (Morphi.isBrowser) {
+  if (Firedev.isBrowser) {
     const body: HTMLElement = document.getElementsByTagName('body')[0];
     body.innerHTML = `<my-app>Loading...</my-app>`;
     if (document.readyState === 'complete') {
@@ -266,7 +266,7 @@ async function start() {
   }
 }
 
-if (Morphi.isBrowser) {
+if (Firedev.isBrowser) {
   start();
 }
 

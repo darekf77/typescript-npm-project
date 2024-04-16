@@ -1,5 +1,5 @@
 //#region imports
-import { Morphi as Firedev } from 'morphi/src';
+import { Firedev } from 'firedev/src';
 import { BuildProcess } from './build-process';
 import { _ } from 'tnp-core/src';
 import {

@@ -72,6 +72,11 @@ export class $Open extends CommandLineFeature<{}, Project> {
     process.exit(0)
   }
 
+  release() {
+    Helpers.run(`code ${this.project.releaseCiProject.location}`).sync();
+    process.exit(0)
+  }
+
   private _openThing(fileName: string) {
     const proj = this.project;
 

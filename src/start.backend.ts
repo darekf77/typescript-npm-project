@@ -31,6 +31,7 @@ export async function start(
       'app': 'build:app:watch', // should be console menu
       'ba': 'build:app',
       'b': 'build',
+      'hosts': 'open:hosts',
       'baw': 'build:app:watch',
       'bw': 'build:watch',
       's': 'build:start',
@@ -42,6 +43,8 @@ export async function start(
       'r:major': 'release:major',
       'r:minor': 'release:minor',
       // 'ra': 'release:all',
+      'e': 'electron',
+      'ekill': 'electron:kill',
       'ar': 'release:auto',
       'ard': 'release:auto:docs',
       're': 'reinstall',
@@ -51,6 +54,7 @@ export async function start(
       'occ': 'open:core:container',
       'ocp': 'open:core:project',
       'o': 'open',
+      'or': 'open:release',
       // test
       'twd': 'test:watch:debug',
       'tdw': 'test:watch:debug',

@@ -8,17 +8,12 @@ import {
   //#endregion
   _, Helpers
 } from 'tnp-core/src';
-import { Morphi } from 'morphi/src';
+
 import type { Project } from '../../abstract/project';
 import { PackageJsonFile } from './package-json-file';
 import { config } from 'tnp-config/src';
 //#endregion
-@Morphi.Entity<PackageJSON>({
-  className: 'PackageJSON',
-  //#region @backend
-  createTable: false
-  //#endregion
-})
+
 export class PackageJSON
   //#region @backend
   extends PackageJsonBase

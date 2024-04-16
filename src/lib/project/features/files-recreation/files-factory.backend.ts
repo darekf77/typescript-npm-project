@@ -49,28 +49,28 @@ export class FilesFactory extends BaseFeatureForProject<Project> {
     this.create(relativePath, kebebCaseName, `${fileNameWithoutExt}.ts`)
       .file(
         `
-import { Morphi } from 'morphi/src';
+import { Firedev } from 'firedev/src';
 
 export interface I${fileNameWithoutExt} {
   id?: number;
   exampleProperty?: string;
 }
 
-@Morphi.Entity<${fileNameWithoutExt}>({
+@Firedev.Entity<${fileNameWithoutExt}>({
   className: '${fileNameWithoutExt}',
   mapping: {
 
   }
 })
-export class ${fileNameWithoutExt} extends Morphi.Base.Entity<${fileNameWithoutExt}, I${fileNameWithoutExt}> implements I${fileNameWithoutExt} {
+export class ${fileNameWithoutExt} extends Firedev.Base.Entity<${fileNameWithoutExt}, I${fileNameWithoutExt}> implements I${fileNameWithoutExt} {
 
   //#region @backend
-  @Morphi.Orm.Column.Generated()
+  @Firedev.Orm.Column.Generated()
   //#endregion
   id: number
 
   //#region @backend
-  @Morphi.Orm.Column.Custom()
+  @Firedev.Orm.Column.Custom()
   //#endregion
   exampleProperty: string
 
@@ -88,10 +88,10 @@ export class ${fileNameWithoutExt} extends Morphi.Base.Entity<${fileNameWithoutE
     this.create(relativePath, kebebCaseName, `${NameController}.ts`)
       .file(
         `
-import { Morphi } from 'morphi/src';
+import { Firedev } from 'morphi/src';
 import { ${fileNameWithoutExt} } from './${fileNameWithoutExt}';
 
-@Morphi.Controller({
+@Firedev.Controller({
   className: '${NameController}',
   entity: ${fileNameWithoutExt},
   //#region @backend
@@ -100,7 +100,7 @@ import { ${fileNameWithoutExt} } from './${fileNameWithoutExt}';
   // }
   //#endregion
 })
-export class ${NameController} extends Morphi.Base.Controller<${fileNameWithoutExt}> {
+export class ${NameController} extends Firedev.Base.Controller<${fileNameWithoutExt}> {
 
   //#region @backend
   async initExampleDbData() {

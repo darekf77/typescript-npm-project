@@ -8,7 +8,6 @@ import {
 } from "tnp-core/src";
 
 export const firedevFrameworkName = 'firedev';
-export const morphiFrameworkName = 'morphi';
 
 export const OVERRIDE_FROM_TNP = [
   'scripts',
@@ -30,7 +29,7 @@ export const INTEGRATION_TEST_TIMEOUT = 30000;
 
 export let morphiPathUserInUserDir: string
   //#region @backend
-  = path.join(crossPlatformPath(os.homedir()), '.firedev', morphiFrameworkName);
+  = path.join(crossPlatformPath(os.homedir()), '.firedev', firedevFrameworkName);
 //#endregion
 
 

@@ -95,14 +95,19 @@ export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
    * Skip project process for assigning automatic ports
    */
   get skipProjectProcess() {
+    return true;
+    //#region @backendFunc
     if (process.platform === 'darwin') {
       return true; // TODO QUICK_FIX @LAST
     }
     return this._skipProjectProcess;
+    //#endregion
   }
   set skipProjectProcess(value) {
     this._skipProjectProcess = value;
   }
+
+  skipCopyManager: boolean;
   /**
    * build executed druring lib release
    */

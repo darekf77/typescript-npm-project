@@ -96,15 +96,10 @@ firedev init # => is a part of lib build and you don't need to use it
 Quicket way to start local development of app and lib build in the same process
 
 ```
-# local lib build
+# global lib build with angular app
 firedev start
 firedev start --port 4444
 firedev start --websql
-firedev s
-
-# global lib build
-firedev start:watch 
-firedev sw 
 ```
 
 
@@ -113,33 +108,15 @@ firedev sw
 Don't waste your local resources and build/serve only things that you need
 
 ```
-# local lib build
-firedev build:dist
-firedev bd
-firedev build:dist:watch
-firedev bdw
-firedev bb
-firedev bbw
-
-# global lib build
-firedev build:watch  
+# lib build
+firedev build
+firedev build:watch
+firedev b
 firedev bw
 
-# revert global lib build of package(s) to original state
-firedev revert
-firedev rev
-
 # app build
-firedev build:app
-firedev ba
-firedev build:app child-project-name
-firedev ba child-project-name
-firedev build:dist:app
-firedev bda
-firedev build:dist:app:watch
-firedev bdaw
-firedev bba
-firedev bbaw
+firedev app
+firedev app child-project-name
 ```
 
 ### Releasing to npm repository or/and  github/gitlab pages
@@ -151,7 +128,7 @@ Easy release of app or libs for standalone/organization projects
 firedev release
 firedev patch:release
 firedev r
-firedev release --all   # for release and omit cache
+firedev release
 firedev automatic:release
 firedev ar
 
@@ -181,6 +158,10 @@ firedev push:feature
 firedev pf
 firedev push:fix 
 firedev pfix
+firedev pchore
+firedev pc
+firedev prefactor
+firedev pref
 ```
 
 ### Testing

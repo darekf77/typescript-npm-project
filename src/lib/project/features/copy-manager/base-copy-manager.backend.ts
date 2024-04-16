@@ -147,7 +147,7 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<{}, Project>
         ...(node_modules_projs),
       ];
     }
-    return Helpers.arrays.uniqArray<Project>(result, 'location');
+    return Helpers.uniqArray<Project>(result, 'location');
   }
   //#endregion
 

@@ -207,11 +207,6 @@ ${appModuleFile}
           );
 
           appComponentFile = appComponentFile.replace(
-            `import { Morphi } from 'morphi/src';`,
-            `import { Morphi } from 'morphi/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
-          );
-
-          appComponentFile = appComponentFile.replace(
             `from 'firedev-ui/src';`,
             `from 'firedev-ui/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
           );
@@ -607,7 +602,7 @@ ${appModuleFile}
               replacement(project.__isStandaloneProject ? tmpProjectsStandalone : tmpProjects)
               ,
               `/${config.file.package_json}`
-            )), 'main', 'electron/bundled/index.js');
+            )), 'main', 'electron/index.js');
           }
 
           Helpers.setValueToJSON(crossPlatformPath(path.join(

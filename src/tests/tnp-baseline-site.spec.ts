@@ -128,8 +128,8 @@
 //   ctx.siteChild.filesFactory.createFile(filePathBaseline.relative.custom, `
 // import { ${fileNameWithoutExt} as Base } from '${ctx.baseline.name}/${ctx.baselinChild.name}/${relativeWithoutext}';
 // import {
-// Morphi
-// } from 'morphi';
+// Firedev
+// } from 'firedev';
 
 // export class ${fileNameWithoutExt} extends Base {
 
@@ -152,7 +152,7 @@
 
 //     // it('should join new lines in import into one long import', async () => {
 //     //   expect(!!~Helpers.readFile(filePathSite.absolute.normal).toString().trim()
-//     //     .search(`import { Morphi } from 'morphi';`)).to.be.true;
+//     //     .search(`import { Firedev } from 'firedev';`)).to.be.true;
 //     // });
 
 //   })

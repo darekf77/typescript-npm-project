@@ -6,11 +6,11 @@ import { LibTypeArr } from 'tnp-config';
 import { CoreConfig } from 'tnp-core';
 import { BuildOptions, InitOptions, ReleaseOptions } from '../../build-options';
 import { Models } from '../../models';
-import { firedevFrameworkName, MESSAGES, morphiFrameworkName, morphiPathUserInUserDir, tmpBuildPort } from '../../constants';
+import { firedevFrameworkName, MESSAGES, morphiPathUserInUserDir, tmpBuildPort } from '../../constants';
 //#region @backend
 import { fse, json5, os } from 'tnp-core/src';
 import { child_process, } from 'tnp-core/src';
-import { Morphi as Firedev } from 'morphi/src';
+import { Firedev } from 'firedev/src';
 import * as semver from 'semver';
 import {
   PackageJSON, QuickFixes,
@@ -220,7 +220,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       const projectsInUserFolder = crossPlatformPath(path.join(
         crossPlatformPath(os.homedir()),
         '.firedev',
-        morphiFrameworkName,
+        firedevFrameworkName,
         'projects',
       ));
       let pathResult = joined.replace(
@@ -234,7 +234,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
 
       } else {
 
-        const morhiVscode = path.join(path.dirname(morphiPathUserInUserDir), 'morphi/.vscode');
+        const morhiVscode = path.join(path.dirname(morphiPathUserInUserDir), 'firedev/.vscode');
 
         if (!fse.existsSync(morphiPathUserInUserDir) && !global.skipCoreCheck) {
           if (!fse.existsSync(path.dirname(morphiPathUserInUserDir))) {
@@ -248,13 +248,13 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
           }
 
           try {
-            child_process.execSync(`git clone ${config.urlMorphi}`, {
+            child_process.execSync(`git clone ${config.urlRepoFiredev}`, {
               cwd: path.dirname(morphiPathUserInUserDir),
               stdio: [0, 1, 2],
             });
             Helpers.remove(morhiVscode);
           } catch (error) {
-            Helpers.error(`[${config.frameworkName}][config] Not able to clone repository: ${config.urlMorphi} in:
+            Helpers.error(`[${config.frameworkName}][config] Not able to clone repository: ${config.urlRepoFiredev} in:
            ${morphiPathUserInUserDir}`, false, true);
           }
 
@@ -276,7 +276,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   }
 
   private static get firedevProjectsRelative() {
-    return `../morphi/projects`;
+    return `../firedev/projects`;
   };
 
   private static resolveCoreProjectsPathes(version?: CoreModels.FrameworkVersion) {
@@ -521,9 +521,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   get __includeOnlyForRelease() {
     //#region @backendFunc
     const result = this.__packageJson?.data?.tnp?.overrided?.includeOnly;
-    if (this.name === config.frameworkNames.tnp) {
-      result.push('morphi'); // TODO QUICK_FIX
-    }
+    // if (this.name === config.frameworkNames.tnp) {
+    //   result.push('morphi'); // TODO QUICK_FIX
+    // }
     return result;
     //#endregion
   }
@@ -1279,7 +1279,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   /**
    * array of isomorphic pacakges
    * example:
-   * ['firedev', '@something/child', 'morphi' ]
+   * ['firedev', '@something/child' ]
    */
   public get __isomorphicPackages(): string[] {
     //#region @backendFunc
@@ -1857,7 +1857,8 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   //#endregion
 
   //#region getters & methods / recreate release project
-  public async recreateReleaseProject() {
+  public async recreateReleaseProject(soft = false) {
+
     this.remove(config.folder.tmpDistRelease);
     await this.__createTempCiReleaseProject()
   }
@@ -2839,11 +2840,12 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
           `tmp-apps-for-${config.folder.dist}${buildOptions.websql ? '-websql' : ''}`
           , this.name,
         ]));
-        Helpers.info('Starting electron...')
+        Helpers.info('Starting electron ...')
 
         if (buildOptions.watch) {
           elecProj.run(`npm-run  electron . --serve ${buildOptions.websql ? '--websql' : ''}`).async();
         } else {
+          Helpers.info('Release build of electron app')
           if (buildOptions.buildForRelease) {
 
             if (!this.isInCiReleaseProject) {
@@ -2858,14 +2860,40 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
             //   //   watch: false
             //   // }))
             // } else {
-            //   Helpers.info('Initing before release build...')
-            await this.init();
-            // }
 
             const elecProj = Project.ins.From(this.pathFor([`tmp-apps-for-dist${buildOptions.websql ? '-websql' : ''}`
               , this.name]));
+            // Helpers.createSymLink(this.__node_modules.path, elecProj.pathFor(`electron/${config.folder.node_modules}`));
+            elecProj.run('code .').sync();
+            Helpers.info('Building lib...')
+            await this.build(buildOptions.clone({
+              buildType: 'lib',
+              targetApp: 'pwa',
+              watch: false,
+              skipProjectProcess: true,
+              skipCopyManager: true,
+              finishCallback: () => { }
+            }));
+            Helpers.info('Build lib done.. building now electron app...')
+
+            // Helpers.pressKeyAndContinue()
             elecProj.run('npm-run ng build angular-electron').sync();
-            elecProj.run('npm-run ncc build electron/main.js -o electron/bundled  --no-cache').sync();
+            const indexHtmlPath = elecProj.pathFor(['dist', 'index.html']);
+            console.log({
+              indexHtmlPath
+            })
+            Helpers.writeFile(indexHtmlPath,
+              Helpers.readFile(indexHtmlPath)
+                .replace(`<base href="/">`, '<base href="./">')
+                .replace(/\/assets\//g, 'assets/')
+            );
+            // <base href="/">
+            await Helpers.ncc(
+              crossPlatformPath([elecProj.location, 'electron', 'main.js']),
+              crossPlatformPath([elecProj.location, 'electron', 'index.js']),
+            )
+            // elecProj.run(`npm-run ncc build electron/main.js -o electron/bundled  --no-cache  --external electron `).sync();
+            await Helpers.questionYesNo('Would you like to do check out?');
             elecProj.run(`npm-run electron-builder build --publish=never`).sync();
             this.openLocation(this.__getElectronAppRelativePath({ websql: buildOptions.websql }))
           } else {
@@ -2963,7 +2991,7 @@ to fix it.
 
 
       this.__saveLaunchJson(projectInfoPort);
-      Helpers.taskDone('project service started')
+      !buildOptions.skipProjectProcess && Helpers.taskDone('project service started')
       // console.log({ context })
       //#endregion
 
@@ -3076,20 +3104,20 @@ ${config.frameworkName} start
       if (buildOptions.appBuild) {
         await buildAssetsFile();
       }
-      if (buildOptions.libBuild) {
+      if (buildOptions.libBuild && !buildOptions.skipCopyManager) {
         await startCopyToManager();
       }
     });
     //#endregion
 
-    const msg = (buildOptions.watch ? `
-      Files watcher started.. ${buildOptions.websql ? '[WEBSQL]' : ''}
-    `: `
-      End of Building ${this.genericName} ${buildOptions.websql ? '[WEBSQL]' : ''}
 
-    ` )
+    !buildOptions.skipCopyManager && Helpers.info((buildOptions.watch ? `
+    Files watcher started.. ${buildOptions.websql ? '[WEBSQL]' : ''}
+  `: `
+    End of Building ${this.genericName} ${buildOptions.websql ? '[WEBSQL]' : ''}
 
-    Helpers.info(msg);
+  ` ));
+
     buildOptions.finishCallback();
     //#endregion
   }
@@ -4526,7 +4554,7 @@ ${shouldBeProjectArr.map((p, index) => `- ${index + 1}. ${p}`).join('\n')}
 
     this.removeFolderByRelativePath('node_modules/husky');
 
-    if (this.name === 'morphi' || this.name === 'firedev-framework') {
+    if (this.name === 'firedev') {
       config.activeFramewrokVersions
         .forEach((frameworkVersion) => {
           // console.log(`Active Framework: ${frameworkVersion}`)

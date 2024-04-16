@@ -495,8 +495,6 @@ export class BrowserCodeCut {
       ...this.additionalSmartPckages,
     ]);
 
-
-    // console.log('MORPHI this.isomorphicLibs', this.isomorphicLibs)
     let realName = packageName;
     let isIsomorphic = false;
     if (packageName !== void 0) {

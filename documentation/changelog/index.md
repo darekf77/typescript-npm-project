@@ -1,21 +1,19 @@
 # Changelog
 
 ## Firedev v17 (in progress)
-
 - support for Angular 17, Node 18
 - (Eslint + Prettier) instead Tslint
-- firedev.json5 instead package.json_tnp.json5
-- electron support 
-- open-source docker with cloud (curl -o- https://firedev.io/install-on-server-script.sh | bash)
+- firedev.json instead package.json_tnp.json5
+- updated socket.io
+- support for apache cordova
 - buildin content manager
 
-## Firedev v16 (LTS)
-
+## Firedev v16 (LTS, in progress)
 - support for Angular 16, Node 16
-- automatic port assigments
+- open-source docker with cloud (curl -o- https://firedev.io/install-on-server-script.sh | bash)
+- electron support (ipc inside controllers)
+- automatic port assigments (with detached process)
 - vscode plugin code generator
-- firedev.json5
-- updated socket.io
 - auto-generated typeorm query selector
 
 ## Firedev v13 (end of support)

@@ -41,8 +41,9 @@ class $Global extends BaseCommandLine<{}, Project> {
     if (process.platform === 'win32') {
       Helpers.run(`taskkill /f /im code.exe`).sync();
       this._exit()
+    } else {
+      Helpers.run(`fkill -f code`).sync();
     }
-    Helpers.run(`fkill -f code`).sync();
     this._exit()
   }
   //#endregion
@@ -840,7 +841,7 @@ class $Global extends BaseCommandLine<{}, Project> {
     try {
       Helpers.run(`git reset --hard && git clean -df && git fetch`, { cwd, output: false }).sync();
     } catch (error) {
-      Helpers.error(`[${config.frameworkName} Not ablt to reset origin of morphi: ${config.urlMorphi} in: ${cwd}`, false, true);
+      Helpers.error(`[${config.frameworkName} Not ablt to reset origin of  firedev: ${config.urlRepoFiredev} in: ${cwd}`, false, true);
     }
 
     try {
@@ -848,7 +849,7 @@ class $Global extends BaseCommandLine<{}, Project> {
       Helpers.log('DONE CHECKING OUT MASTER')
     } catch (error) {
       Helpers.log(error)
-      Helpers.error(`[${config.frameworkName} Not ablt to checkout master branch for :${config.urlMorphi} in: ${cwd}`, false, true);
+      Helpers.error(`[${config.frameworkName} Not ablt to checkout master branch for :${config.urlRepoFiredev} in: ${cwd}`, false, true);
     }
 
     try {
@@ -856,7 +857,7 @@ class $Global extends BaseCommandLine<{}, Project> {
       Helpers.log('DONE PULLING MASTER')
     } catch (error) {
       Helpers.log(error)
-      Helpers.error(`[${config.frameworkName} Not ablt to checkout master branch for :${config.urlMorphi} in: ${cwd}`, false, true);
+      Helpers.error(`[${config.frameworkName} Not ablt to checkout master branch for :${config.urlRepoFiredev} in: ${cwd}`, false, true);
     }
 
     if (useLatestTag) {
@@ -869,14 +870,14 @@ class $Global extends BaseCommandLine<{}, Project> {
           Helpers.run(`git reset --hard && git clean -df && git checkout ${tagToCheckout}`, { cwd }).sync()
         } catch (error) {
           console.log(error)
-          Helpers.warn(`[${config.frameworkName} Not ablt to checkout latest tag of firedev framework (moprhi project) : ${config.urlMorphi} in: ${cwd}`, false);
+          Helpers.warn(`[${config.frameworkName} Not ablt to checkout latest tag of firedev framework (moprhi project) : ${config.urlRepoFiredev} in: ${cwd}`, false);
         }
       }
       try {
         Helpers.run(`git pull origin ${tagToCheckout}`, { cwd }).sync()
       } catch (error) {
         console.log(error)
-        Helpers.warn(`[${config.frameworkName} Not ablt to pull latest tag of firedev framework (moprhi project) : ${config.urlMorphi} in: ${cwd}`, false);
+        Helpers.warn(`[${config.frameworkName} Not ablt to pull latest tag of firedev framework (moprhi project) : ${config.urlRepoFiredev} in: ${cwd}`, false);
       }
     }
 
@@ -1176,6 +1177,18 @@ class $Global extends BaseCommandLine<{}, Project> {
     this.CLEAN()
   }
   //#endregion
+
+  inprogress() {
+    Helpers.info(`
+    In progress
+${this.project.children
+        .filter(f => f.git.lastCommitMessage().startsWith(Helpers.git.ACTION_MSG_RESET_GIT_HARD_COMMIT))
+        .map((c, index) => `${index + 1}. ${c.genericName}`)
+      }
+
+    `);
+    this._exit()
+  }
 }
 
 
