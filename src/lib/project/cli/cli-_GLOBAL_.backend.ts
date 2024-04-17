@@ -609,6 +609,7 @@ class $Global extends BaseCommandLine<{}, Project> {
 
   //#region reinstall
   async REINSTALL() {
+    // await Helpers.killAllNodeExceptCurrentProcess();
     const proj = this.project;
 
     if (proj.__isContainer) {

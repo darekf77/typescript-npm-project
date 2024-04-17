@@ -43,6 +43,8 @@ import { BuildProcess, BuildProcessController } from '../features/build-process/
 import { EnvironmentConfig } from '../features/environment-config/environment-config';
 //#endregion
 
+const debugWord = 'Debug/Start'
+
 
 export class FiredevProjectResolve extends BaseProjectResolver<Project> {
 
@@ -3314,7 +3316,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
         return {
           "type": "node",
           "request": "launch",
-          "name": `Launch Server @${container.name}/${c.name}`,
+          "name": `${debugWord} Server @${container.name}/${c.name}`,
           "cwd": "${workspaceFolder}" + `/dist/${container.name}/${c.name}`,
           "program": "${workspaceFolder}" + `/dist/${container.name}/${c.name}/run-org.js`,
           "args": [
@@ -3370,7 +3372,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
         const startServerTemplate = {
           'type': 'node',
           'request': 'launch',
-          'name': 'Launch Server',
+          'name': `${debugWord} Server`,
           'program': '${workspaceFolder}/run.js',
           'cwd': void 0,
           'args': [`port=${backendPort}`],
@@ -3387,9 +3389,9 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
           startServerTemplate.cwd = cwd;
         }
         if ((serverChild.location === clientProject.location) && serverChild.__isStandaloneProject) {
-          startServerTemplate.name = `${startServerTemplate.name} standalone`
+          // startServerTemplate.name = `${startServerTemplate.name} Standalone`
         } else {
-          startServerTemplate.name = `${startServerTemplate.name} ${serverChild.name} for ${clientProject.name}`
+          startServerTemplate.name = `${startServerTemplate.name} '${serverChild.name}' for '${clientProject.name}'`
         }
         startServerTemplate.args.push(`--ENVoverride=${encodeURIComponent(JSON.stringify({
           clientProjectName: clientProject.name
@@ -3459,7 +3461,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
       //#region electron
       const startElectronServeTemplate = (remoteDebugElectronPort: number) => {
         return {
-          "name": "Start electron app debug",
+          "name": `${debugWord} Electron`,
           "type": "node",
           "request": "launch",
           "protocol": "inspector",
@@ -3488,7 +3490,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
           // configurations.push(startNgServeTemplate(9000, void 0, false));
           configurations.push(startElectronServeTemplate(PortUtils.instance(basePort).calculatePortForElectronDebugging(this)))
           compounds.push({
-            name: 'Debug Server + Electron App',
+            name: `${debugWord} (Server + Electron)`,
             configurations: [
               ...configurations.map(c => c.name)
             ]
@@ -4602,7 +4604,7 @@ ${shouldBeProjectArr.map((p, index) => `- ${index + 1}. ${p}`).join('\n')}
 
     childrenToPush = childrenToPush.filter(f => !!f);
 
-    return Helpers.arrays.uniqArray<Project>(childrenToPush, 'location') as any;
+    return Helpers.uniqArray<Project>(childrenToPush, 'location') as any;
     //#endregion
   }
   //#endregion

@@ -77,6 +77,11 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
     } else {
       try {
         executeCommand(command, this.project);
+
+        // Helpers.taskStarted('Rebuilding better-sqlite for current electron version'); // needed for electorn
+        // this.project.run('npm-run electron-rebuild -f -w better-sqlite3', { output: true }).sync();
+        // this.project.run('npm-run electron-builder install-app-deps', { output: true }).sync();
+        // Helpers.taskDone('Done rebuilding electorn');
       } catch (err) {
         if (config.frameworkName === 'tnp') {
           console.log(err)
