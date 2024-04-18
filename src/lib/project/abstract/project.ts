@@ -8,7 +8,7 @@ import { BuildOptions, InitOptions, ReleaseOptions } from '../../build-options';
 import { Models } from '../../models';
 import { firedevFrameworkName, MESSAGES, firedevRepoPathUserInUserDir, tmpBuildPort } from '../../constants';
 //#region @backend
-import { fse, json5, os } from 'tnp-core/src';
+import { fse, json5, os, dateformat } from 'tnp-core/src';
 import { child_process, } from 'tnp-core/src';
 import { Firedev } from 'firedev/src';
 import * as semver from 'semver';
@@ -1658,7 +1658,7 @@ processing...
         await tnpProj.git.pushCurrentBranch();
         Helpers.success(`
 
-
+      [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]
       R E L E A S E   O F   C O N T I A I N E R  ${chalk.bold(this.genericName)}  D O N E
 
 
@@ -1666,7 +1666,7 @@ processing...
       } else {
         Helpers.success(`
 
-
+      [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]
       P A R T I A L  R E L E A S E   O F   C O N T I A I N E R  ${chalk.bold(this.genericName)}  D O N E
 
 
