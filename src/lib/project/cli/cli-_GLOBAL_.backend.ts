@@ -680,7 +680,7 @@ class $Global extends BaseCommandLine<{}, Project> {
   //#endregion
 
   //#region env
-  ENV_CHECK = (args) => {
+  ENV_CHECK(args) {
     Helpers.checkEnvironment()
     this._exit()
   };
@@ -836,19 +836,18 @@ class $Global extends BaseCommandLine<{}, Project> {
   //#endregion
 
   //#region sync core repositories
-  SYNC(noExit = false, useLatestTag = false) {
-    Project.sync(noExit, useLatestTag);
-    if (!noExit) {
-      this._exit();
-    }
+  async SYNC() {
+    Project.sync();
+    this._exit();
   }
   //#endregion
 
   //#region autoupdate
   async autoupdate() {
     if (config.frameworkName === 'firedev') {
+      Helpers.run('npm i -g firedev', { output: true }).sync();
       if (await Helpers.questionYesNo(`Proceed with ${config.frameworkName} auto-update ?`)) {
-        await this.SYNC(true, true)
+        Project.sync();
       }
     }
     if (config.frameworkName === 'tnp') {

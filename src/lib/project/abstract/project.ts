@@ -41,6 +41,7 @@ import { chalk } from 'tnp-core';
 import { BuildProcess, BuildProcessController } from '../features/build-process/app/build-process';
 //#endregion
 import { EnvironmentConfig } from '../features/environment-config/environment-config';
+import { CLI } from 'tnp-cli/src';
 //#endregion
 
 const debugWord = 'Debug/Start'
@@ -213,64 +214,143 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   //#endregion
 
   private static hasResolveCoreDepsAndFolder = false;
+
+  private static get projectsInUserFolder() {
+    //#region @backendFunc
+    const projectsInUserFolder = crossPlatformPath(path.join(
+      crossPlatformPath(os.homedir()),
+      '.firedev',
+      firedevFrameworkName,
+      'projects',
+    ));
+    return projectsInUserFolder;
+    //#endregion
+  }
+
+  static sync() {
+    //#region @backendFunc
+    const cwd = firedevRepoPathUserInUserDir;
+    Helpers.info(`Syncing... Fetching git data... `);
+    try {
+      Helpers.run(`git reset --hard && git clean -df && git fetch`, { cwd, output: false }).sync();
+    } catch (error) {
+      Helpers.error(`[${config.frameworkName} Not ablt to reset origin of  firedev: ${config.urlRepoFiredev} in: ${cwd}`, false, true);
+    }
+
+    try {
+      Helpers.run(`git checkout master`, { cwd, output: false }).sync();
+      Helpers.log('DONE CHECKING OUT MASTER')
+    } catch (error) {
+      Helpers.log(error)
+      Helpers.error(`[${config.frameworkName} Not ablt to checkout master branch for :${config.urlRepoFiredev} in: ${cwd}`, false, true);
+    }
+
+    try {
+      Helpers.run(`git pull --tags origin master`, { cwd, output: false }).sync();
+      Helpers.log('DONE PULLING MASTER')
+    } catch (error) {
+      Helpers.log(error)
+      Helpers.error(`[${config.frameworkName} Not ablt to checkout master branch for :${config.urlRepoFiredev} in: ${cwd}`, false, true);
+    }
+
+
+    // TODO  SPLIT TO SEPARATED CONTAINERS
+    const tagToCheckout = Project.morphiTagToCheckoutForCurrentCliVersion(cwd);
+    const currentBranch = Helpers.git.currentBranchName(cwd);
+    Helpers.taskStarted(`Checking out lastest tag ${tagToCheckout} for firedev framework...`);
+    if (currentBranch !== tagToCheckout) {
+      try {
+        Helpers.run(`git reset --hard && git clean -df && git checkout ${tagToCheckout}`, { cwd }).sync()
+      } catch (error) {
+        console.log(error)
+        Helpers.warn(`[${config.frameworkName} Not ablt to checkout latest tag of firedev framework: ${config.urlRepoFiredev} in: ${cwd}`, false);
+      }
+    }
+    try {
+      Helpers.run(`git pull origin ${tagToCheckout}`, { cwd }).sync()
+    } catch (error) {
+      console.log(error)
+      Helpers.warn(`[${config.frameworkName} Not ablt to pull latest tag of firedev framework: ${config.urlRepoFiredev} in: ${cwd}`, false);
+    }
+
+    try {
+      Helpers.run('rimraf .vscode', { cwd }).sync();
+    } catch (error) { }
+
+    const arrActive = config.activeFramewrokVersions;
+    for (let index = 0; index < arrActive.length; index++) {
+      const defaultFrameworkVersionForSpecyficContainer = arrActive[index];
+      Helpers.info(`Installing new versions of packages for global container-${defaultFrameworkVersionForSpecyficContainer}`)
+      const container = Project.by('container', defaultFrameworkVersionForSpecyficContainer);
+      container.run(`${config.frameworkName} reinstall --skipCoreCheck`).sync();
+      Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
+    }
+
+    Helpers.success('firedev-framework synced ok');
+    //#endregion
+  }
+
+  public static initialCheck() {
+    //#region @backendFunc
+    if (this.hasResolveCoreDepsAndFolder) {
+      return;
+    }
+    const morhiVscode = crossPlatformPath([path.dirname(firedevRepoPathUserInUserDir), 'firedev/.vscode']);
+
+    if (!fse.existsSync(firedevRepoPathUserInUserDir) && !global.skipCoreCheck) {
+
+      if (!fse.existsSync(path.dirname(firedevRepoPathUserInUserDir))) {
+        fse.mkdirpSync(path.dirname(firedevRepoPathUserInUserDir));
+      }
+
+      CLI.installEnvironment(config.required);
+
+      try {
+        child_process.execSync(`${config.frameworkName} env:install --skipCoreCheck`, { stdio: [0, 1, 2] })
+      } catch (error) {
+        Helpers.error(`[${config.frameworkName}][config] Not able to install local global environment`, false, true);
+      }
+
+      try {
+        child_process.execSync(`git clone ${config.urlRepoFiredev}`, {
+          cwd: path.dirname(firedevRepoPathUserInUserDir),
+          stdio: [0, 1, 2],
+        });
+        Helpers.remove(morhiVscode);
+      } catch (error) {
+        Helpers.error(`[${config.frameworkName}][config] Not able to clone repository: ${config.urlRepoFiredev} in:
+       ${firedevRepoPathUserInUserDir}`, false, true);
+      }
+
+      try {
+        child_process.execSync(`${config.frameworkName} init:core --skipCoreCheck`, {
+          stdio: [0, 1, 2]
+        });
+      } catch (error) {
+        Helpers.error(`[${config.frameworkName}][config] Not able init core project`, false, true);
+      }
+
+      this.sync();
+
+      this.hasResolveCoreDepsAndFolder = true;
+    }
+    //#endregion
+  }
+
   private static pathResolved(...partOfPath: string[]) {
     //#region @backendFunc
     // console.log('pathResolved', partOfPath);
 
     if (global['frameworkName'] && global['frameworkName'] === firedevFrameworkName) {
       const joined = partOfPath.join('/');
-      const projectsInUserFolder = crossPlatformPath(path.join(
-        crossPlatformPath(os.homedir()),
-        '.firedev',
-        firedevFrameworkName,
-        'projects',
-      ));
+
       let pathResult = joined.replace(
         (config.dirnameForTnp + '/' + this.firedevProjectsRelative),
-        projectsInUserFolder,
+        this.projectsInUserFolder,
       );
 
       pathResult = crossPlatformPath(path.resolve(pathResult));
-
-      if (this.hasResolveCoreDepsAndFolder) {
-
-      } else {
-
-        const morhiVscode = path.join(path.dirname(firedevRepoPathUserInUserDir), 'firedev/.vscode');
-
-        if (!fse.existsSync(firedevRepoPathUserInUserDir) && !global.skipCoreCheck) {
-          if (!fse.existsSync(path.dirname(firedevRepoPathUserInUserDir))) {
-            fse.mkdirpSync(path.dirname(firedevRepoPathUserInUserDir));
-          }
-
-          try {
-            child_process.execSync(`${config.frameworkName} env:install --skipCoreCheck`, { stdio: [0, 1, 2] })
-          } catch (error) {
-            Helpers.error(`[${config.frameworkName}][config] Not able to install local global environment`, false, true);
-          }
-
-          try {
-            child_process.execSync(`git clone ${config.urlRepoFiredev}`, {
-              cwd: path.dirname(firedevRepoPathUserInUserDir),
-              stdio: [0, 1, 2],
-            });
-            Helpers.remove(morhiVscode);
-          } catch (error) {
-            Helpers.error(`[${config.frameworkName}][config] Not able to clone repository: ${config.urlRepoFiredev} in:
-           ${firedevRepoPathUserInUserDir}`, false, true);
-          }
-
-          try {
-            child_process.execSync(`${config.frameworkName} init:core --skipCoreCheck`, {
-              stdio: [0, 1, 2]
-            });
-          } catch (error) {
-            Helpers.error(`[${config.frameworkName}][config] Not able init core project`, false, true);
-          }
-        }
-
-        this.hasResolveCoreDepsAndFolder = true;
-      }
+      this.initialCheck();
       return pathResult;
     }
     return crossPlatformPath(path.resolve(path.join(...partOfPath)));
@@ -358,70 +438,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   }
   //#endregion
 
-  static sync(noExit = false, useLatestTag = false) {
-    //#region @backendFunc
-    const cwd = firedevRepoPathUserInUserDir;
-    Helpers.info(`Fetching git data... `);
-    try {
-      Helpers.run(`git reset --hard && git clean -df && git fetch`, { cwd, output: false }).sync();
-    } catch (error) {
-      Helpers.error(`[${config.frameworkName} Not ablt to reset origin of  firedev: ${config.urlRepoFiredev} in: ${cwd}`, false, true);
-    }
 
-    try {
-      Helpers.run(`git checkout master`, { cwd, output: false }).sync();
-      Helpers.log('DONE CHECKING OUT MASTER')
-    } catch (error) {
-      Helpers.log(error)
-      Helpers.error(`[${config.frameworkName} Not ablt to checkout master branch for :${config.urlRepoFiredev} in: ${cwd}`, false, true);
-    }
-
-    try {
-      Helpers.run(`git pull --tags origin master`, { cwd, output: false }).sync();
-      Helpers.log('DONE PULLING MASTER')
-    } catch (error) {
-      Helpers.log(error)
-      Helpers.error(`[${config.frameworkName} Not ablt to checkout master branch for :${config.urlRepoFiredev} in: ${cwd}`, false, true);
-    }
-
-    if (useLatestTag) {
-      // TODO  SPLIT TO SEPARATED CONTAINERS
-      const tagToCheckout = Project.morphiTagToCheckoutForCurrentCliVersion(cwd);
-      const currentBranch = Helpers.git.currentBranchName(cwd);
-      Helpers.taskStarted(`Checking out lastest tag ${tagToCheckout} for firedev framework...`);
-      if (currentBranch !== tagToCheckout) {
-        try {
-          Helpers.run(`git reset --hard && git clean -df && git checkout ${tagToCheckout}`, { cwd }).sync()
-        } catch (error) {
-          console.log(error)
-          Helpers.warn(`[${config.frameworkName} Not ablt to checkout latest tag of firedev framework (moprhi project) : ${config.urlRepoFiredev} in: ${cwd}`, false);
-        }
-      }
-      try {
-        Helpers.run(`git pull origin ${tagToCheckout}`, { cwd }).sync()
-      } catch (error) {
-        console.log(error)
-        Helpers.warn(`[${config.frameworkName} Not ablt to pull latest tag of firedev framework (moprhi project) : ${config.urlRepoFiredev} in: ${cwd}`, false);
-      }
-    }
-
-
-    try {
-      Helpers.run('rimraf .vscode', { cwd }).sync();
-    } catch (error) { }
-
-    const arrActive = config.activeFramewrokVersions;
-    for (let index = 0; index < arrActive.length; index++) {
-      const defaultFrameworkVersionForSpecyficContainer = arrActive[index];
-      Helpers.info(`Installing new versions of packages for global container-${defaultFrameworkVersionForSpecyficContainer}`)
-      const container = Project.by('container', defaultFrameworkVersionForSpecyficContainer);
-      container.run('firedev reinstall').sync();
-      Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
-    }
-
-    Helpers.success('firedev-framework synced ok');
-    //#endregion
-  }
 
   //#endregion
 

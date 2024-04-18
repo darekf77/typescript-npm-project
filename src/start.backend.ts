@@ -22,8 +22,10 @@ export async function start(
   config.frameworkName = frameworkName;
 
   Helpers.log(`ins start, mode: "${mode}"`);
+  const ProjectClass = (await import('./lib/project/abstract/project')).Project;
+  ProjectClass.initialCheck();
   new BaseStartConfig({
-    ProjectClass: (await import('./lib/project/abstract/project')).Project,
+    ProjectClass: ProjectClass as any,
     functionsOrClasses: BaseStartConfig.prepareArgs(cliClassArr),
     argsv,
     shortArgsReplaceConfig: {
