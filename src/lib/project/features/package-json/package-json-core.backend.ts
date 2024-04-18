@@ -13,7 +13,7 @@ import { Models } from '../../../models';
 import { Helpers } from 'tnp-helpers/src';
 //#endregion
 
-const trace = !global.hideLog;
+
 
 export class PackageJsonCore {
   public data: Models.IPackageJSON;

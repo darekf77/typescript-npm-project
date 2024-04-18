@@ -10,6 +10,8 @@ import { Helpers } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
 //#endregion
 
+const noTrace = (global.hideLog && config.frameworkName === 'firedev');
+const showNpmCommandOutput = !noTrace;
 
 export function resolvePacakgesFromArgs(args: string[]): Models.Package[] {
   let installType: Models.InstalationType = '--save';
@@ -56,7 +58,7 @@ export function executeCommand(command: string, project: Project) {
     Helpers.info('This may take a long time... more than 1GB to download from npm...')
   }
 
-  project.run(command, { output: (config.frameworkName === 'tnp'), biggerBuffer: true }).sync();
+  project.run(command, { output: showNpmCommandOutput, biggerBuffer: true }).sync();
   Helpers.writeFile([project.__node_modules.path, '.install-date'], moment(new Date()).format('L LTS'))
 }
 
@@ -76,7 +78,7 @@ export function prepareCommand(pkg: Models.Package, remove: boolean, useYarn: bo
       + ` ${(pkg && pkg.installType && pkg.installType === '--save-dev') ? '-dev' : ''} `;
   } else {
     // --no-progress
-    const argsForFasterInstall = `--force --ignore-engines ${config.frameworkName === 'firedev' ? '--silent' : ''} --no-audit `
+    const argsForFasterInstall = `--force --ignore-engines ${!showNpmCommandOutput ? '--silent' : ''} --no-audit `
       + ` ${noPackageLock} `;
     command = `npm ${install} ${pkg ? pkg.name : ''} `
       + ` ${(pkg && pkg.installType) ? pkg.installType : ''} `
