@@ -269,11 +269,11 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
       },
       get npmignore() {
         const allowedProject: CoreModels.LibType[] = ['isomorphic-lib']
-        const canBeUseAsNpmPackage = self.project.typeIs(...allowedProject);
+        // const canBeUseAsNpmPackage = self.project.typeIs(...allowedProject);
         const npmignoreFiles = [
           '.vscode',
-          'dist/',
-          'src/',
+          '/dist',
+          '/src',
           '/docs',
           '/preview',
           '/tests',

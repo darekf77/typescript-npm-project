@@ -1802,12 +1802,27 @@ processing...
 
       let publish = true;
 
+      const readyToNpmPublishVersionPath = `${this.__getTempProjName('dist')}/${config.folder.node_modules}`;
+      if (this.__isStandaloneProject) {
+
+        const distFolder = crossPlatformPath([specyficProjectForBuild.location, readyToNpmPublishVersionPath, realCurrentProj.name, config.folder.dist])
+        // console.log('Remove dist ' + distFolder)
+        Helpers.remove(distFolder);
+      } else {
+        for (const child of realCurrentProj.children) {
+          const distFolder = crossPlatformPath([specyficProjectForBuild.location, readyToNpmPublishVersionPath, '@', realCurrentProj.name, child.name, config.folder.dist])
+          // console.log('Remove dist ' + distFolder)
+          Helpers.remove(distFolder);
+        }
+      }
+
       if (!global.tnpNonInteractive) {
         await Helpers.questionYesNo(`Do you wanna check compiled version before publishing ?`, async () => {
-          specyficProjectForBuild.run(`code ${this.__getTempProjName('dist')}/${config.folder.node_modules}`).sync();
+          specyficProjectForBuild.run(`code ${readyToNpmPublishVersionPath}`).sync();
           Helpers.pressKeyAndContinue(`Check your compiled code and press any key ...`)
         });
       }
+
 
       publish = await Helpers.questionYesNo(`Publish this package ?`);
 
