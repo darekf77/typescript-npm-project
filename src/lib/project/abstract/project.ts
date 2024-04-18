@@ -4681,6 +4681,8 @@ ${shouldBeProjectArr.map((p, index) => `- ${index + 1}. ${p}`).join('\n')}
   //#region getters & methods / before pull action
   protected async _beforePullProcessAction() {
     //#region @backendFunc
+    await super._beforePullProcessAction();
+    await this._cloneUnexistedProjects();
     // await Helpers.killAllNodeExceptCurrentProcess();
     //#endregion
   }

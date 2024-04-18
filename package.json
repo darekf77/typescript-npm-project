@@ -564,7 +564,7 @@
     "private": false
   },
   "name": "tnp",
-  "version": "16.5.40",
+  "version": "16.5.41",
   "bin": {
     "t": "bin/t",
     "t-debug": "bin/t-debug",
