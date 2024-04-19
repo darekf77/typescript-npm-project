@@ -2,8 +2,8 @@
 import { config, extAllowedToReplace, TAGS } from 'tnp-config/src';
 import { _, crossPlatformPath, path, CoreModels } from 'tnp-core/src';
 import { Helpers, BaseProjectResolver, BaseProject } from 'tnp-helpers/src';
-import { LibTypeArr } from 'tnp-config';
-import { CoreConfig } from 'tnp-core';
+import { LibTypeArr } from 'tnp-config/src';
+import { CoreConfig } from 'tnp-core/src';
 import { BuildOptions, InitOptions, ReleaseOptions } from '../../build-options';
 import { Models } from '../../models';
 import { firedevFrameworkName, MESSAGES, firedevRepoPathUserInUserDir, tmpBuildPort } from '../../constants';
@@ -375,8 +375,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
           return this.pathResolved(config.dirnameForTnp, `${this.firedevProjectsRelative}/container${version}/${libType}${version}`);
         }
         return this.pathResolved(config.dirnameForTnp, `${this.firedevProjectsRelative}/container${version}/${libType}${version}`);
-      },
-      singlefileproject: this.pathResolved(config.dirnameForTnp, `${this.firedevProjectsRelative}/container${version}/single-file-project${version}`)
+      }
     };
     return result;
     //#endregion
@@ -396,11 +395,6 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       const pathToContainer = this.resolveCoreProjectsPathes(version).container;
       const containerProject = Project.ins.From(pathToContainer);
       return containerProject as any;
-    }
-
-    if (libraryType === 'single-file-project') {
-      const singleFileProject = Project.ins.From(this.resolveCoreProjectsPathes(version).singlefileproject);
-      return singleFileProject as any;
     }
 
     const projectPath = this.resolveCoreProjectsPathes(version).projectByType(libraryType);
@@ -2963,7 +2957,11 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
             const elecProj = Project.ins.From(this.pathFor([`tmp-apps-for-dist${buildOptions.websql ? '-websql' : ''}`
               , this.name]));
             // Helpers.createSymLink(this.__node_modules.path, elecProj.pathFor(`electron/${config.folder.node_modules}`));
-            elecProj.run('code .').sync();
+            // elecProj.run('code .').sync();
+            const wasmfileSource = crossPlatformPath([Project.by('isomorphic-lib', this.__frameworkVersion).location, 'app/src/assets/sql-wasm.wasm']);
+            const wasmfileDest = crossPlatformPath([elecProj.location, 'electron', 'sql-wasm.wasm']);
+            Helpers.copyFile(wasmfileSource, wasmfileDest);
+
             Helpers.info('Building lib...')
             await this.build(buildOptions.clone({
               buildType: 'lib',
@@ -2978,21 +2976,28 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
             // Helpers.pressKeyAndContinue()
             elecProj.run('npm-run ng build angular-electron').sync();
             const indexHtmlPath = elecProj.pathFor(['dist', 'index.html']);
-            console.log({
-              indexHtmlPath
-            })
+            // console.log({
+            //   indexHtmlPath
+            // })
+            // @LAST before electron prod fix
             Helpers.writeFile(indexHtmlPath,
               Helpers.readFile(indexHtmlPath)
                 .replace(`<base href="/">`, '<base href="./">')
                 .replace(/\/assets\//g, 'assets/')
             );
             // <base href="/">
+            const indexJSPath = crossPlatformPath([elecProj.location, 'electron', 'index.js']);
             await Helpers.ncc(
               crossPlatformPath([elecProj.location, 'electron', 'main.js']),
-              crossPlatformPath([elecProj.location, 'electron', 'index.js']),
-            )
+              indexJSPath,
+            );
+            Helpers.writeFile(indexJSPath, Helpers.readFile(indexJSPath)
+              .replace('module = undefined;', '')
+              .split('\n').map(line => line.replace(/\@removeStart.*\@removeEnd/g, '')).join('\n')
+            );
+
             // elecProj.run(`npm-run ncc build electron/main.js -o electron/bundled  --no-cache  --external electron `).sync();
-            await Helpers.questionYesNo('Would you like to do check out?');
+            // await Helpers.questionYesNo('Would you like to do check out?');
             elecProj.run(`npm-run electron-builder build --publish=never`).sync();
             this.openLocation(this.__getElectronAppRelativePath({ websql: buildOptions.websql }))
           } else {
