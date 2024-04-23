@@ -6,7 +6,7 @@ import { LibTypeArr } from 'tnp-config/src';
 import { CoreConfig } from 'tnp-core/src';
 import { BuildOptions, InitOptions, ReleaseOptions } from '../../build-options';
 import { Models } from '../../models';
-import { firedevFrameworkName, MESSAGES, firedevRepoPathUserInUserDir, tmpBuildPort } from '../../constants';
+import { firedevFrameworkName, MESSAGES, firedevRepoPathUserInUserDir, tmpBuildPort, tmpBaseHrefOverwriteRelPath } from '../../constants';
 //#region @backend
 import { fse, json5, os, dateformat } from 'tnp-core/src';
 import { child_process, } from 'tnp-core/src';
@@ -42,6 +42,7 @@ import { BuildProcess, BuildProcessController } from '../features/build-process/
 //#endregion
 import { EnvironmentConfig } from '../features/environment-config/environment-config';
 import { CLI } from 'tnp-cli/src';
+import { AngularFeBasenameManager } from '../features/basename-manager';
 //#endregion
 
 const debugWord = 'Debug/Start'
@@ -441,9 +442,10 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   readonly type: CoreModels.LibType;
   private ____projectInfoPort: number;
   private __buildOptions?: BuildOptions;
+
   private __forStandAloneSrc = `${config.folder.src}-for-standalone`;
   private __npmRunNg = `npm-run ng`; // when there is not globl "ng" command -> npm-run ng.js works
-
+  public angularFeBasenameManager: AngularFeBasenameManager;
   //#region @backend
   public __libStandalone: LibProjectStandalone;
   public __libSmartcontainer: LibProjectSmartContainer;
@@ -518,6 +520,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       this.defineProperty<Project>('__libStandalone', LibProjectStandalone);
       this.defineProperty<Project>('__libSmartcontainer', LibProjectSmartContainer);
       this.defineProperty<Project>('__libVscodext', LibProjectVscodeExt);
+      this.defineProperty<Project>('angularFeBasenameManager', AngularFeBasenameManager);
     }
 
   }
@@ -676,57 +679,6 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   }
   //#endregion
 
-  //#region getters & methods / smart container build target
-  get __smartContainerBuildTarget(): Project {
-    //#region @backendFunc
-    if (this.__isSmartContainerChild) {
-      return this.parent.__smartContainerBuildTarget;
-    }
-
-    if (this.__isSmartContainerTarget) {
-      return this.__smartContainerTargetParentContainer.__smartContainerBuildTarget;
-    }
-
-    if (!this.__packageJson.smartContainerBuildTarget) {
-      if (this.children.length === 1) {
-        this.__packageJson.data.tnp.smartContainerBuildTarget = _.first(this.children).name;
-      } else {
-        if (this.__isSmartContainerChild || this.__isSmartContainer) {
-          //#region display update messge for container build
-          Helpers.logError(`
-
- Please specify in your configuration proper ${chalk.bold('smartContainerBuildTarget')}:
-
- file: ${config.file.package_json__tnp_json5}
-
-   ...
-     smartContainerBuildTarget: <name of main project>
-   ...
-
-
-
-       `, false, false);
-
-          Helpers.log(`[singularbuildcontainer] children for build: \n\n${this.children.map(c => c.name)}\n\n`);
-          //#endregion
-
-        }
-      }
-    }
-
-    const children = this.children;
-    let target = children
-      .filter(c => c.typeIs('isomorphic-lib'))
-      .find(c => c.name === this.__packageJson.smartContainerBuildTarget);
-
-    if (!target && children.length === 1) {
-      target = _.first(children);
-    }
-
-    return target;
-    //#endregion
-  }
-  //#endregion
 
   //#region getters & methods / children that are libs
   get __childrenThatAreLibs(): Project[] {
@@ -1021,6 +973,59 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   get version() {
     //#region @backendFunc
     return this.__packageJson?.version;
+    //#endregion
+  }
+  //#endregion
+
+
+  //#region getters & methods / smart container build target
+  get __smartContainerBuildTarget(): Project {
+    //#region @backendFunc
+    if (this.__isSmartContainerChild) {
+      return this.parent.__smartContainerBuildTarget;
+    }
+
+    if (this.__isSmartContainerTarget) {
+      return this.__smartContainerTargetParentContainer.__smartContainerBuildTarget;
+    }
+
+    if (!this.__packageJson.smartContainerBuildTarget) {
+      if (this.children.length === 1) {
+        this.__packageJson.data.tnp.smartContainerBuildTarget = _.first(this.children).name;
+      } else {
+        if (this.__isSmartContainerChild || this.__isSmartContainer) {
+          //#region display update messge for container build
+          Helpers.logError(`
+
+ Please specify in your configuration proper ${chalk.bold('smartContainerBuildTarget')}:
+
+ file: ${config.file.package_json__tnp_json5}
+
+   ...
+     smartContainerBuildTarget: <name of main project>
+   ...
+
+
+
+       `, false, false);
+
+          Helpers.log(`[singularbuildcontainer] children for build: \n\n${this.children.map(c => c.name)}\n\n`);
+          //#endregion
+
+        }
+      }
+    }
+
+    const children = this.children;
+    let target = children
+      .filter(c => c.typeIs('isomorphic-lib'))
+      .find(c => c.name === this.__packageJson.smartContainerBuildTarget);
+
+    if (!target && children.length === 1) {
+      target = _.first(children);
+    }
+
+    return target;
     //#endregion
   }
   //#endregion
@@ -1736,7 +1741,7 @@ processing...
     const { prod = false, shouldReleaseLibrary, automaticReleaseDocs, automaticRelease } = releaseOptions;
 
     if (!this.isInCiReleaseProject) {
-      const tempGeneratedCiReleaseProject = await this.__createTempCiReleaseProject();
+      const tempGeneratedCiReleaseProject = await this.__createTempCiReleaseProject(BuildOptions.from({}));
       await tempGeneratedCiReleaseProject.__release(releaseOptions);
       return;
     }
@@ -1950,15 +1955,15 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   //#endregion
 
   //#region getters & methods / recreate release project
-  public async recreateReleaseProject(soft = false) {
+  public async recreateReleaseProject(buildOptions: BuildOptions, soft = false) {
 
     this.remove(config.folder.tmpDistRelease);
-    await this.__createTempCiReleaseProject()
+    await this.__createTempCiReleaseProject(buildOptions)
   }
   //#endregion
 
   //#region getters & methods / create temp project
-  private async __createTempCiReleaseProject(): Promise<Project> {
+  private async __createTempCiReleaseProject(buildOptions: BuildOptions): Promise<Project> {
     //#region @backendFunc
     const absolutePathReleaseProject = this.__releaseCiProjectPath;
 
@@ -2024,7 +2029,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
       const vscodeFolder = path.join(generatedProject.location, config.folder._vscode);
       Helpers.removeFolderIfExists(vscodeFolder);
-      await generatedProject.__insideStructure.recrate(InitOptions.from({}));
+      await generatedProject.__insideStructure.recrate(InitOptions.fromBuild(buildOptions));
       return generatedProject;
 
     }
@@ -2143,6 +2148,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       //#endregion
 
       //#region preparing variables / incremental build
+
       const incrementalBuildProcess = new IncrementalBuildProcess(this, buildOptions.clone({
         websql: false
       }));
@@ -2899,9 +2905,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       if (!fse.existsSync(this.location)) {
         return;
       }
-      let { outDir, smartContainerTargetName } = buildOptions;
+      let { smartContainerTargetName } = buildOptions;
 
-      let proxy = this.__proxyProjFor(smartContainerTargetName || this.__smartContainerBuildTarget?.name, outDir);
+      let proxy = this.targetProjFor(smartContainerTargetName || this.__smartContainerBuildTarget?.name);
       await proxy.__buildSteps(buildOptions, libBuildDone);
       //#endregion
     }
@@ -2923,92 +2929,125 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   }
 
   //#region getters & methods / build
+  private async __buildElectron(buildOptions: BuildOptions) {
+    //#region @backendFunc
+    const baseHrefElectron = '';
+    if (this.__isStandaloneProject) {
+      const elecProj = Project.ins.From(this.pathFor([
+        `tmp-apps-for-${config.folder.dist}${buildOptions.websql ? '-websql' : ''}`
+        , this.name,
+      ]));
+      Helpers.info('Starting electron ...')
+
+      if (buildOptions.watch) {
+        elecProj.run(`npm-run  electron . --serve ${buildOptions.websql ? '--websql' : ''}`).async();
+      } else {
+        Helpers.info('Release build of electron app')
+        if (buildOptions.buildForRelease) {
+
+          if (!this.isInCiReleaseProject) {
+            await this.init(InitOptions.fromBuild(buildOptions.clone({ baseHref: baseHrefElectron })))
+            const tempGeneratedCiReleaseProject = await this.__createTempCiReleaseProject(buildOptions);
+            await tempGeneratedCiReleaseProject.build(buildOptions);
+            return;
+          }
+
+          // if (!this.pathExists(`tmp-apps-for-dist/${this.name}/electron/compiled/app.electron.js`)) {
+          //   // await this.build(buildOptions.clone({
+          //   //   buildForRelease: false,
+          //   //   watch: false
+          //   // }))
+          // } else {
+
+          const elecProj = Project.ins.From(this.pathFor([`tmp-apps-for-dist${buildOptions.websql ? '-websql' : ''}`
+            , this.name]));
+          // Helpers.createSymLink(this.__node_modules.path, elecProj.pathFor(`electron/${config.folder.node_modules}`));
+          // elecProj.run('code .').sync();
+          const wasmfileSource = crossPlatformPath([Project.by('isomorphic-lib', this.__frameworkVersion).location, 'app/src/assets/sql-wasm.wasm']);
+          const wasmfileDest = crossPlatformPath([elecProj.location, 'electron', 'sql-wasm.wasm']);
+          Helpers.copyFile(wasmfileSource, wasmfileDest);
+
+          Helpers.info('Building lib...')
+          await this.build(buildOptions.clone({
+            buildType: 'lib',
+            targetApp: 'pwa',
+            watch: false,
+            baseHref: baseHrefElectron,
+            skipProjectProcess: true,
+            disableServiceWorker: true,
+            skipCopyManager: true,
+            buildAngularAppForElectron: true,
+            finishCallback: () => { }
+          }));
+          Helpers.info('Build lib done.. building now electron app...')
+
+          // Helpers.pressKeyAndContinue()
+          elecProj.run('npm-run ng build angular-electron').sync();
+          // await this.build(buildOptions.clone({
+          //   buildType: 'app',
+          //   targetApp: 'pwa',
+          //   watch: false,
+          //   baseHref: baseHrefElectron,
+          //   skipProjectProcess: true,
+          //   disableServiceWorker: true,
+          //   skipCopyManager: true,
+          //   buildAngularAppForElectron: true,
+          //   finishCallback: () => { }
+          // }));
+
+          const indexHtmlPath = elecProj.pathFor(['dist', 'index.html']);
+          // console.log({
+          //   indexHtmlPath
+          // })
+          // @LAST before electron prod fix
+          Helpers.writeFile(indexHtmlPath,
+            Helpers.readFile(indexHtmlPath)
+              .replace(`<base href="/">`, '<base href="./">')
+              .replace(`<base href="/">`, '<base href="./">')
+              .replace(/\/assets\//g, 'assets/')
+          );
+          Helpers.replaceLinesInFile(indexHtmlPath, line => {
+            if (line.search(`rel="manifest"`) !== -1) {
+              return '';
+            }
+            return line;
+          })
+          // <base href="/">
+          const indexJSPath = crossPlatformPath([elecProj.location, 'electron', 'index.js']);
+          await Helpers.ncc(
+            crossPlatformPath([elecProj.location, 'electron', 'main.js']),
+            indexJSPath,
+          );
+          Helpers.writeFile(indexJSPath, Helpers.readFile(indexJSPath)
+            .replace('module = undefined;', '')
+            .split('\n').map(line => line.replace(/\@removeStart.*\@removeEnd/g, '')).join('\n')
+          );
+
+          // elecProj.run(`npm-run ncc build electron/main.js -o electron/bundled  --no-cache  --external electron `).sync();
+          // await Helpers.questionYesNo('Would you like to do check out?');
+          elecProj.run(`npm-run electron-builder build --publish=never`).sync();
+          this.openLocation(this.__getElectronAppRelativePath({ websql: buildOptions.websql }))
+        } else {
+          // TODO
+        }
+      }
+      return;
+    } else {
+      Helpers.error(`Electron apps compilation only for standalone projects`, false, true);
+    }
+    buildOptions.finishCallback();
+    //#endregion
+  }
+  //#endregion
+
+  //#region getters & methods / build
   async build(buildOptions?: BuildOptions) {
     //#region @backendFunc
 
     //#region handle electron
     if (buildOptions.targetApp === 'electron') {
-      if (this.__isStandaloneProject) {
-        const elecProj = Project.ins.From(this.pathFor([
-          `tmp-apps-for-${config.folder.dist}${buildOptions.websql ? '-websql' : ''}`
-          , this.name,
-        ]));
-        Helpers.info('Starting electron ...')
-
-        if (buildOptions.watch) {
-          elecProj.run(`npm-run  electron . --serve ${buildOptions.websql ? '--websql' : ''}`).async();
-        } else {
-          Helpers.info('Release build of electron app')
-          if (buildOptions.buildForRelease) {
-
-            if (!this.isInCiReleaseProject) {
-              const tempGeneratedCiReleaseProject = await this.__createTempCiReleaseProject();
-              await tempGeneratedCiReleaseProject.build(buildOptions);
-              return;
-            }
-
-            // if (!this.pathExists(`tmp-apps-for-dist/${this.name}/electron/compiled/app.electron.js`)) {
-            //   // await this.build(buildOptions.clone({
-            //   //   buildForRelease: false,
-            //   //   watch: false
-            //   // }))
-            // } else {
-
-            const elecProj = Project.ins.From(this.pathFor([`tmp-apps-for-dist${buildOptions.websql ? '-websql' : ''}`
-              , this.name]));
-            // Helpers.createSymLink(this.__node_modules.path, elecProj.pathFor(`electron/${config.folder.node_modules}`));
-            // elecProj.run('code .').sync();
-            const wasmfileSource = crossPlatformPath([Project.by('isomorphic-lib', this.__frameworkVersion).location, 'app/src/assets/sql-wasm.wasm']);
-            const wasmfileDest = crossPlatformPath([elecProj.location, 'electron', 'sql-wasm.wasm']);
-            Helpers.copyFile(wasmfileSource, wasmfileDest);
-
-            Helpers.info('Building lib...')
-            await this.build(buildOptions.clone({
-              buildType: 'lib',
-              targetApp: 'pwa',
-              watch: false,
-              skipProjectProcess: true,
-              skipCopyManager: true,
-              finishCallback: () => { }
-            }));
-            Helpers.info('Build lib done.. building now electron app...')
-
-            // Helpers.pressKeyAndContinue()
-            elecProj.run('npm-run ng build angular-electron').sync();
-            const indexHtmlPath = elecProj.pathFor(['dist', 'index.html']);
-            // console.log({
-            //   indexHtmlPath
-            // })
-            // @LAST before electron prod fix
-            Helpers.writeFile(indexHtmlPath,
-              Helpers.readFile(indexHtmlPath)
-                .replace(`<base href="/">`, '<base href="./">')
-                .replace(/\/assets\//g, 'assets/')
-            );
-            // <base href="/">
-            const indexJSPath = crossPlatformPath([elecProj.location, 'electron', 'index.js']);
-            await Helpers.ncc(
-              crossPlatformPath([elecProj.location, 'electron', 'main.js']),
-              indexJSPath,
-            );
-            Helpers.writeFile(indexJSPath, Helpers.readFile(indexJSPath)
-              .replace('module = undefined;', '')
-              .split('\n').map(line => line.replace(/\@removeStart.*\@removeEnd/g, '')).join('\n')
-            );
-
-            // elecProj.run(`npm-run ncc build electron/main.js -o electron/bundled  --no-cache  --external electron `).sync();
-            // await Helpers.questionYesNo('Would you like to do check out?');
-            elecProj.run(`npm-run electron-builder build --publish=never`).sync();
-            this.openLocation(this.__getElectronAppRelativePath({ websql: buildOptions.websql }))
-          } else {
-            // TODO
-          }
-        }
-        return;
-      } else {
-        Helpers.error(`Electron apps compilation only for standalone projects`, false, true);
-      }
-      buildOptions.finishCallback();
+      await this.__buildElectron(buildOptions);
+      return;
     }
     //#endregion
 
@@ -3037,8 +3076,13 @@ to fix it.
     //#endregion
 
     let libContext: Firedev.FrameworkContext;
+    const smartContainerTargetName = buildOptions.smartContainerTargetName || this.__smartContainerBuildTarget?.name;
 
     if (buildOptions.libBuild) {
+      buildOptions.baseHref = !_.isUndefined(buildOptions.baseHref) ? buildOptions.baseHref : this.angularFeBasenameManager.rootBaseHref;
+      const baseHrefLocProj = this.__isSmartContainer ? this.targetProjFor(smartContainerTargetName) : this;
+      baseHrefLocProj.writeFile(tmpBaseHrefOverwriteRelPath, buildOptions.baseHref);
+
       //#region main lib code build ports assignations
       const projectInfoPort = await this.assignFreePort(4100);
       this.__setProjectInfoPort(projectInfoPort);
@@ -3101,14 +3145,27 @@ to fix it.
 
       //#region normal/watch lib build
       if (buildOptions.watch) {
-        await this.__filesStructure.init(InitOptions.from({ watch: true }));
+        await this.__filesStructure.initFileStructure(InitOptions.fromBuild(buildOptions.clone({ watch: true })));
       } else {
-        await this.__filesStructure.init(InitOptions.from({}));
+        await this.__filesStructure.initFileStructure(InitOptions.fromBuild(buildOptions.clone({ watch: false })));
       }
       //#endregion
     }
 
     if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
+      if (!_.isUndefined(buildOptions.baseHref) && buildOptions.buildType === 'app') {
+        Helpers.error(`Build baseHref only can be specify when build lib code:
+
+        try commands:
+        ${config.frameworkName} start --base-href ${buildOptions.baseHref} # it will do lib and app code build
+        ${config.frameworkName} build:watch --base-href ${buildOptions.baseHref} # it will do lib code build
+
+        `, false, true);
+      }
+      const baseHrefLocProj = this.__isSmartContainer ? this.targetProjFor(smartContainerTargetName) : this;
+      const fromFileBaseHref = Helpers.readFile(baseHrefLocProj.pathFor(tmpBaseHrefOverwriteRelPath));
+      buildOptions.baseHref = fromFileBaseHref;
+
       //#region initializae client app remote connection to build server
       if (!libContext) {
         const projectInfoPortFromFile = Number(Helpers.readFile(this.pathFor(tmpBuildPort)));
@@ -3155,6 +3212,12 @@ ${config.frameworkName} start
       }
 
     }
+
+    Helpers.logInfo(`
+
+    Using base href: ${!_.isUndefined(buildOptions.baseHref) ? (`'` + buildOptions.baseHref + `'`) : '/ (default)'}
+
+    `)
 
     if (!this.__isVscodeExtension) {
       PackagesRecognition.fromProject(this as any).start(void 0, '[buildable-project]');
@@ -3979,18 +4042,18 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
   //#endregion
 
   //#region getters & methods / get proxy projects
-  __proxyProjFor(client: string, outFolder: 'dist'): Project {
+  targetProjFor(childProjectName: string): Project {
     //#region @backendFunc
-    return Project.ins.From(this.__getProxyProj(client, outFolder)) as any;
+    return Project.ins.From(this.__getProxyProjPath(childProjectName)) as any;
     //#endregion
   }
   //#endregion
 
   //#region getters & methods / get proxy project location
-  __getProxyProj(client: string, outFolder: 'dist' = 'dist') {
+  __getProxyProjPath(client: string): string {
     //#region @backendFunc
     const workspaceOrContainerProject: Project = this;
-    return crossPlatformPath([workspaceOrContainerProject.location, outFolder, workspaceOrContainerProject.name, client]);
+    return crossPlatformPath([workspaceOrContainerProject.location, config.folder.dist, workspaceOrContainerProject.name, client]);
     //#endregion
   }
   //#endregion
@@ -4000,7 +4063,6 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
     const project: Project = this;
     //#region @backendFunc
     const projepath = crossPlatformPath(path.join(this.location, project.__angularProjProxyPath(
-      void 0, // TODO
       buildOptions.websql,
       type
     )));
@@ -4012,27 +4074,15 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
 
   //#region getters & methods / angular proj proxy path
   public __angularProjProxyPath(
-    client?: string,
     websql?: boolean,
     type: 'app' | 'lib' = 'app'
   ) {
     //#region @backendFunc
     const project = this;
     const pref = ((type === 'app') ? 'apps' : 'libs');
-    const outFolder = config.folder.dist;
+    const tmpProjectsStandalone = `tmp-${pref}-for-${config.folder.dist}${websql ? '-websql' : ''}/${project.name}`;
+    return tmpProjectsStandalone;
 
-    const tmpProjectsStandalone = `tmp-${pref}-for-{{{outFolder}}}${websql ? '-websql' : ''}/${project.name}`;
-    const tmpProjects = `tmp-${pref}-for-{{{outFolder}}}${websql ? '-websql' : ''}/${project.name}--for--{{{client}}}`;
-    if (project.__isStandaloneProject) {
-      if (outFolder) {
-        return tmpProjectsStandalone.replace('{{{outFolder}}}', outFolder);
-      }
-      return tmpProjectsStandalone;
-    }
-    if (outFolder && client) {
-      return tmpProjects.replace('{{{outFolder}}}', outFolder).replace('{{{client}}}', client);
-    }
-    return tmpProjects;
     //#endregion
   }
   //#endregion
@@ -4106,16 +4156,6 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
     const isSmartContainerTarget = this.__isSmartContainerTarget;
     const isSmartContainerTargetNonClient = this.__isSmartContainerTargetNonClient;
 
-    let basename = ''
-    if (this.isInCiReleaseProject) {
-      if (!this.__env.config?.useDomain) {
-        basename = `--base-href /${isSmartContainerTarget ? this.__smartContainerTargetParentContainer.name : this.name}/`;
-        if (isSmartContainerTargetNonClient) {
-          basename = `--base-href /${isSmartContainerTarget ? this.__smartContainerTargetParentContainer.name : this.name}/-/${this.name}/`;
-        }
-      }
-    }
-
     //#endregion
 
     //#region prepare variables / webpack params
@@ -4144,7 +4184,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
       outDirApp = `${outDirApp}/-/${this.name}`;
     }
 
-    const outPutPathCommand = `--output-path ${back}${outDirApp} ${basename}`;
+    const outPutPathCommand = `--output-path ${back}${outDirApp} `;
 
     //#endregion
 
@@ -4195,13 +4235,13 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
     let angularBuildAppCmd: string;
     const portAssignedToAppBuildCommandPart = _.isNumber(portAssignedToAppBuild) ? `--port=${portAssignedToAppBuild}` : '';
 
+
     if (buildOptions.watch) {
-      const isElectron = false;
-      angularBuildAppCmd = `${this.__npmRunNg} serve ${isElectron ? 'angular-electron' : 'app'} `
+      angularBuildAppCmd = `${this.__npmRunNg} serve ${buildOptions.buildAngularAppForElectron ? 'angular-electron' : 'app'} `
         + ` ${portAssignedToAppBuildCommandPart} ${buildOptions.prod ? '--prod' : ''}`;
 
     } else {
-      angularBuildAppCmd = `${this.__npmRunNg} build app`
+      angularBuildAppCmd = `${this.__npmRunNg} build ${buildOptions.buildAngularAppForElectron ? 'angular-electron' : 'app'}`
         + `${buildOptions.prod ? '--configuration production' : ''} `
         + `${buildOptions.watch ? '--watch' : ''}`
         + `${outPutPathCommand} `;
@@ -4212,7 +4252,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
 
     //#region prepare variables / angular info
     const showInfoAngular = () => {
-      Helpers.log(`
+      Helpers.logInfo(`
 
   ANGULAR BUILD APP COMMAND: ${angularBuildAppCmd}
 
@@ -4291,7 +4331,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
     const buildLibDone = `LIB BUILD DONE.. `;
     const ifapp = 'if you want to start app build -> please run in other terminal command:';
 
-    const ngserve = `${buildOptions.watch ? '--port 4201 # or whatever port' : '#'} to run angular ${buildOptions.watch
+    const ngserveCommand = `${buildOptions.watch ? '--port 4201 # or whatever port' : '#'} to run angular ${buildOptions.watch
       ? 'ng serve'
       : 'ng build (for application - not lib)'
       }.`;
@@ -4305,20 +4345,20 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
 
     if (this.__isSmartContainerTarget) {
       const parent = this.__smartContainerTargetParentContainer;
-      const target = buildOptions.smartContainerTargetName || this.__smartContainerBuildTarget.name;
+      const smartContainerTargetName = buildOptions.smartContainerTargetName || this.__smartContainerBuildTarget?.name;
 
       Helpers.taskDone(`${chalk.underline(`
 
       ${buildLibDone}... for target project "`
-        + `${parent ? (parent.name + '/') : ''}${target}"`)}`)
+        + `${parent ? (parent.name + '/') : ''}${smartContainerTargetName}"`)}`)
 
       Helpers.success(`
 
       ${ifapp}
 
-      ${chalk.bold(config.frameworkName + bawOrbaLong + target)}
+      ${chalk.bold(config.frameworkName + bawOrbaLong + smartContainerTargetName)}
       or
-      ${config.frameworkName} ${bawOrbaLongWebsql} ${target}
+      ${config.frameworkName} ${bawOrbaLongWebsql} ${smartContainerTargetName}
 
             `);
     } else if (this.__isStandaloneProject) {
@@ -4551,7 +4591,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
     this.__saveLaunchJson(4000);
     Helpers.removeIfExists(path.join(this.location, config.file.tnpEnvironment_json));
     initOptions = InitOptions.from(initOptions);
-    await this.__filesStructure.init(initOptions);
+    await this.__filesStructure.initFileStructure(initOptions);
 
     initOptions.finishCallback();
     //#endregion

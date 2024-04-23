@@ -5,11 +5,13 @@ import { CommandLineFeature } from "tnp-helpers/src";
 import { Project } from "../abstract/project";
 import { BuildOptions } from "../../build-options";
 import { TEMP_DOCS } from "../../constants";
-import { config } from "tnp-config/src";
-
 
 class $Build extends CommandLineFeature<BuildOptions, Project> {
   protected async __initialize__() {
+    if (this.params['base-href'] && !this.params.baseHref) {
+      this.params.baseHref = this.params['base-href'];
+      delete this.params['base-href'];
+    }
     this.params = BuildOptions.from(this.params);
     //#region resolve smart containter
     this._tryResolveChildIfInsideArg();
@@ -19,6 +21,7 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
     } else if (this.project.__isSmartContainer) {
       this.params.smartContainerTargetName = this.project.__smartContainerBuildTarget?.name;
     }
+
     //#endregion
     // console.log(this.params)
   }

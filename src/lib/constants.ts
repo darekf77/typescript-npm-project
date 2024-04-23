@@ -56,6 +56,7 @@ export const DEFAULT_PORT = {
 }
 
 export const tmpBuildPort = 'tmp-build-port';
+export const tmpBaseHrefOverwriteRelPath = 'tmp-base-href-overwrite'
 
 /**
  *

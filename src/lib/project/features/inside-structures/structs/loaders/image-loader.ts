@@ -1,6 +1,6 @@
 import { ID_LOADER_PRE_BOOTSTRAP, PRE_LOADER_NG_IF_INITED } from "../inside-struct-constants";
 
-export function imageLoader(src: string, preloader = false) {
+export function imageLoader(pathToLoaderImageInAssets: string, preloader = false) {
   return `
 <style>
   .firedev-ui-image-pre-loader {
@@ -19,7 +19,7 @@ export function imageLoader(src: string, preloader = false) {
   }
 </style>
 
-<img  src="${src}" ${preloader ? ID_LOADER_PRE_BOOTSTRAP : PRE_LOADER_NG_IF_INITED}  class="firedev-ui-image-${preloader ? 'pre' : 'ngbootstrap'}-loader">
+<img  src="${pathToLoaderImageInAssets}" ${preloader ? ID_LOADER_PRE_BOOTSTRAP : PRE_LOADER_NG_IF_INITED}  class="firedev-ui-image-${preloader ? 'pre' : 'ngbootstrap'}-loader">
 
   `
 }

@@ -8,6 +8,7 @@ import { argsToClear } from '../../constants';
 import { COMPILER_POOLING, IncrementalWatcherInstance, incrementalWatcher } from 'incremental-compiler/src';
 import { recreateApp } from './inside-structures/structs/inside-struct-helpers';
 import { BaseFeatureForProject } from 'tnp-helpers/src';
+import { InitOptions } from '../../build-options';
 
 //#endregion
 
@@ -20,16 +21,16 @@ export class SingularBuild extends BaseFeatureForProject<Project> {
 
 
   async createSingluarTargeProjFor(options: {
-    parent: Project, targetWorkspaceProject: Project, outFolder: 'dist', watch?: boolean; nonClient?: boolean,
+    parent: Project; targetContainerProject: Project; initOptions: InitOptions; nonClient: boolean,
   }): Promise<Project> {
 
-    const { parent, targetWorkspaceProject, outFolder, watch = false, nonClient = false } = options;
+    const { parent, targetContainerProject, initOptions, nonClient = false } = options;
 
     const children = this.project.children
       .filter(c => (c.typeIs('isomorphic-lib')) && c.__frameworkVersionAtLeast('v3'))
       ;
 
-    const smartContainerTargetProjPath = parent.__getProxyProj(targetWorkspaceProject.name, outFolder);
+    const smartContainerTargetProjPath = parent.__getProxyProjPath(targetContainerProject.name);
 
     Helpers.log(`dist project: ${smartContainerTargetProjPath}`);
     if (!Helpers.exists(smartContainerTargetProjPath)) {
@@ -44,7 +45,7 @@ export class SingularBuild extends BaseFeatureForProject<Project> {
         config.file.environment_js,
         config.file.tnpEnvironment_json,
       ].forEach(fileOrFolder => {
-        const source = path.join(targetWorkspaceProject.location, fileOrFolder);
+        const source = path.join(targetContainerProject.location, fileOrFolder);
         const dest = path.join(smartContainerTargetProjPath, fileOrFolder);
         Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
       });
@@ -58,7 +59,7 @@ export class SingularBuild extends BaseFeatureForProject<Project> {
         'app',
         'lib',
       ].forEach(f => {
-        const source = crossPlatformPath(path.join(targetWorkspaceProject.location, config.folder.src, f));
+        const source = crossPlatformPath(path.join(targetContainerProject.location, config.folder.src, f));
         const dest = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, f));
         // console.log({ dest })
         if (!Helpers.exists(source)) {
@@ -96,13 +97,13 @@ export default def;
         })();
 
         (() => {
-          const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, `../${c.name}`, outFolder, 'index.js'));
+          const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, `../${c.name}`, config.folder.dist, 'index.js'));
           Helpers.writeFile(dest_lib, `var start = require("./compiled/-/${c.name}/app");
 exports.default = start;`);
         })();
 
         (() => {
-          const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, `../${c.name}`, outFolder, 'app.js')); // fix for waiting in run.js
+          const dest_lib = crossPlatformPath(path.join(smartContainerTargetProjPath, `../${c.name}`, config.folder.dist, 'app.js')); // fix for waiting in run.js
           Helpers.writeFile(dest_lib, `var start = require("./compiled/-/${c.name}/app.js").default;
 exports.default = start;`);
         })();
@@ -123,7 +124,7 @@ exports.default = start;`);
     //#region copy core asset files
 
     (() => {
-      const corepro = Project.by('isomorphic-lib', targetWorkspaceProject.__frameworkVersion) as Project;
+      const corepro = Project.by('isomorphic-lib', targetContainerProject.__frameworkVersion) as Project;
       const coreAssetsPath = corepro.pathFor('app/src/assets');
       const filesToCopy = Helpers.filesFrom(coreAssetsPath, true);
       for (let index = 0; index < filesToCopy.length; index++) {
@@ -146,7 +147,7 @@ exports.default = start;`);
         Helpers.mkdirp(source_assets);
       }
 
-      if (watch) {
+      if (initOptions.watch) {
         // SYNCING FOLDERS
         (async () => {
 
@@ -210,8 +211,8 @@ exports.default = start;`);
       const copySourcesToDestTarget = () => {
         for (let index = 0; index < appRelatedFiles.length; index++) {
           const appFileName = appRelatedFiles[index];
-          const source = crossPlatformPath(path.join(targetWorkspaceProject.location, config.folder.src, appFileName))
-          const relativeAfile = source.replace(`${crossPlatformPath([targetWorkspaceProject.location, config.folder.src])}/`, '',);
+          const source = crossPlatformPath(path.join(targetContainerProject.location, config.folder.src, appFileName))
+          const relativeAfile = source.replace(`${crossPlatformPath([targetContainerProject.location, config.folder.src])}/`, '',);
           filesToWatch.push(source);
           const appFileCopyDestination = crossPlatformPath(path.join(smartContainerTargetProjPath, config.folder.src, relativeAfile));
           // console.log({
@@ -226,7 +227,7 @@ exports.default = start;`);
         copySourcesToDestTarget();
       };
 
-      if (watch) {
+      if (initOptions.watch) {
         copyAll();
         const watcher = (await incrementalWatcher(filesToWatch, {
           name: `FIREDEV SINGULAR BUILD CODE WATCHER`,
@@ -244,7 +245,7 @@ exports.default = start;`);
           const toReplace = crossPlatformPath([containerLocaiton, childName, config.folder.src,])
 
           const relative = f.replace(toReplace + '/', '');
-          const isTarget = (childName === targetWorkspaceProject.name);
+          const isTarget = (childName === targetContainerProject.name);
 
           const dest = isTarget
             ? crossPlatformPath([smartContainerTargetProjPath, config.folder.src, relative])
@@ -286,7 +287,7 @@ exports.default = start;`);
     let smartContainerTargetProject = Project.ins.From(smartContainerTargetProjPath);
     parent.__node_modules.linkToProject(smartContainerTargetProject);
 
-    await smartContainerTargetProject.__filesStructure.init(); // THIS CAUSE NOT NICE SHIT
+    await smartContainerTargetProject.__filesStructure.initFileStructure(); // THIS CAUSE NOT NICE SHIT
 
 
     return smartContainerTargetProject;
@@ -294,7 +295,11 @@ exports.default = start;`);
 
 
   //#region init
-  async init(watch: boolean, prod: boolean, outDir: 'dist', smartContainerTargetName?: string) {
+  async initSingularBuild(
+    initOptions: InitOptions,
+    smartContainerTargetName: string,
+    // watch: boolean, prod: boolean, outDir: 'dist', smartContainerTargetName?: string
+  ) {
     if (!this.project.__isSmartContainer) {
       return;
     }
@@ -306,15 +311,25 @@ exports.default = start;`);
     for (let index = 0; index < children.length; index++) {
       const c = children[index];
       recreateApp(c);
-      await c.__filesStructure.init();
+      await c.__filesStructure.initFileStructure();
     }
 
     const nonClinetCildren = children.filter(f => f.name !== smartContainerTargetName) || [];
     const smartContainerBuildTarget = this.project.getChildBy(smartContainerTargetName);
 
-    const singularWatchProj = await this.createSingluarTargeProjFor({ parent: this.project, targetWorkspaceProject: smartContainerBuildTarget, outFolder: outDir, watch });
+    const singularWatchProj = await this.createSingluarTargeProjFor({
+      parent: this.project,
+      targetContainerProject: smartContainerBuildTarget,
+      initOptions,
+      nonClient: false
+    });
     for (let index = 0; index < nonClinetCildren.length; index++) {
-      await this.createSingluarTargeProjFor({ parent: this.project, targetWorkspaceProject: nonClinetCildren[index], outFolder: outDir, watch: false, nonClient: true });
+      await this.createSingluarTargeProjFor({
+        parent: this.project,
+        targetContainerProject: nonClinetCildren[index],
+        initOptions,
+        nonClient: true,
+      });
     }
 
     Helpers.log(`[singular build] init structure ${!!singularWatchProj}`);

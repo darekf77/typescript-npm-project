@@ -97,7 +97,7 @@ export class $Test extends CommandLineFeature<{}, Project> {
 
   async _cypressTests(watch: boolean, debug: boolean, args: string) {
     const proj = Project.ins.Current;
-    await proj.__filesStructure.init();
+    await proj.__filesStructure.initFileStructure();
     if (watch) {
       await proj.__testsCypress.startAndWatch(args.trim().split(' '), debug)
     } else {
@@ -110,7 +110,7 @@ export class $Test extends CommandLineFeature<{}, Project> {
 
   async _mochaTests(watch: boolean, debug: boolean, args: string) {
     const proj = Project.ins.Current;
-    await proj.__filesStructure.init();
+    await proj.__filesStructure.initFileStructure();
     if (watch) {
       await Project.ins.Current.__tests.startAndWatch(args.trim().split(' '), debug)
     } else {
@@ -123,7 +123,7 @@ export class $Test extends CommandLineFeature<{}, Project> {
 
   async _jestTests(watch: boolean, debug: boolean, args: string) {
     const proj = Project.ins.Current;
-    await proj.__filesStructure.init();
+    await proj.__filesStructure.initFileStructure();
     if (watch) {
       await proj.__testsJest.startAndWatch(debug, args.trim())
     } else {

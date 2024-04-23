@@ -223,7 +223,6 @@ export class BroswerCompilation extends BackendCompilation {
     // console.log('inside')
     let env: Models.EnvConfig = this.ENV;
     const compilationProject: Project = this.compilationProject;
-    const buildOptions = this.buildOptions;
     if (!compilationProject) {
       return;
     }
@@ -263,7 +262,7 @@ export class BroswerCompilation extends BackendCompilation {
       },
       project,
       compilationProject,
-      buildOptions,
+      this.buildOptions,
       this.sourceOutBrowser
     );
   }

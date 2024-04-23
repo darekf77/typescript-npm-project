@@ -11,7 +11,7 @@ import {
 import { config, extAllowedToReplace, frontEndOnly, TAGS } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
 import type { Project } from '../../../abstract/project';
-import { BuildOptions } from '../../../../build-options';
+import { BuildOptions, InitOptions } from '../../../../build-options';
 import { Models } from '../../../../models';
 import { RegionRemover } from 'isomorphic-region-loader/src';
 import { MjsModule } from '../../../features/copy-manager/mjs-fesm-module-spliter.backend';
@@ -103,6 +103,7 @@ export class BrowserCodeCut {
     private project?: Project,
     private buildOptions?: BuildOptions,
   ) {
+    // console.log(`[incremental-build-process INSIDE BROWSER!!! '${this.buildOptions.baseHref}'`)
 
     this.absPathTmpSrcDistFolder = crossPlatformPath(absPathTmpSrcDistFolder);
     this.absFileSourcePathBrowserOrWebsql = crossPlatformPath(absFileSourcePathBrowserOrWebsql);
@@ -687,17 +688,9 @@ export class BrowserCodeCut {
   //#region methods / processing asset link for app
   processAssetsLinksForApp() {
     this.rawContentForAPPONLYBrowser = this.rawContentForBrowser;
-
-    const pathname = this.project.__isSmartContainerTarget
-      ? this.project.__smartContainerTargetParentContainer.name
-      : this.project.name;
-
-    let basenameWithSlash = this.project.isInCiReleaseProject ? `/${pathname}/` : '/';
-    if (this.project.__env.config?.useDomain) {
-      basenameWithSlash = '/';
-    }
-
-    basenameWithSlash = basenameWithSlash.endsWith('/') ? basenameWithSlash : (basenameWithSlash + '/');
+    // console.log(`[incremental-build-process processAssetsLinksForApp '${this.buildOptions.baseHref}'`)
+    const baseHref = this.project.angularFeBasenameManager.getBaseHref(InitOptions.fromBuild(this.buildOptions))
+    // console.log(`Fixing with basehref: '${baseHref}'`)
 
     const howMuchBack = (this.relativePath.split('/').length - 1);
     const back = (howMuchBack === 0) ? './' : _.times(howMuchBack).map(() => '../').join('');
@@ -711,27 +704,27 @@ export class BrowserCodeCut {
         },
         {
           from: `src="/assets/assets-for/${relativeAssetPathPart}/`,
-          to: `src="${basenameWithSlash}assets/assets-for/${relativeAssetPathPart}/`,
+          to: `src="${baseHref}assets/assets-for/${relativeAssetPathPart}/`,
         },
         {
           from: `[src]="'/assets/assets-for/${relativeAssetPathPart}/`,
-          to: `[src]="'${basenameWithSlash}assets/assets-for/${relativeAssetPathPart}/`,
+          to: `[src]="'${baseHref}assets/assets-for/${relativeAssetPathPart}/`,
         },
         {
           from: `href="/assets/assets-for/${relativeAssetPathPart}/`,
-          to: `href="${basenameWithSlash}assets/assets-for/${relativeAssetPathPart}/`,
+          to: `href="${baseHref}assets/assets-for/${relativeAssetPathPart}/`,
         },
         {
           from: `[href]="'/assets/assets-for/${relativeAssetPathPart}/`,
-          to: `[href]="'${basenameWithSlash}assets/assets-for/${relativeAssetPathPart}/`,
+          to: `[href]="'${baseHref}assets/assets-for/${relativeAssetPathPart}/`,
         },
         {
           from: `url('/assets/assets-for/${relativeAssetPathPart}/`,
-          to: `url('${basenameWithSlash}assets/assets-for/${relativeAssetPathPart}/`,
+          to: `url('${baseHref}assets/assets-for/${relativeAssetPathPart}/`,
         },
         {
           from: `url("/assets/assets-for/${relativeAssetPathPart}/`,
-          to: `url("${basenameWithSlash}assets/assets-for/${relativeAssetPathPart}/`,
+          to: `url("${baseHref}assets/assets-for/${relativeAssetPathPart}/`,
         },
         /**
          *

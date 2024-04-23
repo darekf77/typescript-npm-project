@@ -1,18 +1,13 @@
 import { CoreModels } from 'tnp-core/src';
 import { Project } from '../../abstract/project';
 
-export type Opt = {
-  outFolder?: 'dist';
-  projectName?: string;
-  projectLocation?: string;
-  client?: Project;
+export type InsideStructureData = {
   replacement?: Function;
-  watchBuild?: boolean;
 };
 
-export type LinkType = (options: Opt) => string;
-export type LinkTypePathRep = (options: Omit<Opt, 'replacement'>) => string;
-export type EndAction = (options: Opt) => void;
+export type InsideStructLinkType = (options: InsideStructureData) => string;
+export type InsideStructLinkTypePathRep = (options: Omit<InsideStructureData, 'replacement'>) => string;
+export type InsideStructEndAction = (options: InsideStructureData) => void;
 
 /**
  * @deprecated
@@ -43,19 +38,19 @@ export class InsideStruct {
      * Replace pathes while copying relateivePathesFromContainer
      * to destination project
      */
-    public pathReplacements: [string | RegExp, LinkTypePathRep][] = [],
+    public pathReplacements: [string | RegExp, InsideStructLinkTypePathRep][] = [],
     public linkNodeModulesTo: string[] = [],
     public linksFuncs: [
       /**
        * orginal real path
        */
-      LinkType,
+      InsideStructLinkType,
       /**
        * destination path
        */
-      LinkType
+      InsideStructLinkType
     ][] = [],
-    public endAction?: EndAction,
+    public endAction?: InsideStructEndAction,
   ) {
 
   }

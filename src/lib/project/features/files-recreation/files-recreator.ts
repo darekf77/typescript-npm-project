@@ -26,7 +26,7 @@ function getVscodeSettingsFrom(project: Project) {
 
 export class FilesRecreator extends BaseFeatureForProject<Project> {
 
-  public async init(initOptions: InitOptions) {
+  public async recreateSimpleFiles(initOptions: InitOptions) {
     Helpers.log(`recreation init of ${chalk.bold(this.project.genericName)}`)
     if (this.project.typeIs('container')) {
       this.gitignore();

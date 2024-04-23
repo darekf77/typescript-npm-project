@@ -10,7 +10,7 @@ export type CleanType = 'all' | 'only_static_generated';
 
 export class FilesStructure extends BaseFeatureForProject<Project> {
 
-  public async init(initOptions?: InitOptions) {
+  public async initFileStructure(initOptions?: InitOptions) {
     initOptions = InitOptions.from(initOptions);
 
     if (!initOptions.initiator) {
@@ -72,7 +72,7 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
 
     //#region handle init of container
     if (this.project.__isContainer) {
-      await this.project.__recreate.init(initOptions);
+      await this.project.__recreate.recreateSimpleFiles(initOptions);
 
       if (!omitChildren && !this.project.__isContainerWithLinkedProjects) {
         const containerChildren = this.project.children.filter(c => {
@@ -86,11 +86,11 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
         })
         for (let index = 0; index < containerChildren.length; index++) {
           const containerChild = containerChildren[index];
-          await containerChild.__filesStructure.init(initOptions);
+          await containerChild.__filesStructure.initFileStructure(initOptions);
           const containerChildChildren = containerChild.children;
           for (let indexChild = 0; indexChild < containerChildChildren.length; indexChild++) {
             const workspaceChild = containerChildChildren[indexChild];
-            await workspaceChild.__filesStructure.init(initOptions)
+            await workspaceChild.__filesStructure.initFileStructure(initOptions)
           }
         }
       }
@@ -98,7 +98,7 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
     }
     //#endregion
 
-    await this.project.__recreate.init(initOptions);
+    await this.project.__recreate.recreateSimpleFiles(initOptions);
     this.project.__recreate.vscode.settings.toogleHideOrShowDeps();
 
     if (this.project.__isStandaloneProject || this.project.__isSmartContainer) {
@@ -120,9 +120,9 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
     if (this.project.__isSmartContainer) {
       //#region handle smart container
 
-      await this.project.__recreate.init(initOptions);
+      await this.project.__recreate.recreateSimpleFiles(initOptions);
       if (!omitChildren) {
-        await this.project.__singluarBuild.init(watch, false, 'dist', smartContainerTargetName);
+        await this.project.__singluarBuild.initSingularBuild(initOptions, smartContainerTargetName);
       }
       //#endregion
     }

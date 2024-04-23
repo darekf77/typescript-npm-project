@@ -1,4 +1,4 @@
-import { CoreModels, _ } from 'tnp-core';
+import { CoreModels, _, crossPlatformPath } from 'tnp-core/src';
 import type { Project } from './project/abstract/project';
 import { config } from 'tnp-config/src';
 import { Models } from './models';
@@ -6,10 +6,6 @@ import { CLASS } from 'typescript-class-helpers/src';
 
 //#region build options lib or app
 class SystemTask<T> {
-  /**
-   * watch build
-   */
-  watch: boolean;
   protected constructor() { }
   finishCallback: () => any;
   public clone(override: Partial<T>): T {
@@ -20,7 +16,40 @@ class SystemTask<T> {
   }
 }
 
-class BuildOptionsLibOrApp<T> extends SystemTask<T> {
+export class BaseBuild<T> extends SystemTask<T> {
+  /**
+   * watch build
+   */
+  watch: boolean;
+  /**
+    * build on remote server (user cannot interfere with console)
+    * without user interaction
+    */
+  ci: boolean;
+
+  /**
+   * base-href -> is a part of lib code build
+   *
+   * overwite base href for app deployment.
+   * Must be at least equal: '/'
+   *
+   * default: /
+   * default for github pages standalone project: '/<project-name-or-overwritten>/'
+   * default for organizaion main target: '/<project-name-or-overwritten>/'
+   * default for organizaion main other targets: '/<project-name-or-overwritten>/-/<other-target-name>/'
+   */
+  get baseHref(): string {
+    return this._baseHref;
+  }
+  set baseHref(v) {
+    this._baseHref = crossPlatformPath(v);
+  }
+  private _baseHref: string;
+  disableServiceWorker: boolean;
+  buildAngularAppForElectron: boolean;
+}
+
+class BuildOptionsLibOrApp<T> extends BaseBuild<T> {
   cliBuildNoDts: boolean;
   cliBuildUglify: boolean;
   cliBuildObscure: boolean;
@@ -42,7 +71,7 @@ export class NewOptions extends SystemTask<NewOptions> {
 //#endregion
 
 //#region init options
-export class InitOptions extends SystemTask<InitOptions> {
+export class InitOptions extends BaseBuild<InitOptions> {
   readonly alreadyInitedPorjects: Project[];
   private constructor() {
     super();
@@ -59,6 +88,34 @@ export class InitOptions extends SystemTask<InitOptions> {
 
   public static from(options: Partial<InitOptions>): InitOptions {
     return from(options, InitOptions);
+  }
+
+  public static fromBuild(options: BuildOptions): InitOptions {
+    const initOptions = InitOptions.from({});
+
+    const propsToInit = [
+      'baseHref',
+      'watch',
+      'websql',
+      'smartContainerTargetName',
+      'ci',
+      'targetApp',
+      'prod',
+      'disableServiceWorker',
+      'buildAngularAppForElectron',
+    ] as (keyof BuildOptions)[];
+
+    for (const prop of propsToInit) {
+      if (!_.isUndefined(options[prop])) {
+        initOptions[prop] = options[prop]
+      }
+    }
+
+    return initOptions;
+  }
+
+  public fillBaseHrefFromFile(project: Project) {
+
   }
 }
 //#endregion
@@ -112,11 +169,12 @@ export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
    * build executed druring lib release
    */
   buildForRelease: boolean;
+
   /**
-   * build on remote server (user cannot interfere with console)
+   * default: '<project-locaiton>/dist-app'
+   * default for github page: '<project-location>/docs'
    */
-  ci: boolean;
-  baseHref: string;
+  appBuildLocation: string;
   /**
    * Cut <@>notForNpm  tag from lib build
    */

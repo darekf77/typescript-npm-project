@@ -626,7 +626,7 @@ class $Global extends BaseCommandLine<{}, Project> {
           Helpers.info(`Recreating node_module for ${c.genericName}`)
           c.__node_modules.remove();
           c.__smartNodeModules.remove();
-          await c.__filesStructure.init();
+          await c.__filesStructure.initFileStructure();
         }
       }
     } else if (proj.__isStandaloneProject && proj.__npmPackages.useSmartInstall) {

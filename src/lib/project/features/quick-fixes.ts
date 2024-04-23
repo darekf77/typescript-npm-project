@@ -231,6 +231,7 @@ Object.defineProperty(document.body.style, 'transform', {
   }
 
   /**
+   * TODO QUICK FIX
    * something wrong when minifying cli
    */
   public async removeTnpFromItself(actionwhenNotInNodeModules: () => {

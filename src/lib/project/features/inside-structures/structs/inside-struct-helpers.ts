@@ -12,22 +12,22 @@ import { EXPORT_TEMPLATE } from '../../../../templates';
 import { Project } from '../../../abstract/project';
 import { DEFAULT_PORT, PortUtils } from '../../../../constants';
 
-export function resolveBrowserPathToAssetFrom(projectTargetOrStandalone: Project, absolutePath: string, outFolder: 'dist', websql: boolean) {
+export function resolveBrowserPathToAssetFrom(projectTargetOrStandalone: Project, absolutePath: string) {
   let resultBrowserPath = '';
   if (projectTargetOrStandalone.__isSmartContainerTarget) {
-    // `tmp-src-${outFolder}${websql ? '-websql' : ''}/assets/assets-for/${projectTargetOrStandalone.name + '--' + projectTargetOrStandalone.parent.name}/`
+    // `tmp-src-${outFolder}${websql ? '-websql' : ''}/assets/assets-for/${project.name + '--' + project.parent.name}/`
     const relatievPath = absolutePath.replace(
       `${projectTargetOrStandalone?.__smartContainerTargetParentContainer.location}/`,
       ''
     );
-    const client = _.first(relatievPath.split('/'));
+    const smartContainerTargetChild = _.first(relatievPath.split('/'));
     resultBrowserPath = `/${relatievPath.split('/').slice(1).join('/')}`;
     resultBrowserPath = resultBrowserPath.replace(
       `/${config.folder.src}/${config.folder.assets}/`,
-      `/${config.folder.assets}/${config.folder.assets}-for/${projectTargetOrStandalone.__smartContainerTargetParentContainer.name + '--' + client}/`,
+      `/${config.folder.assets}/${config.folder.assets}-for/${projectTargetOrStandalone.__smartContainerTargetParentContainer.name + '--' + smartContainerTargetChild}/`,
     );
   } else {
-    // `tmp-src-${outFolder}${websql ? '-websql' : ''}/assets/assets-for/${projectTargetOrStandalone.name}/`
+    // `tmp-src-${outFolder}${websql ? '-websql' : ''}/assets/assets-for/${project.name}/`
     const relatievPath = absolutePath.replace(
       `${crossPlatformPath(projectTargetOrStandalone.location)}/`,
       ''
@@ -42,34 +42,35 @@ export function resolveBrowserPathToAssetFrom(projectTargetOrStandalone: Project
   return resultBrowserPath;
 }
 
-export function resolvePathToAsset(projectTargetOrStandalone: Project, relativePath: string, outFolder: 'dist', websql: boolean) {
-  const loaderRelativePath = relativePath.replace(/^\.\//, '').replace(/^\//, '');
+/**
+ * return ex.
+ * my-path-to/asdasd
+ * test
+ */
+export function resolvePathToAsset(project: Project, relativePathToLoader: string) {
+  const loaderRelativePath = relativePathToLoader.replace(/^\.\//, '').replace(/^\//, '');
   let absPathToAsset = '';
   let browserPath = ''
 
-  if (projectTargetOrStandalone.__isSmartContainerTarget) { // stratego for smart container target project
-    absPathToAsset = crossPlatformPath([projectTargetOrStandalone.__smartContainerTargetParentContainer.location, loaderRelativePath]);
+  if (project.__isSmartContainerTarget) { // stratego for smart container target project
+    absPathToAsset = crossPlatformPath([project.__smartContainerTargetParentContainer.location, loaderRelativePath]);
     if (!Helpers.exists(absPathToAsset)) {
       absPathToAsset = absPathToAsset.replace(
         loaderRelativePath,
-        `${projectTargetOrStandalone.name}/${loaderRelativePath}`
+        `${project.name}/${loaderRelativePath}`
       )
     }
   } else { // stratego for normal standalone project
-    absPathToAsset = crossPlatformPath([projectTargetOrStandalone.location, loaderRelativePath]);
+    absPathToAsset = crossPlatformPath([project.location, loaderRelativePath]);
     if (!Helpers.exists(absPathToAsset)) {
       absPathToAsset = absPathToAsset.replace(
-        `${projectTargetOrStandalone.name}/${loaderRelativePath}`,
+        `${project.name}/${loaderRelativePath}`,
         loaderRelativePath,
       )
     }
   }
-  browserPath = resolveBrowserPathToAssetFrom(projectTargetOrStandalone, absPathToAsset, outFolder, websql);
+  browserPath = resolveBrowserPathToAssetFrom(project, absPathToAsset);
 
-  // console.log({
-  //   pathToAsset: absPathToAsset,
-  //   browserPath,
-  // })
   return browserPath;
 }
 
@@ -286,6 +287,7 @@ ${'//#end' + 'region'}
 } from 'tnp-core';
 ${'//#reg' + 'ion'} @${'back' + 'end'}
 import { app, BrowserWindow, screen } from 'electron';
+import start from './app';
 
 let win: BrowserWindow | null = null;
 const args = process.argv.slice(1);
@@ -301,8 +303,8 @@ win = new BrowserWindow({
   x: 0,
   y: 0,
   autoHideMenuBar: true,
-  width: size.width / 2,
-  height: size.height / 2,
+  width: size.width * (3/4),
+  height: size.height * (3/4),
   webPreferences: {
     nodeIntegration: true,
     allowRunningInsecureContent: (serve),
@@ -313,6 +315,7 @@ win = new BrowserWindow({
 if (serve) {
   const debug = require('electron-debug');
   debug();
+  win.webContents.openDevTools();
 
   require('electron-reloader')(module);
   win.loadURL('http://localhost:' + (websql ? CLIENT_DEV_WEBSQL_APP_PORT : CLIENT_DEV_NORMAL_APP_PORT));
@@ -341,34 +344,36 @@ return win;
 }
 
 async function startElectron() {
-try {
-  // This method will be called when Electron has finished
-  // initialization and is ready to create browser windows.
-  // Some APIs can only be used after this event occurs.
-  // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
-  app.on('ready', () => setTimeout(createWindow, 400));
+  await start();
+  try {
+    // This method will be called when Electron has finished
+    // initialization and is ready to create browser windows.
+    // Some APIs can only be used after this event occurs.
+    // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
+    // app.on('ready', () => setTimeout(createWindow, 400));
+    setTimeout(createWindow, 400)
 
-  // Quit when all windows are closed.
-  app.on('window-all-closed', () => {
-    // On OS X it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== 'darwin') {
-      app.quit();
-    }
-  });
+    // Quit when all windows are closed.
+    app.on('window-all-closed', () => {
+      // On OS X it is common for applications and their menu bar
+      // to stay active until the user quits explicitly with Cmd + Q
+      if (process.platform !== 'darwin') {
+        app.quit();
+      }
+    });
 
-  app.on('activate', () => {
-    // On OS X it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (win === null) {
-      createWindow();
-    }
-  });
+    app.on('activate', () => {
+      // On OS X it's common to re-create a window in the app when the
+      // dock icon is clicked and there are no other windows open.
+      if (win === null) {
+        createWindow();
+      }
+    });
 
-} catch (e) {
-  // Catch Error
-  // throw e;
-}
+  } catch (e) {
+    // Catch Error
+    throw e;
+  }
 }
 
 startElectron();

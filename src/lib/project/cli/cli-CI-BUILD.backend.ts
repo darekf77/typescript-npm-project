@@ -11,7 +11,7 @@ import { config } from "tnp-config";
 class $CiBuild extends CommandLineFeature<BuildOptions, Project> {
   protected async __initialize__() {
     this.params = BuildOptions.from(this.params);
-    await this.project.recreateReleaseProject();
+    await this.project.recreateReleaseProject(this.params);
   }
 
   public async _() {
