@@ -10,6 +10,7 @@ import OPEN from './cli-OPEN.backend';
 import UPDATE from './cli-UPDATE.backend';
 import VSCODE from './cli-VSCODE.backend';
 import NEW from './cli-NEW.backend';
+import SERVICE from './cli-SERVICE.backend';
 
 export default [
   GLOBAL,
@@ -23,6 +24,7 @@ export default [
   UPDATE,
   VSCODE,
   NEW,
+  SERVICE,
 ]
 
 //#endregion
