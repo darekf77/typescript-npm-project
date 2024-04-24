@@ -51,6 +51,7 @@ export namespace PerfectClassClone {
 
   class MyClass {
     context = 'default-context';
+    static static_context = 'default-context';
 
     constructor() {
       console.log(this.context);
@@ -58,6 +59,9 @@ export namespace PerfectClassClone {
 
     greet() {
       console.log(`Hello from ${this.context}`);
+      // also allowed static props
+      const MyClassFun = this.constructor as typeof MyClass;
+      console.log(`Hello from ${MyClassFun.static_context}`);
     }
   }
 
@@ -66,6 +70,7 @@ export namespace PerfectClassClone {
     // Return a new class that extends the base class
     return class extends BaseClass {
       // You can override prototype properties or methods here if needed
+      // static properties override allowed
     };
   }
 
