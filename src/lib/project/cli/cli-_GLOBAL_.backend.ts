@@ -788,11 +788,11 @@ class $Global extends BaseCommandLine<{}, Project> {
 
     let ps: Models.PsListInfo[] = await psList()
 
-    let info = ps.find(p => p.pid == pid);
-    if (!info) {
+    let psinfo = ps.find(p => p.pid == pid);
+    if (!psinfo) {
       Helpers.error(`No process found with pid: ${args}`, false, true)
     }
-    console.log(info)
+    console.log(psinfo)
   }
   //#endregion
 

@@ -10,6 +10,9 @@ import { NumberColumn, PropsEntitySQL, QueryTable, StringColumn } from "firedev-
 //#region build process non columns key type
 export type BuildProcessNonColumnsKeys =
   'ctrl' |
+  '__endpoint_context__' |
+  'inject' |
+  '_' |
   'clone';
 //#endregion
 
@@ -24,6 +27,7 @@ export type IBuildProcessTable = PropsEntitySQL<typeof DEF_MODEL_VALUE_BUILD_PRO
 export class BuildProcessTable extends QueryTable<BuildProcess, number> implements IBuildProcessTable {
   id = new NumberColumn(this, 'id');
   description = new StringColumn(this, 'description');
+
 }
 
 export const BUILD_PROCESS = new BuildProcessTable(BUILD_PROCESS_TABLE_NAME);

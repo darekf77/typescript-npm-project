@@ -3075,7 +3075,7 @@ to fix it.
     }
     //#endregion
 
-    let libContext: Firedev.FrameworkContext;
+    let libContext: any; //  Firedev.FrameworkContext;
     const smartContainerTargetName = buildOptions.smartContainerTargetName || this.__smartContainerBuildTarget?.name;
 
     if (buildOptions.libBuild) {
@@ -3107,30 +3107,30 @@ to fix it.
         Helpers.taskStarted(`starting project service... ${hostForBuild}`);
         try {
           // TOOD @UNCOMMEND
-          const context = await Firedev.init({
-            mode: 'backend/frontend-worker',
-            host: hostForBuild,
-            controllers: [
-              BuildProcessController,
-            ],
-            entities: [
-              BuildProcess,
-            ],
-            //#region @websql
-            config: {
-              type: 'better-sqlite3',
-              database:
-                //  config.frameworkName === 'firedev' ?
-                ':memory:'
-              //  as any : this.pathFor(`tmp-build-process.sqlite`)
-              ,
-              logging: false,
-            }
-            //#endregion
-          });
-          const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
-          await controller.initialize(this);
-          libContext = context;
+          // const context = await Firedev.init({
+          //   mode: 'backend/frontend',
+          //   host: hostForBuild,
+          //   controllers: [
+          //     BuildProcessController,
+          //   ],
+          //   entities: [
+          //     BuildProcess,
+          //   ],
+          //   //#region @websql
+          //   config: {
+          //     type: 'better-sqlite3',
+          //     database:
+          //       //  config.frameworkName === 'firedev' ?
+          //       ':memory:'
+          //     //  as any : this.pathFor(`tmp-build-process.sqlite`)
+          //     ,
+          //     logging: false,
+          //   }
+          //   //#endregion
+          // });
+          // const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
+          // await controller.initialize(this);
+          // libContext = context;
         } catch (error) {
           console.error(error);
           Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
@@ -3174,25 +3174,27 @@ to fix it.
         const hostForAppWorker = `http://localhost:${projectInfoPortFromFile}`;
         // console.log({ hostForAppWorker })
         if (!buildOptions?.skipProjectProcess) {
-          try {
-            Firedev.destroyContext(hostForAppWorker);
-            const context = await Firedev.init({
-              mode: 'remote-backend',
-              host: hostForAppWorker,
-              controllers: [
-                BuildProcessController,
-              ],
-              entities: [
-                BuildProcess,
-              ]
-            });
-            const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
-            await controller.initialize(this);
-          } catch (error) {
-            console.error(error);
-            Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
-          }
-          this.__saveLaunchJson(projectInfoPortFromFile);
+
+          // TODO @UNCOMMENT
+          // try {
+          //   Firedev.destroyContext(hostForAppWorker);
+          //   const context = await Firedev.init({
+          //     mode: 'remote-backend',
+          //     host: hostForAppWorker,
+          //     controllers: [
+          //       BuildProcessController,
+          //     ],
+          //     entities: [
+          //       BuildProcess,
+          //     ]
+          //   });
+          //   const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
+          //   await controller.initialize(this);
+          // } catch (error) {
+          //   console.error(error);
+          //   Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
+          // }
+          // this.__saveLaunchJson(projectInfoPortFromFile);
         }
       }
       //#endregion
@@ -3279,8 +3281,10 @@ ${config.frameworkName} start
 
 
     !buildOptions.skipCopyManager && Helpers.info((buildOptions.watch ? `
+    [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]
     Files watcher started.. ${buildOptions.websql ? '[WEBSQL]' : ''}
   `: `
+    [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]
     End of Building ${this.genericName} ${buildOptions.websql ? '[WEBSQL]' : ''}
 
   ` ));
@@ -3387,6 +3391,20 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
   }
   //#endregion
 
+  get outFilesArgs() {
+    //#region @backendFunc
+    return !this.__isStandaloneProject ? void 0 : [
+      "${workspaceFolder}/dist/**/*.js",
+      "!**/node_modules/**",
+      ...Helpers.uniqArray(this.__isomorphicPackages.map(packageName => {
+        const p = this.pathFor([config.folder.node_modules, packageName, config.folder.src])
+        return Helpers.isExistedSymlink(p)
+          ? `${crossPlatformPath(fse.realpathSync(p))}/../dist/**/*.js` : void 0
+      }).filter(f => !!f))
+    ];
+    //#endregion
+  }
+
   //#region getters & methods / vscode lanuch runtime args
   get __vscodeLaunchRuntimeArgs() {
     //#region @backendFunc
@@ -3476,6 +3494,7 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
           'program': '${workspaceFolder}/run.js',
           'cwd': void 0,
           'args': [`port=${backendPort}`],
+          outFiles: this.outFilesArgs,
           // "outFiles": ["${workspaceFolder}/dist/**/*.js"], becouse of this debugging inside node_moudles
           // with compy manager created moduels does not work..
           runtimeArgs: this.__vscodeLaunchRuntimeArgs
@@ -4588,11 +4607,11 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
   //#region getters & methods / init
   async init(initOptions?: InitOptions) {
     //#region @backendFunc
-    this.__saveLaunchJson(4000);
+
     Helpers.removeIfExists(path.join(this.location, config.file.tnpEnvironment_json));
     initOptions = InitOptions.from(initOptions);
     await this.__filesStructure.initFileStructure(initOptions);
-
+    this.__saveLaunchJson(4000);
     initOptions.finishCallback();
     //#endregion
   }

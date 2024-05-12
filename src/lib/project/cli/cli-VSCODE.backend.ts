@@ -102,6 +102,7 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
     };
 
     let settings = {
+      'editor.renderWhitespace': true,
       "window.commandCenter": false,
       'git.enableSmartCommit': true,
       'terminal.integrated.scrollback': 10000,

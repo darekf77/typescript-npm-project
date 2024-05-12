@@ -33,9 +33,11 @@ export async function start(
       'app': 'build:app:watch', // should be console menu
       'ba': 'build:app',
       'b': 'build',
+      'cb': 'build:clean:build',
       'hosts': 'open:hosts',
       'baw': 'build:app:watch',
       'bw': 'build:watch',
+      'cbw': 'build:clean:watch',
       's': 'build:start',
       'start': 'build:start',
       'ew': 'electron:watch',

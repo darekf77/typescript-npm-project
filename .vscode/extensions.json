@@ -46,5 +46,6 @@
         "SimonSiefke.svg-preview",
         "ctcuff.font-preview",
         "ms-azuretools.vscode-docker",
+        "GitHub.copilot",
     ]
 }

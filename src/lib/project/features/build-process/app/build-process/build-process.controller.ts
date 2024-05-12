@@ -24,12 +24,11 @@ import { Project } from '../../../../abstract/project';
 @Firedev.Controller({
   //#region controller options
   className: 'BuildProcessController',
-  entity: BuildProcess,
   //#endregion
 })
-export class BuildProcessController extends Firedev.Base.Controller<any> {
+export class BuildProcessController extends Firedev.Base.CrudController<any> {
   //#region fields
-  entity: typeof BuildProcess;
+  entity = () => BuildProcess;
   //#region @websql
   readonly backend = BuildProcessBackend.for(this);
   //#endregion

@@ -71,8 +71,9 @@ class User extends Firedev.Base.Entity {
 
 }
 
-@Firedev.Controller({ className: 'UserController', entity: User })
-class UserController extends Firedev.Base.Controller<User> {
+@Firedev.Controller({ className: 'UserController' })
+class UserController extends Firedev.Base.CrudController<User> {
+  entity = () => User;
 
   //#region @websql
   async initExampleDbData(): Promise<void> {
@@ -89,38 +90,38 @@ async function start() {
   console.log('Your server will start on port ' + HOST_BACKEND_PORT);
   const host = 'http://localhost:' + HOST_BACKEND_PORT;
 
-  const context = await Firedev.init({
-    host,
-    controllers: [
-      UserController,
-      FiredevFileController,
-      FiredevBinaryFileController,
-      // PUT FIREDEV CONTORLLERS HERE
-    ],
-    entities: [
-      User,
-      FiredevFile,
-      FiredevFileCss,
-      FiredevBinaryFile,
-      // PUT FIREDEV ENTITIES HERE
-    ],
-    //#region @websql
-    config: {
-      type: 'better-sqlite3',
-      database: 'tmp-db.sqlite',
-      logging: false,
-    }
-    //#endregion
-  });
+  // const context = await Firedev.init({
+  //   host,
+  //   controllers: [
+  //     UserController,
+  //     FiredevFileController,
+  //     FiredevBinaryFileController,
+  //     // PUT FIREDEV CONTORLLERS HERE
+  //   ],
+  //   entities: [
+  //     User,
+  //     FiredevFile,
+  //     FiredevFileCss,
+  //     FiredevBinaryFile,
+  //     // PUT FIREDEV ENTITIES HERE
+  //   ],
+  //   //#region @websql
+  //   config: {
+  //     type: 'better-sqlite3',
+  //     database: 'tmp-db.sqlite',
+  //     logging: false,
+  //   }
+  //   //#endregion
+  // });
 
-  if (Firedev.isBrowser) {
-    //#region @browser
-    const users = (await User.ctrl.getAll().received).body.json;
-    console.log({
-      'users from backend': users
-    });
-    //#endregion
-  }
+  // if (Firedev.isBrowser) {
+  //#region @browser
+  // const users = (await User.ctrl.getAll().received).body.json;
+  // console.log({
+  //   'users from backend': users
+  // });
+  //#endregion
+  // }
 }
 
 export default start;

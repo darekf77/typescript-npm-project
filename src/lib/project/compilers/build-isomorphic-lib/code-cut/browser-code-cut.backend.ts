@@ -278,6 +278,7 @@ export class BrowserCodeCut {
   }
   //#endregion
 
+  //#region methods / remove src from imports
   private processRegexForSrcRemove(regexEnd: RegExp, line: string, matchType: 'from_import_export' | 'imports' | 'require'): string {
     const matches = line.match(regexEnd);
     const firstMatch = _.first(matches) as string;
@@ -293,7 +294,9 @@ export class BrowserCodeCut {
 
     return line.replace(firstMatch, clean);
   }
+  //#endregion
 
+  //#region methods / remove src from imports/exports
   private removeSrcAtEndFromImortExports(content: string): string {
     const regexEnd = /from\s+(\'|\").+\/src(\'|\")/g;
     const singleLineImporrt = /import\((\'|\"|\`).+\/src(\'|\"|\`)\)/g;
@@ -319,8 +322,10 @@ export class BrowserCodeCut {
       return line;
     }).join('\n');
   }
+  //#endregion
 
   private processBrowserNotCorrectImportsExports = (importOrExportLine: string) => {
+    // console.log({ importOrExportLine })
     // TODO
     return importOrExportLine;
   }
@@ -929,7 +934,7 @@ export class BrowserCodeCut {
 ${chalk.bold('WARNING')}: ${chalk.underline('./src/' + this.relativePath + `:${lineindex + 2}:1`)} Don't import things from lib like that (it may not work in your ${this.project.name}/src/app project);
 ${chalk.bold(wrongImport)};
 Please use version compiled in node_modules:
-import { < My Stuff > } from '${this.project.name}';`, false,);
+import { < My Stuff > } from '${this.project.name}/src';`, false,);
     }
   }
   //#endregion

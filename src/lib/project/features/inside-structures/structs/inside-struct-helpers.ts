@@ -222,9 +222,9 @@ class User extends Firedev.Base.Entity {
 
 }
 
-@Firedev.Controller({ className: 'UserController', entity: User })
-class UserController extends Firedev.Base.Controller<User> {
-
+@Firedev.Controller({ className: 'UserController' })
+class UserController extends Firedev.Base.CrudController<User> {
+  entity = ()=> User;
   ${'//#reg' + 'ion'} @${'web' + 'sql'}
   async initExampleDbData(): Promise<void> {
     await this.repository.save(new User())
@@ -239,20 +239,16 @@ async function start() {
 
   const context = await Firedev.init({
     host,
-    controllers: [
+    controllers: {
       UserController,
       // PUT FIREDEV CONTORLLERS HERE
-    ],
-    entities: [
+    },
+    entities: {
       User,
       // PUT FIREDEV ENTITIES HERE
-    ],
+    },
     ${'//#reg' + 'ion'} @${'web' + 'sql'}
-    config: {
-      type: 'better-sqlite3',
-      database: 'tmp-db.sqlite',
-      logging: false,
-    }
+    database:true,
     ${'//#end' + 'region'}
   });
 

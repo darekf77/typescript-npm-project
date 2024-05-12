@@ -293,7 +293,9 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
     if (lastContainer && lastContainer.__isContainer && !lastContainer.__isMonorepo) {
 
       try {
-        appProj.run('git init').sync();
+        if (!(appProj.parent?.__isMonorepo)) {
+          appProj.run('git init').sync();
+        }
       } catch (error) {
         console.log(error);
         Helpers.warn(`Not able to git init inside: ${appProj.location}`)

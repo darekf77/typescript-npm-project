@@ -42,6 +42,16 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
     }));
   }
 
+  async cleanWatch() {
+    await this.project.clear()
+    await this.watch()
+  }
+
+  async cleanBuild() {
+    await this.project.clear()
+    await this._()
+  }
+
   async default() {
     await this.project.build(BuildOptions.from({
       ...this.params,

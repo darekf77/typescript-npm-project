@@ -147,3 +147,71 @@ export namespace PerfectContext {
   injectedUserControllers.control(); // Should print "Controlling users"
 
 }
+
+
+export namespace PerfectClassTypes {
+
+  // Define two simple classes
+  class User {
+    helo() {
+      console.log("Hello from User!");
+    }
+  }
+
+  class Session {
+    key() {
+      console.log("Session key");
+    }
+  }
+
+  // Define the context object that holds class constructors
+  const ctx = { User, Session };
+
+  // Define a function with appropriate TypeScript types
+  function getInstances<T extends Record<string, new (...args: any[]) => any>>(obj: T): {
+    [K in keyof T]: InstanceType<T[K]>;
+  } {
+    const instances = {} as {
+      [K in keyof T]: InstanceType<T[K]>;
+    };
+
+    // Create instances for each key in the object
+    for (const key in obj) {
+      const Constructor = obj[key];
+      if (typeof Constructor === 'function') {
+        instances[key] = new Constructor() as InstanceType<T[typeof key]>;
+      }
+    }
+
+    return instances;
+  }
+
+  // Use the function to get instances
+  const instances = getInstances(ctx);
+
+  // Now the types are correct
+  instances.User.helo(); // Output: "Hello from User!"
+  instances.Session.key(); // Output: "Session key"
+
+  // TypeScript correctly recognizes the types
+  const userType: User = instances.User; // This should work without errors
+  const sessionType: Session = instances.Session; // This should also work
+
+
+
+}
+
+
+export namespace PerfectSIngleton {
+  class Singleton<T> {
+    private static instances = new Map<any, any>();
+
+    public static getInstance<T>(ctor: new (...args: any[]) => T): T {
+      if (!Singleton.instances.has(ctor)) {
+        Singleton.instances.set(ctor, new ctor());
+      }
+      return Singleton.instances.get(ctor) as T;
+    }
+  }
+
+}

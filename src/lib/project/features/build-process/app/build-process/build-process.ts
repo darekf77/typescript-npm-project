@@ -26,7 +26,7 @@ import {
   //#endregion
   //#endregion
 })
-export class BuildProcess extends Firedev.Base.Entity<any> {
+export class BuildProcess extends Firedev.Base.Entity {
   //#region static
   static ctrl: BuildProcessController;
   static from(obj: Omit<Partial<BuildProcess>, BuildProcessNonColumnsKeys>) {
