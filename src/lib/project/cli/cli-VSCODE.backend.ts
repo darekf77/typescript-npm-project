@@ -163,6 +163,9 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
       "redhat.telemetry.enabled": false,
       "editor.accessibilitySupport": "off",
       "editor.minimap.enabled": true,
+      "editor.stickyScroll.enabled": false,
+      "editor.minimap.showMarkSectionHeaders": false,
+      "editor.minimap.showRegionSectionHeaders": false,
     };
     const settingspathWindows = path.join(crossPlatformPath(os.userInfo().homedir), 'AppData/Roaming/Code/User/settings.json');
     const settingspathLinux = path.join(crossPlatformPath(os.userInfo().homedir), '.config/Code/User/settings.json');
