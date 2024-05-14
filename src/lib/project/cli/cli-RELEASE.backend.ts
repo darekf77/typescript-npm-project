@@ -74,7 +74,7 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
   //#endregion
 
   //#region set minor version
-  async setMinorVer() {
+  async setMinorVersion() {
 
     let children = (Project.ins.Current.children as Project[]);
     const minorVersionToSet = Number(_.first(this.args).trim().replace('v', ''));
@@ -95,7 +95,7 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
   //#endregion
 
   //#region set major version
-  async setMajorVer() {
+  async setMajorVersion() {
 
     let children = this.project.children;
 

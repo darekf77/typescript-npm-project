@@ -1119,6 +1119,7 @@ class $Global extends BaseCommandLine<{}, Project> {
   }
   //#endregion
 
+  //#region show git in progress
   inprogress() {
     Helpers.info(`
     In progress
@@ -1130,6 +1131,7 @@ ${this.project.children
     `);
     this._exit()
   }
+  //#endregion
 }
 
 
