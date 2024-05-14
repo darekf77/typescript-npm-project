@@ -175,7 +175,7 @@ export function appfileTemplate(project: Project) {
 
   // TODO quick fix for @ browser remover
   return `
-import { Firedev } from 'firedev';
+import { Firedev } from 'firedev/src';
 import { Observable, map } from 'rxjs';
 ${'//#reg' + 'ion'} ${'@not' + 'ForNpm'}
 import { HOST_BACKEND_PORT } from './app.hosts';
@@ -237,8 +237,9 @@ async function start() {
   console.log('Your server will start on port '+ HOST_BACKEND_PORT);
   const host = 'http://localhost:' + HOST_BACKEND_PORT;
 
-  const context = await Firedev.init({
+  const context = await Firedev.createContext({
     host,
+    contextName: 'context',
     controllers: {
       UserController,
       // PUT FIREDEV CONTORLLERS HERE
@@ -251,6 +252,7 @@ async function start() {
     database:true,
     ${'//#end' + 'region'}
   });
+  await context.initialize();
 
   if (Firedev.isBrowser) {
     const users = (await User.ctrl.getAll().received).body.json;

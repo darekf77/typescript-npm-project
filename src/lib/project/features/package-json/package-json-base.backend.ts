@@ -127,17 +127,6 @@ export class PackageJsonBase extends PackageJsonCore {
     return result;
   }
 
-  public reset() {
-    if (this.project.__isTnp) {
-      Helpers.log(`Npm reset not available for Tnp project`)
-      return;
-    }
-    this.data.tnp.overrided.dependencies = {};
-    this.save(`reset of npm`);
-  }
-
-
-
   public updateFrom(locations: string[]) {
     for (let index = 0; index < locations.length; index++) {
       const location = locations[index];

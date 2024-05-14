@@ -152,7 +152,7 @@
 
 //     // it('should join new lines in import into one long import', async () => {
 //     //   expect(!!~Helpers.readFile(filePathSite.absolute.normal).toString().trim()
-//     //     .search(`import { Firedev } from 'firedev';`)).to.be.true;
+//     //     .search(`import { Firedev } from 'firedev/src';`)).to.be.true;
 //     // });
 
 //   })
