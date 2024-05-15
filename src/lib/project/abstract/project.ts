@@ -1608,7 +1608,17 @@ processing...
       for (let index = 0; index < releaseOptions.resolved.length; index++) {
 
         const child = releaseOptions.resolved[index] as Project;
-        console.log({ child })
+        if (releaseOptions.startFromProject) {
+          if (
+            (child.name !== releaseOptions.startFromProject)
+            ||
+            (child.basename !== releaseOptions.startFromProject)
+          ) {
+            continue;
+          }
+          releaseOptions.startFromProject = void 0;
+        }
+        // console.log({ child })
 
         if (index === 0) {
           global.tnpNonInteractive = (releaseOptions.resolved.length === 0);
