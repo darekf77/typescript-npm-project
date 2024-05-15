@@ -7,7 +7,7 @@
       "name": "Debug/Start Server",
       "program": "${workspaceFolder}/run.js",
       "args": [
-        "port=4504",
+        "port=4404",
         "--ENVoverride=%7B%0A%20%20%20%20%22clientProjectName%22%3A%20%22tnp%22%0A%7D "
       ],
       "outFiles": [
@@ -20,6 +20,7 @@
         "c:/Users/darek/projects/npm/cli-tools/cez-cli/src/../dist/**/*.js",
         "c:/Users/darek/projects/npm/firedev-io/firedev/projects/examples/electron-remote-service/src/../dist/**/*.js",
         "c:/Users/darek/projects/npm/cli-tools/navi-cli/src/../dist/**/*.js",
+        "c:/Users/darek/projects/npm/firedev-io/ng2-rest-swagger-generator/tmp-dist-release/dist/project/ng2-rest-swagger-generator/src/../dist/**/*.js",
         "c:/Users/darek/projects/npm/cli-tools/vpn-cli/src/../dist/**/*.js"
       ],
       "runtimeArgs": [
