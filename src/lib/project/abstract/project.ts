@@ -3323,6 +3323,12 @@ ${config.frameworkName} start
     children (${this.children?.length || 0}):
 ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
 
+    linked projects from json (${this.linkedProjects?.length || 0}):
+${(this.linkedProjects || []).map(c => '- ' + c.relativeClonePath).join('\n')}
+
+    linked projects detected (${this.detectedLinkedProjects?.length || 0}):
+${(this.detectedLinkedProjects || []).map(c => '- ' + c.relativeClonePath).join('\n')}
+
     `)
     // }
     //#endregion
