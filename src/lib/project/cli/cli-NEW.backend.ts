@@ -235,15 +235,7 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
         containers.push(currentContainer);
 
         if (parentContainer?.__isContainer) {
-          parentContainer.__packageJson.linkedProjects.push(path.basename(currentContainer.location));
-          parentContainer.__packageJson.data.tnp.linkedProjects = Helpers
-            .arrays
-            .uniqArray(parentContainer.__packageJson.linkedProjects)
-            .sort()
-
-          parentContainer.__packageJson.save(`updating container: `
-            + `${grandpa ? `${grandpa.name}/` : ''}${chalk.bold(parentContainer.name)}`
-            + ` linked projects for ${currentContainer.parent.type}"`);
+          parentContainer.addLinkedProject(path.basename(currentContainer.location));
         }
         parentContainer = currentContainer;
 
@@ -322,13 +314,7 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
     }
 
     if (lastContainer) {
-      lastContainer.__packageJson.linkedProjects.push(path.basename(lastProjectFromArgName));
-      lastContainer.__packageJson.data.tnp.linkedProjects = Helpers
-        .arrays
-        .uniqArray(lastContainer.__packageJson.linkedProjects)
-        .sort()
-
-      lastContainer.parent?.__packageJson.save(`updating container: ${chalk.bold(lastContainer.name)} linked projects for ${lastProjectFromArgName}"`);
+      lastContainer.addLinkedProject(lastProjectFromArgName);
     }
 
     // if (lastContainer && lastContainer.isContainer && lastContainer.location !== grandpa.location) {

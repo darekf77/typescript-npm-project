@@ -530,7 +530,8 @@ ${(this.project.__isTnp || this.project.__isVscodeExtension) ? '!tsconfig*' : ''
 ${this.project.__isTnp ? 'webpack.*' : ''}
 ${this.project.__isContainerWithLinkedProjects ? `
 # container/workspace git projects
-${this.project.__isMonorepo ? [] : this.project.__packageJson.linkedProjects.map(c => `/${crossPlatformPath(c)}`).join('\n')}
+${this.project.getLinkedProjectsConfig().usePrefix || ''}
+${this.project.__isMonorepo ? [] : this.project.linkedProjects.map(f => f.relativeClonePath).map(c => `/${crossPlatformPath(c)}`).join('\n')}
 ` : []}
 # =====================
 ${this.project.__isCoreProject ? '!*.filetemplate' : '*.filetemplate'}

@@ -1,9 +1,9 @@
 //#region imports
 //#region @backend
-import { path } from 'tnp-core/src';
+import { crossPlatformPath, path } from 'tnp-core/src';
 //#endregion
 import { config } from 'tnp-config/src';
-import { Helpers } from 'tnp-helpers/src';
+import { Helpers, LinkedPorjectsConfig, LinkedProject } from 'tnp-helpers/src';
 import { _ } from 'tnp-core/src';
 import { Models } from '../../../models'
 import { OVERRIDE_FROM_TNP } from '../../../constants';
@@ -297,10 +297,6 @@ function consistencyFixes(
     content[tnpProperty].overrided = {};
     additionalSaveRequired = true;
   }
-  if (_.isUndefined(content[tnpProperty].linkedProjects)) {
-    content[tnpProperty].linkedProjects = [];
-    additionalSaveRequired = true;
-  }
 
   if (_.isArray(content[tnpProperty].linkedProjects)) {
     const arr = content[tnpProperty].linkedProjects;
@@ -310,7 +306,19 @@ function consistencyFixes(
         content[tnpProperty].linkedProjects = sorted;
         additionalSaveRequired = true;
       }
+      const location = crossPlatformPath(path.dirname(fullPath));
+      const linkedProjectsJson = {
+        projects: Helpers.uniqArray(arr).map(projName => {
+          return {
+            relativeClonePath: projName,
+            repoUrl: Helpers.git.getOriginURL(location).replace(`${path.basename(location)}.git`, `${projName}.git`),
+          } as LinkedProject
+        }),
+      } as Partial<LinkedPorjectsConfig>;
+      Helpers.writeFile(crossPlatformPath([location, config.file.linked_projects_json]), linkedProjectsJson);
     }
+    delete content[tnpProperty].linkedProjects;
+    additionalSaveRequired = true;
   }
 
   if (_.isUndefined(content[tnpProperty].smartContainerBuildTarget)) {

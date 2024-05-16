@@ -663,23 +663,6 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   }
   //#endregion
 
-  //#region getters & methods / link project exited
-  get __linkedProjectsExisted(): Project[] {
-    //#region @backendFunc
-    return this.__packageJson.linkedProjects
-      .filter(f => !Helpers.isValidGitRepuUrl(f))
-      .sort()
-      .map(f => {
-        const p = path.join(this.location, f);
-        const proj = Project.ins.From(p);
-        return proj;
-      })
-      .filter(f => !!f);
-    //#endregion
-  }
-  //#endregion
-
-
   //#region getters & methods / children that are libs
   get __childrenThatAreLibs(): Project[] {
     //#region @backendFunc
@@ -1091,7 +1074,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   //#region getters & methods / is container or workspace with linked projects
   get __isContainerWithLinkedProjects() {
     //#region @backendFunc
-    return this.__isContainer && this.__packageJson.linkedProjects.length > 0;
+    return this.__isContainer && this.linkedProjects.length > 0;
     //#endregion
   }
   //#endregion
@@ -4637,84 +4620,6 @@ ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
   }
   //#endregion
 
-  //#region getters & methods / get unexisted projects
-  private async _cloneUnexistedProjects() {
-    //#region @backendFunc
-    const shouldBeProjectArr = this.__packageJson.linkedProjects
-      .map(relativePath => {
-        const possibleProjPath = crossPlatformPath(path.join(this.location, relativePath))
-        let possibleProj = Project.ins.From(possibleProjPath) as Project;
-        if (possibleProj) {
-          return void 0;
-        }
-        if (Helpers.git.isInMergeProcess(possibleProjPath)) {
-          Helpers.run('git reset --hard', { cwd: possibleProjPath }).sync();
-        }
-        possibleProj = Project.ins.From(possibleProjPath) as Project;
-        if (possibleProj) {
-          return void 0;
-        }
-        return relativePath;
-      })
-      .filter(f => !!f)
-      .sort()
-
-    if (shouldBeProjectArr.length > 0) {
-      Helpers.pressKeyAndContinue(`
-
-${shouldBeProjectArr.map((p, index) => `- ${index + 1}. ${p}`).join('\n')}
-
-      press any key to clone each above project..`);
-      for (let index = 0; index < shouldBeProjectArr.length; index++) {
-        const relativePath = shouldBeProjectArr[index];
-        const projectNameFromPackageJson = path.basename(relativePath);
-        if (Helpers.isValidGitRepuUrl(relativePath)) {
-          const p = path.join(this.location, relativePath);
-          if (!Helpers.exists(p)) {
-            await Helpers.actionWrapper(() => {
-              this.git.clone(relativePath);
-            }, `Cloning unexisted project from url ${chalk.bold(relativePath)}`);
-          }
-        } else {
-          const ADDRESS_GITHUB_SSH = this.git.originURL;
-          const githubGitUrl = this.__isSmartContainer
-            ? ADDRESS_GITHUB_SSH.replace(`${this.name}.git`, `${this.name}--${projectNameFromPackageJson}.git`)
-            : ADDRESS_GITHUB_SSH.replace(`${this.name}.git`, `${projectNameFromPackageJson}.git`);
-
-          await Helpers.actionWrapper(() => {
-            this.git.clone(githubGitUrl + ` ${projectNameFromPackageJson}`);
-          }, `Cloning unexisted project ${chalk.bold(projectNameFromPackageJson)}`);
-        }
-
-      }
-    }
-    //#endregion
-  }
-  //#endregion
-
-  //#region getters & methods /  get linked projects and childrens
-  private async _getLinkedPorjectsAndChildrens(): Promise<Project[]> {
-    //#region @backendFunc
-    if (this.__isMonorepo) {
-      return [];
-    }
-    await this._cloneUnexistedProjects();
-
-    let childrenToPush = [
-      ...this.children.filter(c => {
-        return this.__packageJson.linkedProjects.includes(c.name);
-      }),
-      ...(this.hasFile('taon.json') ? this.children : []),
-      ... this.__linkedProjectsExisted,
-    ];
-
-    childrenToPush = childrenToPush.filter(f => !!f);
-
-    return Helpers.uniqArray<Project>(childrenToPush, 'location') as any;
-    //#endregion
-  }
-  //#endregion
-
   //#region getters & methods / before push action
   protected async _beforePushProcessAction() {
     //#region @backendFunc
@@ -4756,7 +4661,6 @@ ${shouldBeProjectArr.map((p, index) => `- ${index + 1}. ${p}`).join('\n')}
   protected async _beforePullProcessAction() {
     //#region @backendFunc
     await super._beforePullProcessAction();
-    await this._cloneUnexistedProjects();
     // await Helpers.killAllNodeExceptCurrentProcess();
     //#endregion
   }

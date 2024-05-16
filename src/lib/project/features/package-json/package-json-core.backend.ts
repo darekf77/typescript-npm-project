@@ -35,18 +35,6 @@ export class PackageJsonCore {
     }
   }
 
-  /**
-   * Container only
-   * linked git project
-   */
-  get linkedProjects(): string[] {
-
-    const res = this.data.tnp ? this.data.tnp.linkedProjects : undefined;
-    if (_.isArray(res)) {
-      return res.sort()
-    }
-    return [];
-  }
 
   get linkedRepos(): Models.LinkedRepo[] {
     const res = this.data.tnp ? this.data.tnp.linkedRepos : undefined;
