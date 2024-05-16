@@ -65,7 +65,6 @@ Thumbs.db
 /tsconfig.backend.dist.json.filetemplate
 /projects/tmp*
 /tsconfig.backend.dist.json
-
 !tsconfig*
 webpack.*
 

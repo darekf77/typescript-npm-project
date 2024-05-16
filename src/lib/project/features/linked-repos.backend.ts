@@ -63,7 +63,7 @@ export class LinkedRepos extends BaseFeatureForProject<Project> {
                 await Helpers.git.pullCurrentBranch(destLinkedRepos);
               }
             } else {
-              Helpers.git.clone({
+              await Helpers.git.clone({
                 cwd: path.dirname(destLinkedRepos),
                 url: repo.origin,
                 override: true
