@@ -498,8 +498,7 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
       }).join('\n').concat('\n');
     // console.log(ignoredByGit)
 
-    Helpers.writeFile(path.join(this.project.location, '.gitignore'),
-      `# profiling files
+    const patternsToIgnore = `# profiling files
 chrome-profiler-events*.json
 speed-measure-plugin*.json
 
@@ -528,9 +527,11 @@ ${this.project.__isVscodeExtension ? '/out' : ''}
 `+ ignoredByGit + `
 ${(this.project.__isTnp || this.project.__isVscodeExtension) ? '!tsconfig*' : ''}
 ${this.project.__isTnp ? 'webpack.*' : ''}
-${this.project.__isContainerWithLinkedProjects ? `
+${(this.project.linkedProjects.length > 0 || !!this.project.linkedProjectsPrefix) ? `
 # container/workspace git projects
-${this.project.getLinkedProjectsConfig().usePrefix || ''}
+# PREFIX
+/${this.project.getLinkedProjectsConfig().prefix || ''}*
+# LINKED PROJECTS
 ${this.project.__isMonorepo ? [] : this.project.linkedProjects.map(f => f.relativeClonePath).map(c => `/${crossPlatformPath(c)}`).join('\n')}
 ` : []}
 # =====================
@@ -540,9 +541,11 @@ ${this.project.__isSmartContainer ? '/angular.json' : ''}
 ${this.project.__isVscodeExtension ? '' : coreFiles}
 ${this.project.__isCoreProject ? '' : '/.vscode/launch.json'}
 
-`.trimRight() + '\n');
+  `.trim() + '\n'
 
-
+    Helpers.writeFile(path.join(this.project.location, '.gitignore'), patternsToIgnore);
+    // console.log({ patternsToIgnore })
+    Helpers.logInfo(`Updated .gitignore file for ${this.project.genericName}`)
   }
 
 

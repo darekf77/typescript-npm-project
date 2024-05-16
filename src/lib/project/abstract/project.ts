@@ -1281,6 +1281,10 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       ]
     }
 
+    if (this.__isContainer) {
+      return [];
+    }
+
     if (this.__isVscodeExtension) {
       return [
         '.vscode/tasks.json',
@@ -3302,6 +3306,7 @@ ${config.frameworkName} start
 
     isStandaloneProject: ${this.__isStandaloneProject}
     isCoreProject: ${this.__isCoreProject}
+    isContainer: ${this.__isContainer}
     isSmartContainer: ${this.__isSmartContainer}
     isSmartContainerChild: ${this.__isSmartContainerChild}
     isSmartContainerTarget: ${this.__isSmartContainerTarget}
@@ -3322,6 +3327,8 @@ ${config.frameworkName} start
 
     children (${this.children?.length || 0}):
 ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
+
+    linked porject prefix: "${this.linkedProjectsPrefix}"
 
     linked projects from json (${this.linkedProjects?.length || 0}):
 ${(this.linkedProjects || []).map(c => '- ' + c.relativeClonePath).join('\n')}
