@@ -6,11 +6,7 @@
         "favicons": "~7.1.2",
         "ng2-rest-swagger-generator": "16.100.3"
       },
-      "npmFixes": [
-        "json5-writer",
-        "lowdb",
-        "misc-utils-of-mine-generic"
-      ],
+      "npmFixes": [],
       "ignoreDepsPattern": [
         "edit-table",
         "bs4-breakpoint",
@@ -507,7 +503,6 @@
             },
             "database": {
               "lowdb": "^1.0.0",
-              "@types/lowdb": "^1.0.6",
               "lockfile": "^1.0.4",
               "@types/lockfile": "^1.0.0"
             },
