@@ -2768,7 +2768,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     if (config.frameworkName === 'tnp') {
       const value = Helpers.readValueFromJson(crossPlatformPath([
         projTnp.location,
-        config.file.firedev_jsonc, // TODO replace with firedev.json5 in future
+        config.file.firedev_jsonc,
       ]), `core.dependencies.trusted.${this.__frameworkVersion}`);
       if (value === '*') {
         return [];

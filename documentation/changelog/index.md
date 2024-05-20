@@ -3,7 +3,7 @@
 ## Firedev v17 (in progress)
 - support for Angular 17, Node 18
 - (Eslint + Prettier) instead Tslint
-- firedev.json instead package.json_tnp.json5
+- firedev.jsonc instead package.json_tnp.json5
 - updated socket.io
 - support for apache cordova
 - buildin content manager
