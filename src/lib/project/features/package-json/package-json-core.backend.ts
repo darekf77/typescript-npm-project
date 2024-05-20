@@ -109,7 +109,7 @@ export class PackageJsonCore {
   get name() {
     if (!_.isString(this.data.name)) {
       if (global.globalSystemToolMode) {
-        Helpers.error(`Please define name for npm project in location: ${this.path}`, false, true)
+        Helpers.error(`Please define name for npm project in location: ${this.pathPackageJson}`, false, true)
       }
     }
     return this.data.name;
@@ -175,12 +175,12 @@ export class PackageJsonCore {
     return this.data.tnp?.core?.dependencies?.['trustedMaxMajor'] || {} as any;
   }
 
-  get path() {
+  get pathPackageJson() {
     return path.join(this.cwd, config.file.package_json);
   }
 
   get isLink() {
-    return Helpers.isSymlinkFileExitedOrUnexisted(this.path);
+    return Helpers.isSymlinkFileExitedOrUnexisted(this.pathPackageJson);
   }
 
   get isCoreProject() {
@@ -230,7 +230,7 @@ export class PackageJsonCore {
     const dest = path.join(_.isString(projectOrPath) ? projectOrPath :
       (projectOrPath as Project).location, config.file.package_json);
 
-    fse.copyFileSync(this.path, dest);
+    fse.copyFileSync(this.pathPackageJson, dest);
   }
 
   public setNamFromContainingFolder() {
@@ -243,84 +243,32 @@ export class PackageJsonCore {
       delete this.data['']
     }
     const data = _.cloneDeep(this.data) as Models.IPackageJSON;
+    const firedevJsonPath = crossPlatformPath([this.cwd, config.file.firedev_jsonc]);
+    Helpers.writeJson5(firedevJsonPath, data.tnp);
 
-    let tnpSaved = false;
-    config.packageJsonSplit.forEach(resultFileName => {
-
-      const splitPath = path.join(path.dirname(this.path), resultFileName);
-      const recreateJson5 = (resultFileName === config.file.package_json__tnp_json5)
-        && !Helpers.exists(splitPath)
-        && (data.tnp?.type === 'isomorphic-lib' || ((data.tnp?.type === 'container') && (data.tnp?.smart)))
-        && Number(data.tnp?.version?.replace('v', '')) >= 3;
-
-      if (recreateJson5) {
-        Helpers.writeJson(splitPath, data.tnp);
-      }
-
-      const property = resultFileName
-        .replace(`${config.file.package_json}_`, '')
-        .replace(`.json5`, '')
-        .replace(`.json`, '');
-
-      const obj = data[property];
-
-      Helpers.log(`splitPath: ${splitPath}`, 2);
-      const dataToWrite = (_.isObject(obj) ? obj : {}) as Models.IPackageJSON;
-      if (resultFileName.endsWith('.json5')) {
-        const current = Helpers.exists(splitPath) && Helpers.readJson(splitPath, void 0, true);
-        if (current && _.keys(current).length > 0) {
-          const writer = json5Write.load(Helpers.readFile(splitPath));
-          writer.write(dataToWrite);
-          if (!Helpers.isSymlinkFileExitedOrUnexisted(splitPath)) {
-            Helpers.writeFile(splitPath, writer.toSource());
-            if (property === 'tnp') {
-              tnpSaved = true;
-            }
-          }
-        }
-      } else {
-        if (!Helpers.isSymlinkFileExitedOrUnexisted(splitPath) && !!(dataToWrite?.tnp?.type)) {
-          Helpers.writeJson(splitPath, dataToWrite);
-          if (property === 'tnp') {
-            tnpSaved = true;
-          }
-        }
-      }
-    });
-
-
-
-    // if (tnpSaved) {
-    //   delete data.tnp; // TODO testing // COMMNENT
-    //   // delete data['overrided']; // TODO testing // COMMNENT
-    // }
+    Helpers.removeFileIfExists(crossPlatformPath([this.cwd, config.file.package_json__devDependencies_json]));
+    Helpers.removeFileIfExists(crossPlatformPath([this.cwd, config.file.package_json__tnp_json5]));
+    Helpers.removeFileIfExists(crossPlatformPath([this.cwd, config.file.package_json__tnp_json]));
+    Helpers.removeFileIfExists(crossPlatformPath([this.cwd, config.file.firedev_json]));
+    Helpers.removeFileIfExists(crossPlatformPath([this.cwd, config.file.devDependencies_json]));
 
     Helpers.log(`Split done..`, 2);
     if (removeFromPj) {
-
-      config.packageJsonSplit
-        .filter(c => c.endsWith('.json5'))
-        .forEach(c => {
-          const property = c
-            .replace(`${config.file.package_json}_`, '')
-            .replace(`.json`, '');
-          delete data[property];
-        });
-      if (Helpers.isExistedSymlink(this.path)) {
-        Helpers.log(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`)
+      if (Helpers.isExistedSymlink(this.pathPackageJson)) {
+        Helpers.log(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.pathPackageJson)}`)
       } else {
-        const d = (_.isObject(data) ? data : {}) as Models.IPackageJSON;
-        if (d.tnp?.type === 'isomorphic-lib') {
-          delete d['main']; // TODO QUICK_FIX delete main from package.json
+        const packageJsonData = (_.isObject(data) ? data : {}) as Models.IPackageJSON;
+        if (packageJsonData.tnp?.type === 'isomorphic-lib') {
+          delete packageJsonData['main']; // TODO QUICK_FIX delete main from package.json
         }
-        Helpers.writeFile(this.path, d);
+        Helpers.writeFile(this.pathPackageJson, packageJsonData);
       }
     } else {
-      if (Helpers.isExistedSymlink(this.path)) {
-        Helpers.log(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.path)}`)
+      if (Helpers.isExistedSymlink(this.pathPackageJson)) {
+        Helpers.log(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.pathPackageJson)}`)
       } else {
         const d = (_.isObject(data) ? data : {}) as Models.IPackageJSON;
-        Helpers.writeFile(this.path, d);
+        Helpers.writeFile(this.pathPackageJson, d);
       }
     }
     Helpers.log(`Writing done..`, 2);
@@ -332,13 +280,5 @@ export class PackageJsonCore {
     // Helpers.log(`Press any key`)
     // await Helpers.pressKeyAndContinue()
   }
-
-  private fixUnexistedBaselineInNOdeModules(pathToBaseline: string) {
-    const baselineInNodeModuels = path.join(this.cwd, config.folder.node_modules, path.basename(pathToBaseline))
-    if (!fse.existsSync(baselineInNodeModuels)) {
-      Helpers.createSymLink(pathToBaseline, baselineInNodeModuels)
-    }
-  }
-
 
 }

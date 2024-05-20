@@ -194,9 +194,9 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
             '.npmignore',
             // '.npmrc',
             '.babelrc',
-            'package.json_devDependencies.json',
+            config.file.devDependencies_json,
             ...(  // TODO or firedev json
-              Helpers.exists(self.project.pathFor(config.file.package_json__tnp_json))
+              Helpers.exists(self.project.pathFor(config.file.firedev_jsonc))
                 ? [config.file.package_json]
                 : []
             ),
@@ -260,7 +260,7 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
             'tsconfig.backend.dist.json'
           ])
         // .concat(self.project.isContainer ? [
-        //   ...(self.project.children.filter(c => c.git.isGitRepo).map(c => c.name))
+        //   ...(self.project.children.filter(c => c.git.isInsideGitRepo).map(c => c.name))
         // ] : []);
 
         // console.log('self.project:', self.project.name);
@@ -399,11 +399,6 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
                 }),
                   [
                     ...self.filesIgnoredBy.vscodeSidebarFilesView,
-                    ...(
-                      Helpers.exists([self.project.location, config.file.package_json__tnp_json5])
-                        ? [config.file.package_json__tnp_json]
-                        : []
-                    )
                   ].map(f => {
                     s['files.exclude'][f] = true;
                   })
@@ -535,6 +530,7 @@ ${(this.project.linkedProjects.length > 0 || !!this.project.linkedProjectsPrefix
 ${this.project.__isMonorepo ? [] : this.project.linkedProjects.map(f => f.relativeClonePath).map(c => `/${crossPlatformPath(c)}`).join('\n')}
 ` : []}
 # =====================
+!firedev.json
 ${this.project.__isCoreProject ? '!*.filetemplate' : '*.filetemplate'}
 ${this.project.__isDocker ? '!Dockerfile.filetemplate' : ''}
 ${this.project.__isSmartContainer ? '/angular.json' : ''}

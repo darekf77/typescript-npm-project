@@ -136,7 +136,7 @@ export class CopyManagerStandalone extends CopyManager {
   createCopyForRestore(destPackageInNodeModules: string, destination: Project) {
     if (destination.__isCoreProject) {
       destination.__packageJson.showDeps('For creating copy to revert for package')
-      const pj = Helpers.readJson(destination.__packageJson.path) as Models.IPackageJSON;
+      const pj = Helpers.readJson(destination.__packageJson.pathPackageJson) as Models.IPackageJSON;
       const availablePackages = {
         ...(pj?.dependencies || {}),
         ...(pj?.devDependencies || {}),

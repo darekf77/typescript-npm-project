@@ -41,7 +41,7 @@ export class EnvironmentConfig
   //#region @backend
   private async updateData(configEn?: Models.EnvConfig) {
 
-    if (this.project.git.isGitRepo) {
+    if (this.project.git.isInsideGitRepo) {
       if (!configEn && this.project.__frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
         Helpers.error(`Please build library first: ${config.frameworkName} build:dist`,)
       }

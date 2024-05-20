@@ -55,10 +55,6 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
     }
 
     this.project.quickFixes.missingAngularLibFiles();
-    if (this.project.__isTnp) { // TODO make it for standalone
-      this.project.quickFixes.overritenBadNpmPackages();
-
-    }
     if (this.project.__isStandaloneProject || this.project.__isContainer) {
       this.project.quickFixes.missingLibs([])
     }
@@ -77,7 +73,7 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
       if (!omitChildren && !this.project.__isContainerWithLinkedProjects) {
         const containerChildren = this.project.children.filter(c => {
           Helpers.log('checking if git repo')
-          if (c.git.isGitRepo) {
+          if (c.git.isInsideGitRepo) {
             Helpers.log(`[init] not initing recrusively, it is git repo ${c.name} `)
             return false;
           }
@@ -110,13 +106,7 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
       await this.project.__npmPackages.installProcess(`inti procedure of ${this.project.name} `);
     }
     this.project.__packageJson.showDeps(`Show new deps for ${this.project.__frameworkVersion} `);
-    //#region handle node modules instalation
-    if (!this.project.__isDocker) {
-      if (this.project.__isContainerCoreProject && this.project.__frameworkVersionEquals('v1')) {
-        this.project.quickFixes.overritenBadNpmPackages();
-      }
-    }
-    //#endregion
+
     if (this.project.__isSmartContainer) {
       //#region handle smart container
 

@@ -433,21 +433,6 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
     // }
   }
 
-  public overritenBadNpmPackages() {
-    Helpers.log(`Fixing bad npm packages - START for ${this.project.genericName}`);
-    if (this.project.__isTnp || this.project.__isContainerCoreProject) { // TODO for all packages ???
-      this.project.__node_modules.fixesForNodeModulesPackages
-        .forEach(f => {
-          const source = path.join(this.project.location, f);
-          const dest = path.join(this.project.location, config.folder.node_modules, f);
-          Helpers.tryCopyFrom(source, dest);
-        });
-    }
-
-
-    Helpers.log(`Fixing bad npm packages - COMPLETE`);
-  }
-
   public missingLibs(missingLibsNames: string[] = []) {
     if (this.project.__isContainer) {
       return;

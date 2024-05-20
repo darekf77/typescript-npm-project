@@ -34,7 +34,7 @@ export class LibProjectSmartContainer extends LibPorjectBase {
         Project.ins.unload(proj);
         proj = Project.ins.From(absFolder) as Project;
         const child = smartContainer.children.find(c => c.name === path.basename(absFolder));
-        const packgeJsonPath = proj.__packageJson.path;
+        const packgeJsonPath = proj.__packageJson.pathPackageJson;
         const pj = Helpers.readJson(packgeJsonPath) as Models.IPackageJSON;
         pj.version = newVersion;
         pj.name = `${rootPackageName}/${proj.name}`;

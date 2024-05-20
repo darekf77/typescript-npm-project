@@ -982,7 +982,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
 
  Please specify in your configuration proper ${chalk.bold('smartContainerBuildTarget')}:
 
- file: ${config.file.package_json__tnp_json5}
+ file: ${config.file.firedev_jsonc}
 
    ...
      smartContainerBuildTarget: <name of main project>
@@ -2138,10 +2138,6 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       const { cliBuildObscure, cliBuildUglify, cliBuildNoDts, cliBuildIncludeNodeModules } = buildOptions;
       const productionModeButIncludePackageJsonDeps = (cliBuildObscure || cliBuildUglify) && !cliBuildIncludeNodeModules;
 
-
-      if (this.isInCiReleaseProject && (cliBuildObscure || cliBuildUglify)) {
-        this.quickFixes.overritenBadNpmPackages();
-      }
       //#endregion
 
       //#region preparing variables / incremental build
@@ -2445,9 +2441,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     //#region @backendFunc
     this.__copyWhenExist('bin', destinations);
     this.__linkWhenExist(config.file.package_json, destinations);
-    config.packageJsonSplit.forEach(c => {
-      this.__copyWhenExist(c, destinations);
-    });
+    this.__copyWhenExist(config.file.firedev_jsonc, destinations);
     this.__copyWhenExist('.npmrc', destinations);
     this.__copyWhenExist('.npmignore', destinations);
     this.__copyWhenExist('.gitignore', destinations);
@@ -2520,7 +2514,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       ...this.__resources,
       ...(this.__isSmartContainerChild ? [
         config.file._npmignore,
-        config.file.package_json__tnp_json5
+        config.file.firedev_jsonc
       ] : [
         config.file._npmignore,
       ]),
@@ -2774,7 +2768,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     if (config.frameworkName === 'tnp') {
       const value = Helpers.readValueFromJson(crossPlatformPath([
         projTnp.location,
-        config.file.package_json__tnp_json5, // TODO replace with firedev.json5 in future
+        config.file.firedev_jsonc, // TODO replace with firedev.json5 in future
       ]), `core.dependencies.trusted.${this.__frameworkVersion}`);
       if (value === '*') {
         return [];
@@ -2813,7 +2807,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     if (config.frameworkName === 'tnp') {
       const value = Helpers.readValueFromJson(crossPlatformPath([
         projTnp.location,
-        config.file.package_json__tnp_json5, // TODO replace with firedev.json5 in future
+        config.file.firedev_jsonc, // TODO replace with firedev.json5 in future
       ]), `core.dependencies.trustedMaxMajor.${this.__frameworkVersion}`);
       trustedValue = value;
     }
@@ -2841,7 +2835,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     if (config.frameworkName === 'tnp') {
       const value = Helpers.readValueFromJson(crossPlatformPath([
         projTnp.location,
-        config.file.package_json__tnp_json5, // TODO replace with firedev.json5 in future
+        config.file.firedev_jsonc, // TODO replace with firedev.json5 in future
       ]), `core.dependencies.additionalTrusted`);
       trustedValue = value;
     }
@@ -3066,7 +3060,7 @@ to fix it.
     if (this.__frameworkVersionLessThan('v4')) {
       Helpers.error(`Please upgrade firedev framework version to to at least v4
 
-      ${config.file.package_json__tnp_json} => tnp.version => should be at least 4
+      ${config.file.firedev_jsonc} => version => should be at least 4
 
       `, false, true);
     }

@@ -293,8 +293,7 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
     Helpers.mkdirp(path.dirname(containerCoreProject.__smartNodeModules.path));
     [
       config.file.package_json,
-      config.file.package_json__tnp_json,
-      config.file.package_json__tnp_json5,
+      config.file.firedev_jsonc,
     ].forEach(pkgFilename => {
       const sourcePj = path.join(containerCoreProject.location, pkgFilename);
       if (Helpers.exists(sourcePj)) {

@@ -72,7 +72,7 @@ export class LinkedRepos extends BaseFeatureForProject<Project> {
           } catch (error) {
             Helpers.error(`Not able to clone/update repo from ${repo.origin}...
 
-              Check your ${config.file.package_json__tnp_json5}:
+              Check your ${config.file.firedev_jsonc}:
               ...
               ${JSON.stringify(repo, null, 4)}
               ...
@@ -172,7 +172,7 @@ export class LinkedRepos extends BaseFeatureForProject<Project> {
   }
 
   private isDestOk(dest: string) {
-    return Helpers.exists(dest) && Helpers.git.isGitRepo(dest) && Helpers.git.isGitRoot(dest);
+    return Helpers.exists(dest) && Helpers.git.isInsideGitRepo(dest) && Helpers.git.isGitRoot(dest);
   }
 
 

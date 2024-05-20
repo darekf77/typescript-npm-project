@@ -41,7 +41,7 @@ export class SingularBuild extends BaseFeatureForProject<Project> {
     (() => {
       [
         config.file.package_json,
-        config.file.package_json__tnp_json5,
+        config.file.firedev_jsonc,
         config.file.environment_js,
         config.file.tnpEnvironment_json,
       ].forEach(fileOrFolder => {

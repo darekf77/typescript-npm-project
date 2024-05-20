@@ -10,7 +10,6 @@ import {
 } from 'tnp-core/src';
 
 import type { Project } from '../../abstract/project';
-import { PackageJsonFile } from './package-json-file';
 import { config } from 'tnp-config/src';
 //#endregion
 
@@ -32,42 +31,29 @@ export class PackageJSON
       return void 0;
     }
 
-    const pj = PackageJsonFile.from(packageJsonPath);
-    let pj_tnp = PackageJsonFile.from(crossPlatformPath(path.join(location, config.file.package_json__tnp_json)));
-    const pj_tnp5 = PackageJsonFile.from(crossPlatformPath(path.join(location, config.file.package_json__tnp_json5)));
-
-    if (pj_tnp.exists && pj_tnp5.exists) {
-      fse.unlinkSync(pj_tnp.fullPath)
+    if (!Helpers.exists([location, config.file.firedev_jsonc])) {
+      const firedevJsonPath = crossPlatformPath([location, config.file.firedev_json]);
+      const json5FilePath = crossPlatformPath([location, config.file.package_json__tnp_json5]);
+      const jsonFilePath = crossPlatformPath([location, config.file.package_json__tnp_json]);
+      if (Helpers.exists(json5FilePath)) {
+        Helpers.writeFile([location, config.file.firedev_jsonc], Helpers.readFile(json5FilePath));
+        Helpers.writeJson5([location, config.file.firedev_jsonc], Helpers.readJson5([location, config.file.firedev_jsonc]));
+      } else if (Helpers.exists(jsonFilePath)) {
+        Helpers.writeFile([location, config.file.firedev_jsonc], Helpers.readFile(jsonFilePath));
+        Helpers.writeJson5([location, config.file.firedev_jsonc], Helpers.readJson5([location, config.file.firedev_jsonc]));
+      } else if (Helpers.exists(firedevJsonPath)) {
+        Helpers.writeFile([location, config.file.firedev_jsonc], Helpers.readFile(firedevJsonPath));
+        Helpers.writeJson5([location, config.file.firedev_jsonc], Helpers.readJson5([location, config.file.firedev_jsonc]));
+      }
+      Helpers.removeFileIfExists(json5FilePath);
+      Helpers.removeFileIfExists(jsonFilePath);
     }
+    const fifedev_json = Helpers.readJson5([location, config.file.firedev_jsonc]);
+    const package_json = Helpers.readJson([location, config.file.package_json]);
+    package_json['tnp'] = _.cloneDeep(fifedev_json);
 
-    if (!pj.exists && !pj_tnp.exists && !pj_tnp5.exists) {
-      return;
-    } else if (!pj.isReadable && !pj_tnp.isReadable && !pj_tnp5.isReadable) {
-
-      Helpers.error(`[package-json][incorrect files] Error while parsing files:
-      - ${config.file.package_json}
-      - ${config.file.package_json__tnp_json}
-      - ${config.file.package_json__tnp_json5}
-
-      in ${location}
-       `, false, true);
-
-    } else if (pj_tnp5.isReadable) {
-      pj.mergeWith(pj_tnp5);
-    } else if (pj_tnp.isReadable) {
-      pj.mergeWith(pj_tnp);
-    }
-
-    pj.lastChecks();
-
-    const pkgJson = new PackageJSON({ data: pj.data, location, project });
-    if (pj.saveAtLoad || (!pj_tnp5.exists && config.activeFramewrokVersions.includes(pkgJson.data.tnp.version))) {
-      Helpers.log(`Saving fixed package.json structure in ${location}`, 1);
-
-      pkgJson.writeToDisc();
-
-
-    }
+    const pkgJson = new PackageJSON({ data: package_json, location, project });
+    pkgJson.writeToDisc();
 
     return pkgJson;
     //#endregion

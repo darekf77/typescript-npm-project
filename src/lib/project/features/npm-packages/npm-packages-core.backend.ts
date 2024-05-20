@@ -96,7 +96,7 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
     if (!generatLockFiles) {
       if (useYarn) {
         if (yarnLockExisits) {
-          if (this.project.git.isGitRepo) {
+          if (this.project.git.isInsideGitRepo) {
             this.project.git.resetFiles(config.file.yarn_lock);
           }
         } else {

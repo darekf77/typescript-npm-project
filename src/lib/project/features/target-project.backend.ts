@@ -143,7 +143,7 @@ async function generate(project: Project, t: Models.TargetProject) {
   });
   [
     config.file.yarn_lock,
-    config.file.package_json5
+    config.file.firedev_jsonc
   ].forEach(dumbFiles => {
     Helpers.removeFileIfExists(path.join(t.path, dumbFiles));
   });

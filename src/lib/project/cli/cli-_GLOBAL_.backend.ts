@@ -12,6 +12,7 @@ import { Models } from '../../models';
 import * as  psList from 'ps-list';
 import { MESSAGES, firedevRepoPathUserInUserDir } from '../../constants';
 import { MagicRenamer } from "magic-renamer/src";
+
 declare const ENV: any;
 //#endregion
 
@@ -1046,6 +1047,61 @@ ${this.project.children
     `);
     this._exit()
   }
+  //#endregion
+
+  //#region fix firedev json
+  //#region @notForNpm
+  async fixFiredevJson() {
+    //#region @backend
+    for (const [index, child] of this.project.children.entries()) {
+
+      while (true) {
+        Helpers.clearConsole();
+        Helpers.info(`(${index + 1} / ${this.project.children.length}) Fixing ${child.genericName}
+
+        deleted
+        ${child.git.listOfCurrentGitChanges.deleted.join('\n')}
+
+        modified
+        ${child.git.listOfCurrentGitChanges.modified.join('\n')}
+
+        created
+        ${child.git.listOfCurrentGitChanges.created.join('\n')}
+
+              `);
+
+        const exists = child.git.listOfCurrentGitChanges.deleted.includes('package.json_tnp.json5');
+        if (exists) {
+          if (await Helpers.questionYesNo(`package.json_tnp.json5 exists in deleted files.. fix it ?`)) {
+            Helpers.pressKeyAndContinue();
+            child.git.unstageAllFiles();
+            child.run(`git checkout package.json_tnp.json5`).sync();
+            child.removeFile('firedev.json');
+            child.removeFile('firedev.jsonc');
+            child.run(`${config.frameworkName} deps:show`).sync();
+            Helpers.writeFile(
+              child.pathFor('firedev.jsonc'),
+              Helpers.readFile(child.pathFor('firedev.jsonc')).replace(/\'/g, '"')
+            );
+            console.log(chalk.underline(child.pathFor('firedev.jsonc')));
+            Helpers.pressKeyAndContinue('is firedev jsonc fixed ? press any key to continue');
+          }
+          break;
+        } else {
+          Helpers.info(`package.json_tnp.json5 DOESNT exists in deleted files.. prese any key to reset soft`);
+          if (await Helpers.questionYesNo(`Reset soft HEAD for ${child.genericName} ?`)) {
+            child.git.resetSoftHEAD();
+          } else {
+            break;
+          }
+        }
+      }
+    }
+    this._exit();
+    Helpers.info(`Fixing done`);
+    //#endregion
+  }
+  //#endregion
   //#endregion
 }
 
