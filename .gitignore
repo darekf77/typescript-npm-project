@@ -70,6 +70,7 @@ webpack.*
 
 # =====================
 !firedev.json
+!firedev.jsonc
 *.filetemplate
 
 
