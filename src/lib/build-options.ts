@@ -213,7 +213,14 @@ export class ReleaseOptions extends BuildOptionsLibOrApp<ReleaseOptions> {
    * build action only for specyfic framework version of prohect
    */
   frameworkVersion: CoreModels.FrameworkVersion;
+  /**
+   * start release on project
+   */
   startFromProject?: string;
+  /**
+   * end release on project
+   */
+  endOnProject?: string;
   skipProjectProcess: boolean;
   /**
    * Projects to release in container

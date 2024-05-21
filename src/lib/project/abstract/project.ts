@@ -1636,6 +1636,16 @@ processing...
           skipProjectProcess: releaseOptions.skipProjectProcess,
         }));
 
+        if (releaseOptions.endOnProject) {
+          if (
+            (child.name !== releaseOptions.endOnProject)
+            ||
+            (child.basename !== releaseOptions.endOnProject)
+          ) {
+            Helpers.info('Done. Relase end on project: ' + releaseOptions.endOnProject);
+            process.exit(0);
+          }
+        }
 
       }
       //#endregion
