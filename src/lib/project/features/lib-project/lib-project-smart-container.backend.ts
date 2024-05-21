@@ -37,7 +37,8 @@ export class LibProjectSmartContainer extends LibPorjectBase {
         const packgeJsonPath = proj.__packageJson.pathPackageJson;
         const pj = Helpers.readJson(packgeJsonPath) as Models.IPackageJSON;
         pj.version = newVersion;
-        pj.name = `${rootPackageName}/${proj.name}`;
+        pj.name = `${rootPackageName}/${proj.name}`
+          .replace(`${rootPackageName}/${rootPackageName}`, rootPackageName); // TODO QUICK_FIX
         delete pj.devDependencies;
         pj.dependencies = child.__packageJson.data.tnp.overrided.dependencies;
         pj.peerDependencies = child.__packageJson.data.peerDependencies;

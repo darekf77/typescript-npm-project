@@ -531,6 +531,7 @@ ${this.project.__isMonorepo ? [] : this.project.linkedProjects.map(f => f.relati
 ` : []}
 # =====================
 !firedev.json
+!firedev.jsonc
 ${this.project.__isCoreProject ? '!*.filetemplate' : '*.filetemplate'}
 ${this.project.__isDocker ? '!Dockerfile.filetemplate' : ''}
 ${this.project.__isSmartContainer ? '/angular.json' : ''}

@@ -44,9 +44,12 @@ export class PackageJSON
       } else if (Helpers.exists(firedevJsonPath)) {
         Helpers.writeFile([location, config.file.firedev_jsonc], Helpers.readFile(firedevJsonPath));
         Helpers.writeJson5([location, config.file.firedev_jsonc], Helpers.readJson5([location, config.file.firedev_jsonc]));
+      } else {
+        Helpers.writeJson5([location, config.file.firedev_jsonc], Helpers.readJson5([location, config.file.package_json])?.tnp || {});
       }
       Helpers.removeFileIfExists(json5FilePath);
       Helpers.removeFileIfExists(jsonFilePath);
+
     }
     const fifedev_json = Helpers.readJson5([location, config.file.firedev_jsonc]);
     const package_json = Helpers.readJson([location, config.file.package_json]);
