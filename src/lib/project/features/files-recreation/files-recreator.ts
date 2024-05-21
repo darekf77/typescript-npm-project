@@ -527,7 +527,7 @@ ${(this.project.linkedProjects.length > 0 || !!this.project.linkedProjectsPrefix
 # PREFIX
 /${this.project.getLinkedProjectsConfig().prefix || ''}*
 # LINKED PROJECTS
-${this.project.__isMonorepo ? [] : this.project.linkedProjects.map(f => f.relativeClonePath).map(c => `/${crossPlatformPath(c)}`).join('\n')}
+${this.project.isMonorepo ? [] : this.project.linkedProjects.map(f => f.relativeClonePath).map(c => `/${crossPlatformPath(c)}`).join('\n')}
 ` : []}
 # =====================
 !firedev.json

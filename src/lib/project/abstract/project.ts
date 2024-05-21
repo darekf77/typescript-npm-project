@@ -1182,7 +1182,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   //#endregion
 
   //#region getters & methods / is monorepo
-  get __isMonorepo() {
+  get isMonorepo() {
     //#region @backendFunc
     return this.__packageJson.isMonorepo;
     //#endregion
@@ -3321,7 +3321,7 @@ ${config.frameworkName} start
     basename: ${this.basename}
     version: ${this.version}
     private: ${this.__packageJson?.isPrivate}
-    monorepo: ${this.__isMonorepo}
+    monorepo: ${this.isMonorepo}
     parent: ${this.parent?.name}
     grandpa: ${this.grandpa?.name}
 

@@ -282,10 +282,10 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
     if (!hasAtLeastOneContainersFromArgs) {
       lastContainer = appProj.parent;
     }
-    if (lastContainer && lastContainer.__isContainer && !lastContainer.__isMonorepo) {
+    if (lastContainer && lastContainer.__isContainer && !lastContainer.isMonorepo) {
 
       try {
-        if (!(appProj.parent?.__isMonorepo)) {
+        if (!(appProj.parent?.isMonorepo)) {
           appProj.run('git init').sync();
         }
       } catch (error) {
