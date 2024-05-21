@@ -45,13 +45,16 @@ export class PackageJSON
         Helpers.writeFile([location, config.file.firedev_jsonc], Helpers.readFile(firedevJsonPath));
         Helpers.writeJson5([location, config.file.firedev_jsonc], Helpers.readJson5([location, config.file.firedev_jsonc]));
       } else {
-        Helpers.writeJson5([location, config.file.firedev_jsonc], Helpers.readJson5([location, config.file.package_json])?.tnp || {});
+        const tnpData = Helpers.readJson5([location, config.file.package_json])?.tnp;
+        if (tnpData) {
+          Helpers.writeJson5([location, config.file.firedev_jsonc], tnpData);
+        }
       }
       Helpers.removeFileIfExists(json5FilePath);
       Helpers.removeFileIfExists(jsonFilePath);
 
     }
-    const fifedev_json = Helpers.readJson5([location, config.file.firedev_jsonc]);
+    const fifedev_json = Helpers.readJson5([location, config.file.firedev_jsonc]) || {};
     const package_json = Helpers.readJson([location, config.file.package_json]);
     package_json['tnp'] = _.cloneDeep(fifedev_json);
 

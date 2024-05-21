@@ -218,6 +218,10 @@ export class ReleaseOptions extends BuildOptionsLibOrApp<ReleaseOptions> {
    */
   startFromProject?: string;
   /**
+   * release only specified projects
+   */
+  releaseOnly?: string | string[];
+  /**
    * end release on project
    */
   endOnProject?: string;

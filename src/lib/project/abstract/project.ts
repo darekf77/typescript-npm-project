@@ -1598,10 +1598,23 @@ processing...
       for (let index = 0; index < releaseOptions.resolved.length; index++) {
 
         const child = releaseOptions.resolved[index] as Project;
+        if (releaseOptions.releaseOnly) {
+          releaseOptions.releaseOnly = Array.isArray(releaseOptions.releaseOnly)
+            ? releaseOptions.releaseOnly : [releaseOptions.releaseOnly];
+
+          if (
+            (!releaseOptions.releaseOnly.includes(child.name))
+            &&
+            (!releaseOptions.releaseOnly.includes(child.basename))
+          ) {
+            continue;
+          }
+        }
+
         if (releaseOptions.startFromProject) {
           if (
             (child.name !== releaseOptions.startFromProject)
-            ||
+            &&
             (child.basename !== releaseOptions.startFromProject)
           ) {
             continue;
@@ -1638,9 +1651,9 @@ processing...
 
         if (releaseOptions.endOnProject) {
           if (
-            (child.name !== releaseOptions.endOnProject)
+            (child.name === releaseOptions.endOnProject)
             ||
-            (child.basename !== releaseOptions.endOnProject)
+            (child.basename === releaseOptions.endOnProject)
           ) {
             Helpers.info('Done. Relase end on project: ' + releaseOptions.endOnProject);
             process.exit(0);

@@ -244,34 +244,39 @@ export class PackageJsonCore {
     }
     const data = _.cloneDeep(this.data) as Models.IPackageJSON;
     const firedevJsonPath = crossPlatformPath([this.cwd, config.file.firedev_jsonc]);
-    Helpers.writeJson5(firedevJsonPath, data.tnp);
+    const isFiredevProj = (data.tnp?.type === 'isomorphic-lib' || data.tnp?.type === 'container');
+    if (isFiredevProj) {
+      Helpers.writeJson5(firedevJsonPath, data.tnp);
+    }
 
     Helpers.removeFileIfExists(crossPlatformPath([this.cwd, config.file.package_json__devDependencies_json]));
     Helpers.removeFileIfExists(crossPlatformPath([this.cwd, config.file.package_json__tnp_json5]));
     Helpers.removeFileIfExists(crossPlatformPath([this.cwd, config.file.package_json__tnp_json]));
     Helpers.removeFileIfExists(crossPlatformPath([this.cwd, config.file.firedev_json]));
     Helpers.removeFileIfExists(crossPlatformPath([this.cwd, config.file.devDependencies_json]));
-
     Helpers.log(`Split done..`, 2);
-    if (removeFromPj) {
-      if (Helpers.isExistedSymlink(this.pathPackageJson)) {
-        Helpers.log(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.pathPackageJson)}`)
-      } else {
-        const packageJsonData = (_.isObject(data) ? data : {}) as Models.IPackageJSON;
-        if (packageJsonData.tnp?.type === 'isomorphic-lib') {
-          delete packageJsonData['main']; // TODO QUICK_FIX delete main from package.json
+
+    if (isFiredevProj) {
+      if (removeFromPj) {
+        if (Helpers.isExistedSymlink(this.pathPackageJson)) {
+          Helpers.log(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.pathPackageJson)}`)
+        } else {
+          const packageJsonData = (_.isObject(data) ? data : {}) as Models.IPackageJSON;
+          if (packageJsonData.tnp?.type === 'isomorphic-lib') {
+            delete packageJsonData['main']; // TODO QUICK_FIX delete main from package.json
+          }
+          Helpers.writeFile(this.pathPackageJson, packageJsonData);
         }
-        Helpers.writeFile(this.pathPackageJson, packageJsonData);
-      }
-    } else {
-      if (Helpers.isExistedSymlink(this.pathPackageJson)) {
-        Helpers.log(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.pathPackageJson)}`)
       } else {
-        const d = (_.isObject(data) ? data : {}) as Models.IPackageJSON;
-        Helpers.writeFile(this.pathPackageJson, d);
+        if (Helpers.isExistedSymlink(this.pathPackageJson)) {
+          Helpers.log(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.pathPackageJson)}`)
+        } else {
+          const d = (_.isObject(data) ? data : {}) as Models.IPackageJSON;
+          Helpers.writeFile(this.pathPackageJson, d);
+        }
       }
+      Helpers.log(`Writing done..`, 2);
     }
-    Helpers.log(`Writing done..`, 2);
   }
 
   public writeToDisc(removeFromPj = false) {
