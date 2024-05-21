@@ -76,6 +76,9 @@ export class FiredevProjectResolve extends BaseProjectResolver<Project> {
     if (Array.isArray(locationOfProj)) {
       locationOfProj = locationOfProj.join('/');
     }
+    if (!locationOfProj) {
+      return;
+    }
     let location = locationOfProj.replace(/\/\//g, '/');
 
     if (!_.isString(location)) {
@@ -1721,6 +1724,7 @@ processing...
             await this.__release(releaseOptions);
             break;
           } catch (error) {
+            console.error(error)
             Helpers.error(`Not able to RELEASE your project ${chalk.bold(this.genericName)}`, true, true);
             if (!(await Helpers.questionYesNo(`Try again ? (or exit proces)`, void 0, void 0, true, true))) {
               process.exit(0)
@@ -2805,7 +2809,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
     let trustedValue: number;
     if (config.frameworkName === 'tnp') {
-      const value = Helpers.readValueFromJson(crossPlatformPath([
+      const value = Helpers.readValueFromJsonC(crossPlatformPath([
         projTnp.location,
         config.file.firedev_jsonc, // TODO replace with firedev.json5 in future
       ]), `core.dependencies.trustedMaxMajor.${this.__frameworkVersion}`);
@@ -3318,19 +3322,21 @@ ${config.frameworkName} start
 
     location: ${this.location}
 
+`
+      //       + `
+      //     children (${this.children?.length || 0}):
+      // ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
 
-    children (${this.children?.length || 0}):
-${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
+      //     linked porject prefix: "${this.linkedProjectsPrefix || ''}"
 
-    linked porject prefix: "${this.linkedProjectsPrefix}"
+      //     linked projects from json (${this.linkedProjects?.length || 0}):
+      // ${(this.linkedProjects || []).map(c => '- ' + c.relativeClonePath).join('\n')}
 
-    linked projects from json (${this.linkedProjects?.length || 0}):
-${(this.linkedProjects || []).map(c => '- ' + c.relativeClonePath).join('\n')}
+      //     linked projects detected (${this.detectedLinkedProjects?.length || 0}):
+      // ${(this.detectedLinkedProjects || []).map(c => '- ' + c.relativeClonePath).join('\n')}
 
-    linked projects detected (${this.detectedLinkedProjects?.length || 0}):
-${(this.detectedLinkedProjects || []).map(c => '- ' + c.relativeClonePath).join('\n')}
-
-    `)
+      //     `
+    )
     // }
     //#endregion
   }
@@ -4107,7 +4113,9 @@ ${(this.detectedLinkedProjects || []).map(c => '- ' + c.relativeClonePath).join(
   //#endregion
 
   get __releaseCiProjectParent() {
-    return Project.ins.From(this.__releaseCiProjectParentPath);
+    const __releaseCiProjectParentPath = this.__releaseCiProjectParentPath;
+    const proj = Project.ins.From(__releaseCiProjectParentPath);
+    return proj;
   }
 
   get __releaseCiProjectParentPath() {

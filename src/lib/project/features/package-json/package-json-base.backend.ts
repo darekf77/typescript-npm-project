@@ -90,13 +90,12 @@ export class PackageJsonBase extends PackageJsonCore {
       Helpers.createSymLink(source, dest);
     })();
 
-    Helpers.filesFrom(this.project.location)
-      .filter(f => path.basename(f).startsWith(config.file.package_json))
-      .forEach(source => {
-        const dest = path.join(destination, path.basename(source));
-        Helpers.removeFileIfExists(dest);
-        Helpers.createSymLink(source, dest);
-      });
+    (() => {
+      const source = path.join(this.project.location, config.file.firedev_jsonc);
+      const dest = path.join(destination, config.file.firedev_jsonc);
+      Helpers.removeFileIfExists(dest);
+      Helpers.createSymLink(source, dest);
+    })();
 
   }
 

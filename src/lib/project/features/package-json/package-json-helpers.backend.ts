@@ -670,7 +670,7 @@ function beforeSaveAction(project: Project, options: Models.PackageJsonSaveOptio
       }
       return versionForTags[checkFor];
     } catch (error) {
-      Helpers.error(`[firedev] Not able to get last versio of package: ${pkgNameToCheckVer}`, false, true);
+      Helpers.error(`[firedev] Not able to get last version of package: ${pkgNameToCheckVer}`, false, true);
     }
   };
 
