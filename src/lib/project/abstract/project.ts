@@ -1598,28 +1598,28 @@ processing...
       for (let index = 0; index < releaseOptions.resolved.length; index++) {
 
         const child = releaseOptions.resolved[index] as Project;
-        if (releaseOptions.releaseOnly) {
-          releaseOptions.releaseOnly = Array.isArray(releaseOptions.releaseOnly)
-            ? releaseOptions.releaseOnly : [releaseOptions.releaseOnly];
+        if (releaseOptions.only) {
+          releaseOptions.only = Array.isArray(releaseOptions.only)
+            ? releaseOptions.only : [releaseOptions.only];
 
           if (
-            (!releaseOptions.releaseOnly.includes(child.name))
+            (!releaseOptions.only.includes(child.name))
             &&
-            (!releaseOptions.releaseOnly.includes(child.basename))
+            (!releaseOptions.only.includes(child.basename))
           ) {
             continue;
           }
         }
 
-        if (releaseOptions.startFromProject) {
+        if (releaseOptions.start) {
           if (
-            (child.name !== releaseOptions.startFromProject)
+            (child.name !== releaseOptions.start)
             &&
-            (child.basename !== releaseOptions.startFromProject)
+            (child.basename !== releaseOptions.start)
           ) {
             continue;
           }
-          releaseOptions.startFromProject = void 0;
+          releaseOptions.start = void 0;
         }
         // console.log({ child })
 
@@ -1649,13 +1649,13 @@ processing...
           skipProjectProcess: releaseOptions.skipProjectProcess,
         }));
 
-        if (releaseOptions.endOnProject) {
+        if (releaseOptions.end) {
           if (
-            (child.name === releaseOptions.endOnProject)
+            (child.name === releaseOptions.end)
             ||
-            (child.basename === releaseOptions.endOnProject)
+            (child.basename === releaseOptions.end)
           ) {
-            Helpers.info('Done. Relase end on project: ' + releaseOptions.endOnProject);
+            Helpers.info('Done. Relase end on project: ' + releaseOptions.end);
             process.exit(0);
           }
         }
