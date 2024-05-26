@@ -1,6 +1,6 @@
 //#region imports
 import chalk from 'chalk';
-import { path } from 'tnp-core/src';
+import { dateformat, path } from 'tnp-core/src';
 import { fse } from 'tnp-core/src';
 import { _, moment } from 'tnp-core/src';
 
@@ -55,10 +55,13 @@ export function executeCommand(command: string, project: Project) {
    `);
 
   if (config.frameworkName === 'firedev' && project.__isContainerCoreProject) {
-    Helpers.info('This may take a long time... more than 1GB to download from npm...')
+    Helpers.info(`
+    [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]
+    This may take a long time... more than 1GB to download from npm...
+    `)
   }
 
-  project.run(command, { output: showNpmCommandOutput, biggerBuffer: true }).sync();
+  project.run(command, { output: true, biggerBuffer: true }).sync();
   Helpers.writeFile([project.__node_modules.path, '.install-date'], moment(new Date()).format('L LTS'))
 }
 
@@ -78,7 +81,7 @@ export function prepareCommand(pkg: Models.Package, remove: boolean, useYarn: bo
       + ` ${(pkg && pkg.installType && pkg.installType === '--save-dev') ? '-dev' : ''} `;
   } else {
     // --no-progress
-    const argsForFasterInstall = `--force --ignore-engines ${!showNpmCommandOutput ? '--silent' : ''} --no-audit `
+    const argsForFasterInstall = `--force --ignore-engines --no-audit `
       + ` ${noPackageLock} `;
     command = `npm ${install} ${pkg ? pkg.name : ''} `
       + ` ${(pkg && pkg.installType) ? pkg.installType : ''} `

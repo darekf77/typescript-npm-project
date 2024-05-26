@@ -238,7 +238,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
     try {
       Helpers.run(`git reset --hard && git clean -df && git fetch`, { cwd, output: false }).sync();
     } catch (error) {
-      Helpers.error(`[${config.frameworkName} Not ablt to reset origin of  firedev: ${config.urlRepoFiredev} in: ${cwd}`, false, true);
+      Helpers.error(`[${config.frameworkName} Not able to reset origin of firedev repo: ${config.urlRepoFiredev} in: ${cwd}`, false, true);
     }
 
     try {
@@ -246,7 +246,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       Helpers.log('DONE CHECKING OUT MASTER')
     } catch (error) {
       Helpers.log(error)
-      Helpers.error(`[${config.frameworkName} Not ablt to checkout master branch for :${config.urlRepoFiredev} in: ${cwd}`, false, true);
+      Helpers.error(`[${config.frameworkName} Not able to checkout master branch for :${config.urlRepoFiredev} in: ${cwd}`, false, true);
     }
 
     try {
@@ -254,7 +254,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       Helpers.log('DONE PULLING MASTER')
     } catch (error) {
       Helpers.log(error)
-      Helpers.error(`[${config.frameworkName} Not ablt to checkout master branch for :${config.urlRepoFiredev} in: ${cwd}`, false, true);
+      Helpers.error(`[${config.frameworkName} Not able to pull master branch for :${config.urlRepoFiredev} in: ${cwd}`, false, true);
     }
 
 
