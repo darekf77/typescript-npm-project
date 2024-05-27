@@ -49,5 +49,6 @@
         "GitHub.copilot",
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
+        "amodio.toggle-excluded-files",
     ]
 }
