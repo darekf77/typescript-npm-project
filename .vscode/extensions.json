@@ -47,5 +47,7 @@
         "ctcuff.font-preview",
         "ms-azuretools.vscode-docker",
         "GitHub.copilot",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
     ]
 }

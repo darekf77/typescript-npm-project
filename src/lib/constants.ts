@@ -218,7 +218,7 @@ export const MESSAGES = {
 
 
 export const ONLY_COPY_ALLOWED = [
-  'background-worker-process',
+  // 'background-worker-process',
   'better-sqlite3',
   '.bin',
   '.install-date',

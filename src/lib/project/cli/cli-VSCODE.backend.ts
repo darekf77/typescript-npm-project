@@ -205,22 +205,6 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
     this._exit();
   }
 
-  PROJ_EXT() {
-    const p = this.project.pathFor('.vscode/extensions.json');
-    const extensions: { recommendations: string[] } = Helpers.readJson(p, { recommendations: [] }, true);
-    for (let index = 0; index < extensions.recommendations.length; index++) {
-      const extname = extensions.recommendations[index];
-      try {
-        Helpers.run(`code --install-extension ${extname}`).sync();
-        Helpers.info(`Installed: ${extname}`)
-      } catch (error) {
-        Helpers.warn(`Not able to install ${extname}`);
-      }
-    }
-    this._exit();
-  }
-
-
   _showfilesfor(project: Project) {
     project.__recreate.vscode.settings.hideOrShowFilesInVscode(false);
   }
