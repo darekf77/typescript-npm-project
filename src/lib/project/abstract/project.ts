@@ -281,18 +281,29 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       Helpers.run('rimraf .vscode', { cwd }).sync();
     } catch (error) { }
 
-    const arrActive = config.activeFramewrokVersions;
-    for (let index = 0; index < arrActive.length; index++) {
-      const defaultFrameworkVersionForSpecyficContainer = arrActive[index];
-      Helpers.info(`Installing new versions of packages for global container-${defaultFrameworkVersionForSpecyficContainer}`)
-      const container = Project.by('container', defaultFrameworkVersionForSpecyficContainer);
-      container.run(`${config.frameworkName} reinstall --skipCoreCheck`).sync();
-      Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
-    }
+    Project.reinstallActiveFrameworkContainers();
 
     Helpers.success('firedev-framework synced ok');
     //#endregion
   }
+  private static reinstallActiveFrameworkContainers() {
+    for (const ver of config.activeFramewrokVersions) {
+      const nodeModulesForContainer = crossPlatformPath([firedevRepoPathUserInUserDir, `projects/container-${ver}`]);
+      Helpers.run(`${config.frameworkName} reinstall --skipCoreCheck`,{cwd:nodeModulesForContainer}).sync();
+      Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
+    }
+  }
+
+  private static get nodeModulesInstalledForCoreContainer(): boolean {
+    for (const ver of config.activeFramewrokVersions) {
+      const nodeModulesForContainer = crossPlatformPath([firedevRepoPathUserInUserDir, `projects/container-${ver}`, config.folder.node_modules]);
+      if (!Helpers.exists(nodeModulesForContainer)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
 
   public static initialCheck() {
     //#region @backendFunc
@@ -337,6 +348,10 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       this.sync();
 
       this.hasResolveCoreDepsAndFolder = true;
+    }
+
+    if (!this.nodeModulesInstalledForCoreContainer && (config.frameworkName === 'firedev') && !global.skipCoreCheck) {
+      Project.reinstallActiveFrameworkContainers();
     }
     //#endregion
   }

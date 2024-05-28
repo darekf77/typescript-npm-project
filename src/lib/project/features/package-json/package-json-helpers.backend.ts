@@ -331,7 +331,7 @@ function filterDevDepOnly(project: Project, deps: Models.DependenciesFromPackage
   const devDeps = (Project.ins.Tnp).__packageJson.data.tnp.core.dependencies.asDevDependencies;
   let onlyAsDevAllowed = (project.__packageJson.data.tnp &&
     project.__packageJson.data.tnp.overrided &&
-    project.__packageJson.data.tnp.overrided.includeAsDev) || [];
+    project.__packageJson.data.tnp?.overrided?.includeAsDev) || [];
 
   const allDeps = getAndTravelCoreDeps();
 
@@ -356,7 +356,7 @@ function filterDevDepOnly(project: Project, deps: Models.DependenciesFromPackage
 
 function filterDepOnly(project: Project, deps: Models.DependenciesFromPackageJsonStyle) {
   const devDeps = (Project.ins.Tnp).__packageJson.data.tnp.core.dependencies.asDevDependencies;
-  let onlyAsDevAllowed = (project.__packageJson.data.tnp.overrided.includeAsDev) || [];
+  let onlyAsDevAllowed = (project.__packageJson.data.tnp?.overrided?.includeAsDev) || [];
 
   // log('d2evDeps', devDeps)
   if (onlyAsDevAllowed !== '*') {
@@ -385,11 +385,11 @@ function cleanForIncludeOnly(project: Project, deps: Models.DependenciesFromPack
 
   if (project.__packageJson.data.tnp &&
     project.__packageJson.data.tnp.overrided &&
-    _.isArray(project.__packageJson.data.tnp.overrided.includeOnly) &&
-    project.__packageJson.data.tnp.overrided.includeOnly.length > 0
+    _.isArray(project.__packageJson.data.tnp?.overrided?.includeOnly) &&
+    project.__packageJson.data.tnp?.overrided?.includeOnly.length > 0
   ) {
 
-    let onlyAllowed = project.__packageJson.data.tnp.overrided.includeOnly;
+    let onlyAllowed = project.__packageJson.data.tnp?.overrided?.includeOnly || [];
 
     onlyAllowed = onlyAllowed.concat((Project.ins.Tnp).__packageJson.data.tnp.core.dependencies.always);
 
@@ -503,13 +503,13 @@ function beforeSaveAction(project: Project, options: Models.PackageJsonSaveOptio
     });
   }
 
-  if ((project.__packageJson.data.tnp.overrided.includeAsDev as any) === '*') {
+  if ((project.__packageJson.data.tnp?.overrided?.includeAsDev as any) === '*') {
     devDependencies = _.merge(devDependencies, dependencies);
     dependencies = {};
     // console.log('inlcude as dev', devDependencies)
   }
 
-  const onlyAllowedInDependencies = project.__packageJson.data.tnp.overrided.includeOnly || [];
+  const onlyAllowedInDependencies = project.__packageJson.data.tnp?.overrided?.includeOnly || [];
   if (project.__frameworkVersionAtLeast('v2') && onlyAllowedInDependencies.length > 0) {
 
     // Helpers.info(`Inlcude only: \n${onlyAllowedInDependencies.join('\n')}`);
@@ -538,7 +538,7 @@ function beforeSaveAction(project: Project, options: Models.PackageJsonSaveOptio
         }
       });
 
-    if (project.__packageJson.data.tnp.overrided.includeOnly.includes('tnp')) {
+    if (project.__packageJson.data.tnp?.overrided?.includeOnly?.includes('tnp')) {
       dependencies['tnp'] = `~${Project.ins.Tnp?.version}`;
     }
 
@@ -612,8 +612,8 @@ function beforeSaveAction(project: Project, options: Models.PackageJsonSaveOptio
   if (project.__frameworkVersionAtLeast('v2')) {
     if (_.isEqual(project.__packageJson.data.dependencies, project.__packageJson.data.devDependencies)) {
       // TODO QUICK_FIX
-      const includeAsDev = (project.__packageJson.data.tnp.overrided.includeAsDev);
-      const includeOnly = (project.__packageJson.data.tnp.overrided.includeOnly);
+      const includeAsDev = (project.__packageJson.data.tnp?.overrided?.includeAsDev);
+      const includeOnly = (project.__packageJson.data.tnp?.overrided?.includeOnly);
       if (
         _.isArray(includeAsDev) && includeAsDev.length === 0 &&
         _.isArray(includeOnly) && includeOnly.length === 0
@@ -629,7 +629,7 @@ function beforeSaveAction(project: Project, options: Models.PackageJsonSaveOptio
 
   if (project.__frameworkVersionAtLeast('v3')) {
     if (_.isArray(project.__packageJson?.data?.tnp?.overrided?.ignoreDepsPattern)) {
-      const patterns = project.__packageJson.data.tnp.overrided.ignoreDepsPattern;
+      const patterns = project.__packageJson.data.tnp?.overrided.ignoreDepsPattern;
       patterns.forEach(patternIgnore => {
         Object.keys(project.__packageJson.data.dependencies).forEach(depName => {
           Helpers.log(`check patter: ${patternIgnore} agains ${depName}`, 2);

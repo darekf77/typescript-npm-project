@@ -49,7 +49,7 @@ export class LibProjectStandalone extends LibPorjectBase {
 
       if (this.project.__packageJson.name === 'tnp') {  // TODO QUICK_FIX
         Helpers.setValueToJSON(path.join(this.project.location, config.folder.dist, config.file.package_json), 'dependencies',
-          Project.ins.Tnp.__packageJson.data.tnp.overrided.includeOnly.reduce((a, b) => {
+          (Project.ins.Tnp.__packageJson.data.tnp?.overrided?.includeOnly || []).reduce((a, b) => {
             return _.merge(a, {
               [b]: Project.ins.Tnp.__packageJson.data.dependencies[b]
             })

@@ -645,13 +645,6 @@ class $Global extends BaseCommandLine<{}, Project> {
   };
   //#endregion
 
-  //#region circural deps check
-  CIRCURAL_CHECK() {
-    this.project.run(`npm-run madge --circular --extensions ts ./src`).sync()
-    this._exit()
-  }
-  //#endregion
-
   //#region file info
   FILEINFO = (args) => {
     console.log(Helpers.getMostRecentFilesNames(crossPlatformPath(this.cwd)))

@@ -57,7 +57,7 @@ export function executeCommand(command: string, project: Project) {
   if (config.frameworkName === 'firedev' && project.__isContainerCoreProject) {
     Helpers.info(`
     [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]
-    This may take a long time... more than 1GB to download from npm...
+    This may take a long time (usually 10-15min on 0.5Gb/s internet connection)... more than 1GB to download from npm...
     `)
   }
 

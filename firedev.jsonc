@@ -273,7 +273,7 @@
         // all isomorphic application config
         "tnp-config": "16.100.9",
         "tnp-models": "16.100.9",
-        "tnp-helpers": "16.100.13",
+        "tnp-helpers": "16.100.16",
         "tnp-db": "16.100.8",
         "firedev-type-sql": "16.100.6",
         "firedev-typeorm": "16.100.5",
