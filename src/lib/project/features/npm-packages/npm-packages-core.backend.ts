@@ -1,5 +1,5 @@
 //#region imports
-import { crossPlatformPath, moment, path } from 'tnp-core/src'
+import { chalk, crossPlatformPath, moment, path } from 'tnp-core/src'
 import { fse } from 'tnp-core/src'
 import { _ } from 'tnp-core/src';
 
@@ -86,7 +86,26 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
         if (config.frameworkName === 'tnp') {
           console.log(err)
         }
-        Helpers.error(`[${config.frameworkName}] Error during npm install... try manual installation`, false, true);
+        const isLinux = (['win32', 'darwin'] as NodeJS.Platform[]).includes(process.platform);
+        const linuxMessage = isLinux ? `
+
+${chalk.red('Make sure that you:')}:
+
+1. Increased maximum node memory size:
+
+export NODE_OPTIONS=--max_old_space_size=4096
+
+2. Increase the amount of inotify watchers:
+
+echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+
+        `: '';
+
+        Helpers.error(`[${config.frameworkName}] Error during npm install...
+
+        ${linuxMessage}
+
+        `, false, true);
       }
     }
 
