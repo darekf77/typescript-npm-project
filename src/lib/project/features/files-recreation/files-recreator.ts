@@ -182,6 +182,7 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
             '.gitignore',
             '.npmignore',
             '.babelrc',
+            '.npmrc',
             config.file.devDependencies_json,
             ...// TODO or firedev json
             (Helpers.exists(self.project.pathFor(config.file.firedev_jsonc))

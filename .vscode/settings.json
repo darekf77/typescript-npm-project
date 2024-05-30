@@ -48,6 +48,7 @@
     ".gitignore": true,
     ".npmignore": true,
     ".babelrc": true,
+    ".npmrc": true,
     "devDependencies.json": true,
     "package.json": true,
     "logo.svg": true

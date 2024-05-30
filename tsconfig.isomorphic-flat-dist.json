@@ -4,6 +4,10 @@
     "rootDir": "./tmp-source-dist",
     "outDir": "./"
   },
-  "include": ["tmp-source-dist/**/*"],
-  "exclude": ["tmp-source-dist/assets"]
+  "include": [
+    "tmp-source-dist/**/*"
+  ],
+  "exclude": [
+    "tmp-source-dist/assets"
+  ]
 }

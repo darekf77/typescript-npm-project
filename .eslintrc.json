@@ -49,7 +49,7 @@
           }
         ],
         "@typescript-eslint/member-ordering": 0,
-        "@typescript-eslint/explicit-function-return-type": 0,
+        "@typescript-eslint/explicit-function-return-type": "warn",
         "@typescript-eslint/typedef": [
           "warn",
           {

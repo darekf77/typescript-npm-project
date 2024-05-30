@@ -11,7 +11,9 @@
     "sourceMap": true,
     "target": "es5",
     "downlevelIteration": true,
-    "typeRoots": ["node_modules/@types"],
+    "typeRoots": [
+      "node_modules/@types"
+    ],
     "lib": [
       "es2015",
       "es2015.promise",
@@ -22,11 +24,16 @@
       "es2016",
       "dom"
     ],
-    "types": ["node", "jest"],
+    "types": [
+      "node",
+      "jest"
+    ],
     "rootDir": "./tmp-src",
     "outDir": "dist"
   },
-  "include": ["tmp-src/**/*"],
+  "include": [
+    "tmp-src/**/*"
+  ],
   "exclude": [
     "node_modules",
     "preview",
