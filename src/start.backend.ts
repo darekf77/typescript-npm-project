@@ -17,7 +17,7 @@ axios.defaults.timeout = 3000;
 export async function start(
   argsv: string[],
   frameworkName: 'tnp' | 'firedev' = 'tnp',
-  mode: 'dist' | 'npm' = 'dist'
+  mode: 'dist' | 'npm' = 'dist',
 ) {
   config.frameworkName = frameworkName;
 
@@ -30,21 +30,21 @@ export async function start(
     argsv,
     shortArgsReplaceConfig: {
       //#region short args replacement
-      'cinit': 'init:clear:init',
-      'app': 'build:app:watch', // should be console menu
-      'ba': 'build:app',
-      'b': 'build',
-      'cb': 'build:clean:build',
-      'hosts': 'open:hosts',
-      'baw': 'build:app:watch',
-      'bw': 'build:watch',
-      'cbw': 'build:clean:watch',
-      's': 'build:start',
-      'start': 'build:start',
-      'ew': 'electron:watch',
-      'r': 'release',
-      'rmajor': 'release:major',
-      'rminor': 'release:minor',
+      cinit: 'init:clear:init',
+      app: 'build:app:watch', // should be console menu
+      ba: 'build:app',
+      b: 'build',
+      cb: 'build:clean:build',
+      hosts: 'open:hosts',
+      baw: 'build:app:watch',
+      bw: 'build:watch',
+      cbw: 'build:clean:watch',
+      s: 'build:start',
+      start: 'build:start',
+      ew: 'electron:watch',
+      r: 'release',
+      rmajor: 'release:major',
+      rminor: 'release:minor',
       'r:major': 'release:major',
       'r:minor': 'release:minor',
       'set:minor:version': 'release:set:minor:version',
@@ -52,31 +52,30 @@ export async function start(
       'set:minor:ver': 'release:set:minor:version',
       'set:major:ver': 'release:set:major:version',
       // 'ra': 'release:all',
-      'e': 'electron',
-      'ekill': 'electron:kill',
-      'ar': 'release:auto',
-      'ard': 'release:auto:docs',
-      're': 'reinstall',
+      e: 'electron',
+      ekill: 'electron:kill',
+      ar: 'release:auto',
+      ard: 'release:auto:docs',
+      re: 'reinstall',
       '--version': 'version',
       '-v': 'version',
       // open
-      'occ': 'open:core:container',
-      'ocp': 'open:core:project',
-      'o': 'open',
-      'or': 'open:release',
+      occ: 'open:core:container',
+      ocp: 'open:core:project',
+      o: 'open',
+      or: 'open:release',
       // test
-      'twd': 'test:watch:debug',
-      'tdw': 'test:watch:debug',
-      'tw': 'test:watch',
-      'td': 'test:debug',
-      't': 'test',
+      twd: 'test:watch:debug',
+      tdw: 'test:watch:debug',
+      tw: 'test:watch',
+      td: 'test:debug',
+      t: 'test',
       // other
-      'au': 'autoupdate',
-      'up': 'update',
+      au: 'autoupdate',
+      up: 'update',
       //#endregion
-    }
+    },
   });
-
 }
 
 export default start;

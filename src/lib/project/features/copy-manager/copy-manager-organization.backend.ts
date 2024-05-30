@@ -1,11 +1,11 @@
-import { config } from "tnp-config/src";
-import { crossPlatformPath, glob, path, _ } from "tnp-core/src";
-import { BuildOptions } from "../../../build-options";
-import { Helpers } from "tnp-helpers/src";
-import { Project } from "../../abstract/project";
-import { CopyMangerHelpers } from "./copy-manager-helpers.backend";
-import { CopyMangerOrganizationAngularFiles } from "./copy-manager-organization-angular-files.backend";
-import { CopyManagerStandalone } from "./copy-manager-standalone.backend";
+import { config } from 'tnp-config/src';
+import { crossPlatformPath, glob, path, _ } from 'tnp-core/src';
+import { BuildOptions } from '../../../build-options';
+import { Helpers } from 'tnp-helpers/src';
+import { Project } from '../../abstract/project';
+import { CopyMangerHelpers } from './copy-manager-helpers.backend';
+import { CopyMangerOrganizationAngularFiles } from './copy-manager-organization-angular-files.backend';
+import { CopyManagerStandalone } from './copy-manager-standalone.backend';
 
 export class CopyManagerOrganization extends CopyManagerStandalone {
   protected children: Project[];
@@ -22,12 +22,14 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
 
   //#region target project path
   get targetProjPath() {
-    return crossPlatformPath(path.join(
-      this.project.location,
-      this.buildOptions.outDir,
-      this.project.name,
-      this.targetProjName,
-    ));
+    return crossPlatformPath(
+      path.join(
+        this.project.location,
+        this.buildOptions.outDir,
+        this.project.name,
+        this.targetProjName,
+      ),
+    );
   }
   //#endregion
 
@@ -38,10 +40,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   //#endregion
 
   //#region init
-  init(
-    buildOptions: BuildOptions,
-    renameDestinationFolder?: string,
-  ) {
+  init(buildOptions: BuildOptions, renameDestinationFolder?: string) {
     super.init(buildOptions, renameDestinationFolder);
     this.children = this.getChildren() as any;
     this.angularCopyManger = new CopyMangerOrganizationAngularFiles(this);
@@ -59,11 +58,11 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   _copyBuildedDistributionTo(
     destination: Project,
     options?: {
-      specyficFileRelativePath?: string,
-      outDir?: 'dist',
-      event?: any,
-      files?: string[]
-    }
+      specyficFileRelativePath?: string;
+      outDir?: 'dist';
+      event?: any;
+      files?: string[];
+    },
   ) {
     super._copyBuildedDistributionTo(destination, options);
   }
@@ -71,35 +70,32 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
 
   //#region local temp proj path
   get localTempProjPath() {
-    const targetProjPath = crossPlatformPath(path.join(
-      this.targetProjPath,
-      this.tempProjName,
-    ));
-    return crossPlatformPath(targetProjPath)
+    const targetProjPath = crossPlatformPath(
+      path.join(this.targetProjPath, this.tempProjName),
+    );
+    return crossPlatformPath(targetProjPath);
   }
   //#endregion
 
   //#region root package name
   get rootPackageName() {
-    const rootPackageName = ((
-      _.isString(this.renameDestinationFolder) && this.renameDestinationFolder !== '')
-      ? this.renameDestinationFolder
-      : `@${this.project.name}`
-    );
-    return rootPackageName
+    const rootPackageName =
+      _.isString(this.renameDestinationFolder) &&
+      this.renameDestinationFolder !== ''
+        ? this.renameDestinationFolder
+        : `@${this.project.name}`;
+    return rootPackageName;
   }
   //#endregion
 
   //#region monitored out dir
   get monitoredOutDir(): string {
-    const monitorDir: string = crossPlatformPath(path.join(
-      this.targetProjPath,
-      this.buildOptions.outDir
-    ));
+    const monitorDir: string = crossPlatformPath(
+      path.join(this.targetProjPath, this.buildOptions.outDir),
+    );
     return monitorDir;
   }
   //#endregion
-
 
   get monitoredOutDirSharedAssets(): string[] {
     const assetsFolders = this.project.children.map(c => {
@@ -110,18 +106,17 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         config.folder.shared,
       ]);
       return monitorDir;
-    })
+    });
 
     return assetsFolders;
   }
-
 
   //#region get chhildren
   getChildren(): Project[] {
     return [
       this.project.children.find(c => c.name === this.targetProjName),
       ...this.project.children.filter(c => c.name !== this.targetProjName),
-    ].filter(f => !!f)
+    ].filter(f => !!f);
   }
   //#endregion
 
@@ -129,33 +124,41 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   linksForPackageAreOk(destination: Project): boolean {
     return true;
     // TODO
-    const destPackageLinkSourceLocation = crossPlatformPath(path.join(
-      destination.location,
-      config.folder.node_modules,
-      this.rootPackageName,
-      config.folder.src
-    ));
+    const destPackageLinkSourceLocation = crossPlatformPath(
+      path.join(
+        destination.location,
+        config.folder.node_modules,
+        this.rootPackageName,
+        config.folder.src,
+      ),
+    );
 
     return Helpers.exists(destPackageLinkSourceLocation);
   }
   //#endregion
 
-
-
   //#region initial fix for destination pacakge
   initalFixForDestination(destination: Project): void {
-
-    const destPackageInNodeModules = crossPlatformPath(path.join(
-      destination.location,
-      config.folder.node_modules,
-      this.rootPackageName
-    ));
+    const destPackageInNodeModules = crossPlatformPath(
+      path.join(
+        destination.location,
+        config.folder.node_modules,
+        this.rootPackageName,
+      ),
+    );
 
     this.createCopyForRestore(destPackageInNodeModules, destination);
 
-    for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
-      const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
-      const destPackageInNodeModulesBrowser = crossPlatformPath(path.join(destPackageInNodeModules, currentBrowserFolder));
+    for (
+      let index = 0;
+      index < CopyMangerHelpers.browserwebsqlFolders.length;
+      index++
+    ) {
+      const currentBrowserFolder =
+        CopyMangerHelpers.browserwebsqlFolders[index];
+      const destPackageInNodeModulesBrowser = crossPlatformPath(
+        path.join(destPackageInNodeModules, currentBrowserFolder),
+      );
 
       Helpers.remove(destPackageInNodeModulesBrowser);
       const children = this.children;
@@ -165,31 +168,40 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         // if (!child) {
         //   debugger
         // }
-        const childDestPackageInNodeModules = crossPlatformPath(path.join(
-          destPackageInNodeModules,
-          CopyMangerHelpers.childPureName(child)
-        ));
+        const childDestPackageInNodeModules = crossPlatformPath(
+          path.join(
+            destPackageInNodeModules,
+            CopyMangerHelpers.childPureName(child),
+          ),
+        );
 
-        const childDestPackageInNodeModulesBrowser = crossPlatformPath(path.join(
-          destPackageInNodeModules,
-          CopyMangerHelpers.childPureName(child),
-          currentBrowserFolder,
-        ));
+        const childDestPackageInNodeModulesBrowser = crossPlatformPath(
+          path.join(
+            destPackageInNodeModules,
+            CopyMangerHelpers.childPureName(child),
+            currentBrowserFolder,
+          ),
+        );
 
-        if (Helpers.isSymlinkFileExitedOrUnexisted(childDestPackageInNodeModules)) {
+        if (
+          Helpers.isSymlinkFileExitedOrUnexisted(childDestPackageInNodeModules)
+        ) {
           Helpers.removeFileIfExists(childDestPackageInNodeModules);
         }
         if (!Helpers.exists(childDestPackageInNodeModules)) {
           Helpers.mkdirp(childDestPackageInNodeModules);
         }
-        if (Helpers.isSymlinkFileExitedOrUnexisted(childDestPackageInNodeModulesBrowser)) {
+        if (
+          Helpers.isSymlinkFileExitedOrUnexisted(
+            childDestPackageInNodeModulesBrowser,
+          )
+        ) {
           Helpers.removeFileIfExists(childDestPackageInNodeModulesBrowser);
         }
         if (!Helpers.exists(childDestPackageInNodeModulesBrowser)) {
           Helpers.mkdirp(childDestPackageInNodeModulesBrowser);
         }
       }
-
     }
   }
   //#endregion
@@ -201,9 +213,10 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     isForLaunchJsonDebugging: boolean,
     absFilePath: string,
   ): string {
-
-
-    if (!content || (!absFilePath.endsWith('.js.map') && !absFilePath.endsWith('.mjs.map'))) {
+    if (
+      !content ||
+      (!absFilePath.endsWith('.js.map') && !absFilePath.endsWith('.mjs.map'))
+    ) {
       // Helpers.warn(`[copytomanager] Empty content for ${absFilePath}`);
       return content;
     }
@@ -215,49 +228,76 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       // content = content.replace(regex1, `"./${config.folder.src}`);
       // content = content.replace(regex2, config.folder.src);
     } else {
-      if (isForLaunchJsonDebugging) { // files is in dist or container target project
+      if (isForLaunchJsonDebugging) {
+        // files is in dist or container target project
         // I am not allowing organizaition as cli tool
 
-        const relative = crossPlatformPath(absFilePath).replace(`${this.monitoredOutDir}/`, '');
-
+        const relative = crossPlatformPath(absFilePath).replace(
+          `${this.monitoredOutDir}/`,
+          '',
+        );
 
         if (this.isForSpecyficTargetCompilation(relative)) {
           let toReplaceString2 = `../tmp-source-${this.buildOptions.outDir}`;
 
           // let toReplaceString1 = `"${toReplaceString2}`;
 
-          const regex2 = new RegExp(Helpers.escapeStringForRegEx(toReplaceString2), 'g');
+          const regex2 = new RegExp(
+            Helpers.escapeStringForRegEx(toReplaceString2),
+            'g',
+          );
           // console.log(`[changeamp] relative: ${relative}`)
-          content = content.replace(regex2, `../../../../${this.targetProjName}/${config.folder.src}`);
+          content = content.replace(
+            regex2,
+            `../../../../${this.targetProjName}/${config.folder.src}`,
+          );
           // console.log({ absFilePathTARGET: absFilePath })
         } else {
-
-          const childName = relative.startsWith(config.folder.libs) ? _.first(relative.split('/').slice(1)) : void 0;
+          const childName = relative.startsWith(config.folder.libs)
+            ? _.first(relative.split('/').slice(1))
+            : void 0;
           let toReplaceString2 = `../tmp-source-${this.buildOptions.outDir}/${config.folder.libs}/${childName}`;
-          const regex2 = new RegExp(Helpers.escapeStringForRegEx(toReplaceString2), 'g');
+          const regex2 = new RegExp(
+            Helpers.escapeStringForRegEx(toReplaceString2),
+            'g',
+          );
 
           // let toReplaceString1 = `"${toReplaceString2}`;
           // console.log(`[changeamp]
           // childName: ${childName} relative: ${relative}`)
           if (childName) {
-            content = content.replace(regex2, `../../../../${childName}/${config.folder.src}/${config.folder.lib}`);
+            content = content.replace(
+              regex2,
+              `../../../../${childName}/${config.folder.src}/${config.folder.lib}`,
+            );
           } else {
             // don not modify anything
           }
           // console.log({ absFilePathLIBS: absFilePath })
         }
-      } else { // debugging inside someone else project/node_modules/<pacakge>
+      } else {
+        // debugging inside someone else project/node_modules/<pacakge>
         let toReplaceString2 = isBrowser
           ? `../tmp-${config.folder.libs}-for-${this.buildOptions.outDir}/${this.project.name}/projects/${this.project.name}/${config.folder.src}`
-          : ((`../../../tmp-${config.folder.source}-${this.buildOptions.outDir}`));
+          : `../../../tmp-${config.folder.source}-${this.buildOptions.outDir}`;
 
         let toReplaceString1 = `"${toReplaceString2}`;
-        const addon = `/${config.folder.libs}/(${this.children.map(c => {
-          return Helpers.escapeStringForRegEx(CopyMangerHelpers.childPureName(c));
-        }).join('|')})`;
+        const addon = `/${config.folder.libs}/(${this.children
+          .map(c => {
+            return Helpers.escapeStringForRegEx(
+              CopyMangerHelpers.childPureName(c),
+            );
+          })
+          .join('|')})`;
 
-        const regex1 = new RegExp(Helpers.escapeStringForRegEx(toReplaceString1) + addon, 'g');
-        const regex2 = new RegExp(Helpers.escapeStringForRegEx(toReplaceString2) + addon, 'g');
+        const regex1 = new RegExp(
+          Helpers.escapeStringForRegEx(toReplaceString1) + addon,
+          'g',
+        );
+        const regex2 = new RegExp(
+          Helpers.escapeStringForRegEx(toReplaceString2) + addon,
+          'g',
+        );
 
         content = content.replace(regex1, `"./${config.folder.src}`);
         content = content.replace(regex2, `${config.folder.src}`);
@@ -270,23 +310,32 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   }
   //#endregion
 
-  sourceMapContentFix(content: string, isBrowser: boolean, absFilePath: string) {
-
+  sourceMapContentFix(
+    content: string,
+    isBrowser: boolean,
+    absFilePath: string,
+  ) {
     if (
       // process.platform === 'win32' &&
-      !isBrowser) {
+      !isBrowser
+    ) {
       const json = JSON.parse(content);
       if (json) {
-
         json.sources = (json.sources || []).map((pathToJoin: string) => {
           if (this.targetProj.isInCiReleaseProject) {
             return '';
           }
 
-          let dirnameAbs = crossPlatformPath(path.dirname(absFilePath))
+          let dirnameAbs = crossPlatformPath(path.dirname(absFilePath));
 
-          let resolved = crossPlatformPath(path.resolve(dirnameAbs, pathToJoin.startsWith('./') ? pathToJoin.replace('./', '') : pathToJoin));
-
+          let resolved = crossPlatformPath(
+            path.resolve(
+              dirnameAbs,
+              pathToJoin.startsWith('./')
+                ? pathToJoin.replace('./', '')
+                : pathToJoin,
+            ),
+          );
 
           const children = this.children;
           for (let index = 0; index < children.length; index++) {
@@ -296,23 +345,31 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
             (() => {
               const localProjFolderName = `/${this.buildOptions.outDir}/${this.project.name}/${child.name}/tmp-source-${this.buildOptions.outDir}/`;
               if (resolved.includes(localProjFolderName)) {
-                resolved = resolved.replace(localProjFolderName, `/${child.name}/src/`);
+                resolved = resolved.replace(
+                  localProjFolderName,
+                  `/${child.name}/src/`,
+                );
               }
             })();
 
             // rule 2
             (() => {
-
-              const ifFromLocal = `/${this.buildOptions.outDir}/${this.project.name}/${child.name}/tmp-local-copyto-proj-`
-                + `${this.buildOptions.outDir}/${config.folder.node_modules}/${this.rootPackageName}/`;
+              const ifFromLocal =
+                `/${this.buildOptions.outDir}/${this.project.name}/${child.name}/tmp-local-copyto-proj-` +
+                `${this.buildOptions.outDir}/${config.folder.node_modules}/${this.rootPackageName}/`;
 
               if (resolved.includes(ifFromLocal)) {
-                const [child] = resolved.replace(this.project.location, '').replace(ifFromLocal, '').split('/')
+                const [child] = resolved
+                  .replace(this.project.location, '')
+                  .replace(ifFromLocal, '')
+                  .split('/');
                 // console.log('child: ' + child)
                 resolved = resolved
                   .replace(ifFromLocal, `/`)
-                  .replace(`${this.project.location}/${child}/src/`, `${this.project.location}/${child}/src/lib/`)
-                  ;
+                  .replace(
+                    `${this.project.location}/${child}/src/`,
+                    `${this.project.location}/${child}/src/lib/`,
+                  );
               }
             })();
 
@@ -326,15 +383,18 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
                 const child = path.basename(resolved.replace(relative, ''));
                 // console.log(`CHILD "${child}"`)
                 // const relative = resolved.replace(this.project.location, '').split('/').slice(4).join('/');
-                resolved = crossPlatformPath([this.project.location, child, config.folder.src, relative]);
+                resolved = crossPlatformPath([
+                  this.project.location,
+                  child,
+                  config.folder.src,
+                  relative,
+                ]);
               }
             })();
           }
 
           return resolved;
-        })
-
-
+        });
       }
       content = JSON.stringify(json);
     }
@@ -345,17 +405,29 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   /**
    * final copy from dist to node_moules/rootpackagename
    */
-  writeSpecyficForChildDtsFiles(destination: Project, rootPackageNameForChildBrowser: string, monitorDirForModuleBrowser: string) {
-    const pkgLocInDestNodeModulesForChildBrowser = destination.__node_modules.pathFor(rootPackageNameForChildBrowser);
-    const filter = Helpers.filterDontCopy(this.sourceFolders, monitorDirForModuleBrowser);
+  writeSpecyficForChildDtsFiles(
+    destination: Project,
+    rootPackageNameForChildBrowser: string,
+    monitorDirForModuleBrowser: string,
+  ) {
+    const pkgLocInDestNodeModulesForChildBrowser =
+      destination.__node_modules.pathFor(rootPackageNameForChildBrowser);
+    const filter = Helpers.filterDontCopy(
+      this.sourceFolders,
+      monitorDirForModuleBrowser,
+    );
     // console.log('COPY', {
     //   monitorDirForModuleBrowser, pkgLocInDestNodeModulesForChildBrowser
     // })
     this.removeSourceLinksFolders(pkgLocInDestNodeModulesForChildBrowser);
-    Helpers.copy(monitorDirForModuleBrowser, pkgLocInDestNodeModulesForChildBrowser, {
-      copySymlinksAsFiles: false,
-      filter,
-    });
+    Helpers.copy(
+      monitorDirForModuleBrowser,
+      pkgLocInDestNodeModulesForChildBrowser,
+      {
+        copySymlinksAsFiles: false,
+        filter,
+      },
+    );
   }
   //#endregion
 
@@ -372,8 +444,13 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   /**
    * example: '@angular/core/(browser|websql)'
    */
-  rootPackageNameForChildBrowser(child: Project, currentBrowserFolder: 'browser' | 'websql' | string) {
-    return crossPlatformPath(path.join(this.childPackageName(child), currentBrowserFolder));
+  rootPackageNameForChildBrowser(
+    child: Project,
+    currentBrowserFolder: 'browser' | 'websql' | string,
+  ) {
+    return crossPlatformPath(
+      path.join(this.childPackageName(child), currentBrowserFolder),
+    );
   }
   //#endregion
 
@@ -384,28 +461,64 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     child: Project,
     currentBrowserFolder: 'browser' | 'websql' | string,
   ) {
-
     // ex. @anguar/code/browser or @anguar/code/websql
-    const rootPackageNameForChildBrowser = this.rootPackageNameForChildBrowser(child, currentBrowserFolder);
+    const rootPackageNameForChildBrowser = this.rootPackageNameForChildBrowser(
+      child,
+      currentBrowserFolder,
+    );
 
-    if (child.name === this.targetProjName) { // target is in lib.... -> no need for target also being in libs
+    if (child.name === this.targetProjName) {
+      // target is in lib.... -> no need for target also being in libs
       const monitorDirForModuleBrowser = isTempLocalProj //
-        ? crossPlatformPath(path.join(this.monitoredOutDir, currentBrowserFolder, config.folder.lib))
-        : this.localTempProj.__node_modules.pathFor(rootPackageNameForChildBrowser);
+        ? crossPlatformPath(
+            path.join(
+              this.monitoredOutDir,
+              currentBrowserFolder,
+              config.folder.lib,
+            ),
+          )
+        : this.localTempProj.__node_modules.pathFor(
+            rootPackageNameForChildBrowser,
+          );
 
-      if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist)
-        this.dtsFixer.processFolder(monitorDirForModuleBrowser, currentBrowserFolder);
+      if (isTempLocalProj) {
+        // when destination === tmp-local-proj => fix d.ts imports in (dist)
+        this.dtsFixer.processFolder(
+          monitorDirForModuleBrowser,
+          currentBrowserFolder,
+        );
       }
-      this.writeSpecyficForChildDtsFiles(destination, rootPackageNameForChildBrowser, monitorDirForModuleBrowser);
+      this.writeSpecyficForChildDtsFiles(
+        destination,
+        rootPackageNameForChildBrowser,
+        monitorDirForModuleBrowser,
+      );
     } else {
       const monitorDirForModuleBrowser = isTempLocalProj //
-        ? crossPlatformPath(path.join(this.monitoredOutDir, currentBrowserFolder, config.folder.libs, child.name))
-        : this.localTempProj.__node_modules.pathFor(rootPackageNameForChildBrowser);
+        ? crossPlatformPath(
+            path.join(
+              this.monitoredOutDir,
+              currentBrowserFolder,
+              config.folder.libs,
+              child.name,
+            ),
+          )
+        : this.localTempProj.__node_modules.pathFor(
+            rootPackageNameForChildBrowser,
+          );
 
-      if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist)
-        this.dtsFixer.processFolder(monitorDirForModuleBrowser, currentBrowserFolder);
+      if (isTempLocalProj) {
+        // when destination === tmp-local-proj => fix d.ts imports in (dist)
+        this.dtsFixer.processFolder(
+          monitorDirForModuleBrowser,
+          currentBrowserFolder,
+        );
       }
-      this.writeSpecyficForChildDtsFiles(destination, rootPackageNameForChildBrowser, monitorDirForModuleBrowser);
+      this.writeSpecyficForChildDtsFiles(
+        destination,
+        rootPackageNameForChildBrowser,
+        monitorDirForModuleBrowser,
+      );
     }
   }
   //#endregion
@@ -416,43 +529,66 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
    */
   copyCompiledSourcesAndDeclarationsBrowsersFolders(
     destination: Project,
-    isTempLocalProj: boolean
+    isTempLocalProj: boolean,
   ) {
     // TODO LAST copy app.ts
     for (let index = 0; index < this.children.length; index++) {
       //#region prepare variables
       const child = this.children[index];
       this.angularCopyManger.fixPackageJson(child, destination);
-      for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
-        const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
-        this.fixesForChildDtsFile(destination, isTempLocalProj, child, currentBrowserFolder);
-        this.angularCopyManger.fixPackageJson(child, destination, currentBrowserFolder);
-        this.angularCopyManger.fixBuildRelatedFiles(child, destination, currentBrowserFolder);
+      for (
+        let index = 0;
+        index < CopyMangerHelpers.browserwebsqlFolders.length;
+        index++
+      ) {
+        const currentBrowserFolder =
+          CopyMangerHelpers.browserwebsqlFolders[index];
+        this.fixesForChildDtsFile(
+          destination,
+          isTempLocalProj,
+          child,
+          currentBrowserFolder,
+        );
+        this.angularCopyManger.fixPackageJson(
+          child,
+          destination,
+          currentBrowserFolder,
+        );
+        this.angularCopyManger.fixBuildRelatedFiles(
+          child,
+          destination,
+          currentBrowserFolder,
+        );
         //#endregion
       }
     }
 
-    for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
-      const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
-      CopyMangerHelpers.angularBrowserComiplationFoldersArr
-        .forEach(angularCompilationFolder => {
+    for (
+      let index = 0;
+      index < CopyMangerHelpers.browserwebsqlFolders.length;
+      index++
+    ) {
+      const currentBrowserFolder =
+        CopyMangerHelpers.browserwebsqlFolders[index];
+      CopyMangerHelpers.angularBrowserComiplationFoldersArr.forEach(
+        angularCompilationFolder => {
           this.angularCopyManger.actionForFolder(
             destination,
             isTempLocalProj,
             currentBrowserFolder,
             angularCompilationFolder,
-          )
-        });
+          );
+        },
+      );
     }
-
-
-
   }
   //#endregion
 
   //#region files for specyfic target
   isForSpecyficTargetCompilation(specyficFileRelativePath: string) {
-    specyficFileRelativePath = crossPlatformPath(specyficFileRelativePath).replace(/^\//, '');
+    specyficFileRelativePath = crossPlatformPath(
+      specyficFileRelativePath,
+    ).replace(/^\//, '');
 
     const shouldNotStartWith = [
       ...CopyMangerHelpers.browserwebsqlFolders,
@@ -478,7 +614,9 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       .map(c => {
         const baseName = crossPlatformPath([base, '-', c.name]);
         // console.log(baseName)
-        return Helpers.exists(baseName) ? Helpers.filesFrom(baseName, true) : [];
+        return Helpers.exists(baseName)
+          ? Helpers.filesFrom(baseName, true)
+          : [];
       })
       .reduce((a, b) => {
         return a.concat(b);
@@ -491,7 +629,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       ...appFiles,
       ...libFiles,
       ...appFlatFiles,
-      ...otherLibsApps
+      ...otherLibsApps,
     ];
 
     return allFiles;
@@ -505,7 +643,10 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     //   additonakFiles
     // })
     additonakFiles.forEach(specyficFileAbsPath => {
-      const specyficFileRelativePath = specyficFileAbsPath.replace(`${this.monitoredOutDir}/`, '');
+      const specyficFileRelativePath = specyficFileAbsPath.replace(
+        `${this.monitoredOutDir}/`,
+        '',
+      );
       // if (specyficFileRelativePath.endsWith('.d.ts')) {
       //   CopyMangerHelpers.browserwebsqlFolders.forEach(currentBrowserFolder => {
       //     const dtsFileAbsolutePath = crossPlatformPath(path.join(this.monitoredOutDir, specyficFileRelativePath));
@@ -515,8 +656,16 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       //     );
       //   });
       // } else if (specyficFileRelativePath.endsWith('.js.map')) {
-      this.writeFixedMapFile(true, specyficFileRelativePath, this.monitoredOutDir);
-      this.writeFixedMapFile(false, specyficFileRelativePath, this.monitoredOutDir);
+      this.writeFixedMapFile(
+        true,
+        specyficFileRelativePath,
+        this.monitoredOutDir,
+      );
+      this.writeFixedMapFile(
+        false,
+        specyficFileRelativePath,
+        this.monitoredOutDir,
+      );
       // }
     });
   }
@@ -527,28 +676,42 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     const children = this.getChildren();
     for (let index = 0; index < children.length; index++) {
       const child = children[index];
-      const rootPackageNameForChild = crossPlatformPath(path.join(this.rootPackageName, child.name));
-      const location = destination.__node_modules.pathFor(rootPackageNameForChild);
-      Helpers.writeFile(path.join( // override dts to easly debugging
-        location,
-        config.file.index_d_ts,
-      ), `export * from './${config.folder.src}';\n`);
+      const rootPackageNameForChild = crossPlatformPath(
+        path.join(this.rootPackageName, child.name),
+      );
+      const location = destination.__node_modules.pathFor(
+        rootPackageNameForChild,
+      );
+      Helpers.writeFile(
+        path.join(
+          // override dts to easly debugging
+          location,
+          config.file.index_d_ts,
+        ),
+        `export * from './${config.folder.src}';\n`,
+      );
     }
   }
   //#endregion
 
   //#region copy compiled sources and declarations
-  copyCompiledSourcesAndDeclarations(destination: Project, isTempLocalProj: boolean) {
-
+  copyCompiledSourcesAndDeclarations(
+    destination: Project,
+    isTempLocalProj: boolean,
+  ) {
     if (isTempLocalProj) {
       this.fixAdditonalFilesAndFolders(destination);
     }
 
     for (let index = 0; index < this.children.length; index++) {
       const child = this.children[index];
-      const rootPackageNameForChild = crossPlatformPath(path.join(this.rootPackageName, child.name));
+      const rootPackageNameForChild = crossPlatformPath(
+        path.join(this.rootPackageName, child.name),
+      );
       const monitorDirForModule = isTempLocalProj //
-        ? crossPlatformPath(path.join(this.monitoredOutDir, config.folder.libs, child.name))
+        ? crossPlatformPath(
+            path.join(this.monitoredOutDir, config.folder.libs, child.name),
+          )
         : this.localTempProj.__node_modules.pathFor(rootPackageNameForChild);
 
       // if (isTempLocalProj) { // when destination === tmp-local-proj => fix d.ts imports in (dist)
@@ -556,17 +719,23 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       // }
 
       //#region final copy from dist to node_moules/rootpackagename
-      const pkgLocInDestNodeModulesForChild = destination.__node_modules.pathFor(rootPackageNameForChild);
-      const filter = Helpers.filterDontCopy(this.sourceFolders, monitorDirForModule);
+      const pkgLocInDestNodeModulesForChild =
+        destination.__node_modules.pathFor(rootPackageNameForChild);
+      const filter = Helpers.filterDontCopy(
+        this.sourceFolders,
+        monitorDirForModule,
+      );
       this.removeSourceLinksFolders(pkgLocInDestNodeModulesForChild);
       Helpers.copy(monitorDirForModule, pkgLocInDestNodeModulesForChild, {
-        copySymlinksAsFiles: (process.platform === 'win32'),
+        copySymlinksAsFiles: process.platform === 'win32',
         filter,
       });
       //#endregion
-
     }
-    this.copyCompiledSourcesAndDeclarationsBrowsersFolders(destination, isTempLocalProj);
+    this.copyCompiledSourcesAndDeclarationsBrowsersFolders(
+      destination,
+      isTempLocalProj,
+    );
 
     this.replaceIndexDtsFilesRootLevel(destination);
   }
@@ -574,51 +743,75 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
 
   //#region replace d.ts files in destination after copy
   replaceIndexDtsFilesRootLevel(destination: Project) {
-    Helpers.writeFile(path.join(destination.location,
-      config.folder.node_modules,
-      this.rootPackageName,
-      config.file.index_d_ts,
-    ),
-      `// Plase use: import { < anything > } from '@${this.project.name}/<${this.children.map(c => c.name).join('|')}>';\n`
+    Helpers.writeFile(
+      path.join(
+        destination.location,
+        config.folder.node_modules,
+        this.rootPackageName,
+        config.file.index_d_ts,
+      ),
+      `// Plase use: import { < anything > } from '@${this.project.name}/<${this.children.map(c => c.name).join('|')}>';\n`,
     );
   }
   //#endregion
 
   //#region source for child
   sourcePathToLinkFor(child: Project) {
-    const sourceToLink = crossPlatformPath(path.join(
-      this.project.location,
-      child.name,
-      config.folder.src,
-      config.folder.lib,
-    ));
+    const sourceToLink = crossPlatformPath(
+      path.join(
+        this.project.location,
+        child.name,
+        config.folder.src,
+        config.folder.lib,
+      ),
+    );
     return sourceToLink;
   }
   //#endregion
 
   //#region destination packge link source (usuall 'src' folder) location
-  destPackageLinkSourceLocation(destination: Project, child: Project, currentBrowserFolder?: 'browser' | 'websql' | string) {
-    const destPackageLinkSourceLocation = currentBrowserFolder ? crossPlatformPath(path.join(
-      destination.__node_modules.pathFor(this.childPackageName(child)),
-      currentBrowserFolder,
-      config.folder.src
-    )) : crossPlatformPath(path.join(
-      destination.__node_modules.pathFor(this.childPackageName(child)),
-      config.folder.src
-    ));
+  destPackageLinkSourceLocation(
+    destination: Project,
+    child: Project,
+    currentBrowserFolder?: 'browser' | 'websql' | string,
+  ) {
+    const destPackageLinkSourceLocation = currentBrowserFolder
+      ? crossPlatformPath(
+          path.join(
+            destination.__node_modules.pathFor(this.childPackageName(child)),
+            currentBrowserFolder,
+            config.folder.src,
+          ),
+        )
+      : crossPlatformPath(
+          path.join(
+            destination.__node_modules.pathFor(this.childPackageName(child)),
+            config.folder.src,
+          ),
+        );
 
     return destPackageLinkSourceLocation;
   }
 
-  destPackageLinkSourceSrcDtsLocation(destination: Project, child: Project, currentBrowserFolder?: 'browser' | 'websql' | string) {
-    const destPackageLinkSourceLocation = currentBrowserFolder ? crossPlatformPath(path.join(
-      destination.__node_modules.pathFor(this.childPackageName(child)),
-      currentBrowserFolder,
-      'src.d.ts'
-    )) : crossPlatformPath(path.join(
-      destination.__node_modules.pathFor(this.childPackageName(child)),
-      'src.d.ts'
-    ));
+  destPackageLinkSourceSrcDtsLocation(
+    destination: Project,
+    child: Project,
+    currentBrowserFolder?: 'browser' | 'websql' | string,
+  ) {
+    const destPackageLinkSourceLocation = currentBrowserFolder
+      ? crossPlatformPath(
+          path.join(
+            destination.__node_modules.pathFor(this.childPackageName(child)),
+            currentBrowserFolder,
+            'src.d.ts',
+          ),
+        )
+      : crossPlatformPath(
+          path.join(
+            destination.__node_modules.pathFor(this.childPackageName(child)),
+            'src.d.ts',
+          ),
+        );
 
     return destPackageLinkSourceLocation;
   }
@@ -629,28 +822,47 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     for (let index = 0; index < this.children.length; index++) {
       const child = this.children[index];
 
-      const destPackageLinkSourceLocation = this.destPackageLinkSourceLocation(destination, child);
+      const destPackageLinkSourceLocation = this.destPackageLinkSourceLocation(
+        destination,
+        child,
+      );
       Helpers.removeIfExists(destPackageLinkSourceLocation);
-      Helpers.removeIfExists(this.destPackageLinkSourceSrcDtsLocation(destination, child));
+      Helpers.removeIfExists(
+        this.destPackageLinkSourceSrcDtsLocation(destination, child),
+      );
       if (!remove) {
-        Helpers.createSymLink(this.sourcePathToLinkFor(child), destPackageLinkSourceLocation);
+        Helpers.createSymLink(
+          this.sourcePathToLinkFor(child),
+          destPackageLinkSourceLocation,
+        );
       }
 
-      for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
-        const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
-        const destPackageLinkSourceLocationForBrowser = this.destPackageLinkSourceLocation(
-          destination,
-          child,
-          currentBrowserFolder,
-        );
+      for (
+        let index = 0;
+        index < CopyMangerHelpers.browserwebsqlFolders.length;
+        index++
+      ) {
+        const currentBrowserFolder =
+          CopyMangerHelpers.browserwebsqlFolders[index];
+        const destPackageLinkSourceLocationForBrowser =
+          this.destPackageLinkSourceLocation(
+            destination,
+            child,
+            currentBrowserFolder,
+          );
         Helpers.removeIfExists(destPackageLinkSourceLocationForBrowser);
-        Helpers.removeIfExists(this.destPackageLinkSourceSrcDtsLocation(
-          destination,
-          child,
-          currentBrowserFolder,
-        ));
+        Helpers.removeIfExists(
+          this.destPackageLinkSourceSrcDtsLocation(
+            destination,
+            child,
+            currentBrowserFolder,
+          ),
+        );
         if (!remove) {
-          Helpers.createSymLink(this.sourcePathToLinkFor(child), destPackageLinkSourceLocationForBrowser);
+          Helpers.createSymLink(
+            this.sourcePathToLinkFor(child),
+            destPackageLinkSourceLocationForBrowser,
+          );
         }
       }
     }
@@ -673,10 +885,16 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   fixBackendAndBrowserJsMapFilesInLocalProj() {
     for (let index = 0; index < this.children.length; index++) {
       const child = this.children[index];
-      const destinationPackageLocation = this.localTempProj.__node_modules.pathFor(this.childPackageName(child));
+      const destinationPackageLocation =
+        this.localTempProj.__node_modules.pathFor(this.childPackageName(child));
 
-      for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
-        const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
+      for (
+        let index = 0;
+        index < CopyMangerHelpers.browserwebsqlFolders.length;
+        index++
+      ) {
+        const currentBrowserFolder =
+          CopyMangerHelpers.browserwebsqlFolders[index];
         this.fixJsMapFiles(destinationPackageLocation, currentBrowserFolder);
       }
 
@@ -687,8 +905,12 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
 
   //#region copy backend and browser js map files from local project to destination
   copyBackendAndBrowserJsMapFilesFromLocalProjTo(destination: Project) {
-    const destinationPackageLocation = this.localTempProj.__node_modules.pathFor(this.rootPackageName);
-    this.copyMapFilesesFromLocalToCopyToProj(destination, destinationPackageLocation);
+    const destinationPackageLocation =
+      this.localTempProj.__node_modules.pathFor(this.rootPackageName);
+    this.copyMapFilesesFromLocalToCopyToProj(
+      destination,
+      destinationPackageLocation,
+    );
   }
   //#endregion
 
@@ -698,15 +920,23 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     specyficFileRelativePath: string,
     destinationPackageLocation: string, // it is local path but is should not be!
   ) {
-
     // TODO QUICK FIX
-    if (crossPlatformPath(destinationPackageLocation) == this.targetProj.pathFor(this.buildOptions.outDir)) {
-      super.writeFixedMapFileForCli(isForBrowser, specyficFileRelativePath, destinationPackageLocation);
+    if (
+      crossPlatformPath(destinationPackageLocation) ==
+      this.targetProj.pathFor(this.buildOptions.outDir)
+    ) {
+      super.writeFixedMapFileForCli(
+        isForBrowser,
+        specyficFileRelativePath,
+        destinationPackageLocation,
+      );
       return;
     }
 
-    let childName = destinationPackageLocation
-      .replace(`${this.localTempProj.__node_modules.pathFor(this.rootPackageName)}/`, '');
+    let childName = destinationPackageLocation.replace(
+      `${this.localTempProj.__node_modules.pathFor(this.rootPackageName)}/`,
+      '',
+    );
 
     let child = this.children.find(c => c.name === childName);
     if (!child) {
@@ -714,18 +944,24 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       child = this.children.find(c => c.name === childName);
     }
 
-    const monitoredOutDirFileToReplaceBack = crossPlatformPath(path.join(
-      this.targetProj.pathFor(this.buildOptions.outDir),
-      config.folder.libs,
-      childName,
-      specyficFileRelativePath,
-    ))
+    const monitoredOutDirFileToReplaceBack = crossPlatformPath(
+      path.join(
+        this.targetProj.pathFor(this.buildOptions.outDir),
+        config.folder.libs,
+        childName,
+        specyficFileRelativePath,
+      ),
+    );
 
     // console.log(`tryingfix: ${monitoredOutDirFileToReplaceBack}
     //  "${destinationPackageLocation}" "${specyficFileRelativePath}" child: ${childName}`)
 
     if (!child) {
-      super.writeFixedMapFileForCli(isForBrowser, specyficFileRelativePath, destinationPackageLocation);
+      super.writeFixedMapFileForCli(
+        isForBrowser,
+        specyficFileRelativePath,
+        destinationPackageLocation,
+      );
       return;
     }
 
@@ -737,10 +973,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         monitoredOutDirFileToReplaceBack,
       );
 
-      Helpers.writeFile(
-        monitoredOutDirFileToReplaceBack,
-        fixedContentCLIDebug,
-      );
+      Helpers.writeFile(monitoredOutDirFileToReplaceBack, fixedContentCLIDebug);
     }
   }
   //#endregion
@@ -753,19 +986,17 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     destination: Project,
     isTempLocalProj: boolean,
     wasRecrusive: boolean,
-    specialReplace: '-' | 'libs' = config.folder.libs as any
+    specialReplace: '-' | 'libs' = config.folder.libs as any,
   ) {
-    const specialAppFilesMode = (specialReplace === '-');
+    const specialAppFilesMode = specialReplace === '-';
     const orgSpecyficFileRelativePath = specyficFileRelativePath;
 
-    const distLocation = crossPlatformPath(path.join(
-      this.targetProj.location,
-      this.buildOptions.outDir,
-    ))
-    let absOrgFilePathInDist = crossPlatformPath(path.normalize(path.join(
-      distLocation,
-      orgSpecyficFileRelativePath
-    )));
+    const distLocation = crossPlatformPath(
+      path.join(this.targetProj.location, this.buildOptions.outDir),
+    );
+    let absOrgFilePathInDist = crossPlatformPath(
+      path.normalize(path.join(distLocation, orgSpecyficFileRelativePath)),
+    );
 
     const childName = _.first(specyficFileRelativePath.split('/').slice(1));
     const child = this.children.find(c => c.name === childName);
@@ -775,28 +1006,45 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       return;
     }
 
-    specyficFileRelativePath = specyficFileRelativePath.replace(`${specialReplace}/${childName}/`, '');
-    const rootPackageNameForChild = crossPlatformPath(path.join(this.rootPackageName, child.name));
+    specyficFileRelativePath = specyficFileRelativePath.replace(
+      `${specialReplace}/${childName}/`,
+      '',
+    );
+    const rootPackageNameForChild = crossPlatformPath(
+      path.join(this.rootPackageName, child.name),
+    );
 
-    Helpers.log(`Handle single file: ${specyficFileRelativePath} for ${rootPackageNameForChild}`)
-
+    Helpers.log(
+      `Handle single file: ${specyficFileRelativePath} for ${rootPackageNameForChild}`,
+    );
 
     if (!wasRecrusive) {
-      this.preventWeakDetectionOfchanges(orgSpecyficFileRelativePath, destination, isTempLocalProj);
+      this.preventWeakDetectionOfchanges(
+        orgSpecyficFileRelativePath,
+        destination,
+        isTempLocalProj,
+      );
     }
 
-    const destinationFilePath = crossPlatformPath(path.normalize(path.join(
-      destination.__node_modules.pathFor(rootPackageNameForChild),
-      specyficFileRelativePath
-    )));
+    const destinationFilePath = crossPlatformPath(
+      path.normalize(
+        path.join(
+          destination.__node_modules.pathFor(rootPackageNameForChild),
+          specyficFileRelativePath,
+        ),
+      ),
+    );
 
     if (!isTempLocalProj && !specialAppFilesMode) {
-      const readyToCopyFileInLocalTempProj = crossPlatformPath(path.join(
-        this.localTempProj.__node_modules.pathFor(rootPackageNameForChild),
-        specyficFileRelativePath
-      ));
+      const readyToCopyFileInLocalTempProj = crossPlatformPath(
+        path.join(
+          this.localTempProj.__node_modules.pathFor(rootPackageNameForChild),
+          specyficFileRelativePath,
+        ),
+      );
       // Helpers.log(`Eqal content with temp proj: ${}`)
-      if (Helpers.exists(readyToCopyFileInLocalTempProj)) { // TODO QUICK_FIX when creating empty file
+      if (Helpers.exists(readyToCopyFileInLocalTempProj)) {
+        // TODO QUICK_FIX when creating empty file
         Helpers.copyFile(readyToCopyFileInLocalTempProj, destinationFilePath);
       }
       return;
@@ -810,13 +1058,18 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         `/${this.targetProjName}/${this.buildOptions.outDir}-nocutsrc/${orgSpecyficFileRelativePath}`,
       );
       if (!Helpers.exists(newAbsOrgFilePathInDist)) {
-        Helpers.log(`[copyto] New path does not exists or in browser | websql: ${newAbsOrgFilePathInDist}`)
+        Helpers.log(
+          `[copyto] New path does not exists or in browser | websql: ${newAbsOrgFilePathInDist}`,
+        );
       } else {
         absOrgFilePathInDist = newAbsOrgFilePathInDist;
       }
     }
 
-    this.fixDtsImportsWithWronPackageName(absOrgFilePathInDist, destinationFilePath)
+    this.fixDtsImportsWithWronPackageName(
+      absOrgFilePathInDist,
+      destinationFilePath,
+    );
 
     const isBackendMapsFile = destinationFilePath.endsWith('.js.map');
     const isBrowserMapsFile = destinationFilePath.endsWith('.mjs.map');
@@ -824,47 +1077,45 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     if (isBackendMapsFile || isBrowserMapsFile) {
       if (isBackendMapsFile) {
         if (specialAppFilesMode) {
-          const fixedContentCLIDebug = this.changedJsMapFilesInternalPathesForDebug(
-            Helpers.readFile(absOrgFilePathInDist),
-            false,
-            true,
-            absOrgFilePathInDist,
-          );
-          Helpers.writeFile(
-            absOrgFilePathInDist,
-            fixedContentCLIDebug,
-          );
+          const fixedContentCLIDebug =
+            this.changedJsMapFilesInternalPathesForDebug(
+              Helpers.readFile(absOrgFilePathInDist),
+              false,
+              true,
+              absOrgFilePathInDist,
+            );
+          Helpers.writeFile(absOrgFilePathInDist, fixedContentCLIDebug);
         } else {
           this.writeFixedMapFile(
             false,
             specyficFileRelativePath,
             destination.__node_modules.pathFor(rootPackageNameForChild),
-          )
+          );
         }
-
       }
       if (isBrowserMapsFile) {
         if (specialAppFilesMode) {
-          const fixedContentCLIDebug = this.changedJsMapFilesInternalPathesForDebug(
-            Helpers.readFile(absOrgFilePathInDist),
-            false,
-            true,
-            absOrgFilePathInDist,
-          );
-          Helpers.writeFile(
-            absOrgFilePathInDist,
-            fixedContentCLIDebug,
-          );
+          const fixedContentCLIDebug =
+            this.changedJsMapFilesInternalPathesForDebug(
+              Helpers.readFile(absOrgFilePathInDist),
+              false,
+              true,
+              absOrgFilePathInDist,
+            );
+          Helpers.writeFile(absOrgFilePathInDist, fixedContentCLIDebug);
         } else {
           this.writeFixedMapFile(
             true,
             specyficFileRelativePath,
             destination.__node_modules.pathFor(rootPackageNameForChild),
-          )
+          );
         }
       }
     } else {
-      Helpers.writeFile(destinationFilePath, (Helpers.readFile(absOrgFilePathInDist) || ''));
+      Helpers.writeFile(
+        destinationFilePath,
+        Helpers.readFile(absOrgFilePathInDist) || '',
+      );
     }
   }
   //#endregion
@@ -878,17 +1129,16 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   ) {
     const orgSpecyficFileRelativePath = specyficFileRelativePath;
 
-    const distLocation = crossPlatformPath(path.join(
-      this.targetProj.location,
-      this.buildOptions.outDir,
-    ))
-    const absOrgFilePathInDist = crossPlatformPath(path.normalize(path.join(
-      distLocation,
-      orgSpecyficFileRelativePath
-    )));
+    const distLocation = crossPlatformPath(
+      path.join(this.targetProj.location, this.buildOptions.outDir),
+    );
+    const absOrgFilePathInDist = crossPlatformPath(
+      path.normalize(path.join(distLocation, orgSpecyficFileRelativePath)),
+    );
 
     const isBackendMapsFileAppJS = specyficFileRelativePath.endsWith('.js.map');
-    const isBrowserMapsFileAppJS = specyficFileRelativePath.endsWith('.mjs.map');
+    const isBrowserMapsFileAppJS =
+      specyficFileRelativePath.endsWith('.mjs.map');
 
     // this.fixDtsImportsWithWronPackageName(
     //   absOrgFilePathInDist,
@@ -897,18 +1147,10 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
 
     if (isBackendMapsFileAppJS || isBrowserMapsFileAppJS) {
       if (isBackendMapsFileAppJS) {
-        this.writeFixedMapFile(
-          false,
-          specyficFileRelativePath,
-          distLocation,
-        )
+        this.writeFixedMapFile(false, specyficFileRelativePath, distLocation);
       }
       if (isBrowserMapsFileAppJS) {
-        this.writeFixedMapFile(
-          true,
-          specyficFileRelativePath,
-          distLocation
-        )
+        this.writeFixedMapFile(true, specyficFileRelativePath, distLocation);
       }
     }
   }
@@ -926,7 +1168,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       destination,
       isTempLocalProj,
       wasRecrusive,
-      '-'
+      '-',
     );
   }
   //#endregion
@@ -935,21 +1177,30 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     absoluteAssetFilePath = crossPlatformPath(absoluteAssetFilePath);
     const monitoredOutDirSharedAssets = this.monitoredOutDirSharedAssets;
     for (let index = 0; index < monitoredOutDirSharedAssets.length; index++) {
-      const folderAssetsShareAbsPath = crossPlatformPath(monitoredOutDirSharedAssets[index]);
+      const folderAssetsShareAbsPath = crossPlatformPath(
+        monitoredOutDirSharedAssets[index],
+      );
       if (absoluteAssetFilePath.startsWith(folderAssetsShareAbsPath)) {
-        const relativePath = absoluteAssetFilePath.replace(`${folderAssetsShareAbsPath}/`, '');
+        const relativePath = absoluteAssetFilePath.replace(
+          `${folderAssetsShareAbsPath}/`,
+          '',
+        );
 
         const childName = absoluteAssetFilePath
           .replace(`${this.project.location}/`, '')
-          .replace(`/${config.folder.src}/${config.folder.assets}/${config.folder.shared}/${relativePath}`, '');
+          .replace(
+            `/${config.folder.src}/${config.folder.assets}/${config.folder.shared}/${relativePath}`,
+            '',
+          );
 
-        const dest = destination.__node_modules.pathFor(`${this.rootPackageName}/${childName}/${config.folder.assets}/${config.folder.shared}/${relativePath}`);
+        const dest = destination.__node_modules.pathFor(
+          `${this.rootPackageName}/${childName}/${config.folder.assets}/${config.folder.shared}/${relativePath}`,
+        );
 
         Helpers.remove(dest, true);
         if (Helpers.exists(absoluteAssetFilePath)) {
           Helpers.copyFile(absoluteAssetFilePath, dest);
         }
-
       }
     }
   }
@@ -958,17 +1209,20 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     destination: Project,
     isTempLocalProj: boolean,
     specyficFileRelativePath: string,
-    wasRecrusive = false
+    wasRecrusive = false,
   ): void {
-    specyficFileRelativePath = crossPlatformPath(specyficFileRelativePath).replace(/^\//, '');
+    specyficFileRelativePath = crossPlatformPath(
+      specyficFileRelativePath,
+    ).replace(/^\//, '');
     if (this.notAllowedFiles.includes(specyficFileRelativePath)) {
       return;
     }
 
     if (
-      specyficFileRelativePath.startsWith(config.folder.libs)
-      ||
-      specyficFileRelativePath.startsWith([config.folder.assets, config.folder.shared].join('/'))
+      specyficFileRelativePath.startsWith(config.folder.libs) ||
+      specyficFileRelativePath.startsWith(
+        [config.folder.assets, config.folder.shared].join('/'),
+      )
     ) {
       this.handleCopyOfSingleFileForChildFromLibs(
         specyficFileRelativePath,
@@ -992,7 +1246,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         destination,
         isTempLocalProj,
         wasRecrusive,
-      )
+      );
     } else {
       this.handleCopyOfSingleFileFromAppAndRoot(
         specyficFileRelativePath,
@@ -1010,26 +1264,39 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
    * erors when we import more "ui package" to backend code
    */
   updateBackendFullDtsFiles(destinationOrDist: Project | string) {
-    const base = crossPlatformPath(path.join(this.targetProj.location, `${this.buildOptions.outDir}-nocutsrc`, config.folder.libs));
+    const base = crossPlatformPath(
+      path.join(
+        this.targetProj.location,
+        `${this.buildOptions.outDir}-nocutsrc`,
+        config.folder.libs,
+      ),
+    );
 
-    const filesToUpdate = Helpers
-      .filesFrom(base, true)
+    const filesToUpdate = Helpers.filesFrom(base, true)
       .filter(f => f.endsWith('.d.ts'))
-      .map(f => f.replace(`${base}/`, ''))
+      .map(f => f.replace(`${base}/`, ''));
 
     for (let index = 0; index < filesToUpdate.length; index++) {
       const relativePath = filesToUpdate[index];
       // const childName = _.first(relativePath.split('/'));
       const source = crossPlatformPath(path.join(base, relativePath));
-      const dest = crossPlatformPath(path.join(
-        _.isString(destinationOrDist)
-          ? crossPlatformPath(path.join(this.monitoredOutDir, config.folder.libs))
-          : destinationOrDist.__node_modules.pathFor(crossPlatformPath(path.join(
-            this.rootPackageName,
-            // childName,
-          ))),
-        relativePath,
-      ));
+      const dest = crossPlatformPath(
+        path.join(
+          _.isString(destinationOrDist)
+            ? crossPlatformPath(
+                path.join(this.monitoredOutDir, config.folder.libs),
+              )
+            : destinationOrDist.__node_modules.pathFor(
+                crossPlatformPath(
+                  path.join(
+                    this.rootPackageName,
+                    // childName,
+                  ),
+                ),
+              ),
+          relativePath,
+        ),
+      );
       // console.log({
       //   source, dest
       // })
@@ -1040,5 +1307,4 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     }
   }
   //#endregion
-
 }

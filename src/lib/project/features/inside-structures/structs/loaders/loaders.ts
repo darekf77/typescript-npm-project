@@ -5,11 +5,15 @@ import { idsFacebook } from './loader-ids-facebook';
 import { idsGrid } from './loader-ids-grid';
 import { idsHeart } from './loader-ids-heart';
 import { idsRipple } from './loader-ids-ripple';
-const defaultLoader = 'lds-default'
+const defaultLoader = 'lds-default';
 
-export function getLoader(loaderName = defaultLoader as keyof typeof loaders, color?: string, preload?: boolean) {
-  if(_.isString(color)) {
-    color = color.replace('##', '')
+export function getLoader(
+  loaderName = defaultLoader as keyof typeof loaders,
+  color?: string,
+  preload?: boolean,
+) {
+  if (_.isString(color)) {
+    color = color.replace('##', '');
   }
   const loaders = {
     'lds-default': idsDefault(color, preload),

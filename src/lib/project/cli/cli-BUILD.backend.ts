@@ -1,10 +1,10 @@
 //#region @backend
-import { _, chalk } from "tnp-core/src";
-import { Helpers } from "tnp-helpers/src";
-import { CommandLineFeature } from "tnp-helpers/src";
-import { Project } from "../abstract/project";
-import { BuildOptions } from "../../build-options";
-import { TEMP_DOCS } from "../../constants";
+import { _, chalk } from 'tnp-core/src';
+import { Helpers } from 'tnp-helpers/src';
+import { CommandLineFeature } from 'tnp-helpers/src';
+import { Project } from '../abstract/project';
+import { BuildOptions } from '../../build-options';
+import { TEMP_DOCS } from '../../constants';
 
 class $Build extends CommandLineFeature<BuildOptions, Project> {
   protected async __initialize__() {
@@ -19,7 +19,8 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
       this.params.smartContainerTargetName = this.project.name;
       this.project = this.project.parent;
     } else if (this.project.__isSmartContainer) {
-      this.params.smartContainerTargetName = this.project.__smartContainerBuildTarget?.name;
+      this.params.smartContainerTargetName =
+        this.project.__smartContainerBuildTarget?.name;
     }
 
     //#endregion
@@ -27,70 +28,83 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
   }
 
   public async _() {
-    await this.project.build(BuildOptions.from({
-      ...this.params,
-      buildType: 'lib',
-      finishCallback: () => this._exit(),
-    }));
+    await this.project.build(
+      BuildOptions.from({
+        ...this.params,
+        buildType: 'lib',
+        finishCallback: () => this._exit(),
+      }),
+    );
   }
 
   async watch() {
-    await this.project.build(BuildOptions.from({
-      ...this.params,
-      buildType: 'lib',
-      watch: true,
-    }));
+    await this.project.build(
+      BuildOptions.from({
+        ...this.params,
+        buildType: 'lib',
+        watch: true,
+      }),
+    );
   }
 
   async cleanWatch() {
-    await this.project.clear()
-    await this.watch()
+    await this.project.clear();
+    await this.watch();
   }
 
   async cleanBuild() {
-    await this.project.clear()
-    await this._()
+    await this.project.clear();
+    await this._();
   }
 
   async default() {
-    await this.project.build(BuildOptions.from({
-      ...this.params,
-      buildType: 'lib',
-      watch: true,
-    }));
+    await this.project.build(
+      BuildOptions.from({
+        ...this.params,
+        buildType: 'lib',
+        watch: true,
+      }),
+    );
   }
 
   async app() {
-    await this.project.build(BuildOptions.from({
-      ...this.params,
-      buildType: 'app',
-      finishCallback: () => this._exit()
-    }));
+    await this.project.build(
+      BuildOptions.from({
+        ...this.params,
+        buildType: 'app',
+        finishCallback: () => this._exit(),
+      }),
+    );
   }
 
   async appWatch() {
-    await this.project.build(BuildOptions.from({
-      ...this.params,
-      buildType: 'app',
-      watch: true,
-    }));
+    await this.project.build(
+      BuildOptions.from({
+        ...this.params,
+        buildType: 'app',
+        watch: true,
+      }),
+    );
   }
 
   async start() {
-    await this.project.build(BuildOptions.from({
-      ...this.params,
-      buildType: 'lib-app',
-      watch: true,
-    }));
+    await this.project.build(
+      BuildOptions.from({
+        ...this.params,
+        buildType: 'lib-app',
+        watch: true,
+      }),
+    );
   }
 
   async mkdocs() {
-
     let res;
     while (true) {
-      Helpers.clearConsole()
-      res = await Helpers.consoleGui.select('What you wanna do with docs ?',
-        Object.values(this.mkdocsActions) as any);
+      Helpers.clearConsole();
+      res = await Helpers.consoleGui.select(
+        'What you wanna do with docs ?',
+        Object.values(this.mkdocsActions) as any,
+      );
       if (res.command) {
         break;
       }
@@ -100,7 +114,7 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
     if (_.isFunction(res.action)) {
       await res.action();
     }
-    Helpers.info('DONE BUILDING DOCS')
+    Helpers.info('DONE BUILDING DOCS');
     this._exit();
   }
 
@@ -114,12 +128,15 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
       value: {
         command: `python -m mkdocs build --site-dir ../../firedev-projects/www-firedev-io/docs/documentation`,
         action: async () => {
-          const firedevProj = Project.ins.From([this.cwd, '../../firedev-projects/www-firedev-io']);
+          const firedevProj = Project.ins.From([
+            this.cwd,
+            '../../firedev-projects/www-firedev-io',
+          ]);
           if (await Helpers.questionYesNo('Push and commit docs update ?')) {
             firedevProj.git.addAndCommit('update docs');
-            await firedevProj.git.pushCurrentBranch()
+            await firedevProj.git.pushCurrentBranch();
           }
-        }
+        },
       },
     },
     BUILD_DOCS_FIREDEV: {
@@ -138,11 +155,9 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
       },
     },
   };
-
 }
-
 
 export default {
   $Build: Helpers.CLIWRAP($Build, '$Build'),
-}
+};
 //#endregion

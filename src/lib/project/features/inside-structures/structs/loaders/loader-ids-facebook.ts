@@ -1,4 +1,7 @@
-import { ID_LOADER_PRE_BOOTSTRAP, PRE_LOADER_NG_IF_INITED } from "../inside-struct-constants";
+import {
+  ID_LOADER_PRE_BOOTSTRAP,
+  PRE_LOADER_NG_IF_INITED,
+} from '../inside-struct-constants';
 
 export function idsFacebook(color = '#8d8d8d', preloader = false) {
   return `
@@ -46,5 +49,5 @@ export function idsFacebook(color = '#8d8d8d', preloader = false) {
 
 <div ${preloader ? ID_LOADER_PRE_BOOTSTRAP : PRE_LOADER_NG_IF_INITED}  class="lds-facebook"><div></div><div></div><div></div></div>
 
-  `
+  `;
 }

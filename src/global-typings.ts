@@ -45,7 +45,6 @@ declare global {
       reinitDb?: boolean;
       dbAlreadyRecreated?: boolean;
       spinner: any; // Ora;
-
     }
   }
 }

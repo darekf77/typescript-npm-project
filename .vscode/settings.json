@@ -62,12 +62,48 @@
     "statusBar.debuggingBackground": "#5c3735"
   },
   "editor.rulers": [
-    100,
+    80,
     120
   ],
   "html.format.wrapAttributes": "force-aligned",
   "workbench.colorTheme": "Default Light+",
   "favorites.sortDirection": "ASC",
   "favorites.groupsFirst": true,
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false
+  },
+  "[json5]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false
+  },
+  "eslint.migration.2_x": "off",
+  "eslint.enable": true,
+  "prettier.enable": true,
+  "editor.suggest.snippetsPreventQuickSuggestions": false,
+  "editor.inlineSuggest.enabled": true,
+  "tslint.autoFixOnSave": false,
+  "tslint.enable": false,
+  "tslint.alwaysShowRuleFailuresAsWarnings": false
 }

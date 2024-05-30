@@ -1,12 +1,11 @@
 //#region @backend
-import { _ } from "tnp-core/src";
-import { Helpers } from "tnp-helpers/src";
-import { CommandLineFeature } from "tnp-helpers/src";
-import { Project } from "../abstract/project";
-import { BuildOptions } from "../../build-options";
-import { TEMP_DOCS } from "../../constants";
-import { config } from "tnp-config";
-
+import { _ } from 'tnp-core/src';
+import { Helpers } from 'tnp-helpers/src';
+import { CommandLineFeature } from 'tnp-helpers/src';
+import { Project } from '../abstract/project';
+import { BuildOptions } from '../../build-options';
+import { TEMP_DOCS } from '../../constants';
+import { config } from 'tnp-config';
 
 class $CiBuild extends CommandLineFeature<BuildOptions, Project> {
   protected async __initialize__() {
@@ -15,7 +14,8 @@ class $CiBuild extends CommandLineFeature<BuildOptions, Project> {
   }
 
   public async _() {
-    Helpers.error(`
+    Helpers.error(
+      `
     Please select proper command
 
     ${config.frameworkName} ci:build
@@ -24,35 +24,38 @@ class $CiBuild extends CommandLineFeature<BuildOptions, Project> {
     ${config.frameworkName} ci:start --port
     ${config.frameworkName} ci:start --domain
 
-    `, false, true);
+    `,
+      false,
+      true,
+    );
   }
 
   async build(prod = false) {
-    await this.project.releaseCiProject.build(BuildOptions.from({
-      prod,
-      finishCallback: () => this._exit()
-    }));
+    await this.project.releaseCiProject.build(
+      BuildOptions.from({
+        prod,
+        finishCallback: () => this._exit(),
+      }),
+    );
     this._exit();
   }
 
   async buildWatch(prod = false) {
-    await this.project.releaseCiProject.build(BuildOptions.from({
-      prod,
-      watch: true,
-    }));
+    await this.project.releaseCiProject.build(
+      BuildOptions.from({
+        prod,
+        watch: true,
+      }),
+    );
     this._exit();
   }
 
   async buildProd() {
     await this.build(true);
   }
-
-
-
 }
-
 
 export default {
   $CiBuild: Helpers.CLIWRAP($CiBuild, '$CiBuild'),
-}
+};
 //#endregion

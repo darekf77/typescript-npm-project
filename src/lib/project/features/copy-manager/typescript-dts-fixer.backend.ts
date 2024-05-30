@@ -1,7 +1,7 @@
-import { config } from "tnp-config/src";
-import { crossPlatformPath, path } from "tnp-core/src";
-import { Helpers } from "tnp-helpers/src";
-import { CopyMangerHelpers } from "./copy-manager-helpers.backend";
+import { config } from 'tnp-config/src';
+import { crossPlatformPath, path } from 'tnp-core/src';
+import { Helpers } from 'tnp-helpers/src';
+import { CopyMangerHelpers } from './copy-manager-helpers.backend';
 
 export const TS_NOCHECK = '// @ts-nocheck';
 
@@ -16,26 +16,16 @@ export const TS_NOCHECK = '// @ts-nocheck';
  */
 export class TypescriptDtsFixer {
   //#region singleton
-  public static for(
-    isomorphicPackages: string[],
-  ) {
-    return new TypescriptDtsFixer(
-      isomorphicPackages,
-    );
+  public static for(isomorphicPackages: string[]) {
+    return new TypescriptDtsFixer(isomorphicPackages);
   }
 
-  private constructor(
-    protected readonly isomorphicPackages: string[] = []
-  ) { }
+  private constructor(protected readonly isomorphicPackages: string[] = []) {}
   //#endregion
 
   //#region helpers / fix dts import
 
-  forContent(
-    content: string,
-    browserFolder: 'browser' | 'websql' | string,
-  ) {
-
+  forContent(content: string, browserFolder: 'browser' | 'websql' | string) {
     content = content ? content : '';
 
     // if(path.basename(filepath) === 'framework-context.d.ts') {
@@ -45,8 +35,12 @@ export class TypescriptDtsFixer {
     for (let index = 0; index < isomorphicPackages.length; index++) {
       const isomorphicPackageName = isomorphicPackages[index];
       content = (content || '').replace(
-        new RegExp(Helpers.escapeStringForRegEx(`import("${isomorphicPackageName}"`), 'g'),
-        `import("${isomorphicPackageName}/${browserFolder}"`);
+        new RegExp(
+          Helpers.escapeStringForRegEx(`import("${isomorphicPackageName}"`),
+          'g',
+        ),
+        `import("${isomorphicPackageName}/${browserFolder}"`,
+      );
     }
 
     if (!content.trimLeft().startsWith(TS_NOCHECK)) {
@@ -63,23 +57,37 @@ export class TypescriptDtsFixer {
    * @param absPathFolderLocationWithBrowserAdnWebsql usually dist
    * @param isTempLocalProj
    */
-  processFolderWithBrowserWebsqlFolders(absPathFolderLocationWithBrowserAdnWebsql: string) {
+  processFolderWithBrowserWebsqlFolders(
+    absPathFolderLocationWithBrowserAdnWebsql: string,
+  ) {
     // console.log({ absPathFolderLocation: absPathFolderLocationWithBrowserAdnWebsql })
 
-    for (let index = 0; index < CopyMangerHelpers.browserwebsqlFolders.length; index++) {
-
-      const currentBrowserFolder = CopyMangerHelpers.browserwebsqlFolders[index];
+    for (
+      let index = 0;
+      index < CopyMangerHelpers.browserwebsqlFolders.length;
+      index++
+    ) {
+      const currentBrowserFolder =
+        CopyMangerHelpers.browserwebsqlFolders[index];
       Helpers.log('Fixing .d.ts. files start...');
-      const sourceBrowser =  crossPlatformPath(path.join(absPathFolderLocationWithBrowserAdnWebsql, currentBrowserFolder));
-      this.processFolder(sourceBrowser, currentBrowserFolder)
+      const sourceBrowser = crossPlatformPath(
+        path.join(
+          absPathFolderLocationWithBrowserAdnWebsql,
+          currentBrowserFolder,
+        ),
+      );
+      this.processFolder(sourceBrowser, currentBrowserFolder);
       Helpers.log('Fixing .d.ts. files done.');
     }
   }
 
-  processFolder(absPathLocation: string, currentBrowserFolder: 'browser' | 'websql' | string) {
-
-    const browserDtsFiles = Helpers.filesFrom(absPathLocation, true)
-      .filter(f => f.endsWith('.d.ts'));
+  processFolder(
+    absPathLocation: string,
+    currentBrowserFolder: 'browser' | 'websql' | string,
+  ) {
+    const browserDtsFiles = Helpers.filesFrom(absPathLocation, true).filter(f =>
+      f.endsWith('.d.ts'),
+    );
 
     for (let index = 0; index < browserDtsFiles.length; index++) {
       const dtsFileAbsolutePath = browserDtsFiles[index];
@@ -92,7 +100,7 @@ export class TypescriptDtsFixer {
   //#region write fixed version of dts file
   forFile(
     dtsFileAbsolutePath: string,
-    currentBrowserFolder: 'browser' | 'websql' | string
+    currentBrowserFolder: 'browser' | 'websql' | string,
   ) {
     if (!dtsFileAbsolutePath.endsWith('.d.ts')) {
       return;
@@ -111,5 +119,4 @@ export class TypescriptDtsFixer {
   }
 
   //#endregion
-
 }

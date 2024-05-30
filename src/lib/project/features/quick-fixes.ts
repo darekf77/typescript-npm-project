@@ -1,6 +1,6 @@
 //#region @backend
-import { path, _, CoreModels } from 'tnp-core/src'
-import { fse, rimraf } from 'tnp-core/src'
+import { path, _, CoreModels } from 'tnp-core/src';
+import { fse, rimraf } from 'tnp-core/src';
 import { glob, crossPlatformPath } from 'tnp-core/src';
 import chalk from 'chalk';
 import { Project } from '../abstract/project';
@@ -11,26 +11,32 @@ import { folder_shared_folder_info, tempSourceFolder } from '../../constants';
 import { Models } from '../../models';
 
 export class QuickFixes extends BaseFeatureForProject<Project> {
-
-  updateStanaloneProjectBeforePublishing(project: Project, realCurrentProj: Project, specyficProjectForBuild: Project) {
+  updateStanaloneProjectBeforePublishing(
+    project: Project,
+    realCurrentProj: Project,
+    specyficProjectForBuild: Project,
+  ) {
     if (project.__isStandaloneProject) {
       const distForPublishPath = crossPlatformPath([
         specyficProjectForBuild.location,
         project.__getTempProjName('dist'),
         config.folder.node_modules,
-        project.name
+        project.name,
       ]);
 
       Helpers.remove(`${distForPublishPath}/app*`); // QUICK_FIX
       Helpers.remove(`${distForPublishPath}/tests*`); // QUICK_FIX
       Helpers.remove(`${distForPublishPath}/src`, true); // QUICK_FIX
-      Helpers.writeFile(crossPlatformPath([distForPublishPath, 'src.d.ts']), `
+      Helpers.writeFile(
+        crossPlatformPath([distForPublishPath, 'src.d.ts']),
+        `
 // THIS FILE IS GENERATED
 export * from './lib';
 // THIS FILE IS GENERATED
 // please use command: firedev build:watch to see here links for your globally builded lib code files
 // THIS FILE IS GENERATED
-      `.trimStart());
+      `.trimStart(),
+      );
 
       const pjPath = crossPlatformPath([
         distForPublishPath,
@@ -45,13 +51,16 @@ export * from './lib';
         pj.devDependencies = {};
       }
       Helpers.removeFileIfExists(pjPath);
-      Helpers.writeJson(pjPath, pj)// QUICK_FIX
+      Helpers.writeJson(pjPath, pj); // QUICK_FIX
     }
   }
 
-  updateContainerProjectBeforePublishing(project: Project, realCurrentProj: Project, specyficProjectForBuild: Project) {
+  updateContainerProjectBeforePublishing(
+    project: Project,
+    realCurrentProj: Project,
+    specyficProjectForBuild: Project,
+  ) {
     if (project.__isSmartContainer) {
-
       const base = path.join(
         specyficProjectForBuild.location,
         specyficProjectForBuild.__getTempProjName('dist'),
@@ -65,13 +74,16 @@ export * from './lib';
         //   distReleaseForPublishPath
         // })
         Helpers.remove(`${distReleaseForPublishPath}/src`, true); // QUICK_FIX
-        Helpers.writeFile(crossPlatformPath([distReleaseForPublishPath, 'src.d.ts']), `
+        Helpers.writeFile(
+          crossPlatformPath([distReleaseForPublishPath, 'src.d.ts']),
+          `
   // THIS FILE IS GENERATED
   export * from './index';
   // THIS FILE IS GENERATED
   // please use command: firedev build:watch to see here links for your globally builded lib code files
   // THIS FILE IS GENERATED
-        `.trimStart());
+        `.trimStart(),
+        );
       }
     }
   }
@@ -81,16 +93,17 @@ export * from './lib';
       return;
     }
 
-
-
     (() => {
-      const tsconfigBrowserPath = path.join(this.project.location, 'tsconfig.browser.json');
+      const tsconfigBrowserPath = path.join(
+        this.project.location,
+        'tsconfig.browser.json',
+      );
       const tempDirs = [
         tempSourceFolder(outDir, true, true),
         tempSourceFolder(outDir, false, false),
         tempSourceFolder(outDir, true, false),
         tempSourceFolder(outDir, false, true),
-      ]
+      ];
       tempDirs.forEach(dirName => {
         // console.log(`
 
@@ -100,40 +113,53 @@ export * from './lib';
         const dest = path.join(this.project.location, dirName, 'tsconfig.json');
         Helpers.copyFile(tsconfigBrowserPath, dest);
 
-
-        Helpers.writeJson(crossPlatformPath([this.project.location, dirName, 'tsconfig.spec.json']), {
-          "extends": "./tsconfig.json",
-          "compilerOptions": {
-            "outDir": "./out-tsc/spec",
-            "types": [
-              "jest",
-              "node"
-            ]
+        Helpers.writeJson(
+          crossPlatformPath([
+            this.project.location,
+            dirName,
+            'tsconfig.spec.json',
+          ]),
+          {
+            extends: './tsconfig.json',
+            compilerOptions: {
+              outDir: './out-tsc/spec',
+              types: ['jest', 'node'],
+            },
+            files: ['src/polyfills.ts'],
+            include: [
+              'lib/**/*.spec.ts',
+              'lib/**/*.d.ts',
+              'app/**/*.spec.ts',
+              'app/**/*.d.ts',
+            ],
           },
-          "files": [
-            "src/polyfills.ts"
-          ],
-          "include": [
-            "lib/**/*.spec.ts",
-            "lib/**/*.d.ts",
-            "app/**/*.spec.ts",
-            "app/**/*.d.ts"
-          ]
-        });
+        );
 
-        Helpers.writeFile(crossPlatformPath([this.project.location, dirName, 'jest.config.js']), `
+        Helpers.writeFile(
+          crossPlatformPath([this.project.location, dirName, 'jest.config.js']),
+          `
 module.exports = {
 preset: "jest-preset-angular",
 setupFilesAfterEnv: ["<rootDir>/setupJest.ts"],
 reporters: ["default", "jest-junit"],
-};`.trim() + '\n');
+};`.trim() + '\n',
+        );
 
-        Helpers.writeFile(crossPlatformPath([this.project.location, dirName, 'setupJest.ts']), `
+        Helpers.writeFile(
+          crossPlatformPath([this.project.location, dirName, 'setupJest.ts']),
+          `
 import 'jest-preset-angular/setup-jest';
 import './jestGlobalMocks';
-`.trim() + '\n');
+`.trim() + '\n',
+        );
 
-        Helpers.writeFile(crossPlatformPath([this.project.location, dirName, 'jestGlobalMocks.ts']), `
+        Helpers.writeFile(
+          crossPlatformPath([
+            this.project.location,
+            dirName,
+            'jestGlobalMocks.ts',
+          ]),
+          `
 Object.defineProperty(window, 'CSS', {value: null});
 Object.defineProperty(document, 'doctype', {
   value: '<!DOCTYPE html>'
@@ -158,13 +184,10 @@ Object.defineProperty(document.body.style, 'transform', {
     };
   },
 });
-`.trim() + '\n');
-
-
-      })
+`.trim() + '\n',
+        );
+      });
     })();
-
-
 
     // const componentsFolder = path.join(this.project.location, config.folder.components)
     // if (fse.existsSync(componentsFolder)) {
@@ -220,30 +243,29 @@ Object.defineProperty(document.body.style, 'transform', {
     // }
   }
 
-
   removeUncessesaryFiles() {
     const filesV1 = [
       'src/tsconfig.packages.json',
       'src/tsconfig.spec.json',
       'src/tsconfig.app.json',
-      '.angular-cli.json'
-    ]
+      '.angular-cli.json',
+    ];
   }
 
   /**
    * TODO QUICK FIX
    * something wrong when minifying cli
    */
-  public async removeTnpFromItself(actionwhenNotInNodeModules: () => {
-
-  }) {
+  public async removeTnpFromItself(actionwhenNotInNodeModules: () => {}) {
     //#region @backend
-    if (!((this.project.name === 'tnp') && this.project.isInCiReleaseProject)) {
+    if (!(this.project.name === 'tnp' && this.project.isInCiReleaseProject)) {
       await Helpers.runSyncOrAsync({
         functionFn: actionwhenNotInNodeModules,
       });
     }
-    const nodeMOdules = crossPlatformPath(path.join(this.project.location, config.folder.node_modules));
+    const nodeMOdules = crossPlatformPath(
+      path.join(this.project.location, config.folder.node_modules),
+    );
     if (Helpers.exists(nodeMOdules)) {
       const folderToMove = crossPlatformPath([
         crossPlatformPath(fse.realpathSync(nodeMOdules)),
@@ -266,21 +288,28 @@ Object.defineProperty(document.body.style, 'transform', {
 
   public missingAngularLibFiles() {
     Helpers.taskStarted(`[quick fixes] missing angular lib fles start`, true);
-    if (this.project.__frameworkVersionAtLeast('v3') && this.project.typeIs('isomorphic-lib')) {
-
+    if (
+      this.project.__frameworkVersionAtLeast('v3') &&
+      this.project.typeIs('isomorphic-lib')
+    ) {
       (() => {
         if (
-          (this.project.__isStandaloneProject && !this.project.__isSmartContainerTarget)
-          || this.project.__isSmartContainerChild
+          (this.project.__isStandaloneProject &&
+            !this.project.__isSmartContainerTarget) ||
+          this.project.__isSmartContainerChild
         ) {
-          const indexTs = crossPlatformPath(path.join(this.project.location, config.folder.src, 'lib/index.ts'));
+          const indexTs = crossPlatformPath(
+            path.join(this.project.location, config.folder.src, 'lib/index.ts'),
+          );
           if (!Helpers.exists(indexTs)) {
-            Helpers.writeFile(indexTs, `
+            Helpers.writeFile(
+              indexTs,
+              `
             export function helloWorldFrom${_.upperFirst(_.camelCase(this.project.name))}() { }
-            `.trimLeft())
+            `.trimLeft(),
+            );
           }
         }
-
       })();
 
       (() => {
@@ -292,15 +321,17 @@ Object.defineProperty(document.body.style, 'transform', {
           folder_shared_folder_info,
         ]);
 
-        Helpers.writeFile(shared_folder_info, `
+        Helpers.writeFile(
+          shared_folder_info,
+          `
 THIS FILE IS GENERATED. THIS FILE IS GENERATED. THIS FILE IS GENERATED.
 
 Assets from this folder are being shipped with this npm package (${this.project.__npmPackageNameAndVersion})
 created from this project.
 
 THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
-          `.trimLeft())
-
+          `.trimLeft(),
+        );
       })();
 
       (() => {
@@ -308,17 +339,19 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
           this.project.location,
           config.folder.src,
           config.folder.migrations,
-          'migrations-info.md'
+          'migrations-info.md',
         ]);
 
-        Helpers.writeFile(shared_folder_info, `
+        Helpers.writeFile(
+          shared_folder_info,
+          `
 THIS FILE IS GENERATED. THIS FILE IS GENERATED. THIS FILE IS GENERATED.
 
 This folder is only for storing migration files with auto-generated names.
 
 THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
-          `.trimLeft())
-
+          `.trimLeft(),
+        );
       })();
 
       (() => {
@@ -326,17 +359,19 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
           this.project.location,
           config.folder.src,
           config.folder.lib,
-          'lib-info.md'
+          'lib-info.md',
         ]);
 
-        Helpers.writeFile(shared_folder_info, `
+        Helpers.writeFile(
+          shared_folder_info,
+          `
 THIS FILE IS GENERATED. THIS FILE IS GENERATED. THIS FILE IS GENERATED.
 
 This folder is an entry point for npm Angular/NodeJS library
 
 THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
-          `.trimLeft())
-
+          `.trimLeft(),
+        );
       })();
 
       (() => {
@@ -347,7 +382,9 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
           'mocha-tests-info.md',
         ]);
 
-        Helpers.writeFile(shared_folder_info, `
+        Helpers.writeFile(
+          shared_folder_info,
+          `
 THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
 
 # Purpose of this folder
@@ -395,18 +432,15 @@ describe('Set name for function or class', () => {
 
 THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
 
-          `.trimLeft())
-
+          `.trimLeft(),
+        );
       })();
-
-
     }
 
-    Helpers.taskDone(`[quick fixes] missing angular lib fles end`)
+    Helpers.taskDone(`[quick fixes] missing angular lib fles end`);
   }
 
   badTypesInNodeModules() {
-
     if (this.project.__frameworkVersionAtLeast('v2')) {
       [
         '@types/prosemirror-*',
@@ -426,7 +460,6 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
     // if (this.project.isVscodeExtension) {
     //   [
 
-
     //   ].forEach(name => {
     //     Helpers.removeFolderIfExists(path.join(this.project.node_modules.path, name));
     //   });
@@ -438,10 +471,16 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
       return;
     }
     missingLibsNames.forEach(missingLibName => {
-      const pathInProjectNodeModules = path.join(this.project.location, config.folder.node_modules, missingLibName)
+      const pathInProjectNodeModules = path.join(
+        this.project.location,
+        config.folder.node_modules,
+        missingLibName,
+      );
       if (fse.existsSync(pathInProjectNodeModules)) {
         if (this.project.__isStandaloneProject) {
-          Helpers.warn(`Package "${missingLibName}" will replaced with empty package mock. ${this.project.genericName}`)
+          Helpers.warn(
+            `Package "${missingLibName}" will replaced with empty package mock. ${this.project.genericName}`,
+          );
         }
       }
       // Helpers.remove(pathInProjectNodeModules);
@@ -449,39 +488,50 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
         Helpers.mkdirp(pathInProjectNodeModules);
       }
 
-      Helpers.writeFile(path.join(pathInProjectNodeModules, 'index.js'), `
+      Helpers.writeFile(
+        path.join(pathInProjectNodeModules, 'index.js'),
+        `
 Object.defineProperty(exports, '__esModule', { value: true });
 exports.default = {};
-`);
-      Helpers.writeFile(path.join(pathInProjectNodeModules, 'index.d.ts'), `
+`,
+      );
+      Helpers.writeFile(
+        path.join(pathInProjectNodeModules, 'index.d.ts'),
+        `
 declare const _default: {};
 export default _default;
-`);
-      Helpers.writeFile(path.join(pathInProjectNodeModules, config.file.package_json), {
-        name: missingLibName,
-        version: "0.0.0"
-      } as Models.IPackageJSON);
-
-    })
+`,
+      );
+      Helpers.writeFile(
+        path.join(pathInProjectNodeModules, config.file.package_json),
+        {
+          name: missingLibName,
+          version: '0.0.0',
+        } as Models.IPackageJSON,
+      );
+    });
   }
 
-
-  public missingSourceFolders() { /// QUCIK_FIX make it more generic
+  public missingSourceFolders() {
+    /// QUCIK_FIX make it more generic
     if (this.project.__frameworkVersionEquals('v1')) {
       return;
     }
-    Helpers.taskStarted(`[quick fixes] missing source folder start`, true)
+    Helpers.taskStarted(`[quick fixes] missing source folder start`, true);
     if (!fse.existsSync(this.project.location)) {
       return;
     }
-    if (this.project.__isStandaloneProject && !this.project.__isSmartContainerTarget) {
+    if (
+      this.project.__isStandaloneProject &&
+      !this.project.__isSmartContainerTarget
+    ) {
       const srcFolder = path.join(this.project.location, config.folder.src);
 
       if (!fse.existsSync(srcFolder)) {
         Helpers.mkdirp(srcFolder);
       }
     }
-    Helpers.taskDone(`[quick fixes] missing source folder end`)
+    Helpers.taskDone(`[quick fixes] missing source folder end`);
   }
 
   public get nodeModulesReplacementsZips() {
@@ -500,26 +550,35 @@ export default _default;
    * This will prevent packages deletion from npm
    */
   public nodeModulesPackagesZipReplacement() {
-    const nodeModulesPath = path.join(this.project.location, config.folder.node_modules);
+    const nodeModulesPath = path.join(
+      this.project.location,
+      config.folder.node_modules,
+    );
 
     if (!fse.existsSync(nodeModulesPath)) {
-      Helpers.mkdirp(nodeModulesPath)
+      Helpers.mkdirp(nodeModulesPath);
     }
     this.nodeModulesReplacementsZips.forEach(p => {
       const name = p.replace(`${config.folder.node_modules}-`, '');
-      const moduleInNodeMdules = path.join(this.project.location, config.folder.node_modules, name);
+      const moduleInNodeMdules = path.join(
+        this.project.location,
+        config.folder.node_modules,
+        name,
+      );
       if (fse.existsSync(moduleInNodeMdules)) {
-        Helpers.info(`Extraction ${chalk.bold(name)} already exists in ` +
-          ` ${chalk.bold(this.project.genericName)}/${config.folder.node_modules}`);
+        Helpers.info(
+          `Extraction ${chalk.bold(name)} already exists in ` +
+            ` ${chalk.bold(this.project.genericName)}/${config.folder.node_modules}`,
+        );
       } else {
-        Helpers.info(`Extraction before instalation ${chalk.bold(name)} in ` +
-          ` ${chalk.bold(this.project.genericName)}/${config.folder.node_modules}`)
+        Helpers.info(
+          `Extraction before instalation ${chalk.bold(name)} in ` +
+            ` ${chalk.bold(this.project.genericName)}/${config.folder.node_modules}`,
+        );
 
-        this.project.run(`extract-zip ${p} ${nodeModulesPath}`).sync()
+        this.project.run(`extract-zip ${p} ${nodeModulesPath}`).sync();
       }
-
     });
   }
-
 }
 //#endregion

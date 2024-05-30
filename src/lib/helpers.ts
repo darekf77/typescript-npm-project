@@ -1,5 +1,4 @@
 export namespace AssetListHelper {
-
   // export enum AssetListRelativePathType {
   //   /**
   //    * 	/src/assets/assets-for/firedev-ui/arnold.png
@@ -15,7 +14,6 @@ export namespace AssetListHelper {
   //    */
   //   FOR_VSCODE = 'FOR_VSCODE',
   // }
-
   // export function transformAbsolute(url: string, type: AssetListRelativePathType): string {
   //   return void 0;
   // }

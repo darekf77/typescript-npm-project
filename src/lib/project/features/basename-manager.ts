@@ -1,6 +1,6 @@
-import { BaseFeatureForProject, Helpers } from "tnp-helpers/src";
-import type { Project } from "../abstract/project";
-import { InitOptions } from "../../../lib/build-options";
+import { BaseFeatureForProject, Helpers } from 'tnp-helpers/src';
+import type { Project } from '../abstract/project';
+import { InitOptions } from '../../../lib/build-options';
 
 /**
  * Base href can be:
@@ -21,7 +21,8 @@ export class AngularFeBasenameManager extends BaseFeatureForProject<Project> {
   private resolveBaseHrefForProj(overrideBaseHref: string) {
     //#region @backendFunc
     let baseHref = this.rootBaseHref;
-    const isSmartContainerTargetNonClient = this.project.__isSmartContainerTargetNonClient;
+    const isSmartContainerTargetNonClient =
+      this.project.__isSmartContainerTargetNonClient;
 
     if (overrideBaseHref === '') {
       if (isSmartContainerTargetNonClient) {
@@ -60,16 +61,16 @@ export class AngularFeBasenameManager extends BaseFeatureForProject<Project> {
 
     // baseHref = baseHref.endsWith('/') ? baseHref : (baseHref + '/');
     // baseHref = baseHref.startsWith('/') ? baseHref : ('/' + baseHref);
-    baseHref = baseHref.replace(/\/\//g, '/')
+    baseHref = baseHref.replace(/\/\//g, '/');
     return baseHref;
     //#endregion
   }
 
-
   replaceBaseHrefInFile(fileAbsPath: string, initOptions: InitOptions) {
     //#region @backendFunc
     let fileContent = Helpers.readFile(fileAbsPath);
-    const frontendBaseHref = this.project.angularFeBasenameManager.getBaseHref(initOptions);
+    const frontendBaseHref =
+      this.project.angularFeBasenameManager.getBaseHref(initOptions);
     fileContent = fileContent.replace(
       '<<<TO_REPLACE_BASENAME>>>',
       frontendBaseHref,
@@ -77,6 +78,4 @@ export class AngularFeBasenameManager extends BaseFeatureForProject<Project> {
     Helpers.writeFile(fileAbsPath, fileContent);
     //#endregion
   }
-
-
 }

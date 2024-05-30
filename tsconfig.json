@@ -4,18 +4,10 @@
     "strictNullChecks": false,
     "rootDir": "./src",
     "paths": {
-      "tnp": [
-        "./src/lib"
-      ],
-      "tnp/*": [
-        "./src/lib/*"
-      ]
+      "tnp": ["./src/lib"],
+      "tnp/*": ["./src/lib/*"]
     }
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "src/assets"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["src/assets"]
 }

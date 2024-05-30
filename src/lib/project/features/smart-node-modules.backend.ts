@@ -1,5 +1,5 @@
 import { crossPlatformPath, _ } from 'tnp-core/src';
-import { path } from 'tnp-core/src'
+import { path } from 'tnp-core/src';
 import chalk from 'chalk';
 import { Project } from '../abstract/project';
 import { Models } from '../../models';
@@ -7,7 +7,7 @@ import { config } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
 import { BaseFeatureForProject } from 'tnp-helpers/src';
 
-export type OverridePacakge = { [name: string]: string | null; };
+export type OverridePacakge = { [name: string]: string | null };
 export type PackageType = Pick<Models.Package, 'name' | 'version'>;
 
 export class SmartNodeModules extends BaseFeatureForProject<Project> {
@@ -23,43 +23,50 @@ export class SmartNodeModules extends BaseFeatureForProject<Project> {
 
     if (destination.__npmPackages.useSmartInstall) {
       (() => {
-        const dest = path.join(this.project.__node_modules.path, destination.name);
+        const dest = path.join(
+          this.project.__node_modules.path,
+          destination.name,
+        );
         Helpers.removeIfExists(dest);
         Helpers.copy(source, dest, {
           copySymlinksAsFiles: true,
           omitFolders: [config.folder.node_modules],
-          omitFoldersBaseFolder: source
+          omitFoldersBaseFolder: source,
         });
       })();
 
       (() => {
-        const dest = path.join(this.project.__smartNodeModules.path, destination.name);
+        const dest = path.join(
+          this.project.__smartNodeModules.path,
+          destination.name,
+        );
         Helpers.removeIfExists(dest);
         Helpers.copy(source, dest, {
           copySymlinksAsFiles: true,
           omitFolders: [config.folder.node_modules],
-          omitFoldersBaseFolder: source
+          omitFoldersBaseFolder: source,
         });
       })();
     } else {
       (() => {
-        const dest = path.join(this.project.__node_modules.path, destination.name);
+        const dest = path.join(
+          this.project.__node_modules.path,
+          destination.name,
+        );
         Helpers.removeIfExists(dest);
         Helpers.copy(source, dest, {
           copySymlinksAsFiles: true,
           omitFolders: [config.folder.node_modules],
-          omitFoldersBaseFolder: source
+          omitFoldersBaseFolder: source,
         });
       })();
     }
-
-
   }
   private static _prepared = {};
 
   public remove = () => {
     Helpers.info(`Removing smart node_modules from ${this.project?.name}`);
-    Helpers.remove(this.path)
+    Helpers.remove(this.path);
   };
 
   //#region getters/private methods
@@ -71,29 +78,31 @@ export class SmartNodeModules extends BaseFeatureForProject<Project> {
       path.dirname(this.project.__smartNodeModules.pathFor(p.name)),
       config.file.package_json,
     );
-    Helpers.removeIfExists(path.dirname(dest))
+    Helpers.removeIfExists(path.dirname(dest));
     Helpers.mkdirp(path.dirname(dest));
     Helpers.writeFile(pj, {
       name: path.basename(path.dirname(dest)),
-      dependencies: { [p.name]: p.version }
+      dependencies: { [p.name]: p.version },
     });
-    return Project.ins.From(path.dirname(this.project.__smartNodeModules.pathFor(p.name)))
+    return Project.ins.From(
+      path.dirname(this.project.__smartNodeModules.pathFor(p.name)),
+    );
   }
   //#endregion
 
   //#region container core project for this project
   private get containerCore() {
-    Helpers.taskStarted('Preparing cointainer core ...', true)
+    Helpers.taskStarted('Preparing cointainer core ...', true);
     const frameworkVersion = this.project.__frameworkVersion;
     const container = Project.by('container', frameworkVersion) as Project;
     if (this.project.location === container?.location) {
-      Helpers.log(`Smart node modules instalation for container core..`)
+      Helpers.log(`Smart node modules instalation for container core..`);
     }
     if (!SmartNodeModules._prepared[container.location]) {
       prepareContainerProject(container, this.project);
     }
     SmartNodeModules._prepared[container.location] = container;
-    Helpers.taskDone('Preparing cointainer core ... done', true)
+    Helpers.taskDone('Preparing cointainer core ... done', true);
     return container;
   }
   //#endregion
@@ -108,24 +117,27 @@ export class SmartNodeModules extends BaseFeatureForProject<Project> {
   //#endregion
 
   //#region resolve smart node_module path
-  private pathFor(packageName?: string) { // TOOD THIS IS CONFUSING
+  private pathFor(packageName?: string) {
+    // TOOD THIS IS CONFUSING
     if (!packageName) {
       packageName = this.project.name;
     }
-    return crossPlatformPath(path.join(
-      this.project.location,
-      `${config.folder.tmp}-smart-${config.folder.node_modules}`,
-      `for`,
-      packageName,
-      config.folder.node_modules,
-    ));
+    return crossPlatformPath(
+      path.join(
+        this.project.location,
+        `${config.folder.tmp}-smart-${config.folder.node_modules}`,
+        `for`,
+        packageName,
+        config.folder.node_modules,
+      ),
+    );
   }
   //#endregion
 
   setToSmartContainer() {
     this.project.__packageJson.data.tnp.type = 'container';
     this.project.__packageJson.data.tnp.smart = true;
-    this.project.__packageJson.save('setting container as smart')
+    this.project.__packageJson.save('setting container as smart');
   }
 
   //#region smart node_modules exists for whole project
@@ -136,12 +148,17 @@ export class SmartNodeModules extends BaseFeatureForProject<Project> {
 
   //#region packages to override after smart node_modules instalation
   private get toOverride(): OverridePacakge {
-    const depsToOverride = (this.project.__packageJson.data?.tnp?.overrided?.dependencies || {});
+    const depsToOverride =
+      this.project.__packageJson.data?.tnp?.overrided?.dependencies || {};
     const keys = Object.keys(depsToOverride);
     for (let index = 0; index < keys.length; index++) {
       const key = keys[index];
       if (key.startsWith('-')) {
-        Helpers.error(`[${config.frameworkName}] Incorrect dependency to override "${chalk.bold(key)}@${depsToOverride[key]}"`, false, true);
+        Helpers.error(
+          `[${config.frameworkName}] Incorrect dependency to override "${chalk.bold(key)}@${depsToOverride[key]}"`,
+          false,
+          true,
+        );
       }
     }
     return depsToOverride;
@@ -150,23 +167,28 @@ export class SmartNodeModules extends BaseFeatureForProject<Project> {
   private handlePackagesOverride() {
     const toOverride = this.toOverride;
 
-    const mainSmartNodeModulesFolder = path.dirname(path.dirname(this.project.__smartNodeModules.path));
+    const mainSmartNodeModulesFolder = path.dirname(
+      path.dirname(this.project.__smartNodeModules.path),
+    );
     Helpers.foldersFrom(mainSmartNodeModulesFolder)
       .filter(f => path.basename(f) !== this.project.name)
       .forEach(f => {
         if (path.dirname(f).startsWith('@')) {
           const orgPackage = `@${crossPlatformPath([path.basename(path.dirname(f)), path.basename(f)])}`;
-          const additonalFolderToRemove = path.join(this.project.__smartNodeModules.pathFor(orgPackage))
+          const additonalFolderToRemove = path.join(
+            this.project.__smartNodeModules.pathFor(orgPackage),
+          );
           Helpers.removeFolderIfExists(additonalFolderToRemove);
         } else {
-          const additonalFolderToRemove = path.join(this.project.__smartNodeModules.pathFor(path.basename(f)))
+          const additonalFolderToRemove = path.join(
+            this.project.__smartNodeModules.pathFor(path.basename(f)),
+          );
           Helpers.removeFolderIfExists(additonalFolderToRemove);
         }
       });
 
     // Helpers.log('OVERRRIDE' + _.keys(toOverride).join('/'))
     _.keys(toOverride).map(packageName => {
-
       //#region excepion for local firedev
 
       const packageVersion = toOverride[packageName];
@@ -174,38 +196,50 @@ export class SmartNodeModules extends BaseFeatureForProject<Project> {
         this.project.__node_modules.remove(packageName);
       } else {
         //#region dedupe from temp before adding to actual node_modules
-        const tempProj = this.project.__smartNodeModules.getAndCreateTempProjForPackage({
-          name: packageName,
-          version: packageVersion
-        });
+        const tempProj =
+          this.project.__smartNodeModules.getAndCreateTempProjForPackage({
+            name: packageName,
+            version: packageVersion,
+          });
         tempProj.__npmPackages.installFromArgs('');
-        const Tnp = (Project.ins.Tnp);
+        const Tnp = Project.ins.Tnp;
         const toDedupe = Tnp.__packageJson.data.tnp.core.dependencies.dedupe;
         toDedupe
           .filter(dedupePkgName => {
             // Helpers.log(`dedupePkgName: ${dedupePkgName}`)
-            return _.isString(dedupePkgName) && !_.keys(toOverride).includes(dedupePkgName)
+            return (
+              _.isString(dedupePkgName) &&
+              !_.keys(toOverride).includes(dedupePkgName)
+            );
           })
           .forEach(dedupePkgName => {
-            const existedVersionInMainNodeModules = this.project.__npmPackages.package(dedupePkgName).version;
+            const existedVersionInMainNodeModules =
+              this.project.__npmPackages.package(dedupePkgName).version;
             if (
               tempProj.__npmPackages.package(dedupePkgName).exists &&
-              tempProj.__npmPackages.package(dedupePkgName).isNotSatisfyBy(existedVersionInMainNodeModules)
+              tempProj.__npmPackages
+                .package(dedupePkgName)
+                .isNotSatisfyBy(existedVersionInMainNodeModules)
             ) {
               const verrrr = tempProj.__npmPackages.package(dedupePkgName);
-              Helpers.warn(`[override package][dedupe "${packageName}"] ${chalk.bold(dedupePkgName)}@${verrrr?.version} won't be satisfy`
-                + ` in this repository by version "${existedVersionInMainNodeModules}"`);
+              Helpers.warn(
+                `[override package][dedupe "${packageName}"] ${chalk.bold(dedupePkgName)}@${verrrr?.version} won't be satisfy` +
+                  ` in this repository by version "${existedVersionInMainNodeModules}"`,
+              );
             }
           });
         tempProj.__node_modules.dedupe(toDedupe);
         //#endregion
         //#region link to main repo
-        const overrideFrom = tempProj.__npmPackages.package(packageName).location;
-        const overrideDest = this.project.__npmPackages.package(packageName).location;
+        const overrideFrom =
+          tempProj.__npmPackages.package(packageName).location;
+        const overrideDest =
+          this.project.__npmPackages.package(packageName).location;
         // console.log(`overrideFrom: ${overrideFrom}`)
         // console.log(`overrideDest: ${overrideDest}`)
         Helpers.removeIfExists(overrideDest);
-        if (Helpers.exists(overrideFrom)) { // TODO quick fix
+        if (Helpers.exists(overrideFrom)) {
+          // TODO quick fix
           Helpers.createSymLink(overrideFrom, overrideDest); // TODO something is causing loop
 
           Helpers.foldersFrom(tempProj.__node_modules.path)
@@ -217,14 +251,18 @@ export class SmartNodeModules extends BaseFeatureForProject<Project> {
               const destProj = this.project.__npmPackages.package(depName);
               if (Helpers.exists(destProj.location)) {
                 if (fromProj.isNotSatisfyBy(destProj.version)) {
-                  Helpers.warn(`
+                  Helpers.warn(
+                    `
 
-                  [override package][link "${packageName}"] ${chalk.bold(depName)}@${verrr} won't be satisfy`
-                    + ` in this repository by version "${destProj.version}"
+                  [override package][link "${packageName}"] ${chalk.bold(depName)}@${verrr} won't be satisfy` +
+                      ` in this repository by version "${destProj.version}"
 
-                    `);
+                    `,
+                  );
                 } else {
-                  Helpers.log(`[override package][link "${packageName}"] copying new package ${chalk.bold(depName)} to main node_modules`)
+                  Helpers.log(
+                    `[override package][link "${packageName}"] copying new package ${chalk.bold(depName)} to main node_modules`,
+                  );
                 }
               } else {
                 Helpers.createSymLink(fromProj.location, destProj.location);
@@ -250,29 +288,36 @@ export class SmartNodeModules extends BaseFeatureForProject<Project> {
   //#endregion
 
   //#region install/reinstall all packages
-  public install(action: 'install' | 'uninstall' = 'install', ...packages: PackageType[]) {
+  public install(
+    action: 'install' | 'uninstall' = 'install',
+    ...packages: PackageType[]
+  ) {
     Helpers.log(`START SMART INSTALL...  for ${this.project.genericName}`);
     if (packages.length > 0) {
       packages.forEach(p => {
-        this.project.__packageJson.data.tnp.overrided.dependencies[p.name] = (action === 'uninstall')
-          ? void 0 : p.version;
+        this.project.__packageJson.data.tnp.overrided.dependencies[p.name] =
+          action === 'uninstall' ? void 0 : p.version;
       });
 
       this.project.__packageJson.save(`save afte smart ${action} of package(s):
-  ${packages.map(p => {
-        return `- ${p.name} @${p.version}`;
-      }).join('\n')}
+  ${packages
+    .map(p => {
+      return `- ${p.name} @${p.version}`;
+    })
+    .join('\n')}
       `);
     }
     const containerCore = this.containerCore;
     if (containerCore.location !== this.project.location) {
       this.project.__node_modules.remove();
       this.project.__node_modules.copyFrom(containerCore, {
-        triggerMsg: 'smart node_modules instalation'
+        triggerMsg: 'smart node_modules instalation',
       });
       this.handlePackagesOverride();
     }
-    Helpers.logSuccess(`npm packages install done for ${this.project.genericName}`);
+    Helpers.logSuccess(
+      `npm packages install done for ${this.project.genericName}`,
+    );
   }
   //#endregion
 
@@ -282,8 +327,13 @@ export class SmartNodeModules extends BaseFeatureForProject<Project> {
 //#region helpers
 
 //#region prepare
-function prepareContainerProject(containerCoreProject: Project, currentProject: Project) {
-  const currentContainerCorePackages = _.cloneDeep(containerCoreProject.__packageJson.dependencies);
+function prepareContainerProject(
+  containerCoreProject: Project,
+  currentProject: Project,
+) {
+  const currentContainerCorePackages = _.cloneDeep(
+    containerCoreProject.__packageJson.dependencies,
+  );
 
   // containerCoreProject.packageJson.save(`prepare for smart node_modules`);
   // const updartedContainerCorePackages = _.cloneDeep(containerCoreProject.packageJson.dependencies);
@@ -291,29 +341,27 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
 
   if (!Helpers.exists(containerCoreProject.__smartNodeModules.path)) {
     Helpers.mkdirp(path.dirname(containerCoreProject.__smartNodeModules.path));
-    [
-      config.file.package_json,
-      config.file.firedev_jsonc,
-    ].forEach(pkgFilename => {
-      const sourcePj = path.join(containerCoreProject.location, pkgFilename);
-      if (Helpers.exists(sourcePj)) {
-        const destPj = path.join(path.dirname(containerCoreProject.__smartNodeModules.path), pkgFilename);
-        Helpers.removeFileIfExists(destPj);
-        Helpers.createSymLink(
-          sourcePj,
-          destPj,
-        );
-      }
-    })
-
+    [config.file.package_json, config.file.firedev_jsonc].forEach(
+      pkgFilename => {
+        const sourcePj = path.join(containerCoreProject.location, pkgFilename);
+        if (Helpers.exists(sourcePj)) {
+          const destPj = path.join(
+            path.dirname(containerCoreProject.__smartNodeModules.path),
+            pkgFilename,
+          );
+          Helpers.removeFileIfExists(destPj);
+          Helpers.createSymLink(sourcePj, destPj);
+        }
+      },
+    );
   }
-  const smartTempContainerCorePackagesProj = Project.ins.From(path.dirname(containerCoreProject.__smartNodeModules.path)) as Project;
+  const smartTempContainerCorePackagesProj = Project.ins.From(
+    path.dirname(containerCoreProject.__smartNodeModules.path),
+  ) as Project;
   // TODO this is not available when moving things
-  const reinstallForceSmartNodeModules = (
-    (
-      containerCoreProject.__isContainerCoreProject && (containerCoreProject.location === currentProject.location)
-    )
-  );
+  const reinstallForceSmartNodeModules =
+    containerCoreProject.__isContainerCoreProject &&
+    containerCoreProject.location === currentProject.location;
   // || packgesHasChanges;
 
   // if (packgesHasChanges) {
@@ -333,12 +381,20 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
   //   `);
   // }
 
-  if (!smartTempContainerCorePackagesProj.__node_modules.exist || reinstallForceSmartNodeModules) {
+  if (
+    !smartTempContainerCorePackagesProj.__node_modules.exist ||
+    reinstallForceSmartNodeModules
+  ) {
     smartTempContainerCorePackagesProj.__npmPackages.installFromArgs('', true);
-    smartTempContainerCorePackagesProj.__node_modules.dedupe({ reason: 'smart temp container dedeupe' }); // TODO QUICK FIX
+    smartTempContainerCorePackagesProj.__node_modules.dedupe({
+      reason: 'smart temp container dedeupe',
+    }); // TODO QUICK FIX
   }
 
-  if (!reinstallForceSmartNodeModules && containerCoreProject.__node_modules.exist) {
+  if (
+    !reinstallForceSmartNodeModules &&
+    containerCoreProject.__node_modules.exist
+  ) {
     Helpers.log(`
 
     No need for update of node_modules links for ${chalk.bold(containerCoreProject.genericName)}
@@ -346,18 +402,26 @@ function prepareContainerProject(containerCoreProject: Project, currentProject: 
     `);
     return;
   }
-  Helpers.actionWrapper(() => {
-    const folders = Helpers.foldersFrom(smartTempContainerCorePackagesProj.__node_modules.path);
-    folders.forEach(from => {
-      // Helpers.info(`linking from smart to node_modules: ${path.dirname(from).startsWith('@')
-      //   ? from.split('/').slice(-2).join('/')
-      //   : from.split('/').slice(-1).join('/')
-      //   }`)
-      const dest = path.join(containerCoreProject.__node_modules.path, path.basename(from));
-      Helpers.remove(dest, true);
-      Helpers.createSymLink(from, dest);
-    });
-  }, `updating node_modules links for ${chalk.bold(containerCoreProject.genericName)} `);
+  Helpers.actionWrapper(
+    () => {
+      const folders = Helpers.foldersFrom(
+        smartTempContainerCorePackagesProj.__node_modules.path,
+      );
+      folders.forEach(from => {
+        // Helpers.info(`linking from smart to node_modules: ${path.dirname(from).startsWith('@')
+        //   ? from.split('/').slice(-2).join('/')
+        //   : from.split('/').slice(-1).join('/')
+        //   }`)
+        const dest = path.join(
+          containerCoreProject.__node_modules.path,
+          path.basename(from),
+        );
+        Helpers.remove(dest, true);
+        Helpers.createSymLink(from, dest);
+      });
+    },
+    `updating node_modules links for ${chalk.bold(containerCoreProject.genericName)} `,
+  );
 }
 //#endregion
 

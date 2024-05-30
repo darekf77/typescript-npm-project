@@ -10,7 +10,7 @@ import { Helpers } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
 //#endregion
 
-const noTrace = (global.hideLog && config.frameworkName === 'firedev');
+const noTrace = global.hideLog && config.frameworkName === 'firedev';
 const showNpmCommandOutput = !noTrace;
 
 export function resolvePacakgesFromArgs(args: string[]): Models.Package[] {
@@ -25,28 +25,26 @@ export function resolvePacakgesFromArgs(args: string[]): Models.Package[] {
       if (p.endsWith('@')) {
         p = `${p}latest`;
       }
-      const res = Helpers.npm.checkValidNpmPackageName(p)
+      const res = Helpers.npm.checkValidNpmPackageName(p);
       if (!res) {
-        Helpers.error(`Invalid package to install: "${p}"`, true, true)
+        Helpers.error(`Invalid package to install: "${p}"`, true, true);
       }
       return res;
     })
     .map(p => {
       if (!~p.search('@')) {
-        return { name: p, installType }
+        return { name: p, installType };
       }
       if (p.endsWith('@')) {
         p = `${p}latest`;
       }
-      const isOrg = p.startsWith('@')
-      const [name, version] = (isOrg ? p.slice(1) : p).split('@')
-      return { name: isOrg ? `@${name}` : name, version, installType }
-    })
+      const isOrg = p.startsWith('@');
+      const [name, version] = (isOrg ? p.slice(1) : p).split('@');
+      return { name: isOrg ? `@${name}` : name, version, installType };
+    });
 }
 
-
 export function executeCommand(command: string, project: Project) {
-
   Helpers.info(`
 
    ${command} in folder:
@@ -58,40 +56,54 @@ export function executeCommand(command: string, project: Project) {
     Helpers.info(`
     [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]
     This may take a long time (usually 10-15min on 0.5Gb/s internet connection)... more than 1GB to download from npm...
-    `)
+    `);
   }
 
   project.run(command, { output: true, biggerBuffer: true }).sync();
-  Helpers.writeFile([project.__node_modules.path, '.install-date'], moment(new Date()).format('L LTS'))
+  Helpers.writeFile(
+    [project.__node_modules.path, '.install-date'],
+    moment(new Date()).format('L LTS'),
+  );
 }
 
-export function prepareCommand(pkg: Models.Package, remove: boolean, useYarn: boolean, project: Project) {
-  const install = (remove ? 'uninstall' : 'install');
+export function prepareCommand(
+  pkg: Models.Package,
+  remove: boolean,
+  useYarn: boolean,
+  project: Project,
+) {
+  const install = remove ? 'uninstall' : 'install';
   let command = '';
-  const noPackageLock = (project.__isStandaloneProject) ? '--no-package-lock' : '';
+  const noPackageLock = project.__isStandaloneProject
+    ? '--no-package-lock'
+    : '';
 
-  if (useYarn
+  if (
+    useYarn
     // || project.frameworkVersionAtLeast('v3') // yarn sucks
   ) {
     // --ignore-scripts
     // yarn install --prefer-offline
     const argsForFasterInstall = ` --no-audit`;
-    command = `rm yarn.lock && touch yarn.lock && yarn ${pkg ? 'add' : ''} ${pkg ? pkg.name : ''} `
-      + ` ${argsForFasterInstall} `
-      + ` ${(pkg && pkg.installType && pkg.installType === '--save-dev') ? '-dev' : ''} `;
+    command =
+      `rm yarn.lock && touch yarn.lock && yarn ${pkg ? 'add' : ''} ${pkg ? pkg.name : ''} ` +
+      ` ${argsForFasterInstall} ` +
+      ` ${pkg && pkg.installType && pkg.installType === '--save-dev' ? '-dev' : ''} `;
   } else {
     // --no-progress
-    const argsForFasterInstall = `--force --ignore-engines --no-audit `
-      + ` ${noPackageLock} `;
-    command = `npm ${install} ${pkg ? pkg.name : ''} `
-      + ` ${(pkg && pkg.installType) ? pkg.installType : ''} `
-      + ` ${argsForFasterInstall} `;
+    const argsForFasterInstall =
+      `--force --ignore-engines --no-audit ` + ` ${noPackageLock} `;
+    command =
+      `npm ${install} ${pkg ? pkg.name : ''} ` +
+      ` ${pkg && pkg.installType ? pkg.installType : ''} ` +
+      ` ${argsForFasterInstall} `;
   }
   return command;
 }
 
-
-export function fixOptions(options?: Models.ActualNpmInstallOptions): Models.ActualNpmInstallOptions {
+export function fixOptions(
+  options?: Models.ActualNpmInstallOptions,
+): Models.ActualNpmInstallOptions {
   if (_.isNil(options)) {
     options = {} as any;
   }
@@ -108,14 +120,15 @@ export function fixOptions(options?: Models.ActualNpmInstallOptions): Models.Act
     options.pkg = void 0;
   }
   if (_.isUndefined(options.reason)) {
-    options.reason = `Reason not defined`
+    options.reason = `Reason not defined`;
   }
   return options;
 }
 
-
-
-export function fixOptionsNpmInstall(options: Models.NpmInstallOptions, project: Project): Models.NpmInstallOptions {
+export function fixOptionsNpmInstall(
+  options: Models.NpmInstallOptions,
+  project: Project,
+): Models.NpmInstallOptions {
   if (_.isNil(options)) {
     options = {};
   }

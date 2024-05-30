@@ -11,11 +11,13 @@ import type { BuildProcessController } from '../build-process.controller';
  */
 export class BuildProcessBackend {
   //#region initialization
-  public static for(ctrl: BuildProcessController) { return new BuildProcessBackend(ctrl); }
+  public static for(ctrl: BuildProcessController) {
+    return new BuildProcessBackend(ctrl);
+  }
   private get repo() {
     return this.ctrl.repository;
   }
-  private constructor(private ctrl: BuildProcessController) { }
+  private constructor(private ctrl: BuildProcessController) {}
   //#endregion
 
   //#region count entities

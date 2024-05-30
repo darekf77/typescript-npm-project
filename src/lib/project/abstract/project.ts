@@ -6,18 +6,31 @@ import { LibTypeArr } from 'tnp-config/src';
 import { CoreConfig } from 'tnp-core/src';
 import { BuildOptions, InitOptions, ReleaseOptions } from '../../build-options';
 import { Models } from '../../models';
-import { firedevFrameworkName, MESSAGES, firedevRepoPathUserInUserDir, tmpBuildPort, tmpBaseHrefOverwriteRelPath } from '../../constants';
+import {
+  firedevFrameworkName,
+  MESSAGES,
+  firedevRepoPathUserInUserDir,
+  tmpBuildPort,
+  tmpBaseHrefOverwriteRelPath,
+} from '../../constants';
 //#region @backend
 import { fse, json5, os, dateformat } from 'tnp-core/src';
-import { child_process, } from 'tnp-core/src';
+import { child_process } from 'tnp-core/src';
 import { Firedev } from 'firedev/src';
 import * as semver from 'semver';
 import {
-  PackageJSON, QuickFixes,
-  NpmPackages, NodeModules, FilesRecreator, FilesFactory,
+  PackageJSON,
+  QuickFixes,
+  NpmPackages,
+  NodeModules,
+  FilesRecreator,
+  FilesFactory,
   FilesTemplatesBuilder,
-  MochaTestRunner, JestTestRunner, CypressTestRunner,
-  FilesStructure, TargetProject,
+  MochaTestRunner,
+  JestTestRunner,
+  CypressTestRunner,
+  FilesStructure,
+  TargetProject,
   WebpackBackendCompilation,
   LinkedRepos,
   Branding,
@@ -38,18 +51,19 @@ import { LibProjectStandalone } from '../features/lib-project/lib-project-standa
 import { LibProjectSmartContainer } from '../features/lib-project/lib-project-smart-container.backend';
 import { LibProjectVscodeExt } from '../features/lib-project/lib-project-vscode-ext';
 import { chalk } from 'tnp-core';
-import { BuildProcess, BuildProcessController } from '../features/build-process/app/build-process';
+import {
+  BuildProcess,
+  BuildProcessController,
+} from '../features/build-process/app/build-process';
 //#endregion
 import { EnvironmentConfig } from '../features/environment-config/environment-config';
 import { CLI } from 'tnp-cli/src';
 import { AngularFeBasenameManager } from '../features/basename-manager';
 //#endregion
 
-const debugWord = 'Debug/Start'
-
+const debugWord = 'Debug/Start';
 
 export class FiredevProjectResolve extends BaseProjectResolver<Project> {
-
   //#region methods / type from
   typeFrom(location: string) {
     //#region @backendFunc
@@ -82,7 +96,7 @@ export class FiredevProjectResolve extends BaseProjectResolver<Project> {
     let location = locationOfProj.replace(/\/\//g, '/');
 
     if (!_.isString(location)) {
-      Helpers.warn(`[project.from] location is not a string`)
+      Helpers.warn(`[project.from] location is not a string`);
       return;
     }
     if (path.basename(location) === 'dist') {
@@ -91,17 +105,22 @@ export class FiredevProjectResolve extends BaseProjectResolver<Project> {
     location = crossPlatformPath(path.resolve(location));
     if (this.emptyLocations.includes(location)) {
       if (location.search(`/${config.folder.dist}`) === -1) {
-        Helpers.log(`[project.from] empty location ${location}`, 2)
+        Helpers.log(`[project.from] empty location ${location}`, 2);
         return;
       }
     }
 
-    const alreadyExist = this.projects.find(l => l.location.trim() === location.trim());
+    const alreadyExist = this.projects.find(
+      l => l.location.trim() === location.trim(),
+    );
     if (alreadyExist) {
       return alreadyExist as any;
     }
     if (!fse.existsSync(location)) {
-      Helpers.log(`[firedev-helpers][project.from] Cannot find project in location: ${location}`, 1);
+      Helpers.log(
+        `[firedev-helpers][project.from] Cannot find project in location: ${location}`,
+        1,
+      );
       this.emptyLocations.push(location);
       return;
     }
@@ -131,26 +150,41 @@ export class FiredevProjectResolve extends BaseProjectResolver<Project> {
   //#region methods / nearest to
   nearestTo<T = Project>(
     absoluteLocation: string,
-    options?: { type?: CoreModels.LibType; findGitRoot?: boolean; onlyOutSideNodeModules?: boolean }): T {
+    options?: {
+      type?: CoreModels.LibType;
+      findGitRoot?: boolean;
+      onlyOutSideNodeModules?: boolean;
+    },
+  ): T {
     //#region @backendFunc
 
     options = options || {};
     const { type, findGitRoot, onlyOutSideNodeModules } = options;
 
     if (_.isString(type) && !LibTypeArr.includes(type)) {
-      Helpers.error(`[firedev-helpers][project.nearestTo] wrong type: ${type}`, false, true)
+      Helpers.error(
+        `[firedev-helpers][project.nearestTo] wrong type: ${type}`,
+        false,
+        true,
+      );
     }
     if (fse.existsSync(absoluteLocation)) {
       absoluteLocation = fse.realpathSync(absoluteLocation);
     }
-    if (fse.existsSync(absoluteLocation) && !fse.lstatSync(absoluteLocation).isDirectory()) {
+    if (
+      fse.existsSync(absoluteLocation) &&
+      !fse.lstatSync(absoluteLocation).isDirectory()
+    ) {
       absoluteLocation = path.dirname(absoluteLocation);
     }
 
     let project: Project;
     let previousLocation: string;
     while (true) {
-      if (onlyOutSideNodeModules && (path.basename(path.dirname(absoluteLocation)) === 'node_modules')) {
+      if (
+        onlyOutSideNodeModules &&
+        path.basename(path.dirname(absoluteLocation)) === 'node_modules'
+      ) {
         absoluteLocation = path.dirname(path.dirname(absoluteLocation));
       }
       project = this.From(absoluteLocation);
@@ -182,7 +216,10 @@ export class FiredevProjectResolve extends BaseProjectResolver<Project> {
         return;
       }
       absoluteLocation = crossPlatformPath(path.resolve(newAbsLocation));
-      if (!fse.existsSync(absoluteLocation) && absoluteLocation.split('/').length < 2) {
+      if (
+        !fse.existsSync(absoluteLocation) &&
+        absoluteLocation.split('/').length < 2
+      ) {
         return;
       }
       if (previousLocation === absoluteLocation) {
@@ -198,9 +235,14 @@ export class FiredevProjectResolve extends BaseProjectResolver<Project> {
   get Tnp(): Project {
     //#region @backendFunc
     let tnpPorject = this.From(config.dirnameForTnp);
-    Helpers.log(`Using ${config.frameworkName} path: ${config.dirnameForTnp}`, 1)
+    Helpers.log(
+      `Using ${config.frameworkName} path: ${config.dirnameForTnp}`,
+      1,
+    );
     if (!tnpPorject && !global.globalSystemToolMode) {
-      Helpers.error(`Not able to find tnp project in "${config.dirnameForTnp}".`)
+      Helpers.error(
+        `Not able to find tnp project in "${config.dirnameForTnp}".`,
+      );
     }
     return tnpPorject;
     //#endregion
@@ -208,9 +250,7 @@ export class FiredevProjectResolve extends BaseProjectResolver<Project> {
   //#endregion
 }
 
-export class Project extends BaseProject<Project, CoreModels.LibType>
-{
-
+export class Project extends BaseProject<Project, CoreModels.LibType> {
   //#region static
 
   //#region static / instace of resolve
@@ -221,12 +261,14 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
 
   private static get projectsInUserFolder() {
     //#region @backendFunc
-    const projectsInUserFolder = crossPlatformPath(path.join(
-      crossPlatformPath(os.homedir()),
-      '.firedev',
-      firedevFrameworkName,
-      'projects',
-    ));
+    const projectsInUserFolder = crossPlatformPath(
+      path.join(
+        crossPlatformPath(os.homedir()),
+        '.firedev',
+        firedevFrameworkName,
+        'projects',
+      ),
+    );
     return projectsInUserFolder;
     //#endregion
   }
@@ -236,50 +278,78 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
     const cwd = firedevRepoPathUserInUserDir;
     Helpers.info(`Syncing... Fetching git data... `);
     try {
-      Helpers.run(`git reset --hard && git clean -df && git fetch`, { cwd, output: false }).sync();
+      Helpers.run(`git reset --hard && git clean -df && git fetch`, {
+        cwd,
+        output: false,
+      }).sync();
     } catch (error) {
-      Helpers.error(`[${config.frameworkName} Not able to reset origin of firedev repo: ${config.urlRepoFiredev} in: ${cwd}`, false, true);
+      Helpers.error(
+        `[${config.frameworkName} Not able to reset origin of firedev repo: ${config.urlRepoFiredev} in: ${cwd}`,
+        false,
+        true,
+      );
     }
 
     try {
       Helpers.run(`git checkout master`, { cwd, output: false }).sync();
-      Helpers.log('DONE CHECKING OUT MASTER')
+      Helpers.log('DONE CHECKING OUT MASTER');
     } catch (error) {
-      Helpers.log(error)
-      Helpers.error(`[${config.frameworkName} Not able to checkout master branch for :${config.urlRepoFiredev} in: ${cwd}`, false, true);
+      Helpers.log(error);
+      Helpers.error(
+        `[${config.frameworkName} Not able to checkout master branch for :${config.urlRepoFiredev} in: ${cwd}`,
+        false,
+        true,
+      );
     }
 
     try {
-      Helpers.run(`git pull --tags origin master`, { cwd, output: false }).sync();
-      Helpers.log('DONE PULLING MASTER')
+      Helpers.run(`git pull --tags origin master`, {
+        cwd,
+        output: false,
+      }).sync();
+      Helpers.log('DONE PULLING MASTER');
     } catch (error) {
-      Helpers.log(error)
-      Helpers.error(`[${config.frameworkName} Not able to pull master branch for :${config.urlRepoFiredev} in: ${cwd}`, false, true);
+      Helpers.log(error);
+      Helpers.error(
+        `[${config.frameworkName} Not able to pull master branch for :${config.urlRepoFiredev} in: ${cwd}`,
+        false,
+        true,
+      );
     }
-
 
     // TODO  SPLIT TO SEPARATED CONTAINERS
     const tagToCheckout = Project.morphiTagToCheckoutForCurrentCliVersion(cwd);
     const currentBranch = Helpers.git.currentBranchName(cwd);
-    Helpers.taskStarted(`Checking out lastest tag ${tagToCheckout} for firedev framework...`);
+    Helpers.taskStarted(
+      `Checking out lastest tag ${tagToCheckout} for firedev framework...`,
+    );
     if (currentBranch !== tagToCheckout) {
       try {
-        Helpers.run(`git reset --hard && git clean -df && git checkout ${tagToCheckout}`, { cwd }).sync()
+        Helpers.run(
+          `git reset --hard && git clean -df && git checkout ${tagToCheckout}`,
+          { cwd },
+        ).sync();
       } catch (error) {
-        console.log(error)
-        Helpers.warn(`[${config.frameworkName} Not ablt to checkout latest tag of firedev framework: ${config.urlRepoFiredev} in: ${cwd}`, false);
+        console.log(error);
+        Helpers.warn(
+          `[${config.frameworkName} Not ablt to checkout latest tag of firedev framework: ${config.urlRepoFiredev} in: ${cwd}`,
+          false,
+        );
       }
     }
     try {
-      Helpers.run(`git pull origin ${tagToCheckout}`, { cwd }).sync()
+      Helpers.run(`git pull origin ${tagToCheckout}`, { cwd }).sync();
     } catch (error) {
-      console.log(error)
-      Helpers.warn(`[${config.frameworkName} Not ablt to pull latest tag of firedev framework: ${config.urlRepoFiredev} in: ${cwd}`, false);
+      console.log(error);
+      Helpers.warn(
+        `[${config.frameworkName} Not ablt to pull latest tag of firedev framework: ${config.urlRepoFiredev} in: ${cwd}`,
+        false,
+      );
     }
 
     try {
       Helpers.run('rimraf .vscode', { cwd }).sync();
-    } catch (error) { }
+    } catch (error) {}
 
     Project.reinstallActiveFrameworkContainers();
 
@@ -288,15 +358,24 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   }
   private static reinstallActiveFrameworkContainers() {
     for (const ver of config.activeFramewrokVersions) {
-      const nodeModulesForContainer = crossPlatformPath([firedevRepoPathUserInUserDir, `projects/container-${ver}`]);
-      Helpers.run(`${config.frameworkName} reinstall --skipCoreCheck`, { cwd: nodeModulesForContainer }).sync();
+      const nodeModulesForContainer = crossPlatformPath([
+        firedevRepoPathUserInUserDir,
+        `projects/container-${ver}`,
+      ]);
+      Helpers.run(`${config.frameworkName} reinstall --skipCoreCheck`, {
+        cwd: nodeModulesForContainer,
+      }).sync();
       Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
     }
   }
 
   private static get nodeModulesInstalledForCoreContainer(): boolean {
     for (const ver of config.activeFramewrokVersions) {
-      const nodeModulesForContainer = crossPlatformPath([firedevRepoPathUserInUserDir, `projects/container-${ver}`, config.folder.node_modules]);
+      const nodeModulesForContainer = crossPlatformPath([
+        firedevRepoPathUserInUserDir,
+        `projects/container-${ver}`,
+        config.folder.node_modules,
+      ]);
       if (!Helpers.exists(nodeModulesForContainer)) {
         return false;
       }
@@ -304,16 +383,20 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
     return true;
   }
 
-
   public static initialCheck() {
     //#region @backendFunc
     if (this.hasResolveCoreDepsAndFolder) {
       return;
     }
-    const morhiVscode = crossPlatformPath([path.dirname(firedevRepoPathUserInUserDir), 'firedev/.vscode']);
+    const morhiVscode = crossPlatformPath([
+      path.dirname(firedevRepoPathUserInUserDir),
+      'firedev/.vscode',
+    ]);
 
-    if (!fse.existsSync(firedevRepoPathUserInUserDir) && !global.skipCoreCheck) {
-
+    if (
+      !fse.existsSync(firedevRepoPathUserInUserDir) &&
+      !global.skipCoreCheck
+    ) {
       if (!fse.existsSync(path.dirname(firedevRepoPathUserInUserDir))) {
         fse.mkdirpSync(path.dirname(firedevRepoPathUserInUserDir));
       }
@@ -321,9 +404,16 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       CLI.installEnvironment(config.required);
 
       try {
-        child_process.execSync(`${config.frameworkName} env:install --skipCoreCheck`, { stdio: [0, 1, 2] })
+        child_process.execSync(
+          `${config.frameworkName} env:install --skipCoreCheck`,
+          { stdio: [0, 1, 2] },
+        );
       } catch (error) {
-        Helpers.error(`[${config.frameworkName}][config] Not able to install local global environment`, false, true);
+        Helpers.error(
+          `[${config.frameworkName}][config] Not able to install local global environment`,
+          false,
+          true,
+        );
       }
 
       try {
@@ -333,16 +423,27 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
         });
         Helpers.remove(morhiVscode);
       } catch (error) {
-        Helpers.error(`[${config.frameworkName}][config] Not able to clone repository: ${config.urlRepoFiredev} in:
-       ${firedevRepoPathUserInUserDir}`, false, true);
+        Helpers.error(
+          `[${config.frameworkName}][config] Not able to clone repository: ${config.urlRepoFiredev} in:
+       ${firedevRepoPathUserInUserDir}`,
+          false,
+          true,
+        );
       }
 
       try {
-        child_process.execSync(`${config.frameworkName} init:core --skipCoreCheck`, {
-          stdio: [0, 1, 2]
-        });
+        child_process.execSync(
+          `${config.frameworkName} init:core --skipCoreCheck`,
+          {
+            stdio: [0, 1, 2],
+          },
+        );
       } catch (error) {
-        Helpers.error(`[${config.frameworkName}][config] Not able init core project`, false, true);
+        Helpers.error(
+          `[${config.frameworkName}][config] Not able init core project`,
+          false,
+          true,
+        );
       }
 
       this.sync();
@@ -350,7 +451,11 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       this.hasResolveCoreDepsAndFolder = true;
     }
 
-    if (!this.nodeModulesInstalledForCoreContainer && (config.frameworkName === 'firedev') && !global.skipCoreCheck) {
+    if (
+      !this.nodeModulesInstalledForCoreContainer &&
+      config.frameworkName === 'firedev' &&
+      !global.skipCoreCheck
+    ) {
       Project.reinstallActiveFrameworkContainers();
     }
     //#endregion
@@ -360,11 +465,14 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
     //#region @backendFunc
     // console.log('pathResolved', partOfPath);
 
-    if (global['frameworkName'] && global['frameworkName'] === firedevFrameworkName) {
+    if (
+      global['frameworkName'] &&
+      global['frameworkName'] === firedevFrameworkName
+    ) {
       const joined = partOfPath.join('/');
 
       let pathResult = joined.replace(
-        (config.dirnameForTnp + '/' + this.firedevProjectsRelative),
+        config.dirnameForTnp + '/' + this.firedevProjectsRelative,
         this.projectsInUserFolder,
       );
 
@@ -378,23 +486,35 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
 
   private static get firedevProjectsRelative() {
     return `../firedev/projects`;
-  };
+  }
 
-  private static resolveCoreProjectsPathes(version?: CoreModels.FrameworkVersion) {
+  private static resolveCoreProjectsPathes(
+    version?: CoreModels.FrameworkVersion,
+  ) {
     //#region @backendFunc
 
-    version = (!version || version === 'v1') ? '' : `-${version}` as any;
+    version = !version || version === 'v1' ? '' : (`-${version}` as any);
     const result = {
-      container: this.pathResolved(config.dirnameForTnp, `${this.firedevProjectsRelative}/container${version}`),
+      container: this.pathResolved(
+        config.dirnameForTnp,
+        `${this.firedevProjectsRelative}/container${version}`,
+      ),
       projectByType: (libType: CoreModels.NewFactoryType) => {
         if (libType === 'vscode-ext') {
-          if (version === '' as any) { // TODO current version handle somehow
-            version = '-' + config.defaultFrameworkVersion as any;
+          if (version === ('' as any)) {
+            // TODO current version handle somehow
+            version = ('-' + config.defaultFrameworkVersion) as any;
           }
-          return this.pathResolved(config.dirnameForTnp, `${this.firedevProjectsRelative}/container${version}/${libType}${version}`);
+          return this.pathResolved(
+            config.dirnameForTnp,
+            `${this.firedevProjectsRelative}/container${version}/${libType}${version}`,
+          );
         }
-        return this.pathResolved(config.dirnameForTnp, `${this.firedevProjectsRelative}/container${version}/${libType}${version}`);
-      }
+        return this.pathResolved(
+          config.dirnameForTnp,
+          `${this.firedevProjectsRelative}/container${version}/${libType}${version}`,
+        );
+      },
     };
     return result;
     //#endregion
@@ -403,9 +523,8 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   //#region static / by
   public static by(
     libraryType: CoreModels.NewFactoryType,
-    version: CoreModels.FrameworkVersion
-      //#region @backend
-      = config.defaultFrameworkVersion
+    //#region @backend
+    version: CoreModels.FrameworkVersion = config.defaultFrameworkVersion,
     //#endregion
   ): Project {
     //#region @backendFunc
@@ -416,15 +535,20 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       return containerProject as any;
     }
 
-    const projectPath = this.resolveCoreProjectsPathes(version).projectByType(libraryType);
+    const projectPath =
+      this.resolveCoreProjectsPathes(version).projectByType(libraryType);
     if (!fse.existsSync(projectPath)) {
-      Helpers.error(`
+      Helpers.error(
+        `
      ${projectPath}
      ${projectPath.replace(/\//g, '\\\\')}
      ${crossPlatformPath(projectPath)}
      [firedev-helpers] Bad library type "${libraryType}" for this framework version "${version}"
 
-     `, false, false);
+     `,
+        false,
+        false,
+      );
     }
     return this.ins.From(projectPath);
     //#endregion
@@ -434,8 +558,10 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   //#region static / angular major version for current cli
   static angularMajorVersionForCurrentCli(): number {
     //#region @backendFunc
-    const tnp = (Project.ins.Tnp);
-    const angularFrameworkVersion = Number(_.first(tnp.version.replace('v', '').split('.')));
+    const tnp = Project.ins.Tnp;
+    const angularFrameworkVersion = Number(
+      _.first(tnp.version.replace('v', '').split('.')),
+    );
     return angularFrameworkVersion;
     //#endregion
   }
@@ -445,13 +571,13 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   static morphiTagToCheckoutForCurrentCliVersion(cwd: string): string {
     //#region @backendFunc
     const ngVer = Project.angularMajorVersionForCurrentCli();
-    const lastTagForVer = (Project.ins.From(cwd) as Project).git.lastTagNameForMajorVersion(ngVer);
+    const lastTagForVer = (
+      Project.ins.From(cwd) as Project
+    ).git.lastTagNameForMajorVersion(ngVer);
     return lastTagForVer;
     //#endregion
   }
   //#endregion
-
-
 
   //#endregion
 
@@ -502,7 +628,8 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
    */
   constructor(location?: string) {
     super(crossPlatformPath(_.isString(location) ? location : ''));
-    if (!global.codePurposeBrowser) { // TODO when on weird on node 12
+    if (!global.codePurposeBrowser) {
+      // TODO when on weird on node 12
 
       this.__packageJson = PackageJSON.fromProject(this);
       this.setType(this.__packageJson ? this.__packageJson.type : 'unknow');
@@ -512,7 +639,10 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       this.defineProperty<Project>('__npmPackages', NpmPackages);
       this.defineProperty<Project>('__recreate', FilesRecreator);
       this.defineProperty<Project>('__filesFactory', FilesFactory);
-      this.defineProperty<Project>('__filesTemplatesBuilder', FilesTemplatesBuilder);
+      this.defineProperty<Project>(
+        '__filesTemplatesBuilder',
+        FilesTemplatesBuilder,
+      );
       // console.log({
       //   MochaTestRunner, JestTestRunner, CypressTestRunner,
       // })
@@ -522,25 +652,36 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       Project.ins.add(this);
       this.defineProperty<Project>('__env', EnvironmentConfig);
       this.defineProperty<Project>('__copyManager', CopyManager, {
-        customInstanceReturn: () => CopyManager.for(this)
+        customInstanceReturn: () => CopyManager.for(this),
       });
       this.defineProperty<Project>('__filesStructure', FilesStructure);
       this.defineProperty<Project>('__targetProjects', TargetProject);
       this.defineProperty<Project>('__smartNodeModules', SmartNodeModules);
       this.defineProperty<Project>('__insideStructure', InsideStructures);
       this.defineProperty<Project>('__singluarBuild', SingularBuild);
-      this.defineProperty<Project>('__webpackBackendBuild', WebpackBackendCompilation);
+      this.defineProperty<Project>(
+        '__webpackBackendBuild',
+        WebpackBackendCompilation,
+      );
       this.defineProperty<Project>('__linkedRepos', LinkedRepos);
       this.defineProperty<Project>('__branding', Branding);
       this.defineProperty<Project>('__docsAppBuild', DocsAppBuildConfig);
       this.defineProperty<Project>('__assetsManager', AssetsManager);
-      this.defineProperty<Project>('__assetsFileListGenerator', AssetsFileListGenerator);
+      this.defineProperty<Project>(
+        '__assetsFileListGenerator',
+        AssetsFileListGenerator,
+      );
       this.defineProperty<Project>('__libStandalone', LibProjectStandalone);
-      this.defineProperty<Project>('__libSmartcontainer', LibProjectSmartContainer);
+      this.defineProperty<Project>(
+        '__libSmartcontainer',
+        LibProjectSmartContainer,
+      );
       this.defineProperty<Project>('__libVscodext', LibProjectVscodeExt);
-      this.defineProperty<Project>('angularFeBasenameManager', AngularFeBasenameManager);
+      this.defineProperty<Project>(
+        'angularFeBasenameManager',
+        AngularFeBasenameManager,
+      );
     }
-
   }
   //#endregion
   //#endregion
@@ -565,7 +706,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
    */
   public get ins(): FiredevProjectResolve {
     return Project.ins;
-  };
+  }
   //#endregion
 
   //#region getters & methods / children
@@ -576,9 +717,11 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
     //#region @backendFunc
     if (this.pathExists('taon.json')) {
       const taonChildren = Helpers.foldersFrom(this.location)
-        .filter(f => !f.startsWith('.') && ![
-          config.folder.node_modules,
-        ].includes(path.basename(f)))
+        .filter(
+          f =>
+            !f.startsWith('.') &&
+            ![config.folder.node_modules].includes(path.basename(f)),
+        )
         .map(f => Project.ins.From(f) as Project)
         .filter(f => !!f);
       // console.log({
@@ -638,7 +781,11 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   }
 
   automaticallyAddAllChnagesWhenPushingToGit() {
-    return this.__isContainer || this.__isStandaloneProject || this?.parent?.__isContainer;
+    return (
+      this.__isContainer ||
+      this.__isStandaloneProject ||
+      this?.parent?.__isContainer
+    );
   }
 
   //#region getters & methods / use git branches when commting and pushing
@@ -662,7 +809,10 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   //#region getters & methods / get standalone normal app port
   get __standaloneNormalAppPort() {
     //#region @backendFunc
-    return PortUtils.instance(this.__projectInfoPort).calculateClientPortFor(this, { websql: false })
+    return PortUtils.instance(this.__projectInfoPort).calculateClientPortFor(
+      this,
+      { websql: false },
+    );
     //#endregion
   }
   //#endregion
@@ -670,7 +820,10 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   //#region getters & methods / get standalone websql app port
   get __standaloneWebsqlAppPort() {
     //#region @backendFunc
-    return PortUtils.instance(this.__projectInfoPort).calculateClientPortFor(this, { websql: true })
+    return PortUtils.instance(this.__projectInfoPort).calculateClientPortFor(
+      this,
+      { websql: true },
+    );
     //#endregion
   }
   //#endregion
@@ -688,9 +841,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       return [];
     }
     return this.children.filter(c => {
-      return c.typeIs(...([
-        'isomorphic-lib'
-      ] as CoreModels.LibType[]));
+      return c.typeIs(...(['isomorphic-lib'] as CoreModels.LibType[]));
     });
     //#endregion
   }
@@ -699,7 +850,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   //#region getters & methods / add sources from core
   __addSourcesFromCore() {
     //#region @backend
-    const corePath = Project.by(this.type, this.__frameworkVersion).location
+    const corePath = Project.by(this.type, this.__frameworkVersion).location;
 
     const srcInCore = path.join(corePath, config.folder.src);
     const srcForStandAloenInCore = path.join(corePath, this.__forStandAloneSrc);
@@ -712,7 +863,10 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
     }
 
     if (Helpers.exists(srcForStandAloenInCore)) {
-      Helpers.copy(srcForStandAloenInCore, destForStandalone, { recursive: true, overwrite: true });
+      Helpers.copy(srcForStandAloenInCore, destForStandalone, {
+        recursive: true,
+        overwrite: true,
+      });
     }
     //#endregion
   }
@@ -726,7 +880,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
     Helpers.removeFolderIfExists(orgSource);
     const standalone = path.join(this.location, this.__forStandAloneSrc);
     if (Helpers.exists(standalone)) {
-      Helpers.move(standalone, orgSource)
+      Helpers.move(standalone, orgSource);
     }
     //#endregion
   }
@@ -746,9 +900,13 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   //#endregion
 
   //#region getters & methods / clear
-  public async clear(options: { recrusive?: boolean, resetOnly?: boolean; } = {}) {
+  public async clear(
+    options: { recrusive?: boolean; resetOnly?: boolean } = {},
+  ) {
     //#region @backend
-    Helpers.removeIfExists(path.join(this.location, config.file.tnpEnvironment_json));
+    Helpers.removeIfExists(
+      path.join(this.location, config.file.tnpEnvironment_json),
+    );
     const { recrusive, resetOnly } = options || {};
     if (this.typeIs('unknow')) {
       return;
@@ -762,10 +920,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
           this.__smartNodeModules.remove();
           break;
         } catch (error) {
-          Helpers.pressKeyAndContinue(MESSAGES.SHUT_DOWN_FOLDERS_AND_DEBUGGERS)
+          Helpers.pressKeyAndContinue(MESSAGES.SHUT_DOWN_FOLDERS_AND_DEBUGGERS);
         }
       }
-
     }
 
     Helpers.remove(crossPlatformPath([this.location, 'tmp-*']));
@@ -782,7 +939,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
 
     this.__removeRecognizedIsomorphicLIbs();
     let gitginoredfiles = this.__recreate.filesIgnoredBy.gitignore
-      .map(f => f.startsWith('/') ? f.substr(1) : f)
+      .map(f => (f.startsWith('/') ? f.substr(1) : f))
       .filter(f => {
         if (f.startsWith('tsconfig.') && this.__isTnp) {
           return false;
@@ -794,21 +951,19 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
           return false;
         }
         return true;
-      })
+      });
 
     if (this.__isCoreProject) {
       gitginoredfiles = gitginoredfiles.filter(f => {
-        return [
-          config.folder.node_modules
-        ].map(c => `/${c}`).includes(f);
-      })
+        return [config.folder.node_modules].map(c => `/${c}`).includes(f);
+      });
     }
 
     for (let index = 0; index < gitginoredfiles.length; index++) {
       const head = gitginoredfiles[index].trim();
       const fileOrDirPath = path.join(this.location, head);
       if (!head.startsWith('**')) {
-        Helpers.log(`Removing: "${head}"`)
+        Helpers.log(`Removing: "${head}"`);
         if (process.platform === 'win32') {
           while (true) {
             try {
@@ -816,13 +971,14 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
               break;
             } catch (error) {
               // TODO last notification to user
-              Helpers.pressKeyAndContinue(MESSAGES.SHUT_DOWN_FOLDERS_AND_DEBUGGERS)
+              Helpers.pressKeyAndContinue(
+                MESSAGES.SHUT_DOWN_FOLDERS_AND_DEBUGGERS,
+              );
             }
           }
         } else {
-          Helpers.remove(fileOrDirPath)
+          Helpers.remove(fileOrDirPath);
         }
-
       }
     }
 
@@ -831,15 +987,19 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
     Helpers.remove(`${this.location}/dist`);
 
     this.__clearNodeModulesFromLinks();
-    this.quickFixes.missingSourceFolders()
+    this.quickFixes.missingSourceFolders();
     if (recrusive) {
       for (const child of this.children) {
         await child.clear(options);
       }
       return;
     }
-    const children = this.children.filter(c => (c.typeIs('isomorphic-lib') || c.__isSmartContainer)
-      && c.__frameworkVersionAtLeast('v3') && c.__npmPackages.useSmartInstall);
+    const children = this.children.filter(
+      c =>
+        (c.typeIs('isomorphic-lib') || c.__isSmartContainer) &&
+        c.__frameworkVersionAtLeast('v3') &&
+        c.__npmPackages.useSmartInstall,
+    );
     for (let index = 0; index < children.length; index++) {
       const c = children[index];
       await c.clear(options);
@@ -859,7 +1019,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
     }
     Helpers.log(`Reseting symbolic links from node_mouels..start..`);
     const node_modules = path.join(this.location, config.folder.node_modules);
-    const folders = !fse.existsSync(node_modules) ? [] : fse.readdirSync(node_modules);
+    const folders = !fse.existsSync(node_modules)
+      ? []
+      : fse.readdirSync(node_modules);
     folders
       .map(f => path.join(node_modules, f))
       .filter(f => fse.lstatSync(f).isSymbolicLink())
@@ -881,14 +1043,14 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
     try {
       const pjPath = path.join(this.location, config.file.package_json);
       const pj: Models.IPackageJSON = fse.readJsonSync(pjPath, {
-        encoding: 'utf8'
+        encoding: 'utf8',
       });
       pj[config.array.isomorphicPackages] = void 0;
       fse.writeJsonSync(pjPath, pj, {
         encoding: 'utf8',
-        spaces: 2
+        spaces: 2,
       });
-    } catch (e) { }
+    } catch (e) {}
     //#endregion
   }
   //#endregion
@@ -931,7 +1093,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       //   this.smartContainerTargetParentContainer.name,
       //   this.name,
       // ]
-      result = result.concat(this.__smartContainerTargetParentContainer.parentsNames);
+      result = result.concat(
+        this.__smartContainerTargetParentContainer.parentsNames,
+      );
     } else {
       result = result.concat(this.parentsNames);
     }
@@ -940,7 +1104,10 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       result.push(this.__smartContainerTargetParentContainer.name);
     }
     result.push(this.name);
-    const res = result.filter(f => !!f).join('/').trim()
+    const res = result
+      .filter(f => !!f)
+      .join('/')
+      .trim();
     if (_.isNil(this.cache['genericName'])) {
       this.cache['genericName'] = res;
     }
@@ -956,12 +1123,16 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
   public get name(): string {
     //#region @backendFunc
     if (this.__packageJson && this.typeIs('unknow-npm-project')) {
-      if (this.__packageJson.name !== path.basename(this.location)
-        && path.basename(path.dirname(this.location)) === 'external') {
+      if (
+        this.__packageJson.name !== path.basename(this.location) &&
+        path.basename(path.dirname(this.location)) === 'external'
+      ) {
         return path.basename(this.location);
       }
     }
-    return this.__packageJson ? this.__packageJson.name : path.basename(this.location);
+    return this.__packageJson
+      ? this.__packageJson.name
+      : path.basename(this.location);
     //#endregion
   }
   //#endregion
@@ -985,47 +1156,47 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
       //#region .eslintrc.json
       // https://github.com/angular-eslint/angular-eslint#notes-for-eslint-plugin-prettier-users
       '.eslintrc.json': {
-        "root": true,
-        "ignorePatterns": ["projects/**/*"],
-        "plugins": ["@typescript-eslint"],
-        "overrides": [
+        root: true,
+        ignorePatterns: ['projects/**/*'],
+        plugins: ['@typescript-eslint'],
+        overrides: [
           {
-            "files": ["*.ts"],
-            "parserOptions": {
-              "project": ["tsconfig.json"],
-              "createDefaultProgram": true
+            files: ['*.ts'],
+            parserOptions: {
+              project: ['tsconfig.json'],
+              createDefaultProgram: true,
             },
-            "extends": [
-              "plugin:@angular-eslint/recommended",
-              "plugin:@angular-eslint/template/process-inline-templates",
+            extends: [
+              'plugin:@angular-eslint/recommended',
+              'plugin:@angular-eslint/template/process-inline-templates',
               'prettier',
               // "plugin:prettier/recommended"
             ],
-            "rules": {
-              "@angular-eslint/component-class-suffix": [
-                "warn",
+            rules: {
+              '@angular-eslint/component-class-suffix': [
+                'warn',
                 {
-                  "suffixes": ["Page", "Component"]
-                }
+                  suffixes: ['Page', 'Component'],
+                },
               ],
-              "@angular-eslint/component-selector": [
-                "warn",
+              '@angular-eslint/component-selector': [
+                'warn',
                 {
-                  "type": "element",
-                  "prefix": "app",
-                  "style": "kebab-case"
-                }
+                  type: 'element',
+                  prefix: 'app',
+                  style: 'kebab-case',
+                },
               ],
-              "@angular-eslint/directive-selector": [
-                "warn",
+              '@angular-eslint/directive-selector': [
+                'warn',
                 {
-                  "type": "attribute",
-                  "prefix": "app",
-                  "style": "camelCase"
-                }
+                  type: 'attribute',
+                  prefix: 'app',
+                  style: 'camelCase',
+                },
               ],
-              "@typescript-eslint/member-ordering": 0,
-              "@typescript-eslint/explicit-function-return-type": 0,
+              '@typescript-eslint/member-ordering': 0,
+              '@typescript-eslint/explicit-function-return-type': 0,
               // "no-void": "error",
               // "@typescript-eslint/explicit-function-return-type": "warn",
               // "@typescript-eslint/typedef": [
@@ -1047,25 +1218,25 @@ export class Project extends BaseProject<Project, CoreModels.LibType>
               //     "format": ["camelCase", "PascalCase"]
               //   }
               // ],
-            }
+            },
           },
           // NOTE: WE ARE NOT APPLYING PRETTIER IN THIS OVERRIDE, ONLY @ANGULAR-ESLINT/TEMPLATE
           {
-            "files": ["*.html"],
-            "extends": ["plugin:@angular-eslint/template/recommended"],
-            "rules": {}
+            files: ['*.html'],
+            extends: ['plugin:@angular-eslint/template/recommended'],
+            rules: {},
           },
           // NOTE: WE ARE NOT APPLYING @ANGULAR-ESLINT/TEMPLATE IN THIS OVERRIDE, ONLY PRETTIER
           {
-            "files": ["*.html"],
-            "excludedFiles": ["*inline-template-*.component.html"],
-            "extends": ["plugin:prettier/recommended"],
-            "rules": {
+            files: ['*.html'],
+            excludedFiles: ['*inline-template-*.component.html'],
+            extends: ['plugin:prettier/recommended'],
+            rules: {
               // NOTE: WE ARE OVERRIDING THE DEFAULT CONFIG TO ALWAYS SET THE PARSER TO ANGULAR (SEE BELOW)
-              "prettier/prettier": ["error", { "parser": "angular" }]
-            }
-          }
-        ]
+              'prettier/prettier': ['error', { parser: 'angular' }],
+            },
+          },
+        ],
       },
       //#endregion
       '.prettierignore': `
@@ -1097,15 +1268,15 @@ www
 
       `,
       '.prettierrc': {
-        "tabWidth": 2,
-        "useTabs": false,
-        "singleQuote": true,
-        "semi": true,
-        "bracketSpacing": true,
-        "arrowParens": "avoid",
-        "trailingComma": "all",
-        "bracketSameLine": true,
-        "printWidth": 80
+        tabWidth: 2,
+        useTabs: false,
+        singleQuote: true,
+        semi: true,
+        bracketSpacing: true,
+        arrowParens: 'avoid',
+        trailingComma: 'all',
+        bracketSameLine: true,
+        printWidth: 80,
       },
       '.editorconfig': `
 # Editor configuration, see http://editorconfig.org
@@ -1129,46 +1300,43 @@ trim_trailing_whitespace = false
       //     "prettier/prettier": 2 // Means error
       //   }
       // }
-    }
+    };
 
     const settingsToOverride = {
-      "[typescriptreact]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.formatOnSave": false
+      '[typescriptreact]': {
+        'editor.defaultFormatter': 'esbenp.prettier-vscode',
+        'editor.formatOnSave': false,
       },
-      "[json]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.formatOnSave": false
+      '[json]': {
+        'editor.defaultFormatter': 'esbenp.prettier-vscode',
+        'editor.formatOnSave': false,
       },
-      "[jsonc]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.formatOnSave": false
+      '[jsonc]': {
+        'editor.defaultFormatter': 'esbenp.prettier-vscode',
+        'editor.formatOnSave': false,
       },
-      "[json5]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.formatOnSave": false
+      '[json5]': {
+        'editor.defaultFormatter': 'esbenp.prettier-vscode',
+        'editor.formatOnSave': false,
       },
-      "[scss]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.formatOnSave": false
+      '[scss]': {
+        'editor.defaultFormatter': 'esbenp.prettier-vscode',
+        'editor.formatOnSave': false,
       },
-      "[html]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.formatOnSave": false
+      '[html]': {
+        'editor.defaultFormatter': 'esbenp.prettier-vscode',
+        'editor.formatOnSave': false,
       },
-      "[typescript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.formatOnSave": false
+      '[typescript]': {
+        'editor.defaultFormatter': 'esbenp.prettier-vscode',
+        'editor.formatOnSave': false,
       },
-      "editor.rulers": [
-        80,
-        120
-      ],
-      "eslint.migration.2_x": "off",
-      "eslint.enable": true,
-      "prettier.enable": true,
-      "editor.suggest.snippetsPreventQuickSuggestions": false,
-      "editor.inlineSuggest.enabled": true,
+      'editor.rulers': [80, 120],
+      'eslint.migration.2_x': 'off',
+      'eslint.enable': true,
+      'prettier.enable': true,
+      'editor.suggest.snippetsPreventQuickSuggestions': false,
+      'editor.inlineSuggest.enabled': true,
       'tslint.autoFixOnSave': false,
       'tslint.enable': false,
       'tslint.alwaysShowRuleFailuresAsWarnings': false,
@@ -1178,12 +1346,12 @@ trim_trailing_whitespace = false
       if (this.__isSmartContainerChild) {
         return;
       }
-      this.__recreate.modifyVscode((settings => {
+      this.__recreate.modifyVscode(settings => {
         return {
           ...settings,
-          ...settingsToOverride
-        }
-      }));
+          ...settingsToOverride,
+        };
+      });
       Object.keys(files).forEach(file => {
         this.writeFile(file, files[file]);
       });
@@ -1200,16 +1368,20 @@ trim_trailing_whitespace = false
     }
 
     if (this.__isSmartContainerTarget) {
-      return this.__smartContainerTargetParentContainer.__smartContainerBuildTarget;
+      return this.__smartContainerTargetParentContainer
+        .__smartContainerBuildTarget;
     }
 
     if (!this.__packageJson.smartContainerBuildTarget) {
       if (this.children.length === 1) {
-        this.__packageJson.data.tnp.smartContainerBuildTarget = _.first(this.children).name;
+        this.__packageJson.data.tnp.smartContainerBuildTarget = _.first(
+          this.children,
+        ).name;
       } else {
         if (this.__isSmartContainerChild || this.__isSmartContainer) {
           //#region display update messge for container build
-          Helpers.logError(`
+          Helpers.logError(
+            `
 
  Please specify in your configuration proper ${chalk.bold('smartContainerBuildTarget')}:
 
@@ -1221,11 +1393,15 @@ trim_trailing_whitespace = false
 
 
 
-       `, false, true);
+       `,
+            false,
+            true,
+          );
 
-          Helpers.log(`[singularbuildcontainer] children for build: \n\n${this.children.map(c => c.name)}\n\n`);
+          Helpers.log(
+            `[singularbuildcontainer] children for build: \n\n${this.children.map(c => c.name)}\n\n`,
+          );
           //#endregion
-
         }
       }
     }
@@ -1247,9 +1423,13 @@ trim_trailing_whitespace = false
   //#region getters & methods / is smart container target
   get __isSmartContainerTarget() {
     //#region @backendFunc
-    const folderBefore = path.basename(path.dirname(path.dirname(this.location)));
-    return [config.folder.dist].includes(folderBefore)
-      && this.__smartContainerTargetParentContainer?.__isSmartContainer;
+    const folderBefore = path.basename(
+      path.dirname(path.dirname(this.location)),
+    );
+    return (
+      [config.folder.dist].includes(folderBefore) &&
+      this.__smartContainerTargetParentContainer?.__isSmartContainer
+    );
     //#endregion
   }
   //#endregion
@@ -1261,7 +1441,10 @@ trim_trailing_whitespace = false
   get __isSmartContainerTargetNonClient() {
     //#region @backendFunc
     const parent = this.__smartContainerTargetParentContainer;
-    return !!(parent?.__isSmartContainer && parent.__smartContainerBuildTarget?.name !== this.name);
+    return !!(
+      parent?.__isSmartContainer &&
+      parent.__smartContainerBuildTarget?.name !== this.name
+    );
     //#endregion
   }
   //#endregion
@@ -1269,7 +1452,9 @@ trim_trailing_whitespace = false
   //#region getters & methods / get smart container target partent
   get __smartContainerTargetParentContainer() {
     //#region @backendFunc
-    return Project.ins.From(path.dirname(path.dirname(path.dirname(this.location)))) as Project;
+    return Project.ins.From(
+      path.dirname(path.dirname(path.dirname(this.location))),
+    ) as Project;
     //#endregion
   }
   //#endregion
@@ -1277,11 +1462,13 @@ trim_trailing_whitespace = false
   //#region getters & methods / is smart container
   get __isSmartContainer() {
     //#region @backendFunc
-    return this.__frameworkVersionAtLeast('v3')
-      && this.__packageJson.isSmart
-      && this.__isContainer
-      && !this.__isContainerCoreProject
-      && !this.__isContainerCoreProjectTempProj;
+    return (
+      this.__frameworkVersionAtLeast('v3') &&
+      this.__packageJson.isSmart &&
+      this.__isContainer &&
+      !this.__isContainerCoreProject &&
+      !this.__isContainerCoreProjectTempProj
+    );
     //#endregion
   }
   //#endregion
@@ -1333,7 +1520,8 @@ trim_trailing_whitespace = false
   /**
    * is normal or smart containter
    */
-  get __isContainer() { // TOOD @LAST
+  get __isContainer() {
+    // TOOD @LAST
     //#region @backendFunc
     return this.typeIs('container');
     //#endregion
@@ -1382,7 +1570,7 @@ trim_trailing_whitespace = false
       config.file.tnpEnvironment_json,
       config.folder.bin,
       config.folder._vscode,
-      ...this.__resources
+      ...this.__resources,
     ];
     return resurces;
     //#endregion
@@ -1401,10 +1589,7 @@ trim_trailing_whitespace = false
     if (this.typeIs('unknow')) {
       return false;
     }
-    return (!this.__isContainer
-      && !this.isUnknowNpmProject
-      && !this.__isDocker
-    );
+    return !this.__isContainer && !this.isUnknowNpmProject && !this.__isDocker;
     //#endregion
   }
   //#endregion
@@ -1463,10 +1648,7 @@ trim_trailing_whitespace = false
     let templates = [];
 
     if (this.__isSmartContainer) {
-      templates = [
-        'tsconfig.json.filetemplate',
-        ...templates,
-      ]
+      templates = ['tsconfig.json.filetemplate', ...templates];
     }
 
     if (this.typeIs('isomorphic-lib')) {
@@ -1486,7 +1668,7 @@ trim_trailing_whitespace = false
       }
 
       if (this.__frameworkVersionAtLeast('v3')) {
-        templates = templates.filter(f => !this.__ignoreInV3.includes(f))
+        templates = templates.filter(f => !this.__ignoreInV3.includes(f));
       }
     }
 
@@ -1498,18 +1680,14 @@ trim_trailing_whitespace = false
   //#region getters & methods / project specify files
   __projectSpecyficFiles() {
     //#region @backendFunc
-    let files = [
-      'index.js',
-      'index.d.ts',
-      'index.js.map',
-    ];
+    let files = ['index.js', 'index.d.ts', 'index.js.map'];
 
     if (this.__isSmartContainer) {
       return [
         ...this.__filesTemplates(),
         // 'tsconfig.json',
         // ...this.vscodeFileTemplates,
-      ]
+      ];
     }
 
     if (this.__isContainer) {
@@ -1538,10 +1716,8 @@ trim_trailing_whitespace = false
           'run.js',
           'run-org.js',
           ...this.__filesTemplates(),
-        ]).concat(
-          !this.__isStandaloneProject ? [
-            'src/typings.d.ts',
-          ] : []);
+        ])
+        .concat(!this.__isStandaloneProject ? ['src/typings.d.ts'] : []);
 
       if (this.__frameworkVersionAtLeast('v2')) {
         files = files.filter(f => f !== 'tsconfig.browser.json');
@@ -1569,8 +1745,10 @@ trim_trailing_whitespace = false
     // TODO should be abstract
     return [
       ...this.__filesTemplates(),
-      ...(this.__filesTemplates().map(f => f.replace(`.${config.filesExtensions.filetemplate}`, ''))),
-      ...(this.__projectSpecyficFiles())
+      ...this.__filesTemplates().map(f =>
+        f.replace(`.${config.filesExtensions.filetemplate}`, ''),
+      ),
+      ...this.__projectSpecyficFiles(),
     ];
     //#endregion
   }
@@ -1595,13 +1773,20 @@ trim_trailing_whitespace = false
         location = path.dirname(this.__smartNodeModules.path);
       }
       if (this.__isContainerCoreProjectTempProj) {
-        const origin = Project.ins.From(path.dirname(path.dirname(path.dirname(this.location)))) as Project;
+        const origin = Project.ins.From(
+          path.dirname(path.dirname(path.dirname(this.location))),
+        ) as Project;
         location = path.dirname(origin.__smartNodeModules.path);
       }
 
-      var p = crossPlatformPath(path.join(location, config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES))
+      var p = crossPlatformPath(
+        path.join(location, config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES),
+      );
       if (!fse.existsSync(p)) {
-        PackagesRecognition.fromProject(this as any).start(void 0, '[firedev-projct][getter isomorphic pacakges ]');
+        PackagesRecognition.fromProject(this as any).start(
+          void 0,
+          '[firedev-projct][getter isomorphic pacakges ]',
+        );
       }
       const f = Helpers.readJson(p);
       const arr = f[config.array.isomorphicPackages];
@@ -1614,10 +1799,14 @@ trim_trailing_whitespace = false
     } catch (e) {
       if (global.globalSystemToolMode) {
         Helpers.log(e);
-        Helpers.error(`Erro while reading ismorphic package file: ${p}`, true, true);
+        Helpers.error(
+          `Erro while reading ismorphic package file: ${p}`,
+          true,
+          true,
+        );
       }
       return isomorphicPackagesArr;
-    };
+    }
     //#endregion
   }
   //#endregion
@@ -1633,10 +1822,13 @@ trim_trailing_whitespace = false
   //#region getters & methods / get framework version minus 1
   public get __frameworkVersionMinusOne(): CoreModels.FrameworkVersion {
     //#region @backendFunc
-    const curr = Number(_.isString(this.__frameworkVersion) && this.__frameworkVersion.replace('v', ''))
+    const curr = Number(
+      _.isString(this.__frameworkVersion) &&
+        this.__frameworkVersion.replace('v', ''),
+    );
     if (!isNaN(curr) && curr >= 2) {
       return `v${curr - 1}` as CoreModels.FrameworkVersion;
-    };
+    }
     return 'v1';
     //#endregion
   }
@@ -1646,8 +1838,11 @@ trim_trailing_whitespace = false
   public __frameworkVersionEquals(version: CoreModels.FrameworkVersion) {
     //#region @backendFunc
     const ver = Number(_.isString(version) && version.replace('v', ''));
-    const curr = Number(_.isString(this.__frameworkVersion) && this.__frameworkVersion.replace('v', ''))
-    return !isNaN(ver) && !isNaN(curr) && (curr === ver);
+    const curr = Number(
+      _.isString(this.__frameworkVersion) &&
+        this.__frameworkVersion.replace('v', ''),
+    );
+    return !isNaN(ver) && !isNaN(curr) && curr === ver;
     //#endregion
   }
   //#endregion
@@ -1656,8 +1851,11 @@ trim_trailing_whitespace = false
   public __frameworkVersionAtLeast(version: CoreModels.FrameworkVersion) {
     //#region @backendFunc
     const ver = Number(_.isString(version) && version.replace('v', ''));
-    const curr = Number(_.isString(this.__frameworkVersion) && this.__frameworkVersion.replace('v', ''))
-    return !isNaN(ver) && !isNaN(curr) && (curr >= ver);
+    const curr = Number(
+      _.isString(this.__frameworkVersion) &&
+        this.__frameworkVersion.replace('v', ''),
+    );
+    return !isNaN(ver) && !isNaN(curr) && curr >= ver;
     //#endregion
   }
   //#endregion
@@ -1666,8 +1864,11 @@ trim_trailing_whitespace = false
   public __frameworkVersionLessThan(version: CoreModels.FrameworkVersion) {
     //#region @backendFunc
     const ver = Number(_.isString(version) && version.replace('v', ''));
-    const curr = Number(_.isString(this.__frameworkVersion) && this.__frameworkVersion.replace('v', ''))
-    return !isNaN(ver) && !isNaN(curr) && (curr < ver);
+    const curr = Number(
+      _.isString(this.__frameworkVersion) &&
+        this.__frameworkVersion.replace('v', ''),
+    );
+    return !isNaN(ver) && !isNaN(curr) && curr < ver;
     //#endregion
   }
   //#endregion
@@ -1675,9 +1876,15 @@ trim_trailing_whitespace = false
   //#region getters & methods / is in release dist
   public get isInCiReleaseProject() {
     //#region @backendFunc
-    return this.location.includes(crossPlatformPath([config.folder.tmpDistRelease, config.folder.dist, 'project']));
+    return this.location.includes(
+      crossPlatformPath([
+        config.folder.tmpDistRelease,
+        config.folder.dist,
+        'project',
+      ]),
+    );
     //#endregion
-  };
+  }
   //#endregion
 
   //#region getters & methods / release
@@ -1706,8 +1913,13 @@ trim_trailing_whitespace = false
       global.tnpNonInteractive = true;
     }
 
-    if (!releaseOptions.automaticRelease && automaticReleaseDocs && !this.__docsAppBuild.configExists) {
-      Helpers.error(`To use command:  ${config.frameworkName} automatic:release:docs
+    if (
+      !releaseOptions.automaticRelease &&
+      automaticReleaseDocs &&
+      !this.__docsAppBuild.configExists
+    ) {
+      Helpers.error(
+        `To use command:  ${config.frameworkName} automatic:release:docs
     you have to build manulally your app first....
 
     Try:
@@ -1715,13 +1927,15 @@ trim_trailing_whitespace = false
 
 
 
-    `, false, true)
+    `,
+        false,
+        true,
+      );
     }
 
     if (this.__isSmartContainerChild) {
       Helpers.error(`Smart container not supported yet...`, false, true);
     }
-
 
     // if (!global.tnpNonInteractive) {
     //   Helpers.clearConsole();
@@ -1752,9 +1966,9 @@ trim_trailing_whitespace = false
       //#region container release
 
       //#region resolve deps
-      releaseOptions.resolved = releaseOptions.resolved.filter(f => f.location !== this.location);
-
-
+      releaseOptions.resolved = releaseOptions.resolved.filter(
+        f => f.location !== this.location,
+      );
 
       const depsOnlyToPush = [];
       //#endregion
@@ -1763,27 +1977,27 @@ trim_trailing_whitespace = false
       for (let index = 0; index < releaseOptions.resolved.length; index++) {
         const child = releaseOptions.resolved[index];
 
-
         const lastBuildHash = child.__packageJson.getBuildHash();
         const lastTagHash = child.git.lastTagHash();
         const versionIsOk = !!releaseOptions.specifiedVersion
-          ? child.__frameworkVersionAtLeast(releaseOptions.specifiedVersion as any) : true;
+          ? child.__frameworkVersionAtLeast(
+              releaseOptions.specifiedVersion as any,
+            )
+          : true;
 
-        const shouldRelease = (
-          (!child.__isSmartContainerChild)
-          && versionIsOk
-          && !child.__shouldBeOmmitedInRelease
-          && !child.__targetProjects?.exists
-        );
+        const shouldRelease =
+          !child.__isSmartContainerChild &&
+          versionIsOk &&
+          !child.__shouldBeOmmitedInRelease &&
+          !child.__targetProjects?.exists;
         Helpers.log(`ACTUALL RELEASE ${child.name}: ${shouldRelease}
       lastBuildHash: ${lastBuildHash}
       lastTagHash: ${lastTagHash}
       isPrivate: ${child.__packageJson.isPrivate}
       versionIsOk: ${versionIsOk}
-      `)
+      `);
 
         if (!shouldRelease) {
-
           // child.git.addAndCommit();
           // await child.git.pushCurrentBranch();
 
@@ -1791,27 +2005,34 @@ trim_trailing_whitespace = false
           releaseOptions.resolved[index] = void 0;
         }
       }
-      releaseOptions.resolved = releaseOptions.resolved.filter(f => !!f).map(c => Project.ins.From(c.location));
+      releaseOptions.resolved = releaseOptions.resolved
+        .filter(f => !!f)
+        .map(c => Project.ins.From(c.location));
       //#endregion
 
       //#region projs tempalte
       const projsTemplate = (child?: Project) => {
         return `
 
-    PROJECTS FOR RELEASE: ${releaseOptions.specifiedVersion
-            ? ('(only framework version = ' + releaseOptions.specifiedVersion + ' )') : ''}
+    PROJECTS FOR RELEASE: ${
+      releaseOptions.specifiedVersion
+        ? '(only framework version = ' + releaseOptions.specifiedVersion + ' )'
+        : ''
+    }
 
-${releaseOptions.resolved.filter(p => {
-              if (releaseOptions.resolved.length > 0) {
-                return releaseOptions.resolved.includes(p)
-              }
-              return true;
-            })
-            .map((p, i) => {
-              const bold = (child?.name === p.name);
-              const index = i + 1;
-              return `(${bold ? chalk.underline(chalk.bold(index.toString())) : index}. ${bold ? chalk.underline(chalk.bold(p.name)) : p.name})`;
-            }).join(', ')}
+${releaseOptions.resolved
+  .filter(p => {
+    if (releaseOptions.resolved.length > 0) {
+      return releaseOptions.resolved.includes(p);
+    }
+    return true;
+  })
+  .map((p, i) => {
+    const bold = child?.name === p.name;
+    const index = i + 1;
+    return `(${bold ? chalk.underline(chalk.bold(index.toString())) : index}. ${bold ? chalk.underline(chalk.bold(p.name)) : p.name})`;
+  })
+  .join(', ')}
 
 
 ${Helpers.terminalLine()}
@@ -1822,18 +2043,16 @@ processing...
 
       //#region release loop
 
-
       for (let index = 0; index < releaseOptions.resolved.length; index++) {
-
         const child = releaseOptions.resolved[index] as Project;
         if (releaseOptions.only) {
           releaseOptions.only = Array.isArray(releaseOptions.only)
-            ? releaseOptions.only : [releaseOptions.only];
+            ? releaseOptions.only
+            : [releaseOptions.only];
 
           if (
-            (!releaseOptions.only.includes(child.name))
-            &&
-            (!releaseOptions.only.includes(child.basename))
+            !releaseOptions.only.includes(child.name) &&
+            !releaseOptions.only.includes(child.basename)
           ) {
             continue;
           }
@@ -1841,9 +2060,8 @@ processing...
 
         if (releaseOptions.start) {
           if (
-            (child.name !== releaseOptions.start)
-            &&
-            (child.basename !== releaseOptions.start)
+            child.name !== releaseOptions.start &&
+            child.basename !== releaseOptions.start
           ) {
             continue;
           }
@@ -1852,18 +2070,18 @@ processing...
         // console.log({ child })
 
         if (index === 0) {
-          global.tnpNonInteractive = (releaseOptions.resolved.length === 0);
+          global.tnpNonInteractive = releaseOptions.resolved.length === 0;
           // Helpers.info(`
           // to relase
           // ${depsOfResolved.map((d, i) => i + '.' + d.name).join('\n')}
           // `)
-
         }
 
-        const exitBecouseNotInResolved = (
-          releaseOptions.resolved.length > 0
-          && _.isUndefined(releaseOptions.resolved.find(c => c.location === child.location))
-        );
+        const exitBecouseNotInResolved =
+          releaseOptions.resolved.length > 0 &&
+          _.isUndefined(
+            releaseOptions.resolved.find(c => c.location === child.location),
+          );
 
         if (exitBecouseNotInResolved) {
           continue;
@@ -1872,22 +2090,22 @@ processing...
         Helpers.clearConsole();
         Helpers.info(projsTemplate(child));
 
-        await child.release(releaseOptions.clone({
-          resolved: [],
-          skipProjectProcess: releaseOptions.skipProjectProcess,
-        }));
+        await child.release(
+          releaseOptions.clone({
+            resolved: [],
+            skipProjectProcess: releaseOptions.skipProjectProcess,
+          }),
+        );
 
         if (releaseOptions.end) {
           if (
-            (child.name === releaseOptions.end)
-            ||
-            (child.basename === releaseOptions.end)
+            child.name === releaseOptions.end ||
+            child.basename === releaseOptions.end
           ) {
             Helpers.info('Done. Relase end on project: ' + releaseOptions.end);
             process.exit(0);
           }
         }
-
       }
       //#endregion
 
@@ -1905,22 +2123,25 @@ processing...
 
         `); // hash in package.json to check
 
-          if (depForPush.typeIs('isomorphic-lib') && depForPush.__isSmartContainer) {
+          if (
+            depForPush.typeIs('isomorphic-lib') &&
+            depForPush.__isSmartContainer
+          ) {
             try {
-              await depForPush.init(InitOptions.from({}))
+              await depForPush.init(InitOptions.from({}));
             } catch (error) {
-              console.error(error)
+              console.error(error);
               Helpers.info(`Not able to init fully...`);
             }
           }
 
           depForPush.git.stageAllAndCommit(`release push`);
-          await depForPush.git.pushCurrentBranch()
+          await depForPush.git.pushCurrentBranch();
         }
 
         this.git.stageAllAndCommit(`Update after release`);
         await this.git.pushCurrentBranch();
-        const tnpProj = (Project.ins.Tnp);
+        const tnpProj = Project.ins.Tnp;
         tnpProj.git.stageAllAndCommit(`Update after release`);
         await tnpProj.git.pushCurrentBranch();
         Helpers.success(`
@@ -1961,9 +2182,13 @@ processing...
               await this.init(); // TODO not needed build includes init
               break;
             } catch (error) {
-              console.error(error)
-              if (!(await Helpers.consoleGui.question.yesNo(`Not able to INIT your project ${chalk.bold(this.genericName)} try again..`))) {
-                releaseOptions?.finishCallback()
+              console.error(error);
+              if (
+                !(await Helpers.consoleGui.question.yesNo(
+                  `Not able to INIT your project ${chalk.bold(this.genericName)} try again..`,
+                ))
+              ) {
+                releaseOptions?.finishCallback();
               }
             }
           }
@@ -1975,10 +2200,22 @@ processing...
             await this.__release(releaseOptions);
             break;
           } catch (error) {
-            console.error(error)
-            Helpers.error(`Not able to RELEASE your project ${chalk.bold(this.genericName)}`, true, true);
-            if (!(await Helpers.questionYesNo(`Try again ? (or exit proces)`, void 0, void 0, true, true))) {
-              process.exit(0)
+            console.error(error);
+            Helpers.error(
+              `Not able to RELEASE your project ${chalk.bold(this.genericName)}`,
+              true,
+              true,
+            );
+            if (
+              !(await Helpers.questionYesNo(
+                `Try again ? (or exit proces)`,
+                void 0,
+                void 0,
+                true,
+                true,
+              ))
+            ) {
+              process.exit(0);
             }
           }
         }
@@ -1990,10 +2227,16 @@ processing...
 
   public async __release(releaseOptions?: ReleaseOptions) {
     //#region @backendFunc
-    const { prod = false, shouldReleaseLibrary, automaticReleaseDocs, automaticRelease } = releaseOptions;
+    const {
+      prod = false,
+      shouldReleaseLibrary,
+      automaticReleaseDocs,
+      automaticRelease,
+    } = releaseOptions;
 
     if (!this.isInCiReleaseProject) {
-      const tempGeneratedCiReleaseProject = await this.__createTempCiReleaseProject(BuildOptions.from({}));
+      const tempGeneratedCiReleaseProject =
+        await this.__createTempCiReleaseProject(BuildOptions.from({}));
       await tempGeneratedCiReleaseProject.__release(releaseOptions);
       return;
     }
@@ -2013,28 +2256,36 @@ processing...
       this.__checkIfReadyForNpm();
 
       if (this.__isStandaloneProject) {
-        await this.__libStandalone.bumpVersionInOtherProjects(newVersion, true)
+        await this.__libStandalone.bumpVersionInOtherProjects(newVersion, true);
       }
 
       this.__commitRelease(newVersion);
 
       this.__packageJson.data.version = newVersion;
-      this.__packageJson.save('show for release')
+      this.__packageJson.save('show for release');
 
       specyficProjectForBuild = await this.__releaseBuildProcess({
-        realCurrentProj, releaseOptions, cutNpmPublishLibReleaseCode: true
+        realCurrentProj,
+        releaseOptions,
+        cutNpmPublishLibReleaseCode: true,
       });
 
       if (this.__isSmartContainer) {
-        specyficProjectForBuild.__libSmartcontainer.preparePackage(this, newVersion);
+        specyficProjectForBuild.__libSmartcontainer.preparePackage(
+          this,
+          newVersion,
+        );
       }
 
       if (this.__isStandaloneProject) {
-        specyficProjectForBuild.__libStandalone.preparePackage(this, newVersion);
+        specyficProjectForBuild.__libStandalone.preparePackage(
+          this,
+          newVersion,
+        );
       }
 
       if (this.__isStandaloneProject) {
-        this.__libStandalone.fixPackageJson(realCurrentProj)
+        this.__libStandalone.fixPackageJson(realCurrentProj);
       }
 
       if (this.__isStandaloneProject) {
@@ -2055,25 +2306,42 @@ processing...
 
       const readyToNpmPublishVersionPath = `${this.__getTempProjName('dist')}/${config.folder.node_modules}`;
       if (this.__isStandaloneProject) {
-
-        const distFolder = crossPlatformPath([specyficProjectForBuild.location, readyToNpmPublishVersionPath, realCurrentProj.name, config.folder.dist])
+        const distFolder = crossPlatformPath([
+          specyficProjectForBuild.location,
+          readyToNpmPublishVersionPath,
+          realCurrentProj.name,
+          config.folder.dist,
+        ]);
         // console.log('Remove dist ' + distFolder)
         Helpers.remove(distFolder);
       } else {
         for (const child of realCurrentProj.children) {
-          const distFolder = crossPlatformPath([specyficProjectForBuild.location, readyToNpmPublishVersionPath, '@', realCurrentProj.name, child.name, config.folder.dist])
+          const distFolder = crossPlatformPath([
+            specyficProjectForBuild.location,
+            readyToNpmPublishVersionPath,
+            '@',
+            realCurrentProj.name,
+            child.name,
+            config.folder.dist,
+          ]);
           // console.log('Remove dist ' + distFolder)
           Helpers.remove(distFolder);
         }
       }
 
       if (!global.tnpNonInteractive) {
-        await Helpers.questionYesNo(`Do you wanna check compiled version before publishing ?`, async () => {
-          specyficProjectForBuild.run(`code ${readyToNpmPublishVersionPath}`).sync();
-          Helpers.pressKeyAndContinue(`Check your compiled code and press any key ...`)
-        });
+        await Helpers.questionYesNo(
+          `Do you wanna check compiled version before publishing ?`,
+          async () => {
+            specyficProjectForBuild
+              .run(`code ${readyToNpmPublishVersionPath}`)
+              .sync();
+            Helpers.pressKeyAndContinue(
+              `Check your compiled code and press any key ...`,
+            );
+          },
+        );
       }
-
 
       publish = await Helpers.questionYesNo(`Publish this package ?`);
 
@@ -2085,7 +2353,7 @@ processing...
             newVersion,
             automaticRelease,
             prod,
-          })
+          });
         }
 
         if (this.__isStandaloneProject) {
@@ -2097,7 +2365,7 @@ processing...
           });
         }
       } else {
-        Helpers.info('Omitting npm publish...')
+        Helpers.info('Omitting npm publish...');
       }
 
       //#endregion
@@ -2108,51 +2376,63 @@ processing...
       // Helpers.clearConsole();
       await new Promise<void>(async (resolve, reject) => {
         if (this.__isStandaloneProject) {
-          await this.__libStandalone.buildDocs(prod, realCurrentProj, automaticReleaseDocs, async () => {
-            try {
-              specyficProjectForBuild = await this.__releaseBuildProcess({
-                realCurrentProj, releaseOptions, cutNpmPublishLibReleaseCode: false
-              });
-              resolve()
-            } catch (error) {
-              reject(error)
-            }
-
-          });
+          await this.__libStandalone.buildDocs(
+            prod,
+            realCurrentProj,
+            automaticReleaseDocs,
+            async () => {
+              try {
+                specyficProjectForBuild = await this.__releaseBuildProcess({
+                  realCurrentProj,
+                  releaseOptions,
+                  cutNpmPublishLibReleaseCode: false,
+                });
+                resolve();
+              } catch (error) {
+                reject(error);
+              }
+            },
+          );
         }
 
         if (this.__isSmartContainer) {
-          await this.__libSmartcontainer.buildDocs(prod, realCurrentProj, automaticReleaseDocs, async () => {
-            try {
-              specyficProjectForBuild = await this.__releaseBuildProcess({
-                realCurrentProj, releaseOptions, cutNpmPublishLibReleaseCode: false
-              });
-              resolve()
-            } catch (error) {
-              reject(error)
-            }
-
-          });
+          await this.__libSmartcontainer.buildDocs(
+            prod,
+            realCurrentProj,
+            automaticReleaseDocs,
+            async () => {
+              try {
+                specyficProjectForBuild = await this.__releaseBuildProcess({
+                  realCurrentProj,
+                  releaseOptions,
+                  cutNpmPublishLibReleaseCode: false,
+                });
+                resolve();
+              } catch (error) {
+                reject(error);
+              }
+            },
+          );
         }
       });
 
       this.__commitRelease(newVersion);
-
     }
     //#endregion
 
     //#region push code to repo
     const docsCwd = realCurrentProj.pathFor('docs');
 
-
     if (!automaticReleaseDocs && Helpers.exists(docsCwd)) {
-      await this.__displayInfoBeforePublish(realCurrentProj, DEFAULT_PORT.DIST_SERVER_DOCS);
-
+      await this.__displayInfoBeforePublish(
+        realCurrentProj,
+        DEFAULT_PORT.DIST_SERVER_DOCS,
+      );
     }
 
     await this.pushToGitRepo(realCurrentProj, newVersion, automaticReleaseDocs);
     if (!automaticReleaseDocs && Helpers.exists(docsCwd)) {
-      await Helpers.killProcessByPort(DEFAULT_PORT.DIST_SERVER_DOCS)
+      await Helpers.killProcessByPort(DEFAULT_PORT.DIST_SERVER_DOCS);
     }
     //#endregion
 
@@ -2162,10 +2442,15 @@ processing...
   //#endregion
 
   //#region getters & methods / info before publish
-  private async __displayInfoBeforePublish(realCurrentProj: Project, defaultTestPort: Number) {
+  private async __displayInfoBeforePublish(
+    realCurrentProj: Project,
+    defaultTestPort: Number,
+  ) {
     //#region @backendFunc
     if (this.__env.config?.useDomain) {
-      Helpers.info(`Cannot local preview.. using doamin: ${this.__env.config.domain}`)
+      Helpers.info(
+        `Cannot local preview.. using doamin: ${this.__env.config.domain}`,
+      );
       return;
     }
     const originPath = `http://localhost:`;
@@ -2173,13 +2458,17 @@ processing...
     if (!Helpers.exists(docsCwd)) {
       return;
     }
-    await Helpers.killProcessByPort(DEFAULT_PORT.DIST_SERVER_DOCS)
+    await Helpers.killProcessByPort(DEFAULT_PORT.DIST_SERVER_DOCS);
     const commandHostLoclDocs = `firedev-http-server -s -p ${DEFAULT_PORT.DIST_SERVER_DOCS} --base-dir ${this.name}`;
 
     // console.log({
     //   cwd, commandHostLoclDocs
     // })
-    Helpers.run(commandHostLoclDocs, { cwd: docsCwd, output: false, silence: true }).async()
+    Helpers.run(commandHostLoclDocs, {
+      cwd: docsCwd,
+      output: false,
+      silence: true,
+    }).async();
     if (this.__isStandaloneProject) {
       Helpers.info(`Before pushing you can acces project here:
 
@@ -2189,9 +2478,8 @@ processing...
     }
     if (this.__isSmartContainer) {
       const smartContainer = this;
-      const mainProjectName = smartContainer.__smartContainerBuildTarget.name
-      const otherProjectNames = smartContainer
-        .children
+      const mainProjectName = smartContainer.__smartContainerBuildTarget.name;
+      const otherProjectNames = smartContainer.children
         .filter(c => c.name !== mainProjectName)
         .map(p => p.name);
       Helpers.info(`Before pushing you can acces projects here:
@@ -2207,20 +2495,28 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   //#endregion
 
   //#region getters & methods / recreate release project
-  public async recreateReleaseProject(buildOptions: BuildOptions, soft = false) {
-
+  public async recreateReleaseProject(
+    buildOptions: BuildOptions,
+    soft = false,
+  ) {
     this.remove(config.folder.tmpDistRelease);
-    await this.__createTempCiReleaseProject(buildOptions)
+    await this.__createTempCiReleaseProject(buildOptions);
   }
   //#endregion
 
   //#region getters & methods / create temp project
-  private async __createTempCiReleaseProject(buildOptions: BuildOptions): Promise<Project> {
+  private async __createTempCiReleaseProject(
+    buildOptions: BuildOptions,
+  ): Promise<Project> {
     //#region @backendFunc
     const absolutePathReleaseProject = this.__releaseCiProjectPath;
 
     if (!this.__checkIfReadyForNpm(true)) {
-      Helpers.error(`Project "${this.name}" is not ready for npm release`, false, true)
+      Helpers.error(
+        `Project "${this.name}" is not ready for npm release`,
+        false,
+        true,
+      );
     }
 
     if (this.__isStandaloneProject || this.__isSmartContainer) {
@@ -2250,7 +2546,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       this.__packageJson.linkTo(absolutePathReleaseProject);
       if (this.__isStandaloneProject) {
         await this.__env.init();
-        (this.__env as any as EnvironmentConfig).coptyTo(absolutePathReleaseProject)
+        (this.__env as any as EnvironmentConfig).coptyTo(
+          absolutePathReleaseProject,
+        );
       }
 
       if (this.__isSmartContainer) {
@@ -2258,12 +2556,15 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         for (let index = 0; index < children.length; index++) {
           const child = children[index] as Project;
           await child.__env.init();
-          (child.__env as any as EnvironmentConfig).coptyTo(crossPlatformPath([absolutePathReleaseProject, child.name]))
+          (child.__env as any as EnvironmentConfig).coptyTo(
+            crossPlatformPath([absolutePathReleaseProject, child.name]),
+          );
         }
-
       }
 
-      const generatedProject = Project.ins.From(absolutePathReleaseProject) as Project;
+      const generatedProject = Project.ins.From(
+        absolutePathReleaseProject,
+      ) as Project;
       this.__allResources.forEach(relPathResource => {
         const source = path.join(this.location, relPathResource);
         const dest = path.join(absolutePathReleaseProject, relPathResource);
@@ -2274,16 +2575,20 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
             Helpers.copyFile(source, dest);
           }
         }
-      })
+      });
 
       // this.linkedRepos.linkToProject(generatedProject as Project)
       this.__node_modules.linkToProject(generatedProject as Project);
 
-      const vscodeFolder = path.join(generatedProject.location, config.folder._vscode);
+      const vscodeFolder = path.join(
+        generatedProject.location,
+        config.folder._vscode,
+      );
       Helpers.removeFolderIfExists(vscodeFolder);
-      await generatedProject.__insideStructure.recrate(InitOptions.fromBuild(buildOptions));
+      await generatedProject.__insideStructure.recrate(
+        InitOptions.fromBuild(buildOptions),
+      );
       return generatedProject;
-
     }
     //#endregion
   }
@@ -2291,32 +2596,52 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
   //#region getters & methods / release build
   private async __releaseBuildProcess({
-    realCurrentProj, releaseOptions, cutNpmPublishLibReleaseCode
-  }: { realCurrentProj: Project; releaseOptions: ReleaseOptions; cutNpmPublishLibReleaseCode: boolean; }) {
+    realCurrentProj,
+    releaseOptions,
+    cutNpmPublishLibReleaseCode,
+  }: {
+    realCurrentProj: Project;
+    releaseOptions: ReleaseOptions;
+    cutNpmPublishLibReleaseCode: boolean;
+  }) {
     //#region @backendFunc
-    const { prod, cliBuildObscure, cliBuildIncludeNodeModules, cliBuildNoDts, cliBuildUglify } = releaseOptions;
-
-    // TODO  - only here so  __smartContainerBuildTarget is available
-    await this.init(InitOptions.from({}));
-
-    const specyficProjectForBuild = this.__isStandaloneProject ? this : Project.ins.From(crossPlatformPath(path.join(
-      this.location,
-      config.folder.dist,
-      this.name,
-      this.__smartContainerBuildTarget.name,
-    ))) as Project;
-
-    await this.build(BuildOptions.from({
-      buildType: 'lib',
+    const {
       prod,
       cliBuildObscure,
       cliBuildIncludeNodeModules,
       cliBuildNoDts,
       cliBuildUglify,
-      cutNpmPublishLibReleaseCode,
-      skipProjectProcess: true,
-      buildForRelease: true,
-    }));
+    } = releaseOptions;
+
+    // TODO  - only here so  __smartContainerBuildTarget is available
+    await this.init(InitOptions.from({}));
+
+    const specyficProjectForBuild = this.__isStandaloneProject
+      ? this
+      : (Project.ins.From(
+          crossPlatformPath(
+            path.join(
+              this.location,
+              config.folder.dist,
+              this.name,
+              this.__smartContainerBuildTarget.name,
+            ),
+          ),
+        ) as Project);
+
+    await this.build(
+      BuildOptions.from({
+        buildType: 'lib',
+        prod,
+        cliBuildObscure,
+        cliBuildIncludeNodeModules,
+        cliBuildNoDts,
+        cliBuildUglify,
+        cutNpmPublishLibReleaseCode,
+        skipProjectProcess: true,
+        buildForRelease: true,
+      }),
+    );
 
     //#region prepare release resources
     const dists = [
@@ -2332,7 +2657,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     if (realCurrentProj.__isStandaloneProject) {
       for (let index = 0; index < dists.length; index++) {
         const releaseDistFolder = dists[index];
-        specyficProjectForBuild.__createClientVersionAsCopyOfBrowser(releaseDistFolder);
+        specyficProjectForBuild.__createClientVersionAsCopyOfBrowser(
+          releaseDistFolder,
+        );
       }
     }
 
@@ -2344,7 +2671,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     if (realCurrentProj.__isStandaloneProject) {
       for (let index = 0; index < dists.length; index++) {
         const releaseDist = dists[index];
-        specyficProjectForBuild.__packResourceInReleaseDistResources(releaseDist);
+        specyficProjectForBuild.__packResourceInReleaseDistResources(
+          releaseDist,
+        );
       }
       specyficProjectForBuild.__copyEssentialFilesTo(dists, 'dist');
     } else if (realCurrentProj.__isSmartContainer) {
@@ -2355,16 +2684,20 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         config.folder.node_modules,
         rootPackageName,
       );
-      const childrenPackages = Helpers.foldersFrom(base).map(f => path.basename(f))
+      const childrenPackages = Helpers.foldersFrom(base).map(f =>
+        path.basename(f),
+      );
       for (let index = 0; index < childrenPackages.length; index++) {
         const childName = childrenPackages[index];
-        const child = Project.ins.From([realCurrentProj.location, childName]) as Project;
+        const child = Project.ins.From([
+          realCurrentProj.location,
+          childName,
+        ]) as Project;
         const releaseDistFolder = path.join(base, childName);
         child.__packResourceInReleaseDistResources(releaseDistFolder);
       }
     }
     //#endregion
-
 
     return specyficProjectForBuild;
 
@@ -2377,7 +2710,6 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     //#region @backendFunc
     Helpers.log(`[buildLib] called buildLib not implemented`);
     if (this.__isIsomorphicLib) {
-
       //#region preparing variables
 
       //#region preparing variables & fixing things
@@ -2387,32 +2719,52 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
       // Helpers.info(`[buildLib] start of building ${websql ? '[WEBSQL]' : ''}`);
       Helpers.log(`[buildLib] start of building...`);
-      this.__copyEssentialFilesTo([crossPlatformPath([this.pathFor(outDir)])], outDir);
+      this.__copyEssentialFilesTo(
+        [crossPlatformPath([this.pathFor(outDir)])],
+        outDir,
+      );
 
-
-      const { cliBuildObscure, cliBuildUglify, cliBuildNoDts, cliBuildIncludeNodeModules } = buildOptions;
-      const productionModeButIncludePackageJsonDeps = (cliBuildObscure || cliBuildUglify) && !cliBuildIncludeNodeModules;
+      const {
+        cliBuildObscure,
+        cliBuildUglify,
+        cliBuildNoDts,
+        cliBuildIncludeNodeModules,
+      } = buildOptions;
+      const productionModeButIncludePackageJsonDeps =
+        (cliBuildObscure || cliBuildUglify) && !cliBuildIncludeNodeModules;
 
       //#endregion
 
       //#region preparing variables / incremental build
 
-      const incrementalBuildProcess = new IncrementalBuildProcess(this, buildOptions.clone({
-        websql: false
-      }));
+      const incrementalBuildProcess = new IncrementalBuildProcess(
+        this,
+        buildOptions.clone({
+          websql: false,
+        }),
+      );
 
-      const incrementalBuildProcessWebsql = new IncrementalBuildProcess(this, buildOptions.clone({
-        websql: true,
-        genOnlyClientCode: true,
-      }));
+      const incrementalBuildProcessWebsql = new IncrementalBuildProcess(
+        this,
+        buildOptions.clone({
+          websql: true,
+          genOnlyClientCode: true,
+        }),
+      );
 
-      const proxyProject = this.__getProxyNgProj(buildOptions.clone({
-        websql: false,
-      }), 'lib');
+      const proxyProject = this.__getProxyNgProj(
+        buildOptions.clone({
+          websql: false,
+        }),
+        'lib',
+      );
 
-      const proxyProjectWebsql = this.__getProxyNgProj(buildOptions.clone({
-        websql: true
-      }), 'lib');
+      const proxyProjectWebsql = this.__getProxyNgProj(
+        buildOptions.clone({
+          websql: true,
+        }),
+        'lib',
+      );
 
       Helpers.log(`
 
@@ -2424,17 +2776,20 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       //#endregion
 
       //#region preparing variables / general
-      const isStandalone = (!this.__isSmartContainer);
+      const isStandalone = !this.__isSmartContainer;
 
       const sharedOptions = () => {
         return {
           // askToTryAgainOnError: true,
-          exitOnErrorCallback: async (code) => {
+          exitOnErrorCallback: async code => {
             if (buildOptions.buildForRelease && !buildOptions.ci) {
               throw 'Typescript compilation lib error';
             } else {
-              Helpers.error(`[${config.frameworkName}] Typescript compilation lib error (code=${code})`
-                , false, true);
+              Helpers.error(
+                `[${config.frameworkName}] Typescript compilation lib error (code=${code})`,
+                false,
+                true,
+              );
             }
           },
           outputLineReplace: (line: string) => {
@@ -2443,10 +2798,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
                 return ' --- [firedev] IGNORED WARN ---- ';
               }
 
-              line = line.replace(
-                `projects/${this.name}/src/`,
-                `./src/`
-              );
+              line = line.replace(`projects/${this.name}/src/`, `./src/`);
 
               if (line.search(`/src/libs/`) !== -1) {
                 const [__, ___, ____, moduleName] = line.split('/');
@@ -2475,7 +2827,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
       //#region prepare variables / angular info
       const showInfoAngular = () => {
-        Helpers.info(`Starting browser Angular/TypeScirpt build.... ${buildOptions.websql ? '[WEBSQL]' : ''}`);
+        Helpers.info(
+          `Starting browser Angular/TypeScirpt build.... ${buildOptions.websql ? '[WEBSQL]' : ''}`,
+        );
         Helpers.log(`
 
       ANGULAR ${Project.ins.Tnp?.version} ${buildOptions.watch ? 'WATCH ' : ''} LIB BUILD STARTED... ${buildOptions.websql ? '[WEBSQL]' : ''}
@@ -2491,17 +2845,19 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       if (buildOptions.watch) {
         if (productionModeButIncludePackageJsonDeps) {
           //#region webpack dist release build
-          console.log('Startomg build')
+          console.log('Startomg build');
           try {
-            await incrementalBuildProcess.startAndWatch(`isomorphic compilation (only browser) `);
-
+            await incrementalBuildProcess.startAndWatch(
+              `isomorphic compilation (only browser) `,
+            );
           } catch (error) {
             console.log('CATCH INCE normal');
-
           }
 
           try {
-            await incrementalBuildProcessWebsql.startAndWatch(`isomorphic compilation (only browser) [WEBSQL]`);
+            await incrementalBuildProcessWebsql.startAndWatch(
+              `isomorphic compilation (only browser) [WEBSQL]`,
+            );
           } catch (error) {
             console.log('CATCH INCE webcsal');
           }
@@ -2511,46 +2867,59 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
           Helpers.info(`Starting watch dist release build for fast cli.. `);
 
           try {
-            await this.__webpackBackendBuild.run(BuildOptions.from({
-              buildType: 'lib',
-              outDir,
-              watch,
-            }));
+            await this.__webpackBackendBuild.run(
+              BuildOptions.from({
+                buildType: 'lib',
+                outDir,
+                watch,
+              }),
+            );
           } catch (er) {
-            Helpers.error(`WATCH ${outDir.toUpperCase()} build failed`, false, true);
+            Helpers.error(
+              `WATCH ${outDir.toUpperCase()} build failed`,
+              false,
+              true,
+            );
           }
           //#endregion
         } else {
           //#region watch backend compilation
 
-          await incrementalBuildProcess.startAndWatch('isomorphic compilation (watch mode)');
-          await incrementalBuildProcessWebsql.startAndWatch('isomorphic compilation (watch mode) [WEBSQL]');
+          await incrementalBuildProcess.startAndWatch(
+            'isomorphic compilation (watch mode)',
+          );
+          await incrementalBuildProcessWebsql.startAndWatch(
+            'isomorphic compilation (watch mode) [WEBSQL]',
+          );
 
-          if (this.__frameworkVersionAtLeast('v3')) { // TOOD
-            showInfoAngular()
+          if (this.__frameworkVersionAtLeast('v3')) {
+            // TOOD
+            showInfoAngular();
 
-            if (isStandalone || (this.__isSmartContainerTarget)) {
-              if (this.__isSmartContainerTarget) { // TODO QUICK_FIX this should be in init/struct
-                PackagesRecognition.fromProject(this).start(true, 'before startling lib proxy project');
+            if (isStandalone || this.__isSmartContainerTarget) {
+              if (this.__isSmartContainerTarget) {
+                // TODO QUICK_FIX this should be in init/struct
+                PackagesRecognition.fromProject(this).start(
+                  true,
+                  'before startling lib proxy project',
+                );
               }
               try {
                 await proxyProject.execute(commandForLibraryBuild, {
                   resolvePromiseMsg: {
-                    stdout: 'Compilation complete. Watching for file changes'
+                    stdout: 'Compilation complete. Watching for file changes',
                   },
                   ...sharedOptions(),
                 });
                 await proxyProjectWebsql.execute(commandForLibraryBuild, {
                   resolvePromiseMsg: {
-                    stdout: 'Compilation complete. Watching for file changes'
+                    stdout: 'Compilation complete. Watching for file changes',
                   },
                   ...sharedOptions(),
                 });
               } catch (error) {
-                console.log(error
-                )
+                console.log(error);
               }
-
             }
           }
           //#endregion
@@ -2564,32 +2933,44 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         if (productionModeButIncludePackageJsonDeps) {
           //#region release production backend build for firedev/tnp specyfic
           // console.log('k1')
-          await incrementalBuildProcess.start('isomorphic compilation (only browser) ');
-          await incrementalBuildProcessWebsql.start('isomorphic compilation (only browser) [WEBSQL] ');
+          await incrementalBuildProcess.start(
+            'isomorphic compilation (only browser) ',
+          );
+          await incrementalBuildProcessWebsql.start(
+            'isomorphic compilation (only browser) [WEBSQL] ',
+          );
 
           try {
-            await this.__webpackBackendBuild.run(BuildOptions.from({
-              buildType: 'lib',
-              outDir,
-              watch,
-            }));
+            await this.__webpackBackendBuild.run(
+              BuildOptions.from({
+                buildType: 'lib',
+                outDir,
+                watch,
+              }),
+            );
           } catch (er) {
-            Helpers.error(`${outDir.toUpperCase()} (single file compilation) build failed`, false, true);
+            Helpers.error(
+              `${outDir.toUpperCase()} (single file compilation) build failed`,
+              false,
+              true,
+            );
           }
 
           if (cliBuildNoDts) {
             //#region fix webpack dt
-            const baseDistGenWebpackDts = crossPlatformPath(path.join(this.location, outDir, 'dist'));
-            Helpers
-              .filesFrom(baseDistGenWebpackDts, true)
-              .forEach(absSource => {
+            const baseDistGenWebpackDts = crossPlatformPath(
+              path.join(this.location, outDir, 'dist'),
+            );
+            Helpers.filesFrom(baseDistGenWebpackDts, true).forEach(
+              absSource => {
                 const destDtsFile = path.join(
                   this.location,
                   outDir,
-                  absSource.replace(`${baseDistGenWebpackDts}/`, '')
+                  absSource.replace(`${baseDistGenWebpackDts}/`, ''),
                 );
                 Helpers.copyFile(absSource, destDtsFile);
-              });
+              },
+            );
           }
           Helpers.removeIfExists(path.join(this.location, outDir, 'dist'));
 
@@ -2598,30 +2979,43 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
               this.__backendCompileToEs5(outDir);
             }
             if (cliBuildUglify) {
-              this.__backendUglifyCode(outDir, config.reservedArgumentsNamesUglify)
-            };
-            if (cliBuildObscure) {
-              this.__backendObscureCode(outDir, config.reservedArgumentsNamesUglify);
+              this.__backendUglifyCode(
+                outDir,
+                config.reservedArgumentsNamesUglify,
+              );
             }
-
+            if (cliBuildObscure) {
+              this.__backendObscureCode(
+                outDir,
+                config.reservedArgumentsNamesUglify,
+              );
+            }
           } catch (er) {
-            Helpers.error(`${outDir.toUpperCase()} (cliBuildObscure || cliBuildUglify) process failed`, false, true);
+            Helpers.error(
+              `${outDir.toUpperCase()} (cliBuildObscure || cliBuildUglify) process failed`,
+              false,
+              true,
+            );
           }
 
           try {
-            showInfoAngular()
+            showInfoAngular();
             await proxyProject.execute(commandForLibraryBuild, {
-              ...sharedOptions()
-            })
+              ...sharedOptions(),
+            });
             await proxyProjectWebsql.execute(commandForLibraryBuild, {
-              ...sharedOptions()
-            })
+              ...sharedOptions(),
+            });
           } catch (e) {
-            Helpers.log(e)
-            Helpers.error(`
+            Helpers.log(e);
+            Helpers.error(
+              `
           Command failed: ${commandForLibraryBuild}
 
-          Not able to build project: ${this.genericName}`, false, true)
+          Not able to build project: ${this.genericName}`,
+              false,
+              true,
+            );
           }
           //#endregion
         } else {
@@ -2640,11 +3034,15 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
             });
             this.__showMesageWhenBuildLibDoneForSmartContainer(buildOptions);
           } catch (e) {
-            Helpers.log(e)
-            Helpers.error(`
+            Helpers.log(e);
+            Helpers.error(
+              `
           Command failed: ${commandForLibraryBuild}
 
-          Not able to build project: ${this.genericName}`, false, true)
+          Not able to build project: ${this.genericName}`,
+              false,
+              true,
+            );
           }
 
           //#endregion
@@ -2661,14 +3059,22 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
           });
 
           if (cliBuildUglify) {
-            this.__backendUglifyCode(outDir, config.reservedArgumentsNamesUglify, cliJsFile)
-          };
+            this.__backendUglifyCode(
+              outDir,
+              config.reservedArgumentsNamesUglify,
+              cliJsFile,
+            );
+          }
           if (!productionModeButIncludePackageJsonDeps) {
             if (cliBuildObscure || cliBuildUglify) {
               this.__backendCompileToEs5(outDir, cliJsFile);
             }
             if (cliBuildObscure) {
-              this.__backendObscureCode(outDir, config.reservedArgumentsNamesUglify, cliJsFile);
+              this.__backendObscureCode(
+                outDir,
+                config.reservedArgumentsNamesUglify,
+                cliJsFile,
+              );
             }
           }
         }
@@ -2676,7 +3082,6 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         if (cliBuildNoDts) {
           this.__backendRemoveDts(outDir);
         }
-
 
         if (cutNpmPublishLibReleaseCode) {
           this.__restoreCuttedReleaseCodeFromSrc(buildOptions);
@@ -2704,10 +3109,14 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       this.__copyWhenExist(config.file.tnpEnvironment_json, destinations);
     }
 
-    if (this.isInCiReleaseProject) { // @LAST probably something else
+    if (this.isInCiReleaseProject) {
+      // @LAST probably something else
       this.__copyWhenExist(config.file.package_json, destinations);
       this.__linkWhenExist(config.folder.node_modules, destinations);
-      this.__copyWhenExist('package.json', destinations.map(d => crossPlatformPath([d, config.folder.client])));
+      this.__copyWhenExist(
+        'package.json',
+        destinations.map(d => crossPlatformPath([d, config.folder.client])),
+      );
     }
     //#endregion
   }
@@ -2741,14 +3150,16 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   //#region getters & methods / create client folder from browser folder
   private __createClientVersionAsCopyOfBrowser(releaseDistFolder: string) {
     //#region @backendFunc
-    const browser = path.join(releaseDistFolder, config.folder.browser)
-    const client = path.join(releaseDistFolder, config.folder.client)
+    const browser = path.join(releaseDistFolder, config.folder.browser);
+    const client = path.join(releaseDistFolder, config.folder.client);
     if (fse.existsSync(browser)) {
-      Helpers.remove(client)
+      Helpers.remove(client);
       Helpers.tryCopyFrom(browser, client);
     } else {
-      Helpers.logWarn(`Browser folder not generated.. replacing with dummy files: browser.js, client.js`,
-        false);
+      Helpers.logWarn(
+        `Browser folder not generated.. replacing with dummy files: browser.js, client.js`,
+        false,
+      );
       const msg = `console.log('${this.genericName} only for backend') `;
       Helpers.writeFile(`${browser}.js`, msg);
       Helpers.writeFile(`${client}.js`, msg);
@@ -2760,40 +3171,46 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   //#region getters & methods / pack resources
   public __packResourceInReleaseDistResources(releaseDistFolder: string) {
     //#region @backendFunc
-    this.__checkIfReadyForNpm()
+    this.__checkIfReadyForNpm();
 
     if (!fse.existsSync(releaseDistFolder)) {
       fse.mkdirSync(releaseDistFolder);
     }
-    [].concat([
-      ...this.__resources,
-      ...(this.__isSmartContainerChild ? [
-        config.file._npmignore,
-        config.file.firedev_jsonc
-      ] : [
-        config.file._npmignore,
-      ]),
-    ]).forEach(res => { //  copy resource to org build and copy shared assets
-      const file = path.join(this.location, res);
-      const dest = path.join(releaseDistFolder, res);
-      if (!fse.existsSync(file)) {
-        Helpers.error(`[${config.frameworkName}][lib-project] Resource file: ${chalk.bold(path.basename(file))} does not `
-          + `exist in "${this.genericName}"  (package.json > resources[])
-        `, false, true)
-      }
-      if (fse.lstatSync(file).isDirectory()) {
-        // console.log('IS DIRECTORY', file)
-        // console.log('IS DIRECTORY DEST', dest)
-        const filter = (src) => {
-          return !/.*node_modules.*/g.test(src);
-        };
-        Helpers.copy(file, dest, { filter });
-      } else {
-        // console.log('IS FILE', file)
-        fse.copyFileSync(file, dest);
-      }
-    })
-    Helpers.logInfo(`Resources copied to release folder: ${config.folder.dist}`);
+    []
+      .concat([
+        ...this.__resources,
+        ...(this.__isSmartContainerChild
+          ? [config.file._npmignore, config.file.firedev_jsonc]
+          : [config.file._npmignore]),
+      ])
+      .forEach(res => {
+        //  copy resource to org build and copy shared assets
+        const file = path.join(this.location, res);
+        const dest = path.join(releaseDistFolder, res);
+        if (!fse.existsSync(file)) {
+          Helpers.error(
+            `[${config.frameworkName}][lib-project] Resource file: ${chalk.bold(path.basename(file))} does not ` +
+              `exist in "${this.genericName}"  (package.json > resources[])
+        `,
+            false,
+            true,
+          );
+        }
+        if (fse.lstatSync(file).isDirectory()) {
+          // console.log('IS DIRECTORY', file)
+          // console.log('IS DIRECTORY DEST', dest)
+          const filter = src => {
+            return !/.*node_modules.*/g.test(src);
+          };
+          Helpers.copy(file, dest, { filter });
+        } else {
+          // console.log('IS FILE', file)
+          fse.copyFileSync(file, dest);
+        }
+      });
+    Helpers.logInfo(
+      `Resources copied to release folder: ${config.folder.dist}`,
+    );
     //#endregion
   }
   //#endregion
@@ -2817,7 +3234,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   //#endregion
 
   //#region getters & methods / project linked files placeholder
-  __projectLinkedFiles(): { sourceProject: Project, relativePath: string }[] {
+  __projectLinkedFiles(): { sourceProject: Project; relativePath: string }[] {
     //#region @backendFunc
     const files = [];
 
@@ -2825,7 +3242,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       if (this.__frameworkVersionAtLeast('v2')) {
         files.push({
           sourceProject: Project.by(this.type, 'v1'),
-          relativePath: 'webpack.backend-dist-build.js'
+          relativePath: 'webpack.backend-dist-build.js',
         });
       }
     }
@@ -2839,9 +3256,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   __recreateIfNotExists() {
     //#region @backendFunc
     if (this.__isVscodeExtension) {
-      return [
-        'src/config.ts',
-      ]
+      return ['src/config.ts'];
     }
     return [];
     //#endregion
@@ -2861,7 +3276,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         'src/models.ts',
         'src/execute-command.ts',
         'src/progress-output.ts',
-      ]
+      ];
       if (this.__frameworkVersionAtLeast('v3')) {
         files = files.filter(f => f !== 'src/helpers-vscode.ts');
       }
@@ -2881,7 +3296,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       const dest = crossPlatformPath([destinations[index], relativePath]);
       if (Helpers.exists(absPath)) {
         if (Helpers.isFolder(absPath)) {
-          Helpers.remove(dest, true)
+          Helpers.remove(dest, true);
           Helpers.copy(absPath, dest, { recursive: true });
         } else {
           Helpers.copyFile(absPath, dest);
@@ -2910,7 +3325,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       const dest = crossPlatformPath([destinations[index], relativePath]);
       if (Helpers.exists(absPath)) {
         Helpers.remove(dest, true);
-        Helpers.createSymLink(absPath, dest)
+        Helpers.createSymLink(absPath, dest);
       }
     }
     //#endregion
@@ -2923,7 +3338,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     if (newVer) {
       this.git.stageAllAndCommit(`${message} v${newVer}`);
     } else {
-      this.git.stageAllAndCommit('relese update')
+      this.git.stageAllAndCommit('relese update');
     }
     //#endregion
   }
@@ -2937,10 +3352,12 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       return;
     }
 
-    if (this.__frameworkVersionEquals('v1') || this.typeIsNot('isomorphic-lib')) {
+    if (
+      this.__frameworkVersionEquals('v1') ||
+      this.typeIsNot('isomorphic-lib')
+    ) {
       return;
     }
-
 
     const cwdBrowser = path.join(pathReleaseDist, config.folder.browser);
     const cwdClient = path.join(pathReleaseDist, config.folder.client);
@@ -2962,16 +3379,22 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   //#endregion
 
   //#region getters & methods / push to git repo
-  async pushToGitRepo(realCurrentProj: Project, newVersion?: string, pushWithoutAsking = false) {
+  async pushToGitRepo(
+    realCurrentProj: Project,
+    newVersion?: string,
+    pushWithoutAsking = false,
+  ) {
     //#region @backendFunc
     const pushFun = async () => {
       if (newVersion) {
         const tagName = `v${newVersion}`;
-        const commitMessage = ('new version ' + newVersion);
+        const commitMessage = 'new version ' + newVersion;
         try {
-          realCurrentProj.run(`git tag -a ${tagName} `
-            + `-m "${commitMessage}"`,
-            { output: false }).sync();
+          realCurrentProj
+            .run(`git tag -a ${tagName} ` + `-m "${commitMessage}"`, {
+              output: false,
+            })
+            .sync();
         } catch (error) {
           Helpers.error(`Not able to tag project`, false, true);
         }
@@ -2983,7 +3406,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         realCurrentProj.__commitRelease();
       }
 
-      Helpers.log('Pushing to git repository... ')
+      Helpers.log('Pushing to git repository... ');
       Helpers.log(`Git branch: ${realCurrentProj.git.currentBranchName}`);
       await realCurrentProj.git.pushCurrentBranch({ askToRetry: true });
       Helpers.info('Pushing to git repository done.');
@@ -3003,10 +3426,17 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   //#region getters & methods / get available isomorpic packages in node_modules
   get __availableIsomorphicPackagesInNodeModules(): string[] {
     //#region @backendFunc
-    const jsonPath = path.join(this.location, PackagesRecognition.FILE_NAME_ISOMORPHIC_PACKAGES);
+    const jsonPath = path.join(
+      this.location,
+      PackagesRecognition.FILE_NAME_ISOMORPHIC_PACKAGES,
+    );
     try {
-      const json = Helpers.readJson(jsonPath) as { isomorphicPackages: string[]; };
-      return (json && _.isArray(json.isomorphicPackages)) ? json.isomorphicPackages : [];
+      const json = Helpers.readJson(jsonPath) as {
+        isomorphicPackages: string[];
+      };
+      return json && _.isArray(json.isomorphicPackages)
+        ? json.isomorphicPackages
+        : [];
     } catch (error) {
       return [];
     }
@@ -3021,10 +3451,10 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
     let trusted = [];
     if (config.frameworkName === 'tnp') {
-      const value = Helpers.readValueFromJson(crossPlatformPath([
-        projTnp.location,
-        config.file.firedev_jsonc,
-      ]), `core.dependencies.trusted.${this.__frameworkVersion}`);
+      const value = Helpers.readValueFromJson(
+        crossPlatformPath([projTnp.location, config.file.firedev_jsonc]),
+        `core.dependencies.trusted.${this.__frameworkVersion}`,
+      );
       if (value === '*') {
         return [];
       }
@@ -3032,10 +3462,10 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     }
 
     if (config.frameworkName === 'firedev') {
-      const value = Helpers.readValueFromJson(crossPlatformPath([
-        projTnp.location,
-        config.file.tnpEnvironment_json,
-      ]), `packageJSON.tnp.core.dependencies.trusted.${this.__frameworkVersion}`);
+      const value = Helpers.readValueFromJson(
+        crossPlatformPath([projTnp.location, config.file.tnpEnvironment_json]),
+        `packageJSON.tnp.core.dependencies.trusted.${this.__frameworkVersion}`,
+      );
       if (value === '*') {
         return [];
       }
@@ -3060,10 +3490,13 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
     let trustedValue: number;
     if (config.frameworkName === 'tnp') {
-      const value = Helpers.readValueFromJsonC(crossPlatformPath([
-        projTnp.location,
-        config.file.firedev_jsonc, // TODO replace with firedev.json5 in future
-      ]), `core.dependencies.trustedMaxMajor.${this.__frameworkVersion}`);
+      const value = Helpers.readValueFromJsonC(
+        crossPlatformPath([
+          projTnp.location,
+          config.file.firedev_jsonc, // TODO replace with firedev.json5 in future
+        ]),
+        `core.dependencies.trustedMaxMajor.${this.__frameworkVersion}`,
+      );
       trustedValue = value;
     }
 
@@ -3072,11 +3505,16 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         projTnp.location,
         config.file.tnpEnvironment_json,
       ]);
-      const value = Helpers.readValueFromJson(file, `packageJSON.tnp.core.dependencies.trustedMaxMajor.${this.__frameworkVersion}`);
+      const value = Helpers.readValueFromJson(
+        file,
+        `packageJSON.tnp.core.dependencies.trustedMaxMajor.${this.__frameworkVersion}`,
+      );
       trustedValue = value;
     }
     trustedValue = Number(trustedValue);
-    return (_.isNumber(trustedValue) && !isNaN(trustedValue)) ? trustedValue : Number.POSITIVE_INFINITY;
+    return _.isNumber(trustedValue) && !isNaN(trustedValue)
+      ? trustedValue
+      : Number.POSITIVE_INFINITY;
     //#endregion
   }
   //#endregion
@@ -3088,10 +3526,13 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
     let trustedValue = [];
     if (config.frameworkName === 'tnp') {
-      const value = Helpers.readValueFromJson(crossPlatformPath([
-        projTnp.location,
-        config.file.firedev_jsonc, // TODO replace with firedev.json5 in future
-      ]), `core.dependencies.additionalTrusted`);
+      const value = Helpers.readValueFromJson(
+        crossPlatformPath([
+          projTnp.location,
+          config.file.firedev_jsonc, // TODO replace with firedev.json5 in future
+        ]),
+        `core.dependencies.additionalTrusted`,
+      );
       trustedValue = value;
     }
 
@@ -3100,7 +3541,10 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         projTnp.location,
         config.file.tnpEnvironment_json,
       ]);
-      const value = Helpers.readValueFromJson(file, `packageJSON.tnp.core.dependencies.additionalTrusted`);
+      const value = Helpers.readValueFromJson(
+        file,
+        `packageJSON.tnp.core.dependencies.additionalTrusted`,
+      );
       trustedValue = value;
     }
 
@@ -3127,7 +3571,10 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   //#endregion
 
   //#region getters & methods / build steps
-  protected async __buildSteps(buildOptions?: BuildOptions, libBuildDone?: () => void) {
+  protected async __buildSteps(
+    buildOptions?: BuildOptions,
+    libBuildDone?: () => void,
+  ) {
     //#region @backendFunc
     if (this.__isVscodeExtension) {
       //#region vscode build
@@ -3153,7 +3600,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       }
       let { smartContainerTargetName } = buildOptions;
 
-      let proxy = this.targetProjFor(smartContainerTargetName || this.__smartContainerBuildTarget?.name);
+      let proxy = this.targetProjFor(
+        smartContainerTargetName || this.__smartContainerBuildTarget?.name,
+      );
       await proxy.__buildSteps(buildOptions, libBuildDone);
       //#endregion
     }
@@ -3170,8 +3619,8 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   }
   //#endregion
 
-  __getElectronAppRelativePath({ websql }: { websql: boolean; }) {
-    return `tmp-build/electron-app-dist${websql ? '-websql' : ''}`
+  __getElectronAppRelativePath({ websql }: { websql: boolean }) {
+    return `tmp-build/electron-app-dist${websql ? '-websql' : ''}`;
   }
 
   //#region getters & methods / build
@@ -3179,21 +3628,31 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     //#region @backendFunc
     const baseHrefElectron = '';
     if (this.__isStandaloneProject) {
-      const elecProj = Project.ins.From(this.pathFor([
-        `tmp-apps-for-${config.folder.dist}${buildOptions.websql ? '-websql' : ''}`
-        , this.name,
-      ]));
-      Helpers.info('Starting electron ...')
+      const elecProj = Project.ins.From(
+        this.pathFor([
+          `tmp-apps-for-${config.folder.dist}${buildOptions.websql ? '-websql' : ''}`,
+          this.name,
+        ]),
+      );
+      Helpers.info('Starting electron ...');
 
       if (buildOptions.watch) {
-        elecProj.run(`npm-run  electron . --serve ${buildOptions.websql ? '--websql' : ''}`).async();
+        elecProj
+          .run(
+            `npm-run  electron . --serve ${buildOptions.websql ? '--websql' : ''}`,
+          )
+          .async();
       } else {
-        Helpers.info('Release build of electron app')
+        Helpers.info('Release build of electron app');
         if (buildOptions.buildForRelease) {
-
           if (!this.isInCiReleaseProject) {
-            await this.init(InitOptions.fromBuild(buildOptions.clone({ baseHref: baseHrefElectron })))
-            const tempGeneratedCiReleaseProject = await this.__createTempCiReleaseProject(buildOptions);
+            await this.init(
+              InitOptions.fromBuild(
+                buildOptions.clone({ baseHref: baseHrefElectron }),
+              ),
+            );
+            const tempGeneratedCiReleaseProject =
+              await this.__createTempCiReleaseProject(buildOptions);
             await tempGeneratedCiReleaseProject.build(buildOptions);
             return;
           }
@@ -3205,27 +3664,40 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
           //   // }))
           // } else {
 
-          const elecProj = Project.ins.From(this.pathFor([`tmp-apps-for-dist${buildOptions.websql ? '-websql' : ''}`
-            , this.name]));
+          const elecProj = Project.ins.From(
+            this.pathFor([
+              `tmp-apps-for-dist${buildOptions.websql ? '-websql' : ''}`,
+              this.name,
+            ]),
+          );
           // Helpers.createSymLink(this.__node_modules.path, elecProj.pathFor(`electron/${config.folder.node_modules}`));
           // elecProj.run('code .').sync();
-          const wasmfileSource = crossPlatformPath([Project.by('isomorphic-lib', this.__frameworkVersion).location, 'app/src/assets/sql-wasm.wasm']);
-          const wasmfileDest = crossPlatformPath([elecProj.location, 'electron', 'sql-wasm.wasm']);
+          const wasmfileSource = crossPlatformPath([
+            Project.by('isomorphic-lib', this.__frameworkVersion).location,
+            'app/src/assets/sql-wasm.wasm',
+          ]);
+          const wasmfileDest = crossPlatformPath([
+            elecProj.location,
+            'electron',
+            'sql-wasm.wasm',
+          ]);
           Helpers.copyFile(wasmfileSource, wasmfileDest);
 
-          Helpers.info('Building lib...')
-          await this.build(buildOptions.clone({
-            buildType: 'lib',
-            targetApp: 'pwa',
-            watch: false,
-            baseHref: baseHrefElectron,
-            skipProjectProcess: true,
-            disableServiceWorker: true,
-            skipCopyManager: true,
-            buildAngularAppForElectron: true,
-            finishCallback: () => { }
-          }));
-          Helpers.info('Build lib done.. building now electron app...')
+          Helpers.info('Building lib...');
+          await this.build(
+            buildOptions.clone({
+              buildType: 'lib',
+              targetApp: 'pwa',
+              watch: false,
+              baseHref: baseHrefElectron,
+              skipProjectProcess: true,
+              disableServiceWorker: true,
+              skipCopyManager: true,
+              buildAngularAppForElectron: true,
+              finishCallback: () => {},
+            }),
+          );
+          Helpers.info('Build lib done.. building now electron app...');
 
           // Helpers.pressKeyAndContinue()
           elecProj.run('npm-run ng build angular-electron').sync();
@@ -3246,40 +3718,55 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
           //   indexHtmlPath
           // })
           // @LAST before electron prod fix
-          Helpers.writeFile(indexHtmlPath,
+          Helpers.writeFile(
+            indexHtmlPath,
             Helpers.readFile(indexHtmlPath)
               .replace(`<base href="/">`, '<base href="./">')
               .replace(`<base href="/">`, '<base href="./">')
-              .replace(/\/assets\//g, 'assets/')
+              .replace(/\/assets\//g, 'assets/'),
           );
           Helpers.replaceLinesInFile(indexHtmlPath, line => {
             if (line.search(`rel="manifest"`) !== -1) {
               return '';
             }
             return line;
-          })
+          });
           // <base href="/">
-          const indexJSPath = crossPlatformPath([elecProj.location, 'electron', 'index.js']);
+          const indexJSPath = crossPlatformPath([
+            elecProj.location,
+            'electron',
+            'index.js',
+          ]);
           await Helpers.ncc(
             crossPlatformPath([elecProj.location, 'electron', 'main.js']),
             indexJSPath,
           );
-          Helpers.writeFile(indexJSPath, Helpers.readFile(indexJSPath)
-            .replace('module = undefined;', '')
-            .split('\n').map(line => line.replace(/\@removeStart.*\@removeEnd/g, '')).join('\n')
+          Helpers.writeFile(
+            indexJSPath,
+            Helpers.readFile(indexJSPath)
+              .replace('module = undefined;', '')
+              .split('\n')
+              .map(line => line.replace(/\@removeStart.*\@removeEnd/g, ''))
+              .join('\n'),
           );
 
           // elecProj.run(`npm-run ncc build electron/main.js -o electron/bundled  --no-cache  --external electron `).sync();
           // await Helpers.questionYesNo('Would you like to do check out?');
           elecProj.run(`npm-run electron-builder build --publish=never`).sync();
-          this.openLocation(this.__getElectronAppRelativePath({ websql: buildOptions.websql }))
+          this.openLocation(
+            this.__getElectronAppRelativePath({ websql: buildOptions.websql }),
+          );
         } else {
           // TODO
         }
       }
       return;
     } else {
-      Helpers.error(`Electron apps compilation only for standalone projects`, false, true);
+      Helpers.error(
+        `Electron apps compilation only for standalone projects`,
+        false,
+        true,
+      );
     }
     buildOptions.finishCallback();
     //#endregion
@@ -3299,7 +3786,8 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
     //#region prevent empty firedev node_modules
     if (!this.__copyManager.coreContainerSmartNodeModulesProj) {
-      Helpers.error(`${_.upperFirst(config.frameworkName)} has incorrect/missing packages container.
+      Helpers.error(
+        `${_.upperFirst(config.frameworkName)} has incorrect/missing packages container.
 Please use command:
 
       ${config.frameworkName} autoupdate
@@ -3307,32 +3795,51 @@ Please use command:
       ${config.frameworkName} au
 
 to fix it.
-      `, false, true)
+      `,
+        false,
+        true,
+      );
     }
     //#endregion
 
     //#region prevent not requested framework version
     if (this.__frameworkVersionLessThan('v4')) {
-      Helpers.error(`Please upgrade firedev framework version to to at least v4
+      Helpers.error(
+        `Please upgrade firedev framework version to to at least v4
 
       ${config.file.firedev_jsonc} => version => should be at least 4
 
-      `, false, true);
+      `,
+        false,
+        true,
+      );
     }
     //#endregion
 
     let libContext: any; //  Firedev.FrameworkContext;
-    const smartContainerTargetName = buildOptions.smartContainerTargetName || this.__smartContainerBuildTarget?.name;
+    const smartContainerTargetName =
+      buildOptions.smartContainerTargetName ||
+      this.__smartContainerBuildTarget?.name;
 
     if (buildOptions.libBuild) {
-      buildOptions.baseHref = !_.isUndefined(buildOptions.baseHref) ? buildOptions.baseHref : this.angularFeBasenameManager.rootBaseHref;
-      const baseHrefLocProj = this.__isSmartContainer ? this.targetProjFor(smartContainerTargetName) : this;
-      baseHrefLocProj.writeFile(tmpBaseHrefOverwriteRelPath, buildOptions.baseHref);
+      buildOptions.baseHref = !_.isUndefined(buildOptions.baseHref)
+        ? buildOptions.baseHref
+        : this.angularFeBasenameManager.rootBaseHref;
+      const baseHrefLocProj = this.__isSmartContainer
+        ? this.targetProjFor(smartContainerTargetName)
+        : this;
+      baseHrefLocProj.writeFile(
+        tmpBaseHrefOverwriteRelPath,
+        buildOptions.baseHref,
+      );
 
       //#region main lib code build ports assignations
       const projectInfoPort = await this.assignFreePort(4100);
       this.__setProjectInfoPort(projectInfoPort);
-      Helpers.writeFile(this.pathFor(tmpBuildPort), projectInfoPort?.toString());
+      Helpers.writeFile(
+        this.pathFor(tmpBuildPort),
+        projectInfoPort?.toString(),
+      );
 
       const hostForBuild = `http://localhost:${projectInfoPort}`;
 
@@ -3379,48 +3886,69 @@ to fix it.
           // libContext = context;
         } catch (error) {
           console.error(error);
-          Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
+          Helpers.error(
+            `Please reinstall ${config.frameworkName} node_modules`,
+            false,
+            true,
+          );
         }
       }
 
-
       this.__saveLaunchJson(projectInfoPort);
-      !buildOptions.skipProjectProcess && Helpers.taskDone('project service started')
+      !buildOptions.skipProjectProcess &&
+        Helpers.taskDone('project service started');
       // console.log({ context })
       //#endregion
 
       //#region normal/watch lib build
       if (buildOptions.watch) {
-        await this.__filesStructure.initFileStructure(InitOptions.fromBuild(buildOptions.clone({ watch: true })));
+        await this.__filesStructure.initFileStructure(
+          InitOptions.fromBuild(buildOptions.clone({ watch: true })),
+        );
       } else {
-        await this.__filesStructure.initFileStructure(InitOptions.fromBuild(buildOptions.clone({ watch: false })));
+        await this.__filesStructure.initFileStructure(
+          InitOptions.fromBuild(buildOptions.clone({ watch: false })),
+        );
       }
       //#endregion
     }
 
-    if (buildOptions.appBuild) { // TODO is this ok baw is not initing ?
-      if (!_.isUndefined(buildOptions.baseHref) && buildOptions.buildType === 'app') {
-        Helpers.error(`Build baseHref only can be specify when build lib code:
+    if (buildOptions.appBuild) {
+      // TODO is this ok baw is not initing ?
+      if (
+        !_.isUndefined(buildOptions.baseHref) &&
+        buildOptions.buildType === 'app'
+      ) {
+        Helpers.error(
+          `Build baseHref only can be specify when build lib code:
 
         try commands:
         ${config.frameworkName} start --base-href ${buildOptions.baseHref} # it will do lib and app code build
         ${config.frameworkName} build:watch --base-href ${buildOptions.baseHref} # it will do lib code build
 
-        `, false, true);
+        `,
+          false,
+          true,
+        );
       }
-      const baseHrefLocProj = this.__isSmartContainer ? this.targetProjFor(smartContainerTargetName) : this;
-      const fromFileBaseHref = Helpers.readFile(baseHrefLocProj.pathFor(tmpBaseHrefOverwriteRelPath));
+      const baseHrefLocProj = this.__isSmartContainer
+        ? this.targetProjFor(smartContainerTargetName)
+        : this;
+      const fromFileBaseHref = Helpers.readFile(
+        baseHrefLocProj.pathFor(tmpBaseHrefOverwriteRelPath),
+      );
       buildOptions.baseHref = fromFileBaseHref;
 
       //#region initializae client app remote connection to build server
       if (!libContext) {
-        const projectInfoPortFromFile = Number(Helpers.readFile(this.pathFor(tmpBuildPort)));
+        const projectInfoPortFromFile = Number(
+          Helpers.readFile(this.pathFor(tmpBuildPort)),
+        );
         this.__setProjectInfoPort(projectInfoPortFromFile);
 
         const hostForAppWorker = `http://localhost:${projectInfoPortFromFile}`;
         // console.log({ hostForAppWorker })
         if (!buildOptions?.skipProjectProcess) {
-
           // TODO @UNCOMMENT
           // try {
           //   Firedev.destroyContext(hostForAppWorker);
@@ -3445,30 +3973,35 @@ to fix it.
       }
       //#endregion
 
-
       if (!this.__node_modules.exist) {
         //#region prevent empty node_modules
-        Helpers.error(`Please start lib build first:
+        Helpers.error(
+          `Please start lib build first:
 
         ${config.frameworkName} build:watch # short -> ${config.frameworkName} bw
 or use command:
 
 ${config.frameworkName} start
 
-        `, false, true);
+        `,
+          false,
+          true,
+        );
         //#endregion
       }
-
     }
 
     Helpers.logInfo(`
 
-    Using base href: ${!_.isUndefined(buildOptions.baseHref) ? (`'` + buildOptions.baseHref + `'`) : '/ (default)'}
+    Using base href: ${!_.isUndefined(buildOptions.baseHref) ? `'` + buildOptions.baseHref + `'` : '/ (default)'}
 
-    `)
+    `);
 
     if (!this.__isVscodeExtension) {
-      PackagesRecognition.fromProject(this as any).start(void 0, '[buildable-project]');
+      PackagesRecognition.fromProject(this as any).start(
+        void 0,
+        '[buildable-project]',
+      );
     }
 
     //#region build assets file
@@ -3478,13 +4011,23 @@ ${config.frameworkName} start
     const buildAssetsFile = async () => {
       // console.log('after build steps');
 
-      const shouldGenerateAssetsList = this.__isSmartContainer || (this.__isStandaloneProject && !this.__isSmartContainerTarget);
+      const shouldGenerateAssetsList =
+        this.__isSmartContainer ||
+        (this.__isStandaloneProject && !this.__isSmartContainerTarget);
       // console.log({ shouldGenerateAssetsList })
       if (shouldGenerateAssetsList) {
         if (buildOptions.watch) {
-          await this.__assetsFileListGenerator.startAndWatch(this.__smartContainerBuildTarget?.name, buildOptions.outDir, buildOptions.websql);
+          await this.__assetsFileListGenerator.startAndWatch(
+            this.__smartContainerBuildTarget?.name,
+            buildOptions.outDir,
+            buildOptions.websql,
+          );
         } else {
-          await this.__assetsFileListGenerator.start(this.__smartContainerBuildTarget?.name, buildOptions.outDir, buildOptions.websql);
+          await this.__assetsFileListGenerator.start(
+            this.__smartContainerBuildTarget?.name,
+            buildOptions.outDir,
+            buildOptions.websql,
+          );
         }
       }
     };
@@ -3492,20 +4035,23 @@ ${config.frameworkName} start
 
     //#region start copy to manager function
     const startCopyToManager = async () => {
-
       Helpers.info(`${buildOptions.watch ? 'files watch started...' : ''}`);
-      Helpers.log(`[buildable-project] Build steps ended (project type: ${this.type}) ... `);
+      Helpers.log(
+        `[buildable-project] Build steps ended (project type: ${this.type}) ... `,
+      );
 
       if (!buildOptions.appBuild) {
-        if ((this.__isStandaloneProject && this.typeIs('isomorphic-lib')) || this.__isSmartContainer) {
-
+        if (
+          (this.__isStandaloneProject && this.typeIs('isomorphic-lib')) ||
+          this.__isSmartContainer
+        ) {
           // // console.log('after build steps')
           this.__copyManager.init(buildOptions);
           const taskName = 'copyto manger';
           if (buildOptions.watch) {
-            await this.__copyManager.startAndWatch({ taskName })
+            await this.__copyManager.startAndWatch({ taskName });
           } else {
-            await this.__copyManager.start({ taskName })
+            await this.__copyManager.start({ taskName });
           }
         }
       }
@@ -3525,15 +4071,19 @@ ${config.frameworkName} start
     });
     //#endregion
 
-
-    !buildOptions.skipCopyManager && Helpers.info((buildOptions.watch ? `
+    !buildOptions.skipCopyManager &&
+      Helpers.info(
+        buildOptions.watch
+          ? `
     [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]
     Files watcher started.. ${buildOptions.websql ? '[WEBSQL]' : ''}
-  `: `
+  `
+          : `
     [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]
     End of Building ${this.genericName} ${buildOptions.websql ? '[WEBSQL]' : ''}
 
-  ` ));
+  `,
+      );
 
     buildOptions.finishCallback();
     //#endregion
@@ -3573,21 +4123,20 @@ ${config.frameworkName} start
 
     location: ${this.location}
 
-`
-      //       + `
-      //     children (${this.children?.length || 0}):
-      // ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
+`);
+    //       + `
+    //     children (${this.children?.length || 0}):
+    // ${(this.children || []).map(c => '- ' + c.__packageJson.name).join('\n')}
 
-      //     linked porject prefix: "${this.linkedProjectsPrefix || ''}"
+    //     linked porject prefix: "${this.linkedProjectsPrefix || ''}"
 
-      //     linked projects from json (${this.linkedProjects?.length || 0}):
-      // ${(this.linkedProjects || []).map(c => '- ' + c.relativeClonePath).join('\n')}
+    //     linked projects from json (${this.linkedProjects?.length || 0}):
+    // ${(this.linkedProjects || []).map(c => '- ' + c.relativeClonePath).join('\n')}
 
-      //     linked projects detected (${this.detectedLinkedProjects?.length || 0}):
-      // ${(this.detectedLinkedProjects || []).map(c => '- ' + c.relativeClonePath).join('\n')}
+    //     linked projects detected (${this.detectedLinkedProjects?.length || 0}):
+    // ${(this.detectedLinkedProjects || []).map(c => '- ' + c.relativeClonePath).join('\n')}
 
-      //     `
-    )
+    //     `
     // }
     //#endregion
   }
@@ -3599,7 +4148,9 @@ ${config.frameworkName} start
     const configSettings = {};
 
     try {
-      const settings = json5.parse(Helpers.readFile(path.join(this.location, '.vscode', 'settings.json')));
+      const settings = json5.parse(
+        Helpers.readFile(path.join(this.location, '.vscode', 'settings.json')),
+      );
       // console.log(settings)
       Object.keys(settings)
         .filter(key => {
@@ -3614,14 +4165,20 @@ ${config.frameworkName} start
       // console.log(err)
     }
 
-    const packaedDistChildrensFolder = path.join(this.location, config.folder.dist);
+    const packaedDistChildrensFolder = path.join(
+      this.location,
+      config.folder.dist,
+    );
     if (!fse.existsSync(packaedDistChildrensFolder)) {
       Helpers.mkdirp(packaedDistChildrensFolder);
     }
     configSettings['terminal.integrated.cwd'] = '${workspaceFolder}';
 
-    const codeworkspacefilepath = path.join(this.location, `tmp.code-workspace`);
-    Helpers.removeFileIfExists(codeworkspacefilepath)
+    const codeworkspacefilepath = path.join(
+      this.location,
+      `tmp.code-workspace`,
+    );
+    Helpers.removeFileIfExists(codeworkspacefilepath);
     // fse.writeJSONSync(codeworkspacefilepath, codeWorkspace, {
     //   encoding: 'utf8',
     //   spaces: 2
@@ -3633,15 +4190,17 @@ ${config.frameworkName} start
   //#region getters & methods / open in vscode
   public __openInVscode() {
     //#region @backendFunc
-    this.__recreateCodeWorkspace()
+    this.__recreateCodeWorkspace();
     if (this.__isStandaloneProject || this.isUnknowNpmProject) {
-      this.run(`code ${this.location}`).sync()
+      this.run(`code ${this.location}`).sync();
     } else {
-      const isomorphicServers: Project[] = this.children.filter(c => c.typeIs('isomorphic-lib'));
+      const isomorphicServers: Project[] = this.children.filter(c =>
+        c.typeIs('isomorphic-lib'),
+      );
 
       this.run(`code ${this.location}`).sync();
       isomorphicServers.forEach(s => {
-        s.run(`code ${s.location}`).sync()
+        s.run(`code ${s.location}`).sync();
       });
     }
     //#endregion
@@ -3650,15 +4209,26 @@ ${config.frameworkName} start
 
   get outFilesArgs() {
     //#region @backendFunc
-    return !this.__isStandaloneProject ? void 0 : [
-      "${workspaceFolder}/dist/**/*.js",
-      "!**/node_modules/**",
-      ...Helpers.uniqArray(this.__isomorphicPackages.map(packageName => {
-        const p = this.pathFor([config.folder.node_modules, packageName, config.folder.src])
-        return Helpers.isExistedSymlink(p)
-          ? `${crossPlatformPath(fse.realpathSync(p))}/../dist/**/*.js` : void 0
-      }).filter(f => !!f))
-    ];
+    return !this.__isStandaloneProject
+      ? void 0
+      : [
+          '${workspaceFolder}/dist/**/*.js',
+          '!**/node_modules/**',
+          ...Helpers.uniqArray(
+            this.__isomorphicPackages
+              .map(packageName => {
+                const p = this.pathFor([
+                  config.folder.node_modules,
+                  packageName,
+                  config.folder.src,
+                ]);
+                return Helpers.isExistedSymlink(p)
+                  ? `${crossPlatformPath(fse.realpathSync(p))}/../dist/**/*.js`
+                  : void 0;
+              })
+              .filter(f => !!f),
+          ),
+        ];
     //#endregion
   }
 
@@ -3666,12 +4236,12 @@ ${config.frameworkName} start
   get __vscodeLaunchRuntimeArgs() {
     //#region @backendFunc
     return [
-      "--nolazy",
-      "-r",
-      "ts-node/register",
+      '--nolazy',
+      '-r',
+      'ts-node/register',
       // "--preserve-symlinks", NOT WORKING
       // "--preserve-symlinks-main",NOT WORKING
-      "--experimental-worker"
+      '--experimental-worker',
     ];
     //#endregion
   }
@@ -3683,44 +4253,51 @@ ${config.frameworkName} start
     if (this.__isSmartContainer) {
       //#region container save
       const container = this;
-      const configurations = container.children.filter(f => {
-        return f.__frameworkVersionAtLeast('v3') && f.typeIs('isomorphic-lib');
-      }).map((c, index) => {
-        const backendPort = PortUtils.instance(basePort).calculateServerPortFor(c);
-        c.writeFile('src/app.hosts.ts', PortUtils.instance(basePort).appHostTemplateFor(c))
-        return {
-          "type": "node",
-          "request": "launch",
-          "name": `${debugWord} Server @${container.name}/${c.name}`,
-          "cwd": "${workspaceFolder}" + `/dist/${container.name}/${c.name}`,
-          "program": "${workspaceFolder}" + `/dist/${container.name}/${c.name}/run-org.js`,
-          "args": [
-            `--child=${c.name}`,
-            `--port=${backendPort}`
-          ],
-          // "sourceMaps": true,
-          // "outFiles": [ // TODOD this is causing unbound breakpoing in thir party modules
-          //   "${workspaceFolder}" + ` / dist / ${ container.name } / ${ c.name } / dist/**/ *.js`
-          // ],
-          runtimeArgs: this.__vscodeLaunchRuntimeArgs,
-          "presentation": {
-            "group": "workspaceServers"
-          }
-        }
-      })
+      const configurations = container.children
+        .filter(f => {
+          return (
+            f.__frameworkVersionAtLeast('v3') && f.typeIs('isomorphic-lib')
+          );
+        })
+        .map((c, index) => {
+          const backendPort =
+            PortUtils.instance(basePort).calculateServerPortFor(c);
+          c.writeFile(
+            'src/app.hosts.ts',
+            PortUtils.instance(basePort).appHostTemplateFor(c),
+          );
+          return {
+            type: 'node',
+            request: 'launch',
+            name: `${debugWord} Server @${container.name}/${c.name}`,
+            cwd: '${workspaceFolder}' + `/dist/${container.name}/${c.name}`,
+            program:
+              '${workspaceFolder}' +
+              `/dist/${container.name}/${c.name}/run-org.js`,
+            args: [`--child=${c.name}`, `--port=${backendPort}`],
+            // "sourceMaps": true,
+            // "outFiles": [ // TODOD this is causing unbound breakpoing in thir party modules
+            //   "${workspaceFolder}" + ` / dist / ${ container.name } / ${ c.name } / dist/**/ *.js`
+            // ],
+            runtimeArgs: this.__vscodeLaunchRuntimeArgs,
+            presentation: {
+              group: 'workspaceServers',
+            },
+          };
+        });
 
       const temlateSmartContine = {
-        "version": "0.2.0",
+        version: '0.2.0',
         configurations,
         // "compounds": []
       };
 
-
-
-      const launchJSOnFilePath = path.join(container.location, '.vscode/launch.json')
+      const launchJSOnFilePath = path.join(
+        container.location,
+        '.vscode/launch.json',
+      );
       Helpers.writeFile(launchJSOnFilePath, temlateSmartContine);
       //#endregion
-
     } else if (this.__isStandaloneProject && !this.__isSmartContainerTarget) {
       //#region standalone save
 
@@ -3729,32 +4306,38 @@ ${config.frameworkName} start
 
       //#region template attach process
       const temlateAttachProcess = {
-        'type': 'node',
-        'request': 'attach',
-        'name': 'Attach to global cli tool',
-        'port': 9229,
-        'skipFiles': [
-          '<node_internals>/**'
-        ],
+        type: 'node',
+        request: 'attach',
+        name: 'Attach to global cli tool',
+        port: 9229,
+        skipFiles: ['<node_internals>/**'],
         // "outFiles": ["${workspaceFolder}/dist/**/*.js"] // not wokring for copy manager
       };
       //#endregion
 
       //#region tempalte start normal nodejs server
-      const templateForServer = (serverChild: Project, clientProject: Project, workspaceLevel: boolean) => {
-        const backendPort = PortUtils.instance(basePort).calculateServerPortFor(serverChild);
-        clientProject.writeFile('src/app.hosts.ts', PortUtils.instance(basePort).appHostTemplateFor(serverChild))
+      const templateForServer = (
+        serverChild: Project,
+        clientProject: Project,
+        workspaceLevel: boolean,
+      ) => {
+        const backendPort =
+          PortUtils.instance(basePort).calculateServerPortFor(serverChild);
+        clientProject.writeFile(
+          'src/app.hosts.ts',
+          PortUtils.instance(basePort).appHostTemplateFor(serverChild),
+        );
         const startServerTemplate = {
-          'type': 'node',
-          'request': 'launch',
-          'name': `${debugWord} Server`,
-          'program': '${workspaceFolder}/run.js',
-          'cwd': void 0,
-          'args': [`port=${backendPort}`],
+          type: 'node',
+          request: 'launch',
+          name: `${debugWord} Server`,
+          program: '${workspaceFolder}/run.js',
+          cwd: void 0,
+          args: [`port=${backendPort}`],
           outFiles: this.outFilesArgs,
           // "outFiles": ["${workspaceFolder}/dist/**/*.js"], becouse of this debugging inside node_moudles
           // with compy manager created moduels does not work..
-          runtimeArgs: this.__vscodeLaunchRuntimeArgs
+          runtimeArgs: this.__vscodeLaunchRuntimeArgs,
         };
         if (serverChild.name !== clientProject.name) {
           let cwd = '${workspaceFolder}' + `/../ ${serverChild.name}`;
@@ -3764,15 +4347,25 @@ ${config.frameworkName} start
           startServerTemplate.program = cwd + '/run.js';
           startServerTemplate.cwd = cwd;
         }
-        if ((serverChild.location === clientProject.location) && serverChild.__isStandaloneProject) {
+        if (
+          serverChild.location === clientProject.location &&
+          serverChild.__isStandaloneProject
+        ) {
           // startServerTemplate.name = `${startServerTemplate.name} Standalone`
         } else {
-          startServerTemplate.name = `${startServerTemplate.name} '${serverChild.name}' for '${clientProject.name}'`
+          startServerTemplate.name = `${startServerTemplate.name} '${serverChild.name}' for '${clientProject.name}'`;
         }
-        startServerTemplate.args.push(`--ENVoverride=${encodeURIComponent(JSON.stringify({
-          clientProjectName: clientProject.name
-        } as Models.EnvConfig, null, 4))
-          } `);
+        startServerTemplate.args.push(
+          `--ENVoverride=${encodeURIComponent(
+            JSON.stringify(
+              {
+                clientProjectName: clientProject.name,
+              } as Models.EnvConfig,
+              null,
+              4,
+            ),
+          )} `,
+        );
         return startServerTemplate;
       };
       //#endregion
@@ -3837,23 +4430,24 @@ ${config.frameworkName} start
       //#region electron
       const startElectronServeTemplate = (remoteDebugElectronPort: number) => {
         return {
-          "name": `${debugWord} Electron`,
-          "type": "node",
-          "request": "launch",
-          "protocol": "inspector",
-          "cwd": "${workspaceFolder}",
-          "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
-          "trace": "verbose",
-          "runtimeArgs": [
-            "--serve",
-            ".",
-            `--remote-debugging-port=${remoteDebugElectronPort}`// 9876
+          name: `${debugWord} Electron`,
+          type: 'node',
+          request: 'launch',
+          protocol: 'inspector',
+          cwd: '${workspaceFolder}',
+          runtimeExecutable: '${workspaceFolder}/node_modules/.bin/electron',
+          trace: 'verbose',
+          runtimeArgs: [
+            '--serve',
+            '.',
+            `--remote-debugging-port=${remoteDebugElectronPort}`, // 9876
           ],
-          "windows": {
-            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
-          }
-        }
-      }
+          windows: {
+            runtimeExecutable:
+              '${workspaceFolder}/node_modules/.bin/electron.cmd',
+          },
+        };
+      };
       //#endregion
 
       //#region handle standalone or worksapce child
@@ -3864,24 +4458,31 @@ ${config.frameworkName} start
         if (this.__isStandaloneProject) {
           configurations.push(templateForServer(this, this, false));
           // configurations.push(startNgServeTemplate(9000, void 0, false));
-          configurations.push(startElectronServeTemplate(PortUtils.instance(basePort).calculatePortForElectronDebugging(this)))
+          configurations.push(
+            startElectronServeTemplate(
+              PortUtils.instance(basePort).calculatePortForElectronDebugging(
+                this,
+              ),
+            ),
+          );
           compounds.push({
             name: `${debugWord} (Server + Electron)`,
-            configurations: [
-              ...configurations.map(c => c.name)
-            ]
+            configurations: [...configurations.map(c => c.name)],
           });
           configurations.push(temlateAttachProcess);
         }
       }
       //#endregion
 
-      const launchJSOnFilePath = path.join(this.location, '.vscode/launch.json');
+      const launchJSOnFilePath = path.join(
+        this.location,
+        '.vscode/launch.json',
+      );
 
       Helpers.writeJson(launchJSOnFilePath, {
         version: '0.2.0',
         configurations,
-        compounds
+        compounds,
       });
       //#endregion
     }
@@ -3914,7 +4515,11 @@ ${config.frameworkName} start
 
     minorVersionToSet = Number(minorVersionToSet);
     if (isNaN(minorVersionToSet) || !Number.isInteger(minorVersionToSet)) {
-      Helpers.error(`Wrong minor version to set: ${minorVersionToSet}`, false, true);
+      Helpers.error(
+        `Wrong minor version to set: ${minorVersionToSet}`,
+        false,
+        true,
+      );
     }
 
     const ver = this.version.split('.');
@@ -3928,7 +4533,7 @@ ${config.frameworkName} start
     if (minorVersionToSet <= currentMinorVersion && !force) {
       Helpers.warn(`Ommiting... Trying to set same or lower minor version for project: ${this.genericName}
         ${this.version} => v${newVer}
-      `)
+      `);
     } else {
       await this.__setNewVersion(newVer);
     }
@@ -3961,7 +4566,11 @@ ${config.frameworkName} start
 
     majorVersionToSet = Number(majorVersionToSet);
     if (isNaN(majorVersionToSet) || !Number.isInteger(majorVersionToSet)) {
-      Helpers.error(`Wrong major version to set: ${majorVersionToSet}`, false, true);
+      Helpers.error(
+        `Wrong major version to set: ${majorVersionToSet}`,
+        false,
+        true,
+      );
     }
 
     const ver = this.version.split('.');
@@ -3975,7 +4584,7 @@ ${config.frameworkName} start
     if (majorVersionToSet <= currentMajorVersion) {
       Helpers.warn(`Ommiting... Trying to set same or lower minor version for project: ${this.genericName}
         ${this.version} => v${newMajorVer}
-      `)
+      `);
     } else {
       await this.__setNewVersion(newMajorVer);
     }
@@ -3998,7 +4607,9 @@ ${config.frameworkName} start
   //#region getters & methods / set new version
   async __setNewVersion(version: string) {
     //#region @backendFunc
-    Helpers.info(`Setting version to project  ${this.genericName}: v${version}`);
+    Helpers.info(
+      `Setting version to project  ${this.genericName}: v${version}`,
+    );
     this.__packageJson.data.version = version;
     this.__packageJson.save('updating version');
     //#endregion
@@ -4018,25 +4629,36 @@ ${config.frameworkName} start
     //#region @backendFunc
     const lastVer = 'last npm version(s): ';
     if (this.__isSmartContainer) {
-      return lastVer + this.children.map(c => {
-        let lastNpmVersion = void 0 as string;
-        try {
-          const ver = Helpers.run(`npm show @${this.name}/${c.name} version`, { output: false }).sync().toString();
-          if (ver) {
-            lastNpmVersion = ver.trim();
-          }
-        } catch (error) { }
-        return `${this.name}/${c.name}=${lastNpmVersion}`;
-      }).join(', ');
-
+      return (
+        lastVer +
+        this.children
+          .map(c => {
+            let lastNpmVersion = void 0 as string;
+            try {
+              const ver = Helpers.run(
+                `npm show @${this.name}/${c.name} version`,
+                { output: false },
+              )
+                .sync()
+                .toString();
+              if (ver) {
+                lastNpmVersion = ver.trim();
+              }
+            } catch (error) {}
+            return `${this.name}/${c.name}=${lastNpmVersion}`;
+          })
+          .join(', ')
+      );
     } else {
       let lastNpmVersion = void 0 as string;
       try {
-        const ver = this.run(`npm show ${this.name} version`, { output: false }).sync().toString();
+        const ver = this.run(`npm show ${this.name} version`, { output: false })
+          .sync()
+          .toString();
         if (ver) {
           lastNpmVersion = ver.trim();
         }
-      } catch (error) { }
+      } catch (error) {}
       return lastVer + lastNpmVersion;
     }
 
@@ -4048,7 +4670,7 @@ ${config.frameworkName} start
   get __resources(): string[] {
     //#region @backendFunc
     if (this.typeIs('unknow')) {
-      return []
+      return [];
     }
     return this.__packageJson.resources;
     //#endregion
@@ -4084,21 +4706,24 @@ ${config.frameworkName} start
       return '';
     }
     if (!this.version) {
-
       if (!global[CoreConfig.message.globalSystemToolMode]) {
         return;
       }
 
-      Helpers.error(`Please define ${chalk.bold('version')} property in your package.json:
+      Helpers.error(
+        `Please define ${chalk.bold('version')} property in your package.json:
       location: ${path.join(this.location, config.file.package_json)}
 
-      `, true, true);
+      `,
+        true,
+        true,
+      );
     }
     const ver = this.version.split('.');
     if (ver.length > 0) {
       ver[ver.length - 1] = (parseInt(_.last(ver)) + 1).toString();
     }
-    return ver.join('.')
+    return ver.join('.');
     //#endregion
   }
   //#endregion
@@ -4110,15 +4735,18 @@ ${config.frameworkName} start
       return '';
     }
     if (!this.version) {
-
       if (!global[CoreConfig.message.globalSystemToolMode]) {
         return;
       }
 
-      Helpers.error(`Please define ${chalk.bold('version')} property in your package.json:
+      Helpers.error(
+        `Please define ${chalk.bold('version')} property in your package.json:
       location: ${path.join(this.location, config.file.package_json)}
 
-      `, true, true);
+      `,
+        true,
+        true,
+      );
     }
     const ver = this.version.split('.');
     if (ver.length > 0) {
@@ -4127,7 +4755,9 @@ ${config.frameworkName} start
         ver[index] = '0';
       }
     } else {
-      Helpers.warn(`[npm-project] something went wrong with bumping major version`)
+      Helpers.warn(
+        `[npm-project] something went wrong with bumping major version`,
+      );
     }
     return ver.join('.');
     //#endregion
@@ -4141,15 +4771,18 @@ ${config.frameworkName} start
       return '';
     }
     if (!this.version) {
-
       if (!global[CoreConfig.message.globalSystemToolMode]) {
         return;
       }
 
-      Helpers.error(`Please define ${chalk.bold('version')} property in your package.json:
+      Helpers.error(
+        `Please define ${chalk.bold('version')} property in your package.json:
       location: ${path.join(this.location, config.file.package_json)}
 
-      `, true, true);
+      `,
+        true,
+        true,
+      );
     }
     const ver = this.version.split('.');
     if (ver.length > 1) {
@@ -4158,7 +4791,9 @@ ${config.frameworkName} start
         ver[index] = '0';
       }
     } else {
-      Helpers.warn(`[npm-project] something went wrong with bumping minor version`)
+      Helpers.warn(
+        `[npm-project] something went wrong with bumping minor version`,
+      );
     }
     return ver.join('.');
     //#endregion
@@ -4182,7 +4817,8 @@ ${config.frameworkName} start
   //#region getters & methods / bump version for path release
   __bumpVersionForPathRelease(proj: Project) {
     //#region @backendFunc
-    let atLestVersion = proj.git.lastTagVersionName.trim().replace('v', '') || '0.0.0';
+    let atLestVersion =
+      proj.git.lastTagVersionName.trim().replace('v', '') || '0.0.0';
     if (semver.gt(proj.version, atLestVersion)) {
       atLestVersion = proj.version;
     }
@@ -4200,51 +4836,69 @@ ${config.frameworkName} start
     //#region @backendFunc
     const proj = this;
     let currentPathNum = proj.versionPathAsNumber; // + 1;
-    let commitMessage = commitMsg ? commitMsg.trim() : ('new version ' + proj.version);
+    let commitMessage = commitMsg
+      ? commitMsg.trim()
+      : 'new version ' + proj.version;
     proj.git.stageAllAndCommit(commitMessage);
     let tagName = `v${proj.version}`;
 
     while (true) {
       if (proj.git.checkTagExists(tagName)) {
-        Helpers.warn(`[${config.frameworkName}] tag taken: ${tagName}.. looking for new...`);
+        Helpers.warn(
+          `[${config.frameworkName}] tag taken: ${tagName}.. looking for new...`,
+        );
         proj.__updateVersionPathRelease(++currentPathNum);
         tagName = `v${proj.__versionPatchedPlusOne}`;
-        commitMessage = commitMsg ? commitMsg.trim() : ('new version ' + proj.__versionPatchedPlusOne);
+        commitMessage = commitMsg
+          ? commitMsg.trim()
+          : 'new version ' + proj.__versionPatchedPlusOne;
         proj.git.stageAllAndCommit(commitMessage);
       } else {
         break;
       }
     }
 
-    proj.run(`git tag -a ${tagName} `
-      + `-m "${commitMessage}"`,
-      { output: false }).sync();
+    proj
+      .run(`git tag -a ${tagName} ` + `-m "${commitMessage}"`, {
+        output: false,
+      })
+      .sync();
     return { newVersion: proj.__versionPatchedPlusOne };
     //#endregion
   }
   //#endregion
 
   //#region getters & methods / get deps as project
-  public __getDepsAsProject(type: Models.NpmDependencyType | Models.TnpNpmDependencyType,
-    contextFolder?: string): Project[] {
+  public __getDepsAsProject(
+    type: Models.NpmDependencyType | Models.TnpNpmDependencyType,
+    contextFolder?: string,
+  ): Project[] {
     //#region @backendFunc
     if (this.typeIs('unknow')) {
       return [];
     }
-    return this.__getDepsAsPackage(type).map(packageObj => {
-      let p = path.join(contextFolder ? contextFolder : this.location, config.folder.node_modules, packageObj.name);
-      if (fse.existsSync(p)) {
-        const project = Project.ins.From(p);
-        return project;
-      }
-      // warn(`Dependency '${packageObj.name}' doen't exist in ${p}`)
-    }).filter(f => !!f);
+    return this.__getDepsAsPackage(type)
+      .map(packageObj => {
+        let p = path.join(
+          contextFolder ? contextFolder : this.location,
+          config.folder.node_modules,
+          packageObj.name,
+        );
+        if (fse.existsSync(p)) {
+          const project = Project.ins.From(p);
+          return project;
+        }
+        // warn(`Dependency '${packageObj.name}' doen't exist in ${p}`)
+      })
+      .filter(f => !!f);
     //#endregion
   }
   //#endregion
 
   //#region getters & methods / get deps as package
-  public __getDepsAsPackage(type: Models.NpmDependencyType | Models.TnpNpmDependencyType): Models.Package[] {
+  public __getDepsAsPackage(
+    type: Models.NpmDependencyType | Models.TnpNpmDependencyType,
+  ): Models.Package[] {
     //#region @backendFunc
     if (this.typeIs('unknow')) {
       return [];
@@ -4252,41 +4906,39 @@ ${config.frameworkName} start
     if (!this.__packageJson.data) {
       return [];
     }
-    const isTnpOverridedDependency = (type === 'tnp_overrided_dependencies') &&
+    const isTnpOverridedDependency =
+      type === 'tnp_overrided_dependencies' &&
       this.__packageJson.data.tnp &&
       this.__packageJson.data.tnp.overrided &&
       this.__packageJson.data.tnp.overrided.dependencies;
-
 
     let installType: Models.InstalationType;
 
     let data: any;
     if (isTnpOverridedDependency) {
-      data = this.__packageJson.data.tnp.overrided.dependencies
+      data = this.__packageJson.data.tnp.overrided.dependencies;
     } else {
       data = this.__packageJson.data[type];
       if (type === 'dependencies') {
-        installType = '--save'
+        installType = '--save';
       } else if (type === 'devDependencies') {
-        installType = '--save-dev'
+        installType = '--save-dev';
       }
     }
 
     const names = _.isArray(data) ? data : _.keys(data);
-    return names
-      .map(p => {
-        if (_.isString(data[p])) {
-          return { name: p, version: data[p], installType }
-        } else {
-          if (!~p.search('@')) {
-            return { name: p, installType }
-          }
-          const isOrg = p.startsWith('@')
-          const [name, version] = (isOrg ? p.slice(1) : p).split('@')
-          return { name: isOrg ? `@${name}` : name, version, installType }
+    return names.map(p => {
+      if (_.isString(data[p])) {
+        return { name: p, version: data[p], installType };
+      } else {
+        if (!~p.search('@')) {
+          return { name: p, installType };
         }
-
-      });
+        const isOrg = p.startsWith('@');
+        const [name, version] = (isOrg ? p.slice(1) : p).split('@');
+        return { name: isOrg ? `@${name}` : name, version, installType };
+      }
+    });
     //#endregion
   }
   //#endregion
@@ -4308,9 +4960,13 @@ ${config.frameworkName} start
       if (soft) {
         return false;
       }
-      Helpers.error(`This project '${chalk.bold(this.name)}' in ${this.location}
+      Helpers.error(
+        `This project '${chalk.bold(this.name)}' in ${this.location}
 
-      isn't library type project (${libs.join(', ')}).`, false, true);
+      isn't library type project (${libs.join(', ')}).`,
+        false,
+        true,
+      );
     }
     return true;
     //#endregion
@@ -4329,19 +4985,29 @@ ${config.frameworkName} start
   __getProxyProjPath(client: string): string {
     //#region @backendFunc
     const workspaceOrContainerProject: Project = this;
-    return crossPlatformPath([workspaceOrContainerProject.location, config.folder.dist, workspaceOrContainerProject.name, client]);
+    return crossPlatformPath([
+      workspaceOrContainerProject.location,
+      config.folder.dist,
+      workspaceOrContainerProject.name,
+      client,
+    ]);
     //#endregion
   }
   //#endregion
 
   //#region getters & methods / get proxy ng projects
-  private __getProxyNgProj(buildOptions: BuildOptions, type: 'app' | 'lib' = 'app'): Project {
+  private __getProxyNgProj(
+    buildOptions: BuildOptions,
+    type: 'app' | 'lib' = 'app',
+  ): Project {
     const project: Project = this;
     //#region @backendFunc
-    const projepath = crossPlatformPath(path.join(this.location, project.__angularProjProxyPath(
-      buildOptions.websql,
-      type
-    )));
+    const projepath = crossPlatformPath(
+      path.join(
+        this.location,
+        project.__angularProjProxyPath(buildOptions.websql, type),
+      ),
+    );
     const proj = Project.ins.From(projepath);
     return proj as Project;
     //#endregion
@@ -4349,13 +5015,10 @@ ${config.frameworkName} start
   //#endregion
 
   //#region getters & methods / angular proj proxy path
-  public __angularProjProxyPath(
-    websql?: boolean,
-    type: 'app' | 'lib' = 'app'
-  ) {
+  public __angularProjProxyPath(websql?: boolean, type: 'app' | 'lib' = 'app') {
     //#region @backendFunc
     const project = this;
-    const pref = ((type === 'app') ? 'apps' : 'libs');
+    const pref = type === 'app' ? 'apps' : 'libs';
     const tmpProjectsStandalone = `tmp-${pref}-for-${config.folder.dist}${websql ? '-websql' : ''}/${project.name}`;
     return tmpProjectsStandalone;
 
@@ -4370,19 +5033,29 @@ ${config.frameworkName} start
   }
 
   get __releaseCiProjectParentPath() {
-    return (this.isInCiReleaseProject && (this.__isStandaloneProject || this.__isSmartContainer)) ?
-      path.resolve(path.join(this.location,
-        '..', // project
-        '..', // dist
-        '..', // tmp-dist-release
-        '..' // location of base proj
-      )) : void 0;
+    return this.isInCiReleaseProject &&
+      (this.__isStandaloneProject || this.__isSmartContainer)
+      ? path.resolve(
+          path.join(
+            this.location,
+            '..', // project
+            '..', // dist
+            '..', // tmp-dist-release
+            '..', // location of base proj
+          ),
+        )
+      : void 0;
   }
 
   //#region getters & methods / releas pproject path
   get __releaseCiProjectPath() {
     //#region @backendFunc
-    const absolutePathReleaseProject = this.pathFor([config.folder.tmpDistRelease, config.folder.dist, 'project', this.name]);
+    const absolutePathReleaseProject = this.pathFor([
+      config.folder.tmpDistRelease,
+      config.folder.dist,
+      'project',
+      this.name,
+    ]);
     return absolutePathReleaseProject;
     //#endregion
   }
@@ -4396,7 +5069,6 @@ ${config.frameworkName} start
   }
   //#endregion
 
-
   //#region getters & methods / ignore from v3 framework version
   get __ignoreInV3() {
     //#region @backendFunc
@@ -4404,10 +5076,7 @@ ${config.frameworkName} start
       'angular.json.filetemplate',
       'ngsw-config.json.filetemplate',
     ];
-    return [
-      ...files,
-      ...files.map(f => f.replace('.filetemplate', '')),
-    ];
+    return [...files, ...files.map(f => f.replace('.filetemplate', ''))];
     //#endregion
   }
   //#endregion
@@ -4432,14 +5101,15 @@ ${config.frameworkName} start
     //#region prepare variables / baseHref
 
     const isSmartContainerTarget = this.__isSmartContainerTarget;
-    const isSmartContainerTargetNonClient = this.__isSmartContainerTargetNonClient;
+    const isSmartContainerTargetNonClient =
+      this.__isSmartContainerTargetNonClient;
 
     //#endregion
 
     //#region prepare variables / webpack params
     let webpackEnvParams = `--env.outFolder=${buildOptions.outDir}`;
-    webpackEnvParams = webpackEnvParams + (buildOptions.watch ? ' --env.watch=true' : '');
-
+    webpackEnvParams =
+      webpackEnvParams + (buildOptions.watch ? ' --env.watch=true' : '');
 
     const backAppTmpFolders = `../../`;
     const backeFromRelase = `../../../../`;
@@ -4457,7 +5127,9 @@ ${config.frameworkName} start
       }
     }
 
-    let outDirApp = this.isInCiReleaseProject ? config.folder.docs : `${buildOptions.outDir}-app${buildOptions.websql ? '-websql' : ''}`;
+    let outDirApp = this.isInCiReleaseProject
+      ? config.folder.docs
+      : `${buildOptions.outDir}-app${buildOptions.websql ? '-websql' : ''}`;
     if (isSmartContainerTargetNonClient) {
       outDirApp = `${outDirApp}/-/${this.name}`;
     }
@@ -4471,58 +5143,66 @@ ${config.frameworkName} start
     let portAssignedToAppBuild: number;
 
     if (!_.isNumber(portAssignedToAppBuild) || !portAssignedToAppBuild) {
-      portAssignedToAppBuild = buildOptions.websql ? this.__standaloneWebsqlAppPort : this.__standaloneNormalAppPort;
+      portAssignedToAppBuild = buildOptions.websql
+        ? this.__standaloneWebsqlAppPort
+        : this.__standaloneNormalAppPort;
     }
 
     if (!_.isNumber(portAssignedToAppBuild) || !portAssignedToAppBuild) {
-      portAssignedToAppBuild = await this.assignFreePort(DEFAULT_PORT.APP_BUILD_LOCALHOST);
+      portAssignedToAppBuild = await this.assignFreePort(
+        DEFAULT_PORT.APP_BUILD_LOCALHOST,
+      );
     }
 
     if (buildOptions.watch) {
       await Helpers.killProcessByPort(portAssignedToAppBuild);
     }
 
-
-    const isStandalone = (this.__isStandaloneProject && !isSmartContainerTarget);
+    const isStandalone = this.__isStandaloneProject && !isSmartContainerTarget;
 
     const buildOutDir = buildOptions.outDir;
-    const parent = (!isStandalone
-      ? (isSmartContainerTarget ? this.__smartContainerTargetParentContainer : this.parent)
-      : void 0
-    );
+    const parent = !isStandalone
+      ? isSmartContainerTarget
+        ? this.__smartContainerTargetParentContainer
+        : this.parent
+      : void 0;
 
     const additionalReplace = (line: string) => {
-      const beforeModule2 = crossPlatformPath(path.join(
-        buildOutDir,
-        parent.name,
-        this.name,
-        `tmp-apps-for-${buildOutDir}/${this.name}`
-      ));
+      const beforeModule2 = crossPlatformPath(
+        path.join(
+          buildOutDir,
+          parent.name,
+          this.name,
+          `tmp-apps-for-${buildOutDir}/${this.name}`,
+        ),
+      );
 
       // console.log({ beforeModule2 })
 
       if (line.search(beforeModule2) !== -1) {
-        line = line.replace(beforeModule2 + '/', '')
+        line = line.replace(beforeModule2 + '/', '');
       }
 
-      return line
+      return line;
     };
     //#endregion
 
     //#region prepare variables / prepare angular command
     let angularBuildAppCmd: string;
-    const portAssignedToAppBuildCommandPart = _.isNumber(portAssignedToAppBuild) ? `--port=${portAssignedToAppBuild}` : '';
-
+    const portAssignedToAppBuildCommandPart = _.isNumber(portAssignedToAppBuild)
+      ? `--port=${portAssignedToAppBuild}`
+      : '';
 
     if (buildOptions.watch) {
-      angularBuildAppCmd = `${this.__npmRunNg} serve ${buildOptions.buildAngularAppForElectron ? 'angular-electron' : 'app'} `
-        + ` ${portAssignedToAppBuildCommandPart} ${buildOptions.prod ? '--prod' : ''}`;
-
+      angularBuildAppCmd =
+        `${this.__npmRunNg} serve ${buildOptions.buildAngularAppForElectron ? 'angular-electron' : 'app'} ` +
+        ` ${portAssignedToAppBuildCommandPart} ${buildOptions.prod ? '--prod' : ''}`;
     } else {
-      angularBuildAppCmd = `${this.__npmRunNg} build ${buildOptions.buildAngularAppForElectron ? 'angular-electron' : 'app'}`
-        + `${buildOptions.prod ? '--configuration production' : ''} `
-        + `${buildOptions.watch ? '--watch' : ''}`
-        + `${outPutPathCommand} `;
+      angularBuildAppCmd =
+        `${this.__npmRunNg} build ${buildOptions.buildAngularAppForElectron ? 'angular-electron' : 'app'}` +
+        `${buildOptions.prod ? '--configuration production' : ''} ` +
+        `${buildOptions.watch ? '--watch' : ''}` +
+        `${outPutPathCommand} `;
     }
     //#endregion
 
@@ -4546,26 +5226,24 @@ ${config.frameworkName} start
 
     await angularTempProj.execute(angularBuildAppCmd, {
       resolvePromiseMsg: {
-        stdout: 'Compiled successfully'
+        stdout: 'Compiled successfully',
       },
       //#region command execute params
-      exitOnErrorCallback: async (code) => {
-
+      exitOnErrorCallback: async code => {
         if (buildOptions.buildForRelease && !buildOptions.ci) {
           throw 'Angular compilation lib error!!!asd';
         } else {
-          Helpers.error(`[${config.frameworkName}] Typescript compilation error (code=${code})`
-            , false, true);
+          Helpers.error(
+            `[${config.frameworkName}] Typescript compilation error (code=${code})`,
+            false,
+            true,
+          );
         }
-
       },
       outputLineReplace: (line: string) => {
         //#region replace outut line for better debugging
         if (isStandalone) {
-          return line.replace(
-            `src/app/${this.name}/`,
-            `./src/`
-          );
+          return line.replace(`src/app/${this.name}/`, `./src/`);
         } else {
           line = line.trim();
 
@@ -4576,18 +5254,19 @@ ${config.frameworkName} start
 
           if (line.search(`src/app/${this.name}/libs/`) !== -1) {
             const [__, ___, ____, _____, ______, moduleName] = line.split('/');
-            return additionalReplace(line.replace(
-              `src/app/${this.name}/libs/${moduleName}/`,
-              `${moduleName}/src/lib/`,
-            ));
+            return additionalReplace(
+              line.replace(
+                `src/app/${this.name}/libs/${moduleName}/`,
+                `${moduleName}/src/lib/`,
+              ),
+            );
           }
 
           if (line.search(`src/app/`) !== -1) {
             const [__, ___, ____, moduleName] = line.split('/');
-            return additionalReplace(line.replace(
-              `src/app/${moduleName}/`,
-              `${moduleName}/src/`,
-            ));
+            return additionalReplace(
+              line.replace(`src/app/${moduleName}/`, `${moduleName}/src/`),
+            );
           }
           return additionalReplace(line);
         }
@@ -4600,35 +5279,45 @@ ${config.frameworkName} start
   //#endregion
 
   //#region getters & methods / show message when build lib done for smart container
-  private __showMesageWhenBuildLibDoneForSmartContainer(buildOptions: BuildOptions) {
+  private __showMesageWhenBuildLibDoneForSmartContainer(
+    buildOptions: BuildOptions,
+  ) {
     //#region @backend
     if (this.isInCiReleaseProject) {
       Helpers.logInfo('Lib build part done...  ');
       return;
     }
     const buildLibDone = `LIB BUILD DONE.. `;
-    const ifapp = 'if you want to start app build -> please run in other terminal command:';
+    const ifapp =
+      'if you want to start app build -> please run in other terminal command:';
 
-    const ngserveCommand = `${buildOptions.watch ? '--port 4201 # or whatever port' : '#'} to run angular ${buildOptions.watch
-      ? 'ng serve'
-      : 'ng build (for application - not lib)'
-      }.`;
+    const ngserveCommand = `${buildOptions.watch ? '--port 4201 # or whatever port' : '#'} to run angular ${
+      buildOptions.watch ? 'ng serve' : 'ng build (for application - not lib)'
+    }.`;
     // const bawOrba = buildOptions.watch ? 'baw' : 'ba';
-    const bawOrbaLong = buildOptions.watch ? ' build:app:watch ' : ' build:app ';
-    const bawOrbaLongWebsql = buildOptions.watch ? 'build:app:watch --websql' : 'build:app --websql';
+    const bawOrbaLong = buildOptions.watch
+      ? ' build:app:watch '
+      : ' build:app ';
+    const bawOrbaLongWebsql = buildOptions.watch
+      ? 'build:app:watch --websql'
+      : 'build:app --websql';
     const withPort = '(with custom port - otherwise automatically selected)';
     const orIfWebsql = `or if you want to try websql mode:`;
 
-
-
     if (this.__isSmartContainerTarget) {
       const parent = this.__smartContainerTargetParentContainer;
-      const smartContainerTargetName = buildOptions.smartContainerTargetName || this.__smartContainerBuildTarget?.name;
+      const smartContainerTargetName =
+        buildOptions.smartContainerTargetName ||
+        this.__smartContainerBuildTarget?.name;
 
-      Helpers.taskDone(`${chalk.underline(`
+      Helpers.taskDone(
+        `${chalk.underline(
+          `
 
-      ${buildLibDone}... for target project "`
-        + `${parent ? (parent.name + '/') : ''}${smartContainerTargetName}"`)}`)
+      ${buildLibDone}... for target project "` +
+            `${parent ? parent.name + '/' : ''}${smartContainerTargetName}"`,
+        )}`,
+      );
 
       Helpers.success(`
 
@@ -4640,7 +5329,7 @@ ${config.frameworkName} start
 
             `);
     } else if (this.__isStandaloneProject) {
-      Helpers.taskDone(`${chalk.underline(`${buildLibDone}...`)}`)
+      Helpers.taskDone(`${chalk.underline(`${buildLibDone}...`)}`);
       Helpers.success(`
 
       ${ifapp}
@@ -4670,26 +5359,33 @@ ${config.frameworkName} start
   //#region getters & methods / include node_modules in compilation
   private __backendRemoveDts(outDir: 'dist') {
     //#region @backend
-    Helpers
-      .filesFrom([this.location, outDir, 'lib'], true)
+    Helpers.filesFrom([this.location, outDir, 'lib'], true)
       .filter(f => f.endsWith('.d.ts'))
-      .forEach(f => Helpers.removeFileIfExists(f))
-      ;
-    Helpers.writeFile([this.location, outDir, 'lib/index.d.ts'], `export declare const dummy${(new Date()).getTime()};`);
+      .forEach(f => Helpers.removeFileIfExists(f));
+    Helpers.writeFile(
+      [this.location, outDir, 'lib/index.d.ts'],
+      `export declare const dummy${new Date().getTime()};`,
+    );
     //#endregion
   }
   //#endregion
 
   //#region getters & methods / include node_modules in compilation
-  private __backendIncludeNodeModulesInCompilation(outDir: 'dist', cliBuildUglify: boolean, mainCliJSFileName: string = config.file.index_js) {
+  private __backendIncludeNodeModulesInCompilation(
+    outDir: 'dist',
+    cliBuildUglify: boolean,
+    mainCliJSFileName: string = config.file.index_js,
+  ) {
     //#region @backend
 
     // QUICK_FIX TODO ncc input change does not work (it takes always index.js)
     //#region QUICK_FIX
     const indexOrg = this.pathFor(`${outDir}/${config.file.index_js}`);
-    const indexOrgBackup = this.pathFor(`${outDir}/${config.file.index_js}-backup`);
+    const indexOrgBackup = this.pathFor(
+      `${outDir}/${config.file.index_js}-backup`,
+    );
     const mainFileAbs = this.pathFor(`${outDir}/${mainCliJSFileName}`);
-    const useBackupFile = (mainCliJSFileName !== config.file.index_js);
+    const useBackupFile = mainCliJSFileName !== config.file.index_js;
     if (useBackupFile) {
       Helpers.copyFile(indexOrg, indexOrgBackup);
     }
@@ -4710,14 +5406,17 @@ ${config.frameworkName} start
     //   ;
 
     const baseDistRelease = crossPlatformPath(path.join(this.location, outDir));
-    const nccBase = crossPlatformPath(path.join(this.location, outDir, 'temp', 'ncc'));
+    const nccBase = crossPlatformPath(
+      path.join(this.location, outDir, 'temp', 'ncc'),
+    );
 
-    Helpers
-      .filesFrom(nccBase, true)
+    Helpers.filesFrom(nccBase, true)
       .filter(f => f.replace(`${nccBase}/`, '') !== config.file.package_json)
       .forEach(f => {
         const relativePath = f.replace(`${nccBase}/`, '');
-        const dest = crossPlatformPath(path.join(baseDistRelease, relativePath));
+        const dest = crossPlatformPath(
+          path.join(baseDistRelease, relativePath),
+        );
         Helpers.copyFile(f, dest);
       });
 
@@ -4727,10 +5426,11 @@ ${config.frameworkName} start
     const pjPath = this.pathFor(`${outDir}/${config.file.package_json}`);
     const pj: Models.IPackageJSON = Helpers.readJson(pjPath);
     Object.keys(pj.dependencies).forEach(name => {
-      if (!['ora'].includes(name)) { // TODO QUICK FIX FOF TNP
+      if (!['ora'].includes(name)) {
+        // TODO QUICK FIX FOF TNP
         delete pj.dependencies[name];
       }
-    })
+    });
     pj.peerDependencies = {};
     pj.devDependencies = {};
     Helpers.removeFileIfExists(pjPath);
@@ -4750,35 +5450,54 @@ ${config.frameworkName} start
   /**
    * TODO not working
    */
-  private __backendCompileToEs5(outDir: 'dist', mainCliJSFileName = 'index.js') {
+  private __backendCompileToEs5(
+    outDir: 'dist',
+    mainCliJSFileName = 'index.js',
+  ) {
     return;
     //#region @backend
     if (!Helpers.exists(path.join(this.location, outDir, 'index.js'))) {
-      Helpers.warn(`[compileToEs5] Nothing to compile to es5... no index.js in ${outDir}`)
+      Helpers.warn(
+        `[compileToEs5] Nothing to compile to es5... no index.js in ${outDir}`,
+      );
       return;
     }
     const indexEs5js = `index-es5.js`;
-    Helpers.writeFile(path.join(this.location, outDir, config.file._babelrc), '{ "presets": ["env"] }\n');
-    this.run(`npm-run babel  ./${outDir}/index.js --out-file ./${outDir}/${indexEs5js}`).sync();
+    Helpers.writeFile(
+      path.join(this.location, outDir, config.file._babelrc),
+      '{ "presets": ["env"] }\n',
+    );
+    this.run(
+      `npm-run babel  ./${outDir}/index.js --out-file ./${outDir}/${indexEs5js}`,
+    ).sync();
     Helpers.writeFile(
       path.join(this.location, outDir, config.file.index_js),
-      Helpers.readFile(path.join(this.location, outDir, indexEs5js))
+      Helpers.readFile(path.join(this.location, outDir, indexEs5js)),
     );
     Helpers.removeFileIfExists(path.join(this.location, outDir, indexEs5js));
-    Helpers.removeFileIfExists(path.join(this.location, outDir, config.file._babelrc));
+    Helpers.removeFileIfExists(
+      path.join(this.location, outDir, config.file._babelrc),
+    );
     //#endregion
   }
   //#endregion
 
   //#region getters & methods / compile/cliBuildUglify backend code
-  private __backendUglifyCode(outDir: 'dist', reservedNames: string[], mainCliJSFileName = 'index.js') {
+  private __backendUglifyCode(
+    outDir: 'dist',
+    reservedNames: string[],
+    mainCliJSFileName = 'index.js',
+  ) {
     //#region @backendFunc
     if (!Helpers.exists(path.join(this.location, outDir, mainCliJSFileName))) {
-      Helpers.warn(`[cliBuildUglifyCode] Nothing to cliBuildUglify... no ${mainCliJSFileName} in /${outDir}`)
-      return
+      Helpers.warn(
+        `[cliBuildUglifyCode] Nothing to cliBuildUglify... no ${mainCliJSFileName} in /${outDir}`,
+      );
+      return;
     }
-    const command = `npm-run cliBuildUglifyjs ${outDir}/${mainCliJSFileName} --output ${outDir}/${mainCliJSFileName} -b`
-      + ` --mangle reserved=[${reservedNames.map(n => `'${n}'`).join(',')}]`
+    const command =
+      `npm-run cliBuildUglifyjs ${outDir}/${mainCliJSFileName} --output ${outDir}/${mainCliJSFileName} -b` +
+      ` --mangle reserved=[${reservedNames.map(n => `'${n}'`).join(',')}]`;
     // + ` --mangle-props reserved=[${reservedNames.join(',')}]` // it breakes code
 
     Helpers.info(`
@@ -4787,27 +5506,38 @@ ${config.frameworkName} start
 
     ${command}
 
-      `)
+      `);
     this.run(command).sync();
     //#endregion
   }
   //#endregion
 
   //#region getters & methods / compile/cliBuildObscure backend code
-  private __backendObscureCode(outDir: 'dist', reservedNames: string[], mainCliJSFileName = 'index.js') {
+  private __backendObscureCode(
+    outDir: 'dist',
+    reservedNames: string[],
+    mainCliJSFileName = 'index.js',
+  ) {
     //#region @backendFunc
-    if (!Helpers.exists(path.join(this.location, config.folder.dist, mainCliJSFileName))) {
-      Helpers.warn(`[cliBuildObscureCode] Nothing to cliBuildObscure... no ${mainCliJSFileName} in release dist`)
-      return
+    if (
+      !Helpers.exists(
+        path.join(this.location, config.folder.dist, mainCliJSFileName),
+      )
+    ) {
+      Helpers.warn(
+        `[cliBuildObscureCode] Nothing to cliBuildObscure... no ${mainCliJSFileName} in release dist`,
+      );
+      return;
     }
-    const commnad = `npm-run javascript-obfuscator dist/${mainCliJSFileName} `
-      + ` --output dist/${mainCliJSFileName}`
-      + ` --target node`
-      + ` --string-array-rotate true`
+    const commnad =
+      `npm-run javascript-obfuscator dist/${mainCliJSFileName} ` +
+      ` --output dist/${mainCliJSFileName}` +
+      ` --target node` +
+      ` --string-array-rotate true` +
       // + ` --stringArray true`
-      + ` --string-array-encoding base64`
-      + ` --reserved-names '${reservedNames.join(',')}'`
-      + ` --reserved-strings '${reservedNames.join(',')}'`
+      ` --string-array-encoding base64` +
+      ` --reserved-names '${reservedNames.join(',')}'` +
+      ` --reserved-strings '${reservedNames.join(',')}'`;
 
     Helpers.info(`
 
@@ -4815,7 +5545,7 @@ ${config.frameworkName} start
 
         ${commnad}
 
-          `)
+          `);
     this.run(commnad).sync();
     //#endregion
   }
@@ -4824,8 +5554,12 @@ ${config.frameworkName} start
   //#region getters & methods / cut release code
   private __restoreCuttedReleaseCodeFromSrc(buildOptions: BuildOptions) {
     //#region @backend
-    const releaseSrcLocation = crossPlatformPath(path.join(this.location, config.folder.src));
-    const releaseSrcLocationOrg = crossPlatformPath(path.join(this.location, buildOptions.temporarySrcForReleaseCutCode));
+    const releaseSrcLocation = crossPlatformPath(
+      path.join(this.location, config.folder.src),
+    );
+    const releaseSrcLocationOrg = crossPlatformPath(
+      path.join(this.location, buildOptions.temporarySrcForReleaseCutCode),
+    );
 
     Helpers.removeFolderIfExists(releaseSrcLocation);
     Helpers.copy(releaseSrcLocationOrg, releaseSrcLocation);
@@ -4834,8 +5568,12 @@ ${config.frameworkName} start
   }
   private __cutReleaseCodeFromSrc(buildOptions: BuildOptions) {
     //#region @backend
-    const releaseSrcLocation = crossPlatformPath(path.join(this.location, config.folder.src));
-    const releaseSrcLocationOrg = crossPlatformPath(path.join(this.location, buildOptions.temporarySrcForReleaseCutCode));
+    const releaseSrcLocation = crossPlatformPath(
+      path.join(this.location, config.folder.src),
+    );
+    const releaseSrcLocationOrg = crossPlatformPath(
+      path.join(this.location, buildOptions.temporarySrcForReleaseCutCode),
+    );
     Helpers.removeFolderIfExists(releaseSrcLocationOrg);
     Helpers.copy(releaseSrcLocation, releaseSrcLocationOrg, {
       copySymlinksAsFiles: true,
@@ -4847,7 +5585,11 @@ ${config.frameworkName} start
 
     const filesForModyficaiton = glob.sync(`${releaseSrcLocation}/**/*`);
     filesForModyficaiton
-      .filter(absolutePath => !Helpers.isFolder(absolutePath) && extAllowedToReplace.includes(path.extname(absolutePath)))
+      .filter(
+        absolutePath =>
+          !Helpers.isFolder(absolutePath) &&
+          extAllowedToReplace.includes(path.extname(absolutePath)),
+      )
       .forEach(absolutePath => {
         let rawContent = Helpers.readFile(absolutePath);
         rawContent = RegionRemover.from(
@@ -4867,7 +5609,9 @@ ${config.frameworkName} start
   async init(initOptions?: InitOptions) {
     //#region @backendFunc
 
-    Helpers.removeIfExists(path.join(this.location, config.file.tnpEnvironment_json));
+    Helpers.removeIfExists(
+      path.join(this.location, config.file.tnpEnvironment_json),
+    );
     initOptions = InitOptions.from(initOptions);
     await this.__filesStructure.initFileStructure(initOptions);
     this.recreateLintConfiguration();
@@ -4879,7 +5623,12 @@ ${config.frameworkName} start
 
   //#region getters & methods / struct
   async struct() {
-    if (!((this.__isIsomorphicLib || this.__isContainer) && this.__frameworkVersionAtLeast('v2'))) {
+    if (
+      !(
+        (this.__isIsomorphicLib || this.__isContainer) &&
+        this.__frameworkVersionAtLeast('v2')
+      )
+    ) {
       Helpers.warn(`Not initing ${this.genericName}`);
       return;
     }
@@ -4892,26 +5641,45 @@ ${config.frameworkName} start
     //#region @backendFunc
     await super._beforePushProcessAction();
 
-    if (!this.git.originURL && this.__isContainerChild && !this.__isSmartContainerChild) {
-      this.run(`git remote add ${origin} ${this.parent.git
-        .originURL.replace(this.parent.name, this.name)}`).sync()
+    if (
+      !this.git.originURL &&
+      this.__isContainerChild &&
+      !this.__isSmartContainerChild
+    ) {
+      this.run(
+        `git remote add ${origin} ${this.parent.git.originURL.replace(
+          this.parent.name,
+          this.name,
+        )}`,
+      ).sync();
     }
 
     this.removeFolderByRelativePath('node_modules/husky');
 
     if (this.name === 'firedev') {
-      config.activeFramewrokVersions
-        .forEach((frameworkVersion) => {
-          // console.log(`Active Framework: ${frameworkVersion}`)
-          const morphiProjectContainerPath = path.join(this.location, 'projects', `container${(frameworkVersion === 'v1') ? '' : `-${frameworkVersion}`}`);
-          const containerCoreForVersion = Project.ins.From(morphiProjectContainerPath) as Project;
-          if (containerCoreForVersion) {
-            Helpers.info(`[${config.frameworkName}] updating on push global container${(frameworkVersion === 'v1') ? '' : `-${frameworkVersion}`} in ${this.name}`)
-            containerCoreForVersion.__packageJson.save('Updating morphi container');
-          } else {
-            Helpers.warn(`[firedev][hotfix] Not able to find container for framework version ${frameworkVersion}`);
-          }
-        });
+      config.activeFramewrokVersions.forEach(frameworkVersion => {
+        // console.log(`Active Framework: ${frameworkVersion}`)
+        const morphiProjectContainerPath = path.join(
+          this.location,
+          'projects',
+          `container${frameworkVersion === 'v1' ? '' : `-${frameworkVersion}`}`,
+        );
+        const containerCoreForVersion = Project.ins.From(
+          morphiProjectContainerPath,
+        ) as Project;
+        if (containerCoreForVersion) {
+          Helpers.info(
+            `[${config.frameworkName}] updating on push global container${frameworkVersion === 'v1' ? '' : `-${frameworkVersion}`} in ${this.name}`,
+          );
+          containerCoreForVersion.__packageJson.save(
+            'Updating morphi container',
+          );
+        } else {
+          Helpers.warn(
+            `[firedev][hotfix] Not able to find container for framework version ${frameworkVersion}`,
+          );
+        }
+      });
     }
     if (this.__targetProjects.exists) {
       Helpers.warn(`
@@ -4935,4 +5703,3 @@ ${config.frameworkName} start
 
   //#endregion
 }
-

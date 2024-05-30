@@ -1,25 +1,24 @@
 import { BaseFeatureForProject } from 'tnp-helpers/src';
-import { fse } from 'tnp-core/src'
-import { path } from 'tnp-core/src'
+import { fse } from 'tnp-core/src';
+import { path } from 'tnp-core/src';
 import { _ } from 'tnp-core/src';
 import { Helpers } from 'tnp-helpers/src';
 import { Project } from '../../../project/abstract/project';
 
-
 export class FilesFactory extends BaseFeatureForProject<Project> {
-
-
   createFile(pathToFile: string, content?: string | JSON) {
-    const destPath = path.isAbsolute(pathToFile) ? pathToFile : path.join(this.project.location, pathToFile)
+    const destPath = path.isAbsolute(pathToFile)
+      ? pathToFile
+      : path.join(this.project.location, pathToFile);
     // log(`CREATE FILE: ${destPath}`)
     if (_.isUndefined(content)) {
       content = '';
     }
     if (!fse.existsSync(path.dirname(destPath))) {
-      Helpers.mkdirp(path.dirname(destPath))
+      Helpers.mkdirp(path.dirname(destPath));
     }
     if (_.isObject(content)) {
-      fse.writeJSONSync(destPath, content, { encoding: 'utf8', spaces: 2 })
+      fse.writeJSONSync(destPath, content, { encoding: 'utf8', spaces: 2 });
     } else {
       Helpers.writeFile(destPath, content);
     }
@@ -30,25 +29,22 @@ export class FilesFactory extends BaseFeatureForProject<Project> {
     return {
       file(content: string) {
         self.createFile(path.join(pathes.join('/')), content);
-      }
-    }
+      },
+    };
   }
 
-
   createModel(relativePath: string, name: string) {
-
     this.createEntity(relativePath, name);
     this.createController(relativePath, name);
   }
 
-
-
   private createEntity(relativePath: string, name: string) {
     const kebebCaseName = _.kebabCase(name);
-    const fileNameWithoutExt = _.upperCase(_.kebabCase(name).replace(/\-/g, '_')).replace(/\s/g, '_');
-    this.create(relativePath, kebebCaseName, `${fileNameWithoutExt}.ts`)
-      .file(
-        `
+    const fileNameWithoutExt = _.upperCase(
+      _.kebabCase(name).replace(/\-/g, '_'),
+    ).replace(/\s/g, '_');
+    this.create(relativePath, kebebCaseName, `${fileNameWithoutExt}.ts`).file(
+      `
 import { Firedev } from 'firedev/src';
 
 export interface I${fileNameWithoutExt} {
@@ -75,19 +71,19 @@ export class ${fileNameWithoutExt} extends Firedev.Base.Entity<${fileNameWithout
   exampleProperty: string
 
 }
-`)
+`,
+    );
   }
-
-
 
   private createController(relativePath: string, name: string) {
     const camelCaseUpperFirst = _.upperFirst(_.camelCase(name));
     const kebebCaseName = _.kebabCase(name);
-    const fileNameWithoutExt = _.upperCase(_.kebabCase(name).replace(/\-/g, '_')).replace(/\s/g, '_');
+    const fileNameWithoutExt = _.upperCase(
+      _.kebabCase(name).replace(/\-/g, '_'),
+    ).replace(/\s/g, '_');
     const NameController = `${camelCaseUpperFirst}Controller`;
-    this.create(relativePath, kebebCaseName, `${NameController}.ts`)
-      .file(
-        `
+    this.create(relativePath, kebebCaseName, `${NameController}.ts`).file(
+      `
 import { Firedev } from 'morphi/src';
 import { ${fileNameWithoutExt} } from './${fileNameWithoutExt}';
 
@@ -109,8 +105,7 @@ export class ${NameController} extends Firedev.Base.Controller<${fileNameWithout
   //#endregion
 
 }
-`);
-
+`,
+    );
   }
-
 }

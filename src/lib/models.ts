@@ -1,10 +1,13 @@
-import { ConnectionOptions } from "firedev-typeorm/src";
-import { CoreModels, _ } from "tnp-core/src";
+import { ConnectionOptions } from 'firedev-typeorm/src';
+import { CoreModels, _ } from 'tnp-core/src';
 
 export namespace Models {
-
   export type TestTypeFiredev = 'mocha' | 'jest' | 'cypress';
-  export const TestTypeFiredevArr = ['mocha', 'jest', 'cypress'] as TestTypeFiredev[];
+  export const TestTypeFiredevArr = [
+    'mocha',
+    'jest',
+    'cypress',
+  ] as TestTypeFiredev[];
 
   export type SaveAction = 'save' | 'show' | 'hide';
 
@@ -14,7 +17,7 @@ export namespace Models {
     toOverride: any;
     reasonToShowPackages: string;
     reasonToHidePackages: string;
-  }
+  };
   export interface ActualNpmInstallOptions {
     generatLockFiles?: boolean;
     useYarn?: boolean;
@@ -23,35 +26,39 @@ export namespace Models {
     remove?: boolean;
   }
 
-
   export interface NpmInstallOptions {
     remove?: boolean;
-    npmPackages?: Package[],
+    npmPackages?: Package[];
     smartInstallPreparing?: boolean;
   }
 
-  export type NpmDependencyType = 'dependencies' | 'devDependencies' | 'peerDependencies' | 'optionalDependencies'
+  export type NpmDependencyType =
+    | 'dependencies'
+    | 'devDependencies'
+    | 'peerDependencies'
+    | 'optionalDependencies'
     | 'extensionDependencies'
     | '_phantomChildren';
 
   export type TnpNpmDependencyType = 'tnp_overrided_dependencies';
 
   export const ArrNpmDependencyType: NpmDependencyType[] = [
-    'dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies', ,
-    'extensionDependencies', '_phantomChildren'
-  ]
+    'dependencies',
+    'devDependencies',
+    'peerDependencies',
+    'optionalDependencies',
+    ,
+    'extensionDependencies',
+    '_phantomChildren',
+  ];
 
   export const ArrTnpNpmDependencyType: TnpNpmDependencyType[] = [
-    'tnp_overrided_dependencies'
-  ]
-
-
+    'tnp_overrided_dependencies',
+  ];
 
   export type InstalationType = '-g' | '--save' | '--save-dev';
 
   export const InstalationTypeArr = ['-g', '--save', '--save-dev'];
-
-
 
   export interface FiredevLoaderConfig {
     name?: FiredevLoaders;
@@ -62,7 +69,7 @@ export namespace Models {
     baseUrl: string;
     host?: string; // generated
     externalHost?: string;
-    name: string;  // checked
+    name: string; // checked
     type?: CoreModels.LibType; // checked
 
     port: number; // override type port
@@ -74,15 +81,15 @@ export namespace Models {
     //#endregion
   }
 
-  export type FiredevLoaders = 'lds-default' |
-    'lds-ellipsis' |
-    'lds-facebook' |
-    'lds-grid' |
-    'lds-heart' |
-    'lds-ripple'
+  export type FiredevLoaders =
+    | 'lds-default'
+    | 'lds-ellipsis'
+    | 'lds-facebook'
+    | 'lds-grid'
+    | 'lds-heart'
+    | 'lds-ripple';
 
   export interface EnvConfig {
-
     /**
      * angular production mode
      */
@@ -102,7 +109,7 @@ export namespace Models {
       // background_color?: string;
       // display?: string;
       // scope?: string;
-    },
+    };
 
     loading?: {
       /**
@@ -114,9 +121,9 @@ export namespace Models {
          * loder path to image or
          * build in loader config
          */
-        loader?: string | FiredevLoaderConfig,
-        background?: string,
-      },
+        loader?: string | FiredevLoaderConfig;
+        background?: string;
+      };
       /**
        * this loader is presented when
        * firedev app data is being loader
@@ -124,13 +131,13 @@ export namespace Models {
        */
       afterAngularBootstrap?: {
         /**
-        * loder path to image or
-        * build in loader config
-        */
-        loader?: string | FiredevLoaderConfig,
+         * loder path to image or
+         * build in loader config
+         */
+        loader?: string | FiredevLoaderConfig;
         background?: string;
-      },
-    },
+      };
+    };
 
     pathes?: any;
     config?: any;
@@ -162,14 +169,14 @@ export namespace Models {
           minify: boolean;
           aot: boolean;
           production: boolean;
-        },
+        };
         server: {
           minify: boolean;
           production: boolean;
-        }
-      },
-      projects: EnvConfigProject[]
-    }
+        };
+      };
+      projects: EnvConfigProject[];
+    };
     clientProjectName?: string;
     currentLibProjectSourceFolder?: 'src' | 'components';
     currentProjectName?: string;
@@ -192,8 +199,8 @@ export namespace Models {
     cloud?: {
       ports: {
         update: number;
-      }
-    }
+      };
+    };
 
     build?: {
       number?: number;
@@ -203,36 +210,32 @@ export namespace Models {
         isWatchBuild?: boolean;
         isWebsqlBuild?: boolean;
         outDir?: 'dist';
-      }
-    }
-
+      };
+    };
   }
-
 
   //#region site option
   export type NewSiteOptions = {
-    type?: CoreModels.NewFactoryType,
-    name?: string,
-    cwd?: string,
-    basedOn?: string,
-    version?: CoreModels.FrameworkVersion,
+    type?: CoreModels.NewFactoryType;
+    name?: string;
+    cwd?: string;
+    basedOn?: string;
+    version?: CoreModels.FrameworkVersion;
     skipInit?: boolean;
     alsoBasedOn?: string[];
     siteProjectMode?: 'strict' | 'dependency';
   };
   //#endregion
 
-
-
   export type TargetProject = {
     path?: string;
     origin: string;
     branch: string;
     links: string[];
-  }
+  };
 
   export interface TnpIPackageJSONOverride {
-    scripts?: { [script in string]: string; };
+    scripts?: { [script in string]: string };
     description?: string;
     license?: string;
     private?: boolean;
@@ -244,7 +247,9 @@ export namespace Models {
     name?: string;
   }
 
-  export type TrustedType = { [frameworkVersion in CoreModels.FrameworkVersion]: (string | string[]) };
+  export type TrustedType = {
+    [frameworkVersion in CoreModels.FrameworkVersion]: string | string[];
+  };
 
   export type LinkedRepo = {
     origin: string;
@@ -252,11 +257,11 @@ export namespace Models {
       from: string;
       to: string;
     }[];
-  }
+  };
 
   export interface TnpData extends TnpIPackageJSONOverride {
     type: CoreModels.LibType;
-    version?: CoreModels.FrameworkVersion,
+    version?: CoreModels.FrameworkVersion;
     smartContainerBuildTarget?: string;
     smart?: boolean;
     monorepo?: boolean;
@@ -284,8 +289,8 @@ export namespace Models {
       cliBuildUglify?: boolean;
       cliBuildNoDts?: boolean;
       cliBuildIncludeNodeModules?: boolean;
-    },
-    targetProjects: TargetProject[],
+    };
+    targetProjects: TargetProject[];
     /**
      * framework available inside project/app
      */
@@ -332,18 +337,24 @@ export namespace Models {
         /**
          * Comon dependencies for all kinds of project types
          */
-        common: DependenciesFromPackageJsonStyle | { [groupAlias: string]: DependenciesFromPackageJsonStyle };
+        common:
+          | DependenciesFromPackageJsonStyle
+          | { [groupAlias: string]: DependenciesFromPackageJsonStyle };
         /**
          * Dependencies only for specyfic project type
          */
-        onlyFor: { [libType: string]: DependenciesFromPackageJsonStyle | { [groupAlias: string]: DependenciesFromPackageJsonStyle }; }
-      }
-    }
+        onlyFor: {
+          [libType: string]:
+            | DependenciesFromPackageJsonStyle
+            | { [groupAlias: string]: DependenciesFromPackageJsonStyle };
+        };
+      };
+    };
 
     /**
      * dependency site baselines
      */
-    dependsOn: string[],
+    dependsOn: string[];
     /**
      * Static resurces for standalone project, that are
      * going to be included in release dist
@@ -354,8 +365,6 @@ export namespace Models {
      */
     allowedEnv?: CoreModels.EnvironmentName[];
 
-
-
     /**
      * Override automation generation
      */
@@ -365,47 +374,50 @@ export namespace Models {
       ignoreDepsPattern?: string[];
       includeOnly?: string[];
       includeAsDev?: string[] | '*';
-      linkedFolders?: { from: string; to: string; }[];
+      linkedFolders?: { from: string; to: string }[];
       dependencies?: DependenciesFromPackageJsonStyle;
-    }
-  };
+    };
+  }
 
   export interface IPackageJSON extends TnpIPackageJSONOverride {
     name: string;
     husky?: {
       hooks: {
         'pre-push': string;
-      }
+      };
     };
     version?: string;
     bin?: any;
     preferGlobal?: boolean;
     lastBuildTagHash?: string;
-    engines?: { node: string; npm: string; };
+    engines?: { node: string; npm: string };
     dependencies?: DependenciesFromPackageJsonStyle;
     peerDependencies?: DependenciesFromPackageJsonStyle;
     devDependencies?: DependenciesFromPackageJsonStyle;
-    tnp: (TnpData & TnpIPackageJSONOverride);
-    firedev: (TnpData & TnpIPackageJSONOverride);
+    tnp: TnpData & TnpIPackageJSONOverride;
+    firedev: TnpData & TnpIPackageJSONOverride;
   }
 
-  export type Package = { name: string; version?: string; installType?: InstalationType; };
+  export type Package = {
+    name: string;
+    version?: string;
+    installType?: InstalationType;
+  };
 
   /**
    * @deprecated
    */
-  export type DependenciesFromPackageJsonStyle = { [name: string]: string; };
-
+  export type DependenciesFromPackageJsonStyle = { [name: string]: string };
 
   export interface ProjectForAutoBuild {
-    cwd: string,
+    cwd: string;
     command: string;
     commandWatch: string;
     args?: string[];
   }
 
   export interface ProjectForAutoRelease {
-    cwd: string,
+    cwd: string;
     command: string;
     args?: string[];
   }
@@ -414,7 +426,6 @@ export namespace Models {
     builds?: ProjectForAutoBuild[];
     autoreleases?: ProjectForAutoRelease[];
   }
-
 
   export interface TscCompileOptions {
     cwd: string;
@@ -426,7 +437,6 @@ export namespace Models {
     hideErrors?: boolean;
     debug?: boolean;
   }
-
 
   export interface BuildServeArgsServe {
     port: string;
@@ -440,13 +450,11 @@ export namespace Models {
   export type InlinePkg = {
     isIsomorphic: boolean;
     realName: string;
-  }
-
+  };
 
   export type ModifiedFiles = { modifiedFiles: string[] };
 
   export class Range {
-
     static clone(r: Range) {
       return new Range(r.from, r.to);
     }
@@ -456,13 +464,14 @@ export namespace Models {
       return {
         to(to: number) {
           return new Range(from, to);
-        }
-      }
+        },
+      };
     }
 
     constructor(
       public from: number,
-      public to: number) {
+      public to: number,
+    ) {
       if (_.isNative(from) || _.isNative(to)) {
         throw new Error(`This Range type is only for positive numbers`);
       }
@@ -482,13 +491,17 @@ export namespace Models {
 
     contains(anotherRangeOrNumber: Range | number) {
       if (_.isNumber(anotherRangeOrNumber)) {
-        return anotherRangeOrNumber >= this.from && anotherRangeOrNumber <= this.to;
+        return (
+          anotherRangeOrNumber >= this.from && anotherRangeOrNumber <= this.to
+        );
       }
       anotherRangeOrNumber = anotherRangeOrNumber as Range;
 
-      return (anotherRangeOrNumber.from >= this.from && anotherRangeOrNumber.to <= this.to);
+      return (
+        anotherRangeOrNumber.from >= this.from &&
+        anotherRangeOrNumber.to <= this.to
+      );
     }
-
   }
 
   export type RootArgsType = {
@@ -501,7 +514,6 @@ export namespace Models {
     findNearestProjectTypeWithGitRoot: CoreModels.LibType;
     cwd: string;
   };
-
 
   export interface GenerateProjectCopyOpt {
     override?: boolean;
@@ -519,35 +531,33 @@ export namespace Models {
     dereference?: boolean;
   }
 
-
   export type SourceFolder = 'src' | 'components' | 'custom' | 'tmp-src';
 
-
   export const ImageFileExtensionArr: CoreModels.ImageFileExtension[] = [
-    'jpg', 'jpeg', 'png', 'svg'
+    'jpg',
+    'jpeg',
+    'png',
+    'svg',
   ];
 
-
-  export type RecreateFile = { where: string; from: string; linked?: boolean; };
+  export type RecreateFile = { where: string; from: string; linked?: boolean };
 
   export type Tnp = TnpData & TnpIPackageJSONOverride;
 
-
   export interface RegisterServiceOptions {
     killAlreadyRegisterd?: boolean;
-    actionWhenAssignedPort?: (itWasRegistered: boolean, registerdOnPort?: number) => any;
+    actionWhenAssignedPort?: (
+      itWasRegistered: boolean,
+      registerdOnPort?: number,
+    ) => any;
   }
 
   export class SystemService {
-
     constructor(
       public name: string,
-      public description?: string
-    ) {
-
-    }
+      public description?: string,
+    ) {}
   }
-
 
   export interface PsListInfo {
     pid: number;
@@ -556,8 +566,5 @@ export namespace Models {
     cpu: number;
     name: string;
     cmd: string;
-
   }
-
-
 }

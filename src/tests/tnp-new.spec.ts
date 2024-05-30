@@ -8,13 +8,8 @@
 // // import { NEW } from '../scripts/NEW-PROJECT_FILES_MODULES/NEW.backend';
 // // import { INIT } from '../scripts/PROJECTS-DEVELOPMENT/FILES_STRUCTURE';
 
-
-
 // const wrap = SpecWrap.create();
 // describe(wrap.describe('Tnp init'), async () => {
-
-
-
 
 //   await wrap.it(`should init worksapce project`,
 //     async (location, testName, { packageJSON, cwdChange }) => {
@@ -32,7 +27,6 @@
 //         expect(true).to.be.true;
 
 //       })
-
 
 //     })
 

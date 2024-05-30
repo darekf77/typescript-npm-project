@@ -1,8 +1,8 @@
 //#region @backend
-import { CoreModels, _, crossPlatformPath, path } from "tnp-core/src";
-import { Helpers } from "tnp-helpers/src";
-import { CommandLineFeature } from "tnp-helpers/src";
-import { Project } from "../abstract/project";
+import { CoreModels, _, crossPlatformPath, path } from 'tnp-core/src';
+import { Helpers } from 'tnp-helpers/src';
+import { CommandLineFeature } from 'tnp-helpers/src';
+import { Project } from '../abstract/project';
 
 /**
  # Branding of assets
@@ -29,11 +29,8 @@ export class $Branding extends CommandLineFeature<{}, Project> {
     await this.project.__branding.apply(true);
     this._exit();
   }
-
-
-
 }
 
 export default {
   $Branding: Helpers.CLIWRAP($Branding, '$Branding'),
-}
+};

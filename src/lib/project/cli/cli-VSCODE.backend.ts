@@ -1,46 +1,50 @@
 //#region @backend
-import { CoreModels, _, crossPlatformPath, os, path } from "tnp-core/src";
-import { Helpers } from "tnp-helpers/src";
-import { CommandLineFeature } from "tnp-helpers/src";
-import { Project } from "../abstract/project";
-import { BuildOptions, InitOptions } from "../../build-options";
-import { MESSAGES, TEMP_DOCS } from "../../constants";
-import { config } from "tnp-config/src";
+import { CoreModels, _, crossPlatformPath, os, path } from 'tnp-core/src';
+import { Helpers } from 'tnp-helpers/src';
+import { CommandLineFeature } from 'tnp-helpers/src';
+import { Project } from '../abstract/project';
+import { BuildOptions, InitOptions } from '../../build-options';
+import { MESSAGES, TEMP_DOCS } from '../../constants';
+import { config } from 'tnp-config/src';
 
 export class $Vscode extends CommandLineFeature<{}, Project> {
-  public _() {
-
-  }
+  public _() {}
 
   //#region global
   GLOBAL() {
-    const keybindingPathLinxu = path.join(crossPlatformPath(os.userInfo().homedir), '.config/Code/User/keybindings.json');
-    const keybindingPath = path.join(crossPlatformPath(os.userInfo().homedir), `Library/Application Support/Code/User/keybindings.json`);
+    const keybindingPathLinxu = path.join(
+      crossPlatformPath(os.userInfo().homedir),
+      '.config/Code/User/keybindings.json',
+    );
+    const keybindingPath = path.join(
+      crossPlatformPath(os.userInfo().homedir),
+      `Library/Application Support/Code/User/keybindings.json`,
+    );
     //#region global / keybindings macos
     const keysMac = [
       {
-        'key': 'shift+cmd+s',
-        'command': 'workbench.action.files.saveAll'
+        key: 'shift+cmd+s',
+        command: 'workbench.action.files.saveAll',
       },
       {
-        'key': 'alt+cmd+s',
-        'command': '-workbench.action.files.saveAll'
+        key: 'alt+cmd+s',
+        command: '-workbench.action.files.saveAll',
       },
       {
-        'key': 'shift+cmd+c',
-        'command': 'extension.firedevstopdefaultbuild'
+        key: 'shift+cmd+c',
+        command: 'extension.firedevstopdefaultbuild',
       },
       {
-        'key': 'shift+cmd+b',
-        'command': 'extension.firedevrundefaultbuild'
+        key: 'shift+cmd+b',
+        command: 'extension.firedevrundefaultbuild',
       },
       {
-        'key': 'ctrl+cmd+p',
-        'command': 'extension.vscode-git-automator.pushLocalCommits'
+        key: 'ctrl+cmd+p',
+        command: 'extension.vscode-git-automator.pushLocalCommits',
       },
       {
-        'key': 'shift+cmd+z',
-        'command': 'default:redo'
+        key: 'shift+cmd+z',
+        command: 'default:redo',
       },
     ];
     //#endregion
@@ -48,36 +52,36 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
     //#region global / keybindings linux
     const keysLinux = [
       {
-        "key": "shift+ctrl+s",
-        "command": "workbench.action.files.saveAll"
+        key: 'shift+ctrl+s',
+        command: 'workbench.action.files.saveAll',
       },
       {
-        "key": "alt+ctrl+s",
-        "command": "-workbench.action.files.saveAll"
+        key: 'alt+ctrl+s',
+        command: '-workbench.action.files.saveAll',
       },
       {
-        "key": "shift+ctrl+z",
-        "command": "default:redo"
+        key: 'shift+ctrl+z',
+        command: 'default:redo',
       },
       {
-        "key": "ctrl+shift+z",
-        "command": "-extension.vscode-git-automator.addAndCommitCurrentFile"
+        key: 'ctrl+shift+z',
+        command: '-extension.vscode-git-automator.addAndCommitCurrentFile',
       },
       {
-        "key": "shift+alt+f",
-        "command": "-filesExplorer.findInFolder",
-        "when": "explorerResourceIsFolder && explorerViewletVisible && filesExplorerFocus && !inputFocus"
+        key: 'shift+alt+f',
+        command: '-filesExplorer.findInFolder',
+        when: 'explorerResourceIsFolder && explorerViewletVisible && filesExplorerFocus && !inputFocus',
       },
       {
-        "key": "shift+alt+f",
-        "command": "editor.action.formatDocument",
-        "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && !inCompositeEditor"
+        key: 'shift+alt+f',
+        command: 'editor.action.formatDocument',
+        when: 'editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && !inCompositeEditor',
       },
       {
-        "key": "ctrl+shift+i",
-        "command": "-editor.action.formatDocument",
-        "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && !inCompositeEditor"
-      }
+        key: 'ctrl+shift+i',
+        command: '-editor.action.formatDocument',
+        when: 'editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && !inCompositeEditor',
+      },
     ];
     //#endregion
 
@@ -88,15 +92,12 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
       if (process.platform === 'darwin') {
         Helpers.writeFile(keybindingPath, keysMac);
       }
-
     }
 
     //#region global / windows only settings
     const windowsSettings = {
       'terminal.integrated.defaultProfile.windows': 'Git Bash',
-      'terminal.integrated.shellArgs.windows': [
-        '--login'
-      ],
+      'terminal.integrated.shellArgs.windows': ['--login'],
       'window.customMenuBarAltFocus': false,
       'window.enableMenuBarMnemonics': false,
       'terminal.integrated.rightClickBehavior': 'selectWord',
@@ -111,8 +112,8 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
 
     let settings = {
       'editor.renderWhitespace': true,
-      "window.commandCenter": false,
-      "window.zoomPerWindow": false,
+      'window.commandCenter': false,
+      'window.zoomPerWindow': false,
       'git.enableSmartCommit': true,
       'terminal.integrated.scrollback': 10000,
       // 'files.insertFinalNewline': true,
@@ -125,14 +126,14 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
       'git.autofetch': false,
       'gitlens.keymap': 'none',
       'gitlens.advanced.messages': {
-        'suppressCommitHasNoPreviousCommitWarning': false,
-        'suppressCommitNotFoundWarning': false,
-        'suppressFileNotUnderSourceControlWarning': false,
-        'suppressGitVersionWarning': false,
-        'suppressLineUncommittedWarning': false,
-        'suppressNoRepositoryWarning': false,
-        'suppressResultsExplorerNotice': false,
-        'suppressShowKeyBindingsNotice': true
+        suppressCommitHasNoPreviousCommitWarning: false,
+        suppressCommitNotFoundWarning: false,
+        suppressFileNotUnderSourceControlWarning: false,
+        suppressGitVersionWarning: false,
+        suppressLineUncommittedWarning: false,
+        suppressNoRepositoryWarning: false,
+        suppressResultsExplorerNotice: false,
+        suppressShowKeyBindingsNotice: true,
       },
       'search.followSymlinks': false,
       'javascript.implicitProjectConfig.experimentalDecorators': true,
@@ -153,27 +154,36 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
       'workbench.colorTheme': 'Default Light+',
       'update.mode': 'none',
       'debug.onTaskErrors': 'abort',
-      "editor.wordBasedSuggestions": false,
+      'editor.wordBasedSuggestions': false,
       'typescript.tsdk': 'node_modules/typescript/lib',
       'terminal.integrated.tabs.enabled': false,
-      "workbench.editor.enablePreview": true,
-      "security.workspace.trust.banner": "never",
-      "telemetry.enableTelemetry": false,
-      "security.workspace.trust.enabled": false,
-      "terminal.integrated.enableMultiLinePasteWarning": false,
-      "git.detectSubmodules": false,
-      "editor.wordBasedSuggestionswordBasedSuggestions": false,
-      "git.openRepositoryInParentFolders": "never",
-      "redhat.telemetry.enabled": false,
-      "editor.accessibilitySupport": "off",
-      "editor.minimap.enabled": true,
-      "editor.stickyScroll.enabled": false,
-      "editor.minimap.showMarkSectionHeaders": false,
-      "editor.minimap.showRegionSectionHeaders": false,
+      'workbench.editor.enablePreview': true,
+      'security.workspace.trust.banner': 'never',
+      'telemetry.enableTelemetry': false,
+      'security.workspace.trust.enabled': false,
+      'terminal.integrated.enableMultiLinePasteWarning': false,
+      'git.detectSubmodules': false,
+      'editor.wordBasedSuggestionswordBasedSuggestions': false,
+      'git.openRepositoryInParentFolders': 'never',
+      'redhat.telemetry.enabled': false,
+      'editor.accessibilitySupport': 'off',
+      'editor.minimap.enabled': true,
+      'editor.stickyScroll.enabled': false,
+      'editor.minimap.showMarkSectionHeaders': false,
+      'editor.minimap.showRegionSectionHeaders': false,
     };
-    const settingspathWindows = path.join(crossPlatformPath(os.userInfo().homedir), 'AppData/Roaming/Code/User/settings.json');
-    const settingspathLinux = path.join(crossPlatformPath(os.userInfo().homedir), '.config/Code/User/settings.json');
-    let settingspath = path.join(crossPlatformPath(os.userInfo().homedir), 'Library/Application Support/Code/User/settings.json');
+    const settingspathWindows = path.join(
+      crossPlatformPath(os.userInfo().homedir),
+      'AppData/Roaming/Code/User/settings.json',
+    );
+    const settingspathLinux = path.join(
+      crossPlatformPath(os.userInfo().homedir),
+      '.config/Code/User/settings.json',
+    );
+    let settingspath = path.join(
+      crossPlatformPath(os.userInfo().homedir),
+      'Library/Application Support/Code/User/settings.json',
+    );
 
     if (process.platform === 'darwin') {
       settings = _.merge(settings, settingsMacOS);
@@ -195,12 +205,12 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
 
   TEMP_SHOW() {
     this._showfilesfor(Project.ins.Current);
-    this._exit()
+    this._exit();
   }
 
   TEMP_HIDE() {
     this._hidefilesfor(this.project);
-    this._exit()
+    this._exit();
   }
 
   INIT() {
@@ -219,4 +229,4 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
 
 export default {
   $Vscode: Helpers.CLIWRAP($Vscode, '$Vscode'),
-}
+};

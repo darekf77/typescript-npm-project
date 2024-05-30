@@ -1,8 +1,5 @@
 //#region @backend
-import {
-  crossPlatformPath,
-  path, _, CoreModels
-} from 'tnp-core/src';
+import { crossPlatformPath, path, _, CoreModels } from 'tnp-core/src';
 //#endregion
 import { config } from 'tnp-config/src';
 
@@ -15,7 +12,6 @@ import { BaseInsideStruct } from './structs/base-inside-struct';
 import { InitOptions } from '../../../build-options';
 
 export class InsideStructures extends BaseFeatureForProject<Project> {
-
   //#region field & getters
   private insideStructAngular13AppNormal: InsideStructAngular13App;
   private insideStructAngular13LibNormal: InsideStructAngular13Lib;
@@ -28,18 +24,28 @@ export class InsideStructures extends BaseFeatureForProject<Project> {
     super(project);
   }
 
-
   //#region api
 
   //#region api / recreate
   public async recrate(initOptions: InitOptions) {
     initOptions = InitOptions.from(initOptions);
 
-    this.insideStructAngular13AppNormal = new InsideStructAngular13App(this.project, initOptions.clone({ websql: false }));
-    this.insideStructAngular13LibNormal = new InsideStructAngular13Lib(this.project, initOptions.clone({ websql: false }));
-    this.insideStructAngular13AppWebsql = new InsideStructAngular13App(this.project, initOptions.clone({ websql: true }));
-    this.insideStructAngular13LibWebsql = new InsideStructAngular13Lib(this.project, initOptions.clone({ websql: true }));
-
+    this.insideStructAngular13AppNormal = new InsideStructAngular13App(
+      this.project,
+      initOptions.clone({ websql: false }),
+    );
+    this.insideStructAngular13LibNormal = new InsideStructAngular13Lib(
+      this.project,
+      initOptions.clone({ websql: false }),
+    );
+    this.insideStructAngular13AppWebsql = new InsideStructAngular13App(
+      this.project,
+      initOptions.clone({ websql: true }),
+    );
+    this.insideStructAngular13LibWebsql = new InsideStructAngular13Lib(
+      this.project,
+      initOptions.clone({ websql: true }),
+    );
 
     const structs: BaseInsideStruct[] = [
       this.insideStructAngular13AppNormal,
@@ -55,27 +61,31 @@ export class InsideStructures extends BaseFeatureForProject<Project> {
         continue;
       }
 
-      const opt: InsideStructureData = {
-      };
+      const opt: InsideStructureData = {};
 
-      const replacement = (pathOrg) => {
-        const replacedPart = insideStruct.struct.pathReplacements.reduce((a, b) => {
-          return pathOrg
-            .replace(b[0], b[1](opt))
-        }, pathOrg);
+      const replacement = pathOrg => {
+        const replacedPart = insideStruct.struct.pathReplacements.reduce(
+          (a, b) => {
+            return pathOrg.replace(b[0], b[1](opt));
+          },
+          pathOrg,
+        );
         return replacedPart;
       };
 
       opt.replacement = replacement;
 
-
       //#region copying files
       if (insideStruct?.struct?.relateivePathesFromContainer) {
-        [
-          ...insideStruct.struct.relateivePathesFromContainer,
-        ].forEach(f => {
-          const orgPath = crossPlatformPath(Helpers.resolve(path.join(insideStruct.struct.coreContainer.location, f)));
-          const destPath = clearUnexistedLinks(crossPlatformPath([this.project.location, replacement(f)]))
+        [...insideStruct.struct.relateivePathesFromContainer].forEach(f => {
+          const orgPath = crossPlatformPath(
+            Helpers.resolve(
+              path.join(insideStruct.struct.coreContainer.location, f),
+            ),
+          );
+          const destPath = clearUnexistedLinks(
+            crossPlatformPath([this.project.location, replacement(f)]),
+          );
 
           if (orgPath !== destPath) {
             if (Helpers.isFolder(orgPath)) {
@@ -86,7 +96,7 @@ export class InsideStructures extends BaseFeatureForProject<Project> {
           } else {
             Helpers.warn(`${config.frameworkName} [initAngularAppStructure] trying to copy same thing:
               ${orgPath}
-              `)
+              `);
           }
         });
       }
@@ -95,9 +105,16 @@ export class InsideStructures extends BaseFeatureForProject<Project> {
 
       //#region linking node_modules
       if (insideStruct?.struct?.linkNodeModulesTo && !initOptions.struct) {
-        for (let index = 0; index < insideStruct.struct.linkNodeModulesTo.length; index++) {
-          const f = insideStruct.struct.linkNodeModulesTo[index]
-          const destPath = crossPlatformPath([this.project.location, replacement(f)]);
+        for (
+          let index = 0;
+          index < insideStruct.struct.linkNodeModulesTo.length;
+          index++
+        ) {
+          const f = insideStruct.struct.linkNodeModulesTo[index];
+          const destPath = crossPlatformPath([
+            this.project.location,
+            replacement(f),
+          ]);
           this.project.__node_modules.linkTo(destPath);
         }
       }
@@ -105,14 +122,18 @@ export class InsideStructures extends BaseFeatureForProject<Project> {
 
       //#region linking files and folders
       if (insideStruct?.struct?.linksFuncs) {
-        for (let index = 0; index < insideStruct.struct.linksFuncs.length; index++) {
-          const [fun1, fun2] = insideStruct.struct.linksFuncs[index]
+        for (
+          let index = 0;
+          index < insideStruct.struct.linksFuncs.length;
+          index++
+        ) {
+          const [fun1, fun2] = insideStruct.struct.linksFuncs[index];
           let from = fun1(opt);
           from = crossPlatformPath([this.project.location, replacement(from)]);
 
           let to = fun2(opt);
           to = crossPlatformPath([this.project.location, replacement(to)]);
-          if (!to || !from || (to === from)) {
+          if (!to || !from || to === from) {
             continue;
           }
           // console.log({
@@ -120,7 +141,9 @@ export class InsideStructures extends BaseFeatureForProject<Project> {
           //   to
           // })
           Helpers.remove(to);
-          Helpers.createSymLink(from, to, { continueWhenExistedFolderDoesntExists: true });
+          Helpers.createSymLink(from, to, {
+            continueWhenExistedFolderDoesntExists: true,
+          });
         }
       }
       //#endregion
@@ -129,7 +152,7 @@ export class InsideStructures extends BaseFeatureForProject<Project> {
       if (_.isFunction(insideStruct?.struct?.endAction)) {
         await Helpers.runSyncOrAsync({
           functionFn: insideStruct.struct.endAction,
-          arrayOfParams: [opt]
+          arrayOfParams: [opt],
         });
       }
       //#endregion
@@ -138,12 +161,10 @@ export class InsideStructures extends BaseFeatureForProject<Project> {
   //#endregion
 
   //#endregion
-
 }
 
-
 function clearUnexistedLinks(pathToClear: string) {
-  pathToClear = (crossPlatformPath(pathToClear) || '');
+  pathToClear = crossPlatformPath(pathToClear) || '';
   const orgPath = pathToClear;
   const splited = pathToClear.split('/');
   let previous: string;

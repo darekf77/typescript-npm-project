@@ -13,7 +13,6 @@
 // const BASELINE_WORKSPACE_PROJECT_NAME = 'test-1'
 // const SITE_NAME = `site-for-${BASELINE_WORKSPACE_PROJECT_NAME}`;
 
-
 // class BaselinSiteJoinTest {
 
 //   baselinChild: Project;
@@ -36,8 +35,6 @@
 //     }
 //   }
 
-
-
 //   scenario(contextFn: (context: BaselinSiteJoinTest) => void) {
 
 //     contextFn(this);
@@ -47,10 +44,8 @@
 
 // }
 
-
 // const wrap = SpecWrap.create();
 // describe(wrap.describe('Tnp Baseline Site'), async () => {
-
 
 //   await wrap.it(`should create baseline/site worksapces projects`,
 //     async (location, testName, { packageJSON, cwdChange }) => {
@@ -65,14 +60,11 @@
 
 //       const ins = BaselinSiteJoinTest.create(project.baseline, project.site);
 
-
 //       ins
 //         .test('isomorphic-lib')
 //         .scenario(ctx => {
 //           simpleContorllerJoin(ctx);
 //         })
-
-
 
 //       it(testName, async () => {
 //         // await cwdChange(BASELINE_WORKSPACE_PROJECT_NAME, async () => {
@@ -91,14 +83,9 @@
 
 //       })
 
-
-
 //     }, { removeTestFolder: false })
 
-
 // })
-
-
 
 // /**
 //  * Simple Baseline Site Join of isomorphic-lib controller
@@ -156,6 +143,5 @@
 //     // });
 
 //   })
-
 
 // }

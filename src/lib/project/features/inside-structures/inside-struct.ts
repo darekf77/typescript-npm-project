@@ -6,7 +6,9 @@ export type InsideStructureData = {
 };
 
 export type InsideStructLinkType = (options: InsideStructureData) => string;
-export type InsideStructLinkTypePathRep = (options: Omit<InsideStructureData, 'replacement'>) => string;
+export type InsideStructLinkTypePathRep = (
+  options: Omit<InsideStructureData, 'replacement'>,
+) => string;
 export type InsideStructEndAction = (options: InsideStructureData) => void;
 
 /**
@@ -16,17 +18,15 @@ export type InsideStructEndAction = (options: InsideStructureData) => void;
  * 2. Link node_modules to desitnation projects
  */
 export class InsideStruct {
-
   //#region @backend
   static from(options: Partial<InsideStruct>) {
     const obj = new InsideStruct();
-    Object.keys(options)
-      .forEach(key => {
-        const v = options[key];
-        if (!!v) {
-          obj[key] = v;
-        }
-      });
+    Object.keys(options).forEach(key => {
+      const v = options[key];
+      if (!!v) {
+        obj[key] = v;
+      }
+    });
     return obj;
   }
 
@@ -38,7 +38,10 @@ export class InsideStruct {
      * Replace pathes while copying relateivePathesFromContainer
      * to destination project
      */
-    public pathReplacements: [string | RegExp, InsideStructLinkTypePathRep][] = [],
+    public pathReplacements: [
+      string | RegExp,
+      InsideStructLinkTypePathRep,
+    ][] = [],
     public linkNodeModulesTo: string[] = [],
     public linksFuncs: [
       /**
@@ -48,21 +51,16 @@ export class InsideStruct {
       /**
        * destination path
        */
-      InsideStructLinkType
+      InsideStructLinkType,
     ][] = [],
     public endAction?: InsideStructEndAction,
-  ) {
-
-  }
+  ) {}
 
   public get coreContainer() {
     return Project.by(this.projectType, this.frameworkVersion) as Project;
   }
 
-  recreate(outFolder: CoreModels.OutFolder = 'dist') {
-
-  }
-
+  recreate(outFolder: CoreModels.OutFolder = 'dist') {}
 
   //#endregion
 }

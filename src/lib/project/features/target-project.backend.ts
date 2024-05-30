@@ -1,7 +1,7 @@
 import { _ } from 'tnp-core/src';
 import { glob } from 'tnp-core/src';
-import { path } from 'tnp-core/src'
-import { fse } from 'tnp-core/src'
+import { path } from 'tnp-core/src';
+import { fse } from 'tnp-core/src';
 import chalk from 'chalk';
 import { config } from 'tnp-config/src';
 import { BaseFeatureForProject } from 'tnp-helpers/src';
@@ -17,22 +17,24 @@ export class TargetProject extends BaseFeatureForProject<Project> {
   }
 
   private get all() {
-    return _.cloneDeep(this.project.__packageJson.targetProjects).map((p: any) => {
-      const res = p as Models.TargetProject;
-      res.path = path.join(
-        this.project.location,
-        config.folder.targetProjects.DEFAULT_PATH_GENERATED,
-        _.kebabCase(res.origin),
-        _.kebabCase(res.branch)
-      );
-      // if (!_.isString(p.path)) {
-      //   p.path = path.join(this.project.location, DEFAULT_PATH_GENERATED, this.project.name);
-      // }
-      // if (!path.isAbsolute(p.path)) {
-      //   p.path = path.resolve(path.join(this.project.location, p.path));
-      // }
-      return res;
-    })
+    return _.cloneDeep(this.project.__packageJson.targetProjects).map(
+      (p: any) => {
+        const res = p as Models.TargetProject;
+        res.path = path.join(
+          this.project.location,
+          config.folder.targetProjects.DEFAULT_PATH_GENERATED,
+          _.kebabCase(res.origin),
+          _.kebabCase(res.branch),
+        );
+        // if (!_.isString(p.path)) {
+        //   p.path = path.join(this.project.location, DEFAULT_PATH_GENERATED, this.project.name);
+        // }
+        // if (!path.isAbsolute(p.path)) {
+        //   p.path = path.resolve(path.join(this.project.location, p.path));
+        // }
+        return res;
+      },
+    );
   }
 
   async update() {
@@ -45,7 +47,6 @@ export class TargetProject extends BaseFeatureForProject<Project> {
   //#endregion
 }
 
-
 async function generate(project: Project, t: Models.TargetProject) {
   project.__packageJson.showDeps('taget project generation');
   if (!Helpers.exists(path.dirname(t.path))) {
@@ -54,7 +55,7 @@ async function generate(project: Project, t: Models.TargetProject) {
   const originDefaultPath = path.join(
     project.location,
     config.folder.targetProjects.DEFAULT_PATH_ORIGINS,
-    _.kebabCase(t.origin)
+    _.kebabCase(t.origin),
   );
 
   if (!Helpers.exists(path.dirname(originDefaultPath))) {
@@ -64,10 +65,10 @@ async function generate(project: Project, t: Models.TargetProject) {
     await Helpers.git.clone({
       cwd: path.dirname(originDefaultPath),
       url: t.origin,
-      destinationFolderName: _.kebabCase(t.origin)
+      destinationFolderName: _.kebabCase(t.origin),
     });
   }
-  Helpers.log('PULLLING BRANCH')
+  Helpers.log('PULLLING BRANCH');
   await Helpers.git.pullCurrentBranch(originDefaultPath);
 
   if (Helpers.exists(t.path)) {
@@ -86,8 +87,10 @@ async function generate(project: Project, t: Models.TargetProject) {
       Helpers.run(`git checkout -b ${t.branch}`, { cwd: t.path }).sync();
       await Helpers.git.pullCurrentBranch(t.path);
     } catch (error) {
-      Helpers.error(`[target-project] Not able create target project (git checkout -b failed)`
-        + `${chalk.bold(project.name)} from origin ${t.origin}...`);
+      Helpers.error(
+        `[target-project] Not able create target project (git checkout -b failed)` +
+          `${chalk.bold(project.name)} from origin ${t.origin}...`,
+      );
     }
   }
 
@@ -128,26 +131,25 @@ async function generate(project: Project, t: Models.TargetProject) {
     }
   });
   Helpers.info('COPY DONE');
-  [
-    config.folder.node_modules,
-  ].forEach(l => {
+  [config.folder.node_modules].forEach(l => {
     const source = path.join(project.location, l);
     const dest = path.join(t.path, l);
     Helpers.removeIfExists(dest);
-    Helpers.createSymLink(source, dest,
-      { continueWhenExistedFolderDoesntExists: true });
+    Helpers.createSymLink(source, dest, {
+      continueWhenExistedFolderDoesntExists: true,
+    });
   });
 
   _.values(config.frameworkNames).forEach(f => {
-    Helpers.setValueToJSON(path.join(t.path, config.file.package_json), `${f}.targetProjects`, void 0);
+    Helpers.setValueToJSON(
+      path.join(t.path, config.file.package_json),
+      `${f}.targetProjects`,
+      void 0,
+    );
   });
-  [
-    config.file.yarn_lock,
-    config.file.firedev_jsonc
-  ].forEach(dumbFiles => {
+  [config.file.yarn_lock, config.file.firedev_jsonc].forEach(dumbFiles => {
     Helpers.removeFileIfExists(path.join(t.path, dumbFiles));
   });
   Helpers.run(`code ${t.path}`).sync();
-  Helpers.info("DONE")
-
+  Helpers.info('DONE');
 }

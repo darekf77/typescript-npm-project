@@ -1,8 +1,11 @@
 //#region @websql
 //#region imports
 import {
-  EntitySubscriberInterface, EventSubscriber, InsertEvent,
-  RemoveEvent, UpdateEvent
+  EntitySubscriberInterface,
+  EventSubscriber,
+  InsertEvent,
+  RemoveEvent,
+  UpdateEvent,
 } from 'firedev-typeorm/src';
 import type { BuildProcess } from '../build-process';
 //#endregion
@@ -14,13 +17,11 @@ import type { BuildProcess } from '../build-process';
  */
 @EventSubscriber()
 export class BuildProcessSubscriber implements EntitySubscriberInterface {
-
   /**
-  * Called after entity update.
-  */
+   * Called after entity update.
+   */
   // afterUpdate(event: UpdateEvent<BuildProcess>) {
   //   console.log(`AFTER ENTITY UPDATED: `, event.entity)
   // }
-
 }
 //#endregion

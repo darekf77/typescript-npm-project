@@ -1,12 +1,11 @@
 //#region @backend
-import { path, crossPlatformPath } from 'tnp-core/src'
+import { path, crossPlatformPath } from 'tnp-core/src';
 import { _ } from 'tnp-core/src';
 import { config } from 'tnp-config/src';
 import { NodeModulesBase } from './node-modules-base.backend';
 import { Helpers } from 'tnp-helpers/src';
 
 export class NodeModules extends NodeModulesBase {
-
   get fixesForNodeModulesPackages() {
     // const notAllowedNames = [
     //   'plugins',

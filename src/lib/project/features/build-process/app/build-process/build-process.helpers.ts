@@ -9,9 +9,5 @@ import { Helpers } from 'tnp-helpers/src';
  * + helper can be used on backend/frontend
  */
 export namespace BuildProcessHelpers {
-
-  export function helloWorldBuildProcess() {
-
-  }
-
+  export function helloWorldBuildProcess() {}
 }

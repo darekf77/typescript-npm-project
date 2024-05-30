@@ -359,7 +359,7 @@
           "lodash": "^4.17.4",
         },
         // "isomophic-orm": {
-          // typeorm: "0.2.7",
+        // typeorm: "0.2.7",
         // },
         "files-operations": {
           "lnk": "~1.0.1",

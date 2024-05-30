@@ -6,11 +6,11 @@ import { CLASS } from 'typescript-class-helpers/src';
 
 //#region build options lib or app
 class SystemTask<T> {
-  protected constructor() { }
+  protected constructor() {}
   finishCallback: () => any;
   public clone(override: Partial<T>): T {
     const classFn = CLASS.getFromObject(this);
-    const result = _.merge(new (classFn)(), _.merge(_.cloneDeep(this), override));
+    const result = _.merge(new classFn(), _.merge(_.cloneDeep(this), override));
     // console.log({result})
     return result;
   }
@@ -22,9 +22,9 @@ export class BaseBuild<T> extends SystemTask<T> {
    */
   watch: boolean;
   /**
-    * build on remote server (user cannot interfere with console)
-    * without user interaction
-    */
+   * build on remote server (user cannot interfere with console)
+   * without user interaction
+   */
   ci: boolean;
 
   /**
@@ -107,16 +107,14 @@ export class InitOptions extends BaseBuild<InitOptions> {
 
     for (const prop of propsToInit) {
       if (!_.isUndefined(options[prop])) {
-        initOptions[prop] = options[prop]
+        initOptions[prop] = options[prop];
       }
     }
 
     return initOptions;
   }
 
-  public fillBaseHrefFromFile(project: Project) {
-
-  }
+  public fillBaseHrefFromFile(project: Project) {}
 }
 //#endregion
 
@@ -180,8 +178,8 @@ export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
    */
   cutNpmPublishLibReleaseCode: boolean;
   /**
- * Do not generate backend code
- */
+   * Do not generate backend code
+   */
   genOnlyClientCode: boolean;
   /**
    * Generate only backend, without browser version
@@ -193,7 +191,9 @@ export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
    */
   smartContainerTargetName: string;
 
-  public static from(options: Omit<Partial<BuildOptions>, 'appBuild' | 'serveApp'>): BuildOptions {
+  public static from(
+    options: Omit<Partial<BuildOptions>, 'appBuild' | 'serveApp'>,
+  ): BuildOptions {
     return from(options, BuildOptions);
   }
 }
@@ -201,7 +201,6 @@ export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
 
 //#region release options
 export class ReleaseOptions extends BuildOptionsLibOrApp<ReleaseOptions> {
-
   private constructor() {
     super();
     this.releaseType = 'patch';
@@ -235,8 +234,8 @@ export class ReleaseOptions extends BuildOptionsLibOrApp<ReleaseOptions> {
    */
   automaticRelease: boolean;
   /**
-  * quick automatic release of docs app(s)
-  */
+   * quick automatic release of docs app(s)
+   */
   automaticReleaseDocs: boolean;
   bumbVersionIn: string[];
   /**
@@ -251,14 +250,17 @@ export class ReleaseOptions extends BuildOptionsLibOrApp<ReleaseOptions> {
 
 //#endregion
 
-function from(options: Partial<InitOptions | BuildOptions | ReleaseOptions>, classFn: Function) {
+function from(
+  options: Partial<InitOptions | BuildOptions | ReleaseOptions>,
+  classFn: Function,
+) {
   const orgFinishCallback = options?.finishCallback;
   options = (options ? options : {}) as any;
   const res = _.merge(new (classFn as any)(), _.cloneDeep(options));
   if (orgFinishCallback) {
     res.finishCallback = orgFinishCallback;
   } else {
-    res.finishCallback = () => { }
+    res.finishCallback = () => {};
   }
   return res;
 }

@@ -1,6 +1,6 @@
 //#region imports
-import { chalk, crossPlatformPath, moment, path } from 'tnp-core/src'
-import { fse } from 'tnp-core/src'
+import { chalk, crossPlatformPath, moment, path } from 'tnp-core/src';
+import { fse } from 'tnp-core/src';
 import { _ } from 'tnp-core/src';
 
 import { Project } from '../../abstract/project';
@@ -11,23 +11,31 @@ import { config } from 'tnp-config/src';
 import * as semver from 'semver';
 import { PackagesRecognition } from '../package-recognition/packages-recognition';
 import {
-  executeCommand, fixOptions, prepareCommand
+  executeCommand,
+  fixOptions,
+  prepareCommand,
 } from './npm-packages-helpers.backend';
 //#endregion
 
 export class NpmPackagesCore extends BaseFeatureForProject<Project> {
-
   global(globalPackageName: string, packageOnly = false) {
-
     const oldContainer = Project.by('container', 'v1') as Project;
     if (!oldContainer.__node_modules.exist) {
-      Helpers.info('initing container v1 for global packages')
+      Helpers.info('initing container v1 for global packages');
       oldContainer.run(`${config.frameworkName} init`).sync();
     }
     if (packageOnly) {
-      return crossPlatformPath(path.join(oldContainer.__node_modules.path, globalPackageName));
+      return crossPlatformPath(
+        path.join(oldContainer.__node_modules.path, globalPackageName),
+      );
     }
-    return crossPlatformPath(path.join(oldContainer.__node_modules.path, globalPackageName, `bin/${globalPackageName}`));
+    return crossPlatformPath(
+      path.join(
+        oldContainer.__node_modules.path,
+        globalPackageName,
+        `bin/${globalPackageName}`,
+      ),
+    );
   }
 
   protected get emptyNodeModuls() {
@@ -35,7 +43,9 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
   }
 
   package(pacakgeName: string) {
-    const p = Project.ins.From(this.project.__node_modules.pathFor(pacakgeName));
+    const p = Project.ins.From(
+      this.project.__node_modules.pathFor(pacakgeName),
+    );
     const ver = p?.version;
     const that = this;
     return {
@@ -43,7 +53,9 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
         return !ver ? false : semver.satisfies(ver, versionOrRange);
       },
       isNotSatisfyBy(versionOrRange: string) {
-        return !ver ? false : !that.package(pacakgeName).isSatisfyBy(versionOrRange);
+        return !ver
+          ? false
+          : !that.package(pacakgeName).isSatisfyBy(versionOrRange);
       },
       get version() {
         return ver;
@@ -52,17 +64,21 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
         return that.project.__node_modules.pathFor(pacakgeName);
       },
       get exists() {
-        return !!p
-      }
-    }
+        return !!p;
+      },
+    };
   }
 
   protected actualNpmProcess(options?: Models.ActualNpmInstallOptions) {
     if (this.project.__isDocker) {
       return;
     }
-    const { generatLockFiles, useYarn, pkg, reason, remove } = fixOptions(options);
-    const yarnLockPath = path.join(this.project.location, config.file.yarn_lock);
+    const { generatLockFiles, useYarn, pkg, reason, remove } =
+      fixOptions(options);
+    const yarnLockPath = path.join(
+      this.project.location,
+      config.file.yarn_lock,
+    );
     const yarnLockExisits = fse.existsSync(yarnLockPath);
     const command: string = prepareCommand(pkg, remove, useYarn, this.project);
     Helpers.log(`
@@ -70,7 +86,6 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
     [actualNpmProcess] npm instalation...
 
     `);
-
 
     if (remove) {
       executeCommand(command, this.project);
@@ -84,10 +99,13 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
         // Helpers.taskDone('Done rebuilding electorn');
       } catch (err) {
         if (config.frameworkName === 'tnp') {
-          console.log(err)
+          console.log(err);
         }
-        const isLinux = (['win32', 'darwin'] as NodeJS.Platform[]).includes(process.platform);
-        const linuxMessage = isLinux ? `
+        const isLinux = (['win32', 'darwin'] as NodeJS.Platform[]).includes(
+          process.platform,
+        );
+        const linuxMessage = isLinux
+          ? `
 
 ${chalk.red('Make sure that you:')}:
 
@@ -99,18 +117,26 @@ export NODE_OPTIONS=--max_old_space_size=4096
 
 echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
 
-        `: '';
+        `
+          : '';
 
-        Helpers.error(`[${config.frameworkName}] Error during npm install...
+        Helpers.error(
+          `[${config.frameworkName}] Error during npm install...
 
         ${linuxMessage}
 
-        `, false, true);
+        `,
+          false,
+          true,
+        );
       }
     }
 
     this.project.quickFixes.nodeModulesPackagesZipReplacement();
-    PackagesRecognition.fromProject(this.project).start(true, '[actualNpmProcess] after npm i');
+    PackagesRecognition.fromProject(this.project).start(
+      true,
+      '[actualNpmProcess] after npm i',
+    );
 
     if (!generatLockFiles) {
       if (useYarn) {
@@ -119,14 +145,17 @@ echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo s
             this.project.git.resetFiles(config.file.yarn_lock);
           }
         } else {
-          fse.existsSync(yarnLockPath) && Helpers.removeFileIfExists(yarnLockPath);
+          fse.existsSync(yarnLockPath) &&
+            Helpers.removeFileIfExists(yarnLockPath);
         }
       } else {
-        const packageLockPath = path.join(this.project.location, config.file.package_lock_json)
-        fse.existsSync(packageLockPath) && Helpers.removeFileIfExists(packageLockPath);
+        const packageLockPath = path.join(
+          this.project.location,
+          config.file.package_lock_json,
+        );
+        fse.existsSync(packageLockPath) &&
+          Helpers.removeFileIfExists(packageLockPath);
       }
     }
   }
-
-
 }

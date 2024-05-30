@@ -1,6 +1,12 @@
 //#region imports
 import { Firedev } from 'firedev/src';
-import { Observable, map, BehaviorSubject, combineLatest, switchMap } from 'rxjs';
+import {
+  Observable,
+  map,
+  BehaviorSubject,
+  combineLatest,
+  switchMap,
+} from 'rxjs';
 import {
   FiredevFileController,
   FiredevBinaryFileController,
@@ -20,28 +26,38 @@ import { CommonModule } from '@angular/common';
 //#region @browser
 @Component({
   selector: 'app-tnp',
-  template: `hello from tnp<br>
-    <br>
-     from backend
+  template: `hello from tnp<br />
+    <br />
+    from backend
     <ul>
-      <li *ngFor="let user of (users$ | async)"> {{ user | json }} </li>
+      <li *ngFor="let user of users$ | async">{{ user | json }}</li>
     </ul>
-    <button (click)="add()" >add and refresh</button>
-  `,
-  styles: [` body { margin: 0px !important; } `],
+    <button (click)="add()">add and refresh</button> `,
+  styles: [
+    `
+      body {
+        margin: 0px !important;
+      }
+    `,
+  ],
 })
 export class TnpComponent implements OnInit {
   trigger = new BehaviorSubject<void>(void 0);
-  users$: Observable<User[]> = this.trigger.asObservable()
-    .pipe(switchMap(() => User.ctrl.getAll().received.observable), map((data) => data.body.json));
+  users$: Observable<User[]> = this.trigger.asObservable().pipe(
+    switchMap(() => User.ctrl.getAll().received.observable),
+    map(data => data.body.json),
+  );
 
   async add() {
-    await User.ctrl.create(User.from({ name: 'franek' + (new Date().getTime()) }));
+    await User.ctrl.create(
+      User.from({ name: 'franek' + new Date().getTime() }),
+    );
     await this.trigger.next();
   }
 
-  constructor() { }
-  ngOnInit() { }
+  constructor() {}
+  // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
+  ngOnInit() {}
 }
 
 @NgModule({
@@ -50,14 +66,14 @@ export class TnpComponent implements OnInit {
   declarations: [TnpComponent],
   providers: [],
 })
-export class TnpModule { }
+export class TnpModule {}
 //#endregion
 
 @Firedev.Entity({ className: 'User' })
 class User extends Firedev.Base.Entity {
   public static ctrl?: UserController;
   public static from(user: Partial<User>) {
-    return _.merge(new User(), _.cloneDeep(user))
+    return _.merge(new User(), _.cloneDeep(user));
   }
   //#region @websql
   @Firedev.Orm.Column.Generated()
@@ -68,7 +84,6 @@ class User extends Firedev.Base.Entity {
   @Firedev.Orm.Column.Custom({ type: 'varchar', length: '100', nullable: true })
   //#endregion
   name?: string | number;
-
 }
 
 @Firedev.Controller({ className: 'UserController' })

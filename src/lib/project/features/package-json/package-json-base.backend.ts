@@ -1,4 +1,4 @@
-import { path } from 'tnp-core/src'
+import { path } from 'tnp-core/src';
 import * as semver from 'semver';
 
 import { Project } from '../../abstract/project';
@@ -7,7 +7,12 @@ import { Helpers } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
 
 import { _ } from 'tnp-core/src';
-import { reolveAndSaveDeps, removeDependencyAndSave, setDependencyAndSave, findVersionRange } from './package-json-helpers.backend';
+import {
+  reolveAndSaveDeps,
+  removeDependencyAndSave,
+  setDependencyAndSave,
+  findVersionRange,
+} from './package-json-helpers.backend';
 import { PackageJsonCore } from './package-json-core.backend';
 import { PackageJsonDepsCoreCategories } from './package-json-deps-categories.backend';
 
@@ -17,19 +22,26 @@ export class PackageJsonBase extends PackageJsonCore {
   private reasonToShowPackages = '';
   private readonly coreCategories: PackageJsonDepsCoreCategories;
 
-  constructor(options: { data: Object, location?: string; project?: Project; }) {
-    super((options.project && !options.location) ? options.project.location : options.location);
+  constructor(options: { data: Object; location?: string; project?: Project }) {
+    super(
+      options.project && !options.location
+        ? options.project.location
+        : options.location,
+    );
     if (_.isObject(options)) {
       if (options.project && !options.location) {
         options.location = options.project.location;
       }
       _.merge(this, options);
 
-      this.data = _.merge({
-        tnp: {
-          resources: []
-        }
-      } as Models.IPackageJSON, options.data as any);
+      this.data = _.merge(
+        {
+          tnp: {
+            resources: [],
+          },
+        } as Models.IPackageJSON,
+        options.data as any,
+      );
     }
     this.coreCategories = new PackageJsonDepsCoreCategories(this.project);
   }
@@ -53,19 +65,28 @@ export class PackageJsonBase extends PackageJsonCore {
   }
 
   public updateHooks() {
-    Helpers.log('[package json] updating hooks')
-    if (!(this.data.husky && this.data.husky.hooks && _.isString(this.data.husky.hooks['pre-push']))) {
+    Helpers.log('[package json] updating hooks');
+    if (
+      !(
+        this.data.husky &&
+        this.data.husky.hooks &&
+        _.isString(this.data.husky.hooks['pre-push'])
+      )
+    ) {
       this.data.husky = {
         hooks: {
-          'pre-push': `${config.frameworkName} deps:show:if:standalone`
-        }
+          'pre-push': `${config.frameworkName} deps:show:if:standalone`,
+        },
       };
       this.save('Update hooks');
     }
-    Helpers.log('[package json] updating hooks done')
+    Helpers.log('[package json] updating hooks done');
   }
 
-  private prepareForSave(action: 'save' | 'show' | 'hide' = 'save', caller?: Project) {
+  private prepareForSave(
+    action: 'save' | 'show' | 'hide' = 'save',
+    caller?: Project,
+  ) {
     if (caller?.location === this.project.location) {
       return;
     }
@@ -75,11 +96,16 @@ export class PackageJsonBase extends PackageJsonCore {
     }
 
     if (this.project.__isStandaloneProject || this.project.__isContainer) {
-      const tnp = (Project.ins.Tnp);
+      const tnp = Project.ins.Tnp;
       tnp.__packageJson.prepareForSave(action, tnp);
     }
 
-    reolveAndSaveDeps(this.project, action, this.reasonToHidePackages, this.reasonToShowPackages);
+    reolveAndSaveDeps(
+      this.project,
+      action,
+      this.reasonToHidePackages,
+      this.reasonToShowPackages,
+    );
   }
 
   linkTo(destination: string) {
@@ -91,22 +117,24 @@ export class PackageJsonBase extends PackageJsonCore {
     })();
 
     (() => {
-      const source = path.join(this.project.location, config.file.firedev_jsonc);
+      const source = path.join(
+        this.project.location,
+        config.file.firedev_jsonc,
+      );
       const dest = path.join(destination, config.file.firedev_jsonc);
       Helpers.removeFileIfExists(dest);
       Helpers.createSymLink(source, dest);
     })();
-
   }
 
   public removeDependencyAndSave = (p: Models.Package, reason: string) => {
-    this.prepareForSave('save')
+    this.prepareForSave('save');
     removeDependencyAndSave(p, reason, this.project);
-  }
+  };
   public setDependencyAndSave = (p: Models.Package, reason: string) => {
-    this.prepareForSave('save')
-    setDependencyAndSave(p, reason, this.project)
-  }
+    this.prepareForSave('save');
+    setDependencyAndSave(p, reason, this.project);
+  };
 
   /**
    * Look all package.json dependencies and check if version range
@@ -114,15 +142,20 @@ export class PackageJsonBase extends PackageJsonCore {
    * @param dependency
    */
   public checDepenciesAreSatisfyBy(dependency: Project): boolean {
-
     const versionRange = findVersionRange(this.project, dependency);
     if (!versionRange) {
-      Helpers.error(`Version range not avaliable root: ${this.name} dependency: ${dependency.name}`, true, true);
+      Helpers.error(
+        `Version range not avaliable root: ${this.name} dependency: ${dependency.name}`,
+        true,
+        true,
+      );
       return false;
     }
     const result = semver.satisfies(dependency.version, versionRange);
     const namePackage = `${dependency.name}@${dependency.version}`;
-    Helpers.log(`[checDepenciesAreSatisfyBy] ${result} for ${namePackage} in range ${versionRange} withing ${this.name}`);
+    Helpers.log(
+      `[checDepenciesAreSatisfyBy] ${result} for ${namePackage} in range ${versionRange} withing ${this.name}`,
+    );
     return result;
   }
 
@@ -130,12 +163,19 @@ export class PackageJsonBase extends PackageJsonCore {
     for (let index = 0; index < locations.length; index++) {
       const location = locations[index];
       const otherProj = Project.ins.From(location);
-      Helpers.log(`Updating package.json from ${otherProj.name}`)
-      updaPackage(this.project, otherProj.__packageJson.data.dependencies, otherProj);
-      updaPackage(this.project, otherProj.__packageJson.data.devDependencies, otherProj);
+      Helpers.log(`Updating package.json from ${otherProj.name}`);
+      updaPackage(
+        this.project,
+        otherProj.__packageJson.data.dependencies,
+        otherProj,
+      );
+      updaPackage(
+        this.project,
+        otherProj.__packageJson.data.devDependencies,
+        otherProj,
+      );
     }
   }
-
 }
 
 function updaPackage(mainProj: Project, deps: Object, otherProj: Project) {
@@ -146,10 +186,13 @@ function updaPackage(mainProj: Project, deps: Object, otherProj: Project) {
   Object.keys(deps).forEach(depName => {
     const version = deps[depName];
     if (_.isString(version)) {
-      mainProj.__packageJson.setDependencyAndSave({
-        name: depName,
-        version
-      }, `update from project: ${otherProj.name}`);
+      mainProj.__packageJson.setDependencyAndSave(
+        {
+          name: depName,
+          version,
+        },
+        `update from project: ${otherProj.name}`,
+      );
     }
   });
 }

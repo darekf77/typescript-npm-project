@@ -29,14 +29,14 @@ theme:
     #   toggle:
     #     icon: material/toggle-switch-off-outline
     #     name: Switch to dark mode
-      # primary: red
-      # accent: red
+    # primary: red
+    # accent: red
     # - scheme: slate
     #   toggle:
     #     icon: material/toggle-switch
     #     name: Switch to light mode
-      # primary: red
-      # accent: red
+    # primary: red
+    # accent: red
 
 extra_css:
   - stylesheets/extra.css

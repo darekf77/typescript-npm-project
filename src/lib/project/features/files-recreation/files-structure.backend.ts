@@ -7,35 +7,55 @@ import { BaseFeatureForProject } from 'tnp-helpers/src';
 
 export type CleanType = 'all' | 'only_static_generated';
 
-
 export class FilesStructure extends BaseFeatureForProject<Project> {
-
   public async initFileStructure(initOptions?: InitOptions) {
     initOptions = InitOptions.from(initOptions);
 
     if (!initOptions.initiator) {
       initOptions.initiator = this.project;
     }
-    const { alreadyInitedPorjects, watch, struct, branding, websql, omitChildren } = initOptions;
-    const smartContainerTargetName = this.project.__smartContainerBuildTarget?.name;
+    const {
+      alreadyInitedPorjects,
+      watch,
+      struct,
+      branding,
+      websql,
+      omitChildren,
+    } = initOptions;
+    const smartContainerTargetName =
+      this.project.__smartContainerBuildTarget?.name;
 
     // THIS IS SLOW... BUT I CAN AFORD IT HERE
-    if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {
+    if (
+      !_.isUndefined(
+        alreadyInitedPorjects.find(p => p.location === this.project.location),
+      )
+    ) {
       this.project.quickFixes.missingSourceFolders();
       if (this.project.__isStandaloneProject && this.project.__packageJson) {
-        this.project.__packageJson.updateHooks()
+        this.project.__packageJson.updateHooks();
       }
     }
 
     await this.project.__linkedRepos.update(struct);
 
-    Helpers.log(`[init] adding project is not exists...done(${this.project.genericName})  `)
+    Helpers.log(
+      `[init] adding project is not exists...done(${this.project.genericName})  `,
+    );
 
-    if (!_.isUndefined(alreadyInitedPorjects.find(p => p.location === this.project.location))) {
-      Helpers.log(`Already inited project: ${chalk.bold(this.project.genericName)} - skip`);
+    if (
+      !_.isUndefined(
+        alreadyInitedPorjects.find(p => p.location === this.project.location),
+      )
+    ) {
+      Helpers.log(
+        `Already inited project: ${chalk.bold(this.project.genericName)} - skip`,
+      );
       return;
     } else {
-      Helpers.log(`Not inited yet... ${chalk.bold(this.project.genericName)} in ${this.project.location} `);
+      Helpers.log(
+        `Not inited yet... ${chalk.bold(this.project.genericName)} in ${this.project.location} `,
+      );
     }
 
     this.project.quickFixes.missingSourceFolders();
@@ -50,21 +70,26 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
       }
     }
 
-    if (this.project.__isStandaloneProject || this.project.__isSmartContainerChild) {
+    if (
+      this.project.__isStandaloneProject ||
+      this.project.__isSmartContainerChild
+    ) {
       await this.project.__branding.apply(!!branding);
     }
 
     this.project.quickFixes.missingAngularLibFiles();
     if (this.project.__isStandaloneProject || this.project.__isContainer) {
-      this.project.quickFixes.missingLibs([])
+      this.project.quickFixes.missingLibs([]);
     }
 
+    Helpers.taskStarted(
+      `Initing project: ${chalk.bold(this.project.genericName)} ${struct ? '(without packages install)' : ''} ${omitChildren ? '(ommiting children)' : ''}`,
+    );
 
-    Helpers.taskStarted(`Initing project: ${chalk.bold(this.project.genericName)} ${struct ? '(without packages install)' : ''} ${omitChildren ? '(ommiting children)' : ''}`);
-
-
-    alreadyInitedPorjects.push(this.project)
-    Helpers.log(`Push to alread inited ${this.project.genericName} from ${this.project.location} `)
+    alreadyInitedPorjects.push(this.project);
+    Helpers.log(
+      `Push to alread inited ${this.project.genericName} from ${this.project.location} `,
+    );
 
     //#region handle init of container
     if (this.project.__isContainer) {
@@ -72,25 +97,32 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
 
       if (!omitChildren && !this.project.__isContainerWithLinkedProjects) {
         const containerChildren = this.project.children.filter(c => {
-          Helpers.log('checking if git repo')
+          Helpers.log('checking if git repo');
           if (c.git.isInsideGitRepo) {
-            Helpers.log(`[init] not initing recrusively, it is git repo ${c.name} `)
+            Helpers.log(
+              `[init] not initing recrusively, it is git repo ${c.name} `,
+            );
             return false;
           }
-          Helpers.log('checking if git repo - done')
+          Helpers.log('checking if git repo - done');
           return true;
-        })
+        });
         for (let index = 0; index < containerChildren.length; index++) {
           const containerChild = containerChildren[index];
           await containerChild.__filesStructure.initFileStructure(initOptions);
           const containerChildChildren = containerChild.children;
-          for (let indexChild = 0; indexChild < containerChildChildren.length; indexChild++) {
+          for (
+            let indexChild = 0;
+            indexChild < containerChildChildren.length;
+            indexChild++
+          ) {
             const workspaceChild = containerChildChildren[indexChild];
-            await workspaceChild.__filesStructure.initFileStructure(initOptions)
+            await workspaceChild.__filesStructure.initFileStructure(
+              initOptions,
+            );
           }
         }
       }
-
     }
     //#endregion
 
@@ -103,16 +135,23 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
     }
 
     if (!this.project.__node_modules.exist && !struct) {
-      await this.project.__npmPackages.installProcess(`inti procedure of ${this.project.name} `);
+      await this.project.__npmPackages.installProcess(
+        `inti procedure of ${this.project.name} `,
+      );
     }
-    this.project.__packageJson.showDeps(`Show new deps for ${this.project.__frameworkVersion} `);
+    this.project.__packageJson.showDeps(
+      `Show new deps for ${this.project.__frameworkVersion} `,
+    );
 
     if (this.project.__isSmartContainer) {
       //#region handle smart container
 
       await this.project.__recreate.recreateSimpleFiles(initOptions);
       if (!omitChildren) {
-        await this.project.__singluarBuild.initSingularBuild(initOptions, smartContainerTargetName);
+        await this.project.__singluarBuild.initSingularBuild(
+          initOptions,
+          smartContainerTargetName,
+        );
       }
       //#endregion
     }
@@ -120,8 +159,8 @@ export class FilesStructure extends BaseFeatureForProject<Project> {
     this.project.quickFixes.missingSourceFolders();
 
     this.project.quickFixes.badTypesInNodeModules();
-    Helpers.log(`Init DONE for project: ${chalk.bold(this.project.genericName)} `);
+    Helpers.log(
+      `Init DONE for project: ${chalk.bold(this.project.genericName)} `,
+    );
   }
-
-
 }

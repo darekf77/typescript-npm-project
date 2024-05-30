@@ -3,7 +3,8 @@ import { config } from 'tnp-config/src';
 import {
   _,
   //#region @backend
-  crossPlatformPath, path
+  crossPlatformPath,
+  path,
   //#endregion
 } from 'tnp-core/src';
 
@@ -12,13 +13,16 @@ import { EXPORT_TEMPLATE } from '../../../../templates';
 import { Project } from '../../../abstract/project';
 import { DEFAULT_PORT, PortUtils } from '../../../../constants';
 
-export function resolveBrowserPathToAssetFrom(projectTargetOrStandalone: Project, absolutePath: string) {
+export function resolveBrowserPathToAssetFrom(
+  projectTargetOrStandalone: Project,
+  absolutePath: string,
+) {
   let resultBrowserPath = '';
   if (projectTargetOrStandalone.__isSmartContainerTarget) {
     // `tmp-src-${outFolder}${websql ? '-websql' : ''}/assets/assets-for/${project.name + '--' + project.parent.name}/`
     const relatievPath = absolutePath.replace(
       `${projectTargetOrStandalone?.__smartContainerTargetParentContainer.location}/`,
-      ''
+      '',
     );
     const smartContainerTargetChild = _.first(relatievPath.split('/'));
     resultBrowserPath = `/${relatievPath.split('/').slice(1).join('/')}`;
@@ -30,12 +34,12 @@ export function resolveBrowserPathToAssetFrom(projectTargetOrStandalone: Project
     // `tmp-src-${outFolder}${websql ? '-websql' : ''}/assets/assets-for/${project.name}/`
     const relatievPath = absolutePath.replace(
       `${crossPlatformPath(projectTargetOrStandalone.location)}/`,
-      ''
+      '',
     );
     resultBrowserPath = `/${relatievPath}`;
     resultBrowserPath = resultBrowserPath.replace(
       `/${config.folder.src}/${config.folder.assets}/`,
-      `/${config.folder.assets}/${config.folder.assets}-for/${projectTargetOrStandalone.name}/`
+      `/${config.folder.assets}/${config.folder.assets}-for/${projectTargetOrStandalone.name}/`,
     );
   }
 
@@ -47,26 +51,36 @@ export function resolveBrowserPathToAssetFrom(projectTargetOrStandalone: Project
  * my-path-to/asdasd
  * test
  */
-export function resolvePathToAsset(project: Project, relativePathToLoader: string) {
-  const loaderRelativePath = relativePathToLoader.replace(/^\.\//, '').replace(/^\//, '');
+export function resolvePathToAsset(
+  project: Project,
+  relativePathToLoader: string,
+) {
+  const loaderRelativePath = relativePathToLoader
+    .replace(/^\.\//, '')
+    .replace(/^\//, '');
   let absPathToAsset = '';
-  let browserPath = ''
+  let browserPath = '';
 
-  if (project.__isSmartContainerTarget) { // stratego for smart container target project
-    absPathToAsset = crossPlatformPath([project.__smartContainerTargetParentContainer.location, loaderRelativePath]);
+  if (project.__isSmartContainerTarget) {
+    // stratego for smart container target project
+    absPathToAsset = crossPlatformPath([
+      project.__smartContainerTargetParentContainer.location,
+      loaderRelativePath,
+    ]);
     if (!Helpers.exists(absPathToAsset)) {
       absPathToAsset = absPathToAsset.replace(
         loaderRelativePath,
-        `${project.name}/${loaderRelativePath}`
-      )
+        `${project.name}/${loaderRelativePath}`,
+      );
     }
-  } else { // stratego for normal standalone project
+  } else {
+    // stratego for normal standalone project
     absPathToAsset = crossPlatformPath([project.location, loaderRelativePath]);
     if (!Helpers.exists(absPathToAsset)) {
       absPathToAsset = absPathToAsset.replace(
         `${project.name}/${loaderRelativePath}`,
         loaderRelativePath,
-      )
+      );
     }
   }
   browserPath = resolveBrowserPathToAssetFrom(project, absPathToAsset);
@@ -76,31 +90,34 @@ export function resolvePathToAsset(project: Project, relativePathToLoader: strin
 
 export function recreateIndex(project: Project) {
   (() => {
-    const indexInSrcFile = crossPlatformPath(path.join(
-      project.location,
-      config.folder.src,
-      config.file.index_ts,
-    ));
+    const indexInSrcFile = crossPlatformPath(
+      path.join(project.location, config.folder.src, config.file.index_ts),
+    );
 
     if (project.__isSmartContainerTarget) {
       const container = project.__smartContainerTargetParentContainer;
       if (!Helpers.exists(indexInSrcFile)) {
         const exportsContainer = container.children
-          .filter(c => c.typeIs('isomorphic-lib') && c.__frameworkVersionAtLeast('v3'))
+          .filter(
+            c =>
+              c.typeIs('isomorphic-lib') && c.__frameworkVersionAtLeast('v3'),
+          )
           .map(c => {
-            return `export * from './libs/${c.name}';`
-          }).join('\n');
-        Helpers.writeFile(indexInSrcFile, `
+            return `export * from './libs/${c.name}';`;
+          })
+          .join('\n');
+        Helpers.writeFile(
+          indexInSrcFile,
+          `
 ${exportsContainer}
-        `);
+        `,
+        );
       }
-
     } else {
       if (!Helpers.exists(indexInSrcFile)) {
         Helpers.writeFile(indexInSrcFile, EXPORT_TEMPLATE('lib'));
       }
     }
-
   })();
 }
 
@@ -110,66 +127,60 @@ export function recreateApp(project: Project) {
   // console.log('TRYING ', project.location)
 
   if (project.__isSmartContainerTarget) {
-    project = project.__smartContainerTargetParentContainer?.children.find(c => c.name === project.name);
+    project = project.__smartContainerTargetParentContainer?.children.find(
+      c => c.name === project.name,
+    );
     if (!project) {
       return;
     }
   }
   // console.log('RECREAT TO ', project.location)
 
-  const appFile = crossPlatformPath(path.join(
-    project.location,
-    config.folder.src,
-    'app.ts'
-  ));
+  const appFile = crossPlatformPath(
+    path.join(project.location, config.folder.src, 'app.ts'),
+  );
 
-  const appElectornFile = crossPlatformPath(path.join(
-    project.location,
-    config.folder.src,
-    'app.electron.ts'
-  ));
+  const appElectornFile = crossPlatformPath(
+    path.join(project.location, config.folder.src, 'app.electron.ts'),
+  );
 
-  const appHostsFile = crossPlatformPath(path.join(
-    project.location,
-    config.folder.src,
-    'app.hosts.ts'
-  ));
+  const appHostsFile = crossPlatformPath(
+    path.join(project.location, config.folder.src, 'app.hosts.ts'),
+  );
 
-  const appFolderWithIndex = crossPlatformPath(path.join(
-    project.location,
-    config.folder.src,
-    'app',
-    'index.ts',
-  ));
+  const appFolderWithIndex = crossPlatformPath(
+    path.join(project.location, config.folder.src, 'app', 'index.ts'),
+  );
 
-
-  if (!Helpers.exists(appFile)
+  if (
+    !Helpers.exists(appFile)
     // && !Helpers.exists(appFolderWithIndex)
   ) {
-    Helpers.writeFile(appFile, appfileTemplate(project))
+    Helpers.writeFile(appFile, appfileTemplate(project));
   }
 
-  if (!Helpers.exists(appHostsFile)
+  if (
+    !Helpers.exists(appHostsFile)
     // && !Helpers.exists(appFolderWithIndex) // TODO @QUESTION why not to remove this
   ) {
-    Helpers.writeFile(appHostsFile, PortUtils.instance(project.__projectInfoPort).appHostTemplateFor(project));
+    Helpers.writeFile(
+      appHostsFile,
+      PortUtils.instance(project.__projectInfoPort).appHostTemplateFor(project),
+    );
   }
 
-  if (!Helpers.exists(appElectornFile)
+  if (
+    !Helpers.exists(appElectornFile)
     // && !Helpers.exists(appFolderWithIndex) // TODO @QUESTION why not to remove this
   ) {
-    Helpers.writeFile(appElectornFile, appElectronTemplate(project))
+    Helpers.writeFile(appElectornFile, appElectronTemplate(project));
   }
-
-
 
   //#endregion
   //#endregion
 }
 
-
 export function appfileTemplate(project: Project) {
-
   const componentName = `${_.upperFirst(_.camelCase(project.name))}Component`;
   const moduleName = `${_.upperFirst(_.camelCase(project.name))}Module`;
 
@@ -273,7 +284,6 @@ ${'//#end' + 'region'}
 `.trim();
 }
 
-
 export function appElectronTemplate(project: Project) {
   return `
 import { CLIENT_DEV_NORMAL_APP_PORT, CLIENT_DEV_WEBSQL_APP_PORT } from './app.hosts';
@@ -375,5 +385,5 @@ async function startElectron() {
 }
 
 startElectron();
-${'//#end' + 'region'}  `
+${'//#end' + 'region'}  `;
 }

@@ -2,10 +2,7 @@
 import { Firedev } from 'firedev/src';
 import { BuildProcess } from './build-process';
 import { _ } from 'tnp-core/src';
-import {
-  randUserName,
-  randAddress,
-} from '@ngneat/falso'; // faking data
+import { randUserName, randAddress } from '@ngneat/falso'; // faking data
 import { IBuildProcess } from './build-process.models';
 //#region @websql
 import { BUILD_PROCESS } from './build-process.models';
@@ -44,12 +41,11 @@ export class BuildProcessController extends Firedev.Base.CrudController<any> {
       currentPorts.WEBSQL_APP ${this.project.__standaloneWebsqlAppPort} <br>
 
       `;
-    }
+    };
   }
 
   private project: Project;
   async initialize(project: Project) {
     this.project = project;
   }
-
 }

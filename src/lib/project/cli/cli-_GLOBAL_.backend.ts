@@ -1,17 +1,36 @@
 //#region imports
-import { IncrementalWatcherOptions, incrementalWatcher } from "incremental-compiler/src";
-import { Project } from "../abstract/project";
-import { config } from "tnp-config/src";
-import { crossPlatformPath, path, _, PROGRESS_DATA, chalk, glob, os, fse, CoreModels } from "tnp-core/src";
-import { TAGS, backendNodejsOnlyFiles, extAllowedToExportAndReplaceTSJSCodeFiles, frontendFiles, notNeededForExportFiles } from 'tnp-config/src';
-import { Helpers, BaseCommandLine } from "tnp-helpers/src";
-import { PackagesRecognition } from "../features/package-recognition/packages-recognition";
-import { BrowserCodeCut } from "../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend";
-import { CLI } from "tnp-cli/src";
+import {
+  IncrementalWatcherOptions,
+  incrementalWatcher,
+} from 'incremental-compiler/src';
+import { Project } from '../abstract/project';
+import { config } from 'tnp-config/src';
+import {
+  crossPlatformPath,
+  path,
+  _,
+  PROGRESS_DATA,
+  chalk,
+  glob,
+  os,
+  fse,
+  CoreModels,
+} from 'tnp-core/src';
+import {
+  TAGS,
+  backendNodejsOnlyFiles,
+  extAllowedToExportAndReplaceTSJSCodeFiles,
+  frontendFiles,
+  notNeededForExportFiles,
+} from 'tnp-config/src';
+import { Helpers, BaseCommandLine } from 'tnp-helpers/src';
+import { PackagesRecognition } from '../features/package-recognition/packages-recognition';
+import { BrowserCodeCut } from '../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
+import { CLI } from 'tnp-cli/src';
 import { Models } from '../../models';
-import * as  psList from 'ps-list';
+import * as psList from 'ps-list';
 import { MESSAGES, firedevRepoPathUserInUserDir } from '../../constants';
-import { MagicRenamer } from "magic-renamer/src";
+import { MagicRenamer } from 'magic-renamer/src';
 
 declare const ENV: any;
 //#endregion
@@ -19,12 +38,12 @@ declare const ENV: any;
 class $Global extends BaseCommandLine<{}, Project> {
   public _() {
     Helpers.error('Please select proper command.', false, true);
-    this._exit()
+    this._exit();
   }
 
   //#region kill process on port
   async killonport() {
-    const port = parseInt(this.firstArg)
+    const port = parseInt(this.firstArg);
     await Helpers.killProcessByPort(port);
     this._exit();
   }
@@ -41,11 +60,11 @@ class $Global extends BaseCommandLine<{}, Project> {
   killAllCode() {
     if (process.platform === 'win32') {
       Helpers.run(`taskkill /f /im code.exe`).sync();
-      this._exit()
+      this._exit();
     } else {
       Helpers.run(`fkill -f code`).sync();
     }
-    this._exit()
+    this._exit();
   }
   //#endregion
 
@@ -59,37 +78,68 @@ class $Global extends BaseCommandLine<{}, Project> {
     }
     Helpers.info(`Forking ${githubUrl} with name ${projectName}`);
     this.project.git.clone(githubUrl, projectName);
-    let newProj = Project.ins.From(path.join(this.project.location, projectName)) as Project;
-    Helpers.setValueToJSON(path.join(newProj.location, config.file.package_json), 'name', projectName);
-    Helpers.setValueToJSON(path.join(newProj.location, config.file.package_json), 'version', '0.0.0');
+    let newProj = Project.ins.From(
+      path.join(this.project.location, projectName),
+    ) as Project;
+    Helpers.setValueToJSON(
+      path.join(newProj.location, config.file.package_json),
+      'name',
+      projectName,
+    );
+    Helpers.setValueToJSON(
+      path.join(newProj.location, config.file.package_json),
+      'version',
+      '0.0.0',
+    );
     if (newProj.containsFile('angular.json')) {
-      Helpers.setValueToJSON(path.join(newProj.location, config.file.package_json), 'tnp.type', 'angular-lib');
-      Helpers.setValueToJSON(path.join(newProj.location, config.file.package_json), 'tnp.version', 'v2');
-      Helpers.setValueToJSON(path.join(newProj.location, config.file.package_json), 'scripts', {});
+      Helpers.setValueToJSON(
+        path.join(newProj.location, config.file.package_json),
+        'tnp.type',
+        'angular-lib',
+      );
+      Helpers.setValueToJSON(
+        path.join(newProj.location, config.file.package_json),
+        'tnp.version',
+        'v2',
+      );
+      Helpers.setValueToJSON(
+        path.join(newProj.location, config.file.package_json),
+        'scripts',
+        {},
+      );
       // const dependencies = Helpers.readValueFromJson(path.join(newProj.location, config.file.package_json), 'dependencies') as Object;
       newProj.run(`${config.frameworkName} init`).sync();
-      newProj = Project.ins.From(path.join(this.project.location, projectName)) as Project;
+      newProj = Project.ins.From(
+        path.join(this.project.location, projectName),
+      ) as Project;
       newProj.removeFile('.browserslistrc');
     }
-    Helpers.writeFile(path.join(newProj.location, config.file.README_MD), `
+    Helpers.writeFile(
+      path.join(newProj.location, config.file.README_MD),
+      `
   # ${projectName}
 
   based on ${githubUrl}
 
-    `);
+    `,
+    );
     Helpers.run(`code ${newProj.location}`).sync();
     Helpers.info(`Done`);
-    this._exit()
+    this._exit();
   }
   //#endregion
 
   //#region watcher linux
   watchersfix() {
-    Helpers.run(`echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`).sync();
+    Helpers.run(
+      `echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`,
+    ).sync();
     this._exit();
   }
   watchers() {
-    Helpers.run(`find /proc/*/fd -user "$USER" -lname anon_inode:inotify -printf '%hinfo/%f\n' 2>/dev/null | xargs cat | grep -c '^inotify'`).sync();
+    Helpers.run(
+      `find /proc/*/fd -user "$USER" -lname anon_inode:inotify -printf '%hinfo/%f\n' 2>/dev/null | xargs cat | grep -c '^inotify'`,
+    ).sync();
     this._exit();
   }
   //#endregion
@@ -107,7 +157,11 @@ class $Global extends BaseCommandLine<{}, Project> {
     const watchLocation = crossPlatformPath([proj.location, config.folder.src]);
     const symlinkCatalog = crossPlatformPath([proj.location, 'symlinkCatalog']);
     const symlinkCatalogInWatch = crossPlatformPath([watchLocation, 'symlink']);
-    const symlinkCatalogFile = crossPlatformPath([proj.location, 'symlinkCatalog', 'dupa.txt']);
+    const symlinkCatalogFile = crossPlatformPath([
+      proj.location,
+      'symlinkCatalog',
+      'dupa.txt',
+    ]);
     const options: IncrementalWatcherOptions = {
       name: `[firedev]  properwatchtest (testing only)`,
       ignoreInitial: true,
@@ -115,8 +169,14 @@ class $Global extends BaseCommandLine<{}, Project> {
 
     Helpers.remove(symlinkCatalog);
     Helpers.writeFile(symlinkCatalogFile, 'hello dupa');
-    Helpers.writeFile(crossPlatformPath([proj.location, config.folder.src, 'a1', 'aa']), 'asdasdasdhello dupa');
-    Helpers.writeFile(crossPlatformPath([proj.location, config.folder.src, 'a2', 'ccc']), 'heasdasdllo asdasd');
+    Helpers.writeFile(
+      crossPlatformPath([proj.location, config.folder.src, 'a1', 'aa']),
+      'asdasdasdhello dupa',
+    );
+    Helpers.writeFile(
+      crossPlatformPath([proj.location, config.folder.src, 'a2', 'ccc']),
+      'heasdasdllo asdasd',
+    );
     Helpers.createSymLink(symlinkCatalog, symlinkCatalogInWatch);
 
     (await incrementalWatcher(watchLocation, options)).on('all', (a, b) => {
@@ -139,7 +199,6 @@ class $Global extends BaseCommandLine<{}, Project> {
   ADD_IMPORT_SRC() {
     const project = this.project as Project;
 
-
     const regexEnd = /from\s+(\'|\").+(\'|\")/g;
     const singleLineImporrt = /import\((\'|\"|\`).+(\'|\"|\`)\)/g;
     const singleLineRequire = /require\((\'|\"|\`).+(\'|\"|\`)\)/g;
@@ -149,60 +208,104 @@ class $Global extends BaseCommandLine<{}, Project> {
     const commentMultilieStart = /^\/\*/;
     const commentSingleLineStart = /^\/\//;
 
-    const processAddSrcAtEnd = (regexEnd: RegExp, line: string, packages: string[], matchType: 'from_import_export' | 'imports' | 'require'): string => {
+    const processAddSrcAtEnd = (
+      regexEnd: RegExp,
+      line: string,
+      packages: string[],
+      matchType: 'from_import_export' | 'imports' | 'require',
+    ): string => {
       const matches = line.match(regexEnd);
       const firstMatch = _.first(matches) as string;
-      const importMatch = (_.first(firstMatch.match(betweenApos)) as string).replace(/(\'|\"|\`)/g, '');
+      const importMatch = (
+        _.first(firstMatch.match(betweenApos)) as string
+      ).replace(/(\'|\"|\`)/g, '');
       const isOrg = importMatch.startsWith('@');
-      const packageName = importMatch.split('/').slice(0, isOrg ? 2 : 1).join('/');
+      const packageName = importMatch
+        .split('/')
+        .slice(0, isOrg ? 2 : 1)
+        .join('/');
       if (packages.includes(packageName) && !srcEnd.test(firstMatch)) {
         let clean: string;
         if (matchType === 'require' || matchType === 'imports') {
           const endCharacters = firstMatch.slice(-2);
-          clean = firstMatch.slice(0, firstMatch.length - 2) + '/src' + endCharacters;
+          clean =
+            firstMatch.slice(0, firstMatch.length - 2) + '/src' + endCharacters;
         } else {
           let endCharacters = firstMatch.slice(-1);
-          clean = firstMatch.slice(0, firstMatch.length - 1) + '/src' + endCharacters;
+          clean =
+            firstMatch.slice(0, firstMatch.length - 1) + '/src' + endCharacters;
         }
 
         return line.replace(firstMatch, clean);
       }
       return line;
-    }
+    };
 
     const changeImport = (content: string, packages: string[]) => {
-      return content.split(/\r?\n/).map((line, index) => {
-        const trimedLine = line.trimStart();
-        if (commentMultilieStart.test(trimedLine) || commentSingleLineStart.test(trimedLine)) {
-          return line;
-        }
-        if (regexEnd.test(line)) {
-          return processAddSrcAtEnd(regexEnd, line, packages, 'from_import_export');
-        }
-        if (singleLineImporrt.test(line)) {
-          return processAddSrcAtEnd(singleLineImporrt, line, packages, 'imports');
-        }
-        if (singleLineRequire.test(line)) {
-          return processAddSrcAtEnd(singleLineRequire, line, packages, 'require');
-        }
-        return line;
-      }).join('\n') + '\n';
+      return (
+        content
+          .split(/\r?\n/)
+          .map((line, index) => {
+            const trimedLine = line.trimStart();
+            if (
+              commentMultilieStart.test(trimedLine) ||
+              commentSingleLineStart.test(trimedLine)
+            ) {
+              return line;
+            }
+            if (regexEnd.test(line)) {
+              return processAddSrcAtEnd(
+                regexEnd,
+                line,
+                packages,
+                'from_import_export',
+              );
+            }
+            if (singleLineImporrt.test(line)) {
+              return processAddSrcAtEnd(
+                singleLineImporrt,
+                line,
+                packages,
+                'imports',
+              );
+            }
+            if (singleLineRequire.test(line)) {
+              return processAddSrcAtEnd(
+                singleLineRequire,
+                line,
+                packages,
+                'require',
+              );
+            }
+            return line;
+          })
+          .join('\n') + '\n'
+      );
     };
 
     const addImportSrc = (proj: Project) => {
       PackagesRecognition.fromProject(proj).start(true, 'src adding process');
       const pacakges = [
         ...BrowserCodeCut.IsomorphicLibs,
-        ...(proj.__isSmartContainerChild ? proj.parent.children.map(c => `@${proj.parent.name}/${c.name}`) : []),
+        ...(proj.__isSmartContainerChild
+          ? proj.parent.children.map(c => `@${proj.parent.name}/${c.name}`)
+          : []),
       ];
       // console.log(pacakges)
 
-      const files = Helpers.filesFrom(proj.pathFor('src'), true).filter(f => f.endsWith('.ts'));
+      const files = Helpers.filesFrom(proj.pathFor('src'), true).filter(f =>
+        f.endsWith('.ts'),
+      );
 
       for (const file of files) {
         const originalContent = Helpers.readFile(file);
         const changed = changeImport(originalContent, pacakges);
-        if (originalContent && changed && originalContent?.trim().replace(/\s/g, '') !== changed?.trim().replace(/\s/g, '')) {
+        if (
+          originalContent &&
+          changed &&
+          originalContent?.trim().replace(/\s/g, '') !==
+            changed?.trim().replace(/\s/g, '')
+        ) {
           Helpers.writeFile(file, changed);
         }
       }
@@ -216,52 +319,61 @@ class $Global extends BaseCommandLine<{}, Project> {
       }
     }
 
-    this._exit()
+    this._exit();
   }
   //#endregion
 
   //#region move js to ts
   $MOVE_JS_TO_TS(args) {
-    Helpers
-      .filesFrom(crossPlatformPath([this.cwd, args]), true)
-      .forEach(f => {
-        if (path.extname(f) === '.js') {
-          Helpers.move(f, crossPlatformPath([path.dirname(f), path.basename(f).replace('.js', '.ts')]))
-        }
-      })
-    Helpers.info('DONE')
-    this._exit()
+    Helpers.filesFrom(crossPlatformPath([this.cwd, args]), true).forEach(f => {
+      if (path.extname(f) === '.js') {
+        Helpers.move(
+          f,
+          crossPlatformPath([
+            path.dirname(f),
+            path.basename(f).replace('.js', '.ts'),
+          ]),
+        );
+      }
+    });
+    Helpers.info('DONE');
+    this._exit();
   }
   //#endregion
 
   //#region show messages
-  ASYNC_PROC = async (args) => {
+  ASYNC_PROC = async args => {
     global.tnpShowProgress = true;
-    let p = Helpers.run(`${config.frameworkName} show:loop ${args}`, { output: false, cwd: this.cwd }).async()
-    p.stdout.on('data', (chunk) => {
-      console.log('prod:' + chunk)
-    })
-    p.on('exit', (c) => {
-      console.log('process exited with code: ' + c)
-      this._exit()
-    })
-  }
+    let p = Helpers.run(`${config.frameworkName} show:loop ${args}`, {
+      output: false,
+      cwd: this.cwd,
+    }).async();
+    p.stdout.on('data', chunk => {
+      console.log('prod:' + chunk);
+    });
+    p.on('exit', c => {
+      console.log('process exited with code: ' + c);
+      this._exit();
+    });
+  };
 
-
-  SYNC_PROC = async (args) => {
+  SYNC_PROC = async args => {
     global.tnpShowProgress = true;
     try {
-      let p = Helpers.run(`${config.frameworkName} show:loop ${args}`, { output: false, cwd: this.cwd }).sync()
-      this._exit()
+      let p = Helpers.run(`${config.frameworkName} show:loop ${args}`, {
+        output: false,
+        cwd: this.cwd,
+      }).sync();
+      this._exit();
     } catch (err) {
-      console.log('Erroroejk')
-      this._exit(1)
+      console.log('Erroroejk');
+      this._exit(1);
     }
-  }
+  };
 
   SHOW_RANDOM_HAMSTERS() {
     while (true) {
-      const arr = ['Pluszla', 'Łapczuch', 'Misia', 'Chrupka']
+      const arr = ['Pluszla', 'Łapczuch', 'Misia', 'Chrupka'];
       console.log(arr[Helpers.numbers.randomInteger(0, arr.length - 1)]);
       Helpers.sleep(1);
     }
@@ -276,8 +388,8 @@ class $Global extends BaseCommandLine<{}, Project> {
         'dwarf roborowski',
         'dwarf russian',
         'dwarf winter white',
-        'chinese hamster'
-      ]
+        'chinese hamster',
+      ];
       console.log(arr[Helpers.numbers.randomInteger(0, arr.length - 1)]);
       Helpers.sleep(1);
     }
@@ -285,12 +397,12 @@ class $Global extends BaseCommandLine<{}, Project> {
 
   SHOW_LOOP_MESSAGES(args) {
     global.tnpShowProgress = true;
-    console.log('process pid', process.pid)
-    console.log('process ppid', process.ppid)
+    console.log('process pid', process.pid);
+    console.log('process ppid', process.ppid);
     // process.on('SIGTERM', () => {
     //   this._exit()
     // })
-    this._SHOW_LOOP_MESSAGES()
+    this._SHOW_LOOP_MESSAGES();
   }
 
   _SHOW_LOOP(c = 0 as any, maximum = Infinity, errExit = false) {
@@ -300,18 +412,23 @@ class $Global extends BaseCommandLine<{}, Project> {
       errExit = err;
       // console.log('max',max)
       // console.log('err',err)
-      c = 0
+      c = 0;
     }
     if (c === maximum) {
-      this._exit(errExit ? 1 : 0)
+      this._exit(errExit ? 1 : 0);
     }
-    console.log(`counter: ${c}`)
+    console.log(`counter: ${c}`);
     setTimeout(() => {
-      this._SHOW_LOOP(++c, maximum, errExit)
+      this._SHOW_LOOP(++c, maximum, errExit);
     }, 1000);
   }
 
-  _SHOW_LOOP_MESSAGES(c = 0 as any, maximum = Infinity, errExit = false, throwErr = false) {
+  _SHOW_LOOP_MESSAGES(
+    c = 0 as any,
+    maximum = Infinity,
+    errExit = false,
+    throwErr = false,
+  ) {
     if (_.isString(c)) {
       const obj = require('minimist')(c.split(' '));
       var { max = Infinity, err = false } = obj;
@@ -320,22 +437,22 @@ class $Global extends BaseCommandLine<{}, Project> {
       throwErr = obj.throw;
       // console.log('max',max)
       // console.log('err',err)
-      c = 0
+      c = 0;
     }
     if (c === maximum) {
       if (throwErr) {
-        throw new Error('Custom error!')
+        throw new Error('Custom error!');
       }
       if (errExit) {
-        this._exit(1)
+        this._exit(1);
       }
-      this._exit()
+      this._exit();
     }
-    console.log(`counter: ${c}`)
-    PROGRESS_DATA.log({ msg: `counter: ${c}`, value: c * 7 })
+    console.log(`counter: ${c}`);
+    PROGRESS_DATA.log({ msg: `counter: ${c}`, value: c * 7 });
     setTimeout(() => {
-      this._SHOW_LOOP_MESSAGES(++c, maximum, errExit, throwErr)
-    }, 2000)
+      this._SHOW_LOOP_MESSAGES(++c, maximum, errExit, throwErr);
+    }, 2000);
   }
   //#endregion
 
@@ -356,16 +473,31 @@ class $Global extends BaseCommandLine<{}, Project> {
       //   await Helpers.isElevated();
       // }
       //#region linking to global/local bin
-      let glboalBinFolderPath = path.dirname(Helpers.run(`which ${config.frameworkName}`, { output: false }).sync().toString());
+      let glboalBinFolderPath = path.dirname(
+        Helpers.run(`which ${config.frameworkName}`, { output: false })
+          .sync()
+          .toString(),
+      );
       if (process.platform === 'win32') {
         glboalBinFolderPath = crossPlatformPath(glboalBinFolderPath);
         if (/^\/[a-z]\//.test(glboalBinFolderPath)) {
-          glboalBinFolderPath = glboalBinFolderPath.replace(/^\/[a-z]\//, `${glboalBinFolderPath.charAt(1).toUpperCase()}:/`);
+          glboalBinFolderPath = glboalBinFolderPath.replace(
+            /^\/[a-z]\//,
+            `${glboalBinFolderPath.charAt(1).toUpperCase()}:/`,
+          );
         }
       }
-      const globalNodeModules = crossPlatformPath(path.join(glboalBinFolderPath,
-        (process.platform === 'win32') ? config.folder.node_modules : `../lib/${config.folder.node_modules}`));
-      const packageInGlobalNodeModules = crossPlatformPath(path.resolve(path.join(globalNodeModules, project.name)));
+      const globalNodeModules = crossPlatformPath(
+        path.join(
+          glboalBinFolderPath,
+          process.platform === 'win32'
+            ? config.folder.node_modules
+            : `../lib/${config.folder.node_modules}`,
+        ),
+      );
+      const packageInGlobalNodeModules = crossPlatformPath(
+        path.resolve(path.join(globalNodeModules, project.name)),
+      );
       // packageInGlobalNodeModules
       Helpers.removeIfExists(packageInGlobalNodeModules);
       project.linkTo(packageInGlobalNodeModules);
@@ -383,43 +515,66 @@ class $Global extends BaseCommandLine<{}, Project> {
         });
 
       if (countLinkInPackageJsonBin.length === 0) {
-        const pathNormalLink = Helpers.path.create(project.location, config.folder.bin, `${project.name}`);
+        const pathNormalLink = Helpers.path.create(
+          project.location,
+          config.folder.bin,
+          `${project.name}`,
+        );
         Helpers.writeFile(pathNormalLink, this._templateBin());
         countLinkInPackageJsonBin.push(pathNormalLink);
 
-        const pathDebugLink = Helpers.path.create(project.location, config.folder.bin, `${project.name}-debug`);
+        const pathDebugLink = Helpers.path.create(
+          project.location,
+          config.folder.bin,
+          `${project.name}-debug`,
+        );
         Helpers.writeFile(pathDebugLink, this._templateBin(true));
         countLinkInPackageJsonBin.push(pathDebugLink);
 
         const startBackendFile = Helpers.path.create(
           project.location,
           config.folder.src,
-          config.file.start_backend_ts
+          config.file.start_backend_ts,
         );
         if (!Helpers.exists(startBackendFile)) {
           Helpers.writeFile(startBackendFile, this._templateStartBackedn());
         }
-
       }
 
       project.__packageJson.data.bin = {};
       countLinkInPackageJsonBin.forEach(p => {
-        project.__packageJson.data.bin[path.basename(p)] = `bin/${path.basename(p)}`;
+        project.__packageJson.data.bin[path.basename(p)] =
+          `bin/${path.basename(p)}`;
       });
       project.__packageJson.save(`update bin data`);
 
       if (_.isObject(project.__packageJson.data.bin)) {
         Object.keys(project.__packageJson.data.bin).forEach(globalName => {
-          const localPath = path.join(project.location, project.__packageJson.data.bin[globalName]);
-          const destinationGlobalLink = path.join(glboalBinFolderPath, globalName);
+          const localPath = path.join(
+            project.location,
+            project.__packageJson.data.bin[globalName],
+          );
+          const destinationGlobalLink = path.join(
+            glboalBinFolderPath,
+            globalName,
+          );
           Helpers.removeIfExists(destinationGlobalLink);
 
-          const inspect = globalName.endsWith('debug') || globalName.endsWith('inspect');
-          const inspectBrk = globalName.endsWith('debug-brk') || globalName.endsWith('inspect-brk');
-          const attachDebugParam = inspect ? '--inspect' : (inspectBrk ? '--inspect-brk' : '')
+          const inspect =
+            globalName.endsWith('debug') || globalName.endsWith('inspect');
+          const inspectBrk =
+            globalName.endsWith('debug-brk') ||
+            globalName.endsWith('inspect-brk');
+          const attachDebugParam = inspect
+            ? '--inspect'
+            : inspectBrk
+              ? '--inspect-brk'
+              : '';
 
           if (process.platform === 'win32') {
-            Helpers.writeFile(destinationGlobalLink, `
+            Helpers.writeFile(
+              destinationGlobalLink,
+              `
   #!/bin/sh
   basedir=$(dirname "$(echo "$0" | sed -e 's,\\\\,/,g')")
 
@@ -435,11 +590,16 @@ class $Global extends BaseCommandLine<{}, Project> {
     ret=$?
   fi
   exit $ret
-            `.trim() + '\n');
+            `.trim() + '\n',
+            );
 
-
-            const destinationGlobalLinkPS1File = path.join(glboalBinFolderPath, `${globalName}.ps1`);
-            Helpers.writeFile(destinationGlobalLinkPS1File, `
+            const destinationGlobalLinkPS1File = path.join(
+              glboalBinFolderPath,
+              `${globalName}.ps1`,
+            );
+            Helpers.writeFile(
+              destinationGlobalLinkPS1File,
+              `
   #!/usr/bin/env pwsh
   $basedir=Split-Path $MyInvocation.MyCommand.Definition -Parent
 
@@ -458,9 +618,15 @@ class $Global extends BaseCommandLine<{}, Project> {
     $ret=$LASTEXITCODE
   }
   exit $ret
-            `.trim() + '\n');
-            const destinationGlobalLinkCmdFile = path.join(glboalBinFolderPath, `${globalName}.cmd`);
-            Helpers.writeFile(destinationGlobalLinkCmdFile, `
+            `.trim() + '\n',
+            );
+            const destinationGlobalLinkCmdFile = path.join(
+              glboalBinFolderPath,
+              `${globalName}.cmd`,
+            );
+            Helpers.writeFile(
+              destinationGlobalLinkCmdFile,
+              `
   @ECHO off
   SETLOCAL
   CALL :find_dp0
@@ -479,15 +645,15 @@ class $Global extends BaseCommandLine<{}, Project> {
   SET dp0=%~dp0
   EXIT /b
 
-            `.trim() + '\n');
-
+            `.trim() + '\n',
+            );
           } else {
             Helpers.createSymLink(localPath, destinationGlobalLink);
             const command = `chmod +x ${destinationGlobalLink}`;
             Helpers.log(`Trying to make file exacutable global command "${chalk.bold(globalName)}".
 
             command: ${command}
-            `)
+            `);
             Helpers.run(command).sync();
           }
 
@@ -498,8 +664,8 @@ class $Global extends BaseCommandLine<{}, Project> {
       this._exit();
       //#endregion
     }
-    Helpers.info(`Linking DONE!`)
-    this._exit()
+    Helpers.info(`Linking DONE!`);
+    this._exit();
   }
 
   _templateBin(debug = false) {
@@ -513,7 +679,7 @@ class $Global extends BaseCommandLine<{}, Project> {
   global.globalSystemToolMode = true;
   var run = require(p).run;
   run(process.argv.slice(2));
-    `
+    `;
   }
 
   _templateStartBackedn() {
@@ -528,52 +694,55 @@ class $Global extends BaseCommandLine<{}, Project> {
       process.stdin.resume();
     }
     this._exit();
-    }`
+    }`;
   }
   //#endregion
 
   //#region dedupe
   DEDUPE() {
-    this.project.__node_modules.dedupe(this.args.join(' ').trim() === '' ? void 0 : this.args)
-    this._exit()
+    this.project.__node_modules.dedupe(
+      this.args.join(' ').trim() === '' ? void 0 : this.args,
+    );
+    this._exit();
   }
 
   DEDUPE_COUNT() {
-    this.project.__node_modules.dedupeCount(this.args.join(' ').trim() === '' ? void 0 : this.args)
-    this._exit()
+    this.project.__node_modules.dedupeCount(
+      this.args.join(' ').trim() === '' ? void 0 : this.args,
+    );
+    this._exit();
   }
   //#endregion
 
   //#region deps
 
   DEPS_SHOW() {
-    this.project.__packageJson.showDeps('deps show')
-    this._exit()
+    this.project.__packageJson.showDeps('deps show');
+    this._exit();
   }
 
   DEPS_HIDE() {
     if (this.project.__isCoreProject) {
-      this.project.__packageJson.showDeps('deps show')
+      this.project.__packageJson.showDeps('deps show');
     } else {
-      this.project.__packageJson.hideDeps('deps hide')
+      this.project.__packageJson.hideDeps('deps hide');
     }
-    this._exit()
+    this._exit();
   }
 
   DEPS_UPDATE_FROM() {
-    let locations: string[] = (this.args.join(' ').trim() === '' ? [] : this.args);
+    let locations: string[] =
+      this.args.join(' ').trim() === '' ? [] : this.args;
 
     if (_.isArray(locations)) {
-      locations = locations
-        .map(l => {
-          if (path.isAbsolute(l)) {
-            return path.resolve(l);
-          }
-          return path.resolve(path.join(this.cwd, l));
-        });
+      locations = locations.map(l => {
+        if (path.isAbsolute(l)) {
+          return path.resolve(l);
+        }
+        return path.resolve(path.join(this.cwd, l));
+      });
     }
     this.project.__packageJson.updateFrom(locations);
-
 
     this._exit();
   }
@@ -584,8 +753,7 @@ class $Global extends BaseCommandLine<{}, Project> {
   DEPS_JSON() {
     const node_moduels = path.join(this.cwd, config.folder.node_modules);
     const result = {};
-    Helpers
-      .foldersFrom(node_moduels)
+    Helpers.foldersFrom(node_moduels)
       .filter(f => path.basename(f) !== '.bin')
       .forEach(f => {
         const packageName = path.basename(f);
@@ -593,17 +761,28 @@ class $Global extends BaseCommandLine<{}, Project> {
           const orgName = packageName;
           Helpers.foldersFrom(f).forEach(f2 => {
             try {
-              result[`${orgName}/${path.basename(f2)}`] = Helpers.readValueFromJson(path.join(f2, config.file.package_json), 'version', '');
-            } catch (error) { }
+              result[`${orgName}/${path.basename(f2)}`] =
+                Helpers.readValueFromJson(
+                  path.join(f2, config.file.package_json),
+                  'version',
+                  '',
+                );
+            } catch (error) {}
           });
         } else {
           try {
-            result[packageName] = Helpers.readValueFromJson(path.join(f, config.file.package_json), 'version', '');
-          } catch (error) { }
+            result[packageName] = Helpers.readValueFromJson(
+              path.join(f, config.file.package_json),
+              'version',
+              '',
+            );
+          } catch (error) {}
         }
-
       });
-    Helpers.writeJson(path.join(this.cwd, config.file.result_packages_json), result);
+    Helpers.writeJson(
+      path.join(this.cwd, config.file.result_packages_json),
+      result,
+    );
     this._exit();
   }
   //#endregion
@@ -621,36 +800,48 @@ class $Global extends BaseCommandLine<{}, Project> {
         Helpers.info(`Reinstal done for core container`);
       } else {
         // smart container or normal container
-        const children = proj.children.filter(c => c.__frameworkVersionAtLeast('v3') && c.typeIs('isomorphic-lib') && c.__npmPackages.useSmartInstall);
+        const children = proj.children.filter(
+          c =>
+            c.__frameworkVersionAtLeast('v3') &&
+            c.typeIs('isomorphic-lib') &&
+            c.__npmPackages.useSmartInstall,
+        );
         for (let index = 0; index < children.length; index++) {
           const c = children[index];
-          Helpers.info(`Recreating node_module for ${c.genericName}`)
+          Helpers.info(`Recreating node_module for ${c.genericName}`);
           c.__node_modules.remove();
           c.__smartNodeModules.remove();
           await c.__filesStructure.initFileStructure();
         }
       }
-    } else if (proj.__isStandaloneProject && proj.__npmPackages.useSmartInstall) {
+    } else if (
+      proj.__isStandaloneProject &&
+      proj.__npmPackages.useSmartInstall
+    ) {
       proj.__node_modules.remove();
       proj.__smartNodeModules.remove();
-      proj.__npmPackages.installFromArgs('')
+      proj.__npmPackages.installFromArgs('');
       Helpers.info(`Reinstal done for core standalone project`);
     } else {
-      Helpers.error(`[${config.frameworkName}] This project does not support reinsall.
+      Helpers.error(
+        `[${config.frameworkName}] This project does not support reinsall.
     location: ${proj?.location}
-    `, false, false);
+    `,
+        false,
+        false,
+      );
     }
 
     this._exit();
-  };
+  }
   //#endregion
 
   //#region file info
-  FILEINFO = (args) => {
-    console.log(Helpers.getMostRecentFilesNames(crossPlatformPath(this.cwd)))
+  FILEINFO = args => {
+    console.log(Helpers.getMostRecentFilesNames(crossPlatformPath(this.cwd)));
 
-    this._exit()
-  }
+    this._exit();
+  };
   //#endregion
 
   //#region versions
@@ -659,29 +850,31 @@ class $Global extends BaseCommandLine<{}, Project> {
 
     for (let index = 0; index < children.length; index++) {
       const child = children[index] as Project;
-      Helpers.info(`v${child.__packageJson.data.version}\t - ${child.genericName}`);
+      Helpers.info(
+        `v${child.__packageJson.data.version}\t - ${child.genericName}`,
+      );
     }
 
-    this._exit()
+    this._exit();
   }
   //#endregion
 
   //#region path
   PATH = () => {
-    console.log((Project.ins.Tnp).location);
-    this._exit()
+    console.log(Project.ins.Tnp.location);
+    this._exit();
   };
   //#endregion
 
   //#region env
   ENV_CHECK(args) {
-    Helpers.checkEnvironment()
-    this._exit()
-  };
+    Helpers.checkEnvironment();
+    this._exit();
+  }
 
   ENV_INSTALL() {
     CLI.installEnvironment(config.required);
-    this._exit()
+    this._exit();
   }
   //#endregion
 
@@ -698,29 +891,37 @@ class $Global extends BaseCommandLine<{}, Project> {
    *  choco install ffmpeg
    */
   MP3(args) {
-    const downloadPath = crossPlatformPath(path.join(os.userInfo().homedir, 'Downloads', 'mp3-from-youtube'));
+    const downloadPath = crossPlatformPath(
+      path.join(os.userInfo().homedir, 'Downloads', 'mp3-from-youtube'),
+    );
     if (!Helpers.exists(downloadPath)) {
-      Helpers.mkdirp(downloadPath)
+      Helpers.mkdirp(downloadPath);
     }
 
-    Helpers.run(`cd ${downloadPath} && yt-dlp --verbose --extract-audio --audio-format mp3 ` + args,
+    Helpers.run(
+      `cd ${downloadPath} && yt-dlp --verbose --extract-audio --audio-format mp3 ` +
+        args,
       {
         output: true,
-        cwd: downloadPath
-      }).sync();
-    this._exit()
+        cwd: downloadPath,
+      },
+    ).sync();
+    this._exit();
   }
   //#endregion
 
   //#region mp4
   MP4(args) {
     // yt-dlp --print filename -o "%(uploader)s-%(upload_date)s-%(title)s.%(ext)s"
-    Helpers.run('yt-dlp --verbose  -S "res:1080,fps" -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" ' + args,
+    Helpers.run(
+      'yt-dlp --verbose  -S "res:1080,fps" -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" ' +
+        args,
       {
         output: true,
-        cwd: crossPlatformPath(path.join(os.userInfo().homedir, 'Downloads'))
-      }).sync();
-    this._exit()
+        cwd: crossPlatformPath(path.join(os.userInfo().homedir, 'Downloads')),
+      },
+    ).sync();
+    this._exit();
   }
   //#endregion
 
@@ -740,7 +941,7 @@ class $Global extends BaseCommandLine<{}, Project> {
 
   //#region version
   async version() {
-    Helpers.log(`Framework name: ${config.frameworkName}`)
+    Helpers.log(`Framework name: ${config.frameworkName}`);
     //#region @notForNpm
     if (ENV.notForNpm) {
       Helpers.success(`I am secret project!!!`);
@@ -764,29 +965,32 @@ class $Global extends BaseCommandLine<{}, Project> {
     // Helpers.sleep(5);
     // global.spinner?.stop();
     // log.data('Hellleoeoeo')
-    const tnp = (Project.ins.Tnp);
-    const firedev = Project.ins.From([fse.realpathSync(path.dirname(tnp.location)), config.frameworkNames.firedev]);
+    const tnp = Project.ins.Tnp;
+    const firedev = Project.ins.From([
+      fse.realpathSync(path.dirname(tnp.location)),
+      config.frameworkNames.firedev,
+    ]);
     Helpers.success(`
 
   Firedev: ${firedev?.version ? `v${firedev.version}` : '-'}
   Tnp: ${tnp?.version ? `v${tnp.version}` : '-'}
 
     `);
-    this._exit()
+    this._exit();
   }
   //#endregion
 
   //#region ps info
   async PSINFO(args: string) {
-    const pid = Number(args)
+    const pid = Number(args);
 
-    let ps: Models.PsListInfo[] = await psList()
+    let ps: Models.PsListInfo[] = await psList();
 
     let psinfo = ps.find(p => p.pid == pid);
     if (!psinfo) {
-      Helpers.error(`No process found with pid: ${args}`, false, true)
+      Helpers.error(`No process found with pid: ${args}`, false, true);
     }
-    console.log(psinfo)
+    console.log(psinfo);
   }
   //#endregion
 
@@ -801,10 +1005,7 @@ class $Global extends BaseCommandLine<{}, Project> {
     (config.coreProjectVersions as CoreModels.FrameworkVersion[]).forEach(v => {
       let corePorjectsTypes: CoreModels.LibType[] = ['isomorphic-lib'];
       const projects = corePorjectsTypes.map(t => Project.by(t, v));
-      allCoreProject = [
-        ...projects,
-        ...allCoreProject,
-      ] as any;
+      allCoreProject = [...projects, ...allCoreProject] as any;
     });
 
     for (let index = 0; index < allCoreProject.length; index++) {
@@ -816,16 +1017,22 @@ class $Global extends BaseCommandLine<{}, Project> {
         const source = path.join(l.sourceProject.location, l.relativePath);
         const dest = path.join(projectToInit.location, l.relativePath);
         if (!Helpers.exists(source)) {
-          Helpers.error(`[${config.frameworkName}] Core source do not exists: ${source}`, false, true);
+          Helpers.error(
+            `[${config.frameworkName}] Core source do not exists: ${source}`,
+            false,
+            true,
+          );
         }
         Helpers.log(`${config.frameworkName} link from: ${source} to ${dest}`);
         // Helpers.remove(dest)
-        Helpers.createSymLink(source, dest, { continueWhenExistedFolderDoesntExists: true });
+        Helpers.createSymLink(source, dest, {
+          continueWhenExistedFolderDoesntExists: true,
+        });
       }
       await projectToInit.struct();
     }
     Helpers.taskDone('DONE');
-    this._exit()
+    this._exit();
   }
   //#endregion
 
@@ -840,15 +1047,19 @@ class $Global extends BaseCommandLine<{}, Project> {
   async autoupdate() {
     if (config.frameworkName === 'firedev') {
       Helpers.run('npm i -g firedev', { output: true }).sync();
-      if (await Helpers.questionYesNo(`Proceed with ${config.frameworkName} auto-update ?`)) {
+      if (
+        await Helpers.questionYesNo(
+          `Proceed with ${config.frameworkName} auto-update ?`,
+        )
+      ) {
         Project.sync();
       }
     }
     if (config.frameworkName === 'tnp') {
       Helpers.taskStarted('Removing old node_modules..');
-      const nm = (Project.ins.Tnp).__node_modules.path;
-      const nm2 = (Project.ins.Tnp).pathFor(`tmp-${config.folder.node_modules}2`)
-      const nm1 = (Project.ins.Tnp).pathFor(`tmp-${config.folder.node_modules}1`)
+      const nm = Project.ins.Tnp.__node_modules.path;
+      const nm2 = Project.ins.Tnp.pathFor(`tmp-${config.folder.node_modules}2`);
+      const nm1 = Project.ins.Tnp.pathFor(`tmp-${config.folder.node_modules}1`);
 
       if (process.platform !== 'win32') {
         Helpers.removeIfExists(nm2);
@@ -862,16 +1073,24 @@ class $Global extends BaseCommandLine<{}, Project> {
       }
       Helpers.taskDone();
 
-      Helpers.taskStarted(`Installing new version of ${config.frameworkName} pacakges`)
-      Project.ins.Tnp.run(`npm i --force && npm-run tsc && ${config.frameworkName} dedupe`).sync();
+      Helpers.taskStarted(
+        `Installing new version of ${config.frameworkName} pacakges`,
+      );
+      Project.ins.Tnp.run(
+        `npm i --force && npm-run tsc && ${config.frameworkName} dedupe`,
+      ).sync();
       Helpers.taskDone();
-
 
       const arrActive = config.activeFramewrokVersions;
       for (let index = 0; index < arrActive.length; index++) {
         const defaultFrameworkVersionForSpecyficContainer = arrActive[index];
-        Helpers.taskStarted(`Installing new versions smart container ${defaultFrameworkVersionForSpecyficContainer} pacakges`)
-        const container = Project.by('container', defaultFrameworkVersionForSpecyficContainer);
+        Helpers.taskStarted(
+          `Installing new versions smart container ${defaultFrameworkVersionForSpecyficContainer} pacakges`,
+        );
+        const container = Project.by(
+          'container',
+          defaultFrameworkVersionForSpecyficContainer,
+        );
         container.run(`${config.frameworkName}  reinstall`).sync();
 
         Helpers.taskDone();
@@ -921,9 +1140,15 @@ class $Global extends BaseCommandLine<{}, Project> {
     // console.log({
     //   nearestProj: nearestProj?.location
     // })
-    let container = Project.by('container', nearestProj.__frameworkVersion) as Project;
+    let container = Project.by(
+      'container',
+      nearestProj.__frameworkVersion,
+    ) as Project;
     if (container.__frameworkVersionLessThan('v3')) {
-      container = Project.by('container', config.defaultFrameworkVersion) as Project;
+      container = Project.by(
+        'container',
+        config.defaultFrameworkVersion,
+      ) as Project;
     }
 
     const myEntity = 'my-entity';
@@ -931,7 +1156,7 @@ class $Global extends BaseCommandLine<{}, Project> {
     const flags = {
       flat: '_flat',
       custom: '_custom',
-    }
+    };
 
     const isFlat = moduleName.includes(flags.flat);
     moduleName = moduleName.replace(flags.flat, '');
@@ -939,11 +1164,20 @@ class $Global extends BaseCommandLine<{}, Project> {
     const isCustom = moduleName.includes(flags.custom);
     moduleName = moduleName.replace(flags.custom, '');
 
-    const exampleLocation = crossPlatformPath([container.location, 'gen-examples', moduleName, myEntity]);
-
+    const exampleLocation = crossPlatformPath([
+      container.location,
+      'gen-examples',
+      moduleName,
+      myEntity,
+    ]);
 
     const newEntityName = _.kebabCase(entityName);
-    const generatedCodeAbsLoc = crossPlatformPath([container.location, 'gen-examples', moduleName, newEntityName]);
+    const generatedCodeAbsLoc = crossPlatformPath([
+      container.location,
+      'gen-examples',
+      moduleName,
+      newEntityName,
+    ]);
     Helpers.remove(generatedCodeAbsLoc, true);
     let destination = crossPlatformPath([absPath, newEntityName]);
     if (isFlat) {
@@ -953,7 +1187,6 @@ class $Global extends BaseCommandLine<{}, Project> {
     if (isCustom) {
       //#region handle custom cases
       if (moduleName === 'generated-index-exports') {
-
         const folders = [
           ...Helpers.foldersFrom(absPath).map(f => path.basename(f)),
           ...Helpers.filesFrom(absPath, false).map(f => path.basename(f)),
@@ -961,33 +1194,53 @@ class $Global extends BaseCommandLine<{}, Project> {
           .filter(f => !['index.ts'].includes(f))
           .filter(f => !f.startsWith('.'))
           .filter(f => !f.startsWith('_'))
-          .filter(f => _.isUndefined(notNeededForExportFiles.find(e => f.endsWith(e))))
-          .filter(f => (path.extname(f) === '') || !_.isUndefined(extAllowedToExportAndReplaceTSJSCodeFiles.find(a => f.endsWith(a))))
-          ;
+          .filter(f =>
+            _.isUndefined(notNeededForExportFiles.find(e => f.endsWith(e))),
+          )
+          .filter(
+            f =>
+              path.extname(f) === '' ||
+              !_.isUndefined(
+                extAllowedToExportAndReplaceTSJSCodeFiles.find(a =>
+                  f.endsWith(a),
+                ),
+              ),
+          );
         Helpers.writeFile(
           crossPlatformPath([absPath, config.file.index_ts]),
-          folders.map(f => {
-            if (!_.isUndefined(frontendFiles.find(bigExt => f.endsWith(bigExt)))) {
-              `${TAGS.COMMENT_REGION} ${TAGS.BROWSER}\n`
-                + `export * from './${f.replace(path.extname(f), '')}';`
-                + + `\n${TAGS.COMMENT_END_REGION}\n`
-            }
-            if (!_.isUndefined(backendNodejsOnlyFiles.find(bigExt => f.endsWith(bigExt)))) {
-              return `${TAGS.COMMENT_REGION} ${TAGS.BACKEND}\n`
-                + `export * from './${f.replace(path.extname(f), '')}';`
-                + + `\n${TAGS.COMMENT_END_REGION}\n`
-            }
-            return `export * from './${f.replace(path.extname(f), '')}';`
-          }).join('\n') + '\n'
+          folders
+            .map(f => {
+              if (
+                !_.isUndefined(frontendFiles.find(bigExt => f.endsWith(bigExt)))
+              ) {
+                `${TAGS.COMMENT_REGION} ${TAGS.BROWSER}\n` +
+                  `export * from './${f.replace(path.extname(f), '')}';` +
+                  +`\n${TAGS.COMMENT_END_REGION}\n`;
+              }
+              if (
+                !_.isUndefined(
+                  backendNodejsOnlyFiles.find(bigExt => f.endsWith(bigExt)),
+                )
+              ) {
+                return (
+                  `${TAGS.COMMENT_REGION} ${TAGS.BACKEND}\n` +
+                  `export * from './${f.replace(path.extname(f), '')}';` +
+                  +`\n${TAGS.COMMENT_END_REGION}\n`
+                );
+              }
+              return `export * from './${f.replace(path.extname(f), '')}';`;
+            })
+            .join('\n') + '\n',
         );
       }
       if (moduleName === 'wrap-with-browser-regions') {
         if (!Helpers.isFolder(absFilePath)) {
           const content = Helpers.readFile(absFilePath);
-          Helpers.writeFile(absFilePath,
-            `${TAGS.COMMENT_REGION} ${TAGS.BROWSER}\n`
-            + content
-            + `\n${TAGS.COMMENT_END_REGION}\n`
+          Helpers.writeFile(
+            absFilePath,
+            `${TAGS.COMMENT_REGION} ${TAGS.BROWSER}\n` +
+              content +
+              `\n${TAGS.COMMENT_END_REGION}\n`,
           );
         }
       }
@@ -1003,13 +1256,13 @@ class $Global extends BaseCommandLine<{}, Project> {
           const destFileAbsPath = crossPlatformPath([destination, relative]);
           Helpers.copyFile(fileAbsPath, destFileAbsPath);
         }
-        Helpers.remove(generatedCodeAbsLoc, true)
+        Helpers.remove(generatedCodeAbsLoc, true);
       } else {
         Helpers.move(generatedCodeAbsLoc, destination);
       }
     }
-    console.info('GENERATION DONE')
-    this._exit(0)
+    console.info('GENERATION DONE');
+    this._exit(0);
   }
   //#endregion
 
@@ -1020,11 +1273,11 @@ class $Global extends BaseCommandLine<{}, Project> {
   }
 
   CLEAR() {
-    this.CLEAN()
+    this.CLEAN();
   }
 
   CL() {
-    this.CLEAN()
+    this.CLEAN();
   }
   //#endregion
 
@@ -1033,31 +1286,32 @@ class $Global extends BaseCommandLine<{}, Project> {
     Helpers.info(`
     In progress
 ${this.project.children
-        .filter(f => f.git.lastCommitMessage().startsWith(Helpers.git.ACTION_MSG_RESET_GIT_HARD_COMMIT))
-        .map((c, index) => `${index + 1}. ${c.genericName}`)
-      }
+  .filter(f =>
+    f.git
+      .lastCommitMessage()
+      .startsWith(Helpers.git.ACTION_MSG_RESET_GIT_HARD_COMMIT),
+  )
+  .map((c, index) => `${index + 1}. ${c.genericName}`)}
 
     `);
-    this._exit()
+    this._exit();
   }
   //#endregion
 
   //#region prettier
   async prettier() {
-    Helpers.info(`Initing before prettier...`)
+    Helpers.info(`Initing before prettier...`);
     await this.project.recreateLintConfiguration();
-    Helpers.info(`Running prettier...`)
+    Helpers.info(`Running prettier...`);
     this.project.run(`npm-run prettier --write .`, { output: true }).sync();
-    Helpers.info(`Prettier done`)
+    Helpers.info(`Prettier done`);
     this._exit();
   }
 
   //#endregion
 }
 
-
-
-
-export default { // registerd as empty
+export default {
+  // registerd as empty
   $Global: Helpers.CLIWRAP($Global, ''),
-}
+};

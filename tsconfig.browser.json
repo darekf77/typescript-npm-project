@@ -6,20 +6,8 @@
     "rootDir": "./",
     "baseUrl": "./",
     "sourceMap": true,
-    "lib": [
-      "dom",
-      "es2018"
-    ]
+    "lib": ["dom", "es2018"]
   },
-  "include": [
-    "./**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "preview",
-    "docs",
-    "dist",
-    "bundle",
-    "tests"
-  ]
+  "include": ["./**/*"],
+  "exclude": ["node_modules", "preview", "docs", "dist", "bundle", "tests"]
 }

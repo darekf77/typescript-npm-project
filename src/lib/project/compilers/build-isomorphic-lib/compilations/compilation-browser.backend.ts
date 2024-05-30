@@ -22,14 +22,13 @@ import { Models } from '../../../../models';
 
 @IncCompiler.Class({ className: 'BroswerCompilation' })
 export class BroswerCompilation extends BackendCompilation {
-
   /**
    * @deprecated
    */
-  private static instances = {} as { [websql: string]: BroswerCompilation; }
+  private static instances = {} as { [websql: string]: BroswerCompilation };
 
   //#region fields & getters
-  compilerName = 'Browser standard compiler'
+  compilerName = 'Browser standard compiler';
   public codecut: CodeCut;
 
   /**
@@ -41,7 +40,6 @@ export class BroswerCompilation extends BackendCompilation {
     }
   }
   get customCompilerName() {
-
     if (this.ENV) {
       return `Browser compilation for ${this.ENV.currentProjectName}`;
     }
@@ -68,13 +66,21 @@ export class BroswerCompilation extends BackendCompilation {
     location: string,
     cwd: string,
     public backendOutFolder: string,
-    public buildOptions: BuildOptions
+    public buildOptions: BuildOptions,
   ) {
-    super(buildOptions, isWatchBuild, outFolder, location, cwd, buildOptions.websql);
+    super(
+      buildOptions,
+      isWatchBuild,
+      outFolder,
+      location,
+      cwd,
+      buildOptions.websql,
+    );
     BroswerCompilation.instances[String(!!buildOptions.websql)] = this;
     this.compilerName = this.customCompilerName;
 
-    Helpers.log(`[BroswerCompilation][constructor]
+    Helpers.log(
+      `[BroswerCompilation][constructor]
 
     compilationProject.genericName: ${compilationProject?.genericName}
     compilationProject.type: ${compilationProject?.type}
@@ -85,7 +91,9 @@ export class BroswerCompilation extends BackendCompilation {
     location: ${location}
     backendOut: ${backendOutFolder}
 
-    `, 1);
+    `,
+      1,
+    );
 
     Helpers.log(`\n\nbuildOptions: ${JSON10.stringify(buildOptions)}\n\n`, 2);
 
@@ -102,25 +110,30 @@ export class BroswerCompilation extends BackendCompilation {
 
   //#region methods / sync action
   async syncAction(absFilesFromSrc: string[]) {
-
     Helpers.removeFolderIfExists(this.absPathTmpSrcDistFolder);
     Helpers.mkdirp(this.absPathTmpSrcDistFolder);
 
-    const tmpSource = this.absPathTmpSrcDistFolder.replace('tmp-src-', 'tmp-source-');
+    const tmpSource = this.absPathTmpSrcDistFolder.replace(
+      'tmp-src-',
+      'tmp-source-',
+    );
     Helpers.removeFolderIfExists(tmpSource);
     Helpers.mkdirp(tmpSource);
 
     this.initCodeCut();
     this.project.quickFixes.recreateTempSourceNecessaryFiles('dist');
 
-    const filesBase = crossPlatformPath(path.join(this.cwd, this.srcFolder))
+    const filesBase = crossPlatformPath(path.join(this.cwd, this.srcFolder));
     const relativePathesToProcess = absFilesFromSrc.map(absFilePath => {
       return absFilePath.replace(`${filesBase}/`, '');
     });
 
     //#region copy core asset files
     if (!this.project.__isSmartContainerTarget) {
-      const corepro = Project.by('isomorphic-lib', this.project.__frameworkVersion) as Project;
+      const corepro = Project.by(
+        'isomorphic-lib',
+        this.project.__frameworkVersion,
+      ) as Project;
       const coreAssetsPath = corepro.pathFor('app/src/assets');
       const filesToCopy = Helpers.filesFrom(coreAssetsPath, true);
       for (let index = 0; index < filesToCopy.length; index++) {
@@ -146,7 +159,10 @@ export class BroswerCompilation extends BackendCompilation {
     //#endregion
 
     this.codecut.files(relativePathesToProcess);
-    this.project.__assetsManager.copyExternalAssets(this.buildOptions?.outDir, this.buildOptions?.websql);
+    this.project.__assetsManager.copyExternalAssets(
+      this.buildOptions?.outDir,
+      this.buildOptions?.websql,
+    );
   }
   //#endregion
 
@@ -154,33 +170,44 @@ export class BroswerCompilation extends BackendCompilation {
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
     // console.log('ASYNC ACTION CODE CUT ', event.fileAbsolutePath);
-    if (!this.codecut) { // TODO QUICK - but I thin it make sense => there is not backedn compilation for websql
+    if (!this.codecut) {
+      // TODO QUICK - but I thin it make sense => there is not backedn compilation for websql
       return;
     }
 
-    if (!this.buildOptions.websql) { // TODO QUICK_FIX QUICK_DIRTY_FIX
-      const websqlInstance = BroswerCompilation.instances[String(!this.buildOptions.websql)];
+    if (!this.buildOptions.websql) {
+      // TODO QUICK_FIX QUICK_DIRTY_FIX
+      const websqlInstance =
+        BroswerCompilation.instances[String(!this.buildOptions.websql)];
       await websqlInstance.asyncAction(event);
     }
 
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
-    const relativeFilePath = crossPlatformPath(absoluteFilePath.replace(`${crossPlatformPath(path.join(this.cwd, this.srcFolder))}/`, ''));
+    const relativeFilePath = crossPlatformPath(
+      absoluteFilePath.replace(
+        `${crossPlatformPath(path.join(this.cwd, this.srcFolder))}/`,
+        '',
+      ),
+    );
     if (path.basename(relativeFilePath) === '.DS_Store') {
       return;
     }
 
-    const destinationFilePath = crossPlatformPath(path.join(this.cwd, this.sourceOutBrowser, relativeFilePath));
-    const destinationFileBackendPath = crossPlatformPath(path.join(
-      this.cwd,
-      this.sourceOutBrowser.replace('tmp-src', 'tmp-source'),
-      relativeFilePath
-    ));
+    const destinationFilePath = crossPlatformPath(
+      path.join(this.cwd, this.sourceOutBrowser, relativeFilePath),
+    );
+    const destinationFileBackendPath = crossPlatformPath(
+      path.join(
+        this.cwd,
+        this.sourceOutBrowser.replace('tmp-src', 'tmp-source'),
+        relativeFilePath,
+      ),
+    );
 
     if (event.eventName === 'unlinkDir') {
       Helpers.removeFolderIfExists(destinationFilePath);
       Helpers.removeFolderIfExists(destinationFileBackendPath);
     } else {
-
       if (event.eventName === 'unlink') {
         if (relativeFilePath.startsWith(`${config.folder.assets}/`)) {
           this.codecut.files([relativeFilePath], true);
@@ -200,10 +227,16 @@ export class BroswerCompilation extends BackendCompilation {
           //#endregion
 
           //#region remove deist if directory
-          if (fse.existsSync(destinationFilePath) && fse.lstatSync(destinationFilePath).isDirectory()) {
+          if (
+            fse.existsSync(destinationFilePath) &&
+            fse.lstatSync(destinationFilePath).isDirectory()
+          ) {
             fse.removeSync(destinationFilePath);
           }
-          if (fse.existsSync(destinationFileBackendPath) && fse.lstatSync(destinationFileBackendPath).isDirectory()) {
+          if (
+            fse.existsSync(destinationFileBackendPath) &&
+            fse.lstatSync(destinationFileBackendPath).isDirectory()
+          ) {
             fse.removeSync(destinationFileBackendPath);
           }
           //#endregion
@@ -211,15 +244,12 @@ export class BroswerCompilation extends BackendCompilation {
           this.codecut.files([relativeFilePath]);
         }
       }
-
-
     }
   }
   //#endregion
 
   //#region methods / init code cut
   initCodeCut() {
-
     // console.log('inside')
     let env: Models.EnvConfig = this.ENV;
     const compilationProject: Project = this.compilationProject;
@@ -239,16 +269,15 @@ export class BroswerCompilation extends BackendCompilation {
       project = compilationProject;
     }
 
-
     const replacements = [];
 
     replacements.push([TAGS.BACKEND_FUNC, `return (void 0);`]);
     replacements.push(TAGS.BACKEND as any);
 
     if (!this.buildOptions.websql) {
-      replacements.push(TAGS.WEBSQL_ONLY as any,);
+      replacements.push(TAGS.WEBSQL_ONLY as any);
       replacements.push([TAGS.WEBSQL_FUNC, `return (void 0);`]);
-      replacements.push(TAGS.WEBSQL as any,);
+      replacements.push(TAGS.WEBSQL as any);
     }
 
     replacements.push([TAGS.CUT_CODE_IF_TRUE, codeCuttFn(true)]);
@@ -258,16 +287,15 @@ export class BroswerCompilation extends BackendCompilation {
       this.absPathTmpSrcDistFolder,
       {
         replacements: replacements.filter(f => !!f),
-        env
+        env,
       },
       project,
       compilationProject,
       this.buildOptions,
-      this.sourceOutBrowser
+      this.sourceOutBrowser,
     );
   }
   //#endregion
 
   //#endregion
-
 }

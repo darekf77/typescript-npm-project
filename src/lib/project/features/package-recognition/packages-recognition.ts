@@ -1,10 +1,5 @@
 //#region @backend
-import {
-  _,
-  path,
-  fse,
-  crossPlatformPath,
-} from 'tnp-core/src';
+import { _, path, fse, crossPlatformPath } from 'tnp-core/src';
 import { Helpers } from 'tnp-helpers/src';
 import { config, PREFIXES } from 'tnp-config/src';
 import { BrowserCodeCut } from '../../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
@@ -16,16 +11,19 @@ const notAllowedAsPacakge = [
   config.folder.assets,
 ];
 
-
 export class PackagesRecognition {
+  static FILE_NAME_ISOMORPHIC_PACKAGES =
+    config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES;
 
-  static FILE_NAME_ISOMORPHIC_PACKAGES = config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES;
-
-  private static cached: { [location: string]: PackagesRecognition; } = {} as any;
+  private static cached: { [location: string]: PackagesRecognition } =
+    {} as any;
 
   public static fromProject(project: Project, cached = false) {
     if (cached && !!project?.location && !this.cached[project?.location]) {
-      this.cached[project?.location] = new PackagesRecognition(project.location, project);
+      this.cached[project?.location] = new PackagesRecognition(
+        project.location,
+        project,
+      );
     }
     if (cached && !!project?.location) {
       const instance = this.cached[project?.location] as PackagesRecognition;
@@ -37,19 +35,24 @@ export class PackagesRecognition {
 
   protected recognizedPackages: string[];
   private processAlreadyDone = false;
-  constructor(protected cwd: string, protected project?: Project) {
-
-  }
+  constructor(
+    protected cwd: string,
+    protected project?: Project,
+  ) {}
 
   get count() {
-    return _.isArray(this.recognizedPackages) ? this.recognizedPackages.length : 0;
+    return _.isArray(this.recognizedPackages)
+      ? this.recognizedPackages.length
+      : 0;
   }
 
   start(force?: boolean, reasonToSearch?: string) {
     if (this.processAlreadyDone) {
       this.updateCurrentIsomorphicJsonSearchResults();
-      Helpers.log(`[package-recognition] Searching isomorphic packages for ${this.project.genericName}...`
-        + ` ommiting, updating from cache`);
+      Helpers.log(
+        `[package-recognition] Searching isomorphic packages for ${this.project.genericName}...` +
+          ` ommiting, updating from cache`,
+      );
       return;
     }
     Helpers.log(`[${config.frameworkName}] reason to search ${reasonToSearch}`);
@@ -63,22 +66,30 @@ export class PackagesRecognition {
     Helpers.log(`[package-recognition] Searching isomorphic packages for ${this.project.genericName}... force=${force}
     in ${this.cwd}
     `);
-    Helpers.mesureExectionInMsSync(`Searching isomorphic packages for ${this.project.genericName}...`, () => {
-      let local = [];
-      if (this.project.__isSmartContainer || this.project.__isSmartContainerTarget) {
-        const parent = this.project.__isSmartContainer ? this.project
-          : this.project.__smartContainerTargetParentContainer;
+    Helpers.mesureExectionInMsSync(
+      `Searching isomorphic packages for ${this.project.genericName}...`,
+      () => {
+        let local = [];
+        if (
+          this.project.__isSmartContainer ||
+          this.project.__isSmartContainerTarget
+        ) {
+          const parent = this.project.__isSmartContainer
+            ? this.project
+            : this.project.__smartContainerTargetParentContainer;
 
-        local = [
-          ...parent.children.map(c => {
-            return `@${parent.name}/${c.name}`
-          })
-        ]
-      }
-      this.superStart(true, reasonToSearch, local); // TODO QUICK_FIX
-
-    });
-    Helpers.log(`[${config.frameworkName}] [package-recognition] Founded ${this.count} isomorphic packages`);
+          local = [
+            ...parent.children.map(c => {
+              return `@${parent.name}/${c.name}`;
+            }),
+          ];
+        }
+        this.superStart(true, reasonToSearch, local); // TODO QUICK_FIX
+      },
+    );
+    Helpers.log(
+      `[${config.frameworkName}] [package-recognition] Founded ${this.count} isomorphic packages`,
+    );
     this.processAlreadyDone = true;
   }
 
@@ -108,10 +119,13 @@ export class PackagesRecognition {
   //   return res;
   // }
 
-
   superStart(force?: boolean, reasonToSearch?: string, local: string[] = []) {
-    Helpers.log(`[${config.frameworkName}][force = ${force}] ${reasonToSearch}`);
-    const pjPath = crossPlatformPath(path.join(this.cwd, config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES));
+    Helpers.log(
+      `[${config.frameworkName}][force = ${force}] ${reasonToSearch}`,
+    );
+    const pjPath = crossPlatformPath(
+      path.join(this.cwd, config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES),
+    );
     if (!Helpers.exists(pjPath)) {
       Helpers.writeJson(pjPath, {});
     }
@@ -120,34 +134,36 @@ export class PackagesRecognition {
         const pj = Helpers.readJson(pjPath);
         if (_.isArray(pj[config.array.isomorphicPackages])) {
           this.recognizedPackages = pj[config.array.isomorphicPackages];
-          BrowserCodeCut.resolveAndAddIsomorphicLibs(_.cloneDeep(this.recognizedPackages));
-          Helpers.log(`[${config.frameworkName}] Recognized (${this.recognizedPackages}) in ${pjPath}`)
+          BrowserCodeCut.resolveAndAddIsomorphicLibs(
+            _.cloneDeep(this.recognizedPackages),
+          );
+          Helpers.log(
+            `[${config.frameworkName}] Recognized (${this.recognizedPackages}) in ${pjPath}`,
+          );
           return;
         }
       } catch (error) {
-        Helpers.log(`[${config.frameworkName}] ERROR not recognized in`)
+        Helpers.log(`[${config.frameworkName}] ERROR not recognized in`);
       }
     }
-    const node_modules = crossPlatformPath(path.join(this.cwd, config.folder.node_modules));
+    const node_modules = crossPlatformPath(
+      path.join(this.cwd, config.folder.node_modules),
+    );
 
     const linksToFolders = [
       ...Helpers.linksToFolderFrom(node_modules).reduce((a, b) => {
         if (path.basename(b).startsWith('@')) {
           const foldersFromB = Helpers.foldersFrom(fse.realpathSync(b))
             .filter(f => !notAllowedAsPacakge.includes(path.basename(f)))
-            .filter(f => Helpers.exists([path.dirname(f), config.file.index_d_ts])) // QUICK_FIX @angular/animation
+            .filter(f =>
+              Helpers.exists([path.dirname(f), config.file.index_d_ts]),
+            ) // QUICK_FIX @angular/animation
             .map(f => {
               return `${path.basename(b)}/${path.basename(f)}`;
             });
-          return [
-            ...a,
-            ...foldersFromB,
-          ]
+          return [...a, ...foldersFromB];
         }
-        return [
-          ...a,
-          b
-        ]
+        return [...a, b];
       }, []),
     ];
 
@@ -156,19 +172,15 @@ export class PackagesRecognition {
         if (path.basename(b).startsWith('@')) {
           const foldersFromB = Helpers.foldersFrom(b)
             .filter(f => !notAllowedAsPacakge.includes(path.basename(f)))
-            .filter(f => Helpers.exists([path.dirname(f), config.file.index_d_ts])) // QUICK_FIX @angular/animation
+            .filter(f =>
+              Helpers.exists([path.dirname(f), config.file.index_d_ts]),
+            ) // QUICK_FIX @angular/animation
             .map(f => {
               return `${path.basename(b)}/${path.basename(f)}`;
             });
-          return [
-            ...a,
-            ...foldersFromB,
-          ]
+          return [...a, ...foldersFromB];
         }
-        return [
-          ...a,
-          b
-        ]
+        return [...a, b];
       }, []),
       ...linksToFolders,
     ] as string[];
@@ -181,7 +193,10 @@ export class PackagesRecognition {
         return path.basename(f);
       })
       .filter(packageName => {
-        Helpers.log(`[${config.frameworkName}] Checking package node_modules/${packageName}`, 2)
+        Helpers.log(
+          `[${config.frameworkName}] Checking package node_modules/${packageName}`,
+          2,
+        );
         // try {
         return this.checkIsomorphic(node_modules, packageName);
         // } catch (error) {
@@ -189,43 +204,57 @@ export class PackagesRecognition {
         // }
       });
     this.recognizedPackages = [
-      ...(this.project.__isStandaloneProject && !this.project.__isSmartContainerTarget) ? [this.project.name] : [],
+      ...(this.project.__isStandaloneProject &&
+      !this.project.__isSmartContainerTarget
+        ? [this.project.name]
+        : []),
       ...folders,
       ...local,
       ...Object.values(config.frameworkNames),
     ].filter(f => !f.startsWith(PREFIXES.RESTORE_NPM));
-    this.updateCurrentIsomorphicJsonSearchResults()
+    this.updateCurrentIsomorphicJsonSearchResults();
   }
 
   protected updateCurrentIsomorphicJsonSearchResults() {
-    Helpers.log(`[${config.frameworkName}] updateCurrentPackageJson`)
+    Helpers.log(`[${config.frameworkName}] updateCurrentPackageJson`);
     try {
-      const pjPath = crossPlatformPath(path.join(this.cwd, config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES));
+      const pjPath = crossPlatformPath(
+        path.join(this.cwd, config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES),
+      );
       if (!Helpers.exists(pjPath)) {
         Helpers.writeJson(pjPath, {});
       }
       const pj = Helpers.readJson(pjPath);
       pj[config.array.isomorphicPackages] = this.recognizedPackages;
       Helpers.writeJson(pjPath, pj);
-      BrowserCodeCut.resolveAndAddIsomorphicLibs(_.cloneDeep(this.recognizedPackages));
+      BrowserCodeCut.resolveAndAddIsomorphicLibs(
+        _.cloneDeep(this.recognizedPackages),
+      );
     } catch (e) {
-      Helpers.log(`[${config.frameworkName}]`, e)
-      Helpers.log(`[${config.frameworkName}] Error during update ismorphic packages list cache`);
+      Helpers.log(`[${config.frameworkName}]`, e);
+      Helpers.log(
+        `[${config.frameworkName}] Error during update ismorphic packages list cache`,
+      );
     }
   }
 
   protected checkIsomorphic(node_modules: string, packageName: string) {
     let isIsomorphic = false;
-    const packageInNodeModulesPath = crossPlatformPath(fse.realpathSync(path.join(node_modules, packageName)));
-    const browser = crossPlatformPath(path.join(packageInNodeModulesPath, config.folder.browser));
-    const websql = crossPlatformPath(path.join(packageInNodeModulesPath, config.folder.websql));
-    isIsomorphic = (Helpers.exists(browser) || Helpers.exists(websql));
+    const packageInNodeModulesPath = crossPlatformPath(
+      fse.realpathSync(path.join(node_modules, packageName)),
+    );
+    const browser = crossPlatformPath(
+      path.join(packageInNodeModulesPath, config.folder.browser),
+    );
+    const websql = crossPlatformPath(
+      path.join(packageInNodeModulesPath, config.folder.websql),
+    );
+    isIsomorphic = Helpers.exists(browser) || Helpers.exists(websql);
     if (isIsomorphic && !Helpers.exists(websql)) {
       Helpers.removeIfExists(websql);
       Helpers.createSymLink(browser, websql);
     }
     return isIsomorphic;
   }
-
 }
 //#endregion

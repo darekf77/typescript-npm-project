@@ -1,11 +1,11 @@
 //#region imports
-import { config, PREFIXES } from "tnp-config/src";
-import { crossPlatformPath, fse, path, _ } from "tnp-core/src";
-import { BuildOptions } from "../../../../build-options";
-import type { Project } from "../../../abstract/project";
-import { BrowserCodeCut } from "./browser-code-cut.backend";
-import { extAllowedToReplace } from "tnp-config/src";
-import { ReplaceOptionsExtended } from "isomorphic-region-loader/src";
+import { config, PREFIXES } from 'tnp-config/src';
+import { crossPlatformPath, fse, path, _ } from 'tnp-core/src';
+import { BuildOptions } from '../../../../build-options';
+import type { Project } from '../../../abstract/project';
+import { BrowserCodeCut } from './browser-code-cut.backend';
+import { extAllowedToReplace } from 'tnp-config/src';
+import { ReplaceOptionsExtended } from 'isomorphic-region-loader/src';
 //#endregion
 
 export class CodeCut {
@@ -27,19 +27,18 @@ export class CodeCut {
     private compilationProject: Project,
     private buildOptions: BuildOptions,
     public sourceOutBrowser: string,
-
-  ) {
-
-  }
+  ) {}
   //#endregion
 
   //#region methods
 
   private isAllowedPathForSave(relativePath: string) {
     // console.log({ relativePath })
-    return (path.basename(relativePath).search(PREFIXES.BASELINE) === -1) &&
-      (path.basename(relativePath).search(PREFIXES.DELETED) === -1) &&
-      !relativePath.replace(/^\\/, '').startsWith(`tests/`);
+    return (
+      path.basename(relativePath).search(PREFIXES.BASELINE) === -1 &&
+      path.basename(relativePath).search(PREFIXES.DELETED) === -1 &&
+      !relativePath.replace(/^\\/, '').startsWith(`tests/`)
+    );
   }
 
   /**
@@ -58,39 +57,39 @@ export class CodeCut {
       return;
     }
 
-    const absSourceFromSrc = crossPlatformPath(path.join(
-      path.dirname(this.absPathTmpSrcDistFolder),
-      config.folder.src,
-      relativePathToFile,
-    ));
+    const absSourceFromSrc = crossPlatformPath(
+      path.join(
+        path.dirname(this.absPathTmpSrcDistFolder),
+        config.folder.src,
+        relativePathToFile,
+      ),
+    );
 
-    const absolutePathToFile = crossPlatformPath(path.join(
-      this.absPathTmpSrcDistFolder,
-      relativePathToFile,
-    ));
+    const absolutePathToFile = crossPlatformPath(
+      path.join(this.absPathTmpSrcDistFolder, relativePathToFile),
+    );
 
     // if (absSourceFromSrc.endsWith('/file.ts')) {
     //   debugger
     // }
 
     if (!extAllowedToReplace.includes(path.extname(relativePathToFile))) {
-
-      return (new BrowserCodeCut(
+      return new BrowserCodeCut(
         absSourceFromSrc,
         absolutePathToFile,
         this.absPathTmpSrcDistFolder,
         this.project,
         this.buildOptions,
-      )).initAndSave(remove);
+      ).initAndSave(remove);
     }
 
-    return (new BrowserCodeCut(
+    return new BrowserCodeCut(
       absSourceFromSrc,
       absolutePathToFile,
       this.absPathTmpSrcDistFolder,
       this.project,
       this.buildOptions,
-    ))
+    )
       .init()
       .REPLACERegionsForIsomorphicLib(_.cloneDeep(this.options) as any)
       .FLATTypescriptImportExport('export')

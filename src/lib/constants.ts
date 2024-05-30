@@ -1,11 +1,12 @@
-import type { Project } from "./project/abstract/project";
+import type { Project } from './project/abstract/project';
 
 import {
-  crossPlatformPath, path,
+  crossPlatformPath,
+  path,
   //#region @backend
-  os
+  os,
   //#endregion
-} from "tnp-core/src";
+} from 'tnp-core/src';
 
 export const firedevFrameworkName = 'firedev';
 
@@ -26,12 +27,10 @@ export const OVERRIDE_FROM_TNP = [
 export const UNIT_TEST_TIMEOUT = 30000;
 export const INTEGRATION_TEST_TIMEOUT = 30000;
 
-
-export let firedevRepoPathUserInUserDir: string
+export let firedevRepoPathUserInUserDir: string =
   //#region @backend
-  = path.join(crossPlatformPath(os.homedir()), '.firedev', firedevFrameworkName);
+  path.join(crossPlatformPath(os.homedir()), '.firedev', firedevFrameworkName);
 //#endregion
-
 
 export const argsToClear = [
   'websql',
@@ -53,10 +52,10 @@ export const DEFAULT_PORT = {
   DIST_SERVER_DOCS: 4000,
   APP_BUILD_LOCALHOST: 4200,
   SERVER_LOCALHOST: 4199,
-}
+};
 
 export const tmpBuildPort = 'tmp-build-port';
-export const tmpBaseHrefOverwriteRelPath = 'tmp-base-href-overwrite'
+export const tmpBaseHrefOverwriteRelPath = 'tmp-base-href-overwrite';
 
 /**
  *
@@ -85,10 +84,8 @@ export class PortUtils {
   }
 
   private readonly n: number;
-  constructor(
-    private basePort: number,
-  ) {
-    this.n = ((basePort - (basePort % 1000)) / 1000);
+  constructor(private basePort: number) {
+    this.n = (basePort - (basePort % 1000)) / 1000;
   }
 
   /**
@@ -109,7 +106,9 @@ export class PortUtils {
       return;
     }
     if (project.__isSmartContainerTarget) {
-      project = project.__smartContainerTargetParentContainer.children.find(c => c.name === project.name);
+      project = project.__smartContainerTargetParentContainer.children.find(
+        c => c.name === project.name,
+      );
     }
     if (project.__isSmartContainerChild) {
       const index = project.parent.children.indexOf(project);
@@ -121,13 +120,18 @@ export class PortUtils {
     //#endregion
   }
 
-  calculateClientPortFor(project: Project, { websql }: { websql: boolean }): number {
+  calculateClientPortFor(
+    project: Project,
+    { websql }: { websql: boolean },
+  ): number {
     //#region @backendFunc
     if (project.__isContainer) {
       return;
     }
     if (project.__isSmartContainerTarget) {
-      project = project.__smartContainerTargetParentContainer.children.find(c => c.name === project.name);
+      project = project.__smartContainerTargetParentContainer.children.find(
+        c => c.name === project.name,
+      );
     }
     if (project.__isSmartContainerChild) {
       const index = project.parent.children.indexOf(project);
@@ -140,36 +144,42 @@ export class PortUtils {
   }
 
   private calculateForStandaloneServer() {
-    const clientStandalonePort = this.basePort + 400 + this.n
+    const clientStandalonePort = this.basePort + 400 + this.n;
     return clientStandalonePort;
   }
 
   private calculateForContainerServer(index: number) {
-    const clientSmartContainerChildPort = this.basePort + 500 + (this.n * this.max) + index;
+    const clientSmartContainerChildPort =
+      this.basePort + 500 + this.n * this.max + index;
     // console.log({ clientSmartContainerChildPort })
     return clientSmartContainerChildPort;
   }
 
   private calculateForStandaloneClient({ websql }: { websql: boolean }) {
-    const clientPort = (this.basePort + (websql ? 300 : 200)) + this.n;
+    const clientPort = this.basePort + (websql ? 300 : 200) + this.n;
     return clientPort;
   }
 
-  private calculateForContainerClient(index: number, { websql }: { websql: boolean }) {
-    const clientPort = (this.basePort + (websql ? 800 : 700)) + this.n * this.max + index;
+  private calculateForContainerClient(
+    index: number,
+    { websql }: { websql: boolean },
+  ) {
+    const clientPort =
+      this.basePort + (websql ? 800 : 700) + this.n * this.max + index;
     return clientPort;
   }
-
-
 
   appHostTemplateFor(project: Project) {
     const backendPort = this.calculateServerPortFor(project);
 
     //#region @backendFunc
-    const clientPorts = (project.__isStandaloneProject && !project.__isSmartContainerTarget) ? `
+    const clientPorts =
+      project.__isStandaloneProject && !project.__isSmartContainerTarget
+        ? `
 export const CLIENT_DEV_NORMAL_APP_PORT = ${project.__standaloneNormalAppPort};
 export const CLIENT_DEV_WEBSQL_APP_PORT = ${project.__standaloneWebsqlAppPort};
-    `: ''
+    `
+        : '';
 
     return `
 // THIS FILE IS GENERATED - DO NOT MODIFY
@@ -182,13 +192,10 @@ ${clientPorts}
 // WEBSQL APP: http://localhost:${project.__standaloneWebsqlAppPort}
 
 // THIS FILE IS GENERATED - DO NOT MODIFY
-`.trim()
+`.trim();
     //#endregion
   }
-
 }
-
-
 
 export const notAllowedProjectNames = [
   'app',
@@ -204,18 +211,20 @@ export const notAllowedProjectNames = [
   'compiled',
   'docs',
   '_',
-]
+];
 
-
-export function tempSourceFolder(outDir: 'dist', appForLib: boolean, websql: boolean) {
-  return `tmp-src-${appForLib ? 'app-' : ''}${outDir}${websql ? '-websql' : ''}`
+export function tempSourceFolder(
+  outDir: 'dist',
+  appForLib: boolean,
+  websql: boolean,
+) {
+  return `tmp-src-${appForLib ? 'app-' : ''}${outDir}${websql ? '-websql' : ''}`;
 }
-
 
 export const MESSAGES = {
-  SHUT_DOWN_FOLDERS_AND_DEBUGGERS: 'Please shut down your code debugger and any open windows from node_modules and press any key...'
-}
-
+  SHUT_DOWN_FOLDERS_AND_DEBUGGERS:
+    'Please shut down your code debugger and any open windows from node_modules and press any key...',
+};
 
 export const ONLY_COPY_ALLOWED = [
   // 'background-worker-process',

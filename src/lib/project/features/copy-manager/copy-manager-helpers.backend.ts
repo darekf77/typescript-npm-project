@@ -8,15 +8,14 @@ import { Models } from '../../../models';
 import { Helpers } from 'tnp-helpers/src';
 //#endregion
 export namespace CopyMangerHelpers {
-
   export const angularBrowserComiplationFolders = {
     esm2022: 'esm2022',
     fesm2022: 'fesm2022',
   };
 
   export const angularBrowserComiplationFoldersArr = Object.values(
-    angularBrowserComiplationFolders
-  ) as (keyof typeof angularBrowserComiplationFolders)[]
+    angularBrowserComiplationFolders,
+  ) as (keyof typeof angularBrowserComiplationFolders)[];
 
   //#region helpers / browser websql folders
   export const browserwebsqlFolders = [
@@ -31,7 +30,6 @@ export namespace CopyMangerHelpers {
   }
   //#endregion
 
-
   //#region helpers / excute copy
   export function executeCopy(
     sourceLocation: string,
@@ -39,7 +37,8 @@ export namespace CopyMangerHelpers {
     options: Models.GenerateProjectCopyOpt,
     project: Project,
   ) {
-    const { useTempLocation, filterForReleaseDist, ommitSourceCode, override } = options;
+    const { useTempLocation, filterForReleaseDist, ommitSourceCode, override } =
+      options;
     let tempDestination: string;
     // console.log('useTempLocation',useTempLocation)
     if (useTempLocation) {
@@ -66,24 +65,29 @@ export namespace CopyMangerHelpers {
     // const toOmmitV3 = ((project.frameworkVersionAtLeast('v3') && project.typeIs('isomorphic-lib')) ? ['app', 'lib'] : []);
 
     const foldersToSkip = [
-      ...(filterForReleaseDist ? [
-        '.vscode',
-        ...Helpers.values(config.tempFolders),
-      ] : []),
-      ...(project.__projectLinkedFiles().map(c => c.relativePath)),
-      ...((filterForReleaseDist && ommitSourceCode) ? sourceFolders : []),
+      ...(filterForReleaseDist
+        ? ['.vscode', ...Helpers.values(config.tempFolders)]
+        : []),
+      ...project.__projectLinkedFiles().map(c => c.relativePath),
+      ...(filterForReleaseDist && ommitSourceCode ? sourceFolders : []),
       // ...toOmmitV3,
     ];
 
     // console.log(foldersToSkip)
 
-    const filter = override ? project.filterOnlyCopy(sourceFolders)
+    const filter = override
+      ? project.filterOnlyCopy(sourceFolders)
       : project.filterDontCopy(foldersToSkip);
 
-    Helpers.copy(`${sourceLocation}/`, tempDestination, { filter, dereference: options.dereference });
+    Helpers.copy(`${sourceLocation}/`, tempDestination, {
+      filter,
+      dereference: options.dereference,
+    });
 
     if (useTempLocation) {
-      Helpers.copy(`${tempDestination}/`, destinationLocation, { dereference: options.dereference });
+      Helpers.copy(`${tempDestination}/`, destinationLocation, {
+        dereference: options.dereference,
+      });
       Helpers.remove(tempDestination);
     }
 
@@ -94,7 +98,7 @@ export namespace CopyMangerHelpers {
       project.__projectSourceFiles().forEach(f => {
         const source = crossPlatformPath(path.join(project.location, f));
         if (fse.existsSync(source)) {
-          Helpers.log(`Copying file/folder to static build: ${f} `)
+          Helpers.log(`Copying file/folder to static build: ${f} `);
           if (fse.lstatSync(source).isDirectory()) {
             Helpers.tryCopyFrom(source, path.join(destinationLocation, f));
           } else {
@@ -105,8 +109,6 @@ export namespace CopyMangerHelpers {
         }
       });
     }
-
   }
   //#endregion
-
 }

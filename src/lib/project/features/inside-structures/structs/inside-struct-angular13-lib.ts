@@ -10,14 +10,15 @@ import { recreateApp, recreateIndex } from './inside-struct-helpers';
 import { InitOptions } from '../../../../build-options';
 //#endregion
 
-
 export class InsideStructAngular13Lib extends BaseInsideStruct {
-
   constructor(project: Project, initOptions: InitOptions) {
     super(project, initOptions);
     //#region @backend
-    if (!project.__frameworkVersionAtLeast('v3') || project.typeIsNot('isomorphic-lib')) {
-      return
+    if (
+      !project.__frameworkVersionAtLeast('v3') ||
+      project.typeIsNot('isomorphic-lib')
+    ) {
+      return;
     }
     const tmpProjectsStandalone = `tmp-libs-for-${config.folder.dist}${this.websql ? '-websql' : ''}/${project.name}`;
 
@@ -65,13 +66,15 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
       projectType: project.type,
       frameworkVersion: project.__frameworkVersion,
       pathReplacements: [
-        [new RegExp('^lib\\/'), () => {
-          return `${tmpProjectsStandalone}/`;
-        }],
+        [
+          new RegExp('^lib\\/'),
+          () => {
+            return `${tmpProjectsStandalone}/`;
+          },
+        ],
       ],
       linkNodeModulesTo: ['lib/'],
-      endAction: (({ replacement }) => {
-
+      endAction: ({ replacement }) => {
         //#region fixing package json dependencies in target proj
         (() => {
           const jsonPath = path.join(
@@ -80,22 +83,27 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
             config.file.package_json,
           );
 
-          const container = Project.by('container', this.project.__frameworkVersion) as Project;
+          const container = Project.by(
+            'container',
+            this.project.__frameworkVersion,
+          ) as Project;
 
           const json = Helpers.readJson(jsonPath) as Models.IPackageJSON;
 
           json.devDependencies = {};
 
-          Object.keys(container.__packageJson.data.dependencies).forEach(pkgName => {
-            json.dependencies[pkgName] = container.__packageJson.data.dependencies[pkgName];
-          });
+          Object.keys(container.__packageJson.data.dependencies).forEach(
+            pkgName => {
+              json.dependencies[pkgName] =
+                container.__packageJson.data.dependencies[pkgName];
+            },
+          );
 
           // Object.keys(json.devDependencies).forEach(pkgName => {
           //   json.devDependencies[pkgName] = container.packageJson.data.dependencies[pkgName];
           // });
 
           Helpers.writeJson(jsonPath, json);
-
         })();
         //#endregion
 
@@ -104,14 +112,13 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
           const source = path.join(
             this.project.location,
             replacement(tmpProjectsStandalone),
-            `projects/my-lib`
+            `projects/my-lib`,
           );
-
 
           const dest = path.join(
             this.project.location,
             replacement(tmpProjectsStandalone),
-            `projects/${this.project.name}`
+            `projects/${this.project.name}`,
           );
           Helpers.remove(dest);
           Helpers.move(source, dest);
@@ -123,17 +130,18 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
           const source = path.join(
             this.project.location,
             `tmp-src-${config.folder.dist}${this.websql ? '-websql' : ''}`,
-            'lib'
+            'lib',
           );
 
           const dest = path.join(
             this.project.location,
             replacement(tmpProjectsStandalone),
-            `projects/${this.project.name}/src/lib`
+            `projects/${this.project.name}/src/lib`,
           );
           Helpers.remove(dest);
-          Helpers.createSymLink(source, dest,
-            { continueWhenExistedFolderDoesntExists: true });
+          Helpers.createSymLink(source, dest, {
+            continueWhenExistedFolderDoesntExists: true,
+          });
           //#endregion
 
           //#region resolve varaibles
@@ -144,7 +152,6 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
           );
 
           let publicApiFile = Helpers.readFile(sourcePublicApi);
-
 
           const sourceTsconfig = path.join(
             this.project.location,
@@ -162,38 +169,43 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
           if (this.project.__isSmartContainerTarget) {
             //#region fixing tsconfig pathes
             const parent = this.project.__smartContainerTargetParentContainer;
-            const otherChildren = parent.children.filter(c => c.name !== this.project.name);
+            const otherChildren = parent.children.filter(
+              c => c.name !== this.project.name,
+            );
             // console.log({
             //   otherChildren: otherChildren.map(c => c.location)
             // })
             const base = this.project.name;
             if (tsconfigJson) {
-              tsconfigJson.compilerOptions.paths = otherChildren.reduce((a, b) => {
-                return _.merge(a, {
-                  [`@${parent.name}/${b.name}/${this.websql ? config.folder.websql : config.folder.browser}`]: [
-                    `./projects/${base}/src/libs/${b.name}`
-                  ],
-                  [`@${parent.name}/${b.name}/${this.websql ? config.folder.websql : config.folder.browser}/*`]: [
-                    `./projects/${base}/src/libs/${b.name}/*`
-                  ],
-                })
-              }, {});
+              tsconfigJson.compilerOptions.paths = otherChildren.reduce(
+                (a, b) => {
+                  return _.merge(a, {
+                    [`@${parent.name}/${b.name}/${this.websql ? config.folder.websql : config.folder.browser}`]:
+                      [`./projects/${base}/src/libs/${b.name}`],
+                    [`@${parent.name}/${b.name}/${this.websql ? config.folder.websql : config.folder.browser}/*`]:
+                      [`./projects/${base}/src/libs/${b.name}/*`],
+                  });
+                },
+                {},
+              );
 
-              tsconfigJson.compilerOptions.paths[`@${parent.name}/${this.project.name}/${this.websql ? config.folder.websql : config.folder.browser}`] = [
-                `./projects/${base}/src/lib`
-              ];
-              tsconfigJson.compilerOptions.paths[`@${parent.name}/${this.project.name}/${this.websql ? config.folder.websql : config.folder.browser}/*`] = [
-                `./projects/${base}/src/lib/*`
-              ];
+              tsconfigJson.compilerOptions.paths[
+                `@${parent.name}/${this.project.name}/${this.websql ? config.folder.websql : config.folder.browser}`
+              ] = [`./projects/${base}/src/lib`];
+              tsconfigJson.compilerOptions.paths[
+                `@${parent.name}/${this.project.name}/${this.websql ? config.folder.websql : config.folder.browser}/*`
+              ] = [`./projects/${base}/src/lib/*`];
             }
             //#endregion
 
             if (otherChildren.length > 0) {
               publicApiFile = `
 export * from './lib';
-${otherChildren.map(c => {
-                return `export * from './libs/${c.name}';`
-              }).join('\n')}
+${otherChildren
+  .map(c => {
+    return `export * from './libs/${c.name}';`;
+  })
+  .join('\n')}
 `.trimLeft();
             } else {
               publicApiFile = `
@@ -211,11 +223,15 @@ export * from './lib';
               const assetDummyDestForLib = path.join(
                 this.project.location,
                 replacement(tmpProjectsStandalone),
-                `projects/${this.project.name}/src/${config.folder.assets}`
+                `projects/${this.project.name}/src/${config.folder.assets}`,
               );
 
               Helpers.remove(assetDummyDestForLib);
-              Helpers.createSymLink(assetDummySourceForLib, assetDummyDestForLib, { continueWhenExistedFolderDoesntExists: true });
+              Helpers.createSymLink(
+                assetDummySourceForLib,
+                assetDummyDestForLib,
+                { continueWhenExistedFolderDoesntExists: true },
+              );
             })();
 
             for (let index = 0; index < otherChildren.length; index++) {
@@ -232,18 +248,18 @@ export * from './lib';
               const destChild = path.join(
                 this.project.location,
                 replacement(tmpProjectsStandalone),
-                `projects/${this.project.name}/src/libs/${child.name}`
+                `projects/${this.project.name}/src/libs/${child.name}`,
               );
 
               Helpers.remove(destChild);
-              Helpers.createSymLink(sourceChild, destChild, { continueWhenExistedFolderDoesntExists: true });
+              Helpers.createSymLink(sourceChild, destChild, {
+                continueWhenExistedFolderDoesntExists: true,
+              });
               //#endregion
-
             }
           } else {
             if (tsconfigJson) {
               tsconfigJson.compilerOptions.paths = void 0;
-
             }
             publicApiFile = `
 export * from './lib';
@@ -255,57 +271,62 @@ export * from './lib';
           }
 
           Helpers.writeFile(sourcePublicApi, publicApiFile);
-
         })();
 
         const libPackageJson = crossPlatformPath([
           this.project.location,
           replacement(tmpProjectsStandalone),
-          `projects/${this.project.name}/package.json`
+          `projects/${this.project.name}/package.json`,
         ]);
 
         const ngPackageJson = crossPlatformPath([
           this.project.location,
           replacement(tmpProjectsStandalone),
-          `projects/${this.project.name}/ng-package.json`
+          `projects/${this.project.name}/ng-package.json`,
         ]);
 
         const angularJson = crossPlatformPath([
           this.project.location,
           replacement(tmpProjectsStandalone),
-          `angular.json`
+          `angular.json`,
         ]);
 
         const tsconfigJson = crossPlatformPath([
           this.project.location,
           replacement(tmpProjectsStandalone),
-          `tsconfig.json`
+          `tsconfig.json`,
         ]);
 
-        [
-          libPackageJson,
-          ngPackageJson,
-          angularJson,
-          tsconfigJson,
-        ].forEach(f => {
-          let content = Helpers.readFile(f) || '';
-          content = content.replace(new RegExp('my\\-lib', 'g'), this.project.name);
-          if (path.basename(f) === 'tsconfig.json') {
+        [libPackageJson, ngPackageJson, angularJson, tsconfigJson].forEach(
+          f => {
+            let content = Helpers.readFile(f) || '';
             content = content.replace(
-              new RegExp(Helpers.escapeStringForRegEx(`"${config.folder.dist}/${this.project.name}`), 'g'),
-              `"../../${config.folder.dist}/${this.websql ? config.folder.websql : config.folder.browser}/${this.project.name}`);
-          }
+              new RegExp('my\\-lib', 'g'),
+              this.project.name,
+            );
+            if (path.basename(f) === 'tsconfig.json') {
+              content = content.replace(
+                new RegExp(
+                  Helpers.escapeStringForRegEx(
+                    `"${config.folder.dist}/${this.project.name}`,
+                  ),
+                  'g',
+                ),
+                `"../../${config.folder.dist}/${this.websql ? config.folder.websql : config.folder.browser}/${this.project.name}`,
+              );
+            }
 
-          Helpers.writeFile(f, content);
-        });
-
-
+            Helpers.writeFile(f, content);
+          },
+        );
 
         (() => {
-
           const json = Helpers.readJson(ngPackageJson); // dist is on porpose
-          json.dest = json.dest.replace(`/${config.folder.dist}/${this.project.name}`, `/../../${config.folder.dist}/`
-            + `${this.websql ? config.folder.websql : config.folder.browser}`);
+          json.dest = json.dest.replace(
+            `/${config.folder.dist}/${this.project.name}`,
+            `/../../${config.folder.dist}/` +
+              `${this.websql ? config.folder.websql : config.folder.browser}`,
+          );
 
           Helpers.writeJson(ngPackageJson, json);
         })();
@@ -320,15 +341,11 @@ export * from './lib';
 
         recreateApp(project);
         recreateIndex(project);
-
-
-      })
+      },
     });
     this.struct = result as any;
     //#endregion
   }
-
 }
-
 
 //#endregion

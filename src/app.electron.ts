@@ -1,9 +1,11 @@
-
-import { CLIENT_DEV_NORMAL_APP_PORT, CLIENT_DEV_WEBSQL_APP_PORT } from './app.hosts';
+import {
+  CLIENT_DEV_NORMAL_APP_PORT,
+  CLIENT_DEV_WEBSQL_APP_PORT,
+} from './app.hosts';
 import {
   path,
   //#region @backend
-  fse
+  fse,
   //#endregion
 } from 'tnp-core';
 //#region @backend
@@ -15,7 +17,6 @@ const serve = args.some(val => val === '--serve');
 const websql = args.some(val => val === '--websql');
 
 function createWindow(): BrowserWindow {
-
   const size = screen.getPrimaryDisplay().workAreaSize;
 
   // TODO @LAST electron debugger fix
@@ -28,7 +29,7 @@ function createWindow(): BrowserWindow {
     height: size.height / 2,
     webPreferences: {
       nodeIntegration: true,
-      allowRunningInsecureContent: (serve),
+      allowRunningInsecureContent: serve,
       contextIsolation: false,
     },
   });
@@ -38,7 +39,10 @@ function createWindow(): BrowserWindow {
     debug();
 
     require('electron-reloader')(module);
-    win.loadURL('http://localhost:' + (websql ? CLIENT_DEV_WEBSQL_APP_PORT : CLIENT_DEV_NORMAL_APP_PORT));
+    win.loadURL(
+      'http://localhost:' +
+        (websql ? CLIENT_DEV_WEBSQL_APP_PORT : CLIENT_DEV_NORMAL_APP_PORT),
+    );
   } else {
     // Path when running electron executable
     let pathIndex = './index.html';
@@ -52,18 +56,18 @@ function createWindow(): BrowserWindow {
     win.loadURL(url.href);
   }
 
-  let tray = null
+  let tray = null;
   app.whenReady().then(() => {
-    tray = new Tray('/src/assets/generated/pwa/favicon.ico')
+    tray = new Tray('/src/assets/generated/pwa/favicon.ico');
     const contextMenu = Menu.buildFromTemplate([
       { label: 'Item1', type: 'radio' },
       { label: 'Item2', type: 'radio' },
       { label: 'Item3', type: 'radio', checked: true },
-      { label: 'Item4', type: 'radio' }
-    ])
-    tray.setToolTip('This is my application.')
-    tray.setContextMenu(contextMenu)
-  })
+      { label: 'Item4', type: 'radio' },
+    ]);
+    tray.setToolTip('This is my application.');
+    tray.setContextMenu(contextMenu);
+  });
 
   // Emitted when the window is closed.
   win.on('closed', () => {
@@ -100,9 +104,6 @@ async function startElectron() {
         createWindow();
       }
     });
-
-
-
   } catch (e) {
     // Catch Error
     // throw e;

@@ -8,14 +8,16 @@ import { Helpers } from 'tnp-helpers/src';
 import { CoreLibCategoryArr } from 'tnp-config/src';
 import { BaseFeatureForProject } from 'tnp-helpers/src';
 
-export type GetPkgType = { category: CoreModels.CoreLibCategory; version: string; };
+export type GetPkgType = {
+  category: CoreModels.CoreLibCategory;
+  version: string;
+};
 
 export class PackageJsonDepsCoreCategories extends BaseFeatureForProject<Project> {
-
   protected s_onlyFor = 'onlyFor';
   protected s_common = 'common';
   private get all() {
-    return (Project.ins.Tnp).__packageJson.data.tnp.core.dependencies;
+    return Project.ins.Tnp.__packageJson.data.tnp.core.dependencies;
   }
 
   private for(libType: CoreModels.LibType) {
@@ -59,7 +61,6 @@ export class PackageJsonDepsCoreCategories extends BaseFeatureForProject<Project
   // }
 
   private removeAllWithName(name: string) {
-
     function rem(deps) {
       if (_.isString(deps[name])) {
         delete deps[name];
@@ -83,7 +84,6 @@ export class PackageJsonDepsCoreCategories extends BaseFeatureForProject<Project
   }
 
   public getBy(name: string): GetPkgType {
-
     function cattt(deps, cat: CoreModels.CoreLibCategory): GetPkgType {
       if (_.isString(deps[name])) {
         return { category: cat, version: deps[name] };
@@ -118,12 +118,19 @@ export class PackageJsonDepsCoreCategories extends BaseFeatureForProject<Project
   }
 
   public set(pkg: Models.Package, type: CoreModels.CoreLibCategory) {
-
     if (!CoreLibCategoryArr.includes(type)) {
-      Helpers.error(`[depscorecategories][set] Incrorrect type ${type}`, false, true);
+      Helpers.error(
+        `[depscorecategories][set] Incrorrect type ${type}`,
+        false,
+        true,
+      );
     }
     if (!pkg || !pkg.name || !pkg.version) {
-      Helpers.error(`[depscorecategories][set] Incrorrect package ${JSON5.stringify(pkg)}`, false, true);
+      Helpers.error(
+        `[depscorecategories][set] Incrorrect package ${JSON5.stringify(pkg)}`,
+        false,
+        true,
+      );
     }
     this.removeAllWithName(pkg.name);
     if (type === 'common') {
@@ -135,5 +142,4 @@ export class PackageJsonDepsCoreCategories extends BaseFeatureForProject<Project
       this.all.onlyFor[type][pkg.name] = pkg.version;
     }
   }
-
 }

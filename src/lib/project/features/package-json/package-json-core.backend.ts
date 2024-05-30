@@ -1,6 +1,6 @@
 //#region imports
-import { fse, CoreConfig, crossPlatformPath } from 'tnp-core/src'
-import { path } from 'tnp-core/src'
+import { fse, CoreConfig, crossPlatformPath } from 'tnp-core/src';
+import { path } from 'tnp-core/src';
 import * as JSON5 from 'json5';
 import * as json5Write from 'json10-writer/src';
 import { _, CoreModels } from 'tnp-core/src';
@@ -13,17 +13,10 @@ import { Models } from '../../../models';
 import { Helpers } from 'tnp-helpers/src';
 //#endregion
 
-
-
 export class PackageJsonCore {
   public data: Models.IPackageJSON;
 
-  constructor(
-    protected readonly cwd: string,
-
-  ) {
-
-  }
+  constructor(protected readonly cwd: string) {}
 
   get type(): CoreModels.LibType {
     const res = this.data.tnp ? this.data.tnp.type : undefined;
@@ -34,7 +27,6 @@ export class PackageJsonCore {
       return 'unknow-npm-project';
     }
   }
-
 
   get linkedRepos(): Models.LinkedRepo[] {
     const res = this.data.tnp ? this.data.tnp.linkedRepos : undefined;
@@ -51,7 +43,6 @@ export class PackageJsonCore {
     }
     return [];
   }
-
 
   get canBePublishToNpmRegistry(): boolean {
     if (!this.data) {
@@ -84,7 +75,9 @@ export class PackageJsonCore {
   }
 
   get smartContainerBuildTarget(): string {
-    const res = this.data.tnp ? this.data.tnp.smartContainerBuildTarget : undefined;
+    const res = this.data.tnp
+      ? this.data.tnp.smartContainerBuildTarget
+      : undefined;
     return res ? res : void 0;
   }
 
@@ -97,11 +90,15 @@ export class PackageJsonCore {
   }
 
   get frameworks(): CoreModels.UIFramework[] {
-    const res = this.data.tnp &&
-      _.isArray(this.data.tnp.frameworks) ? this.data.tnp.frameworks : config.frameworks;
+    const res =
+      this.data.tnp && _.isArray(this.data.tnp.frameworks)
+        ? this.data.tnp.frameworks
+        : config.frameworks;
     if (res.filter(f => !config.frameworks.includes(f)).length > 0) {
-      Helpers.error(`[packagejson][frameworks] Unrecognized  frameworks`
-        + ` in package.json ${JSON.stringify(this.data.tnp.frameworks)}`)
+      Helpers.error(
+        `[packagejson][frameworks] Unrecognized  frameworks` +
+          ` in package.json ${JSON.stringify(this.data.tnp.frameworks)}`,
+      );
     }
     return res;
   }
@@ -109,7 +106,11 @@ export class PackageJsonCore {
   get name() {
     if (!_.isString(this.data.name)) {
       if (global.globalSystemToolMode) {
-        Helpers.error(`Please define name for npm project in location: ${this.pathPackageJson}`, false, true)
+        Helpers.error(
+          `Please define name for npm project in location: ${this.pathPackageJson}`,
+          false,
+          true,
+        );
       }
     }
     return this.data.name;
@@ -140,11 +141,11 @@ export class PackageJsonCore {
     return Array.isArray(p) ? p : [];
   }
 
-  get targetProjects(): (Omit<Models.TargetProject, 'path'>)[] {
+  get targetProjects(): Omit<Models.TargetProject, 'path'>[] {
     const p = this.data.tnp && this.data.tnp.targetProjects;
     // console.log('asdasd',this.data.tnp.targetProjects)
-    return (Array.isArray(p) ? p : []);
-  };
+    return Array.isArray(p) ? p : [];
+  }
 
   setBuildHash(hash: string) {
     this.data.lastBuildTagHash = hash;
@@ -157,7 +158,9 @@ export class PackageJsonCore {
   hasDependency(dependencyName: string, searchOnlyDependencies = false) {
     const deps = [
       ...Object.keys(this.data.dependencies || {}),
-      ...(searchOnlyDependencies ? [] : Object.keys(this.data.devDependencies || {}))
+      ...(searchOnlyDependencies
+        ? []
+        : Object.keys(this.data.devDependencies || {})),
     ];
     return deps.includes(dependencyName);
   }
@@ -168,11 +171,13 @@ export class PackageJsonCore {
   }
 
   get trusted(): Models.TrustedType {
-    return this.data.tnp?.core?.dependencies?.trusted || {} as any;
+    return this.data.tnp?.core?.dependencies?.trusted || ({} as any);
   }
 
-  get trustedMaxMajor(): { [ver in CoreModels.FrameworkVersion]: number; } {
-    return this.data.tnp?.core?.dependencies?.['trustedMaxMajor'] || {} as any;
+  get trustedMaxMajor(): { [ver in CoreModels.FrameworkVersion]: number } {
+    return (
+      this.data.tnp?.core?.dependencies?.['trustedMaxMajor'] || ({} as any)
+    );
   }
 
   get pathPackageJson() {
@@ -188,7 +193,10 @@ export class PackageJsonCore {
       if (_.isBoolean(this.data.tnp.isCoreProject)) {
         return this.data.tnp.isCoreProject;
       }
-      Helpers.error(`Bad value in package.json, tnp.isCoreProject should be boolean.`, true);
+      Helpers.error(
+        `Bad value in package.json, tnp.isCoreProject should be boolean.`,
+        true,
+      );
       Helpers.error(`Location of package.json: ${this.cwd}`);
     }
     return false;
@@ -199,8 +207,11 @@ export class PackageJsonCore {
       if (_.isBoolean(this.data.tnp.isCommandLineToolOnly)) {
         return this.data.tnp.isCommandLineToolOnly;
       }
-      Helpers.error(`Bad value in package.json, tnp.isCommandLineToolOnly should be boolean.`, true);
-      Helpers.error(`Location of package.json: ${this.cwd}`)
+      Helpers.error(
+        `Bad value in package.json, tnp.isCommandLineToolOnly should be boolean.`,
+        true,
+      );
+      Helpers.error(`Location of package.json: ${this.cwd}`);
     }
     return false;
   }
@@ -210,7 +221,10 @@ export class PackageJsonCore {
       if (_.isBoolean(this.data.tnp.useFramework)) {
         return this.data.tnp.useFramework;
       }
-      Helpers.error(`Bad value in package.json, tnp.useFramework should be boolean.`, true);
+      Helpers.error(
+        `Bad value in package.json, tnp.useFramework should be boolean.`,
+        true,
+      );
       Helpers.error(`Location of package.json: ${this.cwd}`);
     }
     return false;
@@ -218,17 +232,24 @@ export class PackageJsonCore {
 
   public copyWithoutDependenciesTo(projectOrPath: Project | String) {
     this.copyTo(projectOrPath);
-    const dest = path.join(_.isString(projectOrPath) ? projectOrPath :
-      (projectOrPath as Project).location);
-    Project.ins.From(dest)
+    const dest = path.join(
+      _.isString(projectOrPath)
+        ? projectOrPath
+        : (projectOrPath as Project).location,
+    );
+    Project.ins.From(dest);
   }
 
   public copyTo(projectOrPath: Project | String) {
     if (!(_.isObject(projectOrPath) || _.isString(projectOrPath))) {
       Helpers.error(`[packagejson][copyTo] Incorrect project of path`);
     }
-    const dest = path.join(_.isString(projectOrPath) ? projectOrPath :
-      (projectOrPath as Project).location, config.file.package_json);
+    const dest = path.join(
+      _.isString(projectOrPath)
+        ? projectOrPath
+        : (projectOrPath as Project).location,
+      config.file.package_json,
+    );
 
     fse.copyFileSync(this.pathPackageJson, dest);
   }
@@ -240,28 +261,49 @@ export class PackageJsonCore {
 
   private splitAndWriteToDisc(removeFromPj = false) {
     if (_.isObject(this.data) && this.data['']) {
-      delete this.data['']
+      delete this.data[''];
     }
     const data = _.cloneDeep(this.data) as Models.IPackageJSON;
-    const firedevJsonPath = crossPlatformPath([this.cwd, config.file.firedev_jsonc]);
-    const isFiredevProj = (data.tnp?.type === 'isomorphic-lib' || data.tnp?.type === 'container');
+    const firedevJsonPath = crossPlatformPath([
+      this.cwd,
+      config.file.firedev_jsonc,
+    ]);
+    const isFiredevProj =
+      data.tnp?.type === 'isomorphic-lib' || data.tnp?.type === 'container';
     if (isFiredevProj) {
       Helpers.writeJson5(firedevJsonPath, data.tnp);
     }
 
-    Helpers.removeFileIfExists(crossPlatformPath([this.cwd, config.file.package_json__devDependencies_json]));
-    Helpers.removeFileIfExists(crossPlatformPath([this.cwd, config.file.package_json__tnp_json5]));
-    Helpers.removeFileIfExists(crossPlatformPath([this.cwd, config.file.package_json__tnp_json]));
-    Helpers.removeFileIfExists(crossPlatformPath([this.cwd, config.file.firedev_json]));
-    Helpers.removeFileIfExists(crossPlatformPath([this.cwd, config.file.devDependencies_json]));
+    Helpers.removeFileIfExists(
+      crossPlatformPath([
+        this.cwd,
+        config.file.package_json__devDependencies_json,
+      ]),
+    );
+    Helpers.removeFileIfExists(
+      crossPlatformPath([this.cwd, config.file.package_json__tnp_json5]),
+    );
+    Helpers.removeFileIfExists(
+      crossPlatformPath([this.cwd, config.file.package_json__tnp_json]),
+    );
+    Helpers.removeFileIfExists(
+      crossPlatformPath([this.cwd, config.file.firedev_json]),
+    );
+    Helpers.removeFileIfExists(
+      crossPlatformPath([this.cwd, config.file.devDependencies_json]),
+    );
     Helpers.log(`Split done..`, 2);
 
     if (isFiredevProj) {
       if (removeFromPj) {
         if (Helpers.isExistedSymlink(this.pathPackageJson)) {
-          Helpers.log(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.pathPackageJson)}`)
+          Helpers.log(
+            `TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.pathPackageJson)}`,
+          );
         } else {
-          const packageJsonData = (_.isObject(data) ? data : {}) as Models.IPackageJSON;
+          const packageJsonData = (
+            _.isObject(data) ? data : {}
+          ) as Models.IPackageJSON;
           if (packageJsonData.tnp?.type === 'isomorphic-lib') {
             delete packageJsonData['main']; // TODO QUICK_FIX delete main from package.json
           }
@@ -269,7 +311,9 @@ export class PackageJsonCore {
         }
       } else {
         if (Helpers.isExistedSymlink(this.pathPackageJson)) {
-          Helpers.log(`TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.pathPackageJson)}`)
+          Helpers.log(
+            `TRYING TO CHANGE CONTENT OF package.json link from :${fse.realpathSync(this.pathPackageJson)}`,
+          );
         } else {
           const d = (_.isObject(data) ? data : {}) as Models.IPackageJSON;
           Helpers.writeFile(this.pathPackageJson, d);
@@ -285,5 +329,4 @@ export class PackageJsonCore {
     // Helpers.log(`Press any key`)
     // await Helpers.pressKeyAndContinue()
   }
-
 }
