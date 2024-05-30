@@ -215,6 +215,7 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
           'backup',
           'module',
           'www',
+          ...Object.keys(self.project.lintFiles),
         ]
           .concat(
             [

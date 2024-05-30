@@ -11,7 +11,7 @@ import { InitOptions } from '../../../lib/build-options';
  *
  */
 export class AngularFeBasenameManager extends BaseFeatureForProject<Project> {
-  public readonly rootBaseHref = '/';
+  public readonly rootBaseHref: string = '/';
   private get baseHrefForGhPages() {
     return this.project.__isSmartContainerTarget
       ? this.project.__smartContainerTargetParentContainer.name

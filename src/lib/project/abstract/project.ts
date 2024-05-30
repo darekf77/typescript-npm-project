@@ -587,8 +587,8 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   private ____projectInfoPort: number;
   private __buildOptions?: BuildOptions;
 
-  private __forStandAloneSrc = `${config.folder.src}-for-standalone`;
-  private __npmRunNg = `npm-run ng`; // when there is not globl "ng" command -> npm-run ng.js works
+  private __forStandAloneSrc: string = `${config.folder.src}-for-standalone`;
+  private __npmRunNg: string = `npm-run ng`; // when there is not globl "ng" command -> npm-run ng.js works
   public angularFeBasenameManager: AngularFeBasenameManager;
   //#region @backend
   public __libStandalone: LibProjectStandalone;
@@ -1149,9 +1149,8 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   }
   //#endregion
 
-  recreateLintConfiguration() {
+  get lintFiles() {
     //#region @backendFunc
-
     const files = {
       //#region .eslintrc.json
       // https://github.com/angular-eslint/angular-eslint#notes-for-eslint-plugin-prettier-users
@@ -1196,17 +1195,17 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
                 },
               ],
               '@typescript-eslint/member-ordering': 0,
-              '@typescript-eslint/explicit-function-return-type': 0,
-              // "no-void": "error",
-              // "@typescript-eslint/explicit-function-return-type": "warn",
-              // "@typescript-eslint/typedef": [
-              //   "warn",
-              //   {
-              //     "memberVariableDeclaration": true,
-              //     "parameter": true,
-              //     "propertyDeclaration": true
-              //   }
-              // ],
+              // '@typescript-eslint/explicit-function-return-type': 0,
+              // 'no-void': 'error',
+              "@typescript-eslint/explicit-function-return-type": "warn",
+              '@typescript-eslint/typedef': [
+                'warn',
+                {
+                  memberVariableDeclaration: true,
+                  parameter: true,
+                  propertyDeclaration: true,
+                },
+              ],
               // "@typescript-eslint/naming-convention": [
               //   "error",
               //   {
@@ -1301,7 +1300,13 @@ trim_trailing_whitespace = false
       //   }
       // }
     };
+    return files;
+    //#endregion
+  }
 
+  recreateLintConfiguration() {
+    //#region @backendFunc
+    const files = this.lintFiles;
     const settingsToOverride = {
       '[typescriptreact]': {
         'editor.defaultFormatter': 'esbenp.prettier-vscode',

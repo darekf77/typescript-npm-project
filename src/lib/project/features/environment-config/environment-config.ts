@@ -16,11 +16,7 @@ import type { Project } from '../../../project/abstract/project';
 import { Models } from '../../../models';
 //#endregion
 
-export class EnvironmentConfig
-  //#region @backend
-  extends BaseFeatureForProject<Project>
-{
-  //#endregion
+export class EnvironmentConfig extends BaseFeatureForProject<Project> {
   //#region methods & getters / copy to
   coptyTo(destination: string) {
     //#region @backend

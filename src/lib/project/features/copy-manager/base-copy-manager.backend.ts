@@ -393,8 +393,8 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
   //#endregion
 
   //#region sync action
-  async syncAction() // files: string[]
-  {
+  async syncAction() {
+    // files: string[]
     const outDir = this.buildOptions.outDir;
 
     const projectToCopyTo = this.projectToCopyTo;

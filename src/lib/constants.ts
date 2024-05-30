@@ -31,6 +31,7 @@ export let firedevRepoPathUserInUserDir: string =
   //#region @backend
   path.join(crossPlatformPath(os.homedir()), '.firedev', firedevFrameworkName);
 //#endregion
+('');
 
 export const argsToClear = [
   'websql',
