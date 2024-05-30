@@ -1298,7 +1298,7 @@ ${this.project.children
   //#region prettier
   async prettier() {
     Helpers.info(`Initing before prettier...`);
-    await this.project.recreateLintConfiguration();
+    await this.project.init();
     Helpers.info(`Running prettier...`);
     this.project.run(`npm-run prettier --write .`, { output: true }).sync();
     Helpers.info(`Prettier done`);
