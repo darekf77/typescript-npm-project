@@ -174,15 +174,6 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
 
   }
 
-
-  private get commonFilesForAllProjects() {
-    return [
-      '.npmrc',
-      'tslint.json',
-      '.editorconfig'
-    ];
-  }
-
   get filesIgnoredBy() {
     const self = this;
     return {
@@ -192,7 +183,6 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
           .concat([
             '.gitignore',
             '.npmignore',
-            // '.npmrc',
             '.babelrc',
             config.file.devDependencies_json,
             ...(  // TODO or firedev json
@@ -241,9 +231,7 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
             .map(l => l.to?.replace(/^\.\//, ''))
             .filter(f => !!f)
           ))
-          .concat( // common files for all project
-            self.project.__isCoreProject ? [] : self.commonFilesForAllProjects
-          ).concat( // core files of projects types
+          .concat( // core files of projects types
             self.project.__isCoreProject ? [] : self.project.__projectSpecyficFiles().filter(relativeFilePath => {
               return !self.project.__recreateIfNotExists().includes(relativeFilePath);
             })
@@ -278,8 +266,8 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
           '/preview',
           '/tests',
           'tsconfig.json',
-          'npm-debug.log*'
-        ].concat(self.commonFilesForAllProjects)
+          'npm-debug.log*',
+        ];
 
         return npmignoreFiles.map(f => crossPlatformPath(f))
       }
@@ -288,7 +276,7 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
 
 
 
-  private modifyVscode(modifyFN: (settings: CoreModels.VSCodeSettings, project?: Project) => CoreModels.VSCodeSettings) {
+  public modifyVscode(modifyFN: (settings: CoreModels.VSCodeSettings, project?: Project) => CoreModels.VSCodeSettings) {
     const pathSettingsVScode = path.join(this.project.location, '.vscode', 'settings.json');
 
     Helpers.log('[modifyVscode] setting things...')
@@ -492,7 +480,7 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
         return true;
       }).join('\n').concat('\n');
     // console.log(ignoredByGit)
-
+    const linkeProjectPrefix = this.project.getLinkedProjectsConfig().prefix;
     const patternsToIgnore = `# profiling files
 chrome-profiler-events*.json
 speed-measure-plugin*.json
@@ -525,7 +513,7 @@ ${this.project.__isTnp ? 'webpack.*' : ''}
 ${(this.project.linkedProjects.length > 0 || !!this.project.linkedProjectsPrefix) ? `
 # container/workspace git projects
 # PREFIX
-/${this.project.getLinkedProjectsConfig().prefix || ''}*
+${linkeProjectPrefix ? `/${linkeProjectPrefix}*` : ''}
 # LINKED PROJECTS
 ${this.project.isMonorepo ? [] : this.project.linkedProjects.map(f => f.relativeClonePath).map(c => `/${crossPlatformPath(c)}`).join('\n')}
 ` : []}
@@ -642,7 +630,7 @@ ${this.project.__isCoreProject ? '' : '/.vscode/launch.json'}
   commonFiles() {
     const wokrspace = Project.by('container', this.project.__frameworkVersion);
 
-    const files = this.commonFilesForAllProjects;
+    const files = [];
     files.map(file => {
       return {
         from: path.join(wokrspace.location, file),

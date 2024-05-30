@@ -1041,7 +1041,21 @@ ${this.project.children
     this._exit()
   }
   //#endregion
+
+  //#region prettier
+  async prettier() {
+    Helpers.info(`Initing before prettier...`)
+    await this.project.recreateLintConfiguration();
+    Helpers.info(`Running prettier...`)
+    this.project.run(`npm-run prettier --write .`, { output: true }).sync();
+    Helpers.info(`Prettier done`)
+    this._exit();
+  }
+
+  //#endregion
 }
+
+
 
 
 export default { // registerd as empty

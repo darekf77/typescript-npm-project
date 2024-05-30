@@ -16,6 +16,7 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
   GLOBAL() {
     const keybindingPathLinxu = path.join(crossPlatformPath(os.userInfo().homedir), '.config/Code/User/keybindings.json');
     const keybindingPath = path.join(crossPlatformPath(os.userInfo().homedir), `Library/Application Support/Code/User/keybindings.json`);
+    //#region global / keybindings macos
     const keysMac = [
       {
         'key': 'shift+cmd+s',
@@ -42,7 +43,9 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
         'command': 'default:redo'
       },
     ];
+    //#endregion
 
+    //#region global / keybindings linux
     const keysLinux = [
       {
         "key": "shift+ctrl+s",
@@ -76,6 +79,7 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
         "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && !inCompositeEditor"
       }
     ];
+    //#endregion
 
     if (process.platform !== 'win32') {
       if (process.platform === 'linux') {
@@ -87,6 +91,7 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
 
     }
 
+    //#region global / windows only settings
     const windowsSettings = {
       'terminal.integrated.defaultProfile.windows': 'Git Bash',
       'terminal.integrated.shellArgs.windows': [
@@ -96,10 +101,13 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
       'window.enableMenuBarMnemonics': false,
       'terminal.integrated.rightClickBehavior': 'selectWord',
     };
+    //#endregion
 
+    //#region global / macos only settings
     const settingsMacOS = {
       'terminal.integrated.shell.osx': '/bin/bash',
     };
+    //#endregion
 
     let settings = {
       'editor.renderWhitespace': true,
@@ -148,10 +156,6 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
       "editor.wordBasedSuggestions": false,
       'typescript.tsdk': 'node_modules/typescript/lib',
       'terminal.integrated.tabs.enabled': false,
-      'tslint.autoFixOnSave': false, // TODO
-      'tslint.enable': false, // TODO
-      'prettier.enable': false, // TODO
-      'tslint.alwaysShowRuleFailuresAsWarnings': true,
       "workbench.editor.enablePreview": true,
       "security.workspace.trust.banner": "never",
       "telemetry.enableTelemetry": false,
@@ -160,7 +164,6 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
       "git.detectSubmodules": false,
       "editor.wordBasedSuggestionswordBasedSuggestions": false,
       "git.openRepositoryInParentFolders": "never",
-      "eslint.migration.2_x": "off",
       "redhat.telemetry.enabled": false,
       "editor.accessibilitySupport": "off",
       "editor.minimap.enabled": true,

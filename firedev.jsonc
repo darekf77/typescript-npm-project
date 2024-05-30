@@ -11,6 +11,7 @@
       "ng2-rest-swagger-generator": "16.100.5",
     },
     "npmFixes": [],
+    //#region ignore deps pattern
     "ignoreDepsPattern": [
       "edit-table",
       "bs4-breakpoint",
@@ -28,7 +29,9 @@
       "@iconify/icons-mdi",
       "@iconify/react",
     ],
+    //#endregion
     "includeAsDev": [],
+    //#region include only for tnp package
     "includeOnly": [
       "tnp-db",
       "ora",
@@ -40,6 +43,7 @@
       // "@parcel/watcher",
       // "morphi",
     ],
+    //#endregion
     "linkedFolders": [],
   },
 
@@ -68,6 +72,7 @@
 
   "core": {
     "dependencies": {
+      //#region dedupe dependencies
       "dedupe": [
         "tnp-models",
         "tnp-helpers",
@@ -145,7 +150,9 @@
         "chai",
         "vpn-split",
       ],
+      //#endregion
       "neverAsLink": [],
+      // TODO remove
       "stubForBackend": [
         "@ngx-formly/core",
         "@ngx-formly/bootstrap",
@@ -156,12 +163,14 @@
         "v2": 13,
         "v3": 13,
       },
+      // TODO remove
       "additionalTrusted": [
         "ng-talkback",
         "record-replay-req-res-scenario",
         "vpn-split",
         "node-cli-tester",
       ],
+      // TODO remove
       "trusted": {
         "v1": "*",
         "v2": "*",
@@ -229,6 +238,7 @@
           "node-cli-tester",
         ],
       },
+      //#region dedupe dependencies for testing
       "dedupe-for-testing": [
         "@types/jasmine",
         "@types/jasminewd2",
@@ -241,6 +251,8 @@
         "karma-jasmine-html-reporter",
         "protractor",
       ],
+      //#endregion
+      //#region TODO remove
       "always": [
         "@types/node",
         "tslib",
@@ -257,6 +269,8 @@
         "babel-preset-env",
         "babel-preset-es2015",
       ],
+      //#endregion
+      //#region TODO remove
       "asDevDependencies": [
         "@types/node",
         "tslib",
@@ -269,6 +283,7 @@
         "prettier",
         "vscode",
       ],
+      //#endregion
       "common": {
         // all isomorphic application config
         "tnp-config": "16.100.9",

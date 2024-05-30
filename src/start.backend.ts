@@ -30,6 +30,7 @@ export async function start(
     argsv,
     shortArgsReplaceConfig: {
       //#region short args replacement
+      'cinit': 'init:clear:init',
       'app': 'build:app:watch', // should be console menu
       'ba': 'build:app',
       'b': 'build',

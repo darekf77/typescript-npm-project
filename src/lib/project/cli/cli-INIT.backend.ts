@@ -26,6 +26,17 @@ export class $Init extends CommandLineFeature<InitOptions, Project> {
     }));
   }
 
+  async clearInit() {
+    await this.project.clear();
+    await this.project.init(InitOptions.from({
+      finishCallback: () => {
+        console.log('DONE!')
+        this._exit();
+      }
+    }));
+    await this.project.__recreate.vscode.settings.hideOrShowFilesInVscode();
+  }
+
   async struct() {
     await this.project.init(InitOptions.from({
       struct: true,
