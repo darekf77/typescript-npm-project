@@ -36,39 +36,17 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
       'container',
       this.project.__frameworkVersion,
     ) as Project;
-    const tempCoreContainerPathForSmartNodeModules = crossPlatformPath(
-      path.dirname(containerCoreProj.__smartNodeModules.path),
-    );
-
     const independentProjects = [];
 
     Helpers.log(
       `[${config.frameworkName}][copytoall] UPDATING ALSO container core ${this.project.__frameworkVersion}...`,
     );
 
-    const tmpSmartNodeModulesProj = Project.ins.From(
-      tempCoreContainerPathForSmartNodeModules,
-    ) as Project;
-    if (tmpSmartNodeModulesProj) {
-      Helpers.log(
-        `${config.frameworkName}][copytoall] UPDATING smart node_modules for container core ${this.project.__frameworkVersion}...`,
-      );
-      independentProjects.push(tmpSmartNodeModulesProj);
-    } else {
-      Helpers.logWarn(
-        `${config.frameworkName}][copytoall] Not able to find smart node_modules` +
-          ` by path:\n${tempCoreContainerPathForSmartNodeModules}`,
-      );
-    }
-
     const packageName = this.project.__isSmartContainer
       ? '@' + this.project.name
       : this.project.name;
     Helpers.createSymLink(
-      crossPlatformPath([
-        containerCoreProj.__smartNodeModules.path,
-        packageName,
-      ]),
+      crossPlatformPath([containerCoreProj.__node_modules.path, packageName]),
       crossPlatformPath([containerCoreProj.__node_modules.path, packageName]),
       { continueWhenExistedFolderDoesntExists: true },
     );
@@ -84,17 +62,18 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
   }
   //#endregion
 
-  get customCompilerName() {
+  get customCompilerName(): string {
     return `Copyto manager compilation`;
   }
 
-  protected readonly notAllowedFiles = [
+  protected readonly notAllowedFiles: string[] = [
     '.DS_Store',
     // config.file.index_d_ts,
   ];
 
   protected readonly sourceFolders = [
     config.folder.src,
+    config.folder.source,
     config.folder.node_modules,
     config.folder.tempSrcDist,
     config.file.package_json,
@@ -139,31 +118,13 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
   }
   //#endregion
 
-  //#region  getters / core container for project
-  get coreContainer() {
-    return Project.by('container', this.project.__frameworkVersion) as Project;
-  }
-  //#endregion
-
-  //#region  getters / core container for project
-  get coreContainerSmartNodeModulesProj() {
-    // console.log('path', path.dirname(this.coreContainer.__smartNodeModules.path))
-    const tempCoreContainerPathForSmartNodeModules = Project.ins.From(
-      crossPlatformPath(
-        path.dirname(this.coreContainer.__smartNodeModules.path),
-      ),
-    ) as Project;
-    return tempCoreContainerPathForSmartNodeModules;
-  }
-  //#endregion
-
   //#region getters / project to copy to
   get projectToCopyTo() {
     const canCopyToNodeModules = this.buildOptions.outDir === 'dist';
     let result = [];
 
     const node_modules_projs = [
-      ...(canCopyToNodeModules ? [this.coreContainerSmartNodeModulesProj] : []),
+      ...(canCopyToNodeModules ? [this.project.coreContainer] : []),
     ];
 
     if (Array.isArray(this.copyto) && this.copyto.length > 0) {
@@ -398,7 +359,6 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
     const outDir = this.buildOptions.outDir;
 
     const projectToCopyTo = this.projectToCopyTo;
-    this.recreateProperLinksToCoreContainer();
     // (${proj.location}/${config.folder.node_modules}/${this.rootPackageName})
 
     if (projectToCopyTo.length > 0) {
@@ -429,41 +389,6 @@ ${projectToCopyTo.map(proj => `- ${proj.genericName}`).join('\n')}
       //   }
       // }
       log.data('copy done...');
-    }
-  }
-  //#endregion
-
-  //#region methods / recreate proper links to core container
-  private recreateProperLinksToCoreContainer() {
-    const canCopyToNodeModules = this.buildOptions.outDir === 'dist';
-    // console.log({
-    //   canCopyToNodeModules
-    // })
-    if (!canCopyToNodeModules) {
-      return;
-    }
-    const root = [config.folder.node_modules, this.rootPackageName];
-
-    const coreContainerFlatNodeModulesPaht = this.coreContainer.pathFor(root);
-    const currentProjNodeMoudles = this.project.pathFor(root);
-
-    const folderToLink = [
-      coreContainerFlatNodeModulesPaht,
-      currentProjNodeMoudles,
-    ];
-    for (let index = 0; index < folderToLink.length; index++) {
-      const destFolder = folderToLink[index];
-      // console.log({ destFolder })
-      if (Helpers.isFolder(destFolder) || !Helpers.exists(destFolder)) {
-        Helpers.remove(destFolder);
-        Helpers.createSymLink(
-          this.coreContainerSmartNodeModulesProj.pathFor(root),
-          destFolder,
-          {
-            continueWhenExistedFolderDoesntExists: true,
-          },
-        );
-      }
     }
   }
   //#endregion

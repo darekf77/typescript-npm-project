@@ -7,7 +7,6 @@ export * from './npm-packages';
 export * from './quick-fixes';
 export * from './test-runner';
 export * from './target-project.backend';
-export * from './smart-node-modules.backend';
 export * from './webpack-backend-compilation.backend';
 export * from './linked-repos.backend';
 export * from './assets-manager.backend';

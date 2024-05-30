@@ -29,7 +29,6 @@ export namespace Models {
   export interface NpmInstallOptions {
     remove?: boolean;
     npmPackages?: Package[];
-    smartInstallPreparing?: boolean;
   }
 
   export type NpmDependencyType =

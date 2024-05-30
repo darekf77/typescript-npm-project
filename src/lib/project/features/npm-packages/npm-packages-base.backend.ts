@@ -9,12 +9,12 @@ import { Models } from '../../../models';
 //#endregion
 
 export class NpmPackagesBase extends NpmPackagesCore {
-  get useSmartInstall() {
+  get useLinkAsNodeModules(): boolean {
     if (
       this.project.__isContainerCoreProject &&
       this.project.__frameworkVersionAtLeast('v2')
     ) {
-      return true;
+      return false;
     }
 
     if (this.project.__isSmartContainer) {
@@ -39,7 +39,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
   public async installProcess(
     triggeredMsg: string,
     options?: Models.NpmInstallOptions,
-  ) {
+  ): Promise<void> {
     if (
       this.project.__isContainer &&
       !this.project.__isSmartContainer &&
@@ -59,7 +59,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
     }
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({
-        msg: `${this.useSmartInstall ? 'SMART ' : ''}npm instalation for "${this.project.genericName}" started..`,
+        msg: `${this.useLinkAsNodeModules ? 'SMART ' : ''}npm instalation for "${this.project.genericName}" started..`,
       });
     }
     options = fixOptionsNpmInstall(options, this.project);
@@ -119,69 +119,33 @@ export class NpmPackagesBase extends NpmPackagesCore {
       }
     }
 
-    if (!this.emptyNodeModuls) {
-      if (
-        this.project.__isContainer &&
-        !this.project.__isContainerCoreProject
-      ) {
-        this.project.__node_modules.remove();
-      } else {
-        this.project.__node_modules.recreateFolder();
-      }
-    }
-
-    if (
-      this.project.__isStandaloneProject ||
-      this.project.isUnknowNpmProject ||
-      this.project.__isContainer
-    ) {
+    if (this.project.__isStandaloneProject || this.project.__isContainer) {
       this.project.__packageJson.showDeps(
         `${this.project.type} instalation before full insall [${triggeredMsg}]`,
       );
-
-      const installAllowed =
-        !this.project.__isContainer ||
-        this.project.__isSmartContainer ||
-        this.project.__isContainerWithLinkedProjects ||
-        this.project.__isContainerCoreProject;
-
-      if (installAllowed) {
-        if (
-          (this.useSmartInstall && !options.smartInstallPreparing) ||
-          this.project.__smartNodeModules.shouldBeReinstalled()
-        ) {
-          this.project.__smartNodeModules.install(
-            remove ? 'uninstall' : 'install',
-            ...npmPackages,
-          );
-        } else {
-          if (fullInstall) {
-            this.actualNpmProcess({ reason: triggeredMsg });
-          } else {
-            npmPackages.forEach(pkg => {
-              this.actualNpmProcess({ pkg, reason: triggeredMsg, remove });
-            });
-          }
-        }
-      } else {
-        Helpers.log(`Project is not allowed to have node_modules installed`);
-      }
-
-      if (this.project.__isStandaloneProject) {
-        if (!this.project.__node_modules.isLink) {
-          if (!this.project.__node_modules.itIsSmartInstalation) {
-            this.project.__node_modules.dedupe();
-          }
-        }
-
-        // TODO this does not apply for smartInstalation..
-        // but how to check if smart installation is smart not normal ?
-      }
-
-      this.project.__packageJson.save(
-        `${this.project.type} instalation after  [${triggeredMsg}]`,
-      );
     }
+
+    if (this.useLinkAsNodeModules) {
+      await this.project.__node_modules.linkFromCoreContainer();
+    } else {
+      if (fullInstall) {
+        this.actualNpmProcess({ reason: triggeredMsg });
+      } else {
+        npmPackages.forEach(pkg => {
+          this.actualNpmProcess({ pkg, reason: triggeredMsg, remove });
+        });
+      }
+    }
+
+    if (!this.project.__node_modules.isLink) {
+      if (!this.project.__npmPackages.useLinkAsNodeModules) {
+        this.project.__node_modules.dedupe();
+      }
+    }
+
+    this.project.__packageJson.save(
+      `${this.project.type} instalation after  [${triggeredMsg}]`,
+    );
 
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({ msg: `npm instalation finish ok` });

@@ -309,7 +309,7 @@ export class LibProjectStandalone extends LibPorjectBase {
       ]
         .filter(f => !!f)
         .forEach(c => {
-          c.__smartNodeModules.updateFromReleaseDist(realCurrentProj);
+          c.__node_modules.updateFromReleaseDist(realCurrentProj);
         });
     }
 

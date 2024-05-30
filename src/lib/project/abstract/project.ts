@@ -39,7 +39,6 @@ import {
 } from '../features';
 import { AssetsFileListGenerator } from '../compilers';
 import { CopyManager } from '../features/copy-manager/copy-manager.backend';
-import { SmartNodeModules } from '../features/smart-node-modules.backend';
 import { InsideStructures } from '../features/inside-structures/inside-structures';
 import { SingularBuild } from '../features/singular-build.backend';
 import { argsToClear, DEFAULT_PORT, PortUtils } from '../../constants';
@@ -608,7 +607,6 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   public __recreate: FilesRecreator;
   public __filesFactory: FilesFactory;
   public quickFixes: QuickFixes;
-  public __smartNodeModules: SmartNodeModules;
   public __assetsFileListGenerator: AssetsFileListGenerator;
   public __npmPackages: NpmPackages;
   public __env: EnvironmentConfig;
@@ -656,7 +654,6 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       });
       this.defineProperty<Project>('__filesStructure', FilesStructure);
       this.defineProperty<Project>('__targetProjects', TargetProject);
-      this.defineProperty<Project>('__smartNodeModules', SmartNodeModules);
       this.defineProperty<Project>('__insideStructure', InsideStructures);
       this.defineProperty<Project>('__singluarBuild', SingularBuild);
       this.defineProperty<Project>(
@@ -917,7 +914,6 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       while (true) {
         try {
           this.__node_modules.remove();
-          this.__smartNodeModules.remove();
           break;
         } catch (error) {
           Helpers.pressKeyAndContinue(MESSAGES.SHUT_DOWN_FOLDERS_AND_DEBUGGERS);
@@ -998,7 +994,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       c =>
         (c.typeIs('isomorphic-lib') || c.__isSmartContainer) &&
         c.__frameworkVersionAtLeast('v3') &&
-        c.__npmPackages.useSmartInstall,
+        c.__npmPackages.useLinkAsNodeModules,
     );
     for (let index = 0; index < children.length; index++) {
       const c = children[index];
@@ -1197,7 +1193,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
               '@typescript-eslint/member-ordering': 0,
               // '@typescript-eslint/explicit-function-return-type': 0,
               // 'no-void': 'error',
-              "@typescript-eslint/explicit-function-return-type": "warn",
+              '@typescript-eslint/explicit-function-return-type': 'warn',
               '@typescript-eslint/typedef': [
                 'warn',
                 {
@@ -1774,19 +1770,11 @@ trim_trailing_whitespace = false
     }
     try {
       let location = this.location;
-      if (this.__isContainerCoreProject) {
-        location = path.dirname(this.__smartNodeModules.path);
-      }
-      if (this.__isContainerCoreProjectTempProj) {
-        const origin = Project.ins.From(
-          path.dirname(path.dirname(path.dirname(this.location))),
-        ) as Project;
-        location = path.dirname(origin.__smartNodeModules.path);
-      }
 
-      var p = crossPlatformPath(
-        path.join(location, config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES),
-      );
+      var p = crossPlatformPath([
+        location,
+        config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES,
+      ]);
       if (!fse.existsSync(p)) {
         PackagesRecognition.fromProject(this as any).start(
           void 0,
@@ -2180,9 +2168,8 @@ processing...
         const tryReleaseProject = async () => {
           while (true) {
             try {
-              if (this.__npmPackages.useSmartInstall) {
-                this.__node_modules.remove();
-                this.__smartNodeModules.install('install');
+              if (this.__npmPackages.useLinkAsNodeModules) {
+                await this.__node_modules.linkFromCoreContainer();
               }
               await this.init(); // TODO not needed build includes init
               break;
@@ -3778,6 +3765,18 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
   }
   //#endregion
 
+  get coreProject(): Project {
+    //#region @backendFunc
+    return Project.by(this.type, this.__frameworkVersion) as any;
+    //#endregion
+  }
+
+  get coreContainer(): Project {
+    //#region @backendFunc
+    return Project.by('container', this.__frameworkVersion) as any;
+    //#endregion
+  }
+
   //#region getters & methods / build
   async build(buildOptions?: BuildOptions) {
     //#region @backendFunc
@@ -3790,21 +3789,7 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     //#endregion
 
     //#region prevent empty firedev node_modules
-    if (!this.__copyManager.coreContainerSmartNodeModulesProj) {
-      Helpers.error(
-        `${_.upperFirst(config.frameworkName)} has incorrect/missing packages container.
-Please use command:
-
-      ${config.frameworkName} autoupdate
-      // or
-      ${config.frameworkName} au
-
-to fix it.
-      `,
-        false,
-        true,
-      );
-    }
+    this.coreContainer.__node_modules.reinstallIfNeeded();
     //#endregion
 
     //#region prevent not requested framework version
@@ -3830,11 +3815,11 @@ to fix it.
       buildOptions.baseHref = !_.isUndefined(buildOptions.baseHref)
         ? buildOptions.baseHref
         : this.angularFeBasenameManager.rootBaseHref;
-      const baseHrefLocProj = this.__isSmartContainer
-        ? this.targetProjFor(smartContainerTargetName)
-        : this;
+
+      const baseHrefLocProj = this;
+
       baseHrefLocProj.writeFile(
-        tmpBaseHrefOverwriteRelPath,
+        tmpBaseHrefOverwriteRelPath + (smartContainerTargetName || ''),
         buildOptions.baseHref,
       );
 
@@ -3936,11 +3921,10 @@ to fix it.
           true,
         );
       }
-      const baseHrefLocProj = this.__isSmartContainer
-        ? this.targetProjFor(smartContainerTargetName)
-        : this;
+      const baseHrefLocProj = this;
+
       const fromFileBaseHref = Helpers.readFile(
-        baseHrefLocProj.pathFor(tmpBaseHrefOverwriteRelPath),
+        baseHrefLocProj.pathFor(tmpBaseHrefOverwriteRelPath + (smartContainerTargetName || '')),
       );
       buildOptions.baseHref = fromFileBaseHref;
 

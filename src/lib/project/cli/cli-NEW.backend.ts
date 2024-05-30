@@ -380,7 +380,7 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
     // });
 
     if (lastContainer && lastSmart) {
-      lastContainer.__smartNodeModules.setToSmartContainer();
+      lastContainer.__node_modules.setToSmartContainer();
     }
 
     await appProj.__filesStructure.initFileStructure(InitOptions.from({}));

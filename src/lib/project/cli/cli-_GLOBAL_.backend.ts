@@ -788,14 +788,13 @@ class $Global extends BaseCommandLine<{}, Project> {
   //#endregion
 
   //#region reinstall
-  async REINSTALL() {
+  async REINSTALL(): Promise<void> {
     // await Helpers.killAllNodeExceptCurrentProcess();
     const proj = this.project;
 
     if (proj.__isContainer) {
       if (proj.__isContainerCoreProject) {
         proj.__node_modules.remove();
-        proj.__smartNodeModules.remove();
         proj.__npmPackages.installFromArgs('');
         Helpers.info(`Reinstal done for core container`);
       } else {
@@ -804,22 +803,20 @@ class $Global extends BaseCommandLine<{}, Project> {
           c =>
             c.__frameworkVersionAtLeast('v3') &&
             c.typeIs('isomorphic-lib') &&
-            c.__npmPackages.useSmartInstall,
+            c.__npmPackages.useLinkAsNodeModules,
         );
         for (let index = 0; index < children.length; index++) {
           const c = children[index];
           Helpers.info(`Recreating node_module for ${c.genericName}`);
           c.__node_modules.remove();
-          c.__smartNodeModules.remove();
           await c.__filesStructure.initFileStructure();
         }
       }
     } else if (
       proj.__isStandaloneProject &&
-      proj.__npmPackages.useSmartInstall
+      proj.__npmPackages.useLinkAsNodeModules
     ) {
       proj.__node_modules.remove();
-      proj.__smartNodeModules.remove();
       proj.__npmPackages.installFromArgs('');
       Helpers.info(`Reinstal done for core standalone project`);
     } else {

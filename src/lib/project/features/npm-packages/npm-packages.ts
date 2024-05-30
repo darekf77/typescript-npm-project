@@ -6,17 +6,12 @@ import { resolvePacakgesFromArgs } from './npm-packages-helpers.backend';
 import { config } from 'tnp-config/src';
 
 export class NpmPackages extends NpmPackagesBase {
-  public installFromArgs(
-    packagesNamesSpaceSeparated: string,
-    smartInstallPreparing: boolean = false,
-  ) {
+  public installFromArgs(packagesNamesSpaceSeparated: string): void {
     const project = this.project;
     const args = packagesNamesSpaceSeparated.split(' ').filter(a => !!a);
 
     if (args.length === 0) {
-      project.__npmPackages.installProcess(`${config.frameworkName} install`, {
-        smartInstallPreparing,
-      });
+      project.__npmPackages.installProcess(`${config.frameworkName} install`);
     } else {
       const packages = resolvePacakgesFromArgs(args);
       project.__npmPackages.installProcess(
@@ -26,12 +21,12 @@ export class NpmPackages extends NpmPackagesBase {
               `${p.installType}${p.version ? ` ${p.name}@${p.version}` : ''}`,
           )
           .join(', ')} `,
-        { npmPackages: packages, smartInstallPreparing },
+        { npmPackages: packages },
       );
     }
   }
 
-  public uninstallFromArgs(packagesNamesSpaceSeparated: string) {
+  public uninstallFromArgs(packagesNamesSpaceSeparated: string): void {
     const project = this.project;
     const args = packagesNamesSpaceSeparated.split(' ').filter(a => !!a);
 

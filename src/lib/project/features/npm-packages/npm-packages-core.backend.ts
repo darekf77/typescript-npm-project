@@ -38,10 +38,6 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
     );
   }
 
-  protected get emptyNodeModuls() {
-    return !this.project.__node_modules.exist;
-  }
-
   package(pacakgeName: string) {
     const p = Project.ins.From(
       this.project.__node_modules.pathFor(pacakgeName),

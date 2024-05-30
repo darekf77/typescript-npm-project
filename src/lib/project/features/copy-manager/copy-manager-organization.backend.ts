@@ -147,8 +147,6 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       ),
     );
 
-    this.createCopyForRestore(destPackageInNodeModules, destination);
-
     for (
       let index = 0;
       index < CopyMangerHelpers.browserwebsqlFolders.length;
@@ -160,7 +158,11 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         path.join(destPackageInNodeModules, currentBrowserFolder),
       );
 
-      Helpers.remove(destPackageInNodeModulesBrowser);
+      try {
+        // TODO QUICK_FIX
+        Helpers.remove(destPackageInNodeModulesBrowser);
+      } catch (error) {}
+
       const children = this.children;
 
       for (let index = 0; index < children.length; index++) {
@@ -189,7 +191,10 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
           Helpers.removeFileIfExists(childDestPackageInNodeModules);
         }
         if (!Helpers.exists(childDestPackageInNodeModules)) {
-          Helpers.mkdirp(childDestPackageInNodeModules);
+          try {
+            // TODO QUICK_FIX
+            Helpers.mkdirp(childDestPackageInNodeModules);
+          } catch (error) {}
         }
         if (
           Helpers.isSymlinkFileExitedOrUnexisted(
@@ -199,7 +204,10 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
           Helpers.removeFileIfExists(childDestPackageInNodeModulesBrowser);
         }
         if (!Helpers.exists(childDestPackageInNodeModulesBrowser)) {
-          Helpers.mkdirp(childDestPackageInNodeModulesBrowser);
+          try {
+            // TODO QUICK_FIX
+            Helpers.mkdirp(childDestPackageInNodeModulesBrowser);
+          } catch (error) {}
         }
       }
     }
@@ -770,6 +778,9 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   //#endregion
 
   //#region destination packge link source (usuall 'src' folder) location
+  /**
+   * source folder locaiton
+   */
   destPackageLinkSourceLocation(
     destination: Project,
     child: Project,
@@ -780,19 +791,21 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
           path.join(
             destination.__node_modules.pathFor(this.childPackageName(child)),
             currentBrowserFolder,
-            config.folder.src,
+            config.folder.source,
           ),
         )
       : crossPlatformPath(
           path.join(
             destination.__node_modules.pathFor(this.childPackageName(child)),
-            config.folder.src,
+            config.folder.source,
           ),
         );
 
     return destPackageLinkSourceLocation;
   }
-
+  /**
+   *'src.d.ts location
+   */
   destPackageLinkSourceSrcDtsLocation(
     destination: Project,
     child: Project,
@@ -817,67 +830,57 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   }
   //#endregion
 
-  //#region remove or add links
-  private addOrRemoveSymlinks(destination: Project, remove = false) {
+  //#region add source symlinks
+  addSourceSymlinks(destination: Project): void {
     for (let index = 0; index < this.children.length; index++) {
       const child = this.children[index];
-
-      const destPackageLinkSourceLocation = this.destPackageLinkSourceLocation(
+      const source = this.destPackageLinkSourceLocation(destination, child);
+      const srcDts = this.destPackageLinkSourceSrcDtsLocation(
         destination,
         child,
       );
-      Helpers.removeIfExists(destPackageLinkSourceLocation);
-      Helpers.removeIfExists(
-        this.destPackageLinkSourceSrcDtsLocation(destination, child),
-      );
-      if (!remove) {
-        Helpers.createSymLink(
-          this.sourcePathToLinkFor(child),
-          destPackageLinkSourceLocation,
-        );
-      }
+      const childLibLocation = this.sourcePathToLinkFor(child);
 
-      for (
-        let index = 0;
-        index < CopyMangerHelpers.browserwebsqlFolders.length;
-        index++
-      ) {
-        const currentBrowserFolder =
-          CopyMangerHelpers.browserwebsqlFolders[index];
-        const destPackageLinkSourceLocationForBrowser =
-          this.destPackageLinkSourceLocation(
-            destination,
-            child,
-            currentBrowserFolder,
-          );
-        Helpers.removeIfExists(destPackageLinkSourceLocationForBrowser);
-        Helpers.removeIfExists(
-          this.destPackageLinkSourceSrcDtsLocation(
-            destination,
-            child,
-            currentBrowserFolder,
-          ),
-        );
-        if (!remove) {
-          Helpers.createSymLink(
-            this.sourcePathToLinkFor(child),
-            destPackageLinkSourceLocationForBrowser,
-          );
-        }
-      }
+      Helpers.removeIfExists(source);
+      Helpers.createSymLink(childLibLocation, source);
+      Helpers.writeFile(
+        srcDts,
+        `
+  // THIS FILE IS GENERATED
+  export * from './source';
+  // THIS FILE IS GENERATED
+  // please use command: firedev build:watch to see here links for your globally builded lib code files
+  // THIS FILE IS GENERATED
+                    `.trimStart(),
+      );
     }
   }
   //#endregion
 
-  //#region add source symlinks
-  addSourceSymlinks(destination: Project) {
-    this.addOrRemoveSymlinks(destination);
-  }
-  //#endregion
-
   //#region remove source symlinks
-  removeSourceSymlinks(destination: Project) {
-    this.addOrRemoveSymlinks(destination, true);
+  removeSourceSymlinks(destination: Project): void {
+    for (let index = 0; index < this.children.length; index++) {
+      const child = this.children[index];
+
+      // source
+      const source = this.destPackageLinkSourceLocation(destination, child);
+      const srcDts = this.destPackageLinkSourceSrcDtsLocation(
+        destination,
+        child,
+      );
+
+      Helpers.writeFile(
+        srcDts,
+        `
+// THIS FILE IS GENERATED
+export * from './lib';
+// THIS FILE IS GENERATED
+// please use command: firedev build:watch to see here links for your globally builded lib code files
+// THIS FILE IS GENERATED
+                    `.trimStart(),
+      );
+      Helpers.removeIfExists(source);
+    }
   }
   //#endregion
 

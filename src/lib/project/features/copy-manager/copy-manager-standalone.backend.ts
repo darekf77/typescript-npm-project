@@ -138,40 +138,6 @@ export class CopyManagerStandalone extends CopyManager {
   }
   //#endregion
 
-  //#region create copy to restore
-  createCopyForRestore(destPackageInNodeModules: string, destination: Project) {
-    if (destination.__isCoreProject) {
-      destination.__packageJson.showDeps(
-        'For creating copy to revert for package',
-      );
-      const pj = Helpers.readJson(
-        destination.__packageJson.pathPackageJson,
-      ) as Models.IPackageJSON;
-      const availablePackages = {
-        ...(pj?.dependencies || {}),
-        ...(pj?.devDependencies || {}),
-        ...(pj?.peerDependencies || {}),
-      };
-      const wasOriginaly = !_.isUndefined(
-        Object.keys(availablePackages).find(key =>
-          key.startsWith(path.basename(destPackageInNodeModules)),
-        ),
-      );
-
-      const prefixed = crossPlatformPath([
-        path.dirname(destPackageInNodeModules),
-        PREFIXES.RESTORE_NPM + path.basename(destPackageInNodeModules),
-      ]);
-      if (wasOriginaly && !Helpers.exists(prefixed)) {
-        Helpers.copy(destPackageInNodeModules, prefixed, {
-          recursive: true,
-          copySymlinksAsFiles: true,
-        });
-      }
-    }
-  }
-  //#endregion
-
   //#region initial fix for destination pacakge
   initalFixForDestination(destination: Project): void {
     const destPackageInNodeModules = crossPlatformPath(
@@ -181,8 +147,6 @@ export class CopyManagerStandalone extends CopyManager {
         this.rootPackageName,
       ),
     );
-
-    this.createCopyForRestore(destPackageInNodeModules, destination);
 
     for (
       let index = 0;
@@ -265,6 +229,7 @@ export class CopyManagerStandalone extends CopyManager {
   }
   //#endregion
 
+  //#region source map content fix
   sourceMapContentFix(
     content: string,
     isBrowser: boolean,
@@ -313,6 +278,7 @@ export class CopyManagerStandalone extends CopyManager {
     }
     return content;
   }
+  //#endregion
 
   //#region remove source folder links
   removeSourceLinksFolders(location: string) {
@@ -328,6 +294,7 @@ export class CopyManagerStandalone extends CopyManager {
   }
   //#endregion
 
+  //#region copy shared assets
   copySharedAssets(destination: Project, isTempLocalProj: boolean) {
     const monitoredOutDirSharedAssets = this.monitoredOutDirSharedAssets;
     for (let index = 0; index < monitoredOutDirSharedAssets.length; index++) {
@@ -347,6 +314,7 @@ export class CopyManagerStandalone extends CopyManager {
       });
     }
   }
+  //#endregion
 
   //#region copy compiled sources and declarations
   copyCompiledSourcesAndDeclarations(
@@ -395,36 +363,60 @@ export class CopyManagerStandalone extends CopyManager {
 
   //#region add source symlinks
   addSourceSymlinks(destination: Project) {
-    const destPackageLinkSourceLocation = crossPlatformPath(
+    const source = crossPlatformPath(
       path.join(
         destination.__node_modules.pathFor(this.rootPackageName),
-        config.folder.src,
+        config.folder.source,
       ),
     );
 
-    const destPackageLinkSourceDtsLocation = crossPlatformPath(
-      path.join(
-        destination.__node_modules.pathFor(this.rootPackageName),
-        'src.d.ts',
-      ),
-    );
+    const srcDts = crossPlatformPath([
+      destination.__node_modules.pathFor(this.rootPackageName),
+      'src.d.ts',
+    ]);
 
-    Helpers.removeIfExists(destPackageLinkSourceDtsLocation);
-    Helpers.removeIfExists(destPackageLinkSourceLocation);
-    Helpers.createSymLink(this.sourcePathToLink, destPackageLinkSourceLocation);
+    Helpers.removeIfExists(source);
+    Helpers.createSymLink(this.sourcePathToLink, source);
+
+    Helpers.writeFile(
+      srcDts,
+      `
+// THIS FILE IS GENERATED
+export * from './source';
+// THIS FILE IS GENERATED
+// please use command: firedev build:watch to see here links for your globally builded lib code files
+// THIS FILE IS GENERATED
+            `.trimStart(),
+    );
   }
   //#endregion
 
   //#region remove source symlinks
   removeSourceSymlinks(destination: Project) {
-    const destPackageLinkSourceLocation = crossPlatformPath(
+    const srcDts = crossPlatformPath([
+      destination.__node_modules.pathFor(this.rootPackageName),
+      'src.d.ts',
+    ]);
+
+    Helpers.writeFile(
+      srcDts,
+      `
+// THIS FILE IS GENERATED
+export * from './source';
+// THIS FILE IS GENERATED
+// please use command: firedev build:watch to see here links for your globally builded lib code files
+// THIS FILE IS GENERATED
+            `.trimStart(),
+    );
+
+    const source = crossPlatformPath(
       path.join(
         destination.__node_modules.pathFor(this.rootPackageName),
-        config.folder.src,
+        config.folder.source,
       ),
     );
 
-    Helpers.removeIfExists(destPackageLinkSourceLocation);
+    Helpers.removeIfExists(source);
   }
   //#endregion
 
