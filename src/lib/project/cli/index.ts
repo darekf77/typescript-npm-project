@@ -11,6 +11,7 @@ import UPDATE from './cli-UPDATE.backend';
 import VSCODE from './cli-VSCODE.backend';
 import NEW from './cli-NEW.backend';
 import SERVICE from './cli-SERVICE.backend';
+import TS from './cli-TS.backend';
 
 export default [
   GLOBAL,
@@ -25,6 +26,7 @@ export default [
   VSCODE,
   NEW,
   SERVICE,
+  TS,
 ];
 
 //#endregion

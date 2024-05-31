@@ -64,7 +64,7 @@ export class CopyManagerStandalone extends CopyManager {
         config.folder.source,
       ),
     );
-    console.log({ destPackageLinkSourceLocation });
+    // console.log({ destPackageLinkSourceLocation });
 
     return Helpers.exists(destPackageLinkSourceLocation);
   }

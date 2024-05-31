@@ -4120,7 +4120,7 @@ ${config.frameworkName} start
 
     Helpers.logInfo(`
 
-    Using base href: ${
+    Building lib for base href: ${
       !_.isUndefined(buildOptions.baseHref)
         ? `'` + buildOptions.baseHref + `'`
         : '/ (default)'
