@@ -33,7 +33,7 @@ export class FilesFactory extends BaseFeatureForProject<Project> {
     };
   }
 
-  createModel(relativePath: string, name: string) {
+  createModel(relativePath: string, name: string): void {
     this.createEntity(relativePath, name);
     this.createController(relativePath, name);
   }

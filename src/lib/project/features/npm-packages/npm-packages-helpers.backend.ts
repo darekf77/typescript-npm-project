@@ -74,9 +74,9 @@ export function prepareCommand(
 ) {
   const install = remove ? 'uninstall' : 'install';
   let command = '';
-  const noPackageLock = project.__isStandaloneProject
-    ? '--no-package-lock'
-    : '';
+  // const noPackageLock = project.__isStandaloneProject
+  //   ? '--no-package-lock'
+  //   : '';
 
   if (
     useYarn
@@ -92,7 +92,7 @@ export function prepareCommand(
   } else {
     // --no-progress
     const argsForFasterInstall =
-      `--force --ignore-engines --no-audit ` + ` ${noPackageLock} `;
+      `--force --ignore-engines --no-audit `;
     command =
       `npm ${install} ${pkg ? pkg.name : ''} ` +
       ` ${pkg && pkg.installType ? pkg.installType : ''} ` +

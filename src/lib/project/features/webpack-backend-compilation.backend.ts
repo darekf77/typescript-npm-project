@@ -45,6 +45,7 @@ export class WebpackBackendCompilation extends BaseFeatureForProject<Project> {
       showInfoWebpack();
       if (watch) {
         await this.project.execute(webpackCommand, {
+          similarProcessKey: 'tsc',
           biggerBuffer: true,
           resolvePromiseMsg: {
             stdout: ['hidden modules'],

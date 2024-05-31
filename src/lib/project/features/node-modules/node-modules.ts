@@ -37,6 +37,28 @@ export class NodeModules extends BaseFeatureForProject<Project> {
     );
     //#endregion
   }
+
+  // // if problem with linking whole node_modules folder
+  // private linkLinks() {
+  // Helpers.remove(this.project.__node_modules.path);
+  // Helpers.mkdirp(this.project.__node_modules.path);
+  // for (const folderAbsPath of Helpers.foldersFrom(
+  //   coreContainer.__node_modules.path,
+  // )) {
+  //   if (path.basename(folderAbsPath) === '.bin') {
+  //     Helpers.copy(
+  //       folderAbsPath,
+  //       this.project.__node_modules.pathFor('.bin'),
+  //     );
+  //   } else {
+  //     Helpers.createSymLink(
+  //       folderAbsPath,
+  //       this.project.__node_modules.pathFor(path.basename(folderAbsPath)),
+  //     );
+  //   }
+  // }
+  // }
+
   async reinstallIfNeeded(): Promise<void> {
     //#region @backend
     if (this.notExist) {

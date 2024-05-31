@@ -107,5 +107,9 @@
   "editor.inlineSuggest.enabled": true,
   "tslint.autoFixOnSave": false,
   "tslint.enable": false,
-  "tslint.alwaysShowRuleFailuresAsWarnings": false
+  "tslint.alwaysShowRuleFailuresAsWarnings": false,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false
+  }
 }

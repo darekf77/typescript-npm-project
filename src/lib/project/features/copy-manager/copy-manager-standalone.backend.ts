@@ -61,9 +61,10 @@ export class CopyManagerStandalone extends CopyManager {
         destination.location,
         config.folder.node_modules,
         this.rootPackageName,
-        config.folder.src,
+        config.folder.source,
       ),
     );
+    console.log({ destPackageLinkSourceLocation });
 
     return Helpers.exists(destPackageLinkSourceLocation);
   }
@@ -586,6 +587,7 @@ export * from './source';
   }
   //#endregion
 
+  //#region handle copy of asset file
   handleCopyOfAssetFile(absoluteAssetFilePath: string, destination: Project) {
     const monitoredOutDirSharedAssets = this.monitoredOutDirSharedAssets;
     for (let index = 0; index < monitoredOutDirSharedAssets.length; index++) {
@@ -605,6 +607,7 @@ export * from './source';
       }
     }
   }
+  //#endregion
 
   //#region handle copy of single file
   handleCopyOfSingleFile(

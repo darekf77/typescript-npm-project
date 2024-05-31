@@ -13,6 +13,7 @@ tmp-*
 **/.vscode/**/*.*
 **/src/assets/**/*.*
 .build
+projects
 dist*
 *.js
 bundle*

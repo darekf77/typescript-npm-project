@@ -236,6 +236,7 @@ Starting backend typescirpt build....
     };
 
     await Helpers.execute(commandJs, cwd, {
+      similarProcessKey: 'tsc',
       exitOnErrorCallback: async code => {
         if (buildOptions.buildForRelease && !buildOptions.ci) {
           throw 'Typescript compilation (backend)';
@@ -307,6 +308,7 @@ Starting backend typescirpt build....
     Helpers.logInfo(`* Typescirpt compilation first part done`);
 
     await Helpers.execute(commandMaps, cwd, {
+      similarProcessKey: 'tsc',
       hideOutput: {
         stderr: true,
         stdout: true,

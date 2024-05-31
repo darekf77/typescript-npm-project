@@ -429,7 +429,7 @@ exports.default = start;`,
     );
     parent.__node_modules.linkToProject(smartContainerTargetProject);
 
-    await smartContainerTargetProject.__filesStructure.initFileStructure(); // THIS CAUSE NOT NICE SHIT
+    await smartContainerTargetProject.init(); // THIS CAUSE NOT NICE SHIT
 
     return smartContainerTargetProject;
   }
@@ -450,7 +450,7 @@ exports.default = start;`,
     for (let index = 0; index < children.length; index++) {
       const c = children[index];
       recreateApp(c);
-      await c.__filesStructure.initFileStructure();
+      await c.init();
     }
 
     const nonClinetCildren =

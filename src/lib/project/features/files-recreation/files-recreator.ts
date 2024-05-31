@@ -594,7 +594,7 @@ ${this.project.__isCoreProject ? '' : '/.vscode/launch.json'}
       patternsToIgnore,
     );
     // console.log({ patternsToIgnore })
-    Helpers.logInfo(`Updated .gitignore file for ${this.project.genericName}`);
+    // Helpers.logInfo(`Updated .gitignore file for ${this.project.genericName}`);
   }
 
   handleProjectSpecyficFiles() {

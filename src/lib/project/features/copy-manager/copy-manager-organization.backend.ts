@@ -97,6 +97,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   }
   //#endregion
 
+  //#region monitored out dir shared assets
   get monitoredOutDirSharedAssets(): string[] {
     const assetsFolders = this.project.children.map(c => {
       const monitorDir: string = crossPlatformPath([
@@ -110,6 +111,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
 
     return assetsFolders;
   }
+  //#endregion
 
   //#region get chhildren
   getChildren(): Project[] {
@@ -122,18 +124,21 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
 
   //#region links for packages are ok
   linksForPackageAreOk(destination: Project): boolean {
+    for (const child of this.children) {
+      const destPackageLinkSourceLocation = crossPlatformPath(
+        path.join(
+          destination.location,
+          config.folder.node_modules,
+          this.rootPackageName,
+          child.name,
+          config.folder.src,
+        ),
+      );
+      if(Helpers.exists(destPackageLinkSourceLocation)) {
+        return false;
+      }
+    }
     return true;
-    // TODO
-    const destPackageLinkSourceLocation = crossPlatformPath(
-      path.join(
-        destination.location,
-        config.folder.node_modules,
-        this.rootPackageName,
-        config.folder.src,
-      ),
-    );
-
-    return Helpers.exists(destPackageLinkSourceLocation);
   }
   //#endregion
 
@@ -318,6 +323,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   }
   //#endregion
 
+  //#region source map content fix
   sourceMapContentFix(
     content: string,
     isBrowser: boolean,
@@ -408,6 +414,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     }
     return content;
   }
+  //#endregion
 
   //#region write specyfic for child dts files
   /**

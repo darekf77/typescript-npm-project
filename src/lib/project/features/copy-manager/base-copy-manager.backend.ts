@@ -309,6 +309,10 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
   }
   //#endregion
 
+  updateTriggered = _.debounce(() => {
+    Helpers.logInfo(`[copy-manager] update triggered`);
+  }, 1000);
+
   //#region async action
   @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
@@ -350,6 +354,7 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
         event,
       });
     }
+    this.updateTriggered();
   }
   //#endregion
 
@@ -390,6 +395,7 @@ ${projectToCopyTo.map(proj => `- ${proj.genericName}`).join('\n')}
       // }
       log.data('copy done...');
     }
+    this.updateTriggered();
   }
   //#endregion
 
@@ -450,6 +456,7 @@ ${projectToCopyTo.map(proj => `- ${proj.genericName}`).join('\n')}
       (specyficFileRelativePath || absoluteAssetFilePath) &&
       allFolderLinksExists
     ) {
+      // Helpers.log(`handle ${specyficFileRelativePath || absoluteAssetFilePath}`);
       if (absoluteAssetFilePath) {
         this.handleCopyOfAssetFile(absoluteAssetFilePath, destination);
       } else {
@@ -472,7 +479,7 @@ ${projectToCopyTo.map(proj => `- ${proj.genericName}`).join('\n')}
       }
     } else {
       //#region handle all files
-      log.data('copying all files');
+      // Helpers.log('copying all files');
       this.copyCompiledSourcesAndDeclarations(destination, isTempLocalProj);
 
       log.d('copying surce maps');

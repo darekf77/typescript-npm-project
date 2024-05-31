@@ -809,7 +809,7 @@ class $Global extends BaseCommandLine<{}, Project> {
           const c = children[index];
           Helpers.info(`Recreating node_module for ${c.genericName}`);
           c.__node_modules.remove();
-          await c.__filesStructure.initFileStructure();
+          await c.init();
         }
       }
     } else if (

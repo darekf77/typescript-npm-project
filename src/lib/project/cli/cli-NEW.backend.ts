@@ -383,7 +383,7 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
       lastContainer.__node_modules.setToSmartContainer();
     }
 
-    await appProj.__filesStructure.initFileStructure(InitOptions.from({}));
+    await appProj.init(InitOptions.from({}));
 
     if (lastContainer?.__isSmartContainer) {
       appProj.__removeStandaloneSources();
@@ -487,10 +487,10 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
     for (let index = 0; index < containers.length; index++) {
       const container = containers[index];
       if (container.__isSmartContainer) {
-        await container.__filesStructure.initFileStructure();
+        await container.init();
         container.__recreate.initVscode();
       } else {
-        await container.__filesStructure.initFileStructure();
+        await container.init();
         container.__recreate.initVscode();
       }
     }

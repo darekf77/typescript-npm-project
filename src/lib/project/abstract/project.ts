@@ -29,7 +29,6 @@ import {
   MochaTestRunner,
   JestTestRunner,
   CypressTestRunner,
-  FilesStructure,
   TargetProject,
   WebpackBackendCompilation,
   LinkedRepos,
@@ -597,7 +596,6 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   public __testsJest: JestTestRunner;
   public __testsCypress: CypressTestRunner;
   public __packageJson: PackageJSON;
-  public __filesStructure: FilesStructure;
   public __filesTemplatesBuilder: FilesTemplatesBuilder;
   public __docsAppBuild: DocsAppBuildConfig;
   public __assetsManager: AssetsManager;
@@ -652,7 +650,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       this.defineProperty<Project>('__copyManager', CopyManager, {
         customInstanceReturn: () => CopyManager.for(this),
       });
-      this.defineProperty<Project>('__filesStructure', FilesStructure);
+
       this.defineProperty<Project>('__targetProjects', TargetProject);
       this.defineProperty<Project>('__insideStructure', InsideStructures);
       this.defineProperty<Project>('__singluarBuild', SingularBuild);
@@ -757,6 +755,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   }
   //#endregion
 
+  //#region getters & methods / packages to include in release
   get __includeOnlyForRelease() {
     //#region @backendFunc
     const result = this.__packageJson?.data?.tnp?.overrided?.includeOnly;
@@ -766,17 +765,23 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     return result;
     //#endregion
   }
+  //#endregion
 
+  //#region getters & methods / install npm packages
   installNpmPackages() {
     //#region @backendFunc
     this.__npmPackages.installFromArgs('');
     //#endregion
   }
+  //#endregion
 
+  //#region getters & methods / use git branches as metadata for commits
   useGitBranchesAsMetadataForCommits() {
     return false;
   }
+  //#endregion
 
+  //#region getters & methods / automatically add all changes when pushing to git
   automaticallyAddAllChnagesWhenPushingToGit() {
     return (
       this.__isContainer ||
@@ -784,6 +789,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       this?.parent?.__isContainer
     );
   }
+  //#endregion
 
   //#region getters & methods / use git branches when commting and pushing
   useGitBranchesWhenCommitingAndPushing() {
@@ -847,7 +853,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   //#region getters & methods / add sources from core
   __addSourcesFromCore() {
     //#region @backend
-    const corePath = Project.by(this.type, this.__frameworkVersion).location;
+    const corePath = this.coreProject.location;
 
     const srcInCore = path.join(corePath, config.folder.src);
     const srcForStandAloenInCore = path.join(corePath, this.__forStandAloneSrc);
@@ -1191,6 +1197,83 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
                 },
               ],
               '@typescript-eslint/member-ordering': 0,
+              // TO EXPENSIVE
+              // '@typescript-eslint/member-ordering': [
+              //   'warn',
+              //   {
+              //     default: [
+              //       'signature',
+              //       'call-signature',
+
+              //       'public-static-field',
+              //       'protected-static-field',
+              //       'private-static-field',
+              //       '#private-static-field',
+
+              //       'public-decorated-field',
+              //       'protected-decorated-field',
+              //       'private-decorated-field',
+
+              //       'public-instance-field',
+              //       'protected-instance-field',
+              //       'private-instance-field',
+              //       '#private-instance-field',
+
+              //       'public-abstract-field',
+              //       'protected-abstract-field',
+
+              //       'public-field',
+              //       'protected-field',
+              //       'private-field',
+              //       '#private-field',
+
+              //       'static-field',
+              //       'instance-field',
+              //       'abstract-field',
+
+              //       'decorated-field',
+
+              //       'field',
+
+              //       'static-initialization',
+
+              //       'public-constructor',
+              //       'protected-constructor',
+              //       'private-constructor',
+
+              //       'constructor',
+              //       'public-static-method',
+              //       'protected-static-method',
+              //       'private-static-method',
+              //       '#private-static-method',
+
+              //       'public-decorated-method',
+              //       'protected-decorated-method',
+              //       'private-decorated-method',
+
+              //       'public-instance-method',
+              //       'protected-instance-method',
+              //       'private-instance-method',
+              //       '#private-instance-method',
+
+              //       'public-abstract-method',
+              //       'protected-abstract-method',
+
+              //       'public-method',
+              //       'protected-method',
+              //       'private-method',
+              //       '#private-method',
+
+              //       'static-method',
+              //       'instance-method',
+              //       'abstract-method',
+
+              //       'decorated-method',
+
+              //       'method',
+              //     ],
+              //   },
+              // ],
               // '@typescript-eslint/explicit-function-return-type': 0,
               // 'no-void': 'error',
               '@typescript-eslint/explicit-function-return-type': 'warn',
@@ -1273,6 +1356,7 @@ www
         trailingComma: 'all',
         bracketSameLine: true,
         printWidth: 80,
+        singleAttributePerLine: true,
       },
       '.editorconfig': `
 # Editor configuration, see http://editorconfig.org
@@ -1284,6 +1368,10 @@ indent_style = space
 indent_size = 2
 insert_final_newline = true
 trim_trailing_whitespace = true
+
+[*.ts]
+quote_type = single
+
 
 [*.md]
 max_line_length = off
@@ -1301,7 +1389,7 @@ trim_trailing_whitespace = false
     //#endregion
   }
 
-  recreateLintConfiguration() {
+  recreateLintConfiguration(): void {
     //#region @backendFunc
     const files = this.lintFiles;
     const settingsToOverride = {
@@ -1329,6 +1417,10 @@ trim_trailing_whitespace = false
         'editor.defaultFormatter': 'esbenp.prettier-vscode',
         'editor.formatOnSave': false,
       },
+      '[javascript]': {
+        'editor.defaultFormatter': 'esbenp.prettier-vscode',
+        'editor.formatOnSave': false,
+      },
       '[typescript]': {
         'editor.defaultFormatter': 'esbenp.prettier-vscode',
         'editor.formatOnSave': false,
@@ -1344,10 +1436,11 @@ trim_trailing_whitespace = false
       'tslint.alwaysShowRuleFailuresAsWarnings': false,
     };
 
-    if (this.typeIs('vscode-ext', 'isomorphic-lib', 'container')) {
-      if (this.__isSmartContainerChild) {
-        return;
-      }
+    if (
+      this.typeIs('vscode-ext', 'isomorphic-lib', 'container') &&
+      !this.__isSmartContainerChild
+    ) {
+      // Helpers.info(`Reacreating lint configuration for ${this.genericName}`);
       this.__recreate.modifyVscode(settings => {
         return {
           ...settings,
@@ -1357,6 +1450,10 @@ trim_trailing_whitespace = false
       Object.keys(files).forEach(file => {
         this.writeFile(file, files[file]);
       });
+    } else {
+      // Helpers.info(
+      //   `Not reacreating lint configuration for ${this.genericName}`,
+      // );
     }
 
     //#endregion
@@ -1385,7 +1482,9 @@ trim_trailing_whitespace = false
           Helpers.logError(
             `
 
- Please specify in your configuration proper ${chalk.bold('smartContainerBuildTarget')}:
+ Please specify in your configuration proper ${chalk.bold(
+   'smartContainerBuildTarget',
+ )}:
 
  file: ${config.file.firedev_jsonc}
 
@@ -1401,7 +1500,9 @@ trim_trailing_whitespace = false
           );
 
           Helpers.log(
-            `[singularbuildcontainer] children for build: \n\n${this.children.map(c => c.name)}\n\n`,
+            `[singularbuildcontainer] children for build: \n\n${this.children.map(
+              c => c.name,
+            )}\n\n`,
           );
           //#endregion
         }
@@ -2024,7 +2125,9 @@ ${releaseOptions.resolved
   .map((p, i) => {
     const bold = child?.name === p.name;
     const index = i + 1;
-    return `(${bold ? chalk.underline(chalk.bold(index.toString())) : index}. ${bold ? chalk.underline(chalk.bold(p.name)) : p.name})`;
+    return `(${bold ? chalk.underline(chalk.bold(index.toString())) : index}. ${
+      bold ? chalk.underline(chalk.bold(p.name)) : p.name
+    })`;
   })
   .join(', ')}
 
@@ -2113,7 +2216,9 @@ processing...
 
           Helpers.warn(`
 
-        No realase needed for ${chalk.bold(depForPush.name)} ..just initing and pushing to git...
+        No realase needed for ${chalk.bold(
+          depForPush.name,
+        )} ..just initing and pushing to git...
 
         `); // hash in package.json to check
 
@@ -2141,7 +2246,9 @@ processing...
         Helpers.success(`
 
       [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]
-      R E L E A S E   O F   C O N T I A I N E R  ${chalk.bold(this.genericName)}  D O N E
+      R E L E A S E   O F   C O N T I A I N E R  ${chalk.bold(
+        this.genericName,
+      )}  D O N E
 
 
       `);
@@ -2149,7 +2256,9 @@ processing...
         Helpers.success(`
 
       [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]
-      P A R T I A L  R E L E A S E   O F   C O N T I A I N E R  ${chalk.bold(this.genericName)}  D O N E
+      P A R T I A L  R E L E A S E   O F   C O N T I A I N E R  ${chalk.bold(
+        this.genericName,
+      )}  D O N E
 
 
       `);
@@ -2178,7 +2287,9 @@ processing...
               console.error(error);
               if (
                 !(await Helpers.consoleGui.question.yesNo(
-                  `Not able to INIT your project ${chalk.bold(this.genericName)} try again..`,
+                  `Not able to INIT your project ${chalk.bold(
+                    this.genericName,
+                  )} try again..`,
                 ))
               ) {
                 releaseOptions?.finishCallback();
@@ -2195,7 +2306,9 @@ processing...
           } catch (error) {
             console.error(error);
             Helpers.error(
-              `Not able to RELEASE your project ${chalk.bold(this.genericName)}`,
+              `Not able to RELEASE your project ${chalk.bold(
+                this.genericName,
+              )}`,
               true,
               true,
             );
@@ -2297,7 +2410,9 @@ processing...
 
       let publish = true;
 
-      const readyToNpmPublishVersionPath = `${this.__getTempProjName('dist')}/${config.folder.node_modules}`;
+      const readyToNpmPublishVersionPath = `${this.__getTempProjName('dist')}/${
+        config.folder.node_modules
+      }`;
       if (this.__isStandaloneProject) {
         const distFolder = crossPlatformPath([
           specyficProjectForBuild.location,
@@ -2478,7 +2593,9 @@ processing...
       Helpers.info(`Before pushing you can acces projects here:
 
 - ${originPath}${defaultTestPort}/${smartContainer.name}
-${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer.name}/-/${c}`).join('\n')}
+${otherProjectNames
+  .map(c => `- ${originPath}${defaultTestPort}/${smartContainer.name}/-/${c}`)
+  .join('\n')}
 
 `);
     }
@@ -2815,17 +2932,23 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
       //#region prepare variables / command
       // const command = `${loadNvm} && ${this.npmRunNg} build ${this.name} ${watch ? '--watch' : ''}`;
-      const commandForLibraryBuild = `${this.__npmRunNg} build ${this.name} ${watch ? '--watch' : ''}`;
+      const commandForLibraryBuild = `${this.__npmRunNg} build ${this.name} ${
+        watch ? '--watch' : ''
+      }`;
       //#endregion
 
       //#region prepare variables / angular info
       const showInfoAngular = () => {
         Helpers.info(
-          `Starting browser Angular/TypeScirpt build.... ${buildOptions.websql ? '[WEBSQL]' : ''}`,
+          `Starting browser Angular/TypeScirpt build.... ${
+            buildOptions.websql ? '[WEBSQL]' : ''
+          }`,
         );
         Helpers.log(`
 
-      ANGULAR ${Project.ins.Tnp?.version} ${buildOptions.watch ? 'WATCH ' : ''} LIB BUILD STARTED... ${buildOptions.websql ? '[WEBSQL]' : ''}
+      ANGULAR ${Project.ins.Tnp?.version} ${
+        buildOptions.watch ? 'WATCH ' : ''
+      } LIB BUILD STARTED... ${buildOptions.websql ? '[WEBSQL]' : ''}
 
       `);
 
@@ -2899,12 +3022,14 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
               }
               try {
                 await proxyProject.execute(commandForLibraryBuild, {
+                  similarProcessKey: 'ng',
                   resolvePromiseMsg: {
                     stdout: 'Compilation complete. Watching for file changes',
                   },
                   ...sharedOptions(),
                 });
                 await proxyProjectWebsql.execute(commandForLibraryBuild, {
+                  similarProcessKey: 'ng',
                   resolvePromiseMsg: {
                     stdout: 'Compilation complete. Watching for file changes',
                   },
@@ -2994,9 +3119,11 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
           try {
             showInfoAngular();
             await proxyProject.execute(commandForLibraryBuild, {
+              similarProcessKey: 'ng',
               ...sharedOptions(),
             });
             await proxyProjectWebsql.execute(commandForLibraryBuild, {
+              similarProcessKey: 'ng',
               ...sharedOptions(),
             });
           } catch (e) {
@@ -3020,9 +3147,11 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
           try {
             showInfoAngular();
             await proxyProject.execute(commandForLibraryBuild, {
+              similarProcessKey: 'ng',
               ...sharedOptions(),
             });
             await proxyProjectWebsql.execute(commandForLibraryBuild, {
+              similarProcessKey: 'ng',
               ...sharedOptions(),
             });
             this.__showMesageWhenBuildLibDoneForSmartContainer(buildOptions);
@@ -3182,7 +3311,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
         const dest = path.join(releaseDistFolder, res);
         if (!fse.existsSync(file)) {
           Helpers.error(
-            `[${config.frameworkName}][lib-project] Resource file: ${chalk.bold(path.basename(file))} does not ` +
+            `[${config.frameworkName}][lib-project] Resource file: ${chalk.bold(
+              path.basename(file),
+            )} does not ` +
               `exist in "${this.genericName}"  (package.json > resources[])
         `,
             false,
@@ -3623,7 +3754,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
     if (this.__isStandaloneProject) {
       const elecProj = Project.ins.From(
         this.pathFor([
-          `tmp-apps-for-${config.folder.dist}${buildOptions.websql ? '-websql' : ''}`,
+          `tmp-apps-for-${config.folder.dist}${
+            buildOptions.websql ? '-websql' : ''
+          }`,
           this.name,
         ]),
       );
@@ -3632,7 +3765,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       if (buildOptions.watch) {
         elecProj
           .run(
-            `npm-run  electron . --serve ${buildOptions.websql ? '--websql' : ''}`,
+            `npm-run  electron . --serve ${
+              buildOptions.websql ? '--websql' : ''
+            }`,
           )
           .async();
       } else {
@@ -3893,11 +4028,11 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
 
       //#region normal/watch lib build
       if (buildOptions.watch) {
-        await this.__filesStructure.initFileStructure(
+        await this.init(
           InitOptions.fromBuild(buildOptions.clone({ watch: true })),
         );
       } else {
-        await this.__filesStructure.initFileStructure(
+        await this.init(
           InitOptions.fromBuild(buildOptions.clone({ watch: false })),
         );
       }
@@ -3925,7 +4060,9 @@ ${otherProjectNames.map(c => `- ${originPath}${defaultTestPort}/${smartContainer
       const baseHrefLocProj = this;
 
       const fromFileBaseHref = Helpers.readFile(
-        baseHrefLocProj.pathFor(tmpBaseHrefOverwriteRelPath + (smartContainerTargetName || '')),
+        baseHrefLocProj.pathFor(
+          tmpBaseHrefOverwriteRelPath + (smartContainerTargetName || ''),
+        ),
       );
       buildOptions.baseHref = fromFileBaseHref;
 
@@ -3983,7 +4120,11 @@ ${config.frameworkName} start
 
     Helpers.logInfo(`
 
-    Using base href: ${!_.isUndefined(buildOptions.baseHref) ? `'` + buildOptions.baseHref + `'` : '/ (default)'}
+    Using base href: ${
+      !_.isUndefined(buildOptions.baseHref)
+        ? `'` + buildOptions.baseHref + `'`
+        : '/ (default)'
+    }
 
     `);
 
@@ -5009,7 +5150,9 @@ ${config.frameworkName} start
     //#region @backendFunc
     const project = this;
     const pref = type === 'app' ? 'apps' : 'libs';
-    const tmpProjectsStandalone = `tmp-${pref}-for-${config.folder.dist}${websql ? '-websql' : ''}/${project.name}`;
+    const tmpProjectsStandalone = `tmp-${pref}-for-${config.folder.dist}${
+      websql ? '-websql' : ''
+    }/${project.name}`;
     return tmpProjectsStandalone;
 
     //#endregion
@@ -5185,11 +5328,17 @@ ${config.frameworkName} start
 
     if (buildOptions.watch) {
       angularBuildAppCmd =
-        `${this.__npmRunNg} serve ${buildOptions.buildAngularAppForElectron ? 'angular-electron' : 'app'} ` +
-        ` ${portAssignedToAppBuildCommandPart} ${buildOptions.prod ? '--prod' : ''}`;
+        `${this.__npmRunNg} serve ${
+          buildOptions.buildAngularAppForElectron ? 'angular-electron' : 'app'
+        } ` +
+        ` ${portAssignedToAppBuildCommandPart} ${
+          buildOptions.prod ? '--prod' : ''
+        }`;
     } else {
       angularBuildAppCmd =
-        `${this.__npmRunNg} build ${buildOptions.buildAngularAppForElectron ? 'angular-electron' : 'app'}` +
+        `${this.__npmRunNg} build ${
+          buildOptions.buildAngularAppForElectron ? 'angular-electron' : 'app'
+        }` +
         `${buildOptions.prod ? '--configuration production' : ''} ` +
         `${buildOptions.watch ? '--watch' : ''}` +
         `${outPutPathCommand} `;
@@ -5215,6 +5364,7 @@ ${config.frameworkName} start
     showInfoAngular();
 
     await angularTempProj.execute(angularBuildAppCmd, {
+      similarProcessKey: 'ng',
       resolvePromiseMsg: {
         stdout: 'Compiled successfully',
       },
@@ -5281,7 +5431,9 @@ ${config.frameworkName} start
     const ifapp =
       'if you want to start app build -> please run in other terminal command:';
 
-    const ngserveCommand = `${buildOptions.watch ? '--port 4201 # or whatever port' : '#'} to run angular ${
+    const ngserveCommand = `${
+      buildOptions.watch ? '--port 4201 # or whatever port' : '#'
+    } to run angular ${
       buildOptions.watch ? 'ng serve' : 'ng build (for application - not lib)'
     }.`;
     // const bawOrba = buildOptions.watch ? 'baw' : 'ba';
@@ -5313,7 +5465,9 @@ ${config.frameworkName} start
 
       ${ifapp}
 
-      ${chalk.bold(config.frameworkName + bawOrbaLong + smartContainerTargetName)}
+      ${chalk.bold(
+        config.frameworkName + bawOrbaLong + smartContainerTargetName,
+      )}
       or
       ${config.frameworkName} ${bawOrbaLongWebsql} ${smartContainerTargetName}
 
@@ -5381,7 +5535,9 @@ ${config.frameworkName} start
     }
     //#endregion
 
-    const nccComand = `ncc build ${outDir}/${config.file.index_js} -o ${outDir}/temp/ncc ${cliBuildUglify ? '-m' : ''}  --no-cache `;
+    const nccComand = `ncc build ${outDir}/${
+      config.file.index_js
+    } -o ${outDir}/temp/ncc ${cliBuildUglify ? '-m' : ''}  --no-cache `;
     // console.log({
     //   useBackupFile,
     //   indexOrg,
@@ -5595,15 +5751,170 @@ ${config.frameworkName} start
   }
   //#endregion
 
-  //#region getters & methods / init
-  async init(initOptions?: InitOptions) {
+  //#region getters & methods / init file structure
+  private async initFileStructure(initOptions?: InitOptions) {
+    //#region @backendFunc
+    initOptions = InitOptions.from(initOptions);
+
+    if (!initOptions.initiator) {
+      initOptions.initiator = this;
+    }
+    const {
+      alreadyInitedPorjects,
+      watch,
+      struct,
+      branding,
+      websql,
+      omitChildren,
+    } = initOptions;
+    const smartContainerTargetName = this.__smartContainerBuildTarget?.name;
+
+    // THIS IS SLOW... BUT I CAN AFORD IT HERE
+    if (
+      !_.isUndefined(
+        alreadyInitedPorjects.find(p => p.location === this.location),
+      )
+    ) {
+      this.quickFixes.missingSourceFolders();
+      if (this.__isStandaloneProject && this.__packageJson) {
+        this.__packageJson.updateHooks();
+      }
+    }
+
+    await this.__linkedRepos.update(struct);
+
+    Helpers.log(
+      `[init] adding project is not exists...done(${this.genericName})  `,
+    );
+
+    if (
+      !_.isUndefined(
+        alreadyInitedPorjects.find(p => p.location === this.location),
+      )
+    ) {
+      Helpers.log(
+        `Already inited project: ${chalk.bold(this.genericName)} - skip`,
+      );
+      return;
+    } else {
+      Helpers.log(
+        `Not inited yet... ${chalk.bold(this.genericName)} in ${
+          this.location
+        } `,
+      );
+    }
+
+    this.quickFixes.missingSourceFolders();
+
+    if (!omitChildren && this.__isSmartContainer) {
+      const children = this.children;
+      for (let index = 0; index < children.length; index++) {
+        const child = children[index];
+        if (child.__frameworkVersion !== this.__frameworkVersion) {
+          await child.__setFramworkVersion(this.__frameworkVersion);
+        }
+      }
+    }
+
+    if (this.__isStandaloneProject || this.__isSmartContainerChild) {
+      await this.__branding.apply(!!branding);
+    }
+
+    this.quickFixes.missingAngularLibFiles();
+    if (this.__isStandaloneProject || this.__isContainer) {
+      this.quickFixes.missingLibs([]);
+    }
+
+    Helpers.taskStarted(
+      `Initing project: ${chalk.bold(this.genericName)} ${
+        struct ? '(without packages install)' : ''
+      } ${omitChildren ? '(ommiting children)' : ''}`,
+    );
+
+    alreadyInitedPorjects.push(this);
+    Helpers.log(
+      `Push to alread inited ${this.genericName} from ${this.location} `,
+    );
+
+    //#region handle init of container
+    if (this.__isContainer) {
+      await this.__recreate.recreateSimpleFiles(initOptions);
+
+      if (!omitChildren && !this.__isContainerWithLinkedProjects) {
+        const containerChildren = this.children.filter(c => {
+          Helpers.log('checking if git repo');
+          if (c.git.isInsideGitRepo) {
+            Helpers.log(
+              `[init] not initing recrusively, it is git repo ${c.name} `,
+            );
+            return false;
+          }
+          Helpers.log('checking if git repo - done');
+          return true;
+        });
+        for (let index = 0; index < containerChildren.length; index++) {
+          const containerChild = containerChildren[index];
+          await containerChild.initFileStructure(initOptions);
+          const containerChildChildren = containerChild.children;
+          for (
+            let indexChild = 0;
+            indexChild < containerChildChildren.length;
+            indexChild++
+          ) {
+            const workspaceChild = containerChildChildren[indexChild];
+            await workspaceChild.initFileStructure(initOptions);
+          }
+        }
+      }
+    }
+    //#endregion
+
+    await this.__recreate.recreateSimpleFiles(initOptions);
+    this.__recreate.vscode.settings.toogleHideOrShowDeps();
+
+    if (this.__isStandaloneProject || this.__isSmartContainer) {
+      await this.__env.init();
+      this.__filesTemplatesBuilder.rebuild();
+    }
+
+    if (!this.__node_modules.exist && !struct) {
+      await this.__npmPackages.installProcess(
+        `inti procedure of ${this.name} `,
+      );
+    }
+    this.__packageJson.showDeps(
+      `Show new deps for ${this.__frameworkVersion} `,
+    );
+
+    if (this.__isSmartContainer) {
+      //#region handle smart container
+
+      await this.__recreate.recreateSimpleFiles(initOptions);
+      if (!omitChildren) {
+        await this.__singluarBuild.initSingularBuild(
+          initOptions,
+          smartContainerTargetName,
+        );
+      }
+      //#endregion
+    }
+
+    this.quickFixes.missingSourceFolders();
+
+    this.quickFixes.badTypesInNodeModules();
+    Helpers.log(`Init DONE for project: ${chalk.bold(this.genericName)} `);
+    //#endregion
+  }
+  //#endregion
+
+  async init(initOptions?: InitOptions): Promise<void> {
     //#region @backendFunc
 
     Helpers.removeIfExists(
       path.join(this.location, config.file.tnpEnvironment_json),
     );
     initOptions = InitOptions.from(initOptions);
-    await this.__filesStructure.initFileStructure(initOptions);
+    await this.initFileStructure(initOptions);
     this.recreateLintConfiguration();
     this.__saveLaunchJson(4000);
     initOptions.finishCallback();
@@ -5659,7 +5970,9 @@ ${config.frameworkName} start
         ) as Project;
         if (containerCoreForVersion) {
           Helpers.info(
-            `[${config.frameworkName}] updating on push global container${frameworkVersion === 'v1' ? '' : `-${frameworkVersion}`} in ${this.name}`,
+            `[${config.frameworkName}] updating on push global container${
+              frameworkVersion === 'v1' ? '' : `-${frameworkVersion}`
+            } in ${this.name}`,
           );
           containerCoreForVersion.__packageJson.save(
             'Updating morphi container',
