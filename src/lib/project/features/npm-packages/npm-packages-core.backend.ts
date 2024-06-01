@@ -94,9 +94,8 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
         // this.project.run('npm-run electron-builder install-app-deps', { output: true }).sync();
         // Helpers.taskDone('Done rebuilding electorn');
       } catch (err) {
-        if (config.frameworkName === 'tnp') {
-          console.log(err);
-        }
+        console.error(err);
+        //#region linux message about memoery
         const isLinux = (['win32', 'darwin'] as NodeJS.Platform[]).includes(
           process.platform,
         );
@@ -125,13 +124,14 @@ echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo s
           false,
           true,
         );
+        //#endregion
       }
     }
 
     this.project.quickFixes.nodeModulesPackagesZipReplacement();
-    PackagesRecognition.fromProject(this.project).start(
-      true,
-      '[actualNpmProcess] after npm i',
+    PackagesRecognition.startFor(
+      this.project,
+      'after npm install',
     );
 
     if (!generatLockFiles) {

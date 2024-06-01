@@ -1,3 +1,4 @@
+import { config } from 'tnp-config/src';
 import type { Project } from './project/abstract/project';
 
 import {
@@ -223,6 +224,13 @@ export function tempSourceFolder(
 ) {
   return `tmp-src-${appForLib ? 'app-' : ''}${outDir}${websql ? '-websql' : ''}`;
 }
+
+
+export const notAllowedAsPacakge = [
+  config.folder.browser,
+  config.folder.websql,
+  config.folder.assets,
+];
 
 export const MESSAGES = {
   SHUT_DOWN_FOLDERS_AND_DEBUGGERS:

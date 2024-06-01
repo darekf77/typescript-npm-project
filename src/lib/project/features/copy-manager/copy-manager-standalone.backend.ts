@@ -33,7 +33,7 @@ export class CopyManagerStandalone extends CopyManager {
     }
 
     this._isomorphicPackages =
-      this.project.__availableIsomorphicPackagesInNodeModules;
+      this.project.allIsomorphicPackagesFromMemory;
 
     Helpers.log(
       `Opearating on ${this.isomorphicPackages.length} isomorphic pacakges...`,

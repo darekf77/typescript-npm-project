@@ -255,8 +255,11 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   static ins = new FiredevProjectResolve(Project);
   //#endregion
 
+  //#region static / has resovle core deps and folder
   private static hasResolveCoreDepsAndFolder = false;
+  //#endregion
 
+  //#region static / projcts in user folder
   private static get projectsInUserFolder() {
     //#region @backendFunc
     const projectsInUserFolder = crossPlatformPath(
@@ -270,7 +273,12 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     return projectsInUserFolder;
     //#endregion
   }
+  //#endregion
 
+  //#region static / sync core project
+  /**
+   * firedev sync command
+   */
   static sync() {
     //#region @backendFunc
     const cwd = firedevRepoPathUserInUserDir;
@@ -354,6 +362,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     Helpers.success('firedev-framework synced ok');
     //#endregion
   }
+  //#endregion
+
+  //#region static / reinstall active framework containers
   private static reinstallActiveFrameworkContainers() {
     for (const ver of config.activeFramewrokVersions) {
       const nodeModulesForContainer = crossPlatformPath([
@@ -366,7 +377,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
     }
   }
+  //#endregion
 
+  //#region static / get node modules installed for core container
   private static get nodeModulesInstalledForCoreContainer(): boolean {
     for (const ver of config.activeFramewrokVersions) {
       const nodeModulesForContainer = crossPlatformPath([
@@ -380,7 +393,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     }
     return true;
   }
+  //#endregion
 
+  //#region static / initial check
   public static initialCheck() {
     //#region @backendFunc
     if (this.hasResolveCoreDepsAndFolder) {
@@ -458,7 +473,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     }
     //#endregion
   }
+  //#endregion
 
+  //#region static / path resolved
   private static pathResolved(...partOfPath: string[]) {
     //#region @backendFunc
     // console.log('pathResolved', partOfPath);
@@ -481,11 +498,15 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     return crossPlatformPath(path.resolve(path.join(...partOfPath)));
     //#endregion
   }
+  //#endregion
 
+  //#region static / firedev relative projects pathes
   private static get firedevProjectsRelative() {
     return `../firedev/projects`;
   }
+  //#endregion
 
+  //#region static / resolve core projects pathes
   private static resolveCoreProjectsPathes(
     version?: CoreModels.FrameworkVersion,
   ) {
@@ -517,6 +538,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     return result;
     //#endregion
   }
+  //#endregion
 
   //#region static / by
   public static by(
@@ -577,6 +599,59 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   }
   //#endregion
 
+  //#endregion
+
+  //#region ISOMORPHIC LIBS
+  private __inMemoryIsomorphicLibs = [];
+
+  public resolveAndAddIsomorphicLibsToMemoery(libsNames: string[], informAboutDiff = false) {
+    // console.log(`add ed isomorphic libs to memory: ${libsNames.join(', ')}`);
+    if (!this.coreContainer) {
+      return;
+    }
+
+    if(informAboutDiff) {
+      const current = this.coreContainer.__inMemoryIsomorphicLibs;
+      const newAdded = libsNames.filter(l => !current.includes(l));
+      for (const packageName of newAdded) {
+        Helpers.info(
+          `[${config.frameworkName}] ${packageName} added to isomorphic packages...`,
+        );
+      }
+    }
+
+    this.coreContainer.__inMemoryIsomorphicLibs = Helpers.arrays.uniqArray([
+      ...this.coreContainer.__inMemoryIsomorphicLibs,
+      ...libsNames,
+    ]);
+
+
+  }
+
+  /**
+   * main source of isomorphic libs
+   */
+  public get allIsomorphicPackagesFromMemory(): string[] {
+    //#region @backendFunc
+    if (this.coreContainer?.__inMemoryIsomorphicLibs.length === 0) {
+      PackagesRecognition.startFor(
+        this,
+        'first time accessing isomorphic libs',
+      );
+    }
+    return this.coreContainer.__inMemoryIsomorphicLibs;
+    //#endregion
+  }
+
+  get selftIsomorphicPackages(): string[] {
+    //#region @backendFunc
+    if (this.__isSmartContainer) {
+      const parent = this;
+      return this.children.map(c => `@${parent.name}/${c.name}`);
+    }
+    return [this.name];
+    //#endregion
+  }
   //#endregion
 
   //#region fields
@@ -943,7 +1018,6 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       return;
     }
 
-    this.__removeRecognizedIsomorphicLIbs();
     let gitginoredfiles = this.__recreate.filesIgnoredBy.gitignore
       .map(f => (f.startsWith('/') ? f.substr(1) : f))
       .filter(f => {
@@ -1036,27 +1110,6 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
         Helpers.remove(f);
       });
     Helpers.log(`Reseting symbolic links from node_mouels..DONE`);
-    //#endregion
-  }
-  //#endregion
-
-  //#region getters & methods / remove recognized isomorhic libs
-  private __removeRecognizedIsomorphicLIbs() {
-    //#region @backend
-    if (this.typeIs('unknow')) {
-      return;
-    }
-    try {
-      const pjPath = path.join(this.location, config.file.package_json);
-      const pj: Models.IPackageJSON = fse.readJsonSync(pjPath, {
-        encoding: 'utf8',
-      });
-      pj[config.array.isomorphicPackages] = void 0;
-      fse.writeJsonSync(pjPath, pj, {
-        encoding: 'utf8',
-        spaces: 2,
-      });
-    } catch (e) {}
     //#endregion
   }
   //#endregion
@@ -1155,6 +1208,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   }
   //#endregion
 
+  //#region getters & methods / lint files
   get lintFiles() {
     //#region @backendFunc
     const files = {
@@ -1393,7 +1447,9 @@ trim_trailing_whitespace = false
     return files;
     //#endregion
   }
+  //#endregion
 
+  //#region getters & methods /  recreate lint configuration
   recreateLintConfiguration(): void {
     //#region @backendFunc
     const files = this.lintFiles;
@@ -1463,6 +1519,7 @@ trim_trailing_whitespace = false
 
     //#endregion
   }
+  //#endregion
 
   //#region getters & methods / smart container build target
   get __smartContainerBuildTarget(): Project {
@@ -1858,55 +1915,6 @@ trim_trailing_whitespace = false
       ),
       ...this.__projectSpecyficFiles(),
     ];
-    //#endregion
-  }
-  //#endregion
-
-  //#region getters & methods / get isomorphic packages
-  /**
-   * array of isomorphic pacakges
-   * example:
-   * ['firedev', '@something/child' ]
-   */
-  public get __isomorphicPackages(): string[] {
-    //#region @backendFunc
-    const isomorphicPackagesArr = [];
-
-    if (this.typeIs('unknow')) {
-      return isomorphicPackagesArr;
-    }
-    try {
-      let location = this.location;
-
-      var p = crossPlatformPath([
-        location,
-        config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES,
-      ]);
-      if (!fse.existsSync(p)) {
-        PackagesRecognition.fromProject(this as any).start(
-          void 0,
-          '[firedev-projct][getter isomorphic pacakges ]',
-        );
-      }
-      const f = Helpers.readJson(p);
-      const arr = f[config.array.isomorphicPackages];
-      if (_.isArray(arr)) {
-        return isomorphicPackagesArr.concat(arr);
-      } else {
-        return isomorphicPackagesArr;
-      }
-      // warn(`Isomorphic package file does not exists : ${p}`);
-    } catch (e) {
-      if (global.globalSystemToolMode) {
-        Helpers.log(e);
-        Helpers.error(
-          `Erro while reading ismorphic package file: ${p}`,
-          true,
-          true,
-        );
-      }
-      return isomorphicPackagesArr;
-    }
     //#endregion
   }
   //#endregion
@@ -3018,13 +3026,6 @@ ${otherProjectNames
             showInfoAngular();
 
             if (isStandalone || this.__isSmartContainerTarget) {
-              if (this.__isSmartContainerTarget) {
-                // TODO QUICK_FIX this should be in init/struct
-                PackagesRecognition.fromProject(this).start(
-                  true,
-                  'before startling lib proxy project',
-                );
-              }
               try {
                 await proxyProject.execute(commandForLibraryBuild, {
                   similarProcessKey: 'ng',
@@ -3547,27 +3548,6 @@ ${otherProjectNames
       await Helpers.questionYesNo('Push changes to git repo ?', async () => {
         await pushFun();
       });
-    }
-    //#endregion
-  }
-  //#endregion
-
-  //#region getters & methods / get available isomorpic packages in node_modules
-  get __availableIsomorphicPackagesInNodeModules(): string[] {
-    //#region @backendFunc
-    const jsonPath = path.join(
-      this.location,
-      PackagesRecognition.FILE_NAME_ISOMORPHIC_PACKAGES,
-    );
-    try {
-      const json = Helpers.readJson(jsonPath) as {
-        isomorphicPackages: string[];
-      };
-      return json && _.isArray(json.isomorphicPackages)
-        ? json.isomorphicPackages
-        : [];
-    } catch (error) {
-      return [];
     }
     //#endregion
   }
@@ -4145,13 +4125,6 @@ ${config.frameworkName} start
 
     `);
 
-    if (!this.__isVscodeExtension) {
-      PackagesRecognition.fromProject(this as any).start(
-        void 0,
-        '[buildable-project]',
-      );
-    }
-
     //#region build assets file
     /**
      * Build assets file for app in app build mode
@@ -4368,12 +4341,12 @@ ${config.frameworkName} start
           '${workspaceFolder}/dist/**/*.js',
           '!**/node_modules/**',
           ...Helpers.uniqArray(
-            this.__isomorphicPackages
+            this.allIsomorphicPackagesFromMemory
               .map(packageName => {
                 const p = this.pathFor([
                   config.folder.node_modules,
                   packageName,
-                  config.folder.src,
+                  config.folder.source,
                 ]);
                 return Helpers.isExistedSymlink(p)
                   ? `${crossPlatformPath(fse.realpathSync(p))}/../dist/**/*.js`

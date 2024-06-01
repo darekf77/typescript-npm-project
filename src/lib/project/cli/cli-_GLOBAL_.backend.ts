@@ -196,6 +196,9 @@ class $Global extends BaseCommandLine<{}, Project> {
   //#endregion
 
   //#region add import src
+  /**
+   * @deprecated
+   */
   ADD_IMPORT_SRC() {
     const project = this.project as Project;
 
@@ -284,9 +287,8 @@ class $Global extends BaseCommandLine<{}, Project> {
     };
 
     const addImportSrc = (proj: Project) => {
-      PackagesRecognition.fromProject(proj).start(true, 'src adding process');
       const pacakges = [
-        ...BrowserCodeCut.IsomorphicLibs,
+        ...proj.allIsomorphicPackagesFromMemory,
         ...(proj.__isSmartContainerChild
           ? proj.parent.children.map(c => `@${proj.parent.name}/${c.name}`)
           : []),
@@ -543,8 +545,9 @@ class $Global extends BaseCommandLine<{}, Project> {
 
       project.__packageJson.data.bin = {};
       countLinkInPackageJsonBin.forEach(p => {
-        project.__packageJson.data.bin[path.basename(p)] =
-          `bin/${path.basename(p)}`;
+        project.__packageJson.data.bin[path.basename(p)] = `bin/${path.basename(
+          p,
+        )}`;
       });
       project.__packageJson.save(`update bin data`);
 
@@ -568,8 +571,8 @@ class $Global extends BaseCommandLine<{}, Project> {
           const attachDebugParam = inspect
             ? '--inspect'
             : inspectBrk
-              ? '--inspect-brk'
-              : '';
+            ? '--inspect-brk'
+            : '';
 
           if (process.platform === 'win32') {
             Helpers.writeFile(
@@ -583,10 +586,14 @@ class $Global extends BaseCommandLine<{}, Project> {
   esac
 
   if [ -x "$basedir/node" ]; then
-    "$basedir/node" ${attachDebugParam} "$basedir/node_modules/${path.basename(project.location)}/bin/${globalName}" "$@"
+    "$basedir/node" ${attachDebugParam} "$basedir/node_modules/${path.basename(
+      project.location,
+    )}/bin/${globalName}" "$@"
     ret=$?
   else
-    node ${attachDebugParam} "$basedir/node_modules/${path.basename(project.location)}/bin/${globalName}" "$@"
+    node ${attachDebugParam} "$basedir/node_modules/${path.basename(
+      project.location,
+    )}/bin/${globalName}" "$@"
     ret=$?
   fi
   exit $ret
@@ -611,10 +618,14 @@ class $Global extends BaseCommandLine<{}, Project> {
   }
   $ret=0
   if (Test-Path "$basedir/node$exe") {
-    & "$basedir/node$exe"  "$basedir/node_modules/${path.basename(project.location)}/bin/${globalName}" $args
+    & "$basedir/node$exe"  "$basedir/node_modules/${path.basename(
+      project.location,
+    )}/bin/${globalName}" $args
     $ret=$LASTEXITCODE
   } else {
-    & "node$exe"  "$basedir/node_modules/${path.basename(project.location)}/bin/${globalName}" $args
+    & "node$exe"  "$basedir/node_modules/${path.basename(
+      project.location,
+    )}/bin/${globalName}" $args
     $ret=$LASTEXITCODE
   }
   exit $ret
@@ -638,7 +649,9 @@ class $Global extends BaseCommandLine<{}, Project> {
     SET PATHEXT=%PATHEXT:;.JS;=;%
   )
 
-  "%_prog%"  "%dp0%\\node_modules\\${path.basename(project.location)}\\bin\\${globalName}" %*
+  "%_prog%"  "%dp0%\\node_modules\\${path.basename(
+    project.location,
+  )}\\bin\\${globalName}" %*
   ENDLOCAL
   EXIT /b %errorlevel%
   :find_dp0
@@ -650,7 +663,9 @@ class $Global extends BaseCommandLine<{}, Project> {
           } else {
             Helpers.createSymLink(localPath, destinationGlobalLink);
             const command = `chmod +x ${destinationGlobalLink}`;
-            Helpers.log(`Trying to make file exacutable global command "${chalk.bold(globalName)}".
+            Helpers.log(`Trying to make file exacutable global command "${chalk.bold(
+              globalName,
+            )}".
 
             command: ${command}
             `);
