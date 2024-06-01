@@ -324,7 +324,10 @@ exports.default = start;`,
             ),
           );
           const relativeAfile = source.replace(
-            `${crossPlatformPath([targetContainerProject.location, config.folder.src])}/`,
+            `${crossPlatformPath([
+              targetContainerProject.location,
+              config.folder.src,
+            ])}/`,
             '',
           );
           filesToWatch.push(source);
@@ -428,8 +431,7 @@ exports.default = start;`,
       smartContainerTargetProjPath,
     );
     parent.__node_modules.linkToProject(smartContainerTargetProject);
-
-    await smartContainerTargetProject.init(); // THIS CAUSE NOT NICE SHIT
+    await smartContainerTargetProject.init('initing dist project'); // THIS CAUSE NOT NICE SHIT
 
     return smartContainerTargetProject;
   }
@@ -450,7 +452,7 @@ exports.default = start;`,
     for (let index = 0; index < children.length; index++) {
       const c = children[index];
       recreateApp(c);
-      await c.init();
+      await c.init('singular build lib init');
     }
 
     const nonClinetCildren =

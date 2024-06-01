@@ -13,7 +13,7 @@ export class $Ts extends CommandLineFeature<{}, Project> {
           : [this.cwd, this.firstArg],
       ),
     ).map(i => {
-      return `${i.embeddedNameToFile} (${i.type})`;
+      return `${i.embeddedPathToFile} (${i.type})`;
     });
     console.log(importsExports);
     this._exit();

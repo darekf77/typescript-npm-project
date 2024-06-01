@@ -163,6 +163,7 @@ export class BroswerCompilation extends BackendCompilation {
       this.buildOptions?.outDir,
       this.buildOptions?.websql,
     );
+    // process.exit(0)
   }
   //#endregion
 

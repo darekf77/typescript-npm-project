@@ -16,6 +16,7 @@ export class $Init extends CommandLineFeature<InitOptions, Project> {
 
   public async _() {
     await this.project.init(
+      'cli init',
       InitOptions.from({
         finishCallback: () => {
           console.log('DONE!');
@@ -28,6 +29,7 @@ export class $Init extends CommandLineFeature<InitOptions, Project> {
   async clearInit() {
     await this.project.clear();
     await this.project.init(
+      'cli clear init',
       InitOptions.from({
         finishCallback: () => {
           console.log('DONE!');
@@ -40,6 +42,7 @@ export class $Init extends CommandLineFeature<InitOptions, Project> {
 
   async struct() {
     await this.project.init(
+      'cli struct init',
       InitOptions.from({
         struct: true,
         finishCallback: () => this._exit(),

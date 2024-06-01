@@ -24,7 +24,9 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
   private _errorMsgCreateProject() {
     Helpers.log(chalk.green(`Good examples:`));
     Helpers.log(
-      `\t${chalk.gray(`${config.frameworkName} new`)} ${chalk.gray('mySuperLib')}`,
+      `\t${chalk.gray(`${config.frameworkName} new`)} ${chalk.gray(
+        'mySuperLib',
+      )}`,
     );
     Helpers.error(chalk.red(`Please use example above.`), false, true);
   }
@@ -251,16 +253,28 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
             const displayNameForLastContainerBeforeApp =
               hasAtLeastOneContainersFromArgs
                 ? chalk.italic(
-                    `${autoCreateNormalContainersPathName ? autoCreateNormalContainersPathName + '/' : ''}`,
+                    `${
+                      autoCreateNormalContainersPathName
+                        ? autoCreateNormalContainersPathName + '/'
+                        : ''
+                    }`,
                   ) +
-                  `${chalk.italic.red(path.basename(path.dirname(standaloneOrOrgWithStanalonePathName)))}` +
+                  `${chalk.italic.red(
+                    path.basename(
+                      path.dirname(standaloneOrOrgWithStanalonePathName),
+                    ),
+                  )}` +
                   chalk.italic(`/${lastProjectFromArgName}`)
                 : chalk.italic(standaloneOrOrgWithStanalonePathName);
 
             Helpers.info(`
 
- ${chalk.bold('SMART CONTAINERS')} - can be used to publish npm organization packages ex. @org/package-name
- ${chalk.bold('NORMAL CONTAINERS')} - are just a wrapper for other project for easy
+ ${chalk.bold(
+   'SMART CONTAINERS',
+ )} - can be used to publish npm organization packages ex. @org/package-name
+ ${chalk.bold(
+   'NORMAL CONTAINERS',
+ )} - are just a wrapper for other project for easy
  git pull/push or children packages release. Normal container can wrap "standalone" or "smart container" projects.
 
              `);
@@ -383,7 +397,7 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
       lastContainer.__node_modules.setToSmartContainer();
     }
 
-    await appProj.init(InitOptions.from({}));
+    await appProj.init('initing new app', InitOptions.from({}));
 
     if (lastContainer?.__isSmartContainer) {
       appProj.__removeStandaloneSources();
@@ -435,9 +449,8 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
     ) {
       if (appProj.__isSmartContainerChild) {
         lastContainer.__packageJson.data.tnp.smartContainerBuildTarget =
-          _.first(
-            lastContainer.children.filter(c => c.name !== appProj.name),
-          )?.name;
+          _.first(lastContainer.children.filter(c => c.name !== appProj.name))
+            ?.name;
         lastContainer.__packageJson.save('updating smart container target');
       }
     }
@@ -487,10 +500,13 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
     for (let index = 0; index < containers.length; index++) {
       const container = containers[index];
       if (container.__isSmartContainer) {
-        await container.init();
+        await container.init(
+          'initing new smart container',
+          InitOptions.from({}),
+        );
         container.__recreate.initVscode();
       } else {
-        await container.init();
+        await container.init('initing new container', InitOptions.from({}));
         container.__recreate.initVscode();
       }
     }
