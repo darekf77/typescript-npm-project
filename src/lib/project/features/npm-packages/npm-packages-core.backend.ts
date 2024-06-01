@@ -96,11 +96,8 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
       } catch (err) {
         console.error(err);
         //#region linux message about memoery
-        const isLinux = (['win32', 'darwin'] as NodeJS.Platform[]).includes(
-          process.platform,
-        );
-        const linuxMessage = isLinux
-          ? `
+
+        const errorMessage = `
 
 ${chalk.red('Make sure that you:')}:
 
@@ -108,17 +105,15 @@ ${chalk.red('Make sure that you:')}:
 
 export NODE_OPTIONS=--max_old_space_size=4096
 
-2. Increase the amount of inotify watchers:
+2. Increase the amount of inotify watchers (linux only):
 
 echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
 
-        `
-          : '';
-
+        `;
         Helpers.error(
           `[${config.frameworkName}] Error during npm install...
 
-        ${linuxMessage}
+        ${errorMessage}
 
         `,
           false,
@@ -129,10 +124,7 @@ echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo s
     }
 
     this.project.quickFixes.nodeModulesPackagesZipReplacement();
-    PackagesRecognition.startFor(
-      this.project,
-      'after npm install',
-    );
+    PackagesRecognition.startFor(this.project, 'after npm install');
 
     if (!generatLockFiles) {
       if (useYarn) {
