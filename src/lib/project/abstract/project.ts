@@ -1,5 +1,9 @@
 //#region imports
-import { config, extAllowedToReplace, TAGS } from 'tnp-config/src';
+import {
+  config,
+  extAllowedToReplace,
+  TAGS,
+} from 'tnp-config/src';
 import { _, crossPlatformPath, path, CoreModels } from 'tnp-core/src';
 import { Helpers, BaseProjectResolver, BaseProject } from 'tnp-helpers/src';
 import { LibTypeArr } from 'tnp-config/src';
@@ -604,13 +608,16 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   //#region ISOMORPHIC LIBS
   private __inMemoryIsomorphicLibs = [];
 
-  public resolveAndAddIsomorphicLibsToMemoery(libsNames: string[], informAboutDiff = false) {
+  public resolveAndAddIsomorphicLibsToMemoery(
+    libsNames: string[],
+    informAboutDiff = false,
+  ) {
     // console.log(`add ed isomorphic libs to memory: ${libsNames.join(', ')}`);
     if (!this.coreContainer) {
       return;
     }
 
-    if(informAboutDiff) {
+    if (informAboutDiff) {
       const current = this.coreContainer.__inMemoryIsomorphicLibs;
       const newAdded = libsNames.filter(l => !current.includes(l));
       for (const packageName of newAdded) {
@@ -624,8 +631,6 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       ...this.coreContainer.__inMemoryIsomorphicLibs,
       ...libsNames,
     ]);
-
-
   }
 
   /**
@@ -1915,6 +1920,70 @@ trim_trailing_whitespace = false
       ),
       ...this.__projectSpecyficFiles(),
     ];
+    //#endregion
+  }
+  //#endregion
+
+  //#region getters & methods / compiled project files and folder
+  /**
+   * BIG TODO Organization project when compiled in dist folder
+   * souold store backend files in lib folder
+   */
+  public get compiledProjectFilesAndFolders(): string[] {
+    //#region @backendFunc
+    const jsDtsMapsArr = ['.js', '.js.map', '.d.ts'];
+    if (this.__isSmartContainer) {
+      return this.children.reduce(
+        (a, c) =>
+          a
+            .concat(c.compiledProjectFilesAndFolders.map(a => `${c.name}/${a}`))
+            .concat(
+              Helpers.foldersFrom(c.pathFor(['src/lib']), {
+                recursive: false,
+              }).map(aaa =>
+                crossPlatformPath(`${c.name}/${path.basename(aaa)}`),
+              ),
+            )
+            .concat(
+              jsDtsMapsArr.reduce((a, b) => {
+                return a.concat([
+                  ...Helpers.filesFrom(c.pathFor(['src/lib']))
+                    .map(aaa =>
+                      crossPlatformPath(`${c.name}/${path.basename(aaa)}`),
+                    )
+                    .map(aa => `${aa.replace('.ts', '')}${b}`),
+                ]);
+              }, []),
+            ),
+        [],
+      );
+    } else if (this.__isStandaloneProject || this.__isSmartContainerChild) {
+      return [
+        config.folder.bin,
+        config.folder.lib,
+        config.folder.assets,
+        config.folder.websql,
+        config.folder.browser,
+        config.file.firedev_jsonc,
+        config.file.tnpEnvironment_json,
+        config.file._gitignore,
+        config.file._npmignore,
+        config.file._npmrc,
+        config.file._npmrc,
+        'src.d.ts',
+        ...this.__resources,
+        config.file.package_json,
+        config.file.package_lock_json,
+        ...jsDtsMapsArr.reduce((a, b) => {
+          return a.concat([
+            ...['cli', 'index', 'start', 'run', 'global-typings'].map(
+              aa => `${aa}${b}`,
+            ),
+          ]);
+        }, []),
+      ];
+    }
+    return [];
     //#endregion
   }
   //#endregion

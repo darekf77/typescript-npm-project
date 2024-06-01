@@ -21,7 +21,7 @@ export class PackagesRecognition {
   //#endregion
 
   //#region static / from project
-  public static startFor(project: Project, reasonToSearch?: string): void {
+  public static startFor(project: Project, reasonToSeachPackages: string): void {
     //#region @backendFunc
     if (!project?.location || !project.coreContainer) {
       return;
@@ -29,7 +29,7 @@ export class PackagesRecognition {
     if (!this.instances[project.location]) {
       this.instances[project.location] = new PackagesRecognition(project);
       (this.instances[project.location] as PackagesRecognition).start(
-        reasonToSearch,
+        reasonToSeachPackages,
       );
     }
     //#endregion
@@ -54,14 +54,14 @@ export class PackagesRecognition {
 
   //#region methods & getters / start
 
-  private start(reasonToSearch?: string) {
+  private start(reasonToSeachPackages?: string) {
     //#region @backendFunc
     this.coreContainer.makeSureNodeModulesInstalled();
     let recognizedPackages = [];
     Helpers.taskStarted(
       `[${this.orginalProject.genericName}]` +
         ` Searching isomorphic packages for ${this.coreContainer.genericName}...`,
-      // +        ` reson "${reasonToSearch}"`,
+      // +        ` reson "${reasonToSeachPackages}"`,
     );
 
     //#region recreate json if not exists

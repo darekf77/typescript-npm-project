@@ -32,24 +32,7 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
   //#region getters & methods / select all project to copy to
   protected async selectAllProjectCopyto() {
     //#region  @backendFunc
-    const containerCoreProj = Project.by(
-      'container',
-      this.project.__frameworkVersion,
-    ) as Project;
     const independentProjects = [];
-
-    Helpers.log(
-      `[${config.frameworkName}][copytoall] UPDATING ALSO container core ${this.project.__frameworkVersion}...`,
-    );
-
-    const packageName = this.project.__isSmartContainer
-      ? '@' + this.project.name
-      : this.project.name;
-    Helpers.createSymLink(
-      crossPlatformPath([containerCoreProj.__node_modules.path, packageName]),
-      crossPlatformPath([containerCoreProj.__node_modules.path, packageName]),
-      { continueWhenExistedFolderDoesntExists: true },
-    );
 
     if (config.frameworkName === 'tnp' && this.project.name !== 'tnp') {
       // tnp in tnp is not being used at all
@@ -310,7 +293,7 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
   //#endregion
 
   updateTriggered = _.debounce(() => {
-    Helpers.logInfo(`[copy-manager] update triggered`);
+    // Helpers.logInfo(`[copy-manager] update triggered`);
   }, 1000);
 
   //#region async action

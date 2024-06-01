@@ -280,43 +280,6 @@ export class LibProjectStandalone extends LibPorjectBase {
   }
   //#endregion
 
-  //#region update core/special projects/container
-  updateTnpAndCoreContainers(realCurrentProj: Project) {
-    //#region @notForNpm
-    const tnpProj = Project.ins.Tnp;
-
-    const updateLocalFiredevProjectWithOwnNodeModules =
-      config.frameworkName === 'tnp' &&
-      realCurrentProj.name !== 'tnp' &&
-      realCurrentProj.__frameworkVersion === tnpProj.__frameworkVersion;
-
-    const coreCont = Project.by(
-      'container',
-      realCurrentProj.__frameworkVersion,
-    ) as Project;
-
-    const arrTrusted =
-      tnpProj.__packageJson.data.tnp.core.dependencies.trusted[
-        this.project.__frameworkVersion
-      ];
-    if (
-      (_.isString(arrTrusted) && arrTrusted === '*') ||
-      (_.isArray(arrTrusted) && arrTrusted.includes(this.project.name))
-    ) {
-      [
-        ...(updateLocalFiredevProjectWithOwnNodeModules ? [tnpProj] : []),
-        coreCont,
-      ]
-        .filter(f => !!f)
-        .forEach(c => {
-          c.__node_modules.updateFromReleaseDist(realCurrentProj);
-        });
-    }
-
-    //#endregion
-  }
-  //#endregion
-
   //#region bump version in other projects
   /**
    * Return how many projects has changed

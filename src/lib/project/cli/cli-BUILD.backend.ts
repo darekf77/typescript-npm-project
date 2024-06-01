@@ -88,6 +88,11 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
     );
   }
 
+  compiledPathes() {
+    console.log(this.project.compiledProjectFilesAndFolders.join('\n'));
+    this._exit();
+  }
+
   async start() {
     const { smartContainerTargetName } = this.params;
 

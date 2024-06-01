@@ -284,6 +284,8 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
           '.vscode',
           '/dist',
           '/src',
+          '/app',
+          '/source',
           '/docs',
           '/preview',
           '/tests',
