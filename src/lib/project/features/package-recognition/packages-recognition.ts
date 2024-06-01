@@ -56,7 +56,7 @@ export class PackagesRecognition {
 
   private start(reasonToSeachPackages?: string) {
     //#region @backendFunc
-    this.coreContainer.makeSureNodeModulesInstalled();
+    this.coreContainer.__node_modules.reinstallIfNeeded();
     let recognizedPackages = [];
     Helpers.taskStarted(
       `[${this.orginalProject.genericName}]` +
