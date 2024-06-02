@@ -1,9 +1,5 @@
 //#region imports
-import {
-  config,
-  extAllowedToReplace,
-  TAGS,
-} from 'tnp-config/src';
+import { config, extAllowedToReplace, TAGS } from 'tnp-config/src';
 import { _, crossPlatformPath, path, CoreModels } from 'tnp-core/src';
 import { Helpers, BaseProjectResolver, BaseProject } from 'tnp-helpers/src';
 import { LibTypeArr } from 'tnp-config/src';
@@ -639,10 +635,22 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   public get allIsomorphicPackagesFromMemory(): string[] {
     //#region @backendFunc
     if (this.coreContainer?.__inMemoryIsomorphicLibs.length === 0) {
-      PackagesRecognition.startFor(
-        this,
-        'first time accessing isomorphic libs',
+      this.resolveAndAddIsomorphicLibsToMemoery(
+        PackagesRecognition.instance(this.coreContainer).libsFromJson,
+        true
       );
+      if (this.coreContainer?.__inMemoryIsomorphicLibs.length === 0) {
+        Helpers.error(
+          `Please synchonize ${config.frameworkName} framework.
+
+
+        ${config.frameworkName} sync
+
+        `,
+          false,
+          true,
+        );
+      }
     }
     return this.coreContainer.__inMemoryIsomorphicLibs;
     //#endregion
@@ -3989,7 +3997,7 @@ ${otherProjectNames
     //#endregion
 
     //#region prevent empty firedev node_modules
-    this.coreContainer.__node_modules.reinstallIfNeeded();
+    await this.coreContainer.__node_modules.reinstallIfNeeded();
     //#endregion
 
     //#region prevent not requested framework version

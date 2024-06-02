@@ -274,7 +274,7 @@ export class LibProjectStandalone extends LibPorjectBase {
         }
 
         await this.bumpVersionInOtherProjects(newVersion);
-        this.updateTnpAndCoreContainers(realCurrentProj);
+        await this.updateTnpAndCoreContainers(realCurrentProj);
       },
     );
   }

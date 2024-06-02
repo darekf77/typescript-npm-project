@@ -81,7 +81,7 @@ export class NodeModules extends BaseFeatureForProject<Project> {
     );
   }
 
-  updateFromReleaseDist(sourceOfCompiledProject: Project) {
+  async updateFromReleaseDist(sourceOfCompiledProject: Project) {
     //#region @backendFunc
 
     //#region source folder
@@ -131,7 +131,7 @@ export class NodeModules extends BaseFeatureForProject<Project> {
     }
     //#endregion
 
-    PackagesRecognition.startFor(
+    await PackagesRecognition.startFor(
       sourceOfCompiledProject,
       'after release update',
     );

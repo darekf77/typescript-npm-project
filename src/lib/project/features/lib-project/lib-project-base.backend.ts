@@ -31,7 +31,7 @@ export abstract class LibPorjectBase extends BaseFeatureForProject<Project> {
   };
 
   //#region update core/special projects/container
-  updateTnpAndCoreContainers(realCurrentProj: Project) {
+  async updateTnpAndCoreContainers(realCurrentProj: Project) {
     //#region @notForNpm
     const tnpProj = Project.ins.Tnp;
 
@@ -40,19 +40,20 @@ export abstract class LibPorjectBase extends BaseFeatureForProject<Project> {
       realCurrentProj.name !== 'tnp' &&
       realCurrentProj.__frameworkVersion === tnpProj.__frameworkVersion;
 
-    const coreContainter = Project.by( // TODO not needed ??
+    const coreContainter = Project.by(
+      // TODO not needed ??
       'container',
       realCurrentProj.__frameworkVersion,
     ) as Project;
 
-    [
+    const toUpdate = [
       ...(updateLocalFiredevProjectWithOwnNodeModules ? [tnpProj] : []),
       coreContainter,
-    ]
-      .filter(f => !!f)
-      .forEach(c => {
-        c.__node_modules.updateFromReleaseDist(realCurrentProj);
-      });
+    ].filter(f => !!f);
+
+    for (const c of toUpdate) {
+      await c.__node_modules.updateFromReleaseDist(realCurrentProj);
+    }
 
     //#endregion
   }

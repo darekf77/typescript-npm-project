@@ -65,7 +65,7 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
     };
   }
 
-  protected actualNpmProcess(options?: Models.ActualNpmInstallOptions) {
+  protected async actualNpmProcess(options?: Models.ActualNpmInstallOptions) {
     if (this.project.__isDocker) {
       return;
     }
@@ -124,7 +124,7 @@ echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo s
     }
 
     this.project.quickFixes.nodeModulesPackagesZipReplacement();
-    PackagesRecognition.startFor(this.project, 'after npm install');
+    await PackagesRecognition.startFor(this.project, 'after npm install');
 
     if (!generatLockFiles) {
       if (useYarn) {

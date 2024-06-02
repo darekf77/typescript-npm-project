@@ -129,11 +129,11 @@ export class NpmPackagesBase extends NpmPackagesCore {
       await this.project.__node_modules.linkFromCoreContainer();
     } else {
       if (fullInstall) {
-        this.actualNpmProcess({ reason: triggeredMsg });
+        await this.actualNpmProcess({ reason: triggeredMsg });
       } else {
-        npmPackages.forEach(pkg => {
-          this.actualNpmProcess({ pkg, reason: triggeredMsg, remove });
-        });
+        for (const pkg of npmPackages) {
+          await this.actualNpmProcess({ pkg, reason: triggeredMsg, remove });
+        }
       }
     }
 

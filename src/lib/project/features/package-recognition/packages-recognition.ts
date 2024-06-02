@@ -21,14 +21,30 @@ export class PackagesRecognition {
   //#endregion
 
   //#region static / from project
-  public static startFor(project: Project, reasonToSeachPackages: string): void {
+
+  public static instance(project: Project): PackagesRecognition {
     //#region @backendFunc
     if (!project?.location || !project.coreContainer) {
       return;
     }
     if (!this.instances[project.location]) {
       this.instances[project.location] = new PackagesRecognition(project);
-      (this.instances[project.location] as PackagesRecognition).start(
+    }
+    return this.instances[project.location] as PackagesRecognition;
+    //#endregion
+  }
+
+  public static async startFor(
+    project: Project,
+    reasonToSeachPackages: string,
+  ): Promise<void> {
+    //#region @backendFunc
+    if (!project?.location || !project.coreContainer) {
+      return;
+    }
+    if (!this.instances[project.location]) {
+      this.instances[project.location] = new PackagesRecognition(project);
+      await (this.instances[project.location] as PackagesRecognition).start(
         reasonToSeachPackages,
       );
     }
@@ -50,13 +66,21 @@ export class PackagesRecognition {
       config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES,
     ]);
   }
+
+  get libsFromJson(): string[] {
+    const json = Helpers.readJson(this.jsonPath) || {};
+    console.log(`json: `,this.jsonPath )
+    const arr = json[config.array.isomorphicPackages] || [];
+    console.log(`libs from json: `,arr);
+    return arr;
+  }
   //#endregion
 
   //#region methods & getters / start
 
-  private start(reasonToSeachPackages?: string) {
+  private async start(reasonToSeachPackages?: string) {
     //#region @backendFunc
-    this.coreContainer.__node_modules.reinstallIfNeeded();
+    await this.coreContainer.__node_modules.reinstallIfNeeded();
     let recognizedPackages = [];
     Helpers.taskStarted(
       `[${this.orginalProject.genericName}]` +
