@@ -128,9 +128,9 @@ export class PackagesRecognition {
     //#endregion
 
     recognizedPackages = [
-      ...recognizedPackages,
+      ...(recognizedPackages || []),
       ...this.orginalProject.selftIsomorphicPackages,
-      ...fromNodeModulesFolderSearch,
+      ...(fromNodeModulesFolderSearch || []),
       ...Object.values(config.frameworkNames),
     ].filter(f => !f.startsWith(PREFIXES.RESTORE_NPM));
 
