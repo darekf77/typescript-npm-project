@@ -137,10 +137,8 @@ export class NpmPackagesBase extends NpmPackagesCore {
       }
     }
 
-    if (!this.project.__node_modules.isLink) {
-      if (!this.project.__npmPackages.useLinkAsNodeModules) {
-        this.project.__node_modules.dedupe();
-      }
+    if(this.project.__node_modules.shouldDedupePackages) {
+      this.project.__node_modules.dedupe();
     }
 
     this.project.__packageJson.save(

@@ -556,7 +556,7 @@
     "private": false
   },
   "name": "tnp",
-  "version": "16.100.24",
+  "version": "16.100.25",
   "bin": {
     "t": "bin/t",
     "t-debug": "bin/t-debug",
@@ -565,7 +565,7 @@
     "tnp-debug": "bin/tnp-debug",
     "tnp-debug-brk": "bin/tnp-debug-brk"
   },
-  "lastBuildTagHash": "6d78c600cf25ccaf91c73217648570751f04d47f",
+  "lastBuildTagHash": "fc650eb59a475c85d66bd37424431ad3b0f5ee75",
   "scripts": {
     "activate": "npm i --force && firedev dedupe && npx tsc && firedev link && tnp bd"
   },

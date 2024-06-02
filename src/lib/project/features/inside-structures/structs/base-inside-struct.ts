@@ -1,4 +1,4 @@
-import { BuildOptions, InitOptions } from 'tnp/build-options';
+import { BuildOptions, InitOptions } from '../../../../build-options';
 import { Project } from '../../../abstract/project';
 import { InsideStruct } from '../inside-struct';
 

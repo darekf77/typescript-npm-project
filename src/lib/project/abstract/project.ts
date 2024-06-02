@@ -52,7 +52,7 @@ import { glob } from 'tnp-core/src';
 import { LibProjectStandalone } from '../features/lib-project/lib-project-standalone.backend';
 import { LibProjectSmartContainer } from '../features/lib-project/lib-project-smart-container.backend';
 import { LibProjectVscodeExt } from '../features/lib-project/lib-project-vscode-ext';
-import { chalk } from 'tnp-core';
+import { chalk } from 'tnp-core/src';
 import {
   BuildProcess,
   BuildProcessController,
@@ -4300,6 +4300,7 @@ ${config.frameworkName} start
     isSmartContainerChild: ${this.__isSmartContainerChild}
     isSmartContainerTarget: ${this.__isSmartContainerTarget}
     isSmartContainerTargetNonClient: ${this.__isSmartContainerTargetNonClient}
+    should dedupe packages ${this.__node_modules.shouldDedupePackages}
 
     genericName: ${this.genericName}
 

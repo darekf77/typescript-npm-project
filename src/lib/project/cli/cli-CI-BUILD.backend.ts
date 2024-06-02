@@ -5,7 +5,7 @@ import { CommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
 import { BuildOptions } from '../../build-options';
 import { TEMP_DOCS } from '../../constants';
-import { config } from 'tnp-config';
+import { config } from 'tnp-config/src';
 
 class $CiBuild extends CommandLineFeature<BuildOptions, Project> {
   protected async __initialize__() {

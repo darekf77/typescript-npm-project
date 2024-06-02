@@ -74,6 +74,13 @@ export class NodeModules extends BaseFeatureForProject<Project> {
     return !this.exist;
   }
 
+  get shouldDedupePackages() {
+    return (
+      !this.project.__npmPackages.useLinkAsNodeModules &&
+      !this.project.__node_modules.isLink
+    );
+  }
+
   updateFromReleaseDist(sourceOfCompiledProject: Project) {
     //#region @backendFunc
 
