@@ -315,8 +315,8 @@ export class NodeModules extends BaseFeatureForProject<Project> {
     }
     if (!this.project.__node_modules.exist) {
       // TODO QUICK_FIX make it async install
-      this.project
-        .run(`${config.frameworkName} ${$Global.prototype.REINSTALL.name}`)
+      this.project //$Global.prototype.REINSTALL.name
+        .run(`${config.frameworkName} ${'REINSTALL'}`)
         .sync();
     }
     Helpers.remove(path.join(target, config.folder.node_modules));

@@ -389,7 +389,8 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
         `projects/container-${ver}`,
       ]);
       Helpers.run(
-        `${config.frameworkName} ${$Global.prototype.REINSTALL.name} --skipCoreCheck`,
+        // $Global.prototype.REINSTALL.name
+        `${config.frameworkName} ${'REINSTALL'} --skipCoreCheck`,
         {
           cwd: nodeModulesForContainer,
         },
@@ -439,7 +440,8 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
       try {
         child_process.execSync(
-          `${config.frameworkName}  ${$Global.prototype.ENV_INSTALL.name} --skipCoreCheck`,
+          //$Global.prototype.ENV_INSTALL.name
+          `${config.frameworkName}  ${'ENV_INSTALL'} --skipCoreCheck`,
           { stdio: [0, 1, 2] },
         );
       } catch (error) {
@@ -467,7 +469,8 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
       try {
         child_process.execSync(
-          `${config.frameworkName} ${$Global.prototype.INIT_CORE.name} --skipCoreCheck`,
+          //$Global.prototype.INIT_CORE.name
+          `${config.frameworkName} ${'INIT_CORE'} --skipCoreCheck`,
           {
             stdio: [0, 1, 2],
           },
@@ -665,7 +668,8 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       if (this.coreContainer?.__inMemoryIsomorphicLibs.length === 0) {
         this.coreContainer
           .run(
-            `${config.frameworkName}  ${$Global.prototype.reinstallCore.name}`,
+            // $Global.prototype.reinstallCore.name
+            `${config.frameworkName}  ${'reinstallCore'}`,
           )
           .sync();
         this.resolveAndAddIsomorphicLibsToMemoery(
