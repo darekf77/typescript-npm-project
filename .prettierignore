@@ -14,16 +14,15 @@ tmp-*
 **/src/assets/**/*.*
 .build
 projects
-dist*
 *.js
-bundle*
-browser
-browser*
-websql
-websql*
+/dist*
+/bundle*
+/browser
+/browser*
+/websql
+/websql*
 module*
 backup
 module
 www
 
-      

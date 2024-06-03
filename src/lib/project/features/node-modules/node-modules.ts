@@ -23,18 +23,18 @@ export class NodeModules extends BaseFeatureForProject<Project> {
       await coreContainer.__node_modules.reinstallIfNeeded();
       return;
     }
-    Helpers.taskStarted(
-      `Linking from core container ${coreContainer.name} ${this.project.genericName}`,
-    );
+    // Helpers.taskStarted(
+    //   `Linking from core container ${coreContainer.name} ${this.project.genericName}`,
+    // );
     await coreContainer.__node_modules.reinstallIfNeeded();
     Helpers.remove(this.project.__node_modules.path);
     Helpers.createSymLink(
       coreContainer.__node_modules.path,
       this.project.__node_modules.path,
     );
-    Helpers.taskDone(
-      `Linking from core container ${coreContainer.name} ${this.project.genericName}`,
-    );
+    // Helpers.taskDone(
+    //   `Linking from core container ${coreContainer.name} ${this.project.genericName}`,
+    // );
     //#endregion
   }
 

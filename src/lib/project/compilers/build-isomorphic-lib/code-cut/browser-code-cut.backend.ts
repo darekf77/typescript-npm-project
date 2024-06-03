@@ -8,22 +8,31 @@ import {
   chalk,
 } from 'tnp-core/src';
 
-import { config, extAllowedToReplace, frontEndOnly, TAGS } from 'tnp-config/src';
+import {
+  config,
+  extAllowedToReplace,
+  frontEndOnly,
+  TAGS,
+} from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
 import type { Project } from '../../../abstract/project';
 import { BuildOptions, InitOptions } from '../../../../build-options';
 import { Models } from '../../../../models';
 import { RegionRemover } from 'isomorphic-region-loader/src';
 import { MjsModule } from '../../../features/copy-manager/mjs-fesm-module-spliter.backend';
-import { labelReplacementCode, ReplaceOptionsExtended } from 'isomorphic-region-loader/src';
-
+import {
+  labelReplacementCode,
+  ReplaceOptionsExtended,
+} from 'isomorphic-region-loader/src';
+import { SplitFileProcess } from './file-split-process';
 
 //#endregion
 
 //#region consts
-const regexAsyncImport = /\ import\((\`|\'|\")([a-zA-Z|\-|\@|\/|\.]+)(\`|\'|\")\)/;
-const regexAsyncImportG = /\ import\((\`|\'|\")([a-zA-Z|\-|\@|\/|\.]+)(\`|\'|\")\)/g;
-
+const regexAsyncImport =
+  /\ import\((\`|\'|\")([a-zA-Z|\-|\@|\/|\.]+)(\`|\'|\")\)/;
+const regexAsyncImportG =
+  /\ import\((\`|\'|\")([a-zA-Z|\-|\@|\/|\.]+)(\`|\'|\")\)/g;
 
 const debugFiles = [
   // 'firedev-cms.models.ts'
@@ -46,12 +55,14 @@ const debugFiles = [
 //#endregion
 
 export class BrowserCodeCut {
-
   //#region static
   public static IsomorphicLibs = [];
   public static resolveAndAddIsomorphicLibs(libsNames: string[]) {
-    this.IsomorphicLibs = Helpers.arrays.uniqArray(BrowserCodeCut.IsomorphicLibs.concat(libsNames));
+    this.IsomorphicLibs = Helpers.arrays.uniqArray(
+      BrowserCodeCut.IsomorphicLibs.concat(libsNames),
+    );
   }
+
   //#endregion
 
   //#region fields & getters
@@ -62,27 +73,12 @@ export class BrowserCodeCut {
   private rawContentForAPPONLYBrowser: string;
   private rawContentBackend: string;
   /**
-  * ex. path/to/file-somewhere.ts or assets/something/here
-  * in src or tmp-src-dist etc.
-  */
+   * ex. path/to/file-somewhere.ts or assets/something/here
+   * in src or tmp-src-dist etc.
+   */
   private readonly relativePath: string;
   private readonly isWebsqlMode: boolean;
   private readonly absoluteBackendDestFilePath: string;
-
-
-  get isEmptyBrowserFile() {
-    return this.rawContentForBrowser.replace(/\s/g, '').trim() === '';
-  }
-
-  get isEmptyModuleBackendFile() {
-    return (this.rawContentBackend || '').replace(/\/\*\ \*\//g, '').trim().length === 0;
-  }
-
-  get additionalSmartPckages() {
-    const parent = this.getParentContainer();
-    const additionalSmartPckages = (!parent ? [] : parent.children.map(c => `@${parent.name}/${c.name}`));
-    return additionalSmartPckages;
-  }
 
   //#endregion
 
@@ -106,11 +102,16 @@ export class BrowserCodeCut {
     // console.log(`[incremental-build-process INSIDE BROWSER!!! '${this.buildOptions.baseHref}'`)
 
     this.absPathTmpSrcDistFolder = crossPlatformPath(absPathTmpSrcDistFolder);
-    this.absFileSourcePathBrowserOrWebsql = crossPlatformPath(absFileSourcePathBrowserOrWebsql);
-    this.absFileSourcePathBrowserOrWebsqlAPPONLY = this.absFileSourcePathBrowserOrWebsql.replace(
-      `tmp-src-${buildOptions.outDir}${buildOptions.websql ? '-websql' : ''}`,
-      `tmp-src-app-${buildOptions.outDir}${buildOptions.websql ? '-websql' : ''}`
-    ); // for slighted modifed app release dist
+    this.absFileSourcePathBrowserOrWebsql = crossPlatformPath(
+      absFileSourcePathBrowserOrWebsql,
+    );
+    this.absFileSourcePathBrowserOrWebsqlAPPONLY =
+      this.absFileSourcePathBrowserOrWebsql.replace(
+        `tmp-src-${buildOptions.outDir}${buildOptions.websql ? '-websql' : ''}`,
+        `tmp-src-app-${buildOptions.outDir}${
+          buildOptions.websql ? '-websql' : ''
+        }`,
+      ); // for slighted modifed app release dist
 
     this.absSourcePathFromSrc = crossPlatformPath(absSourcePathFromSrc);
 
@@ -120,33 +121,49 @@ export class BrowserCodeCut {
     // }
 
     if (project.__isStandaloneProject) {
-      if (absSourcePathFromSrc
-        .replace(crossPlatformPath([project.location, config.folder.src]), '')
-        .startsWith('/assets/')
+      if (
+        absSourcePathFromSrc
+          .replace(crossPlatformPath([project.location, config.folder.src]), '')
+          .startsWith('/assets/')
       ) {
         this.isAssetsFile = true;
       }
     }
 
-    this.relativePath = crossPlatformPath(this.absFileSourcePathBrowserOrWebsql)
-      .replace(`${this.absPathTmpSrcDistFolder}/`, '')
+    this.relativePath = crossPlatformPath(
+      this.absFileSourcePathBrowserOrWebsql,
+    ).replace(`${this.absPathTmpSrcDistFolder}/`, '');
 
-    this.absoluteBackendDestFilePath = crossPlatformPath(path.join(
-      this.absPathTmpSrcDistFolder.replace('tmp-src', 'tmp-source'),
-      this.relativePath, // .replace('-websql', '') // backend is ONE
-    ));
+    this.absoluteBackendDestFilePath = crossPlatformPath(
+      path.join(
+        this.absPathTmpSrcDistFolder.replace('tmp-src', 'tmp-source'),
+        this.relativePath, // .replace('-websql', '') // backend is ONE
+      ),
+    );
 
     // console.log('RELATIVE ', this.relativePath)
 
-    this.isWebsqlMode = (this.relativePath.startsWith(`tmp-src-${config.folder.dist}-${config.folder.websql}`));
+    this.isWebsqlMode = this.relativePath.startsWith(
+      `tmp-src-${config.folder.dist}-${config.folder.websql}`,
+    );
   }
   //#endregion
 
   //#region methods
 
-  //#region methods / init
+  //#region methods & getters / init
+  splitFileProcess: SplitFileProcess;
   init() {
-    this.rawContentForBrowser = this.removeSrcAtEndFromImortExports(Helpers.readFile(this.absSourcePathFromSrc, void 0, true) || '');
+    const orgContent =
+      Helpers.readFile(this.absSourcePathFromSrc, void 0, true) || '';
+    this.splitFileProcess = new SplitFileProcess(
+      orgContent,
+      this.absSourcePathFromSrc,
+      this.isomorphicPackagesNames,
+    );
+    this.rawContentForBrowser = this.removeSrcAtEndFromImortExports(
+      this.splitFileProcess.content,
+    );
     this.rawContentForAPPONLYBrowser = this.rawContentForBrowser; // TODO not needed ?
     this.rawContentBackend = this.rawContentForBrowser; // at the beginning those are normal files from src
     return this;
@@ -154,99 +171,183 @@ export class BrowserCodeCut {
 
   //#endregion
 
-  //#region methods / init and save
-  private replaceAssetsPath = (absDestinationPath: string) => {
-    const isAsset = !this.project.__isSmartContainerTarget && this.relativePath.startsWith(`${config.folder.assets}/`);
-    return isAsset ? absDestinationPath.replace('/assets/', `/assets/assets-for/${this.project.name}/`) : absDestinationPath;
+  get isomorphicPackagesNames() {
+    const parentContainer = this.getParentContainer();
+    let packagesNames = BrowserCodeCut.IsomorphicLibs;
+    packagesNames = packagesNames.concat([
+      ...(parentContainer ? [] : [this.project.name]),
+      ...this.additionalSmartPckages,
+    ]);
+    return BrowserCodeCut.IsomorphicLibs;
   }
+
+  //#region methods & getters / init and save
+  private replaceAssetsPath = (absDestinationPath: string) => {
+    const isAsset =
+      !this.project.__isSmartContainerTarget &&
+      this.relativePath.startsWith(`${config.folder.assets}/`);
+    return isAsset
+      ? absDestinationPath.replace(
+          '/assets/',
+          `/assets/assets-for/${this.project.name}/`,
+        )
+      : absDestinationPath;
+  };
 
   initAndSave(remove = false) {
     if (remove) {
-      Helpers.removeIfExists(this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsql));
-      Helpers.removeIfExists(this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsqlAPPONLY));
-      Helpers.removeIfExists(this.replaceAssetsPath(this.absoluteBackendDestFilePath));
+      Helpers.removeIfExists(
+        this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsql),
+      );
+      Helpers.removeIfExists(
+        this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsqlAPPONLY),
+      );
+      Helpers.removeIfExists(
+        this.replaceAssetsPath(this.absoluteBackendDestFilePath),
+      );
     } else {
       // this is needed for json in src/lib or something
-      const realAbsSourcePathFromSrc = fse.realpathSync(this.absSourcePathFromSrc);
-      if (!Helpers.exists(realAbsSourcePathFromSrc) || Helpers.isFolder(realAbsSourcePathFromSrc)) {
+      const realAbsSourcePathFromSrc = fse.realpathSync(
+        this.absSourcePathFromSrc,
+      );
+      if (
+        !Helpers.exists(realAbsSourcePathFromSrc) ||
+        Helpers.isFolder(realAbsSourcePathFromSrc)
+      ) {
         return;
       }
 
       try {
-        Helpers.copyFile(this.absSourcePathFromSrc, this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsql));
-        Helpers.copyFile(this.absSourcePathFromSrc, this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsqlAPPONLY));
+        Helpers.copyFile(
+          this.absSourcePathFromSrc,
+          this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsql),
+        );
+        Helpers.copyFile(
+          this.absSourcePathFromSrc,
+          this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsqlAPPONLY),
+        );
         // final straight copy to tmp-source-folder
-        Helpers.copyFile(this.absSourcePathFromSrc, this.replaceAssetsPath(this.absoluteBackendDestFilePath));
+        Helpers.copyFile(
+          this.absSourcePathFromSrc,
+          this.replaceAssetsPath(this.absoluteBackendDestFilePath),
+        );
       } catch (error) {
-        Helpers.warn(`[firedev][browser-code-cut] file not found ${this.absSourcePathFromSrc}`)
+        Helpers.warn(
+          `[firedev][browser-code-cut] file not found ${this.absSourcePathFromSrc}`,
+        );
       }
     }
-
   }
   //#endregion
 
-  //#region methods / save empty file
+  //#region methods & getters / is empty browser file
+  get isEmptyBrowserFile() {
+    return this.rawContentForBrowser.replace(/\s/g, '').trim() === '';
+  }
+  //#endregion
+
+  //#region methods & getters / is empty module backend file
+  get isEmptyModuleBackendFile() {
+    return (
+      (this.rawContentBackend || '').replace(/\/\*\ \*\//g, '').trim()
+        .length === 0
+    );
+  }
+  //#endregion
+
+  //#region methods & getters / additional smart packages
+  get additionalSmartPckages() {
+    const parent = this.getParentContainer();
+    const additionalSmartPckages = !parent
+      ? []
+      : parent.children.map(c => `@${parent.name}/${c.name}`);
+    return additionalSmartPckages;
+  }
+  //#endregion
+
+  //#region methods & getters / save empty file
   private saveEmptyFile(isTsFile: boolean, endOfBrowserOrWebsqlCode: string) {
-    if (!fse.existsSync(path.dirname(this.absFileSourcePathBrowserOrWebsql))) { // write empty instead unlink
+    if (!fse.existsSync(path.dirname(this.absFileSourcePathBrowserOrWebsql))) {
+      // write empty instead unlink
       fse.mkdirpSync(path.dirname(this.absFileSourcePathBrowserOrWebsql));
     }
-    if (!fse.existsSync(path.dirname(this.absFileSourcePathBrowserOrWebsqlAPPONLY))) { // write empty instead unlink
-      fse.mkdirpSync(path.dirname(this.absFileSourcePathBrowserOrWebsqlAPPONLY));
+    if (
+      !fse.existsSync(
+        path.dirname(this.absFileSourcePathBrowserOrWebsqlAPPONLY),
+      )
+    ) {
+      // write empty instead unlink
+      fse.mkdirpSync(
+        path.dirname(this.absFileSourcePathBrowserOrWebsqlAPPONLY),
+      );
     }
     if (isTsFile) {
       if (!this.relativePath.startsWith('app/')) {
         fse.writeFileSync(
           this.absFileSourcePathBrowserOrWebsql,
-          `/* files for browser${this.isWebsqlMode
-            ? '-websql' + endOfBrowserOrWebsqlCode
-            : '' + endOfBrowserOrWebsqlCode
+          `/* files for browser${
+            this.isWebsqlMode
+              ? '-websql' + endOfBrowserOrWebsqlCode
+              : '' + endOfBrowserOrWebsqlCode
           } mode */`,
-          'utf8'
+          'utf8',
         );
       }
       fse.writeFileSync(
         this.absFileSourcePathBrowserOrWebsqlAPPONLY,
-        `/* files for browser${this.isWebsqlMode
-          ? '-websql' + endOfBrowserOrWebsqlCode
-          : '' + endOfBrowserOrWebsqlCode
+        `/* files for browser${
+          this.isWebsqlMode
+            ? '-websql' + endOfBrowserOrWebsqlCode
+            : '' + endOfBrowserOrWebsqlCode
         } mode */`,
-        'utf8'
+        'utf8',
       );
     } else {
       if (!this.relativePath.startsWith('app/')) {
-        fse.writeFileSync(
-          this.absFileSourcePathBrowserOrWebsql, ``,
-          'utf8'
-        );
+        fse.writeFileSync(this.absFileSourcePathBrowserOrWebsql, ``, 'utf8');
       }
       fse.writeFileSync(
-        this.absFileSourcePathBrowserOrWebsqlAPPONLY, ``,
-        'utf8'
+        this.absFileSourcePathBrowserOrWebsqlAPPONLY,
+        ``,
+        'utf8',
       );
     }
   }
   //#endregion
 
-  //#region methods / save normal file
+  //#region methods & getters / save normal file
   private saveNormalFile(isTsFile: boolean, endOfBrowserOrWebsqlCode?: string) {
     // console.log('SAVE NORMAL FILE')
     if (this.isAssetsFile) {
-      this.absFileSourcePathBrowserOrWebsql = this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsql);
+      this.absFileSourcePathBrowserOrWebsql = this.replaceAssetsPath(
+        this.absFileSourcePathBrowserOrWebsql,
+      );
       // console.log(`ASSETE: ${this.absFileSourcePathBrowserOrWebsql}`)
     }
     if (this.isAssetsFile) {
-      this.absFileSourcePathBrowserOrWebsqlAPPONLY = this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsqlAPPONLY);
+      this.absFileSourcePathBrowserOrWebsqlAPPONLY = this.replaceAssetsPath(
+        this.absFileSourcePathBrowserOrWebsqlAPPONLY,
+      );
       // console.log(`ASSETE: ${this.absFileSourcePathBrowserOrWebsql}`)
     }
     if (!fse.existsSync(path.dirname(this.absFileSourcePathBrowserOrWebsql))) {
       fse.mkdirpSync(path.dirname(this.absFileSourcePathBrowserOrWebsql));
     }
-    if (!fse.existsSync(path.dirname(this.absFileSourcePathBrowserOrWebsqlAPPONLY))) {
-      fse.mkdirpSync(path.dirname(this.absFileSourcePathBrowserOrWebsqlAPPONLY));
+    if (
+      !fse.existsSync(
+        path.dirname(this.absFileSourcePathBrowserOrWebsqlAPPONLY),
+      )
+    ) {
+      fse.mkdirpSync(
+        path.dirname(this.absFileSourcePathBrowserOrWebsqlAPPONLY),
+      );
     }
 
     this.processAssetsLinksForApp();
-    this.warnAboutUsingFilesFromNodeModulesWithLibFiles(this.rawContentForAPPONLYBrowser, this.absFileSourcePathBrowserOrWebsqlAPPONLY);
+    this.warnAboutUsingFilesFromNodeModulesWithLibFiles(
+      this.rawContentForAPPONLYBrowser,
+      this.absFileSourcePathBrowserOrWebsqlAPPONLY,
+    );
 
     if (!this.isAssetsFile && this.relativePath.endsWith('.backend.ts')) {
       return;
@@ -254,32 +355,48 @@ export class BrowserCodeCut {
 
     if (isTsFile) {
       if (!this.relativePath.startsWith('app/')) {
-        fse.writeFileSync(this.absFileSourcePathBrowserOrWebsql,
-          this.changeBrowserOrWebsqlFileContentBeforeSave(this.rawContentForBrowser, endOfBrowserOrWebsqlCode, this.absFileSourcePathBrowserOrWebsql),
-          'utf8'
+        fse.writeFileSync(
+          this.absFileSourcePathBrowserOrWebsql,
+          this.changeBrowserOrWebsqlFileContentBeforeSave(
+            this.rawContentForBrowser,
+            endOfBrowserOrWebsqlCode,
+            this.absFileSourcePathBrowserOrWebsql,
+          ),
+          'utf8',
         );
       }
-      fse.writeFileSync(this.absFileSourcePathBrowserOrWebsqlAPPONLY,
-        this.changeBrowserOrWebsqlFileContentBeforeSave(this.rawContentForAPPONLYBrowser, endOfBrowserOrWebsqlCode, this.absFileSourcePathBrowserOrWebsqlAPPONLY),
-        'utf8'
+      fse.writeFileSync(
+        this.absFileSourcePathBrowserOrWebsqlAPPONLY,
+        this.changeBrowserOrWebsqlFileContentBeforeSave(
+          this.rawContentForAPPONLYBrowser,
+          endOfBrowserOrWebsqlCode,
+          this.absFileSourcePathBrowserOrWebsqlAPPONLY,
+        ),
+        'utf8',
       );
     } else {
       if (!this.relativePath.startsWith('app/')) {
-        fse.writeFileSync(this.absFileSourcePathBrowserOrWebsql,
+        fse.writeFileSync(
+          this.absFileSourcePathBrowserOrWebsql,
           this.rawContentForBrowser,
-          'utf8'
+          'utf8',
         );
       }
-      fse.writeFileSync(this.absFileSourcePathBrowserOrWebsqlAPPONLY,
+      fse.writeFileSync(
+        this.absFileSourcePathBrowserOrWebsqlAPPONLY,
         this.rawContentForAPPONLYBrowser,
-        'utf8'
+        'utf8',
       );
     }
   }
   //#endregion
 
-  //#region methods / remove src from imports
-  private processRegexForSrcRemove(regexEnd: RegExp, line: string, matchType: 'from_import_export' | 'imports' | 'require'): string {
+  //#region methods & getters / remove src from imports
+  private processRegexForSrcRemove(
+    regexEnd: RegExp,
+    line: string,
+    matchType: 'from_import_export' | 'imports' | 'require',
+  ): string {
     const matches = line.match(regexEnd);
     const firstMatch = _.first(matches) as string;
 
@@ -296,7 +413,7 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods / remove src from imports/exports
+  //#region methods & getters / remove src from imports/exports
   private removeSrcAtEndFromImortExports(content: string): string {
     const regexEnd = /from\s+(\'|\").+\/src(\'|\")/g;
     const singleLineImporrt = /import\((\'|\"|\`).+\/src(\'|\"|\`)\)/g;
@@ -305,41 +422,60 @@ export class BrowserCodeCut {
     const commentMultilieStart = /^\/\*/;
     const commentSingleLineStart = /^\/\//;
 
-    return content.split(/\r?\n/).map((line, index) => {
-      const trimedLine = line.trimStart();
-      if (commentMultilieStart.test(trimedLine) || commentSingleLineStart.test(trimedLine)) {
+    return content
+      .split(/\r?\n/)
+      .map((line, index) => {
+        const trimedLine = line.trimStart();
+        if (
+          commentMultilieStart.test(trimedLine) ||
+          commentSingleLineStart.test(trimedLine)
+        ) {
+          return line;
+        }
+        if (regexEnd.test(line)) {
+          return this.processRegexForSrcRemove(
+            regexEnd,
+            line,
+            'from_import_export',
+          );
+        }
+        if (singleLineImporrt.test(line)) {
+          return this.processRegexForSrcRemove(
+            singleLineImporrt,
+            line,
+            'imports',
+          );
+        }
+        if (singleLineRequire.test(line)) {
+          return this.processRegexForSrcRemove(
+            singleLineRequire,
+            line,
+            'require',
+          );
+        }
         return line;
-      }
-      if (regexEnd.test(line)) {
-        return this.processRegexForSrcRemove(regexEnd, line, 'from_import_export');
-      }
-      if (singleLineImporrt.test(line)) {
-        return this.processRegexForSrcRemove(singleLineImporrt, line, 'imports');
-      }
-      if (singleLineRequire.test(line)) {
-        return this.processRegexForSrcRemove(singleLineRequire, line, 'require');
-      }
-      return line;
-    }).join('\n');
+      })
+      .join('\n');
   }
   //#endregion
 
-  private processBrowserNotCorrectImportsExports = (importOrExportLine: string) => {
+  private processBrowserNotCorrectImportsExports = (
+    importOrExportLine: string,
+  ) => {
     // console.log({ importOrExportLine })
     // TODO
     return importOrExportLine;
-  }
+  };
 
-  //#region methods / flat typescript import export
+  //#region methods & getters / flat typescript import export
   public FLATTypescriptImportExport(usage: CoreModels.TsUsage) {
-
     if (this.isAssetsFile) {
       return this;
     }
     if (!this.relativePath.endsWith('.ts')) {
       return this;
     }
-    const isExport = (usage === 'export');
+    const isExport = usage === 'export';
     const fileContent: string = this.rawContentForBrowser;
     const commentStart = new RegExp(`\\/\\*`);
     const commentEnds = new RegExp(`\\*\\/`);
@@ -348,8 +484,7 @@ export class BrowserCodeCut {
     const singleLineExport = new RegExp(`^\\ *export\\ +\\{.*\\}\\;?`);
 
     const regexEnd = new RegExp(`from\\s+(\\'|\\").+(\\'|\\")`);
-    const regextStart = new RegExp(`${usage}\\s+{`)
-
+    const regextStart = new RegExp(`${usage}\\s+{`);
 
     let toAppendLines = 0;
     let insideComment = false;
@@ -357,15 +492,16 @@ export class BrowserCodeCut {
       let appendingToNewFlatOutput = false;
       let newFlatOutput = '';
       fileContent.split(/\r?\n/).forEach((line, index) => {
-
         const matchSingleLineExport = isExport && singleLineExport.test(line);
         const matchCommentStart = commentStart.test(line);
         const matchCommentEnd = commentEnds.test(line);
         const matchStart = regextStart.test(line);
 
-        const matchEndExportOnly = isExport && commentEndExportOnly.test(line) && (line.replace(commentEndExportOnly, '') === '');
-        const matchEnd = (matchEndExportOnly || regexEnd.test(line))
-
+        const matchEndExportOnly =
+          isExport &&
+          commentEndExportOnly.test(line) &&
+          line.replace(commentEndExportOnly, '') === '';
+        const matchEnd = matchEndExportOnly || regexEnd.test(line);
 
         if (matchCommentStart) {
           insideComment = true;
@@ -390,26 +526,31 @@ export class BrowserCodeCut {
             toAppendLines++;
           } else if (matchEnd) {
             appendingToNewFlatOutput = false;
-            newFlatOutput += ` ${this.processBrowserNotCorrectImportsExports(line)}${_.times(toAppendLines,
-              () => `${labelReplacementCode.flatenImportExportRequred}\n`).join('')}`; // TOOD @UNCOMMENT
+            newFlatOutput += ` ${this.processBrowserNotCorrectImportsExports(
+              line,
+            )}${_.times(
+              toAppendLines,
+              () => `${labelReplacementCode.flatenImportExportRequred}\n`,
+            ).join('')}`; // TOOD @UNCOMMENT
             toAppendLines = 0;
           }
         } else {
           if (insideComment) {
-            newFlatOutput += (((index > 0) ? '\n' : '') + line);
+            newFlatOutput += (index > 0 ? '\n' : '') + line;
           } else {
             if (matchSingleLineExport) {
-              newFlatOutput += (((index > 0) ? '\n' : '') + line);
+              newFlatOutput += (index > 0 ? '\n' : '') + line;
             } else {
-              appendingToNewFlatOutput = (matchStart && !matchEnd);
+              appendingToNewFlatOutput = matchStart && !matchEnd;
               // if (joiningLine) console.log('line', line)
-              newFlatOutput += (((index > 0) ? '\n' : '') + this.processBrowserNotCorrectImportsExports(line));
+              newFlatOutput +=
+                (index > 0 ? '\n' : '') +
+                this.processBrowserNotCorrectImportsExports(line);
             }
             toAppendLines = 1;
           }
         }
-
-      })
+      });
       this.rawContentForBrowser = newFlatOutput;
     }
     // console.log('\n\n\n\n')
@@ -417,7 +558,7 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods / resolved pacakge name from
+  //#region methods & getters / resolved pacakge name from
   /**
    * Get "npm package name" from line of code in .ts or .js files
    */
@@ -425,15 +566,18 @@ export class BrowserCodeCut {
     const self = this;
     return {
       JSrequired(rawImport) {
-        rawImport = rawImport.replace(new RegExp(`require\\((\\'|\\")`), '')
-        rawImport = rawImport.replace(new RegExp(`(\\'|\\")\\)`), '')
-        rawImport = rawImport.trim()
+        rawImport = rawImport.replace(new RegExp(`require\\((\\'|\\")`), '');
+        rawImport = rawImport.replace(new RegExp(`(\\'|\\")\\)`), '');
+        rawImport = rawImport.trim();
         if (rawImport.startsWith(`./`)) return void 0;
         if (rawImport.startsWith(`../`)) return void 0;
-        const fisrtName = rawImport.match(new RegExp(`\@?([a-zA-z]|\-)+\\/`))
-        let res: string = (_.isArray(fisrtName) && fisrtName.length > 0) ? fisrtName[0] : rawImport;
+        const fisrtName = rawImport.match(new RegExp(`\@?([a-zA-z]|\-)+\\/`));
+        let res: string =
+          _.isArray(fisrtName) && fisrtName.length > 0
+            ? fisrtName[0]
+            : rawImport;
         if (res.endsWith('/') && res.length > 1) {
-          res = res.substring(0, res.length - 1)
+          res = res.substring(0, res.length - 1);
         }
         return res;
       },
@@ -449,32 +593,39 @@ export class BrowserCodeCut {
           }
         }
 
-        rawImport = rawImport.replace(new RegExp(`${usage}.+from\\s+`), '')
-        rawImport = rawImport.replace(new RegExp(`(\'|\")`, 'g'), '').trim()
+        rawImport = rawImport.replace(new RegExp(`${usage}.+from\\s+`), '');
+        rawImport = rawImport.replace(new RegExp(`(\'|\")`, 'g'), '').trim();
         if (rawImport.startsWith(`./`)) return void 0;
         if (rawImport.startsWith(`../`)) return void 0;
 
-        const workspacePackgeMatch = (rawImport.match(new RegExp(`^\\@([a-zA-z]|\\-)+\\/([a-zA-z]|\\-)+$`)) || [])
-          .filter(d => d.length > 1);
-        const worskpacePackageName = (_.isArray(workspacePackgeMatch) && workspacePackgeMatch.length === 1)
-          ? _.first(workspacePackgeMatch) : void 0;
+        const workspacePackgeMatch = (
+          rawImport.match(
+            new RegExp(`^\\@([a-zA-z]|\\-)+\\/([a-zA-z]|\\-)+$`),
+          ) || []
+        ).filter(d => d.length > 1);
+        const worskpacePackageName =
+          _.isArray(workspacePackgeMatch) && workspacePackgeMatch.length === 1
+            ? _.first(workspacePackgeMatch)
+            : void 0;
 
         // const normalPackageMatch = (rawImport.match(new RegExp(`^([a-zA-z]|\\-)+\\/`)) || []);
         // const normalPackageName = (_.isArray(normalPackageMatch) && normalPackageMatch.length === 1)
         //   ? _.first(normalPackageMatch) : '';
 
-        let res: string = worskpacePackageName ? worskpacePackageName : rawImport;
+        let res: string = worskpacePackageName
+          ? worskpacePackageName
+          : rawImport;
         if (res.endsWith('/') && res.length > 1) {
-          res = res.substring(0, res.length - 1)
+          res = res.substring(0, res.length - 1);
         }
 
         return res;
-      }
+      },
     };
   }
   //#endregion
 
-  //#region methods / get parent
+  //#region methods & getters / get parent
 
   getParentContainer() {
     let parent: Project;
@@ -491,88 +642,92 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods / get inline package
+  //#region methods & getters / get inline package
   protected getInlinePackage(packageName: string): Models.InlinePkg {
-    const parentContainer = this.getParentContainer();
-    let packagesNames = BrowserCodeCut.IsomorphicLibs;
-
-    packagesNames = packagesNames.concat([
-      ...(parentContainer ? [] : [this.project.name]),
-      ...this.additionalSmartPckages,
-    ]);
+    const packagesNames = this.isomorphicPackagesNames;
 
     let realName = packageName;
     let isIsomorphic = false;
     if (packageName !== void 0) {
-      isIsomorphic = !!packagesNames
-        .find(p => {
-          if (p === packageName) {
-            return true;
-          }
-          const slashes = (p.match(new RegExp("\/", "g")) || []).length;
-          if (slashes === 0) {
-            return p === packageName
-          }
-          // console.log('am here ', packageName)
-          // console.log('p', p)
-          if (p.startsWith(packageName)) {
-            realName = p;
-            // console.log('FOUDNED for ', packageName)
-            // console.log('is REAL', p)
-            return true;
-          }
-          return false;
-        });
+      isIsomorphic = !!packagesNames.find(p => {
+        if (p === packageName) {
+          return true;
+        }
+        const slashes = (p.match(new RegExp('/', 'g')) || []).length;
+        if (slashes === 0) {
+          return p === packageName;
+        }
+        // console.log('am here ', packageName)
+        // console.log('p', p)
+        if (p.startsWith(packageName)) {
+          realName = p;
+          // console.log('FOUDNED for ', packageName)
+          // console.log('is REAL', p)
+          return true;
+        }
+        return false;
+      });
     }
     return {
       isIsomorphic,
-      realName
-    }
+      realName,
+    };
   }
   //#endregion
 
-  //#region methods / regex region
+  //#region methods & getters / regex region
   protected REGEX_REGION(word) {
-    return new RegExp("[\\t ]*\\/\\/\\s*#?region\\s+" + word + " ?[\\s\\S]*?\\/\\/\\s*#?endregion ?[\\t ]*\\n?", "g")
+    return new RegExp(
+      '[\\t ]*\\/\\/\\s*#?region\\s+' +
+        word +
+        ' ?[\\s\\S]*?\\/\\/\\s*#?endregion ?[\\t ]*\\n?',
+      'g',
+    );
   }
   //#endregion
 
-  //#region methods / replace region with
+  //#region methods & getters / replace region with
   protected replaceRegionsWith(stringContent = '', words = []) {
     if (words.length === 0) return stringContent;
     let word = words.shift();
-    let replacement = ''
+    let replacement = '';
     if (Array.isArray(word) && word.length === 2) {
       replacement = word[1];
-      word = word[0]
+      word = word[0];
     }
-
 
     stringContent = stringContent.replace(this.REGEX_REGION(word), replacement);
     return this.replaceRegionsWith(stringContent, words);
   }
   //#endregion
 
-  //#region methods / replace from line
+  //#region methods & getters / replace from line
   replaceFromLine(pkgName: string, imp: string) {
     // console.log(`Check package: "${pkgName}"`)
     // console.log(`imp: "${imp}"`)
-    const inlinePkg = this.getInlinePackage(pkgName)
+    const inlinePkg = this.getInlinePackage(pkgName);
 
     if (inlinePkg.isIsomorphic) {
       // console.log('inlinePkg ', inlinePkg.realName)
       const replacedImp = imp.replace(
         inlinePkg.realName,
-        `${inlinePkg.realName}/${this.buildOptions.websql ? config.folder.websql : config.folder.browser}`
+        `${inlinePkg.realName}/${
+          this.buildOptions.websql
+            ? config.folder.websql
+            : config.folder.browser
+        }`,
       );
 
-      this.rawContentForBrowser = this.rawContentForBrowser.replace(imp, replacedImp);
+      this.rawContentForBrowser = this.rawContentForBrowser.replace(
+        imp,
+        replacedImp,
+      );
       return;
     }
   }
   //#endregion
 
-  //#region methods / replace regions from ts import export
+  //#region methods & getters / replace regions from ts import export
   REPLACERegionsFromTsImportExport(usage: CoreModels.TsUsage) {
     // const debug = filesToDebug.includes(path.basename(this.absoluteFilePath));
     // if (debug) {
@@ -585,16 +740,22 @@ export class BrowserCodeCut {
       return this;
     }
     if (!_.isString(this.rawContentForBrowser)) return;
-    const importRegex = new RegExp(`${usage}.+from\\s+(\\'|\\").+(\\'|\\")`, 'g');
+    const importRegex = new RegExp(
+      `${usage}.+from\\s+(\\'|\\").+(\\'|\\")`,
+      'g',
+    );
 
-    const asynMatches = (usage === 'import') ? this.rawContentForBrowser.match(regexAsyncImportG) : [];
+    const asynMatches =
+      usage === 'import'
+        ? this.rawContentForBrowser.match(regexAsyncImportG)
+        : [];
     const normalMatches = this.rawContentForBrowser.match(importRegex);
 
-    const asyncImports = (Array.isArray(asynMatches) ? asynMatches : []);
+    const asyncImports = Array.isArray(asynMatches) ? asynMatches : [];
     let imports = [
       ...(Array.isArray(normalMatches) ? normalMatches : []),
       ...asyncImports,
-    ]
+    ];
     // debug && console.log(imports)
     if (_.isArray(imports)) {
       imports.forEach(imp => {
@@ -604,13 +765,13 @@ export class BrowserCodeCut {
         if (pkgName) {
           this.replaceFromLine(pkgName, imp);
         }
-      })
+      });
     }
     return this;
   }
   //#endregion
 
-  //#region methods / replace regions from js require
+  //#region methods & getters / replace regions from js require
   REPLACERegionsFromJSrequire() {
     if (this.isAssetsFile) {
       return this;
@@ -620,8 +781,8 @@ export class BrowserCodeCut {
     }
     if (!_.isString(this.rawContentForBrowser)) return;
     // fileContent = IsomorphicRegions.flattenRequiresForContent(fileContent, usage)
-    const importRegex = new RegExp(`require\\((\\'|\\").+(\\'|\\")\\)`, 'g')
-    let imports = this.rawContentForBrowser.match(importRegex)
+    const importRegex = new RegExp(`require\\((\\'|\\").+(\\'|\\")\\)`, 'g');
+    let imports = this.rawContentForBrowser.match(importRegex);
     // console.log(imports)
     if (_.isArray(imports)) {
       imports.forEach(imp => {
@@ -629,13 +790,13 @@ export class BrowserCodeCut {
         if (pkgName) {
           this.replaceFromLine(pkgName, imp);
         }
-      })
+      });
     }
     return this;
   }
   //#endregion
 
-  //#region methods / replace regions for isomorphic lib
+  //#region methods & getters / replace regions for isomorphic lib
   REPLACERegionsForIsomorphicLib(options: ReplaceOptionsExtended) {
     if (this.isAssetsFile) {
       return this;
@@ -646,10 +807,18 @@ export class BrowserCodeCut {
     // console.log(`Ext: "${ext}" for file: ${path.basename(this.absoluteFilePath)}`)
     if (extAllowedToReplace.includes(ext)) {
       const orgContent = this.rawContentForBrowser;
-      this.rawContentForBrowser = RegionRemover.from(this.relativePath, orgContent, options.replacements, this.project).output;
+      this.rawContentForBrowser = RegionRemover.from(
+        this.relativePath,
+        orgContent,
+        options.replacements,
+        this.project,
+      ).output;
 
-      if ((this.project.__isStandaloneProject || this.project.__isSmartContainer) && !this.isWebsqlMode) {
-
+      if (
+        (this.project.__isStandaloneProject ||
+          this.project.__isSmartContainer) &&
+        !this.isWebsqlMode
+      ) {
         const regionsToRemove = [TAGS.BROWSER, TAGS.WEBSQL_ONLY];
 
         const orgContentBackend = this.rawContentBackend;
@@ -657,11 +826,10 @@ export class BrowserCodeCut {
           this.absoluteBackendDestFilePath,
           orgContentBackend,
           regionsToRemove,
-          this.project
+          this.project,
         ).output;
       }
     }
-
 
     if (this.project.__isSmartContainerTarget) {
       const parent = this.project.__smartContainerTargetParentContainer;
@@ -671,18 +839,30 @@ export class BrowserCodeCut {
           if (true) {
             const from = `${c.name}/src/assets/`;
             const to = `assets/assets-for/${parent.name + '--' + c.name}/`;
-            this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
-            this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+            this.rawContentForBrowser = this.rawContentForBrowser.replace(
+              new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'),
+              to,
+            );
+            this.rawContentForBrowser = this.rawContentForBrowser.replace(
+              new RegExp(Helpers.escapeStringForRegEx(from), 'g'),
+              to,
+            );
           }
-        })
+        });
     } else if (this.project.__isStandaloneProject) {
       [this.project]
         .filter(f => f.typeIs('isomorphic-lib'))
         .forEach(c => {
           const from = `src/assets/`;
           const to = `assets/assets-for/${c.name}/`;
-          this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), to);
-          this.rawContentForBrowser = this.rawContentForBrowser.replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+          this.rawContentForBrowser = this.rawContentForBrowser.replace(
+            new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'),
+            to,
+          );
+          this.rawContentForBrowser = this.rawContentForBrowser.replace(
+            new RegExp(Helpers.escapeStringForRegEx(from), 'g'),
+            to,
+          );
         });
     }
 
@@ -690,15 +870,22 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods / processing asset link for app
+  //#region methods & getters / processing asset link for app
   processAssetsLinksForApp() {
     this.rawContentForAPPONLYBrowser = this.rawContentForBrowser;
     // console.log(`[incremental-build-process processAssetsLinksForApp '${this.buildOptions.baseHref}'`)
-    const baseHref = this.project.angularFeBasenameManager.getBaseHref(InitOptions.fromBuild(this.buildOptions))
+    const baseHref = this.project.angularFeBasenameManager.getBaseHref(
+      InitOptions.fromBuild(this.buildOptions),
+    );
     // console.log(`Fixing with basehref: '${baseHref}'`)
 
-    const howMuchBack = (this.relativePath.split('/').length - 1);
-    const back = (howMuchBack === 0) ? './' : _.times(howMuchBack).map(() => '../').join('');
+    const howMuchBack = this.relativePath.split('/').length - 1;
+    const back =
+      howMuchBack === 0
+        ? './'
+        : _.times(howMuchBack)
+            .map(() => '../')
+            .join('');
 
     const toReplaceFn = (relativeAssetPathPart: string) => {
       return [
@@ -761,8 +948,7 @@ export class BrowserCodeCut {
         to: string;
         makeSureSlashAtBegin?: boolean;
       }[];
-    }
-
+    };
 
     if (this.project.__isSmartContainerTarget) {
       const parent = this.project.__smartContainerTargetParentContainer;
@@ -774,18 +960,26 @@ export class BrowserCodeCut {
           for (let index = 0; index < cases.length; index++) {
             const { to, from, makeSureSlashAtBegin } = cases[index];
             if (makeSureSlashAtBegin) {
-              this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser
-                .replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), `/${to}`);
+              this.rawContentForAPPONLYBrowser =
+                this.rawContentForAPPONLYBrowser.replace(
+                  new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'),
+                  `/${to}`,
+                );
 
-              this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser
-                .replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), `/${to}`);
-
+              this.rawContentForAPPONLYBrowser =
+                this.rawContentForAPPONLYBrowser.replace(
+                  new RegExp(Helpers.escapeStringForRegEx(from), 'g'),
+                  `/${to}`,
+                );
             } else {
-              this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser
-                .replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+              this.rawContentForAPPONLYBrowser =
+                this.rawContentForAPPONLYBrowser.replace(
+                  new RegExp(Helpers.escapeStringForRegEx(from), 'g'),
+                  to,
+                );
             }
           }
-        })
+        });
     } else if (this.project.__isStandaloneProject) {
       [this.project]
         .filter(f => f.typeIs('isomorphic-lib'))
@@ -795,15 +989,23 @@ export class BrowserCodeCut {
           for (let index = 0; index < cases.length; index++) {
             const { to, from, makeSureSlashAtBegin } = cases[index];
             if (makeSureSlashAtBegin) {
-              this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser
-                .replace(new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'), `/${to}`);
+              this.rawContentForAPPONLYBrowser =
+                this.rawContentForAPPONLYBrowser.replace(
+                  new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'),
+                  `/${to}`,
+                );
 
-              this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser
-                .replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), `/${to}`);
-
+              this.rawContentForAPPONLYBrowser =
+                this.rawContentForAPPONLYBrowser.replace(
+                  new RegExp(Helpers.escapeStringForRegEx(from), 'g'),
+                  `/${to}`,
+                );
             } else {
-              this.rawContentForAPPONLYBrowser = this.rawContentForAPPONLYBrowser
-                .replace(new RegExp(Helpers.escapeStringForRegEx(from), 'g'), to);
+              this.rawContentForAPPONLYBrowser =
+                this.rawContentForAPPONLYBrowser.replace(
+                  new RegExp(Helpers.escapeStringForRegEx(from), 'g'),
+                  to,
+                );
             }
           }
         });
@@ -811,17 +1013,22 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods / save
+  //#region methods & getters / save
   save() {
     if (this.isAssetsFile) {
-      this.saveNormalFile(false)
-      return
+      this.saveNormalFile(false);
+      return;
     }
     // Helpers.log(`saving ismoprhic file: ${this.absoluteFilePath}`, 1)
-    const isFromLibs = (_.first(this.relativePath.split('/')) === config.folder.libs);
-    const module = isFromLibs ? _.first(this.relativePath.split('/').slice(1)) : this.project.name; // taget
+    const isFromLibs =
+      _.first(this.relativePath.split('/')) === config.folder.libs;
+    const module = isFromLibs
+      ? _.first(this.relativePath.split('/').slice(1))
+      : this.project.name; // taget
     const endOfBrowserOrWebsqlCode = `\n ${MjsModule.KEY_END_MODULE_FILE}${module} ${this.relativePath}`;
-    const isTsFile = ['.ts'].includes(path.extname(this.absFileSourcePathBrowserOrWebsql));
+    const isTsFile = ['.ts'].includes(
+      path.extname(this.absFileSourcePathBrowserOrWebsql),
+    );
     const backendFileSaveMode = !this.isWebsqlMode; // websql does not do anything on be
 
     if (this.isEmptyBrowserFile) {
@@ -838,33 +1045,51 @@ export class BrowserCodeCut {
       if (!fse.existsSync(path.dirname(absoluteBackendDestFilePath))) {
         fse.mkdirpSync(path.dirname(absoluteBackendDestFilePath));
       }
-      const isFrontendFile = !_.isUndefined(frontEndOnly.find(f => absoluteBackendDestFilePath.endsWith(f)));
+      const isFrontendFile = !_.isUndefined(
+        frontEndOnly.find(f => absoluteBackendDestFilePath.endsWith(f)),
+      );
 
       if (isFrontendFile) {
         // console.log(`Ommiting for backend: ${absoluteBackendDestFilePath} `)
         return;
       }
 
-
-
       if (this.project.__isSmartContainerTarget) {
-        const contentSmartTarget = (isEmptyModuleBackendFile && isTsFile) ? `
-        export function dummy${(new Date()).getTime()}() { }
-        export default function dummyDefault${(new Date()).getTime()}() { }
+        const contentSmartTarget =
+          isEmptyModuleBackendFile && isTsFile
+            ? `
+        export function dummy${new Date().getTime()}() { }
+        export default function dummyDefault${new Date().getTime()}() { }
         `
-          : this.changeOrganizationBackendFileContentBeforeSave(this.rawContentBackend, absoluteBackendDestFilePath);
-        fse.writeFileSync(absoluteBackendDestFilePath, contentSmartTarget, 'utf8');
+            : this.changeOrganizationBackendFileContentBeforeSave(
+                this.rawContentBackend,
+                absoluteBackendDestFilePath,
+              );
+        fse.writeFileSync(
+          absoluteBackendDestFilePath,
+          contentSmartTarget,
+          'utf8',
+        );
       } else {
-        const contentStandalone = (isEmptyModuleBackendFile && isTsFile) ? `export function dummy${(new Date()).getTime()}() { }`
-          : this.changeStandaloneBackendFileContentBeforeSave(this.rawContentBackend, absoluteBackendDestFilePath);
+        const contentStandalone =
+          isEmptyModuleBackendFile && isTsFile
+            ? `export function dummy${new Date().getTime()}() { }`
+            : this.changeStandaloneBackendFileContentBeforeSave(
+                this.rawContentBackend,
+                absoluteBackendDestFilePath,
+              );
 
-        fse.writeFileSync(absoluteBackendDestFilePath, contentStandalone, 'utf8');
+        fse.writeFileSync(
+          absoluteBackendDestFilePath,
+          contentStandalone,
+          'utf8',
+        );
       }
     }
   }
   //#endregion
 
-  //#region methods / warn about using file from node_modules with lib files
+  //#region methods & getters / warn about using file from node_modules with lib files
   warnAboutUsingFilesFromNodeModulesWithLibFiles(
     content: string,
     absFilePath: string,
@@ -874,12 +1099,16 @@ export class BrowserCodeCut {
       return content;
     }
 
-    if (this.project.__isSmartContainerTarget
-      || !(this.relativePath.startsWith('app.ts') || this.relativePath.startsWith('app/'))
+    if (
+      this.project.__isSmartContainerTarget ||
+      !(
+        this.relativePath.startsWith('app.ts') ||
+        this.relativePath.startsWith('app/')
+      )
     ) {
       return;
     }
-    const howMuchBack = (this.relativePath.split('/').length - 1);
+    const howMuchBack = this.relativePath.split('/').length - 1;
     // const debugFiles = [
     //   // 'files.container.ts',
     //   // 'app.ts',
@@ -890,36 +1119,47 @@ export class BrowserCodeCut {
     // }
 
     const recognizeImport = (usage: CoreModels.TsUsage) => {
-      const importRegex = new RegExp(`${usage}.+from\\s+(\\'|\\").+(\\'|\\")`, 'g');
+      const importRegex = new RegExp(
+        `${usage}.+from\\s+(\\'|\\").+(\\'|\\")`,
+        'g',
+      );
 
-      const asynMatches = (usage === 'import') ? content.match(regexAsyncImportG) : [];
+      const asynMatches =
+        usage === 'import' ? content.match(regexAsyncImportG) : [];
       const normalMatches = content.match(importRegex);
 
-      const asyncImports = (Array.isArray(asynMatches) ? asynMatches : []);
+      const asyncImports = Array.isArray(asynMatches) ? asynMatches : [];
       let importsLines = [
         ...(Array.isArray(normalMatches) ? normalMatches : []),
         ...asyncImports,
       ];
       return importsLines;
-    }
+    };
 
     let lines: [string, number][] = [
       ...recognizeImport('import'),
-      ...recognizeImport('export')
-    ].map((line, index) => {
-      if (howMuchBack === 0) {
-        const importRegex = new RegExp(`from\\s+(\\'|\\")\\.\\/lib(\\/|(\\'|\\"))`, 'g');
-        const match = importRegex.test(line);
-        return match ? [line, index] : void 0;
-      } else {
-        const importRegex = new RegExp(`from\\s+(\\'|\\")${_.times(howMuchBack, () => {
-          return '\\.\\.';
-        }).join('\\/')}\\/lib(\\/|(\\'|\\"))`, 'g');
-        const match = importRegex.test(line);
-        return match ? [line, index] : void 0;
-      }
-
-    }).filter(f => !!f) as any;
+      ...recognizeImport('export'),
+    ]
+      .map((line, index) => {
+        if (howMuchBack === 0) {
+          const importRegex = new RegExp(
+            `from\\s+(\\'|\\")\\.\\/lib(\\/|(\\'|\\"))`,
+            'g',
+          );
+          const match = importRegex.test(line);
+          return match ? [line, index] : void 0;
+        } else {
+          const importRegex = new RegExp(
+            `from\\s+(\\'|\\")${_.times(howMuchBack, () => {
+              return '\\.\\.';
+            }).join('\\/')}\\/lib(\\/|(\\'|\\"))`,
+            'g',
+          );
+          const match = importRegex.test(line);
+          return match ? [line, index] : void 0;
+        }
+      })
+      .filter(f => !!f) as any;
 
     // if(lines.length > 0) {
     //   console.log({
@@ -930,24 +1170,47 @@ export class BrowserCodeCut {
 
     for (let index = 0; index < lines.length; index++) {
       const [wrongImport, lineindex] = lines[index];
-      Helpers.warn(`
-${chalk.bold('WARNING')}: ${chalk.underline('./src/' + this.relativePath + `:${lineindex + 2}:1`)} Don't import things from lib like that (it may not work in your ${this.project.name}/src/app project);
+      Helpers.warn(
+        `
+${chalk.bold('WARNING')}: ${chalk.underline(
+          './src/' + this.relativePath + `:${lineindex + 2}:1`,
+        )} Don't import things from lib like that (it may not work in your ${
+          this.project.name
+        }/src/app project);
 ${chalk.bold(wrongImport)};
 Please use version compiled in node_modules:
-import { < My Stuff > } from '${this.project.name}/src';`, false,);
+import { < My Stuff > } from '${this.project.name}/src';`,
+        false,
+      );
     }
   }
   //#endregion
 
-  //#region methods / fix comments
-  private changeBrowserOrWebsqlFileContentBeforeSave(browserOrWebsqlFileContent: string, endComment: string, absFilePath: string, packageName = this.project.name) {
+  //#region methods & getters / fix comments
+  private changeBrowserOrWebsqlFileContentBeforeSave(
+    browserOrWebsqlFileContent: string,
+    endComment: string,
+    absFilePath: string,
+    packageName = this.project.name,
+  ) {
     if (!this.relativePath.endsWith('.ts')) {
       return browserOrWebsqlFileContent;
     }
 
-    const endOfFile = ((this.relativePath.endsWith('.ts') && endComment) ? endComment : '');
-    const standaloneRegexImportExport = new RegExp(`from\\s+(\\'|\\")${Helpers.escapeStringForRegEx(packageName)}\\/(browser|websql)(\\'|\\")`, 'g');
-    const standaloneRegexImports = new RegExp(`imports\\((\\'|\\")${Helpers.escapeStringForRegEx(packageName)}\\/(browser|websql)(\\'|\\")\\)`, 'g');
+    const endOfFile =
+      this.relativePath.endsWith('.ts') && endComment ? endComment : '';
+    const standaloneRegexImportExport = new RegExp(
+      `from\\s+(\\'|\\")${Helpers.escapeStringForRegEx(
+        packageName,
+      )}\\/(browser|websql)(\\'|\\")`,
+      'g',
+    );
+    const standaloneRegexImports = new RegExp(
+      `imports\\((\\'|\\")${Helpers.escapeStringForRegEx(
+        packageName,
+      )}\\/(browser|websql)(\\'|\\")\\)`,
+      'g',
+    );
 
     //#region debug stuff
     // const debug = debugFiles.includes(path.basename(absFilePath));
@@ -966,19 +1229,22 @@ import { < My Stuff > } from '${this.project.name}/src';`, false,);
     ];
 
     const ignoreIndex = [];
-    const res = splited
-      .map((line, index) => {
-        if (standaloneRegexImportExport.test(line) || standaloneRegexImports.test(line)) {
-          ignoreIndex.push(index - 1);
-        }
-        if ((line.trimLeft().startsWith('// ') || line.trimLeft().startsWith('//#'))
-          && (line.search('@ts-ignore') === -1)
-        ) {
-          return ''
-        }
-        return line;
-      })
-
+    const res = splited.map((line, index) => {
+      if (
+        standaloneRegexImportExport.test(line) ||
+        standaloneRegexImports.test(line)
+      ) {
+        ignoreIndex.push(index - 1);
+      }
+      if (
+        (line.trimLeft().startsWith('// ') ||
+          line.trimLeft().startsWith('//#')) &&
+        line.search('@ts-ignore') === -1
+      ) {
+        return '';
+      }
+      return line;
+    });
 
     for (let index = 0; index < ignoreIndex.length; index++) {
       res[ignoreIndex[index]] = res[ignoreIndex[index]] + ' // @ts-ignore';
@@ -990,41 +1256,61 @@ import { < My Stuff > } from '${this.project.name}/src';`, false,);
       // TODO @LAST check this
       // result = this.changeOrganizationBackendFileContentBeforeSave(result, absFilePath, true);
     } else {
-      result = this.changeStandaloneBackendFileContentBeforeSave(result, absFilePath, true);
+      result = this.changeStandaloneBackendFileContentBeforeSave(
+        result,
+        absFilePath,
+        true,
+      );
     }
     return result;
   }
   //#endregion
 
-  //#region methods / change content before saving file
-  changeContenBeforeSave(content: string, absFilePath: string, options: {
-    additionalSmartPckages: string[];
-    isStandalone: boolean;
-    isBrowser: boolean;
-  }) {
+  //#region methods & getters / change content before saving file
+  changeContenBeforeSave(
+    content: string,
+    absFilePath: string,
+    options: {
+      additionalSmartPckages: string[];
+      isStandalone: boolean;
+      isBrowser: boolean;
+    },
+  ) {
     if (!absFilePath.endsWith('.ts')) {
       // console.log(`NOT_FIXING: ${absFilePath}`)
       return content;
     }
-
 
     const { isBrowser, isStandalone, additionalSmartPckages } = options;
 
     // const debug = debugFiles.includes(path.basename(absFilePath));
     // debug && console.log(`FIXING: ${absFilePath} for ${isStandalone ? 'STANDALONE' : 'ORGANIZATION'}`)
 
-    const howMuchBack = (this.relativePath.split('/').length - 1);
+    const howMuchBack = this.relativePath.split('/').length - 1;
 
     for (let index = 0; index < additionalSmartPckages.length; index++) {
       const rootChildPackage = additionalSmartPckages[index];
       const [__, childName] = rootChildPackage.split('/');
-      const libName = isStandalone ? config.folder.lib : `${config.folder.libs}/${childName}`
-      const back = (howMuchBack === 0) ? './' : _.times(howMuchBack).map(() => '../').join('');
+      const libName = isStandalone
+        ? config.folder.lib
+        : `${config.folder.libs}/${childName}`;
+      const back =
+        howMuchBack === 0
+          ? './'
+          : _.times(howMuchBack)
+              .map(() => '../')
+              .join('');
       const escapedName = Helpers.escapeStringForRegEx(rootChildPackage);
 
       if (isBrowser) {
-        const regexFull = new RegExp(`from\\s+(\\'|\\")${escapedName}\\/(browser|websql)(\\'|\\")`, 'g');
-        const regexPartial = new RegExp(`from\\s+(\\'|\\")${escapedName}\\/(browser|websql)\\/`, 'g');
+        const regexFull = new RegExp(
+          `from\\s+(\\'|\\")${escapedName}\\/(browser|websql)(\\'|\\")`,
+          'g',
+        );
+        const regexPartial = new RegExp(
+          `from\\s+(\\'|\\")${escapedName}\\/(browser|websql)\\/`,
+          'g',
+        );
         // debug && console.log({
         //   escapedName,
         //   regexFull,
@@ -1033,8 +1319,14 @@ import { < My Stuff > } from '${this.project.name}/src';`, false,);
         content = content.replace(regexFull, `from '${back}${libName}'`);
         content = content.replace(regexPartial, `from '${back}${libName}/`);
       } else {
-        const regexFull = new RegExp(`from\\s+(\\'|\\")${escapedName}(\\'|\\")`, 'g');
-        const regexPartial = new RegExp(`from\\s+(\\'|\\")${escapedName}\\/`, 'g');
+        const regexFull = new RegExp(
+          `from\\s+(\\'|\\")${escapedName}(\\'|\\")`,
+          'g',
+        );
+        const regexPartial = new RegExp(
+          `from\\s+(\\'|\\")${escapedName}\\/`,
+          'g',
+        );
         // debug && console.log({
         //   escapedName,
         //   regexFull,
@@ -1043,7 +1335,6 @@ import { < My Stuff > } from '${this.project.name}/src';`, false,);
         content = content.replace(regexFull, `from '${back}${libName}'`);
         content = content.replace(regexPartial, `from '${back}${libName}/`);
       }
-
     }
     // Helpers.warn(`[copytomanager] Empty content for ${absFilePath}`);
     // console.log({ absFilePathJSJSJ: absFilePath })
@@ -1051,7 +1342,7 @@ import { < My Stuff > } from '${this.project.name}/src';`, false,);
   }
   //#endregion
 
-  //#region methods / change file import/export for organization
+  //#region methods & getters / change file import/export for organization
   /**
    * TODO may be weak solutin
    */
@@ -1068,7 +1359,7 @@ import { < My Stuff > } from '${this.project.name}/src';`, false,);
   }
   //#endregion
 
-  //#region methods / change file import/export for standalone
+  //#region methods & getters / change file import/export for standalone
   /**
    * TODO may be weak solutin
    */
@@ -1086,5 +1377,4 @@ import { < My Stuff > } from '${this.project.name}/src';`, false,);
   //#endregion
 
   //#endregion
-
 }

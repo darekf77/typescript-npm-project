@@ -5,6 +5,7 @@ import { CommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
 import { BuildOptions } from '../../build-options';
 import { TEMP_DOCS } from '../../constants';
+import { config } from 'tnp-config/src';
 
 class $Build extends CommandLineFeature<BuildOptions, Project> {
   protected async __initialize__() {
@@ -88,6 +89,39 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
   }
 
   async start() {
+    const { smartContainerTargetName } = this.params;
+
+    console.log('smartContainerTargetName', smartContainerTargetName);
+    console.log(
+      'this.project?.__smartContainerBuildTarget?.name',
+      this.project?.__smartContainerBuildTarget?.name,
+    );
+    //#region prevent start mode for smart container non child
+    if (
+      smartContainerTargetName !==
+      this.project?.__smartContainerBuildTarget?.name
+    ) {
+      Helpers.error(
+        `Start mode only available for child project "${this.project
+          ?.__smartContainerBuildTarget.name}"
+
+        Please use 2 commands instead (in 2 separaed terminals):
+
+1. Build of every lib in container
+${config.frameworkName} build:watch
+
+2. Start ng server for app
+${config.frameworkName} app ${smartContainerTargetName} ${
+          this.params.websql ? '--websql' : ''
+        }  # to build app
+
+
+        `,
+        false,
+        true,
+      );
+    }
+    //#endregion
     await this.project.build(
       BuildOptions.from({
         ...this.params,
@@ -95,6 +129,11 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
         watch: true,
       }),
     );
+  }
+
+  async startClean() {
+    await this.project.clear();
+    await this.start();
   }
 
   async mkdocs() {

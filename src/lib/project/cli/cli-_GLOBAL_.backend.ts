@@ -809,7 +809,7 @@ class $Global extends BaseCommandLine<{}, Project> {
           const c = children[index];
           Helpers.info(`Recreating node_module for ${c.genericName}`);
           c.__node_modules.remove();
-          await c.init();
+          await c.init('initing after reinstall');
         }
       }
     } else if (
@@ -1298,7 +1298,7 @@ ${this.project.children
   //#region prettier
   async prettier() {
     Helpers.info(`Initing before prettier...`);
-    await this.project.init();
+    await this.project.init('initing before prettier');
     Helpers.info(`Running prettier...`);
     this.project.run(`npm-run prettier --write .`, { output: true }).sync();
     Helpers.info(`Prettier done`);

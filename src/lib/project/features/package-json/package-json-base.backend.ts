@@ -64,24 +64,24 @@ export class PackageJsonBase extends PackageJsonCore {
     this.writeToDisc(true);
   }
 
-  public updateHooks() {
-    Helpers.log('[package json] updating hooks');
-    if (
-      !(
-        this.data.husky &&
-        this.data.husky.hooks &&
-        _.isString(this.data.husky.hooks['pre-push'])
-      )
-    ) {
-      this.data.husky = {
-        hooks: {
-          'pre-push': `${config.frameworkName} deps:show:if:standalone`,
-        },
-      };
-      this.save('Update hooks');
-    }
-    Helpers.log('[package json] updating hooks done');
-  }
+  // public updateHooks() {
+  //   Helpers.log('[package json] updating hooks');
+  //   if (
+  //     !(
+  //       this.data.husky &&
+  //       this.data.husky.hooks &&
+  //       _.isString(this.data.husky.hooks['pre-push'])
+  //     )
+  //   ) {
+  //     this.data.husky = {
+  //       hooks: {
+  //         'pre-push': `${config.frameworkName} deps:show:if:standalone`,
+  //       },
+  //     };
+  //     this.save('Update hooks');
+  //   }
+  //   Helpers.log('[package json] updating hooks done');
+  // }
 
   private prepareForSave(
     action: 'save' | 'show' | 'hide' = 'save',
