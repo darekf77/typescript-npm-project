@@ -639,7 +639,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     if (this.coreContainer?.__inMemoryIsomorphicLibs.length === 0) {
       this.resolveAndAddIsomorphicLibsToMemoery(
         PackagesRecognition.instance(this.coreContainer).libsFromJson,
-        true,
+        false,
       );
 
       if (this.coreContainer?.__inMemoryIsomorphicLibs.length === 0) {
@@ -648,7 +648,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
           .sync();
         this.resolveAndAddIsomorphicLibsToMemoery(
           PackagesRecognition.instance(this.coreContainer).libsFromJson,
-          true,
+          false,
         );
         if (this.coreContainer?.__inMemoryIsomorphicLibs.length === 0) {
           Helpers.error(
