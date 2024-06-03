@@ -1,5 +1,11 @@
 //#region imports
-import { chalk, crossPlatformPath, moment, path } from 'tnp-core/src';
+import {
+  chalk,
+  crossPlatformPath,
+  dateformat,
+  moment,
+  path,
+} from 'tnp-core/src';
 import { fse } from 'tnp-core/src';
 import { _ } from 'tnp-core/src';
 
@@ -77,9 +83,10 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
     );
     const yarnLockExisits = fse.existsSync(yarnLockPath);
     const command: string = prepareCommand(pkg, remove, useYarn, this.project);
-    Helpers.log(`
+    Helpers.taskStarted(`
 
-    [actualNpmProcess] npm instalation...
+    [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]
+    npm install process for ${this.project.genericName} started...
 
     `);
 
@@ -95,7 +102,7 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
         // Helpers.taskDone('Done rebuilding electorn');
       } catch (err) {
         console.error(err);
-        //#region linux message about memoery
+        //#region message about memory and inotify watchers
 
         const errorMessage = `
 
@@ -122,6 +129,10 @@ echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo s
         //#endregion
       }
     }
+
+    Helpers.taskDone(`
+    npm install process for ${this.project.genericName} done.
+    [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]`);
 
     this.project.quickFixes.nodeModulesPackagesZipReplacement();
     await PackagesRecognition.startFor(this.project, 'after npm install');
