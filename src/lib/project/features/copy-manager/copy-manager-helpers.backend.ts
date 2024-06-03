@@ -98,7 +98,7 @@ export namespace CopyMangerHelpers {
       project.__projectSourceFiles().forEach(f => {
         const source = crossPlatformPath(path.join(project.location, f));
         if (fse.existsSync(source)) {
-          Helpers.log(`Copying file/folder to static build: ${f} `);
+          // Helpers.log(`Copying file/folder to static build: ${f} `);
           if (fse.lstatSync(source).isDirectory()) {
             Helpers.tryCopyFrom(source, path.join(destinationLocation, f));
           } else {

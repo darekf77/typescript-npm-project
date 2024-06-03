@@ -55,16 +55,6 @@ const debugFiles = [
 //#endregion
 
 export class BrowserCodeCut {
-  //#region static
-  public static IsomorphicLibs = [];
-  public static resolveAndAddIsomorphicLibs(libsNames: string[]) {
-    this.IsomorphicLibs = Helpers.arrays.uniqArray(
-      BrowserCodeCut.IsomorphicLibs.concat(libsNames),
-    );
-  }
-
-  //#endregion
-
   //#region fields & getters
 
   readonly isAssetsFile: boolean = false;
@@ -156,13 +146,14 @@ export class BrowserCodeCut {
   init() {
     const orgContent =
       Helpers.readFile(this.absSourcePathFromSrc, void 0, true) || '';
-    this.splitFileProcess = new SplitFileProcess(
-      orgContent,
-      this.absSourcePathFromSrc,
-      this.isomorphicPackagesNames,
-    );
+    // TODO @UNCOMMENT find why build is failing
+    // this.splitFileProcess = new SplitFileProcess(
+    //   orgContent,
+    //   this.absSourcePathFromSrc,
+    //   this.project.allIsomorphicPackagesFromMemory,
+    // );
     this.rawContentForBrowser = this.removeSrcAtEndFromImortExports(
-      this.splitFileProcess.content,
+      orgContent, // this.splitFileProcess.content, // TODO @UNCOMMENT find why build is failing
     );
     this.rawContentForAPPONLYBrowser = this.rawContentForBrowser; // TODO not needed ?
     this.rawContentBackend = this.rawContentForBrowser; // at the beginning those are normal files from src
@@ -170,16 +161,6 @@ export class BrowserCodeCut {
   }
 
   //#endregion
-
-  get isomorphicPackagesNames() {
-    const parentContainer = this.getParentContainer();
-    let packagesNames = BrowserCodeCut.IsomorphicLibs;
-    packagesNames = packagesNames.concat([
-      ...(parentContainer ? [] : [this.project.name]),
-      ...this.additionalSmartPckages,
-    ]);
-    return BrowserCodeCut.IsomorphicLibs;
-  }
 
   //#region methods & getters / init and save
   private replaceAssetsPath = (absDestinationPath: string) => {
@@ -252,16 +233,6 @@ export class BrowserCodeCut {
       (this.rawContentBackend || '').replace(/\/\*\ \*\//g, '').trim()
         .length === 0
     );
-  }
-  //#endregion
-
-  //#region methods & getters / additional smart packages
-  get additionalSmartPckages() {
-    const parent = this.getParentContainer();
-    const additionalSmartPckages = !parent
-      ? []
-      : parent.children.map(c => `@${parent.name}/${c.name}`);
-    return additionalSmartPckages;
   }
   //#endregion
 
@@ -644,7 +615,7 @@ export class BrowserCodeCut {
 
   //#region methods & getters / get inline package
   protected getInlinePackage(packageName: string): Models.InlinePkg {
-    const packagesNames = this.isomorphicPackagesNames;
+    const packagesNames = this.project.allIsomorphicPackagesFromMemory;
 
     let realName = packageName;
     let isIsomorphic = false;
@@ -1352,7 +1323,7 @@ import { < My Stuff > } from '${this.project.name}/src';`,
     isBrowser: boolean = false,
   ): string {
     return this.changeContenBeforeSave(content, absFilePath, {
-      additionalSmartPckages: this.additionalSmartPckages,
+      additionalSmartPckages: this.project.selftIsomorphicPackages,
       isStandalone: false,
       isBrowser,
     });

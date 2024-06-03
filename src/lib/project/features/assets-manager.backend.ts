@@ -8,7 +8,7 @@ const assetsFor = `${config.folder.assets}-for`;
 
 export class AssetsManager extends BaseFeatureForProject<Project> {
   copyExternalAssets(outDir: 'dist', websql: boolean) {
-    this.project.__isomorphicPackages
+    this.project.allIsomorphicPackagesFromMemory
       .filter(f => !f.startsWith('@'))
       .map(pkgName => {
         const sharedPath = this.project.__node_modules.pathFor(
@@ -55,7 +55,7 @@ export class AssetsManager extends BaseFeatureForProject<Project> {
           }
         }
       });
-    this.project.__isomorphicPackages
+    this.project.allIsomorphicPackagesFromMemory
       .filter(f => f.startsWith('@'))
       .map(orgPkgName => {
         const orgName = path.dirname(orgPkgName).replace('@', '');

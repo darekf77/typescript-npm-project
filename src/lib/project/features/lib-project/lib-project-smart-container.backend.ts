@@ -82,15 +82,22 @@ export class LibProjectSmartContainer extends LibPorjectBase {
           // const proj = Project.ins.From(absFolder) as Project;
 
           try {
-            Helpers.run('npm publish --access public', {
-              cwd,
-              output: true,
-            }).sync();
+            Helpers.run(
+              `npm publish ${
+                realCurrentProj.__packageJson.isPrivate ? '' : '--access public'
+              }`,
+              {
+                cwd,
+                output: true,
+              },
+            ).sync();
             successPublis = true;
           } catch (e) {
             this.project.__removeTagAndCommit(automaticRelease);
           }
         });
+
+        await this.updateTnpAndCoreContainers(realCurrentProj);
       },
     );
   }
@@ -115,7 +122,9 @@ export class LibProjectSmartContainer extends LibPorjectBase {
     Helpers.info(`
 Smart container routes for project:
 + ${chalk.bold(mainProjectName)} => /${mainProjectName}
-${otherProjectNames.map(c => `+ ${chalk.bold(c)} => /${mainProjectName}/-/${c}`).join('\n')}
+${otherProjectNames
+  .map(c => `+ ${chalk.bold(c)} => /${mainProjectName}/-/${c}`)
+  .join('\n')}
         `);
     //#endregion
 
@@ -178,13 +187,13 @@ ${otherProjectNames.map(c => `+ ${chalk.bold(c)} => /${mainProjectName}/-/${c}`)
         let toBuildNormally = automaticReleaseDocs
           ? toBuildNormallyCFG
           : allProjects.length === 0
-            ? []
-            : await Helpers.consoleGui.multiselect(
-                'Which projects you want to build with normally',
-                allProjects.map(childName => {
-                  return returnFun(childName);
-                }),
-              );
+          ? []
+          : await Helpers.consoleGui.multiselect(
+              'Which projects you want to build with normally',
+              allProjects.map(childName => {
+                return returnFun(childName);
+              }),
+            );
 
         //#region questions
         let appBuildOptions = { docsAppInProdMode: prod, websql: false };

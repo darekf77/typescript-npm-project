@@ -32,8 +32,9 @@ export class CopyManagerStandalone extends CopyManager {
       );
     }
 
-    this._isomorphicPackages =
-      this.project.__availableIsomorphicPackagesInNodeModules;
+    // console.log('this.copyto', this.copyto);
+
+    this._isomorphicPackages = this.project.allIsomorphicPackagesFromMemory;
 
     Helpers.log(
       `Opearating on ${this.isomorphicPackages.length} isomorphic pacakges...`,
@@ -304,7 +305,9 @@ export class CopyManagerStandalone extends CopyManager {
         `${
           this.project.__isStandaloneProject
             ? this.rootPackageName
-            : `${this.rootPackageName}/${path.basename(path.dirname(path.dirname(path.dirname(sharedAssetsPath))))}`
+            : `${this.rootPackageName}/${path.basename(
+                path.dirname(path.dirname(path.dirname(sharedAssetsPath))),
+              )}`
         }/${config.folder.assets}/${config.folder.shared}`,
       );
 

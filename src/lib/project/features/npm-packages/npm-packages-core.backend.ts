@@ -1,5 +1,11 @@
 //#region imports
-import { chalk, crossPlatformPath, moment, path } from 'tnp-core/src';
+import {
+  chalk,
+  crossPlatformPath,
+  dateformat,
+  moment,
+  path,
+} from 'tnp-core/src';
 import { fse } from 'tnp-core/src';
 import { _ } from 'tnp-core/src';
 
@@ -18,11 +24,11 @@ import {
 //#endregion
 
 export class NpmPackagesCore extends BaseFeatureForProject<Project> {
-  global(globalPackageName: string, packageOnly = false) {
+  async global(globalPackageName: string, packageOnly = false) {
     const oldContainer = Project.by('container', 'v1') as Project;
     if (!oldContainer.__node_modules.exist) {
       Helpers.info('initing container v1 for global packages');
-      oldContainer.run(`${config.frameworkName} init`).sync();
+      await oldContainer.init('old container init');
     }
     if (packageOnly) {
       return crossPlatformPath(
@@ -65,7 +71,7 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
     };
   }
 
-  protected actualNpmProcess(options?: Models.ActualNpmInstallOptions) {
+  protected async actualNpmProcess(options?: Models.ActualNpmInstallOptions) {
     if (this.project.__isDocker) {
       return;
     }
@@ -77,9 +83,10 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
     );
     const yarnLockExisits = fse.existsSync(yarnLockPath);
     const command: string = prepareCommand(pkg, remove, useYarn, this.project);
-    Helpers.log(`
+    Helpers.taskStarted(`
 
-    [actualNpmProcess] npm instalation...
+    [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]
+    npm install process for ${this.project.genericName} started...
 
     `);
 
@@ -94,14 +101,10 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
         // this.project.run('npm-run electron-builder install-app-deps', { output: true }).sync();
         // Helpers.taskDone('Done rebuilding electorn');
       } catch (err) {
-        if (config.frameworkName === 'tnp') {
-          console.log(err);
-        }
-        const isLinux = (['win32', 'darwin'] as NodeJS.Platform[]).includes(
-          process.platform,
-        );
-        const linuxMessage = isLinux
-          ? `
+        console.error(err);
+        //#region message about memory and inotify watchers
+
+        const errorMessage = `
 
 ${chalk.red('Make sure that you:')}:
 
@@ -109,30 +112,31 @@ ${chalk.red('Make sure that you:')}:
 
 export NODE_OPTIONS=--max_old_space_size=4096
 
-2. Increase the amount of inotify watchers:
+2. Increase the amount of inotify watchers (linux only):
 
 echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
 
-        `
-          : '';
-
+        `;
         Helpers.error(
           `[${config.frameworkName}] Error during npm install...
 
-        ${linuxMessage}
+        ${errorMessage}
 
         `,
           false,
           true,
         );
+        //#endregion
       }
+      Helpers.info(`Reinstal done`);
     }
 
+    Helpers.taskDone(`
+    npm install process for ${this.project.genericName} done.
+    [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]`);
+
     this.project.quickFixes.nodeModulesPackagesZipReplacement();
-    PackagesRecognition.fromProject(this.project).start(
-      true,
-      '[actualNpmProcess] after npm i',
-    );
+    await PackagesRecognition.startFor(this.project, 'after npm install');
 
     if (!generatLockFiles) {
       if (useYarn) {

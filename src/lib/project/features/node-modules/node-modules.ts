@@ -4,8 +4,10 @@ import { _ } from 'tnp-core/src';
 import { config } from 'tnp-config/src';
 import { BaseFeatureForProject, Helpers } from 'tnp-helpers/src';
 import { Project } from '../../abstract/project';
+import { $Global } from '../../cli/cli-_GLOBAL_.backend';
 //#region @backend
 import { dedupePackages } from './node-modules-helpers.backend';
+import { PackagesRecognition } from '../package-recognition/packages-recognition';
 //#endregion
 //#endregion
 
@@ -73,57 +75,68 @@ export class NodeModules extends BaseFeatureForProject<Project> {
     return !this.exist;
   }
 
-  updateFromReleaseDist(destination: Project) {
+  get shouldDedupePackages() {
+    return (
+      !this.project.__npmPackages.useLinkAsNodeModules &&
+      !this.project.__node_modules.isLink
+    );
+  }
+
+  async updateFromReleaseDist(sourceOfCompiledProject: Project) {
     //#region @backendFunc
-    const source = crossPlatformPath([
-      destination.location,
-      config.folder.tmpDistRelease,
-      config.folder.dist,
-      'project',
-      destination.name,
-      `tmp-local-copyto-proj-${config.folder.dist}/${config.folder.node_modules}/${destination.name}`,
+
+    //#region source folder
+    const sourcePathToLocalProj = sourceOfCompiledProject.__isStandaloneProject
+      ? crossPlatformPath([
+          sourceOfCompiledProject.location,
+          config.folder.tmpDistRelease,
+          config.folder.dist,
+          'project',
+          sourceOfCompiledProject.name,
+          `tmp-local-copyto-proj-${config.folder.dist}/${config.folder.node_modules}/${sourceOfCompiledProject.name}`,
+        ])
+      : crossPlatformPath([
+          sourceOfCompiledProject.location,
+          config.folder.tmpDistRelease,
+          config.folder.dist,
+          'project',
+          sourceOfCompiledProject.name,
+          config.folder.dist,
+          sourceOfCompiledProject.name,
+          sourceOfCompiledProject.__smartContainerBuildTarget.name,
+          `tmp-local-copyto-proj-${config.folder.dist}/${config.folder.node_modules}/@${sourceOfCompiledProject.name}`,
+        ]);
+    //#endregion
+
+    //#region copy process
+    const destBasePath = crossPlatformPath([
+      this.project.__node_modules.path,
+      sourceOfCompiledProject.name,
     ]);
+    for (const fileOrFolder of sourceOfCompiledProject.compiledProjectFilesAndFolders) {
+      const dest = crossPlatformPath([destBasePath, fileOrFolder]);
+      const source = crossPlatformPath([sourcePathToLocalProj, fileOrFolder]);
 
-    if (destination.__npmPackages.useLinkAsNodeModules) {
-      (() => {
-        const dest = path.join(
-          this.project.__node_modules.path,
-          destination.name,
-        );
-        Helpers.removeIfExists(dest);
-        Helpers.copy(source, dest, {
-          copySymlinksAsFiles: true,
-          omitFolders: [config.folder.node_modules],
-          omitFoldersBaseFolder: source,
-        });
-      })();
-
-      (() => {
-        const dest = path.join(
-          this.project.__node_modules.path,
-          destination.name,
-        );
-        Helpers.removeIfExists(dest);
-        Helpers.copy(source, dest, {
-          copySymlinksAsFiles: true,
-          omitFolders: [config.folder.node_modules],
-          omitFoldersBaseFolder: source,
-        });
-      })();
-    } else {
-      (() => {
-        const dest = path.join(
-          this.project.__node_modules.path,
-          destination.name,
-        );
-        Helpers.removeIfExists(dest);
-        Helpers.copy(source, dest, {
-          copySymlinksAsFiles: true,
-          omitFolders: [config.folder.node_modules],
-          omitFoldersBaseFolder: source,
-        });
-      })();
+      if (Helpers.exists(source)) {
+        // Helpers.info(`Release update copying
+        // EXISTS ${Helpers.exists(source)}
+        // ${source}
+        //  to
+        // ${dest}`);
+        if (Helpers.isFolder(source)) {
+          Helpers.copy(source, dest, { overwrite: true, recursive: true });
+        } else {
+          Helpers.copyFile(source, dest);
+        }
+      }
     }
+    //#endregion
+
+    await PackagesRecognition.startFor(
+      sourceOfCompiledProject,
+      'after release update',
+    );
+
     //#endregion
   }
 
@@ -172,7 +185,7 @@ export class NodeModules extends BaseFeatureForProject<Project> {
   }
   pathFor(packageName: string): string {
     //#region @backendFunc
-    return crossPlatformPath(path.join(this.path, packageName));
+    return crossPlatformPath([fse.realpathSync(this.path), packageName]);
     //#endregion
   }
   get exist(): boolean {
@@ -302,7 +315,9 @@ export class NodeModules extends BaseFeatureForProject<Project> {
     }
     if (!this.project.__node_modules.exist) {
       // TODO QUICK_FIX make it async install
-      this.project.installNpmPackages();
+      this.project
+        .run(`${config.frameworkName} ${$Global.prototype.REINSTALL.name}`)
+        .sync();
     }
     Helpers.remove(path.join(target, config.folder.node_modules));
     Helpers.createSymLink(this.path, target, {

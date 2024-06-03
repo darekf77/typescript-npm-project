@@ -1,7 +1,7 @@
 import { Helpers, recognizeImportsFromFile } from 'tnp-helpers/src';
 import { CommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
-import { path } from 'tnp-core';
+import { path } from 'tnp-core/src';
 
 export class $Ts extends CommandLineFeature<{}, Project> {
   public _() {

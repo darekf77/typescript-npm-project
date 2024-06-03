@@ -13,7 +13,9 @@ import {
   tmpBuildPort,
   tmpBaseHrefOverwriteRelPath,
 } from '../../constants';
+
 //#region @backend
+import { $Global } from '../cli/cli-_GLOBAL_.backend';
 import { fse, json5, os, dateformat } from 'tnp-core/src';
 import { child_process } from 'tnp-core/src';
 import { Firedev } from 'firedev/src';
@@ -48,7 +50,7 @@ import { glob } from 'tnp-core/src';
 import { LibProjectStandalone } from '../features/lib-project/lib-project-standalone.backend';
 import { LibProjectSmartContainer } from '../features/lib-project/lib-project-smart-container.backend';
 import { LibProjectVscodeExt } from '../features/lib-project/lib-project-vscode-ext';
-import { chalk } from 'tnp-core';
+import { chalk } from 'tnp-core/src';
 import {
   BuildProcess,
   BuildProcessController,
@@ -255,8 +257,11 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   static ins = new FiredevProjectResolve(Project);
   //#endregion
 
+  //#region static / has resovle core deps and folder
   private static hasResolveCoreDepsAndFolder = false;
+  //#endregion
 
+  //#region static / projcts in user folder
   private static get projectsInUserFolder() {
     //#region @backendFunc
     const projectsInUserFolder = crossPlatformPath(
@@ -270,11 +275,18 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     return projectsInUserFolder;
     //#endregion
   }
+  //#endregion
 
+  //#region static / sync core project
+  /**
+   * firedev sync command
+   */
   static sync() {
     //#region @backendFunc
     const cwd = firedevRepoPathUserInUserDir;
     Helpers.info(`Syncing... Fetching git data... `);
+
+    //#region reset origin of firedev repo
     try {
       Helpers.run(`git reset --hard && git clean -df && git fetch`, {
         cwd,
@@ -287,7 +299,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
         true,
       );
     }
+    //#endregion
 
+    //#region checkout master
     try {
       Helpers.run(`git checkout master`, { cwd, output: false }).sync();
       Helpers.log('DONE CHECKING OUT MASTER');
@@ -299,7 +313,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
         true,
       );
     }
+    //#endregion
 
+    //#region pull master with tags
     try {
       Helpers.run(`git pull --tags origin master`, {
         cwd,
@@ -314,7 +330,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
         true,
       );
     }
+    //#endregion
 
+    //#region checkout lastest tag
     // TODO  SPLIT TO SEPARATED CONTAINERS
     const tagToCheckout = Project.morphiTagToCheckoutForCurrentCliVersion(cwd);
     const currentBranch = Helpers.git.currentBranchName(cwd);
@@ -335,6 +353,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
         );
       }
     }
+    //#endregion
+
+    //#region pull latest tag
     try {
       Helpers.run(`git pull origin ${tagToCheckout}`, { cwd }).sync();
     } catch (error) {
@@ -344,29 +365,42 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
         false,
       );
     }
+    //#endregion
 
+    //#region remove vscode folder
     try {
       Helpers.run('rimraf .vscode', { cwd }).sync();
     } catch (error) {}
+    //#endregion
 
     Project.reinstallActiveFrameworkContainers();
 
     Helpers.success('firedev-framework synced ok');
     //#endregion
   }
+  //#endregion
+
+  //#region static / reinstall active framework containers
   private static reinstallActiveFrameworkContainers() {
+    //#region @backendFunc
     for (const ver of config.activeFramewrokVersions) {
       const nodeModulesForContainer = crossPlatformPath([
         firedevRepoPathUserInUserDir,
         `projects/container-${ver}`,
       ]);
-      Helpers.run(`${config.frameworkName} reinstall --skipCoreCheck`, {
-        cwd: nodeModulesForContainer,
-      }).sync();
+      Helpers.run(
+        `${config.frameworkName} ${$Global.prototype.REINSTALL.name} --skipCoreCheck`,
+        {
+          cwd: nodeModulesForContainer,
+        },
+      ).sync();
       Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
     }
+    //#endregion
   }
+  //#endregion
 
+  //#region static / get node modules installed for core container
   private static get nodeModulesInstalledForCoreContainer(): boolean {
     for (const ver of config.activeFramewrokVersions) {
       const nodeModulesForContainer = crossPlatformPath([
@@ -380,7 +414,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     }
     return true;
   }
+  //#endregion
 
+  //#region static / initial check
   public static initialCheck() {
     //#region @backendFunc
     if (this.hasResolveCoreDepsAndFolder) {
@@ -403,7 +439,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
       try {
         child_process.execSync(
-          `${config.frameworkName} env:install --skipCoreCheck`,
+          `${config.frameworkName}  ${$Global.prototype.ENV_INSTALL.name} --skipCoreCheck`,
           { stdio: [0, 1, 2] },
         );
       } catch (error) {
@@ -431,7 +467,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
       try {
         child_process.execSync(
-          `${config.frameworkName} init:core --skipCoreCheck`,
+          `${config.frameworkName} ${$Global.prototype.INIT_CORE.name} --skipCoreCheck`,
           {
             stdio: [0, 1, 2],
           },
@@ -449,16 +485,19 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       this.hasResolveCoreDepsAndFolder = true;
     }
 
-    if (
-      !this.nodeModulesInstalledForCoreContainer &&
-      config.frameworkName === 'firedev' &&
-      !global.skipCoreCheck
-    ) {
-      Project.reinstallActiveFrameworkContainers();
-    }
+    // TODO (remove this) this is causing problems
+    // if (
+    //   !this.nodeModulesInstalledForCoreContainer &&
+    //   config.frameworkName === 'firedev' &&
+    //   !global.skipCoreCheck
+    // ) {
+    //   Project.reinstallActiveFrameworkContainers();
+    // }
     //#endregion
   }
+  //#endregion
 
+  //#region static / path resolved
   private static pathResolved(...partOfPath: string[]) {
     //#region @backendFunc
     // console.log('pathResolved', partOfPath);
@@ -481,11 +520,15 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     return crossPlatformPath(path.resolve(path.join(...partOfPath)));
     //#endregion
   }
+  //#endregion
 
+  //#region static / firedev relative projects pathes
   private static get firedevProjectsRelative() {
     return `../firedev/projects`;
   }
+  //#endregion
 
+  //#region static / resolve core projects pathes
   private static resolveCoreProjectsPathes(
     version?: CoreModels.FrameworkVersion,
   ) {
@@ -517,6 +560,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     return result;
     //#endregion
   }
+  //#endregion
 
   //#region static / by
   public static by(
@@ -579,6 +623,79 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
   //#endregion
 
+  //#region ISOMORPHIC LIBS
+  private __inMemoryIsomorphicLibs = [];
+
+  public resolveAndAddIsomorphicLibsToMemoery(
+    libsNames: string[],
+    informAboutDiff = false,
+  ) {
+    // console.log(`add ed isomorphic libs to memory: ${libsNames.join(', ')}`);
+    if (!this.coreContainer) {
+      return;
+    }
+
+    if (informAboutDiff) {
+      const current = this.coreContainer.__inMemoryIsomorphicLibs;
+      const newAdded = libsNames.filter(l => !current.includes(l));
+      for (const packageName of newAdded) {
+        Helpers.info(
+          `[${config.frameworkName}] ${packageName} added to isomorphic packages...`,
+        );
+      }
+    }
+
+    this.coreContainer.__inMemoryIsomorphicLibs = Helpers.arrays.uniqArray([
+      ...this.coreContainer.__inMemoryIsomorphicLibs,
+      ...libsNames,
+    ]);
+  }
+
+  /**
+   * main source of isomorphic libs
+   */
+  public get allIsomorphicPackagesFromMemory(): string[] {
+    //#region @backendFunc
+    if (this.coreContainer?.__inMemoryIsomorphicLibs.length === 0) {
+      this.resolveAndAddIsomorphicLibsToMemoery(
+        PackagesRecognition.instance(this.coreContainer).libsFromJson,
+        false,
+      );
+
+      if (this.coreContainer?.__inMemoryIsomorphicLibs.length === 0) {
+        this.coreContainer
+          .run(
+            `${config.frameworkName}  ${$Global.prototype.reinstallCore.name}`,
+          )
+          .sync();
+        this.resolveAndAddIsomorphicLibsToMemoery(
+          PackagesRecognition.instance(this.coreContainer).libsFromJson,
+          false,
+        );
+        if (this.coreContainer?.__inMemoryIsomorphicLibs.length === 0) {
+          Helpers.error(
+            `Not able to resolve isomorphic libs for core container...`,
+            false,
+            true,
+          );
+        }
+      }
+    }
+    return this.coreContainer.__inMemoryIsomorphicLibs;
+    //#endregion
+  }
+
+  get selftIsomorphicPackages(): string[] {
+    //#region @backendFunc
+    if (this.__isSmartContainer) {
+      const parent = this;
+      return this.children.map(c => `@${parent.name}/${c.name}`);
+    }
+    return [this.name];
+    //#endregion
+  }
+  //#endregion
+
   //#region fields
   id: number;
   readonly type: CoreModels.LibType;
@@ -612,6 +729,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   public __insideStructure: InsideStructures;
   public __singluarBuild: SingularBuild;
   public __webpackBackendBuild: WebpackBackendCompilation;
+
   public __linkedRepos: LinkedRepos;
   //#endregion
 
@@ -685,6 +803,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   // get isNotInitedProject() {
   //   return !this.pathExists('tmp-libs-for-dist');
   // }
+
   //#endregion
 
   //#region getters & methods / set project info port
@@ -767,14 +886,6 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     //   result.push('morphi'); // TODO QUICK_FIX
     // }
     return result;
-    //#endregion
-  }
-  //#endregion
-
-  //#region getters & methods / install npm packages
-  installNpmPackages() {
-    //#region @backendFunc
-    this.__npmPackages.installFromArgs('');
     //#endregion
   }
   //#endregion
@@ -943,7 +1054,6 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       return;
     }
 
-    this.__removeRecognizedIsomorphicLIbs();
     let gitginoredfiles = this.__recreate.filesIgnoredBy.gitignore
       .map(f => (f.startsWith('/') ? f.substr(1) : f))
       .filter(f => {
@@ -1036,27 +1146,6 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
         Helpers.remove(f);
       });
     Helpers.log(`Reseting symbolic links from node_mouels..DONE`);
-    //#endregion
-  }
-  //#endregion
-
-  //#region getters & methods / remove recognized isomorhic libs
-  private __removeRecognizedIsomorphicLIbs() {
-    //#region @backend
-    if (this.typeIs('unknow')) {
-      return;
-    }
-    try {
-      const pjPath = path.join(this.location, config.file.package_json);
-      const pj: Models.IPackageJSON = fse.readJsonSync(pjPath, {
-        encoding: 'utf8',
-      });
-      pj[config.array.isomorphicPackages] = void 0;
-      fse.writeJsonSync(pjPath, pj, {
-        encoding: 'utf8',
-        spaces: 2,
-      });
-    } catch (e) {}
     //#endregion
   }
   //#endregion
@@ -1155,6 +1244,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   }
   //#endregion
 
+  //#region getters & methods / lint files
   get lintFiles() {
     //#region @backendFunc
     const files = {
@@ -1393,7 +1483,9 @@ trim_trailing_whitespace = false
     return files;
     //#endregion
   }
+  //#endregion
 
+  //#region getters & methods /  recreate lint configuration
   recreateLintConfiguration(): void {
     //#region @backendFunc
     const files = this.lintFiles;
@@ -1463,6 +1555,7 @@ trim_trailing_whitespace = false
 
     //#endregion
   }
+  //#endregion
 
   //#region getters & methods / smart container build target
   get __smartContainerBuildTarget(): Project {
@@ -1862,51 +1955,66 @@ trim_trailing_whitespace = false
   }
   //#endregion
 
-  //#region getters & methods / get isomorphic packages
+  //#region getters & methods / compiled project files and folder
   /**
-   * array of isomorphic pacakges
-   * example:
-   * ['firedev', '@something/child' ]
+   * BIG TODO Organization project when compiled in dist folder
+   * souold store backend files in lib folder
    */
-  public get __isomorphicPackages(): string[] {
+  public get compiledProjectFilesAndFolders(): string[] {
     //#region @backendFunc
-    const isomorphicPackagesArr = [];
-
-    if (this.typeIs('unknow')) {
-      return isomorphicPackagesArr;
+    const jsDtsMapsArr = ['.js', '.js.map', '.d.ts'];
+    if (this.__isSmartContainer) {
+      return this.children.reduce(
+        (a, c) =>
+          a
+            .concat(c.compiledProjectFilesAndFolders.map(a => `${c.name}/${a}`))
+            .concat(
+              Helpers.foldersFrom(c.pathFor(['src/lib']), {
+                recursive: false,
+              }).map(aaa =>
+                crossPlatformPath(`${c.name}/${path.basename(aaa)}`),
+              ),
+            )
+            .concat(
+              jsDtsMapsArr.reduce((a, b) => {
+                return a.concat([
+                  ...Helpers.filesFrom(c.pathFor(['src/lib']))
+                    .map(aaa =>
+                      crossPlatformPath(`${c.name}/${path.basename(aaa)}`),
+                    )
+                    .map(aa => `${aa.replace('.ts', '')}${b}`),
+                ]);
+              }, []),
+            ),
+        [],
+      );
+    } else if (this.__isStandaloneProject || this.__isSmartContainerChild) {
+      return [
+        config.folder.bin,
+        config.folder.lib,
+        config.folder.assets,
+        config.folder.websql,
+        config.folder.browser,
+        config.file.firedev_jsonc,
+        config.file.tnpEnvironment_json,
+        config.file._gitignore,
+        config.file._npmignore,
+        config.file._npmrc,
+        config.file._npmrc,
+        'src.d.ts',
+        ...this.__resources,
+        config.file.package_json,
+        config.file.package_lock_json,
+        ...jsDtsMapsArr.reduce((a, b) => {
+          return a.concat([
+            ...['cli', 'index', 'start', 'run', 'global-typings'].map(
+              aa => `${aa}${b}`,
+            ),
+          ]);
+        }, []),
+      ];
     }
-    try {
-      let location = this.location;
-
-      var p = crossPlatformPath([
-        location,
-        config.tempFiles.FILE_NAME_ISOMORPHIC_PACKAGES,
-      ]);
-      if (!fse.existsSync(p)) {
-        PackagesRecognition.fromProject(this as any).start(
-          void 0,
-          '[firedev-projct][getter isomorphic pacakges ]',
-        );
-      }
-      const f = Helpers.readJson(p);
-      const arr = f[config.array.isomorphicPackages];
-      if (_.isArray(arr)) {
-        return isomorphicPackagesArr.concat(arr);
-      } else {
-        return isomorphicPackagesArr;
-      }
-      // warn(`Isomorphic package file does not exists : ${p}`);
-    } catch (e) {
-      if (global.globalSystemToolMode) {
-        Helpers.log(e);
-        Helpers.error(
-          `Erro while reading ismorphic package file: ${p}`,
-          true,
-          true,
-        );
-      }
-      return isomorphicPackagesArr;
-    }
+    return [];
     //#endregion
   }
   //#endregion
@@ -1938,6 +2046,7 @@ trim_trailing_whitespace = false
   public __frameworkVersionEquals(version: CoreModels.FrameworkVersion) {
     //#region @backendFunc
     const ver = Number(_.isString(version) && version.replace('v', ''));
+
     const curr = Number(
       _.isString(this.__frameworkVersion) &&
         this.__frameworkVersion.replace('v', ''),
@@ -2277,7 +2386,7 @@ processing...
         await this.__targetProjects.update();
       } else {
         if (!this.__node_modules.exist) {
-          this.__npmPackages.installFromArgs('');
+          await this.__npmPackages.installFromArgs('');
         }
 
         const tryReleaseProject = async () => {
@@ -3018,13 +3127,6 @@ ${otherProjectNames
             showInfoAngular();
 
             if (isStandalone || this.__isSmartContainerTarget) {
-              if (this.__isSmartContainerTarget) {
-                // TODO QUICK_FIX this should be in init/struct
-                PackagesRecognition.fromProject(this).start(
-                  true,
-                  'before startling lib proxy project',
-                );
-              }
               try {
                 await proxyProject.execute(commandForLibraryBuild, {
                   similarProcessKey: 'ng',
@@ -3552,27 +3654,6 @@ ${otherProjectNames
   }
   //#endregion
 
-  //#region getters & methods / get available isomorpic packages in node_modules
-  get __availableIsomorphicPackagesInNodeModules(): string[] {
-    //#region @backendFunc
-    const jsonPath = path.join(
-      this.location,
-      PackagesRecognition.FILE_NAME_ISOMORPHIC_PACKAGES,
-    );
-    try {
-      const json = Helpers.readJson(jsonPath) as {
-        isomorphicPackages: string[];
-      };
-      return json && _.isArray(json.isomorphicPackages)
-        ? json.isomorphicPackages
-        : [];
-    } catch (error) {
-      return [];
-    }
-    //#endregion
-  }
-  //#endregion
-
   //#region getters & methods / get trusted packages from tnp
   get __trusted(): string[] {
     //#region @backendFunc
@@ -3940,7 +4021,7 @@ ${otherProjectNames
     //#endregion
 
     //#region prevent empty firedev node_modules
-    this.coreContainer.__node_modules.reinstallIfNeeded();
+    await this.coreContainer.__node_modules.reinstallIfNeeded();
     //#endregion
 
     //#region prevent not requested framework version
@@ -4145,13 +4226,6 @@ ${config.frameworkName} start
 
     `);
 
-    if (!this.__isVscodeExtension) {
-      PackagesRecognition.fromProject(this as any).start(
-        void 0,
-        '[buildable-project]',
-      );
-    }
-
     //#region build assets file
     /**
      * Build assets file for app in app build mode
@@ -4258,6 +4332,7 @@ ${config.frameworkName} start
     isSmartContainerChild: ${this.__isSmartContainerChild}
     isSmartContainerTarget: ${this.__isSmartContainerTarget}
     isSmartContainerTargetNonClient: ${this.__isSmartContainerTargetNonClient}
+    should dedupe packages ${this.__node_modules.shouldDedupePackages}
 
     genericName: ${this.genericName}
 
@@ -4368,12 +4443,12 @@ ${config.frameworkName} start
           '${workspaceFolder}/dist/**/*.js',
           '!**/node_modules/**',
           ...Helpers.uniqArray(
-            this.__isomorphicPackages
+            this.allIsomorphicPackagesFromMemory
               .map(packageName => {
                 const p = this.pathFor([
                   config.folder.node_modules,
                   packageName,
-                  config.folder.src,
+                  config.folder.source,
                 ]);
                 return Helpers.isExistedSymlink(p)
                   ? `${crossPlatformPath(fse.realpathSync(p))}/../dist/**/*.js`

@@ -36,20 +36,8 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
       'container',
       this.project.__frameworkVersion,
     ) as Project;
-    const independentProjects = [];
 
-    Helpers.log(
-      `[${config.frameworkName}][copytoall] UPDATING ALSO container core ${this.project.__frameworkVersion}...`,
-    );
-
-    const packageName = this.project.__isSmartContainer
-      ? '@' + this.project.name
-      : this.project.name;
-    Helpers.createSymLink(
-      crossPlatformPath([containerCoreProj.__node_modules.path, packageName]),
-      crossPlatformPath([containerCoreProj.__node_modules.path, packageName]),
-      { continueWhenExistedFolderDoesntExists: true },
-    );
+    const independentProjects = [containerCoreProj];
 
     if (config.frameworkName === 'tnp' && this.project.name !== 'tnp') {
       // tnp in tnp is not being used at all
@@ -135,7 +123,7 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
       ] as Project[];
     } else {
       result = [this.localTempProj, ...node_modules_projs];
-    }
+    } // @ts-ignore
     return Helpers.uniqArray<Project>(result, 'location');
   }
   //#endregion
@@ -251,7 +239,9 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
       //#region show info about generation
       let dir = path.basename(path.dirname(destinationLocation));
       if (fse.existsSync(path.dirname(path.dirname(destinationLocation)))) {
-        dir = `${path.basename(path.dirname(path.dirname(destinationLocation)))}/${dir}`;
+        dir = `${path.basename(
+          path.dirname(path.dirname(destinationLocation)),
+        )}/${dir}`;
       }
       Helpers.log(
         `Source of project "${this.project.genericName}" generated in ${dir} /(< here >) `,
@@ -310,7 +300,7 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
   //#endregion
 
   updateTriggered = _.debounce(() => {
-    Helpers.logInfo(`[copy-manager] update triggered`);
+    Helpers.log(`[copy-manager] update triggered`);
   }, 1000);
 
   //#region async action
@@ -376,7 +366,9 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
         `From now... ${porjectINfo} will be updated after every change...`,
       );
 
-      Helpers.info(`[buildable-project] copying compiled code/assets to ${projectToCopyTo.length} other projects...
+      Helpers.info(`[buildable-project] copying compiled code/assets to ${
+        projectToCopyTo.length
+      } other projects...
 ${projectToCopyTo.map(proj => `- ${proj.genericName}`).join('\n')}
       `);
     }

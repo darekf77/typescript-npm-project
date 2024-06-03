@@ -20,6 +20,7 @@ export async function start(
   mode: 'dist' | 'npm' = 'dist',
 ) {
   config.frameworkName = frameworkName;
+  // console.log('frameworkName', frameworkName);
 
   Helpers.log(`ins start, mode: "${mode}"`);
   const ProjectClass = (await import('./lib/project/abstract/project')).Project;

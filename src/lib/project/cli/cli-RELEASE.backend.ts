@@ -10,7 +10,7 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
   __initialize__() {
     //#region resolve smart containter
     let resolved = [];
-    if (this.project.__isContainer) {
+    if (this.project.__isContainer) { // @ts-ignore
       resolved = Helpers.cliTool.resolveItemsFromArgsBegin<Project>(
         this.args,
         a => {
@@ -202,7 +202,9 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
     if (project.__isSmartContainer) {
       Helpers.info(`Pacakges available for new version release:
 
-${project.children.map(c => ` - @${project.name}/${c.name} v${newVersion}`).join('\n')}
+${project.children
+  .map(c => ` - @${project.name}/${c.name} v${newVersion}`)
+  .join('\n')}
 `);
       const message = 'Proceed with lib release ?';
 
@@ -216,19 +218,27 @@ ${project.children.map(c => ` - @${project.name}/${c.name} v${newVersion}`).join
       .map(
         (c, index) =>
           `(${index + 1}) ` +
-          `${c.__isSmartContainer ? '@' + c.name + `/(${c.children.map(l => l.name).join(',')})` : c.name}` +
+          `${
+            c.__isSmartContainer
+              ? '@' + c.name + `/(${c.children.map(l => l.name).join(',')})`
+              : c.name
+          }` +
           `@${c.getVersionFor(releaseOptions.releaseType)}`,
       )
       .join(', ')}
     `);
-      const message = `Proceed ${releaseOptions.automaticRelease ? '(automatic)' : ''} release of packages from ${project.genericName} ?`;
+      const message = `Proceed ${
+        releaseOptions.automaticRelease ? '(automatic)' : ''
+      } release of packages from ${project.genericName} ?`;
       if (!(await Helpers.questionYesNo(message))) {
         this._exit();
       }
       return true;
     } else {
       const message = `Proceed with release of new version: ${newVersion} ?`;
-      return await Helpers.questionYesNo(message);
+      return releaseOptions.automaticRelease
+        ? true
+        : await Helpers.questionYesNo(message);
     }
     //#endregion
   }

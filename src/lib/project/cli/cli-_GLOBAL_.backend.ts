@@ -35,7 +35,7 @@ import { MagicRenamer } from 'magic-renamer/src';
 declare const ENV: any;
 //#endregion
 
-class $Global extends BaseCommandLine<{}, Project> {
+export class $Global extends BaseCommandLine<{}, Project> {
   public _() {
     Helpers.error('Please select proper command.', false, true);
     this._exit();
@@ -69,7 +69,7 @@ class $Global extends BaseCommandLine<{}, Project> {
   //#endregion
 
   //#region fork
-  fork() {
+  async fork() {
     const argv = this.args;
     const githubUrl = _.first(argv);
     let projectName = _.last(githubUrl.replace('.git', '').split('/'));
@@ -108,7 +108,7 @@ class $Global extends BaseCommandLine<{}, Project> {
         {},
       );
       // const dependencies = Helpers.readValueFromJson(path.join(newProj.location, config.file.package_json), 'dependencies') as Object;
-      newProj.run(`${config.frameworkName} init`).sync();
+      await newProj.init('forking project');
       newProj = Project.ins.From(
         path.join(this.project.location, projectName),
       ) as Project;
@@ -196,6 +196,9 @@ class $Global extends BaseCommandLine<{}, Project> {
   //#endregion
 
   //#region add import src
+  /**
+   * @deprecated
+   */
   ADD_IMPORT_SRC() {
     const project = this.project as Project;
 
@@ -284,9 +287,8 @@ class $Global extends BaseCommandLine<{}, Project> {
     };
 
     const addImportSrc = (proj: Project) => {
-      PackagesRecognition.fromProject(proj).start(true, 'src adding process');
       const pacakges = [
-        ...BrowserCodeCut.IsomorphicLibs,
+        ...proj.allIsomorphicPackagesFromMemory,
         ...(proj.__isSmartContainerChild
           ? proj.parent.children.map(c => `@${proj.parent.name}/${c.name}`)
           : []),
@@ -543,8 +545,9 @@ class $Global extends BaseCommandLine<{}, Project> {
 
       project.__packageJson.data.bin = {};
       countLinkInPackageJsonBin.forEach(p => {
-        project.__packageJson.data.bin[path.basename(p)] =
-          `bin/${path.basename(p)}`;
+        project.__packageJson.data.bin[path.basename(p)] = `bin/${path.basename(
+          p,
+        )}`;
       });
       project.__packageJson.save(`update bin data`);
 
@@ -568,8 +571,8 @@ class $Global extends BaseCommandLine<{}, Project> {
           const attachDebugParam = inspect
             ? '--inspect'
             : inspectBrk
-              ? '--inspect-brk'
-              : '';
+            ? '--inspect-brk'
+            : '';
 
           if (process.platform === 'win32') {
             Helpers.writeFile(
@@ -583,10 +586,14 @@ class $Global extends BaseCommandLine<{}, Project> {
   esac
 
   if [ -x "$basedir/node" ]; then
-    "$basedir/node" ${attachDebugParam} "$basedir/node_modules/${path.basename(project.location)}/bin/${globalName}" "$@"
+    "$basedir/node" ${attachDebugParam} "$basedir/node_modules/${path.basename(
+      project.location,
+    )}/bin/${globalName}" "$@"
     ret=$?
   else
-    node ${attachDebugParam} "$basedir/node_modules/${path.basename(project.location)}/bin/${globalName}" "$@"
+    node ${attachDebugParam} "$basedir/node_modules/${path.basename(
+      project.location,
+    )}/bin/${globalName}" "$@"
     ret=$?
   fi
   exit $ret
@@ -611,10 +618,14 @@ class $Global extends BaseCommandLine<{}, Project> {
   }
   $ret=0
   if (Test-Path "$basedir/node$exe") {
-    & "$basedir/node$exe"  "$basedir/node_modules/${path.basename(project.location)}/bin/${globalName}" $args
+    & "$basedir/node$exe"  "$basedir/node_modules/${path.basename(
+      project.location,
+    )}/bin/${globalName}" $args
     $ret=$LASTEXITCODE
   } else {
-    & "node$exe"  "$basedir/node_modules/${path.basename(project.location)}/bin/${globalName}" $args
+    & "node$exe"  "$basedir/node_modules/${path.basename(
+      project.location,
+    )}/bin/${globalName}" $args
     $ret=$LASTEXITCODE
   }
   exit $ret
@@ -638,7 +649,9 @@ class $Global extends BaseCommandLine<{}, Project> {
     SET PATHEXT=%PATHEXT:;.JS;=;%
   )
 
-  "%_prog%"  "%dp0%\\node_modules\\${path.basename(project.location)}\\bin\\${globalName}" %*
+  "%_prog%"  "%dp0%\\node_modules\\${path.basename(
+    project.location,
+  )}\\bin\\${globalName}" %*
   ENDLOCAL
   EXIT /b %errorlevel%
   :find_dp0
@@ -650,7 +663,9 @@ class $Global extends BaseCommandLine<{}, Project> {
           } else {
             Helpers.createSymLink(localPath, destinationGlobalLink);
             const command = `chmod +x ${destinationGlobalLink}`;
-            Helpers.log(`Trying to make file exacutable global command "${chalk.bold(globalName)}".
+            Helpers.log(`Trying to make file exacutable global command "${chalk.bold(
+              globalName,
+            )}".
 
             command: ${command}
             `);
@@ -788,6 +803,11 @@ class $Global extends BaseCommandLine<{}, Project> {
   //#endregion
 
   //#region reinstall
+  async reinstallCore() {
+    await this.project.coreContainer?.__npmPackages.installFromArgs('');
+    this._exit();
+  }
+
   async REINSTALL(): Promise<void> {
     // await Helpers.killAllNodeExceptCurrentProcess();
     const proj = this.project;
@@ -795,7 +815,7 @@ class $Global extends BaseCommandLine<{}, Project> {
     if (proj.__isContainer) {
       if (proj.__isContainerCoreProject) {
         proj.__node_modules.remove();
-        proj.__npmPackages.installFromArgs('');
+        await proj.__npmPackages.installFromArgs('');
         Helpers.info(`Reinstal done for core container`);
       } else {
         // smart container or normal container
@@ -812,13 +832,10 @@ class $Global extends BaseCommandLine<{}, Project> {
           await c.init('initing after reinstall');
         }
       }
-    } else if (
-      proj.__isStandaloneProject &&
-      proj.__npmPackages.useLinkAsNodeModules
-    ) {
+    } else if (proj.__isStandaloneProject) {
       proj.__node_modules.remove();
-      proj.__npmPackages.installFromArgs('');
-      Helpers.info(`Reinstal done for core standalone project`);
+      await proj.__npmPackages.installFromArgs('');
+      // Helpers.info(`Reinstal done for core standalone project`);
     } else {
       Helpers.error(
         `[${config.frameworkName}] This project does not support reinsall.
@@ -937,8 +954,9 @@ class $Global extends BaseCommandLine<{}, Project> {
   //#endregion
 
   //#region version
+
   async version() {
-    Helpers.log(`Framework name: ${config.frameworkName}`);
+    // Helpers.log(`Framework name: '${config.frameworkName}'`);
     //#region @notForNpm
     if (ENV.notForNpm) {
       Helpers.success(`I am secret project!!!`);
@@ -1041,75 +1059,76 @@ class $Global extends BaseCommandLine<{}, Project> {
   //#endregion
 
   //#region autoupdate
-  async autoupdate() {
-    if (config.frameworkName === 'firedev') {
-      Helpers.run('npm i -g firedev', { output: true }).sync();
-      if (
-        await Helpers.questionYesNo(
-          `Proceed with ${config.frameworkName} auto-update ?`,
-        )
-      ) {
-        Project.sync();
-      }
-    }
-    if (config.frameworkName === 'tnp') {
-      Helpers.taskStarted('Removing old node_modules..');
-      const nm = Project.ins.Tnp.__node_modules.path;
-      const nm2 = Project.ins.Tnp.pathFor(`tmp-${config.folder.node_modules}2`);
-      const nm1 = Project.ins.Tnp.pathFor(`tmp-${config.folder.node_modules}1`);
+  // async autoupdate() {
+  // TODO move to electron app
+  //   if (config.frameworkName === 'firedev') {
+  //     Helpers.run('npm i -g firedev', { output: true }).sync();
+  //     if (
+  //       await Helpers.questionYesNo(
+  //         `Proceed with ${config.frameworkName} auto-update ?`,
+  //       )
+  //     ) {
+  //       Project.sync();
+  //     }
+  //   }
+  //   if (config.frameworkName === 'tnp') {
+  //     Helpers.taskStarted('Removing old node_modules..');
+  //     const nm = Project.ins.Tnp.__node_modules.path;
+  //     const nm2 = Project.ins.Tnp.pathFor(`tmp-${config.folder.node_modules}2`);
+  //     const nm1 = Project.ins.Tnp.pathFor(`tmp-${config.folder.node_modules}1`);
 
-      if (process.platform !== 'win32') {
-        Helpers.removeIfExists(nm2);
-        if (Helpers.exists(nm1)) {
-          Helpers.move(nm1, nm2);
-        }
-        Helpers.removeIfExists(nm1);
-        if (Helpers.exists(nm)) {
-          Helpers.move(nm, nm1);
-        }
-      }
-      Helpers.taskDone();
+  //     if (process.platform !== 'win32') {
+  //       Helpers.removeIfExists(nm2);
+  //       if (Helpers.exists(nm1)) {
+  //         Helpers.move(nm1, nm2);
+  //       }
+  //       Helpers.removeIfExists(nm1);
+  //       if (Helpers.exists(nm)) {
+  //         Helpers.move(nm, nm1);
+  //       }
+  //     }
+  //     Helpers.taskDone();
 
-      Helpers.taskStarted(
-        `Installing new version of ${config.frameworkName} pacakges`,
-      );
-      Project.ins.Tnp.run(
-        `npm i --force && npm-run tsc && ${config.frameworkName} dedupe`,
-      ).sync();
-      Helpers.taskDone();
+  //     Helpers.taskStarted(
+  //       `Installing new version of ${config.frameworkName} pacakges`,
+  //     );
+  //     Project.ins.Tnp.run(
+  //       `npm i --force && npm-run tsc && ${config.frameworkName} dedupe`,
+  //     ).sync();
+  //     Helpers.taskDone();
 
-      const arrActive = config.activeFramewrokVersions;
-      for (let index = 0; index < arrActive.length; index++) {
-        const defaultFrameworkVersionForSpecyficContainer = arrActive[index];
-        Helpers.taskStarted(
-          `Installing new versions smart container ${defaultFrameworkVersionForSpecyficContainer} pacakges`,
-        );
-        const container = Project.by(
-          'container',
-          defaultFrameworkVersionForSpecyficContainer,
-        );
-        container.run(`${config.frameworkName}  reinstall`).sync();
+  //     const arrActive = config.activeFramewrokVersions;
+  //     for (let index = 0; index < arrActive.length; index++) {
+  //       const defaultFrameworkVersionForSpecyficContainer = arrActive[index];
+  //       Helpers.taskStarted(
+  //         `Installing new versions smart container ${defaultFrameworkVersionForSpecyficContainer} pacakges`,
+  //       );
+  //       const container = Project.by(
+  //         'container',
+  //         defaultFrameworkVersionForSpecyficContainer,
+  //       );
+  //       container.run(`${config.frameworkName}  ${$Global.prototype.REINSTALL.name}`).sync();
 
-        Helpers.taskDone();
-      }
-      Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
-    }
-    // const file = path.basename(args.trim());
-    // function processing() {
-    //   Helpers.info(`processing file...`);
-    // }
-    // switch (file) {
-    //   case config.file.tmpIsomorphicPackagesJson:
-    //     processing();
-    //     PackagesRecognition.fromProject(this.project).start(true, '[update process]');
-    //     break;
-    //   default:
-    //     Helpers.error(`Not recognized file for update`, false, true);
-    //     break;
-    // }
-    Helpers.info(`${config.frameworkName} - AUTOUPDATE  DONE`);
-    this._exit();
-  }
+  //       Helpers.taskDone();
+  //     }
+  //     Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
+  //   }
+  //   // const file = path.basename(args.trim());
+  //   // function processing() {
+  //   //   Helpers.info(`processing file...`);
+  //   // }
+  //   // switch (file) {
+  //   //   case config.file.tmpIsomorphicPackagesJson:
+  //   //     processing();
+  //   //     PackagesRecognition.fromProject(this.project).start(true, '[update process]');
+  //   //     break;
+  //   //   default:
+  //   //     Helpers.error(`Not recognized file for update`, false, true);
+  //   //     break;
+  //   // }
+  //   Helpers.info(`${config.frameworkName} - AUTOUPDATE  DONE`);
+  //   this._exit();
+  // }
   //#endregion
 
   //#region copy and rename (vscode option)

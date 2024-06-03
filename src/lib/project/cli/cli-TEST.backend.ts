@@ -72,7 +72,7 @@ export class $Test extends CommandLineFeature<{}, Project> {
       ? possibleTest
       : void 0;
     const res = testType
-      ? testType
+      ? testType // @ts-ignore
       : await Helpers.consoleGui.select<Models.TestTypeFiredev>(
           `What do you want to test ? ${
             !watch ? '(single run ' : '(watch mode '

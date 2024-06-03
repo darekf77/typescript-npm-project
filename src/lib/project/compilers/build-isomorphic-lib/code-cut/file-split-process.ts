@@ -1,6 +1,6 @@
 import { extAllowedToExportAndReplaceTSJSCodeFiles } from 'tnp-config/src';
 import { Helpers } from 'tnp-helpers/src';
-import { path, _ } from 'tnp-core';
+import { path, _ } from 'tnp-core/src';
 import { TsImportExport, recognizeImportsFromFile } from 'tnp-helpers/src';
 import { CODE_SPLIT_PROCESS } from './code-split-process.enum';
 import type { CallBackProcess } from './code-split-process.enum';

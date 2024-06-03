@@ -134,7 +134,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
           config.folder.src,
         ),
       );
-      if(Helpers.exists(destPackageLinkSourceLocation)) {
+      if (Helpers.exists(destPackageLinkSourceLocation)) {
         return false;
       }
     }
@@ -451,7 +451,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
    * example: '@angular/core'
    */
   childPackageName(child: Project) {
-    return crossPlatformPath(path.join(this.rootPackageName, child.name));
+    return crossPlatformPath([this.rootPackageName, child.name]);
   }
   //#endregion
 
@@ -463,9 +463,10 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
     child: Project,
     currentBrowserFolder: 'browser' | 'websql' | string,
   ) {
-    return crossPlatformPath(
-      path.join(this.childPackageName(child), currentBrowserFolder),
-    );
+    return crossPlatformPath([
+      this.childPackageName(child),
+      currentBrowserFolder,
+    ]);
   }
   //#endregion
 
@@ -736,6 +737,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
       //#region final copy from dist to node_moules/rootpackagename
       const pkgLocInDestNodeModulesForChild =
         destination.__node_modules.pathFor(rootPackageNameForChild);
+
       const filter = Helpers.filterDontCopy(
         this.sourceFolders,
         monitorDirForModule,
@@ -765,7 +767,9 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
         this.rootPackageName,
         config.file.index_d_ts,
       ),
-      `// Plase use: import { < anything > } from '@${this.project.name}/<${this.children.map(c => c.name).join('|')}>';\n`,
+      `// Plase use: import { < anything > } from '@${
+        this.project.name
+      }/<${this.children.map(c => c.name).join('|')}>';\n`,
     );
   }
   //#endregion

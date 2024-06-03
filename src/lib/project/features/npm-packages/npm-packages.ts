@@ -6,15 +6,19 @@ import { resolvePacakgesFromArgs } from './npm-packages-helpers.backend';
 import { config } from 'tnp-config/src';
 
 export class NpmPackages extends NpmPackagesBase {
-  public installFromArgs(packagesNamesSpaceSeparated: string): void {
+  public async installFromArgs(
+    packagesNamesSpaceSeparated: string,
+  ): Promise<void> {
     const project = this.project;
     const args = packagesNamesSpaceSeparated.split(' ').filter(a => !!a);
 
     if (args.length === 0) {
-      project.__npmPackages.installProcess(`${config.frameworkName} install`);
+      await project.__npmPackages.installProcess(
+        `${config.frameworkName} install`,
+      );
     } else {
       const packages = resolvePacakgesFromArgs(args);
-      project.__npmPackages.installProcess(
+      await project.__npmPackages.installProcess(
         `${config.frameworkName} install ${packages
           .map(
             p =>
@@ -26,7 +30,9 @@ export class NpmPackages extends NpmPackagesBase {
     }
   }
 
-  public uninstallFromArgs(packagesNamesSpaceSeparated: string): void {
+  public async uninstallFromArgs(
+    packagesNamesSpaceSeparated: string,
+  ): Promise<void> {
     const project = this.project;
     const args = packagesNamesSpaceSeparated.split(' ').filter(a => !!a);
 
@@ -38,7 +44,7 @@ export class NpmPackages extends NpmPackagesBase {
       );
     } else {
       const packages = resolvePacakgesFromArgs(args);
-      project.__npmPackages.installProcess(
+      await project.__npmPackages.installProcess(
         `${config.frameworkName} uninstall ${packages
           .map(
             p =>

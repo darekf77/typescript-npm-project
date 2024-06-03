@@ -74,7 +74,7 @@ export class $Init extends CommandLineFeature<InitOptions, Project> {
       `Do you wanna init project in this folder ?`,
     );
     if (yesNewProj) {
-      const responseProjectType =
+      const responseProjectType = // @ts-ignore
         await Helpers.autocompleteAsk<CoreModels.LibType>(
           `Choose type of project`,
           [
