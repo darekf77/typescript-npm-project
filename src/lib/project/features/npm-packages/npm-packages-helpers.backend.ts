@@ -92,7 +92,7 @@ export function prepareCommand(
   } else {
     // --no-progress
     const argsForFasterInstall =
-      `--force --ignore-engines --no-audit `;
+      `--force --ignore-engines --no-audit --silent --no-progress  `;
     command =
       `npm ${install} ${pkg ? pkg.name : ''} ` +
       ` ${pkg && pkg.installType ? pkg.installType : ''} ` +

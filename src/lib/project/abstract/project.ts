@@ -13,7 +13,9 @@ import {
   tmpBuildPort,
   tmpBaseHrefOverwriteRelPath,
 } from '../../constants';
+
 //#region @backend
+import type { $Global } from '../cli/cli-_GLOBAL_.backend';
 import { fse, json5, os, dateformat } from 'tnp-core/src';
 import { child_process } from 'tnp-core/src';
 import { Firedev } from 'firedev/src';
@@ -637,19 +639,24 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     if (this.coreContainer?.__inMemoryIsomorphicLibs.length === 0) {
       this.resolveAndAddIsomorphicLibsToMemoery(
         PackagesRecognition.instance(this.coreContainer).libsFromJson,
-        true
+        true,
       );
+
       if (this.coreContainer?.__inMemoryIsomorphicLibs.length === 0) {
-        Helpers.error(
-          `Please synchonize ${config.frameworkName} framework.
-
-
-        ${config.frameworkName} sync
-
-        `,
-          false,
+        this.coreContainer
+          .run(`${config.frameworkName}  ${'reinstallCore' as keyof $Global}`)
+          .sync();
+        this.resolveAndAddIsomorphicLibsToMemoery(
+          PackagesRecognition.instance(this.coreContainer).libsFromJson,
           true,
         );
+        if (this.coreContainer?.__inMemoryIsomorphicLibs.length === 0) {
+          Helpers.error(
+            `Not able to resolve isomorphic libs for core container...`,
+            false,
+            true,
+          );
+        }
       }
     }
     return this.coreContainer.__inMemoryIsomorphicLibs;
@@ -700,6 +707,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   public __insideStructure: InsideStructures;
   public __singluarBuild: SingularBuild;
   public __webpackBackendBuild: WebpackBackendCompilation;
+
   public __linkedRepos: LinkedRepos;
   //#endregion
 
@@ -773,6 +781,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   // get isNotInitedProject() {
   //   return !this.pathExists('tmp-libs-for-dist');
   // }
+
   //#endregion
 
   //#region getters & methods / set project info port
@@ -855,14 +864,6 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     //   result.push('morphi'); // TODO QUICK_FIX
     // }
     return result;
-    //#endregion
-  }
-  //#endregion
-
-  //#region getters & methods / install npm packages
-  installNpmPackages() {
-    //#region @backendFunc
-    this.__npmPackages.installFromArgs('');
     //#endregion
   }
   //#endregion
@@ -2023,6 +2024,7 @@ trim_trailing_whitespace = false
   public __frameworkVersionEquals(version: CoreModels.FrameworkVersion) {
     //#region @backendFunc
     const ver = Number(_.isString(version) && version.replace('v', ''));
+
     const curr = Number(
       _.isString(this.__frameworkVersion) &&
         this.__frameworkVersion.replace('v', ''),
@@ -2362,7 +2364,7 @@ processing...
         await this.__targetProjects.update();
       } else {
         if (!this.__node_modules.exist) {
-          this.__npmPackages.installFromArgs('');
+          await this.__npmPackages.installFromArgs('');
         }
 
         const tryReleaseProject = async () => {

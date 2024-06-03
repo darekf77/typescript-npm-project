@@ -35,7 +35,7 @@ import { MagicRenamer } from 'magic-renamer/src';
 declare const ENV: any;
 //#endregion
 
-class $Global extends BaseCommandLine<{}, Project> {
+export class $Global extends BaseCommandLine<{}, Project> {
   public _() {
     Helpers.error('Please select proper command.', false, true);
     this._exit();
@@ -803,6 +803,11 @@ class $Global extends BaseCommandLine<{}, Project> {
   //#endregion
 
   //#region reinstall
+  async reinstallCore() {
+    await this.project.coreContainer?.__npmPackages.installFromArgs('');
+    this._exit();
+  }
+
   async REINSTALL(): Promise<void> {
     // await Helpers.killAllNodeExceptCurrentProcess();
     const proj = this.project;
@@ -810,7 +815,7 @@ class $Global extends BaseCommandLine<{}, Project> {
     if (proj.__isContainer) {
       if (proj.__isContainerCoreProject) {
         proj.__node_modules.remove();
-        proj.__npmPackages.installFromArgs('');
+        await proj.__npmPackages.installFromArgs('');
         Helpers.info(`Reinstal done for core container`);
       } else {
         // smart container or normal container
@@ -827,12 +832,9 @@ class $Global extends BaseCommandLine<{}, Project> {
           await c.init('initing after reinstall');
         }
       }
-    } else if (
-      proj.__isStandaloneProject &&
-      proj.__npmPackages.useLinkAsNodeModules
-    ) {
+    } else if (proj.__isStandaloneProject) {
       proj.__node_modules.remove();
-      proj.__npmPackages.installFromArgs('');
+      await proj.__npmPackages.installFromArgs('');
       Helpers.info(`Reinstal done for core standalone project`);
     } else {
       Helpers.error(

@@ -69,9 +69,9 @@ export class PackagesRecognition {
 
   get libsFromJson(): string[] {
     const json = Helpers.readJson(this.jsonPath) || {};
-    console.log(`json: `,this.jsonPath )
+    // console.log(`json: `,this.jsonPath )
     const arr = json[config.array.isomorphicPackages] || [];
-    console.log(`libs from json: `,arr);
+    // console.log(`libs from json: `,arr);
     return arr;
   }
   //#endregion

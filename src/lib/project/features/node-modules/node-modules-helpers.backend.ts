@@ -8,6 +8,7 @@ import { Helpers } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
 
 //#region dedupe packages
+
 export function dedupePackages(
   projectLocation: string,
   packagesNames?: string[],
@@ -15,7 +16,9 @@ export function dedupePackages(
   warnings = true,
 ) {
   Helpers.taskStarted(
-    `${countOnly ? 'Counting' : 'Fixing/removing'} duplicates ${path.basename(projectLocation)}/node_modules`,
+    `${countOnly ? 'Counting' : 'Fixing/removing'} duplicates ${path.basename(
+      projectLocation,
+    )}/node_modules`,
   );
 
   const rules: {
@@ -73,7 +76,9 @@ export function dedupePackages(
     if (!fse.existsSync(nodeMod)) {
       Helpers.mkdirp(nodeMod);
     }
-    const removeCommand = `find ${config.folder.node_modules}/ -name ${f.replace('@', '\\@')} `;
+    const removeCommand = `find ${
+      config.folder.node_modules
+    }/ -name ${f.replace('@', '\\@')} `;
     // console.log(`removeCommand: ${removeCommand}`)
     const res = Helpers.run(removeCommand, {
       output: false,
@@ -110,7 +115,9 @@ export function dedupePackages(
             '',
           );
           Helpers.info(
-            `${i + 1}. Duplicate "${nproj.name}@${nproj.version}" in:\n\t ${chalk.bold(p)}\n`,
+            `${i + 1}. Duplicate "${nproj.name}@${
+              nproj.version
+            }" in:\n\t ${chalk.bold(p)}\n`,
           );
         }
       });
@@ -128,7 +135,9 @@ export function dedupePackages(
             .dirname(p)
             .replace(
               new RegExp(
-                `${Helpers.escapeStringForRegEx(config.folder.node_modules)}\/?$`,
+                `${Helpers.escapeStringForRegEx(
+                  config.folder.node_modules,
+                )}\/?$`,
               ),
               '',
             )
@@ -155,14 +164,18 @@ export function dedupePackages(
           ) {
             Helpers.logWarn(
               `[excluded] Ommiting duplicate of ` +
-                `${parentLabel}${current.name}@${versionRem} inside ${chalk.bold(parentName)}`,
+                `${parentLabel}${
+                  current.name
+                }@${versionRem} inside ${chalk.bold(parentName)}`,
             );
             return;
           }
           if (_.isArray(r.onlyFor) && !r.onlyFor.includes(parentName)) {
             Helpers.logWarn(
               `[not included] Ommiting duplicate of ` +
-                `${parentLabel}${current.name}@${versionRem} inside ${chalk.bold(parentName)}`,
+                `${parentLabel}${
+                  current.name
+                }@${versionRem} inside ${chalk.bold(parentName)}`,
             );
             return;
           }
@@ -178,7 +191,9 @@ export function dedupePackages(
   });
 
   Helpers.taskDone(
-    `${countOnly ? 'Counting' : 'Fixing/removing'} duplicates from npm container`,
+    `${
+      countOnly ? 'Counting' : 'Fixing/removing'
+    } duplicates from npm container`,
   );
 }
 //#endregion
