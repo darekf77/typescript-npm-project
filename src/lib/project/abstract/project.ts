@@ -15,7 +15,7 @@ import {
 } from '../../constants';
 
 //#region @backend
-import type { $Global } from '../cli/cli-_GLOBAL_.backend';
+import { $Global } from '../cli/cli-_GLOBAL_.backend';
 import { fse, json5, os, dateformat } from 'tnp-core/src';
 import { child_process } from 'tnp-core/src';
 import { Firedev } from 'firedev/src';
@@ -285,6 +285,8 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     //#region @backendFunc
     const cwd = firedevRepoPathUserInUserDir;
     Helpers.info(`Syncing... Fetching git data... `);
+
+    //#region reset origin of firedev repo
     try {
       Helpers.run(`git reset --hard && git clean -df && git fetch`, {
         cwd,
@@ -297,7 +299,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
         true,
       );
     }
+    //#endregion
 
+    //#region checkout master
     try {
       Helpers.run(`git checkout master`, { cwd, output: false }).sync();
       Helpers.log('DONE CHECKING OUT MASTER');
@@ -309,7 +313,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
         true,
       );
     }
+    //#endregion
 
+    //#region pull master with tags
     try {
       Helpers.run(`git pull --tags origin master`, {
         cwd,
@@ -324,7 +330,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
         true,
       );
     }
+    //#endregion
 
+    //#region checkout lastest tag
     // TODO  SPLIT TO SEPARATED CONTAINERS
     const tagToCheckout = Project.morphiTagToCheckoutForCurrentCliVersion(cwd);
     const currentBranch = Helpers.git.currentBranchName(cwd);
@@ -345,6 +353,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
         );
       }
     }
+    //#endregion
+
+    //#region pull latest tag
     try {
       Helpers.run(`git pull origin ${tagToCheckout}`, { cwd }).sync();
     } catch (error) {
@@ -354,10 +365,13 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
         false,
       );
     }
+    //#endregion
 
+    //#region remove vscode folder
     try {
       Helpers.run('rimraf .vscode', { cwd }).sync();
     } catch (error) {}
+    //#endregion
 
     Project.reinstallActiveFrameworkContainers();
 
@@ -368,16 +382,21 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
   //#region static / reinstall active framework containers
   private static reinstallActiveFrameworkContainers() {
+    //#region @backendFunc
     for (const ver of config.activeFramewrokVersions) {
       const nodeModulesForContainer = crossPlatformPath([
         firedevRepoPathUserInUserDir,
         `projects/container-${ver}`,
       ]);
-      Helpers.run(`${config.frameworkName} reinstall --skipCoreCheck`, {
-        cwd: nodeModulesForContainer,
-      }).sync();
+      Helpers.run(
+        `${config.frameworkName} ${$Global.prototype.REINSTALL.name} --skipCoreCheck`,
+        {
+          cwd: nodeModulesForContainer,
+        },
+      ).sync();
       Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
     }
+    //#endregion
   }
   //#endregion
 
@@ -420,7 +439,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
       try {
         child_process.execSync(
-          `${config.frameworkName} env:install --skipCoreCheck`,
+          `${config.frameworkName}  ${$Global.prototype.ENV_INSTALL.name} --skipCoreCheck`,
           { stdio: [0, 1, 2] },
         );
       } catch (error) {
@@ -448,7 +467,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
       try {
         child_process.execSync(
-          `${config.frameworkName} init:core --skipCoreCheck`,
+          `${config.frameworkName} ${$Global.prototype.INIT_CORE.name} --skipCoreCheck`,
           {
             stdio: [0, 1, 2],
           },
@@ -466,13 +485,14 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       this.hasResolveCoreDepsAndFolder = true;
     }
 
-    if (
-      !this.nodeModulesInstalledForCoreContainer &&
-      config.frameworkName === 'firedev' &&
-      !global.skipCoreCheck
-    ) {
-      Project.reinstallActiveFrameworkContainers();
-    }
+    // TODO (remove this) this is causing problems
+    // if (
+    //   !this.nodeModulesInstalledForCoreContainer &&
+    //   config.frameworkName === 'firedev' &&
+    //   !global.skipCoreCheck
+    // ) {
+    //   Project.reinstallActiveFrameworkContainers();
+    // }
     //#endregion
   }
   //#endregion
@@ -644,7 +664,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
       if (this.coreContainer?.__inMemoryIsomorphicLibs.length === 0) {
         this.coreContainer
-          .run(`${config.frameworkName}  ${'reinstallCore' as keyof $Global}`)
+          .run(
+            `${config.frameworkName}  ${$Global.prototype.reinstallCore.name}`,
+          )
           .sync();
         this.resolveAndAddIsomorphicLibsToMemoery(
           PackagesRecognition.instance(this.coreContainer).libsFromJson,

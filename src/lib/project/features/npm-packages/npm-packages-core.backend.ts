@@ -24,11 +24,11 @@ import {
 //#endregion
 
 export class NpmPackagesCore extends BaseFeatureForProject<Project> {
-  global(globalPackageName: string, packageOnly = false) {
+  async global(globalPackageName: string, packageOnly = false) {
     const oldContainer = Project.by('container', 'v1') as Project;
     if (!oldContainer.__node_modules.exist) {
       Helpers.info('initing container v1 for global packages');
-      oldContainer.run(`${config.frameworkName} init`).sync();
+      await oldContainer.init('old container init');
     }
     if (packageOnly) {
       return crossPlatformPath(

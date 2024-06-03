@@ -69,7 +69,7 @@ export class $Global extends BaseCommandLine<{}, Project> {
   //#endregion
 
   //#region fork
-  fork() {
+  async fork() {
     const argv = this.args;
     const githubUrl = _.first(argv);
     let projectName = _.last(githubUrl.replace('.git', '').split('/'));
@@ -108,7 +108,7 @@ export class $Global extends BaseCommandLine<{}, Project> {
         {},
       );
       // const dependencies = Helpers.readValueFromJson(path.join(newProj.location, config.file.package_json), 'dependencies') as Object;
-      newProj.run(`${config.frameworkName} init`).sync();
+      await newProj.init('forking project');
       newProj = Project.ins.From(
         path.join(this.project.location, projectName),
       ) as Project;
@@ -955,7 +955,7 @@ export class $Global extends BaseCommandLine<{}, Project> {
 
   //#region version
   async version() {
-    Helpers.log(`Framework name: ${config.frameworkName}`);
+    Helpers.log(`Framework name: '${config.frameworkName}'`);
     //#region @notForNpm
     if (ENV.notForNpm) {
       Helpers.success(`I am secret project!!!`);
@@ -1058,75 +1058,76 @@ export class $Global extends BaseCommandLine<{}, Project> {
   //#endregion
 
   //#region autoupdate
-  async autoupdate() {
-    if (config.frameworkName === 'firedev') {
-      Helpers.run('npm i -g firedev', { output: true }).sync();
-      if (
-        await Helpers.questionYesNo(
-          `Proceed with ${config.frameworkName} auto-update ?`,
-        )
-      ) {
-        Project.sync();
-      }
-    }
-    if (config.frameworkName === 'tnp') {
-      Helpers.taskStarted('Removing old node_modules..');
-      const nm = Project.ins.Tnp.__node_modules.path;
-      const nm2 = Project.ins.Tnp.pathFor(`tmp-${config.folder.node_modules}2`);
-      const nm1 = Project.ins.Tnp.pathFor(`tmp-${config.folder.node_modules}1`);
+  // async autoupdate() {
+  // TODO move to electron app
+  //   if (config.frameworkName === 'firedev') {
+  //     Helpers.run('npm i -g firedev', { output: true }).sync();
+  //     if (
+  //       await Helpers.questionYesNo(
+  //         `Proceed with ${config.frameworkName} auto-update ?`,
+  //       )
+  //     ) {
+  //       Project.sync();
+  //     }
+  //   }
+  //   if (config.frameworkName === 'tnp') {
+  //     Helpers.taskStarted('Removing old node_modules..');
+  //     const nm = Project.ins.Tnp.__node_modules.path;
+  //     const nm2 = Project.ins.Tnp.pathFor(`tmp-${config.folder.node_modules}2`);
+  //     const nm1 = Project.ins.Tnp.pathFor(`tmp-${config.folder.node_modules}1`);
 
-      if (process.platform !== 'win32') {
-        Helpers.removeIfExists(nm2);
-        if (Helpers.exists(nm1)) {
-          Helpers.move(nm1, nm2);
-        }
-        Helpers.removeIfExists(nm1);
-        if (Helpers.exists(nm)) {
-          Helpers.move(nm, nm1);
-        }
-      }
-      Helpers.taskDone();
+  //     if (process.platform !== 'win32') {
+  //       Helpers.removeIfExists(nm2);
+  //       if (Helpers.exists(nm1)) {
+  //         Helpers.move(nm1, nm2);
+  //       }
+  //       Helpers.removeIfExists(nm1);
+  //       if (Helpers.exists(nm)) {
+  //         Helpers.move(nm, nm1);
+  //       }
+  //     }
+  //     Helpers.taskDone();
 
-      Helpers.taskStarted(
-        `Installing new version of ${config.frameworkName} pacakges`,
-      );
-      Project.ins.Tnp.run(
-        `npm i --force && npm-run tsc && ${config.frameworkName} dedupe`,
-      ).sync();
-      Helpers.taskDone();
+  //     Helpers.taskStarted(
+  //       `Installing new version of ${config.frameworkName} pacakges`,
+  //     );
+  //     Project.ins.Tnp.run(
+  //       `npm i --force && npm-run tsc && ${config.frameworkName} dedupe`,
+  //     ).sync();
+  //     Helpers.taskDone();
 
-      const arrActive = config.activeFramewrokVersions;
-      for (let index = 0; index < arrActive.length; index++) {
-        const defaultFrameworkVersionForSpecyficContainer = arrActive[index];
-        Helpers.taskStarted(
-          `Installing new versions smart container ${defaultFrameworkVersionForSpecyficContainer} pacakges`,
-        );
-        const container = Project.by(
-          'container',
-          defaultFrameworkVersionForSpecyficContainer,
-        );
-        container.run(`${config.frameworkName}  reinstall`).sync();
+  //     const arrActive = config.activeFramewrokVersions;
+  //     for (let index = 0; index < arrActive.length; index++) {
+  //       const defaultFrameworkVersionForSpecyficContainer = arrActive[index];
+  //       Helpers.taskStarted(
+  //         `Installing new versions smart container ${defaultFrameworkVersionForSpecyficContainer} pacakges`,
+  //       );
+  //       const container = Project.by(
+  //         'container',
+  //         defaultFrameworkVersionForSpecyficContainer,
+  //       );
+  //       container.run(`${config.frameworkName}  ${$Global.prototype.REINSTALL.name}`).sync();
 
-        Helpers.taskDone();
-      }
-      Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
-    }
-    // const file = path.basename(args.trim());
-    // function processing() {
-    //   Helpers.info(`processing file...`);
-    // }
-    // switch (file) {
-    //   case config.file.tmpIsomorphicPackagesJson:
-    //     processing();
-    //     PackagesRecognition.fromProject(this.project).start(true, '[update process]');
-    //     break;
-    //   default:
-    //     Helpers.error(`Not recognized file for update`, false, true);
-    //     break;
-    // }
-    Helpers.info(`${config.frameworkName} - AUTOUPDATE  DONE`);
-    this._exit();
-  }
+  //       Helpers.taskDone();
+  //     }
+  //     Helpers.success(`${config.frameworkName.toUpperCase()} AUTOUPDATE DONE`);
+  //   }
+  //   // const file = path.basename(args.trim());
+  //   // function processing() {
+  //   //   Helpers.info(`processing file...`);
+  //   // }
+  //   // switch (file) {
+  //   //   case config.file.tmpIsomorphicPackagesJson:
+  //   //     processing();
+  //   //     PackagesRecognition.fromProject(this.project).start(true, '[update process]');
+  //   //     break;
+  //   //   default:
+  //   //     Helpers.error(`Not recognized file for update`, false, true);
+  //   //     break;
+  //   // }
+  //   Helpers.info(`${config.frameworkName} - AUTOUPDATE  DONE`);
+  //   this._exit();
+  // }
   //#endregion
 
   //#region copy and rename (vscode option)

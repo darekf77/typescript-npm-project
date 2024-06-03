@@ -4,7 +4,7 @@ import { _ } from 'tnp-core/src';
 import { config } from 'tnp-config/src';
 import { BaseFeatureForProject, Helpers } from 'tnp-helpers/src';
 import { Project } from '../../abstract/project';
-import type { $Global } from '../../cli/cli-_GLOBAL_.backend';
+import { $Global } from '../../cli/cli-_GLOBAL_.backend';
 //#region @backend
 import { dedupePackages } from './node-modules-helpers.backend';
 import { PackagesRecognition } from '../package-recognition/packages-recognition';
@@ -316,7 +316,7 @@ export class NodeModules extends BaseFeatureForProject<Project> {
     if (!this.project.__node_modules.exist) {
       // TODO QUICK_FIX make it async install
       this.project
-        .run(`${config.frameworkName} ${'REINSTALL' as keyof $Global}`)
+        .run(`${config.frameworkName} ${$Global.prototype.REINSTALL.name}`)
         .sync();
     }
     Helpers.remove(path.join(target, config.folder.node_modules));
