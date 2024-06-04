@@ -183,6 +183,7 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
             '.npmignore',
             '.babelrc',
             '.npmrc',
+            ...Object.keys(self.project.lintFiles),
             config.file.devDependencies_json,
             ...// TODO or firedev json
             (Helpers.exists(self.project.pathFor(config.file.firedev_jsonc))
@@ -216,7 +217,6 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
           'backup',
           'module',
           'www',
-          ...Object.keys(self.project.lintFiles),
         ]
           .concat(
             [
