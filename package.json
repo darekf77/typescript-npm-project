@@ -259,7 +259,7 @@
         "common": {
           "tnp-config": "16.100.10",
           "tnp-models": "16.100.10",
-          "tnp-helpers": "16.100.22",
+          "tnp-helpers": "16.100.23",
           "tnp-db": "16.100.9",
           "firedev-type-sql": "16.100.7",
           "firedev-typeorm": "16.100.7",
@@ -556,7 +556,7 @@
     "private": false
   },
   "name": "tnp",
-  "version": "16.100.30",
+  "version": "16.100.31",
   "bin": {
     "t": "bin/t",
     "t-debug": "bin/t-debug",
@@ -565,7 +565,7 @@
     "tnp-debug": "bin/tnp-debug",
     "tnp-debug-brk": "bin/tnp-debug-brk"
   },
-  "lastBuildTagHash": "9a11b97758ec0db14bec0de2396215e237a990e3",
+  "lastBuildTagHash": "0bc357030da85eddec63ab778b45821031b8e607",
   "scripts": {
     "activate": "npm i --force && firedev dedupe && npx tsc && firedev link && tnp bd"
   },
@@ -843,7 +843,7 @@
     "tnp-config": "16.100.10",
     "tnp-core": "16.100.23",
     "tnp-db": "16.100.9",
-    "tnp-helpers": "16.100.22",
+    "tnp-helpers": "16.100.23",
     "tnp-models": "16.100.10",
     "ts-debug": "1.3.0",
     "ts-json-schema-generator": "2.1.1",
