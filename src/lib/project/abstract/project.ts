@@ -1112,6 +1112,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       for (const child of this.children) {
         await child.clear(options);
       }
+
       return;
     }
     const children = this.children.filter(

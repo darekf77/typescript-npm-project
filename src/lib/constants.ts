@@ -11,6 +11,8 @@ import {
 
 export const firedevFrameworkName = 'firedev';
 
+export const firedevIgnore = '@firedev' + '-' + 'ignore';
+
 export const OVERRIDE_FROM_TNP = [
   'scripts',
   'description',
@@ -224,7 +226,6 @@ export function tempSourceFolder(
 ) {
   return `tmp-src-${appForLib ? 'app-' : ''}${outDir}${websql ? '-websql' : ''}`;
 }
-
 
 export const notAllowedAsPacakge = [
   config.folder.browser,

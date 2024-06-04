@@ -4,10 +4,12 @@ import { path, _ } from 'tnp-core/src';
 import { TsImportExport, recognizeImportsFromFile } from 'tnp-helpers/src';
 import { CODE_SPLIT_PROCESS } from './code-split-process.enum';
 import type { CallBackProcess } from './code-split-process.enum';
+//import { firedevIgnore}from '../../../../../cli'; // TODO create rule
+import { firedevIgnore } from '../../../../constants';
 
 export class SplitFileProcess {
   private importExports: TsImportExport[] = [];
-  private rewriteFile = false;
+  private rewriteFile: boolean = false;
   constructor(
     private fileContent: string,
     private filePath: string,
@@ -18,7 +20,7 @@ export class SplitFileProcess {
   }
 
   //#region get content
-  get content() {
+  get content(): { modifiedContent: string; rewriteFile: boolean } {
     //#region @backendFunc
     if (
       _.isUndefined(
@@ -28,8 +30,9 @@ export class SplitFileProcess {
       )
     ) {
       // console.error(`Not allowed to export and replace file: ${this.filePath}`);
-      return this.fileContent;
+      return { modifiedContent: this.fileContent, rewriteFile: false };
     }
+
     // console.log(this.isomorphicLibraries);
     // process.exit(0);
     //     console.log(`
@@ -44,7 +47,7 @@ export class SplitFileProcess {
       CODE_SPLIT_PROCESS.BEFORE.SPLIT.IMPORT_EXPORT,
     );
     for (const imp of this.importExports) {
-      if(!imp.isIsomorphic) {
+      if (!imp.isIsomorphic) {
         continue;
       }
       for (const processFun of BEFORE_PROCESSES) {
@@ -62,12 +65,7 @@ export class SplitFileProcess {
     }
 
     const result = this.replaceInFile(this.fileContent, this.importExports);
-
-    if (this.rewriteFile) {
-      Helpers.writeFile(this.filePath, result);
-    }
-
-    return result;
+    return { modifiedContent: result, rewriteFile: this.rewriteFile };
     //#endregion
   }
   //#endregion
@@ -106,8 +104,13 @@ export class SplitFileProcess {
     // Perform replacements from last to first
     for (const imp of imports) {
       const lineIndex = imp.startRow - 1;
+
       if (lineIndex < lines.length) {
         const line = lines[lineIndex];
+        const prevLine = lines[lineIndex - 1];
+        if (prevLine && prevLine.includes(firedevIgnore)) {
+          continue;
+        }
         const actualStartIndex = imp.startCol - 1;
         const actualEndIndex = imp.endCol - 1;
 

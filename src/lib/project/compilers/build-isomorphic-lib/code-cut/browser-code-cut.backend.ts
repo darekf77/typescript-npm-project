@@ -86,8 +86,8 @@ export class BrowserCodeCut {
      * ex. < project location >/tmp-src-dist-websql
      */
     protected absPathTmpSrcDistFolder: string,
-    private project?: Project,
-    private buildOptions?: BuildOptions,
+    private project: Project,
+    private buildOptions: BuildOptions,
   ) {
     // console.log(`[incremental-build-process INSIDE BROWSER!!! '${this.buildOptions.baseHref}'`)
 
@@ -146,12 +146,29 @@ export class BrowserCodeCut {
   init() {
     const orgContent =
       Helpers.readFile(this.absSourcePathFromSrc, void 0, true) || '';
-    // TODO @UNCOMMENT find why build is failing
-    // this.splitFileProcess = new SplitFileProcess(
-    //   orgContent,
-    //   this.absSourcePathFromSrc,
-    //   this.project.allIsomorphicPackagesFromMemory,
-    // );
+    this.splitFileProcess = new SplitFileProcess(
+      orgContent,
+      this.absSourcePathFromSrc,
+      this.project.allIsomorphicPackagesFromMemory,
+    );
+    const { modifiedContent: firstPass, rewriteFile: firstTimeRewriteFile } =
+      this.splitFileProcess.content;
+
+    const { modifiedContent: secondPass, rewriteFile: secondTimeRewriteFile } =
+      new SplitFileProcess(
+        firstPass,
+        this.absSourcePathFromSrc,
+        this.project.allIsomorphicPackagesFromMemory,
+      ).content;
+
+    if (firstPass === secondPass) {
+      if (firstTimeRewriteFile) {
+        Helpers.writeFile(this.absSourcePathFromSrc, firstPass);
+      }
+    } else {
+      Helpers.warn(`Unstable file modification ${this.absSourcePathFromSrc}`);
+    }
+
     this.rawContentForBrowser = this.removeSrcAtEndFromImortExports(
       orgContent, // this.splitFileProcess.content, // TODO @UNCOMMENT find why build is failing
     );
