@@ -73,9 +73,6 @@ export async function start(
       tw: 'test:watch',
       td: 'test:debug',
       t: 'test',
-      // other
-      au: 'autoupdate',
-      up: 'update',
       //#endregion
     },
   });
