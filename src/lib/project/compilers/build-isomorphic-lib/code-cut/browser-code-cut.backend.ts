@@ -146,6 +146,7 @@ export class BrowserCodeCut {
   init() {
     const orgContent =
       Helpers.readFile(this.absSourcePathFromSrc, void 0, true) || '';
+
     this.splitFileProcess = new SplitFileProcess(
       orgContent,
       this.absSourcePathFromSrc,
@@ -161,17 +162,19 @@ export class BrowserCodeCut {
         this.project.allIsomorphicPackagesFromMemory,
       ).content;
 
-    if (firstPass === secondPass) {
-      if (firstTimeRewriteFile) {
+    if ((orgContent || '').trim() !== (firstPass || '')?.trim()) {
+      if (
+        firstTimeRewriteFile &&
+        (firstPass || '').trim() === (secondPass || '').trim() // it means it is stable
+      ) {
+        Helpers.logInfo(`Rewrite file ${this.absSourcePathFromSrc}`);
         Helpers.writeFile(this.absSourcePathFromSrc, firstPass);
+      } else {
+        Helpers.logWarn(`Unstable file modification ${this.absSourcePathFromSrc}`);
       }
-    } else {
-      Helpers.warn(`Unstable file modification ${this.absSourcePathFromSrc}`);
     }
 
-    this.rawContentForBrowser = this.removeSrcAtEndFromImortExports(
-      orgContent, // this.splitFileProcess.content, // TODO @UNCOMMENT find why build is failing
-    );
+    this.rawContentForBrowser = this.removeSrcAtEndFromImortExports(orgContent);
     this.rawContentForAPPONLYBrowser = this.rawContentForBrowser; // TODO not needed ?
     this.rawContentBackend = this.rawContentForBrowser; // at the beginning those are normal files from src
     return this;

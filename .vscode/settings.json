@@ -105,12 +105,9 @@
   "prettier.enable": true,
   "editor.suggest.snippetsPreventQuickSuggestions": false,
   "editor.inlineSuggest.enabled": true,
-  // "tslint.autoFixOnSave": false,
-  // "tslint.enable": false,
-  // "prettier.endOfLine": "auto",
-  // "tslint.alwaysShowRuleFailuresAsWarnings": false,
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": false
-  }
+  },
+  "prettier.endOfLine": "auto"
 }
