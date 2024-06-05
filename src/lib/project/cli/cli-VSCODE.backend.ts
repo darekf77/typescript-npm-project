@@ -171,6 +171,7 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
       'editor.stickyScroll.enabled': false,
       'editor.minimap.showMarkSectionHeaders': false,
       'editor.minimap.showRegionSectionHeaders': false,
+      "prettier.endOfLine": "auto",
     };
     const settingspathWindows = path.join(
       crossPlatformPath(os.userInfo().homedir),

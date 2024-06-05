@@ -51,7 +51,7 @@ only possible with isomorphic code
 
 ### 6. Every package available everywhere - shared <b>node_modules</b> for similar projects
 
-Firedev hasone big npm pacakges container (located in: ~/.firedev/morphi/projects/container-v4 - )
+Firedev has one big npm pacakges container (located in: ~/.firedev/firedev/projects/container-v4 - )
 **There is no need for local node_modules** => many projects takes megabytes instead gigabytes
 
 ### 8. Automation for releasing projects (standalone and organization) to github pages / npm repositories

@@ -124,6 +124,7 @@ export class FiredevProjectResolve extends BaseProjectResolver<Project> {
       this.emptyLocations.push(location);
       return;
     }
+
     let type = this.typeFrom(location);
 
     let resultProject: Project;
@@ -538,6 +539,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     //#region @backendFunc
 
     version = !version || version === 'v1' ? '' : (`-${version}` as any);
+    if(version === 'v4') {
+      Helpers.warn(`[firedev-helpers] v4 is not supported anymore.. use v16 instead`)
+    }
     const result = {
       container: this.pathResolved(
         config.dirnameForTnp,
@@ -1533,9 +1537,10 @@ trim_trailing_whitespace = false
       'prettier.enable': true,
       'editor.suggest.snippetsPreventQuickSuggestions': false,
       'editor.inlineSuggest.enabled': true,
-      'tslint.autoFixOnSave': false,
-      'tslint.enable': false,
-      'tslint.alwaysShowRuleFailuresAsWarnings': false,
+      'prettier.endOfLine': 'auto', // fix for jumpling to end of file when file > 100kb
+      // 'tslint.autoFixOnSave': false,
+      // 'tslint.enable': false,
+      // 'tslint.alwaysShowRuleFailuresAsWarnings': false,
     };
 
     if (
@@ -2088,6 +2093,7 @@ trim_trailing_whitespace = false
   //#endregion
 
   //#region getters & methods / is in release dist
+
   public get isInCiReleaseProject() {
     //#region @backendFunc
     return this.location.includes(

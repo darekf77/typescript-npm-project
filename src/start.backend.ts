@@ -54,6 +54,8 @@ export async function start(
       'set:major:version': 'release:set:major:version',
       'set:minor:ver': 'release:set:minor:version',
       'set:major:ver': 'release:set:major:version',
+      'set:framework:ver': 'release:set:framework:version',
+      'set:framework:version': 'release:set:framework:version',
       // 'ra': 'release:all',
       e: 'electron',
       ekill: 'electron:kill',

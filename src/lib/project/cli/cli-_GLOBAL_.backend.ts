@@ -31,6 +31,7 @@ import { Models } from '../../models';
 import * as psList from 'ps-list';
 import { MESSAGES, firedevRepoPathUserInUserDir } from '../../constants';
 import { MagicRenamer } from 'magic-renamer/src';
+import * as semver from 'semver';
 
 declare const ENV: any;
 //#endregion
@@ -571,8 +572,8 @@ export class $Global extends BaseCommandLine<{}, Project> {
           const attachDebugParam = inspect
             ? '--inspect'
             : inspectBrk
-            ? '--inspect-brk'
-            : '';
+              ? '--inspect-brk'
+              : '';
 
           if (process.platform === 'win32') {
             Helpers.writeFile(
@@ -1324,6 +1325,265 @@ ${this.project.children
     this._exit();
   }
 
+  //#endregion
+
+  //#region @notForNpm
+
+  async ccupdate() {
+
+    //#region packages to check
+    const packageToCheck = {
+      randomcolor: '^0.5.3',
+      uuid: '^8.3.2',
+      'buffer-shims': '^1.0.0',
+      'content-type': '^1.0.4',
+      axios: '^0.17.1',
+      '@types/diff': '^3.2.2',
+      diff: '^3.2.0',
+      cheerio: '1.0.0-rc.3',
+      'string-similarity': '~4.0.2',
+      '@types/q': '^1.0.3',
+      q: '^1.5.1',
+      dateformat: '^3.0.3',
+      '@types/dateformat': '^1.0.1',
+      moment: '^2.22.2',
+      webpack: '3.10.0',
+      'webpack-cli': '3.3.12',
+      'webpack-dev-server': '~2.9.3',
+      'html-webpack-plugin': '^2.29.0',
+      'babel-core': '^6.25.0',
+      'babel-loader': '^7.1.1',
+      'babel-plugin-syntax-dynamic-import': '^6.18.0',
+      'babel-preset-env': '^1.6.1',
+      'babel-preset-es2015': '^6.24.1',
+      underscore: '^1.9.1',
+      'json-stringify-safe': '^5.0.1',
+      '@types/json-stringify-safe': '^5.0.0',
+      'circular-json': '^0.5.1',
+      json5: '~2.1.3',
+      'json5-writer': '~0.2.0',
+      '@types/json5': '0.0.29',
+      '@types/lodash': '4.14.92',
+      lodash: '^4.17.4',
+      lnk: '~1.0.1',
+      'cross-spawn': '~7.0.3',
+      'copy-paste': '~1.3.0',
+      chokidar: '3.5.3',
+      '@types/chokidar': '2.1.3',
+      cpr: '^3.0.1',
+      mkdirp: '^0.5.1',
+      rimraf: '^2.6.2',
+      'fs-extra': '8.1.0',
+      jscodeshift: '^0.6.3',
+      '@types/fs-extra': '^7.0.0',
+      '@types/rimraf': '^2.0.2',
+      open: '7.2.1',
+      '@types/socket.io-client': '^1.4.32',
+      'socket.io': '2.4.1',
+      '@types/socket.io': '^1.4.31',
+      '@types/chai': '^4.1.2',
+      chai: '^4.2.0',
+      mocha: '^5.2.0',
+      '@types/mocha': '^5.2.5',
+      'detect-mocha': '0.1.0',
+      'node-cli-test': '0.0.2',
+      'reflect-metadata': '^0.1.10',
+      'ts-loader': '^2.3.1',
+      tslib: '2.2.0',
+      'ts-node': '^7.0.1',
+      typescript: '4.1.5',
+      tslint: '^5.9.1',
+      prettier: '~2.3.2',
+      eslint: '7.13.0',
+      'eslint-plugin-import': '2.22.1',
+      'eslint-plugin-jsdoc': '30.7.8',
+      'eslint-plugin-prefer-arrow': '1.2.2',
+      nodemon: '^1.14.11',
+      'enum-values': '1.2.1',
+      '@angular-devkit/build-optimizer': '^0.3.1',
+      '@angular-devkit/schematics': '^0.0.42',
+      '@angular/animations': '5.2.0',
+      '@angular/cli': '~1.6.8',
+      '@angular/cdk': '^5.2.5',
+      '@angular/common': '5.2.0',
+      '@angular/compiler': '5.2.0',
+      '@angular/compiler-cli': '~5.1.0',
+      '@angular/core': '5.2.0',
+      '@angular/forms': '5.2.0',
+      '@angular/http': '5.2.0',
+      '@angular/language-service': '~5.1.0',
+      '@angular/material': '^5.2.5',
+      '@angular/platform-browser': '5.2.0',
+      '@angular/platform-browser-dynamic': '5.2.0',
+      '@angular/router': '5.2.0',
+      'core-js': '2.5.3',
+      'zone.js': '0.8.20',
+      rxjs: '5.5.6',
+      tsickle: '^0.26.0',
+      'sw-toolbox': '^3.6.0',
+      vscode: '^1.1.37',
+      'cross-env': '7.0.2',
+      'wait-on': '7.0.1',
+      'ngx-store': '2.1.0',
+
+      'node-localstorage': '2.1.6',
+      hammerjs: '^2.0.8',
+      concurrently: '^3.5.1',
+      'gulp-inline-ng2-template': '^4.1.0',
+      autoprefixer: '^6.5.3',
+      'babel-cli': '^6.26.0',
+      'circular-dependency-plugin': '^4.2.1',
+      'copy-webpack-plugin': '^4.1.1',
+      'css-loader': '^0.28.1',
+      cssnano: '^3.10.0',
+      'exports-loader': '^0.6.3',
+      'file-loader': '^1.1.5',
+      'friendly-errors-webpack-plugin': '^1.6.1',
+      'istanbul-instrumenter-loader': '^2.0.0',
+      'jasmine-core': '~2.8.0',
+      'jasmine-spec-reporter': '~4.2.0',
+      karma: '~2.0.0',
+      'karma-chrome-launcher': '~2.2.0',
+      'karma-cli': '~1.0.1',
+      'karma-coverage-istanbul-reporter': '^1.3.0',
+      'karma-jasmine': '~1.1.0',
+      'karma-jasmine-html-reporter': '^0.2.2',
+      'less-loader': '^4.0.5',
+      'ng-packagr': '^2.0.0',
+      'ngc-webpack': '^4.1.2',
+      'postcss-custom-properties': '^7.0.0',
+      'postcss-loader': '^2.0.8',
+      'postcss-url': '^7.1.2',
+      protractor: '~5.2.0',
+      'raw-loader': '^0.5.1',
+      'sass-loader': '^6.0.3',
+      'source-map-loader': '^0.2.0',
+      'style-loader': '^0.13.1',
+      'stylus-loader': '^3.0.1',
+      'uglifyjs-webpack-plugin': '~1.1.2',
+      'url-loader': '^0.6.2',
+      '@ngtools/webpack': '^1.9.3',
+      'sass-variable-loader': '^0.1.2',
+      'callsite-record': '4.1.3',
+      '@types/vinyl': '^2.0.2',
+      progress: '^2.0.3',
+      '@types/progress': '^2.0.3',
+      ora: '3.4.0',
+      enquirer: '^2.3.0',
+      prompts: '^0.1.8',
+      omelette: '^0.4.5',
+      inquirer: '~7.3.3',
+      minimist: '^1.2.0',
+      chalk: '^2.3.2',
+      fuzzy: '^0.1.3',
+      'inquirer-autocomplete-prompt': '~1.3.0',
+      '@types/watch': '^1.0.0',
+      watch: '~1.0.2',
+      portfinder: '1.0.21',
+      '@types/node-notifier': '^5.4.0',
+      'node-notifier': '^6.0.0',
+      '@types/glob': '^5.0.35',
+      glob: '^7.1.2',
+      sloc: '^0.2.0',
+      'simple-git': '^1.96.0',
+      fkill: '6.1.0',
+      'ps-list': '6.1.0',
+      'check-node-version': '^3.2.0',
+      'command-exists': '^1.2.2',
+      '@types/systeminformation': '^3.23.0',
+      systeminformation: '^3.45.7',
+      'ps-node': '^0.1.6',
+      'npm-get-dependents': '^1.0.1',
+      'is-elevated': '~3.0.0',
+      'sudo-block': '~3.0.0',
+      'sort-package-json': '^1.11.0',
+      'npm-run': '^4.1.2',
+      lowdb: '^1.0.0',
+      lockfile: '^1.0.4',
+      '@types/lockfile': '^1.0.0',
+      '@types/http-proxy': '^1.16.0',
+      'http-proxy': '^1.16.2',
+      'http-server': '0.11.1',
+      '@types/express-fileupload': '^0.1.1',
+      'express-fileupload': '^0.4.0',
+      '@types/express': '^4.11.0',
+      errorhandler: '^1.5.0',
+      express: '^4.16.3',
+      'method-override': '^2.3.10',
+      accepts: '^1.3.4',
+      'body-parser': '^1.18.2',
+      'cookie-parser': '^1.4.3',
+      cors: '^2.8.4',
+      'http-proxy-middleware': '0.19.1',
+      '@types/http-proxy-middleware': '0.19.2',
+      compression: '1.7.4',
+      hostile: '~1.3.3',
+      '@types/oauth2orize': '^1.8.0',
+      '@types/password-hash': '^1.2.19',
+      bcryptjs: '2.4.3',
+      passport: '^0.3.2',
+      'passport-http-bearer': '^1.0.1',
+      'password-hash': '^1.2.2',
+      '@ionic-native/core': '^4.4.0',
+      '@ionic-native/splash-screen': '^4.4.0',
+      '@ionic-native/status-bar': '^4.4.0',
+      '@ionic/storage': '^2.1.3',
+      '@ionic/app-scripts': '^3.1.8',
+      ionic: '^3.19.1',
+      'ionic-angular': '^3.9.2',
+      ionicons: '^3.0.0',
+    };
+    //#endregion
+
+    const coreContainerProject = Project.by(
+      'container',
+      this.firstArg as any,
+    ).readJson<any>(config.file.firedev_jsonc).overrided.dependencies;
+
+    // get latest version from npm
+    const latestVersion = async (packageName: string) => {
+      try {
+        return await require('latest-version')(packageName);
+      } catch (error) {
+        return '0.0.0';
+      }
+    };
+
+    // console.log('core deps', coreContainerProject)
+    const clean = async (v: string) => {
+      if (v === 'latest') {
+        return await latestVersion(v);
+      }
+      v= v ? v: '0.0.0';
+      v = v.replace(/\^|~/g, '');
+      // add 0 to version
+      if (v.split('.').length === 2) {
+        v += '.0';
+      }
+      return v;
+    };
+
+    for (const packageName of Object.keys(packageToCheck)) {
+      const coreContainerDepVer = await clean(
+        coreContainerProject[packageName],
+      );
+      const toCheckVer = await clean(packageToCheck[packageName]);
+
+      const wasRemoved = _.isNull(coreContainerProject[packageName]);
+      const notExits = _.isUndefined(coreContainerProject[packageName]);
+      const wasUpdated = semver.gt(coreContainerDepVer, toCheckVer);
+      if (notExits) {
+        Helpers.info(`"${packageName}":"${packageToCheck[packageName]}",`);
+      }
+    }
+
+    this._exit();
+  }
+
+  async tnpFixFiredevJson() {
+
+    this._exit();
+  }
   //#endregion
 }
 

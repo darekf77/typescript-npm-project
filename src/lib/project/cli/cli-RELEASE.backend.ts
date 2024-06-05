@@ -10,7 +10,8 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
   __initialize__() {
     //#region resolve smart containter
     let resolved = [];
-    if (this.project.__isContainer) { // @ts-ignore
+    if (this.project.__isContainer) {
+      // @ts-ignore
       resolved = Helpers.cliTool.resolveItemsFromArgsBegin<Project>(
         this.args,
         a => {
@@ -150,6 +151,21 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
     this._exit();
   }
   //#endregion
+
+  async setFrameworkVersion() {
+    const newFrameworkVersion =
+      `v${this.firstArg.replace('v', '')}` as CoreModels.FrameworkVersion;
+    Helpers.info(
+      `Setting framework version (${newFrameworkVersion}) for ${this.project.name}... and children`,
+    );
+
+    await this.project.__setFramworkVersion(newFrameworkVersion);
+    for (const child of this.project.children) {
+      await child.__setFramworkVersion(newFrameworkVersion);
+    }
+    Helpers.taskDone(`Framework version set to ${newFrameworkVersion}`);
+    this._exit();
+  }
 
   //#region start
   private async start(
