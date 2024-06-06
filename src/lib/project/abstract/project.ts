@@ -539,8 +539,10 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     //#region @backendFunc
 
     version = !version || version === 'v1' ? '' : (`-${version}` as any);
-    if(version === 'v4') {
-      Helpers.warn(`[firedev-helpers] v4 is not supported anymore.. use v16 instead`)
+    if (version === 'v4') {
+      Helpers.warn(
+        `[firedev-helpers] v4 is not supported anymore.. use v16 instead`,
+      );
     }
     const result = {
       container: this.pathResolved(
@@ -1489,10 +1491,20 @@ trim_trailing_whitespace = false
       //   }
       // }
     };
+    if (this.shouldNotEnableLintAndPrettier) {
+      return {};
+    }
     return files;
     //#endregion
   }
   //#endregion
+
+  get shouldNotEnableLintAndPrettier(): boolean {
+    return (
+      (this.__isContainer && !this.__isSmartContainer) ||
+      this.__isSmartContainerChild
+    );
+  }
 
   //#region getters & methods /  recreate lint configuration
   recreateLintConfiguration(): void {
@@ -1537,12 +1549,16 @@ trim_trailing_whitespace = false
       'prettier.enable': true,
       'editor.suggest.snippetsPreventQuickSuggestions': false,
       'editor.inlineSuggest.enabled': true,
+      'prettier.prettierPath': './node_modules/prettier',
       'prettier.endOfLine': 'auto', // fix for jumpling to end of file when file > 100kb
       // 'tslint.autoFixOnSave': false,
       // 'tslint.enable': false,
       // 'tslint.alwaysShowRuleFailuresAsWarnings': false,
     };
 
+    if (this.shouldNotEnableLintAndPrettier) {
+      return;
+    }
     if (
       this.typeIs('vscode-ext', 'isomorphic-lib', 'container') &&
       !this.__isSmartContainerChild
