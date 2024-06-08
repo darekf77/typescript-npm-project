@@ -11,7 +11,7 @@ export class LibProjectVscodeExt extends BaseFeatureForProject<Project> {
   }
 
   // methods / install locally
-  async installLocaly(releaseOptions?: ReleaseOptions) {
+  async installLocally(releaseOptions?: ReleaseOptions) {
     //
     if (this.project.__isVscodeExtension) {
       const vsixPackageName = this.extensionVsixName;

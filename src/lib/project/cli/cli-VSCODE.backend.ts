@@ -172,6 +172,7 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
       'editor.minimap.showMarkSectionHeaders': false,
       'editor.minimap.showRegionSectionHeaders': false,
       "prettier.endOfLine": "auto",
+      "eslint.format.enable": true,
     };
     const settingspathWindows = path.join(
       crossPlatformPath(os.userInfo().homedir),

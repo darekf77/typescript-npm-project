@@ -326,7 +326,8 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     } catch (error) {
       Helpers.log(error);
       Helpers.error(
-        `[${config.frameworkName} Not able to pull master branch for :${config.urlRepoFiredev} in: ${cwd}`,
+        `[${config.frameworkName} Not able to pull master branch for :` +
+          `${config.urlRepoFiredev} in: ${crossPlatformPath(cwd)}`,
         false,
         true,
       );
@@ -4031,7 +4032,23 @@ ${otherProjectNames
   //#region getters & methods / core container
   get coreContainer(): Project {
     //#region @backendFunc
-    return Project.by('container', this.__frameworkVersion) as any;
+    const coreContainer = Project.by(
+      'container',
+      this.__frameworkVersion,
+    ) as any;
+    if (!coreContainer) {
+      Helpers.error(
+        `You need to sync firedev. Try command:
+
+      ${config.frameworkName} sync
+
+      `,
+        false,
+        true,
+      );
+    }
+    // TODO @LAST install automatically
+    return coreContainer;
     //#endregion
   }
   //#endregion

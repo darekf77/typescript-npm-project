@@ -1,4 +1,3 @@
-import { ConnectionOptions } from 'firedev-typeorm/src';
 import { CoreModels, _ } from 'tnp-core/src';
 
 export namespace Models {

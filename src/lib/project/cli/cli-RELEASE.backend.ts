@@ -40,8 +40,8 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
   //#endregion
 
   //#region install:locally
-  async installLocaly() {
-    await this.project.__libVscodext.installLocaly(this.params);
+  async installLocally() {
+    await this.project.__libVscodext.installLocally(this.params);
     this._exit();
   }
   //#endregion
