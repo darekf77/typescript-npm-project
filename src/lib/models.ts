@@ -72,7 +72,7 @@ export namespace Models {
 
     port: number; // override type port
     //#region @backend
-    $db?: ConnectionOptions;
+    $db?: any;
     ommitAppBuild?: boolean;
     isWatchBuild?: boolean; // generated
     isWebsqlBuild?: boolean; // generated
