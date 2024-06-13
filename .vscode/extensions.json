@@ -50,6 +50,7 @@
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
         "amodio.toggle-excluded-files",
-        "GitHub.copilot"
+        "GitHub.copilot",
+        "unifiedjs.vscode-mdx" ,
     ]
 }

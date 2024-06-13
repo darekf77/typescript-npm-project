@@ -173,6 +173,18 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
       'editor.minimap.showRegionSectionHeaders': false,
       "prettier.endOfLine": "auto",
       "eslint.format.enable": true,
+      "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+      },
+      "[typescript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+      },
+      "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+      },
+      "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+      },
     };
     const settingspathWindows = path.join(
       crossPlatformPath(os.userInfo().homedir),
