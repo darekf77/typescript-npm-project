@@ -110,6 +110,8 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
     };
     //#endregion
 
+    //#region global / setting for all
+
     let settings = {
       'editor.renderWhitespace': true,
       'window.commandCenter': false,
@@ -171,21 +173,30 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
       'editor.stickyScroll.enabled': false,
       'editor.minimap.showMarkSectionHeaders': false,
       'editor.minimap.showRegionSectionHeaders': false,
-      "prettier.endOfLine": "auto",
-      "eslint.format.enable": true,
-      "[json]": {
-        "editor.defaultFormatter": "vscode.json-language-features"
+      'prettier.endOfLine': 'auto',
+      'eslint.format.enable': true,
+      '[json]': {
+        'editor.defaultFormatter': 'vscode.json-language-features',
       },
-      "[typescript]": {
-        "editor.defaultFormatter": "vscode.typescript-language-features"
+      '[typescript]': {
+        'editor.defaultFormatter': 'vscode.typescript-language-features',
       },
-      "[jsonc]": {
-        "editor.defaultFormatter": "vscode.json-language-features"
+      '[jsonc]': {
+        'editor.defaultFormatter': 'vscode.json-language-features',
       },
-      "[javascript]": {
-        "editor.defaultFormatter": "vscode.typescript-language-features"
+      '[javascript]': {
+        'editor.defaultFormatter': 'vscode.typescript-language-features',
+      },
+      '[css]': {
+        'editor.defaultFormatter': 'vscode.typescript-language-features',
+      },
+      '[scss]': {
+        'editor.defaultFormatter': 'vscode.typescript-language-features',
       },
     };
+    //#endregion
+
+    //#region global / settings patjes
     const settingspathWindows = path.join(
       crossPlatformPath(os.userInfo().homedir),
       'AppData/Roaming/Code/User/settings.json',
@@ -209,6 +220,7 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
     if (process.platform === 'linux') {
       settingspath = settingspathLinux;
     }
+    //#endregion
 
     const dest = crossPlatformPath(settingspath);
     Helpers.writeFile(dest, settings);

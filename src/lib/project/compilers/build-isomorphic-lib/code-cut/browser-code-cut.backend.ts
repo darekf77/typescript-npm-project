@@ -170,7 +170,9 @@ export class BrowserCodeCut {
         Helpers.logInfo(`Rewrite file ${this.absSourcePathFromSrc}`);
         Helpers.writeFile(this.absSourcePathFromSrc, firstPass);
       } else {
-        Helpers.logWarn(`Unstable file modification ${this.absSourcePathFromSrc}`);
+        Helpers.logWarn(
+          `Unstable file modification ${this.absSourcePathFromSrc}`,
+        );
       }
     }
 
@@ -274,6 +276,10 @@ export class BrowserCodeCut {
     }
     if (isTsFile) {
       if (!this.relativePath.startsWith('app/')) {
+        try {
+          // QUICK_FIX remove directory when trying to save as file
+          fse.removeSync(this.absFileSourcePathBrowserOrWebsql);
+        } catch (error) {}
         fse.writeFileSync(
           this.absFileSourcePathBrowserOrWebsql,
           `/* files for browser${
@@ -284,6 +290,10 @@ export class BrowserCodeCut {
           'utf8',
         );
       }
+      try {
+        // QUICK_FIX remove directory when trying to save as file
+        fse.removeSync(this.absFileSourcePathBrowserOrWebsqlAPPONLY);
+      } catch (error) {}
       fse.writeFileSync(
         this.absFileSourcePathBrowserOrWebsqlAPPONLY,
         `/* files for browser${
@@ -295,8 +305,16 @@ export class BrowserCodeCut {
       );
     } else {
       if (!this.relativePath.startsWith('app/')) {
+        try {
+          // QUICK_FIX remove directory when trying to save as file
+          fse.removeSync(this.absFileSourcePathBrowserOrWebsql);
+        } catch (error) {}
         fse.writeFileSync(this.absFileSourcePathBrowserOrWebsql, ``, 'utf8');
       }
+      try {
+        // QUICK_FIX remove directory when trying to save as file
+        fse.removeSync(this.absFileSourcePathBrowserOrWebsqlAPPONLY);
+      } catch (error) {}
       fse.writeFileSync(
         this.absFileSourcePathBrowserOrWebsqlAPPONLY,
         ``,

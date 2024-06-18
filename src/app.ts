@@ -88,7 +88,7 @@ class User extends Firedev.Base.Entity {
 
 @Firedev.Controller({ className: 'UserController' })
 class UserController extends Firedev.Base.CrudController<User> {
-  entity = () => User;
+  entityClassResolveFn: () => User;
 
   //#region @websql
   async initExampleDbData(): Promise<void> {

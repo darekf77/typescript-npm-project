@@ -14,15 +14,15 @@ export class BuildProcessBackend {
   public static for(ctrl: BuildProcessController) {
     return new BuildProcessBackend(ctrl);
   }
-  private get repo() {
-    return this.ctrl.repository;
-  }
+  // private get repo() {
+  //   // return this.ctrl.repository;
+  // }
   private constructor(private ctrl: BuildProcessController) {}
   //#endregion
 
   //#region count entities
   async countEntities() {
-    await this.ctrl.repository.count();
+    // await this.ctrl.repository.count();
   }
   //#endregion
 

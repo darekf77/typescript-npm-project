@@ -24,10 +24,11 @@ import { Project } from '../../../../abstract/project';
   //#endregion
 })
 export class BuildProcessController extends Firedev.Base.CrudController<any> {
+  entityClassResolveFn: () => BuildProcess;
   //#region fields
-  entity = () => BuildProcess;
+  // entity = () => BuildProcess;
   //#region @websql
-  readonly backend = BuildProcessBackend.for(this);
+  // readonly backend = BuildProcessBackend.for(this);
   //#endregion
   //#endregion
 

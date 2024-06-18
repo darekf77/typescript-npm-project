@@ -55,6 +55,7 @@ import {
   BuildProcess,
   BuildProcessController,
 } from '../features/build-process/app/build-process';
+import { rimraf } from 'tnp-core/src';
 //#endregion
 import { EnvironmentConfig } from '../features/environment-config/environment-config';
 import { CLI } from 'tnp-cli/src';
@@ -1024,113 +1025,58 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   }
   //#endregion
 
-  //#region getters & methods / clear Process
-
-  //#endregion
-
   //#region getters & methods / clear
-  public async clear(
-    options: { recrusive?: boolean; resetOnly?: boolean } = {},
-  ) {
+  public async clear(options: { recrusive?: boolean } = {}) {
     //#region @backend
-    Helpers.removeIfExists(
-      path.join(this.location, config.file.tnpEnvironment_json),
-    );
-    const { recrusive, resetOnly } = options || {};
-    if (this.typeIs('unknow')) {
+    Helpers.taskStarted(`Cleaning project: ${this.genericName}`);
+    const { recrusive } = options || {};
+    if (this.typeIs('unknow') || this.typeIs('unknow-npm-project')) {
       return;
     }
-    Helpers.info(`Cleaning project: ${this.genericName}`);
-    if (!resetOnly) {
-      this.__node_modules.remove();
-      while (true) {
+
+    while (true) {
+      try {
+        if (this.__isVscodeExtension) {
+          this.remove('out');
+        }
+
+        this.remove(config.folder.dist);
+        rimraf.sync(
+          crossPlatformPath([this.location, config.folder.tmp + '*']),
+        );
         try {
-          this.__node_modules.remove();
-          break;
+          this.removeFile(config.folder.node_modules);
         } catch (error) {
-          Helpers.pressKeyAndContinue(MESSAGES.SHUT_DOWN_FOLDERS_AND_DEBUGGERS);
+          this.remove(config.folder.node_modules);
         }
+        this.removeFile(config.folder.browser);
+        this.removeFile(config.folder.websql);
+        this.removeFile(config.file.tnpEnvironment_json);
+        if (this.__isCoreProject) {
+          return;
+        }
+        this.quickFixes.removeUncessesaryFiles();
+        glob.sync(`${this.location}/*.filetemplate`).forEach(fileTemplate => {
+          Helpers.remove(fileTemplate);
+          Helpers.remove(fileTemplate.replace('.filetemplate', ''));
+        });
+
+        Helpers.removeIfExists(
+          path.join(this.location, config.file.tnpEnvironment_json),
+        );
+        break;
+      } catch (error) {
+        Helpers.pressKeyAndContinue(MESSAGES.SHUT_DOWN_FOLDERS_AND_DEBUGGERS);
       }
     }
 
-    Helpers.remove(crossPlatformPath([this.location, 'tmp-*']));
-    this.quickFixes.removeUncessesaryFiles();
-
-    glob.sync(`${this.location}/*.filetemplate`).forEach(fileTemplate => {
-      Helpers.remove(fileTemplate);
-      Helpers.remove(fileTemplate.replace('.filetemplate', ''));
-    });
-
-    if (this.typeIs('unknow')) {
-      return;
-    }
-
-    let gitginoredfiles = this.__recreate.filesIgnoredBy.gitignore
-      .map(f => (f.startsWith('/') ? f.substr(1) : f))
-      .filter(f => {
-        if (f.startsWith('tsconfig.') && this.__isTnp) {
-          return false;
-        }
-        if (f === config.folder.node_modules) {
-          return false;
-        }
-        if (config.filesNotAllowedToClean.includes(f)) {
-          return false;
-        }
-        return true;
-      });
-
-    if (this.__isCoreProject) {
-      gitginoredfiles = gitginoredfiles.filter(f => {
-        return [config.folder.node_modules].map(c => `/${c}`).includes(f);
-      });
-    }
-
-    for (let index = 0; index < gitginoredfiles.length; index++) {
-      const head = gitginoredfiles[index].trim();
-      const fileOrDirPath = path.join(this.location, head);
-      if (!head.startsWith('**')) {
-        Helpers.log(`Removing: "${head}"`);
-        if (process.platform === 'win32') {
-          while (true) {
-            try {
-              Helpers.remove(fileOrDirPath);
-              break;
-            } catch (error) {
-              // TODO last notification to user
-              Helpers.pressKeyAndContinue(
-                MESSAGES.SHUT_DOWN_FOLDERS_AND_DEBUGGERS,
-              );
-            }
-          }
-        } else {
-          Helpers.remove(fileOrDirPath);
-        }
-      }
-    }
-
-    Helpers.remove(`${this.location}/tmp*`);
-    Helpers.remove(`${this.location}/browser-*`);
-    Helpers.remove(`${this.location}/dist`);
-
-    this.__clearNodeModulesFromLinks();
     this.quickFixes.missingSourceFolders();
+    Helpers.info(`Cleaning project: ${this.genericName} done`);
+
     if (recrusive) {
       for (const child of this.children) {
         await child.clear(options);
       }
-
-      return;
-    }
-    const children = this.children.filter(
-      c =>
-        (c.typeIs('isomorphic-lib') || c.__isSmartContainer) &&
-        c.__frameworkVersionAtLeast('v3') &&
-        c.__npmPackages.useLinkAsNodeModules,
-    );
-    for (let index = 0; index < children.length; index++) {
-      const c = children[index];
-      await c.clear(options);
     }
     //#endregion
   }
@@ -1434,8 +1380,6 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 **/*.md
 tmp-*
 **/tmp-*
-.vscode/**/*.*
-**/.vscode/**/*.*
 **/src/assets/**/*.*
 /.build
 /projects
@@ -3816,6 +3760,10 @@ ${otherProjectNames
     //#region @backendFunc
     if (this.__isVscodeExtension) {
       //#region vscode build
+      await this.init(
+        'before vscode build',
+        InitOptions.fromBuild(buildOptions),
+      );
       try {
         if (buildOptions.watch) {
           this.run(`npm-run tsc -p ./`).sync();
@@ -4363,6 +4311,7 @@ ${config.frameworkName} start
 
     name: ${this.name}
     basename: ${this.basename}
+    has node_modules :${!this.nodeModulesEmpty()}
     version: ${this.version}
     private: ${this.__packageJson?.isPrivate}
     monorepo: ${this.isMonorepo}
@@ -4512,7 +4461,8 @@ ${config.frameworkName} start
       '--nolazy',
       '-r',
       'ts-node/register',
-      // "--preserve-symlinks", NOT WORKING
+      // needs to be for debugging from node_modules
+      '--preserve-symlinks',
       // "--preserve-symlinks-main",NOT WORKING
       '--experimental-worker',
     ];

@@ -34,6 +34,7 @@ export type IBuildProcessTable = PropsEntitySQL<
   typeof DEF_MODEL_VALUE_BUILD_PROCESS
 >;
 
+// @ts-ignore
 export class BuildProcessTable
   extends QueryTable<BuildProcess, number>
   implements IBuildProcessTable

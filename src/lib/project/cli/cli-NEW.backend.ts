@@ -99,9 +99,7 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
       cwd: this.cwd,
       basedOn: void 0,
       version:
-        _.isString(version) && version.length <= 5 && version.startsWith('v')
-          ? version
-          : void 0,
+        _.isString(version) && version.startsWith('v') ? version : void 0,
       skipInit,
     });
 
@@ -298,7 +296,7 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
             version: '0.0.0',
             private: true,
             tnp: {
-              version,
+              version: version || config.defaultFrameworkVersion,
               type: 'container',
               monorepo,
               smartContainerBuildTarget,

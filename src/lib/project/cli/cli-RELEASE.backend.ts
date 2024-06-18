@@ -41,8 +41,17 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
 
   //#region install:locally
   async installLocally() {
+    if (!this.project.hasFolder('out')) {
+      Helpers.info('Building project...')
+      await this.project.build(BuildOptions.from({ watch: false }));
+    }
     await this.project.__libVscodext.installLocally(this.params);
     this._exit();
+  }
+
+  async clearInstallLocally() {
+    await this.project.clear();
+    await this.installLocally();
   }
   //#endregion
 
