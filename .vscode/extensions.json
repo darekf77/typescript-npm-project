@@ -52,5 +52,6 @@
         "amodio.toggle-excluded-files",
         "GitHub.copilot",
         "unifiedjs.vscode-mdx" ,
+        "oven.bun-vscode",
     ]
 }

@@ -5316,7 +5316,7 @@ ${config.frameworkName} start
   __startOnCommand(args: string) {
     //#region @backendFunc
     if (this.typeIs('isomorphic-lib')) {
-      const command = `npm-run ts-node run.js ${args}`;
+      const command = `npm-run bun run.js ${args}`;
       return command;
     }
     //#endregion
