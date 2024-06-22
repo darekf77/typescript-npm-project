@@ -1,5 +1,5 @@
 ## Show version of projects inside container
-```
+```bash
 tnp versions
 ```
 
@@ -8,7 +8,7 @@ tnp versions
 
 Install vscode plugin
 
-```
+```bash
 tnp vscode:global
 ```
 
@@ -17,7 +17,7 @@ tnp vscode:global
 
 Install vscode plugin
 
-```
+```bash
 tnp mp3 <url to video>
 ```
 
@@ -26,6 +26,6 @@ tnp mp3 <url to video>
 
 Install vscode plugin
 
-```
+```bash
 tnp mp4 <url to video>
 ```

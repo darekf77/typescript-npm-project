@@ -3,7 +3,7 @@
 sudo mount -t cifs -o username=myUsername,password=myPassword,uid=$(id -u),gid=$(id -g),forceuid,forcegid //192.168.10.100/public /media/sharename
 ```
 
-```
+```bash
 sudo apt-get update && sudo apt-get upgrade
 
 sudo apt-get install git build-essential python gedit
@@ -103,14 +103,20 @@ useradd dariusz
 ```
 
 # mesure script time
+```bash
 time tnp build ss-ui
+```
 
 
 # copy script for dependencies
+```bash
 rimraf ../tnp/node_modules/`basename \`pwd\`` && cp -R `pwd`/dist ../tnp/node_modules/`basename \`pwd\``
+```
 
 # increase number of watchers in linux
 
+```bash
 /etc/sysctl.conf -> append fs.inotify.max_user_watches=524288
 
 check command: cat /proc/sys/fs/inotify/max_user_watches
+```

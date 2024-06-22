@@ -730,9 +730,13 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   public __assetsManager: AssetsManager;
   public __targetProjects: TargetProject;
   public __branding: Branding;
+  /**
+   * @deprecated use thing from base-project
+   */
   public __node_modules: NodeModules;
   public __recreate: FilesRecreator;
   public __filesFactory: FilesFactory;
+
   public quickFixes: QuickFixes;
   public __assetsFileListGenerator: AssetsFileListGenerator;
   public __npmPackages: NpmPackages;
@@ -741,7 +745,6 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   public __insideStructure: InsideStructures;
   public __singluarBuild: SingularBuild;
   public __webpackBackendBuild: WebpackBackendCompilation;
-
   public __linkedRepos: LinkedRepos;
   //#endregion
 
@@ -5371,7 +5374,7 @@ ${config.frameworkName} start
 
     //#region prepare variables / general variables
 
-    let portAssignedToAppBuild: number;
+    let portAssignedToAppBuild: number = Number(buildOptions.port);
 
     if (!_.isNumber(portAssignedToAppBuild) || !portAssignedToAppBuild) {
       portAssignedToAppBuild = buildOptions.websql

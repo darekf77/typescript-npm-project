@@ -8,6 +8,45 @@ git rm --cached path_to_submodule (no trailing slash).
  ipconfig getifaddr en0
 ```
 
+# trackable array
+```ts
+class TrackedArray<T> extends Array<T> {
+    constructor(...args: any[]) {
+        super(...args);
+
+        // Create a Proxy for the instance
+        return new Proxy(this, {
+            get(target, prop) {
+                // Intercept access to the 'push' method
+                if (prop === 'push') {
+                    return function (...args: any[]) {
+                        console.log('Array push called with:', args);
+                        debugger; // Add a debugger statement here for detailed inspection
+                        return Array.prototype.push.apply(target, args);
+                    };
+                }
+
+                // Default behavior for other properties
+                return target[prop];
+            }
+        });
+    }
+}
+
+function createTrackedArray<T>(existingArray: T[]): TrackedArray<T> {
+    const trackedArray = new TrackedArray<T>();
+
+    // Copy elements from the existing array to the tracked array
+    trackedArray.push(...existingArray);
+
+    return trackedArray;
+}
+
+const normalArray = [];
+const trackableArr = createTrackedArray(normalArray)
+
+```
+
 # dynamic getter 
 ```ts
 if (isUndefined(Object.getOwnPropertyDescriptor(model, 'locationOidView'))) {

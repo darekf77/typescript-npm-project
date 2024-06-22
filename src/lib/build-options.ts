@@ -87,7 +87,7 @@ export class InitOptions extends BaseBuild<InitOptions> {
   branding: boolean;
 
   public static from(options: Partial<InitOptions>): InitOptions {
-    return from(options, InitOptions);
+    return instanceFrom(options, InitOptions);
   }
 
   public static fromBuild(options: BuildOptions): InitOptions {
@@ -162,6 +162,11 @@ export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
     this._skipProjectProcess = value;
   }
 
+  /**
+   * override port number for app build
+   */
+  port: number;
+
   skipCopyManager: boolean;
   /**
    * build executed druring lib release
@@ -194,7 +199,7 @@ export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
   public static from(
     options: Omit<Partial<BuildOptions>, 'appBuild' | 'serveApp'>,
   ): BuildOptions {
-    return from(options, BuildOptions);
+    return instanceFrom(options, BuildOptions);
   }
 }
 //#endregion
@@ -244,13 +249,13 @@ export class ReleaseOptions extends BuildOptionsLibOrApp<ReleaseOptions> {
   specifiedVersion: string;
   releaseTarget: 'lib' | 'app' | 'lib-app';
   public static from(options: Partial<ReleaseOptions>): ReleaseOptions {
-    return from(options, ReleaseOptions);
+    return instanceFrom(options, ReleaseOptions);
   }
 }
 
 //#endregion
 
-function from(
+function instanceFrom(
   options: Partial<InitOptions | BuildOptions | ReleaseOptions>,
   classFn: Function,
 ) {
