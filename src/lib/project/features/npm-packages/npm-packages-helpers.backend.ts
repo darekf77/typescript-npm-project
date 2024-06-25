@@ -94,7 +94,7 @@ export function prepareCommand(
     // --no-progress
     const argsForFasterInstall = `--force --ignore-engines --no-audit ${config.frameworkName !== 'tnp' ? '--silent' : ''} --no-progress  `;
     command =
-      `npm ${install} ${pkg ? pkg.name : ''} ` +
+      `node --max-old-space-size=8000 $(which npm) ${install} ${pkg ? pkg.name : ''} ` +
       ` ${pkg && pkg.installType ? pkg.installType : ''} ` +
       ` ${argsForFasterInstall} `;
   }
