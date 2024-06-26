@@ -82,7 +82,7 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
       config.file.yarn_lock,
     );
     const yarnLockExisits = fse.existsSync(yarnLockPath);
-    const command: string = prepareCommand(pkg, remove, useYarn, this.project);
+    const command: string = await prepareCommand(pkg, remove, useYarn, this.project);
     Helpers.taskStarted(`
 
     [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]

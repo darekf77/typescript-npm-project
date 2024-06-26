@@ -1043,9 +1043,11 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
           this.remove('out');
         }
 
-        this.remove(config.folder.dist);
         rimraf.sync(
           crossPlatformPath([this.location, config.folder.tmp + '*']),
+        );
+        rimraf.sync(
+          crossPlatformPath([this.location, config.folder.dist + '*']),
         );
         try {
           this.removeFile(config.folder.node_modules);
@@ -4476,7 +4478,39 @@ ${config.frameworkName} start
   //#region getters & methods / save lanunch json
   public __saveLaunchJson(basePort: number) {
     //#region @backendFunc
-    if (this.__isSmartContainer) {
+    if (this.__isVscodeExtension) {
+      const configVscodeLaunch = {
+        version: '0.2.0',
+        configurations: [
+          {
+            name: 'Run Extension',
+            type: 'extensionHost',
+            request: 'launch',
+            runtimeExecutable: '${execPath}',
+            args: ['--extensionDevelopmentPath=${workspaceFolder}'],
+            outFiles: ['${workspaceFolder}/out/**/*.js'],
+            // preLaunchTask: 'npm: watch',
+          },
+          {
+            name: 'Extension Tests',
+            type: 'extensionHost',
+            request: 'launch',
+            runtimeExecutable: '${execPath}',
+            args: [
+              '--extensionDevelopmentPath=${workspaceFolder}',
+              '--extensionTestsPath=${workspaceFolder}/out/test',
+            ],
+            outFiles: ['${workspaceFolder}/out/test/**/*.js'],
+            preLaunchTask: 'npm: watch',
+          },
+        ],
+      };
+      const launchJSOnFilePath = path.join(
+        this.location,
+        '.vscode/launch.json',
+      );
+      Helpers.writeJson5(launchJSOnFilePath, configVscodeLaunch);
+    } else if (this.__isSmartContainer) {
       //#region container save
       const container = this;
       const configurations = container.children

@@ -1,6 +1,6 @@
 //#region imports
 import chalk from 'chalk';
-import { dateformat, path } from 'tnp-core/src';
+import { crossPlatformPath, dateformat, path } from 'tnp-core/src';
 import { fse } from 'tnp-core/src';
 import { _, moment } from 'tnp-core/src';
 
@@ -67,7 +67,7 @@ export function executeCommand(command: string, project: Project) {
   );
 }
 
-export function prepareCommand(
+export async function prepareCommand(
   pkg: Models.Package,
   remove: boolean,
   useYarn: boolean,
@@ -93,8 +93,9 @@ export function prepareCommand(
   } else {
     // --no-progress
     const argsForFasterInstall = `--force --ignore-engines --no-audit ${config.frameworkName !== 'tnp' ? '--silent' : ''} --no-progress  `;
+
     command =
-      `node --max-old-space-size=8000 $(which npm) ${install} ${pkg ? pkg.name : ''} ` +
+      `npx --node-options=--max-old-space-size=8000 npm ${install} ${pkg ? pkg.name : ''} ` +
       ` ${pkg && pkg.installType ? pkg.installType : ''} ` +
       ` ${argsForFasterInstall} `;
   }
