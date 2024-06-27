@@ -69,8 +69,6 @@
   ],
   "html.format.wrapAttributes": "force-aligned",
   "workbench.colorTheme": "Default Light+",
-  "favorites.sortDirection": "ASC",
-  "favorites.groupsFirst": true,
   "typescript.tsdk": "node_modules/typescript/lib",
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -108,9 +106,6 @@
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": false
-  },
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
   },
   "prettier.endOfLine": "auto",
   "prettier.prettierPath": "./node_modules/prettier"

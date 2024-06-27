@@ -186,15 +186,23 @@ export function appfileTemplate(project: Project) {
 
   // TODO quick fix for @ browser remover
   return `
-import { Firedev } from 'firedev/src';
+${'//#reg' + 'ion'} imports
+import { Firedev, BaseContext } from 'firedev/src';
 import { Observable, map } from 'rxjs';
-${'//#reg' + 'ion'} ${'@not' + 'ForNpm'}
 import { HOST_BACKEND_PORT } from './app.hosts';
 ${'//#reg' + 'ion'} @${'bro' + 'wser'}
-import { NgModule } from '@angular/core';
+import { NgModule, inject, Injectable } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+${'//#end' + 'region'}
+${'//#end' + 'region'}
 
+console.log('hello world');
+console.log('Your server will start on port '+ HOST_BACKEND_PORT);
+const host = 'http://localhost:' + HOST_BACKEND_PORT;
+
+${'//#reg' + 'ion'} ${project.name} component
+${'//#reg' + 'ion'} @${'bro' + 'wser'}
 @Component({
   selector: 'app-${project.name}',
   template: \`hello from ${project.name}<br>
@@ -206,70 +214,95 @@ import { CommonModule } from '@angular/common';
   \`,
   styles: [\` body { margin: 0px !important; } \`],
 })
-export class ${componentName} implements OnInit {
-  users$: Observable<User[]> = User.ctrl.getAll().received.observable
-    .pipe(map(data => data.body.json));
-
-  constructor() { }
-  ngOnInit() { }
+export class ${componentName} {
+  userApiService = inject(UserApiService);
+  readonly users$: Observable<User[]> = this.userApiService.getAll();
 }
+${'//#end' + 'region'}
+${'//#end' + 'region'}
 
+${'//#reg' + 'ion'}  ${project.name} api service
+${'//#reg' + 'ion'} @${'bro' + 'wser'}
+@Injectable({
+  providedIn:'root'
+})
+export class UserApiService {
+  userControlller = Firedev.inject(()=> MainContext.get(UserController))
+  getAll() {
+    return this.userControlller.getAll()
+      .received
+      .observable
+      .pipe(map(r => r.body.json));
+  }
+}
+${'//#end' + 'region'}
+${'//#end' + 'region'}
+
+${'//#reg' + 'ion'}  ${project.name} module
+${'//#reg' + 'ion'} @${'bro' + 'wser'}
 @NgModule({
-  imports: [CommonModule],
   exports: [${componentName}],
+  imports: [CommonModule],
   declarations: [${componentName}],
-  providers: [],
 })
 export class ${moduleName} { }
-//#endregion
+${'//#end' + 'region'}
+${'//#end' + 'region'}
 
+${'//#reg' + 'ion'}  ${project.name} entity
 @Firedev.Entity({ className: 'User' })
-class User extends Firedev.Base.Entity {
+class User extends Firedev.Base.AbstractEntity {
   public static ctrl?: UserController;
   ${'//#reg' + 'ion'} @${'web' + 'sql'}
-  @Firedev.Orm.Column.Generated()
+  @Firedev.Orm.Column.String()
   ${'//#end' + 'region'}
-  id?: string | number;
-
+  name?: string;
 }
+${'//#end' + 'region'}
 
+${'//#reg' + 'ion'}  ${project.name} controller
 @Firedev.Controller({ className: 'UserController' })
 class UserController extends Firedev.Base.CrudController<User> {
-  entity = ()=> User;
+  entityClassResolveFn = ()=> User;
   ${'//#reg' + 'ion'} @${'web' + 'sql'}
   async initExampleDbData(): Promise<void> {
-    await this.repository.save(new User())
+    const superAdmin = new User();
+    superAdmin.name = 'super-admin';
+    await this.db.save(superAdmin);
   }
   ${'//#end' + 'region'}
 }
+${'//#end' + 'region'}
+
+${'//#reg' + 'ion'}  ${project.name} context
+const MainContext = Firedev.createContext(()=>({
+  host,
+  contextName: 'MainContext',
+  contexts:{ BaseContext },
+  controllers: {
+    UserController,
+    // PUT FIREDEV CONTORLLERS HERE
+  },
+  entities: {
+    User,
+    // PUT FIREDEV ENTITIES HERE
+  },
+  database: true,
+  disabledRealtime: true,
+}));
+${'//#end' + 'region'}
 
 async function start() {
-  console.log('hello world');
-  console.log('Your server will start on port '+ HOST_BACKEND_PORT);
-  const host = 'http://localhost:' + HOST_BACKEND_PORT;
 
-  const context = await Firedev.createContext({
-    host,
-    contextName: 'context',
-    controllers: {
-      UserController,
-      // PUT FIREDEV CONTORLLERS HERE
-    },
-    entities: {
-      User,
-      // PUT FIREDEV ENTITIES HERE
-    },
-    ${'//#reg' + 'ion'} @${'web' + 'sql'}
-    database:true,
-    ${'//#end' + 'region'}
-  });
-  await context.initialize();
+  await MainContext.initialize();
 
   if (Firedev.isBrowser) {
-    const users = (await User.ctrl.getAll().received).body.json;
+     const ref = await MainContext.ref();
+    const users = (await ref.getInstanceBy(UserController).getAll().received)
+      .body?.json;
     console.log({
-      'users from backend': users
-    })
+      'users from backend': users,
+    });
   }
 }
 
@@ -277,7 +310,6 @@ export default start;
 
 
 
-${'//#end' + 'region'}
 
 
 

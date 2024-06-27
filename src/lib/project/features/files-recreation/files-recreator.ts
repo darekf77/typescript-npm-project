@@ -449,12 +449,10 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
 
               if (hide) {
                 settings = getSettingsFor(self.project, settings) as any;
-                if (self.project.__isSmartContainer) {
-                  if (self.project.__isSmartContainer) {
-                    settings['files.exclude'][`recent.json`] = true;
-                    settings['files.exclude'][`angular.json`] = true;
-                    // settings['files.exclude'][`src/lib`] = true;
-                  }
+                if (self.project.__isContainer) {
+                  settings['files.exclude'][`recent.json`] = true;
+                  settings['files.exclude'][`angular.json`] = true;
+                  // settings['files.exclude'][`src/lib`] = true;
 
                   self.project.children.forEach(c => {
                     const childernSettings = getSettingsFor(c);
@@ -544,6 +542,7 @@ yarn-error.log
 testem.log
 /typings
 app.hosts.ts
+/**/*._auto-generated_.ts
 ${this.project.__linkedRepos.git.ignored()}
 ${this.project.__isStandaloneProject ? `/${config.folder.testsEnvironments}` : ''}
 /src/lib/lib-info.md

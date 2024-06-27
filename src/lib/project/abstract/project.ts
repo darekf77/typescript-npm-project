@@ -717,6 +717,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   private __forStandAloneSrc: string = `${config.folder.src}-for-standalone`;
   private __npmRunNg: string = `npm-run ng`; // when there is not globl "ng" command -> npm-run ng.js works
   public angularFeBasenameManager: AngularFeBasenameManager;
+
   //#region @backend
   public __libStandalone: LibProjectStandalone;
   public __libSmartcontainer: LibProjectSmartContainer;
@@ -1111,6 +1112,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     Helpers.log(`Reseting symbolic links from node_mouels..DONE`);
     //#endregion
   }
+
   //#endregion
 
   //#region getters & methods / get string npm package name
@@ -1413,6 +1415,7 @@ tmp-*
         bracketSameLine: true,
         printWidth: 80,
         singleAttributePerLine: true,
+        endOfLine: 'auto',
       },
       '.editorconfig': `
 # Editor configuration, see http://editorconfig.org
@@ -1449,12 +1452,14 @@ trim_trailing_whitespace = false
   }
   //#endregion
 
+  //#region getters & methods / should not enable lint and prettier
   get shouldNotEnableLintAndPrettier(): boolean {
     return (
       (this.__isContainer && !this.__isSmartContainer) ||
       this.__isSmartContainerChild
     );
   }
+  //#endregion
 
   //#region getters & methods /  recreate lint configuration
   recreateLintConfiguration(): void {
@@ -1493,6 +1498,7 @@ trim_trailing_whitespace = false
         'editor.defaultFormatter': 'esbenp.prettier-vscode',
         'editor.formatOnSave': false,
       },
+
       'editor.rulers': [80, 120],
       'eslint.migration.2_x': 'off',
       'eslint.enable': true,
@@ -3804,7 +3810,7 @@ ${otherProjectNames
       if (buildOptions.libBuild) {
         await this.__buildLib(buildOptions);
       }
-      await Helpers.runSyncOrAsync({ functionFn: libBuildDone });
+      await Helpers.runSyncOrAsync({ functionFn: libBuildDone, context: this });
       if (buildOptions.appBuild) {
         await this.__buildApp(buildOptions);
       }
@@ -4233,7 +4239,7 @@ ${config.frameworkName} start
       const shouldGenerateAssetsList =
         this.__isSmartContainer ||
         (this.__isStandaloneProject && !this.__isSmartContainerTarget);
-      // console.log({ shouldGenerateAssetsList })
+      console.log({ shouldGenerateAssetsList });
       if (shouldGenerateAssetsList) {
         if (buildOptions.watch) {
           await this.__assetsFileListGenerator.startAndWatch(
@@ -4254,12 +4260,16 @@ ${config.frameworkName} start
 
     //#region start copy to manager function
     const startCopyToManager = async () => {
+      // console.info('starting copy manager');
       Helpers.info(`${buildOptions.watch ? 'files watch started...' : ''}`);
       Helpers.log(
         `[buildable-project] Build steps ended (project type: ${this.type}) ... `,
       );
 
-      if (!buildOptions.appBuild) {
+      if (
+        buildOptions.buildType == 'lib' ||
+        buildOptions.buildType == 'lib-app'
+      ) {
         if (
           (this.__isStandaloneProject && this.typeIs('isomorphic-lib')) ||
           this.__isSmartContainer
@@ -4278,16 +4288,19 @@ ${config.frameworkName} start
     //#endregion
 
     //#region start build
-
-    // console.log('before build steps')
-    await this.__buildSteps(buildOptions, async () => {
+    const libBuildDone = async () => {
       if (buildOptions.appBuild) {
         await buildAssetsFile();
       }
-      if (buildOptions.libBuild && !buildOptions.skipCopyManager) {
+      const shouldStartCopyToManager =
+        buildOptions.libBuild && !buildOptions.skipCopyManager;
+      // console.log('Should start copy to manager', { shouldStartCopyToManager });
+      if (shouldStartCopyToManager) {
         await startCopyToManager();
       }
-    });
+    };
+    // console.log('before build steps')
+    await this.__buildSteps(buildOptions, libBuildDone);
     //#endregion
 
     !buildOptions.skipCopyManager &&
@@ -5897,6 +5910,7 @@ ${config.frameworkName} start
     const {
       alreadyInitedPorjects,
       watch,
+
       struct,
       branding,
       websql,
@@ -6066,7 +6080,35 @@ ${config.frameworkName} start
     // Helpers.mesureExectionInMsSync('saving json', async () => {
     this.__saveLaunchJson(4000);
     // });
+    await this.creteBuildInfoFile(initOptions);
     initOptions.finishCallback();
+
+    //#endregion
+  }
+  //#endregion
+
+  //#region getters & methods / build infor
+
+  async creteBuildInfoFile(initOptions: InitOptions) {
+    //#region @backendFunc
+    initOptions = InitOptions.from(initOptions);
+    if (this.__isSmartContainer) {
+      this.children.forEach(c => c.creteBuildInfoFile(initOptions));
+    } else {
+      const dest = this.pathFor([
+        config.folder.src,
+        config.folder.lib,
+        config.file.build_info_generated_ts,
+      ]);
+      Helpers.writeFile(
+        dest,
+        `
+export const BUILD_FRAMEWORK_CLI_NAME = '${config.frameworkName}';
+
+      `,
+      );
+    }
+
     //#endregion
   }
   //#endregion

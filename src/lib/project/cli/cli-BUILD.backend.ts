@@ -96,11 +96,11 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
   async start() {
     const { smartContainerTargetName } = this.params;
 
-    console.log('smartContainerTargetName', smartContainerTargetName);
-    console.log(
-      'this.project?.__smartContainerBuildTarget?.name',
-      this.project?.__smartContainerBuildTarget?.name,
-    );
+    // console.log('smartContainerTargetName', smartContainerTargetName);
+    // console.log(
+    //   'this.project?.__smartContainerBuildTarget?.name',
+    //   this.project?.__smartContainerBuildTarget?.name,
+    // );
     //#region prevent start mode for smart container non child
     if (
       smartContainerTargetName !==
