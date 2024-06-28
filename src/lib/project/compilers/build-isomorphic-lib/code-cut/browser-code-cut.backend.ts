@@ -610,7 +610,7 @@ export class BrowserCodeCut {
         const workspacePackgeMatch = (
           rawImport.match(
             new RegExp(`^\\@([a-zA-z]|\\-)+\\/([a-zA-z]|\\-)+$`),
-          ) || []
+          ) || [] // @ts-ignore
         ).filter(d => d.length > 1);
         const worskpacePackageName =
           _.isArray(workspacePackgeMatch) && workspacePackgeMatch.length === 1

@@ -6070,6 +6070,10 @@ ${config.frameworkName} start
     );
     // });
 
+    if (this.__isStandaloneProject && this.isInCiReleaseProject) {
+      this.__packageJson.data.main = 'dist/app.electron.js';
+      this.__packageJson.save('update main for electorn');
+    }
     initOptions = InitOptions.from(initOptions);
     // await Helpers.mesureExectionInMs('initing process', async () => {
     await this.initFileStructure(initOptions);
