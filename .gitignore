@@ -12,6 +12,7 @@ yarn-error.log
 testem.log
 /typings
 app.hosts.ts
+/**/*._auto-generated_.ts
 /linked-repos
 
 /tests-environments
@@ -60,7 +61,11 @@ Thumbs.db
 /tsconfig.browser.json.filetemplate
 /tsconfig.json.filetemplate
 /tsconfig.backend.dist.json.filetemplate
+/projects/tmp*
 /tsconfig.backend.dist.json
+!tsconfig*
+webpack.*
+
 # =====================
 !firedev.json
 !firedev.jsonc
