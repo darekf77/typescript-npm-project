@@ -4287,7 +4287,7 @@ ${config.frameworkName} start
       const shouldGenerateAssetsList =
         this.__isSmartContainer ||
         (this.__isStandaloneProject && !this.__isSmartContainerTarget);
-      console.log({ shouldGenerateAssetsList });
+      // console.log({ shouldGenerateAssetsList });
       if (shouldGenerateAssetsList) {
         if (buildOptions.watch) {
           await this.__assetsFileListGenerator.startAndWatch(

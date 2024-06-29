@@ -224,7 +224,7 @@ ${'//#reg' + 'ion'} @${'bro' + 'wser'}
   providedIn:'root'
 })
 export class UserApiService {
-  userControlller = Firedev.inject(()=> MainContext.get(UserController))
+  userControlller = Firedev.inject(()=> MainContext.getClass(UserController))
   getAll() {
     return this.userControlller.getAll()
       .received
