@@ -8,6 +8,5 @@
   "trailingComma": "all",
   "bracketSameLine": true,
   "printWidth": 80,
-  "singleAttributePerLine": true,
-  "endOfLine": "auto"
+  "singleAttributePerLine": true
 }

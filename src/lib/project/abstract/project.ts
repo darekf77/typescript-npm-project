@@ -18,7 +18,7 @@ import {
 import { $Global } from '../cli/cli-_GLOBAL_.backend';
 import { fse, json5, os, dateformat } from 'tnp-core/src';
 import { child_process } from 'tnp-core/src';
-import { Firedev } from 'firedev/src';
+import { Firedev, BaseContext } from 'firedev/src';
 import * as semver from 'semver';
 import {
   PackageJSON,
@@ -711,7 +711,6 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   //#region fields
   id: number;
   readonly type: CoreModels.LibType;
-  private ____projectInfoPort: number;
   private __buildOptions?: BuildOptions;
 
   private __forStandAloneSrc: string = `${config.folder.src}-for-standalone`;
@@ -825,7 +824,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   //#region getters & methods / set project info port
   __setProjectInfoPort(v) {
     //#region @backend
-    this.____projectInfoPort = v;
+    this.projectInfoPort = v;
     const children = this.children.filter(f => f.location !== this.location);
     for (const child of children) {
       child.__setProjectInfoPort(v);
@@ -929,11 +928,12 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   //#endregion
 
   //#region getters & methods / set project info
-  get __projectInfoPort() {
+  get resolve_projectInfoPort() {
     //#region @backendFunc
-    let port = this.____projectInfoPort;
+    let port = this.projectInfoPort;
     if (!port && this.__isSmartContainerTarget) {
-      return this.__smartContainerTargetParentContainer?.__projectInfoPort;
+      return this.__smartContainerTargetParentContainer
+        ?.projectInfoPort;
     }
     return port;
     //#endregion
@@ -941,26 +941,32 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   //#endregion
 
   //#region getters & methods / get standalone normal app port
-  get __standaloneNormalAppPort() {
+  get resolve_standaloneNormalAppPort() {
     //#region @backendFunc
-    return PortUtils.instance(this.__projectInfoPort).calculateClientPortFor(
-      this,
-      { websql: false },
-    );
+    const resolvePort = PortUtils.instance(
+      this.resolve_projectInfoPort,
+    ).calculateClientPortFor(this, { websql: false });
+    // console.log(`resolveStandaloneNormalAppPort ${resolvePort}`);
+    return resolvePort;
     //#endregion
   }
   //#endregion
 
   //#region getters & methods / get standalone websql app port
-  get __standaloneWebsqlAppPort() {
+  get resolve_standaloneWebsqlAppPort() {
     //#region @backendFunc
-    return PortUtils.instance(this.__projectInfoPort).calculateClientPortFor(
-      this,
-      { websql: true },
-    );
+    const resolvePort = PortUtils.instance(
+      this.resolve_projectInfoPort,
+    ).calculateClientPortFor(this, { websql: true });
+    return resolvePort;
     //#endregion
   }
   //#endregion
+
+  projectInfoPort: number;
+  backendPort: number;
+  standaloneNormalAppPort: number;
+  standaloneWebsqlAppPort: number;
 
   //#region  methods & getters / get default develop Branch
   getDefaultDevelopmentBranch() {
@@ -4041,12 +4047,16 @@ ${otherProjectNames
     }
     //#endregion
 
-    let libContext: any; //  Firedev.FrameworkContext;
+    let libContextExists = false;
+
+    //#region set proper smart container target name
     const smartContainerTargetName =
       buildOptions.smartContainerTargetName ||
       this.__smartContainerBuildTarget?.name;
+    //#endregion
 
     if (buildOptions.libBuild) {
+      //#region save baseHref for lib build
       buildOptions.baseHref = !_.isUndefined(buildOptions.baseHref)
         ? buildOptions.baseHref
         : this.angularFeBasenameManager.rootBaseHref;
@@ -4057,10 +4067,15 @@ ${otherProjectNames
         tmpBaseHrefOverwriteRelPath + (smartContainerTargetName || ''),
         buildOptions.baseHref,
       );
+      //#endregion
 
-      //#region main lib code build ports assignations
+      //#region create firedev context for main lib code build ports assignations
       const projectInfoPort = await this.assignFreePort(4100);
       this.__setProjectInfoPort(projectInfoPort);
+      this.backendPort = PortUtils.instance(
+        this.projectInfoPort,
+      ).calculateServerPortFor(this);
+
       Helpers.writeFile(
         this.pathFor(tmpBuildPort),
         projectInfoPort?.toString(),
@@ -4071,7 +4086,7 @@ ${otherProjectNames
       // Firedev.destroyContext(hostForBuild);
       if (!buildOptions?.skipProjectProcess) {
         //#region check build message
-        Helpers.info(`
+        console.info(`
 
 
 
@@ -4084,31 +4099,23 @@ ${otherProjectNames
 
         Helpers.taskStarted(`starting project service... ${hostForBuild}`);
         try {
-          // TOOD @UNCOMMEND
-          // const context = await Firedev.init({
-          //   mode: 'backend/frontend',
-          //   host: hostForBuild,
-          //   controllers: [
-          //     BuildProcessController,
-          //   ],
-          //   entities: [
-          //     BuildProcess,
-          //   ],
-          //   //#region @websql
-          //   config: {
-          //     type: 'better-sqlite3',
-          //     database:
-          //       //  config.frameworkName === 'firedev' ?
-          //       ':memory:'
-          //     //  as any : this.pathFor(`tmp-build-process.sqlite`)
-          //     ,
-          //     logging: false,
-          //   }
-          //   //#endregion
-          // });
-          // const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
-          // await controller.initialize(this);
-          // libContext = context;
+          const ProjectBuildContext = Firedev.createContext(() => ({
+            contextName: 'ProjectBuildContext',
+            host: hostForBuild,
+            contexts: { BaseContext },
+            controllers: { BuildProcessController },
+            entities: { BuildProcess },
+            logs: false,
+            database: true,
+          }));
+          await ProjectBuildContext.initialize();
+          const buildProcessController: BuildProcessController =
+            ProjectBuildContext.getClassInstance(BuildProcessController);
+
+          await buildProcessController.initialize(this);
+          this.standaloneNormalAppPort = this.resolve_standaloneNormalAppPort;
+          this.standaloneWebsqlAppPort = this.resolve_standaloneWebsqlAppPort;
+          libContextExists = true;
         } catch (error) {
           console.error(error);
           Helpers.error(
@@ -4142,6 +4149,8 @@ ${otherProjectNames
 
     if (buildOptions.appBuild) {
       // TODO is this ok baw is not initing ?
+
+      //#region prevent empty baseHref for app build
       if (
         !_.isUndefined(buildOptions.baseHref) &&
         buildOptions.buildType === 'app'
@@ -4158,6 +4167,7 @@ ${otherProjectNames
           true,
         );
       }
+
       const baseHrefLocProj = this;
 
       const fromFileBaseHref = Helpers.readFile(
@@ -4166,9 +4176,10 @@ ${otherProjectNames
         ),
       );
       buildOptions.baseHref = fromFileBaseHref;
+      //#endregion
 
-      //#region initializae client app remote connection to build server
-      if (!libContext) {
+      //#region create firedev context for for client app remote connection to build server
+      if (!libContextExists) {
         const projectInfoPortFromFile = Number(
           Helpers.readFile(this.pathFor(tmpBuildPort)),
         );
@@ -4177,32 +4188,34 @@ ${otherProjectNames
         const hostForAppWorker = `http://localhost:${projectInfoPortFromFile}`;
         // console.log({ hostForAppWorker })
         if (!buildOptions?.skipProjectProcess) {
-          // TODO @UNCOMMENT
-          // try {
-          //   Firedev.destroyContext(hostForAppWorker);
-          //   const context = await Firedev.init({
-          //     mode: 'remote-backend',
-          //     host: hostForAppWorker,
-          //     controllers: [
-          //       BuildProcessController,
-          //     ],
-          //     entities: [
-          //       BuildProcess,
-          //     ]
-          //   });
-          //   const controller: BuildProcessController = context.getInstanceBy(BuildProcessController) as any;
-          //   await controller.initialize(this);
-          // } catch (error) {
-          //   console.error(error);
-          //   Helpers.error(`Please reinstall ${config.frameworkName} node_modules`, false, true);
-          // }
-          // this.__saveLaunchJson(projectInfoPortFromFile);
+          try {
+            const ProjectBuildContext = Firedev.createContext(() => ({
+              contextName: 'ProjectBuildContext',
+              remoteHost: hostForAppWorker,
+              contexts: { BaseContext },
+              controllers: { BuildProcessController },
+              entities: { BuildProcess },
+              logs: false,
+            }));
+            const buildProcessController: BuildProcessController =
+              ProjectBuildContext.getClassInstance(BuildProcessController);
+
+            await buildProcessController.initialize(this);
+          } catch (error) {
+            console.error(error);
+            Helpers.error(
+              `Please reinstall ${config.frameworkName} node_modules`,
+              false,
+              true,
+            );
+          }
+          this.__saveLaunchJson(projectInfoPortFromFile);
         }
       }
       //#endregion
 
+      //#region prevent empty node_modules
       if (!this.__node_modules.exist) {
-        //#region prevent empty node_modules
         Helpers.error(
           `Please start lib build first:
 
@@ -4215,8 +4228,8 @@ ${config.frameworkName} start
           false,
           true,
         );
-        //#endregion
       }
+      //#endregion
     }
 
     Helpers.logInfo(`
@@ -4303,6 +4316,7 @@ ${config.frameworkName} start
     await this.__buildSteps(buildOptions, libBuildDone);
     //#endregion
 
+    //#region show end lib build info
     !buildOptions.skipCopyManager &&
       Helpers.info(
         buildOptions.watch
@@ -4316,6 +4330,7 @@ ${config.frameworkName} start
 
   `,
       );
+    //#endregion
 
     buildOptions.finishCallback();
     //#endregion
@@ -5425,8 +5440,8 @@ ${config.frameworkName} start
 
     if (!_.isNumber(portAssignedToAppBuild) || !portAssignedToAppBuild) {
       portAssignedToAppBuild = buildOptions.websql
-        ? this.__standaloneWebsqlAppPort
-        : this.__standaloneNormalAppPort;
+        ? this.standaloneWebsqlAppPort
+        : this.standaloneNormalAppPort;
     }
 
     if (!_.isNumber(portAssignedToAppBuild) || !portAssignedToAppBuild) {
@@ -6082,7 +6097,7 @@ ${config.frameworkName} start
     this.recreateLintConfiguration();
     // });
     // Helpers.mesureExectionInMsSync('saving json', async () => {
-    this.__saveLaunchJson(4000);
+    // this.__saveLaunchJson(4000);
     // });
     await this.creteBuildInfoFile(initOptions);
     initOptions.finishCallback();

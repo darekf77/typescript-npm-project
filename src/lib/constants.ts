@@ -174,26 +174,26 @@ export class PortUtils {
   }
 
   appHostTemplateFor(project: Project) {
-    const backendPort = this.calculateServerPortFor(project);
 
     //#region @backendFunc
     const clientPorts =
       project.__isStandaloneProject && !project.__isSmartContainerTarget
         ? `
-export const CLIENT_DEV_NORMAL_APP_PORT = ${project.__standaloneNormalAppPort};
-export const CLIENT_DEV_WEBSQL_APP_PORT = ${project.__standaloneWebsqlAppPort};
+export const CLIENT_DEV_NORMAL_APP_PORT = ${project.standaloneNormalAppPort};
+export const CLIENT_DEV_WEBSQL_APP_PORT = ${project.standaloneWebsqlAppPort};
     `
         : '';
 
     return `
 // THIS FILE IS GENERATED - DO NOT MODIFY
 
-export const HOST_BACKEND_PORT = ${backendPort};
+export const HOST_BACKEND_PORT = ${project.backendPort};
 ${clientPorts}
 
 // Check yout build info here http://localhost:${this.basePort}
-// NORMAL APP: http://localhost:${project.__standaloneNormalAppPort}
-// WEBSQL APP: http://localhost:${project.__standaloneWebsqlAppPort}
+// BACKEND FOR NORMAL APP: http://localhost:${this.basePort}/helloworld
+// NORMAL APP: http://localhost:${project.standaloneNormalAppPort}
+// WEBSQL APP: http://localhost:${project.standaloneWebsqlAppPort}
 
 // THIS FILE IS GENERATED - DO NOT MODIFY
 `.trim();

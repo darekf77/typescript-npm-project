@@ -165,7 +165,7 @@ export function recreateApp(project: Project) {
   ) {
     Helpers.writeFile(
       appHostsFile,
-      PortUtils.instance(project.__projectInfoPort).appHostTemplateFor(project),
+      PortUtils.instance(project.projectInfoPort).appHostTemplateFor(project),
     );
   }
 
@@ -297,8 +297,7 @@ async function start() {
   await MainContext.initialize();
 
   if (Firedev.isBrowser) {
-     const ref = await MainContext.ref();
-    const users = (await ref.getInstanceBy(UserController).getAll().received)
+    const users = (await MainContext.getClassInstance(UserController).getAll().received)
       .body?.json;
     console.log({
       'users from backend': users,
