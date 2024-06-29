@@ -319,10 +319,13 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
     //#region pull master with tags
     try {
-      Helpers.run(`git pull --tags origin master`, {
-        cwd,
-        output: false,
-      }).sync();
+      Helpers.run(
+        `git reset --hard HEAD~20 && git reset --hard && git clean -df && git pull --tags origin master`,
+        {
+          cwd,
+          output: false,
+        },
+      ).sync();
       Helpers.log('DONE PULLING MASTER');
     } catch (error) {
       Helpers.log(error);
@@ -5745,6 +5748,22 @@ ${config.frameworkName} start
     const nccBase = crossPlatformPath(
       path.join(this.location, outDir, 'temp', 'ncc'),
     );
+    const indexJSPath = crossPlatformPath([nccBase, 'index.js']);
+    Helpers.writeFile(
+      indexJSPath,
+      Helpers.readFile(indexJSPath).replace('module = undefined;', ''),
+    );
+
+    // copy wasm file for dest
+    const wasmfileSource = crossPlatformPath([
+      Project.by('isomorphic-lib', this.__frameworkVersion).location,
+      'app/src/assets/sql-wasm.wasm',
+    ]);
+    const wasmfileDest = crossPlatformPath([
+      nccBase,
+      'sql-wasm.wasm',
+    ]);
+    Helpers.copyFile(wasmfileSource, wasmfileDest);
 
     Helpers.filesFrom(nccBase, true)
       .filter(f => f.replace(`${nccBase}/`, '') !== config.file.package_json)
