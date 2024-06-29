@@ -163,10 +163,7 @@ export function recreateApp(project: Project) {
     !Helpers.exists(appHostsFile)
     // && !Helpers.exists(appFolderWithIndex) // TODO @QUESTION why not to remove this
   ) {
-    Helpers.writeFile(
-      appHostsFile,
-      PortUtils.instance(project.projectInfoPort).appHostTemplateFor(project),
-    );
+    project.writePortsToFile();
   }
 
   if (

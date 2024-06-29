@@ -543,6 +543,7 @@ testem.log
 /typings
 app.hosts.ts
 /**/*._auto-generated_.ts
+/**/BUILD-INFO.md
 ${this.project.__linkedRepos.git.ignored()}
 ${this.project.__isStandaloneProject ? `/${config.folder.testsEnvironments}` : ''}
 /src/lib/lib-info.md

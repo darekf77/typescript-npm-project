@@ -932,8 +932,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     //#region @backendFunc
     let port = this.projectInfoPort;
     if (!port && this.__isSmartContainerTarget) {
-      return this.__smartContainerTargetParentContainer
-        ?.projectInfoPort;
+      return this.__smartContainerTargetParentContainer?.projectInfoPort;
     }
     return port;
     //#endregion
@@ -962,6 +961,39 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     //#endregion
   }
   //#endregion
+
+  writePortsToFile() {
+    //#region @backend
+    const appHostsFile = crossPlatformPath(
+      path.join(this.location, config.folder.src, 'app.hosts.ts'),
+    );
+
+    Helpers.writeFile(
+      appHostsFile,
+      PortUtils.instance(this.projectInfoPort).appHostTemplateFor(this),
+    );
+
+    if (this.__isStandaloneProject) {
+      this.writeFile(
+        'BUILD-INFO.md',
+        `
+*This file is generated. This file is generated.*
+
+# Project info
+
+- Project name: ${this.genericName}
+- project info host: http://localhost:${this.projectInfoPort}
+- backend host: http://localhost:${this.backendPort}
+- standalone normal app host: http://localhost:${this.standaloneNormalAppPort}
+- standalone websql app host: http://localhost:${this.standaloneWebsqlAppPort}
+
+*This file is generated. This file is generated.*
+      `,
+      );
+    }
+
+    //#endregion
+  }
 
   projectInfoPort: number;
   backendPort: number;
@@ -4550,10 +4582,8 @@ ${config.frameworkName} start
         .map((c, index) => {
           const backendPort =
             PortUtils.instance(basePort).calculateServerPortFor(c);
-          c.writeFile(
-            'src/app.hosts.ts',
-            PortUtils.instance(basePort).appHostTemplateFor(c),
-          );
+
+          c.writePortsToFile();
           return {
             type: 'node',
             request: 'launch',
@@ -4611,10 +4641,7 @@ ${config.frameworkName} start
       ) => {
         const backendPort =
           PortUtils.instance(basePort).calculateServerPortFor(serverChild);
-        clientProject.writeFile(
-          'src/app.hosts.ts',
-          PortUtils.instance(basePort).appHostTemplateFor(serverChild),
-        );
+        clientProject.writePortsToFile();
         const startServerTemplate = {
           type: 'node',
           request: 'launch',
