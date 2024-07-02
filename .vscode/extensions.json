@@ -53,5 +53,6 @@
         "GitHub.copilot",
         "unifiedjs.vscode-mdx" ,
         "oven.bun-vscode",
+        "qwtel.sqlite-viewer"
     ]
 }
