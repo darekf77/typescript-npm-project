@@ -3685,8 +3685,12 @@ ${otherProjectNames
 
     let trusted = [];
     if (config.frameworkName === 'tnp') {
-      const value = Helpers.readValueFromJson(
-        crossPlatformPath([projTnp.location, config.file.firedev_jsonc]),
+      const pathToCheck = crossPlatformPath([
+        projTnp.location,
+        config.file.firedev_jsonc,
+      ]);
+      const value = Helpers.readValueFromJsonC(
+        pathToCheck,
         `core.dependencies.trusted.${this.__frameworkVersion}`,
       );
       if (value === '*') {
@@ -3696,7 +3700,7 @@ ${otherProjectNames
     }
 
     if (config.frameworkName === 'firedev') {
-      const value = Helpers.readValueFromJson(
+      const value = Helpers.readValueFromJsonC(
         crossPlatformPath([projTnp.location, config.file.tnpEnvironment_json]),
         `packageJSON.tnp.core.dependencies.trusted.${this.__frameworkVersion}`,
       );
@@ -5759,10 +5763,7 @@ ${config.frameworkName} start
       Project.by('isomorphic-lib', this.__frameworkVersion).location,
       'app/src/assets/sql-wasm.wasm',
     ]);
-    const wasmfileDest = crossPlatformPath([
-      nccBase,
-      'sql-wasm.wasm',
-    ]);
+    const wasmfileDest = crossPlatformPath([nccBase, 'sql-wasm.wasm']);
     Helpers.copyFile(wasmfileSource, wasmfileDest);
 
     Helpers.filesFrom(nccBase, true)

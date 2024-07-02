@@ -1329,6 +1329,11 @@ ${this.project.children
 
   //#region @notForNpm
 
+  trusted() {
+    console.log(this.project.__trusted);
+    this._exit();
+  }
+
   async ccupdate() {
 
     //#region packages to check

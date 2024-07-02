@@ -71,6 +71,29 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
     };
   }
 
+  // TOOD QUICK_FIX
+  private modifyPackageJson(project: Project) {
+    const packgeJson = project.readJson(config.file.package_json) as {
+      dependencies: { [packageName: string]: string };
+    };
+    const trusted = project.__trusted;
+    for (const trustedPackageName of trusted) {
+      if (packgeJson.dependencies[trustedPackageName]) {
+        if (semver.valid(packgeJson.dependencies[trustedPackageName])) {
+          const plainVersionRegex = /^\d+\.\d+\.\d+$/;
+
+          if (
+            plainVersionRegex.test(packgeJson.dependencies[trustedPackageName])
+          ) {
+            packgeJson.dependencies[trustedPackageName] =
+              `~${packgeJson.dependencies[trustedPackageName]}`;
+          }
+        }
+      }
+    }
+    project.writeJson(config.file.package_json, packgeJson);
+  }
+
   protected async actualNpmProcess(options?: Models.ActualNpmInstallOptions) {
     if (this.project.__isDocker) {
       return;
@@ -82,7 +105,14 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
       config.file.yarn_lock,
     );
     const yarnLockExisits = fse.existsSync(yarnLockPath);
-    const command: string = await prepareCommand(pkg, remove, useYarn, this.project);
+    const command: string = await prepareCommand(
+      pkg,
+      remove,
+      useYarn,
+      this.project,
+    );
+    this.modifyPackageJson(this.project);
+
     Helpers.taskStarted(`
 
     [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]
