@@ -517,6 +517,7 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
           .join('\n');
 
     const ignoredByGit = this.filesIgnoredBy.gitignore
+      .filter(f => !f.startsWith('/tsconfig'))
       .filter(f => {
         if (this.project.__isCoreProject && f.endsWith('.filetemplate')) {
           return false;
