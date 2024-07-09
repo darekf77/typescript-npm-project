@@ -374,7 +374,7 @@
         //#region my common libs
         "tnp-config": "16.444.8",
         "tnp-models": "16.444.8",
-        "tnp-helpers": "16.444.15",
+        "tnp-helpers": "16.444.16",
         "tnp-db": "16.444.7",
         "firedev-type-sql": "16.444.8",
         "firedev-typeorm": "16.444.5",
@@ -382,7 +382,7 @@
         "firedev-ports": "16.444.8",
         "firedev-crud-deamon": "16.444.8",
         "firedev-ui": "16.444.1",
-        "tnp-core": "16.444.9",
+        "tnp-core": "16.444.11",
         "tnp-cli": "16.444.1",
         "any-project-cli": "16.444.8",
         "ng2-logger": "16.444.8",
