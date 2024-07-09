@@ -374,7 +374,7 @@
         //#region my common libs
         "tnp-config": "16.444.8",
         "tnp-models": "16.444.8",
-        "tnp-helpers": "16.444.12",
+        "tnp-helpers": "16.444.15",
         "tnp-db": "16.444.7",
         "firedev-type-sql": "16.444.8",
         "firedev-typeorm": "16.444.5",

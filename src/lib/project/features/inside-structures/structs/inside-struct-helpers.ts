@@ -285,7 +285,7 @@ const MainContext = Firedev.createContext(()=>({
     // PUT FIREDEV ENTITIES HERE
   },
   database: true,
-  disabledRealtime: true,
+  // disabledRealtime: true,
 }));
 ${'//#end' + 'region'}
 

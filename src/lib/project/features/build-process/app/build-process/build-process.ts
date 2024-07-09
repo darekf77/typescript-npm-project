@@ -13,7 +13,7 @@ import { _ } from 'tnp-core/src';
   className: 'BuildProcess',
   //#endregion
 })
-export class BuildProcess extends Firedev.Base.AbstractEntity {
+export class BuildProcess extends Firedev.Base.AbstractEntity<BuildProcess> {
   //#region @websql
   @Firedev.Orm.Column.Custom({
     type: 'varchar',
@@ -22,4 +22,20 @@ export class BuildProcess extends Firedev.Base.AbstractEntity {
   })
   //#endregion
   description?: string;
+
+  //#region @websql
+  @Firedev.Orm.Column.Number()
+  //#endregion
+  backendPort: number;
+
+  //#region @websql
+  @Firedev.Orm.Column.Number()
+  //#endregion
+  standaloneNormalAppPort: number;
+
+  //#region @websql
+  @Firedev.Orm.Column.Number()
+  //#endregion
+  standaloneWebsqlAppPort: number;
+
 }

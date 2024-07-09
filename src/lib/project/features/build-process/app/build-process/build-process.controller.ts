@@ -35,8 +35,37 @@ export class BuildProcessController extends Firedev.Base.CrudController<any> {
     };
   }
 
+  @Firedev.Http.GET()
+  getPorts(): Firedev.Response<BuildProcess> {
+    return async (req, res) => {
+      return this.db.findOne({});
+    };
+  }
+
   private project: Project;
-  async initialize(project: Project) {
+  async initializeServer(project: Project) {
     this.project = project;
+    const portsToSave = {
+      backendPort: this.project.backendPort,
+      standaloneNormalAppPort: this.project.standaloneNormalAppPort,
+      standaloneWebsqlAppPort: this.project.standaloneWebsqlAppPort,
+    };
+    console.log(portsToSave);
+    await this.db.save(new BuildProcess().clone(portsToSave));
+  }
+
+  async initializeClientToRemoteServer(project: Project) {
+    this.project = project;
+    const { backendPort, standaloneNormalAppPort, standaloneWebsqlAppPort } = (
+      await this.getPorts().received
+    ).body.json;
+    const ports = {
+      backendPort,
+      standaloneNormalAppPort,
+      standaloneWebsqlAppPort,
+    };
+    console.log('ports from remote db', ports);
+    Object.assign(project, ports);
+    // @LAST TODO app should request portss from remote server
   }
 }

@@ -4137,32 +4137,24 @@ ${otherProjectNames
         //#endregion
 
         Helpers.taskStarted(`starting project service... ${hostForBuild}`);
-        try {
-          const ProjectBuildContext = Firedev.createContext(() => ({
-            contextName: 'ProjectBuildContext',
-            host: hostForBuild,
-            contexts: { BaseContext },
-            controllers: { BuildProcessController },
-            entities: { BuildProcess },
-            logs: false,
-            database: true,
-          }));
-          await ProjectBuildContext.initialize();
-          const buildProcessController: BuildProcessController =
-            ProjectBuildContext.getClassInstance(BuildProcessController);
 
-          await buildProcessController.initialize(this);
-          this.standaloneNormalAppPort = this.resolve_standaloneNormalAppPort;
-          this.standaloneWebsqlAppPort = this.resolve_standaloneWebsqlAppPort;
-          libContextExists = true;
-        } catch (error) {
-          console.error(error);
-          Helpers.error(
-            `Please reinstall ${config.frameworkName} node_modules`,
-            false,
-            true,
-          );
-        }
+        const ProjectBuildContext = Firedev.createContext(() => ({
+          contextName: 'ProjectBuildContext',
+          host: hostForBuild,
+          contexts: { BaseContext },
+          controllers: { BuildProcessController },
+          entities: { BuildProcess },
+          logs: false,
+          database: true,
+        }));
+        await ProjectBuildContext.initialize();
+        const buildProcessController: BuildProcessController =
+          ProjectBuildContext.getClassInstance(BuildProcessController);
+
+        await buildProcessController.initializeServer(this);
+        this.standaloneNormalAppPort = this.resolve_standaloneNormalAppPort;
+        this.standaloneWebsqlAppPort = this.resolve_standaloneWebsqlAppPort;
+        libContextExists = true;
       }
 
       this.__saveLaunchJson(projectInfoPort);
@@ -4222,33 +4214,27 @@ ${otherProjectNames
         const projectInfoPortFromFile = Number(
           Helpers.readFile(this.pathFor(tmpBuildPort)),
         );
+        console.log({
+          projectInfoPortFromFile,
+        });
         this.__setProjectInfoPort(projectInfoPortFromFile);
 
         const hostForAppWorker = `http://localhost:${projectInfoPortFromFile}`;
         // console.log({ hostForAppWorker })
         if (!buildOptions?.skipProjectProcess) {
-          try {
-            const ProjectBuildContext = Firedev.createContext(() => ({
-              contextName: 'ProjectBuildContext',
-              remoteHost: hostForAppWorker,
-              contexts: { BaseContext },
-              controllers: { BuildProcessController },
-              entities: { BuildProcess },
-              logs: false,
-            }));
-            const buildProcessController: BuildProcessController =
-              ProjectBuildContext.getClassInstance(BuildProcessController);
+          const ProjectBuildContext = Firedev.createContext(() => ({
+            contextName: 'ProjectBuildContext',
+            remoteHost: hostForAppWorker,
+            contexts: { BaseContext },
+            controllers: { BuildProcessController },
+            entities: { BuildProcess },
+            logs: false,
+          }));
+          await ProjectBuildContext.initialize();
+          const buildProcessController: BuildProcessController =
+            ProjectBuildContext.getClassInstance(BuildProcessController);
 
-            await buildProcessController.initialize(this);
-          } catch (error) {
-            console.error(error);
-            Helpers.error(
-              `Please reinstall ${config.frameworkName} node_modules`,
-              false,
-              true,
-            );
-          }
-          this.__saveLaunchJson(projectInfoPortFromFile);
+          await buildProcessController.initializeClientToRemoteServer(this);
         }
       }
       //#endregion
