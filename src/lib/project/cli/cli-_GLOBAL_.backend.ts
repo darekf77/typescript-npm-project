@@ -927,13 +927,16 @@ export class $Global extends BaseCommandLine<{}, Project> {
 
   //#region mp4
   MP4(args) {
+    const downloadPath = crossPlatformPath(
+      path.join(os.userInfo().homedir, 'Downloads', 'mp3-from-youtube'),
+    );
     // yt-dlp --print filename -o "%(uploader)s-%(upload_date)s-%(title)s.%(ext)s"
     Helpers.run(
       'yt-dlp --verbose  -S "res:1080,fps" -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" ' +
         args,
       {
         output: true,
-        cwd: crossPlatformPath(path.join(os.userInfo().homedir, 'Downloads')),
+        cwd: downloadPath,
       },
     ).sync();
     this._exit();

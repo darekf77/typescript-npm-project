@@ -23,7 +23,7 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
         return !resolved.includes(c);
       });
 
-      resolved = Project.sortGroupOfProject<Project>(
+      resolved = this.project.ins.sortGroupOfProject<Project>(
         [...resolved, ...otherDeps],
         proj => proj.__includeOnlyForRelease || [],
         proj => proj.name,
