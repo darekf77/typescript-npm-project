@@ -15,6 +15,7 @@ import {
 } from './package-json-helpers.backend';
 import { PackageJsonCore } from './package-json-core.backend';
 import { PackageJsonDepsCoreCategories } from './package-json-deps-categories.backend';
+import { CoreModels } from 'tnp-core/src';
 
 export class PackageJsonBase extends PackageJsonCore {
   public readonly project: Project;
@@ -127,11 +128,11 @@ export class PackageJsonBase extends PackageJsonCore {
     })();
   }
 
-  public removeDependencyAndSave = (p: Models.Package, reason: string) => {
+  public removeDependencyAndSave = (p: CoreModels.Package, reason: string) => {
     this.prepareForSave('save');
     removeDependencyAndSave(p, reason, this.project);
   };
-  public setDependencyAndSave = (p: Models.Package, reason: string) => {
+  public setDependencyAndSave = (p: CoreModels.Package, reason: string) => {
     this.prepareForSave('save');
     setDependencyAndSave(p, reason, this.project);
   };

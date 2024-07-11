@@ -23,11 +23,13 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
         return !resolved.includes(c);
       });
 
-      resolved = this.project.ins.sortGroupOfProject<Project>(
-        [...resolved, ...otherDeps],
-        proj => proj.__includeOnlyForRelease || [],
-        proj => proj.name,
-      ).filter(d => d.name !== this.project.name);
+      resolved = this.project.ins
+        .sortGroupOfProject<Project>(
+          [...resolved, ...otherDeps],
+          proj => proj.__includeOnlyForRelease || [],
+          proj => proj.name,
+        )
+        .filter(d => d.name !== this.project.name);
     }
     this.params = ReleaseOptions.from({ ...this.params, resolved });
     //#endregion
@@ -42,7 +44,7 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
   //#region install:locally
   async installLocally() {
     if (!this.project.hasFolder('out')) {
-      Helpers.info('Building project...')
+      Helpers.info('Building project...');
       await this.project.build(BuildOptions.from({ watch: false }));
     }
     await this.project.__libVscodext.installLocally(this.params);
@@ -145,7 +147,7 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
           );
         }
       }
-      if (child.majorVersion === majorVersionToSet) {
+      if (child.npmHelpers.majorVersion === majorVersionToSet) {
         Helpers.info(
           `[${child.name}] Major version ${majorVersionToSet} alread set.`,
         );

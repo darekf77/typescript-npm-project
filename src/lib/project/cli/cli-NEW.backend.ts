@@ -311,7 +311,7 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
         containers.push(currentContainer);
 
         if (parentContainer?.__isContainer) {
-          parentContainer.addLinkedProject(
+          parentContainer.linkedProjects.addLinkedProject(
             path.basename(currentContainer.location),
           );
         }
@@ -404,7 +404,7 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
     }
 
     if (lastContainer) {
-      lastContainer.addLinkedProject(lastProjectFromArgName);
+      lastContainer.linkedProjects.addLinkedProject(lastProjectFromArgName);
     }
 
     // if (lastContainer && lastContainer.isContainer && lastContainer.location !== grandpa.location) {
@@ -447,8 +447,9 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
     ) {
       if (appProj.__isSmartContainerChild) {
         lastContainer.__packageJson.data.tnp.smartContainerBuildTarget =
-          _.first(lastContainer.children.filter(c => c.name !== appProj.name))
-            ?.name;
+          _.first(
+            lastContainer.children.filter(c => c.name !== appProj.name),
+          )?.name;
         lastContainer.__packageJson.save('updating smart container target');
       }
     }

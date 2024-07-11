@@ -16,11 +16,8 @@ import { BaseFeatureForProject } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
 import * as semver from 'semver';
 import { PackagesRecognition } from '../package-recognition/packages-recognition';
-import {
-  executeCommand,
-  fixOptions,
-  prepareCommand,
-} from './npm-packages-helpers.backend';
+import { executeCommand, fixOptions } from './npm-packages-helpers.backend';
+import { CoreModels } from 'tnp-core/src';
 //#endregion
 
 export class NpmPackagesCore extends BaseFeatureForProject<Project> {
@@ -94,23 +91,17 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
     project.writeJson(config.file.package_json, packgeJson);
   }
 
-  protected async actualNpmProcess(options?: Models.ActualNpmInstallOptions) {
+  protected async actualNpmProcess(options?: CoreModels.NpmInstallOptions) {
     if (this.project.__isDocker) {
       return;
     }
-    const { generatLockFiles, useYarn, pkg, reason, remove } =
-      fixOptions(options);
-    const yarnLockPath = path.join(
-      this.project.location,
-      config.file.yarn_lock,
-    );
-    const yarnLockExisits = fse.existsSync(yarnLockPath);
-    const command: string = await prepareCommand(
+    const { useYarn, pkg, remove } = fixOptions(options);
+
+    const command: string = await this.project.npmHelpers.prepareCommand({
       pkg,
       remove,
       useYarn,
-      this.project,
-    );
+    });
     this.modifyPackageJson(this.project);
 
     Helpers.taskStarted(`
@@ -132,25 +123,9 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
         // Helpers.taskDone('Done rebuilding electorn');
       } catch (err) {
         console.error(err);
-        //#region message about memory and inotify watchers
-
-        const errorMessage = `
-
-${chalk.red('Make sure that you:')}:
-
-1. Increased maximum node memory size:
-
-export NODE_OPTIONS=--max_old_space_size=4096
-
-2. Increase the amount of inotify watchers (linux only):
-
-echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-
-        `;
+        //#region message about memory
         Helpers.error(
           `[${config.frameworkName}] Error during npm install...
-
-        ${errorMessage}
 
         `,
           false,
@@ -168,8 +143,10 @@ echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo s
     this.project.quickFixes.nodeModulesPackagesZipReplacement();
     await PackagesRecognition.startFor(this.project, 'after npm install');
 
-    if (!generatLockFiles) {
+    if (!options.generateYarnOrPackageJsonLock) {
       if (useYarn) {
+        const yarnLockPath = this.project.pathFor(config.file.yarn_lock);
+        const yarnLockExisits = fse.existsSync(yarnLockPath);
         if (yarnLockExisits) {
           if (this.project.git.isInsideGitRepo) {
             this.project.git.resetFiles(config.file.yarn_lock);
@@ -179,8 +156,7 @@ echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo s
             Helpers.removeFileIfExists(yarnLockPath);
         }
       } else {
-        const packageLockPath = path.join(
-          this.project.location,
+        const packageLockPath = this.project.pathFor(
           config.file.package_lock_json,
         );
         fse.existsSync(packageLockPath) &&

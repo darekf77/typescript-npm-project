@@ -224,7 +224,7 @@ function removeDepsByType(deps: object, libType: CoreModels.LibType) {
 
 //#region set dependency and save
 export function setDependencyAndSave(
-  p: Models.Package,
+  p: CoreModels.Package,
   reason: string,
   project: Project,
 ) {
@@ -298,7 +298,7 @@ export function setDependencyAndSave(
 
 //#region remove dependency and save
 export function removeDependencyAndSave(
-  p: Models.Package,
+  p: CoreModels.Package,
   reason: string,
   project: Project,
 ) {

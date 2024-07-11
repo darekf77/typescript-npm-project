@@ -117,7 +117,7 @@ export class PackageJsonDepsCoreCategories extends BaseFeatureForProject<Project
     return result;
   }
 
-  public set(pkg: Models.Package, type: CoreModels.CoreLibCategory) {
+  public set(pkg: CoreModels.Package, type: CoreModels.CoreLibCategory) {
     if (!CoreLibCategoryArr.includes(type)) {
       Helpers.error(
         `[depscorecategories][set] Incrorrect type ${type}`,

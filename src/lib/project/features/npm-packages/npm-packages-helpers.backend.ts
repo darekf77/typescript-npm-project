@@ -8,18 +8,19 @@ import { Project } from '../../abstract/project';
 import { Models } from '../../../models';
 import { Helpers } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
+import { CoreModels } from 'tnp-core/src';
 //#endregion
 
 const noTrace = global.hideLog && config.frameworkName === 'firedev';
 const showNpmCommandOutput = !noTrace;
 
-export function resolvePacakgesFromArgs(args: string[]): Models.Package[] {
-  let installType: Models.InstalationType = '--save';
+export function resolvePacakgesFromArgs(args: string[]): CoreModels.Package[] {
+  let installType: CoreModels.InstalationType = '--save';
   return args
     .map(p => p.trim())
     .filter(p => {
-      if (Models.InstalationTypeArr.includes(p)) {
-        installType = p as Models.InstalationType;
+      if (CoreModels.InstalationTypeArr.includes(p)) {
+        installType = p as CoreModels.InstalationType;
         return false;
       }
       if (p.endsWith('@')) {
@@ -67,49 +68,14 @@ export function executeCommand(command: string, project: Project) {
   );
 }
 
-export async function prepareCommand(
-  pkg: Models.Package,
-  remove: boolean,
-  useYarn: boolean,
-  project: Project,
-) {
-  const install = remove ? 'uninstall' : 'install';
-  let command = '';
-  // const noPackageLock = project.__isStandaloneProject
-  //   ? '--no-package-lock'
-  //   : '';
-
-  if (
-    useYarn
-    // || project.frameworkVersionAtLeast('v3') // yarn sucks
-  ) {
-    // --ignore-scripts
-    // yarn install --prefer-offline
-    const argsForFasterInstall = ` --no-audit`;
-    command =
-      `rm yarn.lock && touch yarn.lock && yarn ${pkg ? 'add' : ''} ${pkg ? pkg.name : ''} ` +
-      ` ${argsForFasterInstall} ` +
-      ` ${pkg && pkg.installType && pkg.installType === '--save-dev' ? '-dev' : ''} `;
-  } else {
-    // --no-progress
-    const argsForFasterInstall = `--force --ignore-engines --no-audit ${config.frameworkName !== 'tnp' ? '--silent' : ''} --no-progress  `;
-
-    command =
-      `npx --node-options=--max-old-space-size=8000 npm ${install} ${pkg ? pkg.name : ''} ` +
-      ` ${pkg && pkg.installType ? pkg.installType : ''} ` +
-      ` ${argsForFasterInstall} `;
-  }
-  return command;
-}
-
 export function fixOptions(
-  options?: Models.ActualNpmInstallOptions,
-): Models.ActualNpmInstallOptions {
+  options?: CoreModels.NpmInstallOptions,
+): CoreModels.NpmInstallOptions {
   if (_.isNil(options)) {
     options = {} as any;
   }
-  if (_.isUndefined(options.generatLockFiles)) {
-    options.generatLockFiles = false;
+  if (_.isUndefined(options.generateYarnOrPackageJsonLock)) {
+    options.generateYarnOrPackageJsonLock = false;
   }
   if (_.isUndefined(options.useYarn)) {
     options.useYarn = false;

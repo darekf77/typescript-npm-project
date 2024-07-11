@@ -527,7 +527,8 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
       .join('\n')
       .concat('\n');
     // console.log(ignoredByGit)
-    const linkeProjectPrefix = this.project.getLinkedProjectsConfig().prefix;
+    const linkeProjectPrefix =
+      this.project.linkedProjects.getLinkedProjectsConfig().prefix;
     const patternsToIgnore =
       `# profiling files
 chrome-profiler-events*.json
@@ -563,7 +564,8 @@ ${this.project.__isVscodeExtension ? '/out' : ''}
 ${this.project.__isTnp || this.project.__isVscodeExtension ? '!tsconfig*' : ''}
 ${this.project.__isTnp ? 'webpack.*' : ''}
 ${
-  this.project.linkedProjects.length > 0 || !!this.project.linkedProjectsPrefix
+  this.project.linkedProjects.linkedProjects.length > 0 ||
+  !!this.project.linkedProjects.linkedProjectsPrefix
     ? `
 # container/workspace git projects
 # PREFIX
@@ -572,7 +574,7 @@ ${linkeProjectPrefix ? `/${linkeProjectPrefix}*` : ''}
 ${
   this.project.isMonorepo
     ? []
-    : this.project.linkedProjects
+    : this.project.linkedProjects.linkedProjects
         .map(f => f.relativeClonePath)
         .map(c => `/${crossPlatformPath(c)}`)
         .join('\n')

@@ -17,17 +17,11 @@ export namespace Models {
     reasonToShowPackages: string;
     reasonToHidePackages: string;
   };
-  export interface ActualNpmInstallOptions {
-    generatLockFiles?: boolean;
-    useYarn?: boolean;
-    pkg?: Package;
-    reason: string;
-    remove?: boolean;
-  }
+
 
   export interface NpmInstallOptions {
     remove?: boolean;
-    npmPackages?: Package[];
+    npmPackages?: CoreModels.Package[];
   }
 
   export type NpmDependencyType =
@@ -54,9 +48,6 @@ export namespace Models {
     'tnp_overrided_dependencies',
   ];
 
-  export type InstalationType = '-g' | '--save' | '--save-dev';
-
-  export const InstalationTypeArr = ['-g', '--save', '--save-dev'];
 
   export interface FiredevLoaderConfig {
     name?: FiredevLoaders;
@@ -396,11 +387,7 @@ export namespace Models {
     firedev: TnpData & TnpIPackageJSONOverride;
   }
 
-  export type Package = {
-    name: string;
-    version?: string;
-    installType?: InstalationType;
-  };
+
 
   /**
    * @deprecated

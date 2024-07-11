@@ -1,19 +1,4 @@
 //#region imports
-import { config, extAllowedToReplace, TAGS } from 'tnp-config/src';
-import { _, crossPlatformPath, path, CoreModels } from 'tnp-core/src';
-import { Helpers, BaseProjectResolver, BaseProject } from 'tnp-helpers/src';
-import { LibTypeArr } from 'tnp-config/src';
-import { CoreConfig } from 'tnp-core/src';
-import { BuildOptions, InitOptions, ReleaseOptions } from '../../build-options';
-import { Models } from '../../models';
-import {
-  firedevFrameworkName,
-  MESSAGES,
-  firedevRepoPathUserInUserDir,
-  tmpBuildPort,
-  tmpBaseHrefOverwriteRelPath,
-} from '../../constants';
-
 //#region @backend
 import { $Global } from '../cli/cli-_GLOBAL_.backend';
 import { fse, json5, os, dateformat } from 'tnp-core/src';
@@ -57,9 +42,27 @@ import {
 } from '../features/build-process/app/build-process';
 import { rimraf } from 'tnp-core/src';
 //#endregion
+import { config, extAllowedToReplace, TAGS } from 'tnp-config/src';
+import { _, crossPlatformPath, path, CoreModels } from 'tnp-core/src';
+import { Helpers, BaseProjectResolver, BaseProject } from 'tnp-helpers/src';
+import { LibTypeArr } from 'tnp-config/src';
+import { CoreConfig } from 'tnp-core/src';
+import { BuildOptions, InitOptions, ReleaseOptions } from '../../build-options';
+import { Models } from '../../models';
+import {
+  firedevFrameworkName,
+  MESSAGES,
+  firedevRepoPathUserInUserDir,
+  tmpBuildPort,
+  tmpBaseHrefOverwriteRelPath,
+} from '../../constants';
 import { EnvironmentConfig } from '../features/environment-config/environment-config';
 import { CLI } from 'tnp-cli/src';
 import { AngularFeBasenameManager } from '../features/basename-manager';
+import { LibraryBuild } from './library-build';
+import { NpmHelpers } from './npm-helpers';
+import { LinkedProjects } from './linked-projects';
+import { Git } from './git';
 //#endregion
 
 const debugWord = 'Debug/Start';
@@ -727,6 +730,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   public __tests: MochaTestRunner;
   public __testsJest: JestTestRunner;
   public __testsCypress: CypressTestRunner;
+  /**
+   * @deprecated use thing npmHelpers
+   */
   public __packageJson: PackageJSON;
   public __filesTemplatesBuilder: FilesTemplatesBuilder;
   public __docsAppBuild: DocsAppBuildConfig;
@@ -734,7 +740,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   public __targetProjects: TargetProject;
   public __branding: Branding;
   /**
-   * @deprecated use thing from base-project
+   * @deprecated use thing npmHelpers
    */
   public __node_modules: NodeModules;
   public __recreate: FilesRecreator;
@@ -742,6 +748,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
   public quickFixes: QuickFixes;
   public __assetsFileListGenerator: AssetsFileListGenerator;
+  /**
+   * @deprecated use thing npmHelpers
+   */
   public __npmPackages: NpmPackages;
   public __env: EnvironmentConfig;
   public __copyManager: CopyManager;
@@ -760,6 +769,17 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
    */
   constructor(location?: string) {
     super(crossPlatformPath(_.isString(location) ? location : ''));
+    this.git = new (require('./git').Git as typeof Git)(this as any);
+
+    this.libraryBuild = new (require('./library-build')
+      .LibraryBuild as typeof LibraryBuild)(this as any);
+
+    this.npmHelpers = new (require('./npm-helpers')
+      .NpmHelpers as typeof NpmHelpers)(this as any);
+
+    this.linkedProjects = new (require('./linked-projects')
+      .LinkedProjects as typeof LinkedProjects)(this as any);
+
     if (!global.codePurposeBrowser) {
       // TODO when on weird on node 12
 
@@ -1716,7 +1736,7 @@ trim_trailing_whitespace = false
   //#region getters & methods / is container or workspace with linked projects
   get __isContainerWithLinkedProjects() {
     //#region @backendFunc
-    return this.__isContainer && this.linkedProjects.length > 0;
+    return this.__isContainer && this.linkedProjects.linkedProjects.length > 0;
     //#endregion
   }
   //#endregion
@@ -2496,7 +2516,7 @@ processing...
       //#region publish lib process
       var newVersion = realCurrentProj.version;
 
-      this.checkIfLogginInToNpm();
+      this.npmHelpers.checkIfLogginInToNpm();
       this.__checkIfReadyForNpm();
 
       if (this.__isStandaloneProject) {
@@ -4369,7 +4389,7 @@ ${config.frameworkName} start
 
     name: ${this.name}
     basename: ${this.basename}
-    has node_modules :${!this.nodeModulesEmpty()}
+    has node_modules :${!this.npmHelpers.emptyNodeModules}
     version: ${this.version}
     private: ${this.__packageJson?.isPrivate}
     monorepo: ${this.isMonorepo}
@@ -5145,7 +5165,7 @@ ${config.frameworkName} start
   __createNewVersionWithTagForPathRelease(commitMsg?: string) {
     //#region @backendFunc
     const proj = this;
-    let currentPathNum = proj.versionPathAsNumber; // + 1;
+    let currentPathNum = proj.npmHelpers.versionPathAsNumber; // + 1;
     let commitMessage = commitMsg
       ? commitMsg.trim()
       : 'new version ' + proj.version;
@@ -5208,7 +5228,7 @@ ${config.frameworkName} start
   //#region getters & methods / get deps as package
   public __getDepsAsPackage(
     type: Models.NpmDependencyType | Models.TnpNpmDependencyType,
-  ): Models.Package[] {
+  ): CoreModels.Package[] {
     //#region @backendFunc
     if (this.typeIs('unknow')) {
       return [];
@@ -5222,7 +5242,7 @@ ${config.frameworkName} start
       this.__packageJson.data.tnp.overrided &&
       this.__packageJson.data.tnp.overrided.dependencies;
 
-    let installType: Models.InstalationType;
+    let installType: CoreModels.InstalationType;
 
     let data: any;
     if (isTnpOverridedDependency) {
@@ -6183,72 +6203,6 @@ export const BUILD_FRAMEWORK_CLI_NAME = '${config.frameworkName}';
   }
   //#endregion
 
-  //#region getters & methods / before push action
-  protected async _beforePushProcessAction() {
-    //#region @backendFunc
-    await super._beforePushProcessAction();
-
-    if (
-      !this.git.originURL &&
-      this.__isContainerChild &&
-      !this.__isSmartContainerChild
-    ) {
-      this.run(
-        `git remote add ${origin} ${this.parent.git.originURL.replace(
-          this.parent.name,
-          this.name,
-        )}`,
-      ).sync();
-    }
-
-    this.removeFolderByRelativePath('node_modules/husky');
-
-    if (this.name === 'firedev') {
-      config.activeFramewrokVersions.forEach(frameworkVersion => {
-        // console.log(`Active Framework: ${frameworkVersion}`)
-        const morphiProjectContainerPath = path.join(
-          this.location,
-          'projects',
-          `container${frameworkVersion === 'v1' ? '' : `-${frameworkVersion}`}`,
-        );
-        const containerCoreForVersion = Project.ins.From(
-          morphiProjectContainerPath,
-        ) as Project;
-        if (containerCoreForVersion) {
-          Helpers.info(
-            `[${config.frameworkName}] updating on push global container${
-              frameworkVersion === 'v1' ? '' : `-${frameworkVersion}`
-            } in ${this.name}`,
-          );
-          containerCoreForVersion.__packageJson.save(
-            'Updating morphi container',
-          );
-        } else {
-          Helpers.warn(
-            `[firedev][hotfix] Not able to find container for framework version ${frameworkVersion}`,
-          );
-        }
-      });
-    }
-    if (this.__targetProjects.exists) {
-      Helpers.warn(`
-
-      Don't forget to push target projects for project ${chalk.bold(this.name)}
-
-      `);
-    }
-    //#endregion
-  }
-  //#endregion
-
-  //#region getters & methods / before pull action
-  protected async _beforePullProcessAction() {
-    //#region @backendFunc
-    await super._beforePullProcessAction();
-    // await Helpers.killAllNodeExceptCurrentProcess();
-    //#endregion
-  }
-  //#endregion
 
   //#endregion
 }
