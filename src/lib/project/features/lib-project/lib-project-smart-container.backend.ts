@@ -31,7 +31,7 @@ export class LibProjectSmartContainer extends LibPorjectBase {
       proj = Project.ins.From(absFolder) as Project;
       const child = smartContainer.children.find(
         c => c.name === path.basename(absFolder),
-      );
+      ) as Project;
       const packgeJsonPath = proj.__packageJson.pathPackageJson;
       const pj = Helpers.readJson(packgeJsonPath) as Models.IPackageJSON;
       pj.version = newVersion;
@@ -40,7 +40,7 @@ export class LibProjectSmartContainer extends LibPorjectBase {
         rootPackageName,
       ); // TODO QUICK_FIX
       delete pj.devDependencies;
-      pj.dependencies = child.__packageJson.data.tnp.overrided.dependencies;
+      pj.dependencies = child.__packageJson.data.tnp.overrided?.dependencies;
       pj.peerDependencies = child.__packageJson.data.peerDependencies;
       pj.engines = child.__packageJson.data.engines;
       pj.homepage = child.__packageJson.data.homepage;
@@ -187,13 +187,13 @@ ${otherProjectNames
         let toBuildNormally = automaticReleaseDocs
           ? toBuildNormallyCFG
           : allProjects.length === 0
-          ? []
-          : await Helpers.consoleGui.multiselect(
-              'Which projects you want to build with normally',
-              allProjects.map(childName => {
-                return returnFun(childName);
-              }),
-            );
+            ? []
+            : await Helpers.consoleGui.multiselect(
+                'Which projects you want to build with normally',
+                allProjects.map(childName => {
+                  return returnFun(childName);
+                }),
+              );
 
         //#region questions
         let appBuildOptions = { docsAppInProdMode: prod, websql: false };
