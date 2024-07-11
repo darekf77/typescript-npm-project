@@ -4,7 +4,6 @@ import { BaseGit, Helpers } from 'tnp-helpers/src';
 import { chalk, path } from 'tnp-core/src';
 
 export class Git extends BaseGit<Project> {
-
   //#region getters & methods / before push action
   protected async _beforePushProcessAction() {
     //#region @backendFunc
@@ -71,6 +70,28 @@ export class Git extends BaseGit<Project> {
     await super._beforePullProcessAction();
     // await Helpers.killAllNodeExceptCurrentProcess();
     //#endregion
+  }
+  //#endregion
+
+  //#region getters & methods / use git branches as metadata for commits
+  useGitBranchesAsMetadataForCommits() {
+    return false;
+  }
+  //#endregion
+
+  //#region getters & methods / automatically add all changes when pushing to git
+  automaticallyAddAllChnagesWhenPushingToGit() {
+    return (
+      this.project.__isContainer ||
+      this.project.__isStandaloneProject ||
+      this.project?.parent?.__isContainer
+    );
+  }
+  //#endregion
+
+  //#region getters & methods / use git branches when commting and pushing
+  useGitBranchesWhenCommitingAndPushing() {
+    return false;
   }
   //#endregion
 }

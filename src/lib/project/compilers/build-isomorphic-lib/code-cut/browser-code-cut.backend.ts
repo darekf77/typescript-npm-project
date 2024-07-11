@@ -1262,7 +1262,7 @@ import { < My Stuff > } from '${this.project.name}/src';`,
     let result = res.join('\n') + endOfFile;
 
     if (this.project.__isSmartContainerTarget) {
-      // TODO @LAST check this
+      // TODO check this
       // result = this.changeOrganizationBackendFileContentBeforeSave(result, absFilePath, true);
     } else {
       result = this.changeStandaloneBackendFileContentBeforeSave(

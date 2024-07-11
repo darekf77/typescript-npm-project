@@ -95,7 +95,6 @@ export class IncrementalBuildProcess {
       );
 
       if (this.project.isInCiReleaseProject) {
-        // @LAST
         browserOutFolder = crossPlatformPath(
           path.join(outFolder, browserOutFolder),
         );

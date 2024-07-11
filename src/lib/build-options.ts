@@ -151,10 +151,6 @@ export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
    */
   get skipProjectProcess() {
     //#region @backendFunc
-    // return true;
-    // if (process.platform === 'darwin') {
-    //   return true; // TODO QUICK_FIX @LAST
-    // }
     return this._skipProjectProcess;
     //#endregion
   }
@@ -255,6 +251,7 @@ export class ReleaseOptions extends BuildOptionsLibOrApp<ReleaseOptions> {
 
 //#endregion
 
+//#region helpers / instance from
 function instanceFrom(
   options: Partial<InitOptions | BuildOptions | ReleaseOptions>,
   classFn: Function,
@@ -269,3 +266,4 @@ function instanceFrom(
   }
   return res;
 }
+//#endregion

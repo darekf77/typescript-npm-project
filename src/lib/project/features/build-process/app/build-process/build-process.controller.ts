@@ -38,19 +38,21 @@ export class BuildProcessController extends Firedev.Base.CrudController<any> {
   @Firedev.Http.GET()
   getPorts(): Firedev.Response<BuildProcess> {
     return async (req, res) => {
-      return this.db.findOne({});
+      const all = await this.db.find();
+      return _.first(all);
     };
   }
 
   private project: Project;
   async initializeServer(project: Project) {
     this.project = project;
+    this.project.standaloneNormalAppPort = this.resolve_standaloneNormalAppPort;
+    this.project.standaloneWebsqlAppPort = this.resolve_standaloneWebsqlAppPort;
     const portsToSave = {
       backendPort: this.project.backendPort,
       standaloneNormalAppPort: this.project.standaloneNormalAppPort,
       standaloneWebsqlAppPort: this.project.standaloneWebsqlAppPort,
     };
-    console.log(portsToSave);
     await this.db.save(new BuildProcess().clone(portsToSave));
   }
 
@@ -59,13 +61,53 @@ export class BuildProcessController extends Firedev.Base.CrudController<any> {
     const { backendPort, standaloneNormalAppPort, standaloneWebsqlAppPort } = (
       await this.getPorts().received
     ).body.json;
-    const ports = {
-      backendPort,
-      standaloneNormalAppPort,
-      standaloneWebsqlAppPort,
-    };
-    console.log('ports from remote db', ports);
-    Object.assign(project, ports);
-    // @LAST TODO app should request portss from remote server
+    project.backendPort = backendPort;
+    project.standaloneNormalAppPort = standaloneNormalAppPort;
+    project.standaloneWebsqlAppPort = standaloneWebsqlAppPort;
   }
+
+  //#region getters & methods / set project info
+  private get resolve_projectInfoPort() {
+    //#region @backendFunc
+    if (!this.project) {
+      return void 0;
+    }
+    let port = this.project.projectInfoPort;
+    if (!port && this.project.__isSmartContainerTarget) {
+      return this.project.__smartContainerTargetParentContainer
+        ?.projectInfoPort;
+    }
+    return port;
+    //#endregion
+  }
+  //#endregion
+
+  //#region getters & methods / get standalone normal app port
+  private get resolve_standaloneNormalAppPort() {
+    //#region @backendFunc
+    if (!this.project) {
+      return void 0;
+    }
+    const resolvePort = PortUtils.instance(
+      this.resolve_projectInfoPort,
+    ).calculateClientPortFor(this.project, { websql: false });
+    // console.log(`resolveStandaloneNormalAppPort ${resolvePort}`);
+    return resolvePort;
+    //#endregion
+  }
+  //#endregion
+
+  //#region getters & methods / get standalone websql app port
+  private get resolve_standaloneWebsqlAppPort() {
+    //#region @backendFunc
+    if (!this.project) {
+      return void 0;
+    }
+    const resolvePort = PortUtils.instance(
+      this.resolve_projectInfoPort,
+    ).calculateClientPortFor(this.project, { websql: true });
+    return resolvePort;
+    //#endregion
+  }
+  //#endregion
 }

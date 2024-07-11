@@ -87,7 +87,7 @@ export class CopyMangerOrganizationAngularFiles {
             .split('/')
             .slice(2)
             .join('/'),
-          singleFile: true, // TODO @LAST
+          singleFile: true,
         },
       );
     } else if (angularCompilationFolderOrLibs === config.folder.libs) {

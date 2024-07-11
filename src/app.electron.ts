@@ -19,7 +19,6 @@ const websql = args.some(val => val === '--websql');
 function createWindow(): BrowserWindow {
   const size = screen.getPrimaryDisplay().workAreaSize;
 
-  // TODO @LAST electron debugger fix
   // Create the browser window.
   win = new BrowserWindow({
     x: 0,

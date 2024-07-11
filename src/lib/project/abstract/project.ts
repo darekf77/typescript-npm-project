@@ -928,63 +928,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   }
   //#endregion
 
-  //#region getters & methods / use git branches as metadata for commits
-  useGitBranchesAsMetadataForCommits() {
-    return false;
-  }
-  //#endregion
-
-  //#region getters & methods / automatically add all changes when pushing to git
-  automaticallyAddAllChnagesWhenPushingToGit() {
-    return (
-      this.__isContainer ||
-      this.__isStandaloneProject ||
-      this?.parent?.__isContainer
-    );
-  }
-  //#endregion
-
-  //#region getters & methods / use git branches when commting and pushing
-  useGitBranchesWhenCommitingAndPushing() {
-    return false;
-  }
-  //#endregion
-
-  //#region getters & methods / set project info
-  get resolve_projectInfoPort() {
-    //#region @backendFunc
-    let port = this.projectInfoPort;
-    if (!port && this.__isSmartContainerTarget) {
-      return this.__smartContainerTargetParentContainer?.projectInfoPort;
-    }
-    return port;
-    //#endregion
-  }
-  //#endregion
-
-  //#region getters & methods / get standalone normal app port
-  get resolve_standaloneNormalAppPort() {
-    //#region @backendFunc
-    const resolvePort = PortUtils.instance(
-      this.resolve_projectInfoPort,
-    ).calculateClientPortFor(this, { websql: false });
-    // console.log(`resolveStandaloneNormalAppPort ${resolvePort}`);
-    return resolvePort;
-    //#endregion
-  }
-  //#endregion
-
-  //#region getters & methods / get standalone websql app port
-  get resolve_standaloneWebsqlAppPort() {
-    //#region @backendFunc
-    const resolvePort = PortUtils.instance(
-      this.resolve_projectInfoPort,
-    ).calculateClientPortFor(this, { websql: true });
-    return resolvePort;
-    //#endregion
-  }
-  //#endregion
-
+  //#region getters & methods / write ports to file
   writePortsToFile() {
     //#region @backend
     const appHostsFile = crossPlatformPath(
@@ -1017,6 +961,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
     //#endregion
   }
+  //#endregion
 
   projectInfoPort: number;
   backendPort: number;
@@ -1765,7 +1710,6 @@ trim_trailing_whitespace = false
    * is normal or smart containter
    */
   get __isContainer() {
-    // TOOD @LAST
     //#region @backendFunc
     return this.typeIs('container');
     //#endregion
@@ -3383,7 +3327,6 @@ ${otherProjectNames
     }
 
     if (this.isInCiReleaseProject) {
-      // @LAST probably something else
       this.__copyWhenExist(config.file.package_json, destinations);
       this.__linkWhenExist(config.folder.node_modules, destinations);
       this.__copyWhenExist(
@@ -3989,7 +3932,6 @@ ${otherProjectNames
           // console.log({
           //   indexHtmlPath
           // })
-          // @LAST before electron prod fix
           Helpers.writeFile(
             indexHtmlPath,
             Helpers.readFile(indexHtmlPath)
@@ -4172,8 +4114,7 @@ ${otherProjectNames
           ProjectBuildContext.getClassInstance(BuildProcessController);
 
         await buildProcessController.initializeServer(this);
-        this.standaloneNormalAppPort = this.resolve_standaloneNormalAppPort;
-        this.standaloneWebsqlAppPort = this.resolve_standaloneWebsqlAppPort;
+
         libContextExists = true;
       }
 
@@ -6203,6 +6144,4 @@ export const BUILD_FRAMEWORK_CLI_NAME = '${config.frameworkName}';
   }
   //#endregion
 
-
-  //#endregion
 }
