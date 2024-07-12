@@ -1043,7 +1043,7 @@ export class $Global extends BaseCommandLine<{}, Project> {
           );
         }
         Helpers.log(`${config.frameworkName} link from: ${source} to ${dest}`);
-        // Helpers.remove(dest)
+
         Helpers.createSymLink(source, dest, {
           continueWhenExistedFolderDoesntExists: true,
         });
