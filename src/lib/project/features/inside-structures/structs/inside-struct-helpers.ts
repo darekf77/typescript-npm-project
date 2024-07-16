@@ -249,7 +249,6 @@ ${'//#end' + 'region'}
 ${'//#reg' + 'ion'}  ${project.name} entity
 @Firedev.Entity({ className: 'User' })
 class User extends Firedev.Base.AbstractEntity {
-  public static ctrl?: UserController;
   ${'//#reg' + 'ion'} @${'web' + 'sql'}
   @Firedev.Orm.Column.String()
   ${'//#end' + 'region'}
