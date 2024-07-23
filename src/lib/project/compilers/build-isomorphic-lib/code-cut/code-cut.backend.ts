@@ -57,17 +57,16 @@ export class CodeCut {
       return;
     }
 
-    const absSourceFromSrc = crossPlatformPath(
-      path.join(
-        path.dirname(this.absPathTmpSrcDistFolder),
-        config.folder.src,
-        relativePathToFile,
-      ),
-    );
+    const absSourceFromSrc = crossPlatformPath([
+      path.dirname(this.absPathTmpSrcDistFolder),
+      config.folder.src,
+      relativePathToFile,
+    ]);
 
-    const absolutePathToFile = crossPlatformPath(
-      path.join(this.absPathTmpSrcDistFolder, relativePathToFile),
-    );
+    const absolutePathToFile = crossPlatformPath([
+      this.absPathTmpSrcDistFolder,
+      relativePathToFile,
+    ]);
 
     // if (absSourceFromSrc.endsWith('/file.ts')) {
     //   debugger
@@ -80,7 +79,11 @@ export class CodeCut {
         this.absPathTmpSrcDistFolder,
         this.project,
         this.buildOptions,
-      ).initAndSave(remove);
+      ).processFile({
+        isCuttableFile: false,
+        fileRemovedEvent: remove,
+        regionReplaceOptions: this.options,
+      });
     }
 
     return new BrowserCodeCut(
@@ -89,15 +92,11 @@ export class CodeCut {
       this.absPathTmpSrcDistFolder,
       this.project,
       this.buildOptions,
-    )
-      .init()
-      .REPLACERegionsForIsomorphicLib(_.cloneDeep(this.options) as any)
-      .FLATTypescriptImportExport('export')
-      .FLATTypescriptImportExport('import')
-      .REPLACERegionsFromTsImportExport('export')
-      .REPLACERegionsFromTsImportExport('import')
-      .REPLACERegionsFromJSrequire()
-      .save();
+    ).processFile({
+      isCuttableFile: true,
+      fileRemovedEvent: remove,
+      regionReplaceOptions: this.options,
+    });
   }
 
   //#endregion

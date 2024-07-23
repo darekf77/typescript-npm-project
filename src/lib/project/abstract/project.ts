@@ -41,6 +41,7 @@ import {
   BuildProcessController,
 } from '../features/build-process/app/build-process';
 import { rimraf } from 'tnp-core/src';
+import { IndexAutogenProvider } from '../features/index-autogen-provider.backend';
 //#endregion
 import { config, extAllowedToReplace, TAGS } from 'tnp-config/src';
 import { _, crossPlatformPath, path, CoreModels } from 'tnp-core/src';
@@ -754,6 +755,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   public __npmPackages: NpmPackages;
   public __env: EnvironmentConfig;
   public __copyManager: CopyManager;
+  public __indexAutogenProvider: IndexAutogenProvider;
   public __insideStructure: InsideStructures;
   public __singluarBuild: SingularBuild;
   public __webpackBackendBuild: WebpackBackendCompilation;
@@ -806,6 +808,11 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       this.defineProperty<Project>('__copyManager', CopyManager, {
         customInstanceReturn: () => CopyManager.for(this),
       });
+
+      this.defineProperty<Project>(
+        '__indexAutogenProvider',
+        IndexAutogenProvider,
+      );
 
       this.defineProperty<Project>('__targetProjects', TargetProject);
       this.defineProperty<Project>('__insideStructure', InsideStructures);
@@ -3061,6 +3068,7 @@ ${otherProjectNames
       //#endregion
 
       if (buildOptions.watch) {
+        // await this.__indexAutogenProvider.startAndWatch(); // TOOD @UNCOMMENT
         if (productionModeButIncludePackageJsonDeps) {
           //#region webpack dist release build
           console.log('Startomg build');
@@ -3139,6 +3147,7 @@ ${otherProjectNames
         }
       } else {
         //#region non watch build
+        // await this.__indexAutogenProvider.start(); // TODO @UNCOMMENT
         if (cutNpmPublishLibReleaseCode) {
           this.__cutReleaseCodeFromSrc(buildOptions);
         }
@@ -6143,5 +6152,4 @@ export const BUILD_FRAMEWORK_CLI_NAME = '${config.frameworkName}';
     );
   }
   //#endregion
-
 }

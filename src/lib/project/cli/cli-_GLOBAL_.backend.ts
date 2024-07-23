@@ -1010,6 +1010,7 @@ export class $Global extends BaseCommandLine<{}, Project> {
       Helpers.error(`No process found with pid: ${args}`, false, true);
     }
     console.log(psinfo);
+    this._exit()
   }
   //#endregion
 

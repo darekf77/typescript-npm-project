@@ -55,13 +55,13 @@ const debugFiles = [
 //#endregion
 
 export class BrowserCodeCut {
-  //#region fields & getters
-
+  //#region fields
   readonly isAssetsFile: boolean = false;
   protected absFileSourcePathBrowserOrWebsqlAPPONLY: string;
   private rawContentForBrowser: string;
   private rawContentForAPPONLYBrowser: string;
   private rawContentBackend: string;
+  private splitFileProcess: SplitFileProcess;
   /**
    * ex. path/to/file-somewhere.ts or assets/something/here
    * in src or tmp-src-dist etc.
@@ -139,65 +139,37 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods
-
-  //#region methods & getters / init
-  splitFileProcess: SplitFileProcess;
-  init() {
-    const orgContent =
-      Helpers.readFile(this.absSourcePathFromSrc, void 0, true) || '';
-
-    this.splitFileProcess = new SplitFileProcess(
-      orgContent,
-      this.absSourcePathFromSrc,
-      this.project.allIsomorphicPackagesFromMemory,
-    );
-    const { modifiedContent: firstPass, rewriteFile: firstTimeRewriteFile } =
-      this.splitFileProcess.content;
-
-    const { modifiedContent: secondPass, rewriteFile: secondTimeRewriteFile } =
-      new SplitFileProcess(
-        firstPass,
-        this.absSourcePathFromSrc,
-        this.project.allIsomorphicPackagesFromMemory,
-      ).content;
-
-    if ((orgContent || '').trim() !== (firstPass || '')?.trim()) {
-      if (
-        firstTimeRewriteFile &&
-        (firstPass || '').trim() === (secondPass || '').trim() // it means it is stable
-      ) {
-        Helpers.logInfo(`Rewrite file ${this.absSourcePathFromSrc}`);
-        Helpers.writeFile(this.absSourcePathFromSrc, firstPass);
-      } else {
-        Helpers.logWarn(
-          `Unstable file modification ${this.absSourcePathFromSrc}`,
-        );
-      }
+  processFile({
+    fileRemovedEvent,
+    regionReplaceOptions,
+    isCuttableFile,
+  }: {
+    fileRemovedEvent?: boolean;
+    isCuttableFile: boolean;
+    regionReplaceOptions: ReplaceOptionsExtended;
+  }) {
+    if (isCuttableFile) {
+      this.initAndSaveCuttableFile(regionReplaceOptions);
+    } else {
+      this.initAndSaveAssetFile(fileRemovedEvent);
     }
-
-    this.rawContentForBrowser = this.removeSrcAtEndFromImortExports(orgContent);
-    this.rawContentForAPPONLYBrowser = this.rawContentForBrowser; // TODO not needed ?
-    this.rawContentBackend = this.rawContentForBrowser; // at the beginning those are normal files from src
-    return this;
   }
 
+  //#region private / methods & getters / init and save cuttabl file
+  private initAndSaveCuttableFile(options: ReplaceOptionsExtended) {
+    return this.init()
+      .REPLACERegionsForIsomorphicLib(_.cloneDeep(options) as any)
+      .FLATTypescriptImportExport('export')
+      .FLATTypescriptImportExport('import')
+      .REPLACERegionsFromTsImportExport('export')
+      .REPLACERegionsFromTsImportExport('import')
+      .REPLACERegionsFromJSrequire()
+      .save();
+  }
   //#endregion
 
-  //#region methods & getters / init and save
-  private replaceAssetsPath = (absDestinationPath: string) => {
-    const isAsset =
-      !this.project.__isSmartContainerTarget &&
-      this.relativePath.startsWith(`${config.folder.assets}/`);
-    return isAsset
-      ? absDestinationPath.replace(
-          '/assets/',
-          `/assets/assets-for/${this.project.name}/`,
-        )
-      : absDestinationPath;
-  };
-
-  initAndSave(remove = false) {
+  //#region private / methods & getters / init and save
+  private initAndSaveAssetFile(remove = false) {
     if (remove) {
       Helpers.removeIfExists(
         this.replaceAssetsPath(this.absFileSourcePathBrowserOrWebsql),
@@ -243,14 +215,57 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods & getters / is empty browser file
-  get isEmptyBrowserFile() {
+  //#region private / methods & getters / init
+
+  private init() {
+    const orgContent =
+      Helpers.readFile(this.absSourcePathFromSrc, void 0, true) || '';
+
+    this.splitFileProcess = new SplitFileProcess(
+      orgContent,
+      this.absSourcePathFromSrc,
+      this.project.allIsomorphicPackagesFromMemory,
+    );
+    const { modifiedContent: firstPass, rewriteFile: firstTimeRewriteFile } =
+      this.splitFileProcess.content;
+
+    const { modifiedContent: secondPass, rewriteFile: secondTimeRewriteFile } =
+      new SplitFileProcess(
+        firstPass,
+        this.absSourcePathFromSrc,
+        this.project.allIsomorphicPackagesFromMemory,
+      ).content;
+
+    if ((orgContent || '').trim() !== (firstPass || '')?.trim()) {
+      if (
+        firstTimeRewriteFile &&
+        (firstPass || '').trim() === (secondPass || '').trim() // it means it is stable
+      ) {
+        Helpers.logInfo(`Rewrite file ${this.absSourcePathFromSrc}`);
+        Helpers.writeFile(this.absSourcePathFromSrc, firstPass);
+      } else {
+        Helpers.logWarn(
+          `Unstable file modification ${this.absSourcePathFromSrc}`,
+        );
+      }
+    }
+
+    this.rawContentForBrowser = this.removeSrcAtEndFromImortExports(orgContent);
+    this.rawContentForAPPONLYBrowser = this.rawContentForBrowser; // TODO not needed ?
+    this.rawContentBackend = this.rawContentForBrowser; // at the beginning those are normal files from src
+    return this;
+  }
+
+  //#endregion
+
+  //#region private / methods & getters / is empty browser file
+  private get isEmptyBrowserFile() {
     return this.rawContentForBrowser.replace(/\s/g, '').trim() === '';
   }
   //#endregion
 
-  //#region methods & getters / is empty module backend file
-  get isEmptyModuleBackendFile() {
+  //#region private / methods & getters / is empty module backend file
+  private get isEmptyModuleBackendFile() {
     return (
       (this.rawContentBackend || '').replace(/\/\*\ \*\//g, '').trim()
         .length === 0
@@ -258,7 +273,7 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods & getters / save empty file
+  //#region private / methods & getters / save empty file
   private saveEmptyFile(isTsFile: boolean, endOfBrowserOrWebsqlCode: string) {
     if (!fse.existsSync(path.dirname(this.absFileSourcePathBrowserOrWebsql))) {
       // write empty instead unlink
@@ -324,7 +339,7 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods & getters / save normal file
+  //#region private / methods & getters / save normal file
   private saveNormalFile(isTsFile: boolean, endOfBrowserOrWebsqlCode?: string) {
     // console.log('SAVE NORMAL FILE')
     if (this.isAssetsFile) {
@@ -400,7 +415,7 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods & getters / remove src from imports
+  //#region private / methods & getters / remove src from imports
   private processRegexForSrcRemove(
     regexEnd: RegExp,
     line: string,
@@ -422,7 +437,7 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods & getters / remove src from imports/exports
+  //#region private / methods & getters / remove src from imports/exports
   private removeSrcAtEndFromImortExports(content: string): string {
     const regexEnd = /from\s+(\'|\").+\/src(\'|\")/g;
     const singleLineImporrt = /import\((\'|\"|\`).+\/src(\'|\"|\`)\)/g;
@@ -468,6 +483,7 @@ export class BrowserCodeCut {
   }
   //#endregion
 
+  //#region private / methods & getters / process brrowser not correct imports exports
   private processBrowserNotCorrectImportsExports = (
     importOrExportLine: string,
   ) => {
@@ -475,9 +491,10 @@ export class BrowserCodeCut {
     // TODO
     return importOrExportLine;
   };
+  //#endregion
 
-  //#region methods & getters / flat typescript import export
-  public FLATTypescriptImportExport(usage: CoreModels.TsUsage) {
+  //#region private / methods & getters / flat typescript import export
+  private FLATTypescriptImportExport(usage: CoreModels.TsUsage) {
     if (this.isAssetsFile) {
       return this;
     }
@@ -567,7 +584,7 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods & getters / resolved pacakge name from
+  //#region private / methods & getters / resolved pacakge name from
   /**
    * Get "npm package name" from line of code in .ts or .js files
    */
@@ -610,8 +627,9 @@ export class BrowserCodeCut {
         const workspacePackgeMatch = (
           rawImport.match(
             new RegExp(`^\\@([a-zA-z]|\\-)+\\/([a-zA-z]|\\-)+$`),
-          ) || [] // @ts-ignore
-        ).filter(d => d.length > 1);
+          ) || []
+        ) // @ts-ignore
+          .filter(d => d.length > 1);
         const worskpacePackageName =
           _.isArray(workspacePackgeMatch) && workspacePackgeMatch.length === 1
             ? _.first(workspacePackgeMatch)
@@ -634,25 +652,8 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods & getters / get parent
-
-  getParentContainer() {
-    let parent: Project;
-    if (this.project.__isSmartContainer) {
-      parent = this.project;
-    }
-    if (this.project.__isSmartContainerChild) {
-      parent = this.project.parent;
-    }
-    if (this.project.__isSmartContainerTarget) {
-      parent = this.project.__smartContainerTargetParentContainer;
-    }
-    return parent;
-  }
-  //#endregion
-
-  //#region methods & getters / get inline package
-  protected getInlinePackage(packageName: string): Models.InlinePkg {
+  //#region private / methods & getters / get inline package
+  private getInlinePackage(packageName: string): Models.InlinePkg {
     const packagesNames = this.project.allIsomorphicPackagesFromMemory;
 
     let realName = packageName;
@@ -684,8 +685,8 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods & getters / regex region
-  protected REGEX_REGION(word) {
+  //#region private / methods & getters / regex region
+  private REGEX_REGION(word) {
     return new RegExp(
       '[\\t ]*\\/\\/\\s*#?region\\s+' +
         word +
@@ -695,8 +696,8 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods & getters / replace region with
-  protected replaceRegionsWith(stringContent = '', words = []) {
+  //#region private / methods & getters / replace region with
+  private replaceRegionsWith(stringContent = '', words = []) {
     if (words.length === 0) return stringContent;
     let word = words.shift();
     let replacement = '';
@@ -710,8 +711,8 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods & getters / replace from line
-  replaceFromLine(pkgName: string, imp: string) {
+  //#region private / methods & getters / replace from line
+  private replaceFromLine(pkgName: string, imp: string) {
     // console.log(`Check package: "${pkgName}"`)
     // console.log(`imp: "${imp}"`)
     const inlinePkg = this.getInlinePackage(pkgName);
@@ -736,8 +737,8 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods & getters / replace regions from ts import export
-  REPLACERegionsFromTsImportExport(usage: CoreModels.TsUsage) {
+  //#region private / methods & getters / replace regions from ts import export
+  private REPLACERegionsFromTsImportExport(usage: CoreModels.TsUsage) {
     // const debug = filesToDebug.includes(path.basename(this.absoluteFilePath));
     // if (debug) {
     //   debugger
@@ -780,8 +781,8 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods & getters / replace regions from js require
-  REPLACERegionsFromJSrequire() {
+  //#region private / methods & getters / replace regions from js require
+  private REPLACERegionsFromJSrequire() {
     if (this.isAssetsFile) {
       return this;
     }
@@ -805,8 +806,8 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods & getters / replace regions for isomorphic lib
-  REPLACERegionsForIsomorphicLib(options: ReplaceOptionsExtended) {
+  //#region private / methods & getters / replace regions for isomorphic lib
+  private REPLACERegionsForIsomorphicLib(options: ReplaceOptionsExtended) {
     if (this.isAssetsFile) {
       return this;
     }
@@ -879,8 +880,8 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods & getters / processing asset link for app
-  processAssetsLinksForApp() {
+  //#region private / methods & getters / processing asset link for app
+  private processAssetsLinksForApp() {
     this.rawContentForAPPONLYBrowser = this.rawContentForBrowser;
     // console.log(`[incremental-build-process processAssetsLinksForApp '${this.buildOptions.baseHref}'`)
     const baseHref = this.project.angularFeBasenameManager.getBaseHref(
@@ -1022,8 +1023,8 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods & getters / save
-  save() {
+  //#region private / methods & getters / save
+  private save() {
     if (this.isAssetsFile) {
       this.saveNormalFile(false);
       return;
@@ -1098,8 +1099,8 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region methods & getters / warn about using file from node_modules with lib files
-  warnAboutUsingFilesFromNodeModulesWithLibFiles(
+  //#region private / methods & getters / warn about using file from node_modules with lib files
+  private warnAboutUsingFilesFromNodeModulesWithLibFiles(
     content: string,
     absFilePath: string,
   ) {
@@ -1195,7 +1196,7 @@ import { < My Stuff > } from '${this.project.name}/src';`,
   }
   //#endregion
 
-  //#region methods & getters / fix comments
+  //#region private / methods & getters / fix comments
   private changeBrowserOrWebsqlFileContentBeforeSave(
     browserOrWebsqlFileContent: string,
     endComment: string,
@@ -1275,8 +1276,8 @@ import { < My Stuff > } from '${this.project.name}/src';`,
   }
   //#endregion
 
-  //#region methods & getters / change content before saving file
-  changeContenBeforeSave(
+  //#region private / methods & getters / change content before saving file
+  private changeContenBeforeSave(
     content: string,
     absFilePath: string,
     options: {
@@ -1351,11 +1352,11 @@ import { < My Stuff > } from '${this.project.name}/src';`,
   }
   //#endregion
 
-  //#region methods & getters / change file import/export for organization
+  //#region private / methods & getters / change file import/export for organization
   /**
    * TODO may be weak solutin
    */
-  changeOrganizationBackendFileContentBeforeSave(
+  private changeOrganizationBackendFileContentBeforeSave(
     content: string,
     absFilePath: string,
     isBrowser: boolean = false,
@@ -1368,11 +1369,11 @@ import { < My Stuff > } from '${this.project.name}/src';`,
   }
   //#endregion
 
-  //#region methods & getters / change file import/export for standalone
+  //#region private / methods & getters / change file import/export for standalone
   /**
    * TODO may be weak solutin
    */
-  changeStandaloneBackendFileContentBeforeSave(
+  private changeStandaloneBackendFileContentBeforeSave(
     content: string,
     absFilePath: string,
     isBrowser: boolean = false,
@@ -1385,5 +1386,17 @@ import { < My Stuff > } from '${this.project.name}/src';`,
   }
   //#endregion
 
+  //#region private / methods & getters / repalce accesets path
+  private replaceAssetsPath(absDestinationPath: string) {
+    const isAsset =
+      !this.project.__isSmartContainerTarget &&
+      this.relativePath.startsWith(`${config.folder.assets}/`);
+    return isAsset
+      ? absDestinationPath.replace(
+          '/assets/',
+          `/assets/assets-for/${this.project.name}/`,
+        )
+      : absDestinationPath;
+  }
   //#endregion
 }

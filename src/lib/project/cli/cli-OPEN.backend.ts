@@ -86,10 +86,6 @@ export class $Open extends CommandLineFeature<{}, Project> {
     this._openThing('tmp-routes.json');
   }
 
-  HOSTS() {
-    Helpers.run(`code ${crossPlatformPath(VpnSplit.HOST_FILE_PATH)}`).sync();
-    process.exit(0);
-  }
 
   release() {
     Helpers.run(`code ${this.project.releaseCiProject.location}`).sync();

@@ -40,7 +40,6 @@ export async function start(
       b: 'build',
       cb: 'build:clean:build',
       cbuild: 'build:clean:build',
-      hosts: 'open:hosts',
       baw: 'build:app:watch',
       bw: 'build:watch',
       cbw: 'build:clean:watch',

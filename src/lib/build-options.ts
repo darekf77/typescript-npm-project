@@ -14,6 +14,7 @@ class SystemTask<T> {
     // console.log({result})
     return result;
   }
+  copyto?: string[];
 }
 
 export class BaseBuild<T> extends SystemTask<T> {
