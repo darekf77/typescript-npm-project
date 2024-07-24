@@ -203,6 +203,7 @@ ${clientPorts}
 
 export const notAllowedProjectNames = [
   // TODO @LAST add all npm package names from core container
+  'copyto',
   'app',
   'apps',
   'libs',

@@ -23,13 +23,20 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
         return !resolved.includes(c);
       });
 
+      const trusdedPackages = this.project.__trusted;
       resolved = this.project.ins
         .sortGroupOfProject<Project>(
           [...resolved, ...otherDeps],
           proj => proj.__includeOnlyForRelease || [],
           proj => proj.name,
         )
-        .filter(d => d.name !== this.project.name);
+        .filter(d => d.name !== this.project.name)
+        .filter(d => {
+          if (this.params.trusted) {
+            return trusdedPackages.includes(d.name);
+          }
+          return true;
+        });
     }
     this.params = ReleaseOptions.from({ ...this.params, resolved });
     //#endregion

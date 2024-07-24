@@ -15,6 +15,7 @@ class SystemTask<T> {
     return result;
   }
   copyto?: string[];
+  copytoall?: boolean;
 }
 
 export class BaseBuild<T> extends SystemTask<T> {
@@ -244,6 +245,10 @@ export class ReleaseOptions extends BuildOptionsLibOrApp<ReleaseOptions> {
    * @deprecated
    */
   specifiedVersion: string;
+  /**
+   * release only trusted projects for specyfic container framework version
+   */
+  trusted: boolean;
   releaseTarget: 'lib' | 'app' | 'lib-app';
   public static from(options: Partial<ReleaseOptions>): ReleaseOptions {
     return instanceFrom(options, ReleaseOptions);
