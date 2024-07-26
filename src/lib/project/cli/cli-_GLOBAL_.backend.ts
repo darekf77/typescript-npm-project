@@ -576,9 +576,10 @@ export class $Global extends BaseCommandLine<{}, Project> {
               : '';
 
           if (process.platform === 'win32') {
-            Helpers.writeFile(
-              destinationGlobalLink,
-              `
+            try {
+              Helpers.writeFile(
+                destinationGlobalLink,
+                `
   #!/bin/sh
   basedir=$(dirname "$(echo "$0" | sed -e 's,\\\\,/,g')")
 
@@ -599,15 +600,15 @@ export class $Global extends BaseCommandLine<{}, Project> {
   fi
   exit $ret
             `.trim() + '\n',
-            );
+              );
 
-            const destinationGlobalLinkPS1File = path.join(
-              glboalBinFolderPath,
-              `${globalName}.ps1`,
-            );
-            Helpers.writeFile(
-              destinationGlobalLinkPS1File,
-              `
+              const destinationGlobalLinkPS1File = path.join(
+                glboalBinFolderPath,
+                `${globalName}.ps1`,
+              );
+              Helpers.writeFile(
+                destinationGlobalLinkPS1File,
+                `
   #!/usr/bin/env pwsh
   $basedir=Split-Path $MyInvocation.MyCommand.Definition -Parent
 
@@ -631,14 +632,14 @@ export class $Global extends BaseCommandLine<{}, Project> {
   }
   exit $ret
             `.trim() + '\n',
-            );
-            const destinationGlobalLinkCmdFile = path.join(
-              glboalBinFolderPath,
-              `${globalName}.cmd`,
-            );
-            Helpers.writeFile(
-              destinationGlobalLinkCmdFile,
-              `
+              );
+              const destinationGlobalLinkCmdFile = path.join(
+                glboalBinFolderPath,
+                `${globalName}.cmd`,
+              );
+              Helpers.writeFile(
+                destinationGlobalLinkCmdFile,
+                `
   @ECHO off
   SETLOCAL
   CALL :find_dp0
@@ -660,7 +661,10 @@ export class $Global extends BaseCommandLine<{}, Project> {
   EXIT /b
 
             `.trim() + '\n',
-            );
+              );
+            } catch (error) {
+              Helpers.error(`Check if you cli is not active in another terminal and try again`, false, true);
+            }
           } else {
             Helpers.createSymLink(localPath, destinationGlobalLink);
             const command = `chmod +x ${destinationGlobalLink}`;
@@ -1010,7 +1014,7 @@ export class $Global extends BaseCommandLine<{}, Project> {
       Helpers.error(`No process found with pid: ${args}`, false, true);
     }
     console.log(psinfo);
-    this._exit()
+    this._exit();
   }
   //#endregion
 
@@ -1339,7 +1343,6 @@ ${this.project.children
   }
 
   async ccupdate() {
-
     //#region packages to check
     const packageToCheck = {
       randomcolor: '^0.5.3',
@@ -1563,7 +1566,7 @@ ${this.project.children
       if (v === 'latest') {
         return await latestVersion(v);
       }
-      v= v ? v: '0.0.0';
+      v = v ? v : '0.0.0';
       v = v.replace(/\^|~/g, '');
       // add 0 to version
       if (v.split('.').length === 2) {
@@ -1590,7 +1593,6 @@ ${this.project.children
   }
 
   async tnpFixFiredevJson() {
-
     this._exit();
   }
   //#endregion
