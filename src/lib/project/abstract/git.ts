@@ -90,8 +90,13 @@ export class Git extends BaseGit<Project> {
   //#endregion
 
   //#region getters & methods / use git branches when commting and pushing
+
   useGitBranchesWhenCommitingAndPushing() {
     return false;
   }
   //#endregion
+
+  duringPushWarnIfProjectNotOnSpecyficDevBranch() {
+    return 'master';
+  }
 }
