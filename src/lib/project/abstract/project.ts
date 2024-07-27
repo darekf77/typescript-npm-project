@@ -4980,6 +4980,9 @@ ${config.frameworkName} start
   //#endregion
 
   //#region getters & methods / version patched plus one
+  /**
+   * @deprecated use npmHelpers.versionPatchedPlusOne
+   */
   get __versionPatchedPlusOne() {
     //#region @backendFunc
     if (this.typeIs('unknow')) {
@@ -5009,6 +5012,9 @@ ${config.frameworkName} start
   //#endregion
 
   //#region getters & methods / version major plus with zeros
+  /**
+   * @deprecated use npmHelpers.versionWithMajorPlusOneAndMinorZeroAndPatchZero
+   */
   get __versionMajorPlusWithZeros() {
     //#region @backendFunc
     if (this.typeIs('unknow')) {
@@ -5045,6 +5051,9 @@ ${config.frameworkName} start
   //#endregion
 
   //#region getters & methods / version minor plus with zero
+  /**
+   * @deprecated use npmHelpers.versionWithMinorPlusOneAndPatchZero
+   */
   get __versionMinorPlusWithZeros() {
     //#region @backendFunc
     if (this.typeIs('unknow')) {
