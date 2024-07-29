@@ -6095,6 +6095,7 @@ ${config.frameworkName} start
     Helpers.removeFileIfExists(
       path.join(this.location, config.file.tnpEnvironment_json),
     );
+    this.vsCodeHelpers.recreateExtensions();
     // });
 
     if (this.__isStandaloneProject && this.isInCiReleaseProject) {
