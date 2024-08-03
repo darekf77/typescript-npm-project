@@ -63,6 +63,7 @@ import { AngularFeBasenameManager } from '../features/basename-manager';
 import { LibraryBuild } from './library-build';
 import { NpmHelpers } from './npm-helpers';
 import { LinkedProjects } from './linked-projects';
+import { BaseLocalRelease } from './base-local-release';
 import { Git } from './git';
 //#endregion
 
@@ -663,7 +664,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       }
     }
 
-    this.coreContainer.__inMemoryIsomorphicLibs = Helpers.arrays.uniqArray([
+    this.coreContainer.__inMemoryIsomorphicLibs = Helpers.uniqArray([
       ...this.coreContainer.__inMemoryIsomorphicLibs,
       ...libsNames,
     ]);
@@ -723,6 +724,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   private __forStandAloneSrc: string = `${config.folder.src}-for-standalone`;
   private __npmRunNg: string = `npm-run ng`; // when there is not globl "ng" command -> npm-run ng.js works
   public angularFeBasenameManager: AngularFeBasenameManager;
+  public localRelease: BaseLocalRelease;
 
   //#region @backend
   public __libStandalone: LibProjectStandalone;
@@ -781,6 +783,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
     this.linkedProjects = new (require('./linked-projects')
       .LinkedProjects as typeof LinkedProjects)(this as any);
+
+    this.localRelease = new (require('./base-local-release')
+      .BaseLocalRelease as typeof BaseLocalRelease)(this as any);
 
     if (!global.codePurposeBrowser) {
       // TODO when on weird on node 12
@@ -3146,15 +3151,16 @@ ${otherProjectNames
           //#endregion
         }
       } else {
-        //#region non watch build
         // await this.__indexAutogenProvider.start(); // TODO @UNCOMMENT
+        //#region non watch build
+
         if (cutNpmPublishLibReleaseCode) {
           this.__cutReleaseCodeFromSrc(buildOptions);
         }
 
         if (productionModeButIncludePackageJsonDeps) {
           //#region release production backend build for firedev/tnp specyfic
-          // console.log('k1')
+
           await incrementalBuildProcess.start(
             'isomorphic compilation (only browser) ',
           );
@@ -3162,6 +3168,7 @@ ${otherProjectNames
             'isomorphic compilation (only browser) [WEBSQL] ',
           );
 
+          //#region webpack build @deprecated
           try {
             await this.__webpackBackendBuild.run(
               BuildOptions.from({
@@ -3177,9 +3184,10 @@ ${otherProjectNames
               true,
             );
           }
+          //#endregion
 
+          //#region build without dts in dist @deprecated
           if (cliBuildNoDts) {
-            //#region fix webpack dt
             const baseDistGenWebpackDts = crossPlatformPath(
               path.join(this.location, outDir, 'dist'),
             );
@@ -3194,8 +3202,11 @@ ${otherProjectNames
               },
             );
           }
+          //#endregion
+
           Helpers.removeIfExists(path.join(this.location, outDir, 'dist'));
 
+          //#region obscure & uglify
           try {
             if (cliBuildObscure || cliBuildUglify) {
               this.__backendCompileToEs5(outDir);
@@ -3219,7 +3230,9 @@ ${otherProjectNames
               true,
             );
           }
+          //#endregion
 
+          //#region isomorphic compilation
           try {
             showInfoAngular();
             await proxyProject.execute(commandForLibraryBuild, {
@@ -3241,6 +3254,8 @@ ${otherProjectNames
               true,
             );
           }
+          //#endregion
+
           //#endregion
         } else {
           //#region normal backend compilation
@@ -3275,6 +3290,7 @@ ${otherProjectNames
         }
 
         if (cliBuildIncludeNodeModules) {
+          //#region build for including node_modules in compilation
           const cliJsFile = 'cli.js';
           this.quickFixes.removeTnpFromItself(async () => {
             this.__backendIncludeNodeModulesInCompilation(
@@ -3283,7 +3299,9 @@ ${otherProjectNames
               cliJsFile,
             );
           });
+          //#endregion
 
+          //#region uglify
           if (cliBuildUglify) {
             this.__backendUglifyCode(
               outDir,
@@ -3291,6 +3309,9 @@ ${otherProjectNames
               cliJsFile,
             );
           }
+          //#endregion
+
+          //#region normal build not obscured
           if (!productionModeButIncludePackageJsonDeps) {
             if (cliBuildObscure || cliBuildUglify) {
               this.__backendCompileToEs5(outDir, cliJsFile);
@@ -3303,6 +3324,7 @@ ${otherProjectNames
               );
             }
           }
+          //#endregion
         }
 
         if (cliBuildNoDts) {
@@ -3312,7 +3334,6 @@ ${otherProjectNames
         if (cutNpmPublishLibReleaseCode) {
           this.__restoreCuttedReleaseCodeFromSrc(buildOptions);
         }
-        //#endregion
         //#endregion
       }
 

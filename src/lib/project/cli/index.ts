@@ -6,6 +6,7 @@ import INIT from './cli-INIT.backend';
 import START from './cli-START.backend';
 import BRANDING from './cli-BRANDING.backend';
 import RELEASE from './cli-RELEASE.backend';
+import LOCAL_RELEASE from './cli-LOCAL-RELEASE.backend';
 import OPEN from './cli-OPEN.backend';
 import UPDATE from './cli-UPDATE.backend';
 import VSCODE from './cli-VSCODE.backend';
@@ -20,6 +21,7 @@ export default [
   INIT,
   START,
   RELEASE,
+  LOCAL_RELEASE,
   OPEN,
   BRANDING,
   UPDATE,

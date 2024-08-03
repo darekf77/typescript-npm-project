@@ -99,7 +99,7 @@ export class PackagesRecognition {
       try {
         const pj = Helpers.readJson(this.jsonPath);
         if (_.isArray(pj[config.array.isomorphicPackages])) {
-          return pj[config.array.isomorphicPackages];
+          return Helpers.uniqArray(pj[config.array.isomorphicPackages]);
         }
       } catch (error) {
         Helpers.log(`[${config.frameworkName}] ERROR not recognized in`);
@@ -151,12 +151,14 @@ export class PackagesRecognition {
       });
     //#endregion
 
-    recognizedPackages = [
-      ...(recognizedPackages || []),
-      ...this.orginalProject.selftIsomorphicPackages,
-      ...(fromNodeModulesFolderSearch || []),
-      ...Object.values(config.frameworkNames),
-    ].filter(f => !f.startsWith(PREFIXES.RESTORE_NPM));
+    recognizedPackages = Helpers.uniqArray(
+      [
+        ...(recognizedPackages || []),
+        ...this.orginalProject.selftIsomorphicPackages,
+        ...(fromNodeModulesFolderSearch || []),
+        ...Object.values(config.frameworkNames),
+      ].filter(f => !f.startsWith(PREFIXES.RESTORE_NPM)),
+    );
 
     // console.log(`
 

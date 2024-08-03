@@ -536,6 +536,7 @@ speed-measure-plugin*.json
 
 # misc
 /.sass-cache
+/**/tmp-*
 /connect.lock
 /coverage
 /libpeerconnection.log

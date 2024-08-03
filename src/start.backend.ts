@@ -50,6 +50,7 @@ export async function start(
       cs: 'build:start:clean',
       ew: 'electron:watch',
       r: 'release',
+      'lr':'local:release',
       rmajor: 'release:major',
       rminor: 'release:minor',
       'r:major': 'release:major',
