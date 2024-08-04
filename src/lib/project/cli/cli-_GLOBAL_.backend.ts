@@ -15,6 +15,7 @@ import {
   os,
   fse,
   CoreModels,
+  Utils,
 } from 'tnp-core/src';
 import {
   TAGS,
@@ -32,6 +33,7 @@ import * as psList from 'ps-list';
 import { MESSAGES, firedevRepoPathUserInUserDir } from '../../constants';
 import { MagicRenamer } from 'magic-renamer/src';
 import * as semver from 'semver';
+import { walk } from 'lodash-walk-object/src';
 
 declare const ENV: any;
 //#endregion
@@ -663,7 +665,11 @@ export class $Global extends BaseCommandLine<{}, Project> {
             `.trim() + '\n',
               );
             } catch (error) {
-              Helpers.error(`Check if you cli is not active in another terminal and try again`, false, true);
+              Helpers.error(
+                `Check if you cli is not active in another terminal and try again`,
+                false,
+                true,
+              );
             }
           } else {
             Helpers.createSymLink(localPath, destinationGlobalLink);
@@ -1339,11 +1345,29 @@ ${this.project.children
 
   //#region @notForNpm
 
+  //#region not for npm / get trusted
+  getJsonCAttrs() {
+    console.log(`Scannign for args in jsonc files...`);
+    const jsoncContent = this.project.readFile(config.file.firedev_jsonc);
+    walk.Object(Helpers.parse(jsoncContent, true), (value, jsonPath) => {
+      // console.log(jsonPath);
+      const attrs = Utils.json.getAtrributies(jsonPath, jsoncContent);
+      if (attrs.length > 0) {
+        console.log(`Detacted attributes in path: ${jsonPath}`, attrs);
+      }
+    });
+    this._exit();
+  }
+  //#endregion
+
+  //#region not for npm / get trusted
   trusted() {
     console.log(this.project.__trusted);
     this._exit();
   }
+  //#endregion
 
+  //#region not for npm / core container update
   async ccupdate() {
     //#region packages to check
     const packageToCheck = {
@@ -1593,10 +1617,14 @@ ${this.project.children
 
     this._exit();
   }
+  //#endregion
 
+  //#region not for npm / tnp fix firedev json
   async tnpFixFiredevJson() {
     this._exit();
   }
+  //#endregion
+
   //#endregion
 }
 
