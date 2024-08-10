@@ -756,23 +756,6 @@ export class $Global extends BaseCommandLine<{}, Project> {
     this._exit();
   }
 
-  DEPS_UPDATE_FROM() {
-    let locations: string[] =
-      this.args.join(' ').trim() === '' ? [] : this.args;
-
-    if (_.isArray(locations)) {
-      locations = locations.map(l => {
-        if (path.isAbsolute(l)) {
-          return path.resolve(l);
-        }
-        return path.resolve(path.join(this.cwd, l));
-      });
-    }
-    this.project.__packageJson.updateFrom(locations);
-
-    this._exit();
-  }
-
   /**
    * generate deps json
    */
@@ -908,50 +891,6 @@ export class $Global extends BaseCommandLine<{}, Project> {
   //#region throw error
   THROW_ERR() {
     Helpers.error(`Erororoororo here`, false, true);
-  }
-  //#endregion
-
-  //#region mp3
-  /**
-   *  npm install --global bin-version-check-cli
-   *  npm i -g yt-dlp
-   *  choco install ffmpeg
-   */
-  MP3(args) {
-    const downloadPath = crossPlatformPath(
-      path.join(os.userInfo().homedir, 'Downloads', 'mp3-from-youtube'),
-    );
-    if (!Helpers.exists(downloadPath)) {
-      Helpers.mkdirp(downloadPath);
-    }
-
-    Helpers.run(
-      `cd ${downloadPath} && yt-dlp --verbose --extract-audio --audio-format mp3 ` +
-        args,
-      {
-        output: true,
-        cwd: downloadPath,
-      },
-    ).sync();
-    this._exit();
-  }
-  //#endregion
-
-  //#region mp4
-  MP4(args) {
-    const downloadPath = crossPlatformPath(
-      path.join(os.userInfo().homedir, 'Downloads', 'mp3-from-youtube'),
-    );
-    // yt-dlp --print filename -o "%(uploader)s-%(upload_date)s-%(title)s.%(ext)s"
-    Helpers.run(
-      'yt-dlp --verbose  -S "res:1080,fps" -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" ' +
-        args,
-      {
-        output: true,
-        cwd: downloadPath,
-      },
-    ).sync();
-    this._exit();
   }
   //#endregion
 
@@ -1343,31 +1282,457 @@ ${this.project.children
 
   //#endregion
 
+  async updatedeps(): Promise<void> {
+    if (!this.project || !this.project.__isCoreProject) {
+      Helpers.error(`This command is only for core projects`, false, true);
+    }
+    const allDeps = this.project.npmHelpers.allDependencies;
+    // const overrideAndUpdateAllToLatest = false;
+    // await Helpers.questionYesNo(
+    //   'update all to latest ?',
+    // );
+
+    //#region helpers
+
+    //#region helpers / getLatestVersionFromNpm
+    const getLatestVersionFromNpm = async (
+      packageName: string,
+    ): Promise<string> => {
+      const res = await fetch(
+        `https://registry.npmjs.org/${packageName}/latest`,
+      );
+      const json = await res.json();
+      return json.version;
+    };
+    //#endregion
+
+    //#region helpers / checkIfPackageVersionAvailable
+    const checkIfPackageVersionAvailable = async (
+      pkgName: string,
+      pkgVersion: string,
+    ): Promise<boolean> => {
+      const res = await fetch(
+        `https://registry.npmjs.org/${pkgName}/${pkgVersion}`,
+      );
+      return res.status === 200;
+    };
+    //#endregion
+
+    //#region helpers / getLastMajorVersions
+    const getLastMajorVersions = async (pkgName: string): Promise<string[]> => {
+      try {
+        const res = await fetch(`https://registry.npmjs.org/${pkgName}`);
+        const json = await res.json();
+        return Object.keys(json.versions).filter(v =>
+          v.startsWith(json['dist-tags'].latest.split('.')[0]),
+        );
+      } catch (error) {
+        return [];
+      }
+    };
+    //#endregion
+
+    //#region helpers / getLastMinorVersionsForMajor
+    const getLastMinorVersionsForMajor = async (
+      majorVer: number,
+      pkgName: string,
+    ): Promise<string[]> => {
+      try {
+        const res = await fetch(`https://registry.npmjs.org/${pkgName}`);
+        const json = await res.json();
+        return Object.keys(json.versions).filter(v =>
+          v.startsWith(`${majorVer}.`),
+        );
+      } catch (error) {
+        return [];
+      }
+    };
+    //#endregion
+
+    //#region helpers / getVerObj
+    const getVerObj = (
+      version: string,
+    ): {
+      major: number;
+      minor: number;
+      patch: number;
+    } => {
+      return version
+        .replace('^', '')
+        .replace('~', '')
+        .split('.')
+        .map(Number)
+        .reduce((acc, c, i) => {
+          if (i === 0) {
+            return { ...acc, ['major']: c };
+          } else if (i === 1) {
+            return { ...acc, ['minor']: c };
+          } else {
+            return { ...acc, ['patch']: c };
+          }
+        }, {}) as any;
+    };
+    //#endregion
+
+    //#endregion
+
+    const allDepsKeys = Object.keys(allDeps);
+    for (let index = 0; index < allDepsKeys.length; index++) {
+      Helpers.clearConsole();
+
+      //#region resolve variables
+      const packageName = allDepsKeys[index];
+      const currentPackageVersion = allDeps[packageName];
+      const currentVerObj = getVerObj(currentPackageVersion);
+      const firedevJsonContent = this.project.readFile(
+        config.file.firedev_jsonc,
+      );
+      const tags = Utils.json.getAtrributies(packageName, firedevJsonContent);
+      Helpers.info(
+        `(${index + 1} / ${allDepsKeys.length}) ` +
+          `Downloading info about "${packageName}" (current ver: ${currentPackageVersion})`,
+      );
+      const getLastVersions = async (pkgName: string): Promise<string[]> => {
+        let someLastVersion = Helpers.uniqArray([
+          ...(await getLastMajorVersions(pkgName)),
+          ...(await getLastMinorVersionsForMajor(
+            latestVerObj.major - 1,
+            pkgName,
+          )),
+          ...(await getLastMinorVersionsForMajor(
+            latestVerObj.major - 2,
+            pkgName,
+          )),
+          ...(await getLastMinorVersionsForMajor(currentVerObj.major, pkgName)),
+          ...(await getLastMinorVersionsForMajor(
+            currentVerObj.major - 1,
+            pkgName,
+          )),
+          ...(await getLastMinorVersionsForMajor(
+            currentVerObj.major - 2,
+            pkgName,
+          )),
+        ])
+          .sort((a, b) => {
+            const aVerObj = getVerObj(a);
+            const bVerObj = getVerObj(b);
+            if (aVerObj.major === bVerObj.major) {
+              if (aVerObj.minor === bVerObj.minor) {
+                return aVerObj.patch - bVerObj.patch;
+              }
+              return aVerObj.minor - bVerObj.minor;
+            }
+            return aVerObj.major - bVerObj.major;
+          })
+          .reverse();
+        return someLastVersion;
+      };
+
+      let latestToUpdate = await getLatestVersionFromNpm(packageName);
+
+      const latestVerObj = getVerObj(latestToUpdate);
+      const isTheSameVersion =
+        latestVerObj.major === currentVerObj.major &&
+        latestVerObj.minor === currentVerObj.minor &&
+        latestVerObj.patch === currentVerObj.patch;
+
+      const isOnlyMajorpdate = latestVerObj.major >= currentVerObj.major;
+
+      const isOnlyMinorUpdate =
+        latestVerObj.major === currentVerObj.major &&
+        latestVerObj.minor > currentVerObj.minor;
+
+      const isOnlyPatchUpdate =
+        latestVerObj.major === currentVerObj.major &&
+        latestVerObj.minor === currentVerObj.minor &&
+        latestVerObj.patch > currentVerObj.patch;
+
+      const trustedMajor = !!tags.find(
+        c => c.name === '@trusted' && c.value === 'major',
+      );
+
+      const trustedMinor = !!tags.find(
+        c => c.name === '@trusted' && c.value === 'minor',
+      );
+
+      const trustedPath = !!tags.find(
+        c => c.name === '@trusted' && c.value === 'patch',
+      );
+
+      const notTrusted = !tags.find(c => c.name === '@trusted');
+      if (notTrusted) {
+        console.log(`Package "${packageName}" is not trusted. Skipping.`);
+        continue;
+      }
+
+      let automaticallyUpdate =
+        (isOnlyMajorpdate && trustedMajor) ||
+        (isOnlyMinorUpdate && (trustedMajor || trustedMinor)) ||
+        (isOnlyPatchUpdate && (trustedMajor || trustedMinor || trustedPath));
+      //#endregion
+
+      if (currentPackageVersion === 'latest') {
+        console.log(`Package "${packageName}" is set to latest. Skipping.`);
+        continue;
+      }
+
+      if (isTheSameVersion) {
+        // await Helpers.questionYesNo('package is the same, continue ?');
+        this.project.npmHelpers.updateDependency({
+          packageName,
+          version: currentPackageVersion,
+          updateFiredevJsonFirst: true,
+        });
+        continue;
+      }
+
+      if (!automaticallyUpdate) {
+        //#region display last versions
+        const someLastVersion = await getLastVersions(packageName);
+        if (trustedMinor) {
+          // if (someLastVersion.some(a => a.startsWith(currentPackageVersion))) {
+          //   console.log(
+          //     `Package "${packageName}" on the highest minor version. Skipping.`,
+          //   );
+          //   continue;
+          // }
+          const trustedMinorVersion = someLastVersion.find(
+            v => getVerObj(v).minor > currentVerObj.minor,
+          );
+          if (trustedMinorVersion) {
+            latestToUpdate = trustedMinorVersion;
+            automaticallyUpdate = true;
+          }
+        }
+        if (trustedPath) {
+          // if (someLastVersion.some(a => a.startsWith(currentPackageVersion))) {
+          //   console.log(
+          //     `Package "${packageName}" on the highest patch version. Skipping.`,
+          //   );
+          //   continue;
+          // }
+          const trustedPatchVersion = someLastVersion.find(
+            v => getVerObj(v).patch > currentVerObj.patch,
+          );
+          if (trustedPatchVersion) {
+            latestToUpdate = trustedPatchVersion;
+            automaticallyUpdate = true;
+          }
+        }
+        if (!automaticallyUpdate) {
+          console.log(
+            `Can't update automatically. Latest versions for ${packageName}:\n\n` +
+              someLastVersion.map(v => `- ${v}`).join('\n') +
+              '\n',
+          );
+        }
+        //#endregion
+      }
+
+      const questionsForUpdate = {
+        //#region question for update options
+        update: {
+          name:
+            `Update to latest version "${currentPackageVersion}=>` +
+            `${chalk.bold.underline(latestToUpdate)}" ` +
+            `${
+              tags.length > 0
+                ? '(' +
+                  tags
+                    .map(c => c.name + (c.value ? '=' + c.value : ''))
+                    .join(',') +
+                  ')'
+                : ''
+            }`,
+        },
+        skip: {
+          name: 'Skip this package ?',
+        },
+        skipTo: {
+          name: 'Skip and got to package with index ?',
+        },
+        delete: {
+          name: 'Delete this package ?',
+        },
+        manual: {
+          name: 'Set version manually ?',
+        },
+        //#endregion
+      };
+
+      const whatToDo = automaticallyUpdate
+        ? 'update'
+        : await Helpers.selectChoicesAsk<keyof typeof questionsForUpdate>(
+            `(${index + 1} / ${allDepsKeys.length}) ` +
+              `${chalk.gray('What to do with package ')}` +
+              ` "${chalk.bold(packageName)} ${currentPackageVersion}" ?`,
+            questionsForUpdate,
+          );
+
+      // Helpers.pressKeyAndContinue('Press any key to continue');
+      if (whatToDo === 'update') {
+        const prefixOpt = {
+          //#region prefix options
+          '~': {
+            name: `tilde (~) => ${chalk.bold(`~${latestToUpdate}`)}`,
+          },
+          '^': {
+            name: `caret (^)  => ${chalk.bold(`^${latestToUpdate}`)}`,
+          },
+          '': {
+            name: `no prefix => ${chalk.bold(`${latestToUpdate}`)}`,
+          },
+          back: {
+            name: `-- go back -- => ${chalk.bold(`${latestToUpdate}`)}`,
+          },
+          //#endregion
+        };
+        const prefix = automaticallyUpdate
+          ? '~'
+          : await Helpers.selectChoicesAsk<keyof typeof prefixOpt>(
+              'Select prefix',
+              prefixOpt,
+            );
+
+        if (prefix === 'back') {
+          index--;
+          continue;
+        }
+        await this.project.npmHelpers.updateDep({
+          packageName,
+          version: `${prefix}${latestToUpdate}`,
+          updateFiredevJsonFirst: true,
+        });
+      } else if (whatToDo === 'delete') {
+        await this.project.npmHelpers.updateDep({
+          packageName,
+          version: null,
+          updateFiredevJsonFirst: true,
+        });
+      } else if (whatToDo === 'manual') {
+        while (true) {
+          const version = await Helpers.input({
+            question: `Enter version for ${packageName}`,
+            defaultValue: allDeps[packageName],
+          });
+          console.log('Checking version...');
+          const isAvailable = await checkIfPackageVersionAvailable(
+            packageName,
+            version,
+          );
+          if (isAvailable) {
+            await this.project.npmHelpers.updateDep({
+              packageName,
+              version,
+              updateFiredevJsonFirst: true,
+            });
+            break;
+          } else {
+            Helpers.error(`Version ${version} not available on npm...`);
+          }
+        }
+      } else if (whatToDo === 'skipTo') {
+        while (true) {
+          const indexToSkip = await Helpers.input({
+            question: `Enter index to skip to`,
+            defaultValue: `${index}`,
+          });
+          index = Number(indexToSkip) - 1;
+          if (index >= 0 && index < allDepsKeys.length) {
+            break;
+          }
+        }
+      } else {
+        Helpers.info(`Skipping ${packageName}`);
+      }
+    }
+
+    this._exit();
+  }
+
+  //#region not for npm / mp3
   //#region @notForNpm
+  /**
+   *  npm install --global bin-version-check-cli
+   *  npm i -g yt-dlp
+   *  choco install ffmpeg
+   */
+  MP3(args) {
+    const downloadPath = crossPlatformPath(
+      path.join(os.userInfo().homedir, 'Downloads', 'mp3-from-youtube'),
+    );
+    if (!Helpers.exists(downloadPath)) {
+      Helpers.mkdirp(downloadPath);
+    }
+
+    Helpers.run(
+      `cd ${downloadPath} && yt-dlp --verbose --extract-audio --audio-format mp3 ` +
+        args,
+      {
+        output: true,
+        cwd: downloadPath,
+      },
+    ).sync();
+    this._exit();
+  }
+  //#endregion
+  //#endregion
+
+  //#region not for npm / mp4
+  //#region @notForNpm
+  MP4(args) {
+    const downloadPath = crossPlatformPath(
+      path.join(os.userInfo().homedir, 'Downloads', 'mp3-from-youtube'),
+    );
+    // yt-dlp --print filename -o "%(uploader)s-%(upload_date)s-%(title)s.%(ext)s"
+    Helpers.run(
+      'yt-dlp --verbose  -S "res:1080,fps" -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" ' +
+        args,
+      {
+        output: true,
+        cwd: downloadPath,
+      },
+    ).sync();
+    this._exit();
+  }
+  //#endregion
+  //#endregion
 
   //#region not for npm / get trusted
+  //#region @notForNpm
   getJsonCAttrs() {
     console.log(`Scannign for args in jsonc files...`);
     const jsoncContent = this.project.readFile(config.file.firedev_jsonc);
     walk.Object(Helpers.parse(jsoncContent, true), (value, jsonPath) => {
-      // console.log(jsonPath);
-      const attrs = Utils.json.getAtrributies(jsonPath, jsoncContent);
-      if (attrs.length > 0) {
-        console.log(`Detacted attributes in path: ${jsonPath}`, attrs);
+      if (!this.firstArg || jsonPath.includes(this.firstArg)) {
+        // console.log('PATH: ' + jsonPath);
+        const attrs = Utils.json.getAtrributies(jsonPath, jsoncContent);
+
+        console.log(
+          `${attrs.length > 0 ? chalk.bold('DETECTED') : 'DETECTED'} ` +
+            `(${attrs.length} tags): ${attrs.length > 0 ? chalk.bold(jsonPath) : jsonPath}`,
+          attrs
+            .map(c => chalk.red.underline(c.name + (c.value ? '=' + chalk.bold(c.value) : '')))
+            .join(', '),
+        );
       }
     });
     this._exit();
   }
   //#endregion
+  //#endregion
 
   //#region not for npm / get trusted
+  //#region @notForNpm
   trusted() {
     console.log(this.project.__trusted);
     this._exit();
   }
   //#endregion
+  //#endregion
 
   //#region not for npm / core container update
+  //#region @notForNpm
   async ccupdate() {
     //#region packages to check
     const packageToCheck = {
@@ -1618,13 +1983,14 @@ ${this.project.children
     this._exit();
   }
   //#endregion
+  //#endregion
 
   //#region not for npm / tnp fix firedev json
+  //#region @notForNpm
   async tnpFixFiredevJson() {
     this._exit();
   }
   //#endregion
-
   //#endregion
 }
 

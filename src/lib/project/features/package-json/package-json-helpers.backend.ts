@@ -223,6 +223,9 @@ function removeDepsByType(deps: object, libType: CoreModels.LibType) {
 //#endregion
 
 //#region set dependency and save
+/**
+ * @deprecated
+ */
 export function setDependencyAndSave(
   p: CoreModels.Package,
   reason: string,
@@ -793,6 +796,9 @@ function beforeSaveAction(
   ]);
   const versionForTags = Helpers.readJson(versionForTagsPath, {});
 
+  /**
+   * @deprecated
+   */
   const lastVerFun = pkgNameToCheckVer => {
     const checkFor = `${pkgNameToCheckVer}@${maxVersionForAngular}`;
     if (versionForTags[checkFor]) {
