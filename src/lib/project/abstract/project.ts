@@ -2422,9 +2422,6 @@ processing...
         const tryReleaseProject = async () => {
           while (true) {
             try {
-              if (this.__npmPackages.useLinkAsNodeModules) {
-                await this.__node_modules.linkFromCoreContainer();
-              }
               await this.init('relase project init'); // TODO not needed build includes init
               break;
             } catch (error) {
@@ -4398,6 +4395,7 @@ ${config.frameworkName} start
     monorepo: ${this.isMonorepo}
     parent: ${this.parent?.name}
     grandpa: ${this.grandpa?.name}
+    children: ${this.children.length}
 
     isStandaloneProject: ${this.__isStandaloneProject}
     isCoreProject: ${this.__isCoreProject}
@@ -4929,7 +4927,7 @@ ${config.frameworkName} start
     if (this.typeIs('unknow')) {
       return '';
     }
-    this.setValueToJSON(
+    this.setValueToJSONC(
       config.file.firedev_jsonc,
       'version',
       frameworkVersionArg,
@@ -6112,7 +6110,10 @@ ${config.frameworkName} start
       this.__filesTemplatesBuilder.rebuild();
     }
 
-    if (!this.__node_modules.exist && !struct) {
+    if (
+      this.__npmPackages.useLinkAsNodeModules ||
+      (!this.__node_modules.exist && !struct)
+    ) {
       await this.__npmPackages.installProcess(
         `inti procedure of ${this.name} `,
       );

@@ -56,7 +56,10 @@
   "search.exclude": {
     "docs": true,
     "projects": true,
-    "bin": true
+    "bin": true,
+    "local_release": true,
+    "**/package-lock.json": true,
+    "package-lock.json": true
   },
   "workbench.colorCustomizations": {
     "activityBar.background": "#5c3735",

@@ -29,7 +29,11 @@ export class NodeModules extends BaseFeatureForProject<Project> {
     //   `Linking from core container ${coreContainer.name} ${this.project.genericName}`,
     // );
     await coreContainer.__node_modules.reinstallIfNeeded();
-    Helpers.remove(this.project.__node_modules.path);
+    try {
+      fse.unlinkSync(this.project.__node_modules.path);
+    } catch (error) {
+      Helpers.remove(this.project.__node_modules.path);
+    }
     Helpers.createSymLink(
       coreContainer.__node_modules.path,
       this.project.__node_modules.path,
@@ -188,6 +192,10 @@ export class NodeModules extends BaseFeatureForProject<Project> {
     return crossPlatformPath([fse.realpathSync(this.path), packageName]);
     //#endregion
   }
+
+  /**
+   * @deprecated
+   */
   get exist(): boolean {
     //#region @backendFunc
     const project = this.project;
