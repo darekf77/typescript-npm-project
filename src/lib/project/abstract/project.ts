@@ -288,7 +288,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   /**
    * firedev sync command
    */
-  static sync() {
+  static sync({ syncFromCommand }: { syncFromCommand?: boolean } = {}): void {
     //#region @backendFunc
     const cwd = firedevRepoPathUserInUserDir;
     Helpers.info(`Syncing... Fetching git data... `);
@@ -384,7 +384,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     } catch (error) {}
     //#endregion
 
-    Project.reinstallActiveFrameworkContainers();
+    if (syncFromCommand) {
+      Project.reinstallActiveFrameworkContainers();
+    }
 
     Helpers.success('firedev-framework synced ok');
     //#endregion
@@ -1229,7 +1231,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
   public get packageNamesFromProject(): string[] {
     //#region @backendFunc
-    if(this.__isSmartContainer) {
+    if (this.__isSmartContainer) {
       return this.children.map(c => c.universalPackageName);
     }
     return [this.universalPackageName];

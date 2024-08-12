@@ -1009,7 +1009,7 @@ export class $Global extends BaseCommandLine<{}, Project> {
 
   //#region sync core repositories
   async SYNC() {
-    Project.sync();
+    Project.sync({ syncFromCommand: true });
     this._exit();
   }
   //#endregion
