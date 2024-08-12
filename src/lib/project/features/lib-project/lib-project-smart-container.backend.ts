@@ -97,7 +97,7 @@ export class LibProjectSmartContainer extends LibPorjectBase {
           }
         });
 
-        await this.updateTnpAndCoreContainers(realCurrentProj);
+        await this.updateTnpAndCoreContainers(realCurrentProj, newVersion);
       },
     );
   }

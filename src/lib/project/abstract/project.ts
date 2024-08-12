@@ -413,19 +413,19 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   //#endregion
 
   //#region static / get node modules installed for core container
-  private static get nodeModulesInstalledForCoreContainer(): boolean {
-    for (const ver of config.activeFramewrokVersions) {
-      const nodeModulesForContainer = crossPlatformPath([
-        firedevRepoPathUserInUserDir,
-        `projects/container-${ver}`,
-        config.folder.node_modules,
-      ]);
-      if (!Helpers.exists(nodeModulesForContainer)) {
-        return false;
-      }
-    }
-    return true;
-  }
+  // private static get nodeModulesInstalledForCoreContainer(): boolean {
+  //   for (const ver of config.activeFramewrokVersions) {
+  //     const nodeModulesForContainer = crossPlatformPath([
+  //       firedevRepoPathUserInUserDir,
+  //       `projects/container-${ver}`,
+  //       config.folder.node_modules,
+  //     ]);
+  //     if (!Helpers.exists(nodeModulesForContainer)) {
+  //       return false;
+  //     }
+  //   }
+  //   return true;
+  // }
   //#endregion
 
   //#region static / initial check
@@ -1214,6 +1214,27 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     //#endregion
   }
   //#endregion
+
+  public get universalPackageName(): string {
+    //#region @backendFunc
+    if (this.__isSmartContainerChild) {
+      return `@${this.parent?.name}/${this.name}`;
+    }
+    if (this.__isSmartContainer) {
+      return `@${this.parent?.name}`;
+    }
+    return this.name;
+    //#endregion
+  }
+
+  public get packageNamesFromProject(): string[] {
+    //#region @backendFunc
+    if(this.__isSmartContainer) {
+      return this.children.map(c => c.universalPackageName);
+    }
+    return [this.universalPackageName];
+    //#endregion
+  }
 
   //#region getters & methods / version
   /**
@@ -2475,9 +2496,11 @@ processing...
       this.npmHelpers.checkIfLogginInToNpm();
       this.__checkIfReadyForNpm();
 
-      if (this.__isStandaloneProject) {
-        await this.__libStandalone.bumpVersionInOtherProjects(newVersion, true);
-      }
+      // TODO somehting need when decide what is child
+      // for standalone or smartcontainer
+      // if (this.__isStandaloneProject) {
+      //   await this.__libStandalone.bumpVersionInOtherProjects(newVersion, true);
+      // }
 
       this.__commitRelease(newVersion);
 
@@ -2802,7 +2825,7 @@ ${otherProjectNames
       });
 
       // this.linkedRepos.linkToProject(generatedProject as Project)
-      this.__node_modules.linkToProject(generatedProject as Project);
+      this.__node_modules.linkTo(generatedProject);
 
       const vscodeFolder = path.join(
         generatedProject.location,

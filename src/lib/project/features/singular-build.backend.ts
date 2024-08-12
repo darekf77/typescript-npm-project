@@ -430,7 +430,7 @@ exports.default = start;`,
     let smartContainerTargetProject = Project.ins.From(
       smartContainerTargetProjPath,
     );
-    parent.__node_modules.linkToProject(smartContainerTargetProject);
+    parent.__node_modules.linkTo(smartContainerTargetProject);
     await smartContainerTargetProject.init('initing dist project'); // THIS CAUSE NOT NICE SHIT
 
     return smartContainerTargetProject;

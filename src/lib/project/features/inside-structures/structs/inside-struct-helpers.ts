@@ -191,6 +191,7 @@ ${'//#reg' + 'ion'} @${'bro' + 'wser'}
 import { NgModule, inject, Injectable } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { VERSION } from '@angular/core';
 ${'//#end' + 'region'}
 ${'//#end' + 'region'}
 
@@ -203,6 +204,7 @@ ${'//#reg' + 'ion'} @${'bro' + 'wser'}
 @Component({
   selector: 'app-${project.name}',
   template: \`hello from ${project.name}<br>
+    Angular version: {{ angularVersion }}<br>
     <br>
     users from backend
     <ul>
@@ -212,6 +214,7 @@ ${'//#reg' + 'ion'} @${'bro' + 'wser'}
   styles: [\` body { margin: 0px !important; } \`],
 })
 export class ${componentName} {
+  angularVersion = VERSION.full;
   userApiService = inject(UserApiService);
   readonly users$: Observable<User[]> = this.userApiService.getAll();
 }

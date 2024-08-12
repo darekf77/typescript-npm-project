@@ -305,22 +305,26 @@ export class NodeModules extends BaseFeatureForProject<Project> {
     Helpers.remove(this.path, true);
   }
 
-  linkToProject(target: Project): void {
-    Helpers.createSymLink(this.path, target.__node_modules.path);
-  }
+  linkTo(targetProjectOrPath: Project | string): void {
+    let pathDestNodeModules = crossPlatformPath(
+      _.isString(targetProjectOrPath)
+        ? targetProjectOrPath
+        : targetProjectOrPath.location,
+    );
+    if (!path.isAbsolute(pathDestNodeModules)) {
+      Helpers.error(
+        `[linkTo] taget path is not absolute "${pathDestNodeModules}"`,
+      );
+    }
+    if (!pathDestNodeModules.endsWith('/' + config.folder.node_modules)) {
+      pathDestNodeModules = crossPlatformPath([
+        pathDestNodeModules,
+        config.folder.node_modules,
+      ]);
+    }
 
-  linkTo(target: string): void {
-    if (!path.isAbsolute(target)) {
-      Helpers.error(`[linkTo] taget path is not absolute "${target}"`);
-    }
-    if (!this.project.__node_modules.exist) {
-      // TODO QUICK_FIX make it async install
-      this.project //$Global.prototype.REINSTALL.name
-        .run(`${config.frameworkName} ${'REINSTALL'}`)
-        .sync();
-    }
-    Helpers.remove(path.join(target, config.folder.node_modules));
-    Helpers.createSymLink(this.path, target, {
+    Helpers.remove(pathDestNodeModules, true);
+    Helpers.createSymLink(this.path, pathDestNodeModules, {
       continueWhenExistedFolderDoesntExists: true,
     });
   }

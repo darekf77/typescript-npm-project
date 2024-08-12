@@ -112,7 +112,17 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
     let result = [];
 
     const node_modules_projs = [
-      ...(canCopyToNodeModules ? [this.project.coreContainer] : []),
+      ...(canCopyToNodeModules
+        ? [
+            ...(config.activeFramewrokVersions.length > 1
+              ? [
+                  ...config.activeFramewrokVersions.map(v =>
+                    Project.by('container', v),
+                  ),
+                ]
+              : [this.project.coreContainer]),
+          ]
+        : []),
     ];
 
     if (Array.isArray(this.copyto) && this.copyto.length > 0) {

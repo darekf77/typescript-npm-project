@@ -356,6 +356,9 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
                 docs: true,
                 projects: true,
                 bin: true,
+                local_release: true,
+                "**/package-lock.json": true,
+                "package-lock.json": true,
               };
 
               if (!settings['files.exclude']) {

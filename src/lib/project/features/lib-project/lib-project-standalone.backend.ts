@@ -273,83 +273,9 @@ export class LibProjectStandalone extends LibPorjectBase {
           }
         }
 
-        await this.bumpVersionInOtherProjects(newVersion);
-        await this.updateTnpAndCoreContainers(realCurrentProj);
+        await this.updateTnpAndCoreContainers(realCurrentProj, newVersion);
       },
     );
   }
   //#endregion
-
-  //#region bump version in other projects
-  /**
-   * Return how many projects has changed
-   * @param bumbVersionIn
-   * @param newVersion
-   * @param onlyInThisProjectSubprojects
-   */
-  async bumpVersionInOtherProjects(
-    newVersion,
-    onlyInThisProjectSubprojects = false,
-  ) {
-    if (onlyInThisProjectSubprojects) {
-      // console.log('UPDATE VERSION !!!!!!!!!!!!!')
-      updateChildrenVersion(this.project, newVersion, this.project.name);
-    } else {
-      if (Project.ins.Tnp.name === this.project.name) {
-        Helpers.info(
-          `Ommiting version bump ${this.project.name} - for ${config.frameworkName} itself`,
-        );
-      } else if (
-        this.project.__packageJson.hasDependency(Project.ins.Tnp.name)
-      ) {
-        Helpers.info(
-          `Ommiting version bump ${this.project.name} - has ${config.frameworkName} as dependency`,
-        );
-      } else {
-        Project.ins.Tnp.__packageJson.setDependencyAndSave(
-          {
-            name: this.project.name,
-            version: newVersion,
-          },
-          `Bump new version "${newVersion}" of ${this.project.name}`,
-        );
-      }
-    }
-  }
-  //#endregion
 }
-
-//#region update children version
-function updateChildrenVersion(
-  project: Project,
-  newVersion,
-  name,
-  updatedProjectw: Project[] = [],
-) {
-  if (updatedProjectw.filter(p => p.location === project.location).length > 0) {
-    Helpers.log(
-      `[release - ${name}][lib-proj] Alredy update ${project.genericName}`,
-    );
-    return;
-  }
-  if (project.name !== name) {
-    project.__packageJson.setDependencyAndSave(
-      {
-        name,
-        version: newVersion,
-      },
-      `Bump versoin of library ${name}`,
-    );
-  } else {
-    project.__packageJson.data.version = newVersion;
-    project.__packageJson.save(`[lib-proj] set version`);
-  }
-  updatedProjectw.push(project);
-  Helpers.log(
-    `[release - ${name}][lib-proj] children of ${project.genericName}: \n${project.children.map(c => c.location)}\n`,
-  );
-  project.children.forEach(childProject =>
-    updateChildrenVersion(childProject, newVersion, name, updatedProjectw),
-  );
-}
-//#endregion

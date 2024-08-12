@@ -822,6 +822,7 @@ function beforeSaveAction(
       }
       return versionForTags[checkFor];
     } catch (error) {
+      // debugger;
       Helpers.error(
         `[firedev] Not able to get last version of package: ${pkgNameToCheckVer}`,
         false,
@@ -880,16 +881,13 @@ function beforeSaveAction(
     });
 
     if (
-      project.__frameworkVersionAtLeast('v3') &&
+      project.__frameworkVersionAtLeast('v16') &&
       project.__isContainerCoreProject
     ) {
-      const saveTnpFiredevVer = `^${_.first(Project.ins.Tnp.version.split('.'))}`;
-      if (project.__frameworkVersion === config.defaultFrameworkVersion) {
-        project.__packageJson.data.dependencies['firedev'] = saveTnpFiredevVer;
-      } else {
-        project.__packageJson.data.dependencies['firedev'] =
-          lastVerFun('firedev');
-      }
+      const versionFromContainerName = `^${_.last(project.name.split('-v'))}`;
+      console.log('versionFromContainerName', versionFromContainerName);
+      project.__packageJson.data.dependencies['firedev'] =
+        versionFromContainerName;
     }
 
     //#endregion
