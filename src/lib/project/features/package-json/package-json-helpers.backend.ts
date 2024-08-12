@@ -884,8 +884,8 @@ function beforeSaveAction(
       project.__frameworkVersionAtLeast('v16') &&
       project.__isContainerCoreProject
     ) {
-      const versionFromContainerName = `^${_.last(project.name.split('-v'))}`;
-      console.log('versionFromContainerName', versionFromContainerName);
+      const versionFromContainerName = `^${_.last(project.universalPackageName.split('-v'))}`;
+      // console.log('versionFromContainerName', versionFromContainerName);
       project.__packageJson.data.dependencies['firedev'] =
         versionFromContainerName;
     }

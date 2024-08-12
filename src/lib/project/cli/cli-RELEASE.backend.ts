@@ -64,11 +64,11 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
   }
   //#endregion
 
+  //#region automatic release
   async auto() {
     await this.start('patch', true);
   }
-
-  async autoDocs() {}
+  //#endregion
 
   //#region major
   async major() {
@@ -113,63 +113,112 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
   //#endregion
 
   //#region set major version
+  /**
+   * settin npm version
+   */
   async setMajorVersion() {
     let children = this.project.children;
 
     const majorVersionToSet = Number(
       _.first(this.args).trim().replace('v', ''),
     );
-    if (this.params.frameworkVersion) {
-      if (
-        !(await Helpers.questionYesNo(
-          `Proceed with setting major version v${majorVersionToSet} and` +
-            ` framework version v${this.params.frameworkVersion} for all ${children.length} packages ?`,
-        ))
-      ) {
+
+    const frameworkVersion = (this.params.frameworkVersion ||
+      this.params['frameworkVer'] ||
+      this.params['fver']) as string;
+
+    //#region quesitons
+    if (frameworkVersion) {
+      Helpers.info(
+        `
+      Setting major npm version "${majorVersionToSet}" for this
+      and for all ${children.length} children packages.
+      (Framework version from parameters "v${frameworkVersion}"
+      will be set for this and all children packages as well)
+      `,
+      );
+      if (!(await Helpers.questionYesNo(`Proceed ?`))) {
         this._exit();
       }
     } else {
-      if (
-        !(await Helpers.questionYesNo(
-          `Proceed with setting major version v${majorVersionToSet} for all ${children.length} packages ?`,
-        ))
-      ) {
+      Helpers.info(
+        `
+      Setting major npm version "${majorVersionToSet}" for this
+      and for all ${children.length} children packages.`,
+      );
+      if (!(await Helpers.questionYesNo(`Proceed ?`))) {
         this._exit();
       }
     }
+    //#endregion
 
+    //#region setting major version (and optionally framework ver.) for current project
+    if (frameworkVersion) {
+      if (this.project.__frameworkVersion === `v${frameworkVersion}`) {
+        Helpers.info(
+          `[${this.project.universalPackageName}] Framwork version v${frameworkVersion} alread set.`,
+        );
+      }
+      Helpers.info(
+        `[${this.project.universalPackageName}] Updating framework version for ` +
+          `${this.project.__frameworkVersion} => v${frameworkVersion} ... `,
+      );
+      await this.project.__setFramworkVersion(
+        `v${frameworkVersion}` as CoreModels.FrameworkVersion,
+      );
+    }
+
+    if (this.project.npmHelpers.majorVersion === majorVersionToSet) {
+      Helpers.info(
+        `[${this.project.universalPackageName}] Major version ${majorVersionToSet} alread set.`,
+      );
+    }
+    Helpers.info(
+      `[${this.project.universalPackageName}] Updating version ` +
+        `${this.project.__packageJson.data.version} => ${majorVersionToSet} ... `,
+    );
+    await this.project.__setMajorVersion(majorVersionToSet);
+
+    //#endregion
+
+    //#region setting major version (and optionally framework ver.) for children
     for (let index = 0; index < children.length; index++) {
       const child = children[index] as Project;
-      if (_.isString(this.params.frameworkVersion)) {
-        if (child.__frameworkVersion === `v${this.params.frameworkVersion}`) {
+      if (frameworkVersion) {
+        if (child.__frameworkVersion === `v${frameworkVersion}`) {
           Helpers.info(
-            `[${child.name}] Framwork version v${this.params.frameworkVersion} alread set.`,
-          );
-        } else {
-          Helpers.info(
-            `[${child.name}] Updating framework version for ${child.__frameworkVersion} => v${this.params.frameworkVersion} ... `,
-          );
-          await child.__setFramworkVersion(
-            `v${this.params.frameworkVersion}` as CoreModels.FrameworkVersion,
+            `[${child.name}] Framwork version v${frameworkVersion} alread set.`,
           );
         }
+        Helpers.info(
+          `[${child.name}] Updating framework version for ` +
+            `${child.__frameworkVersion} => v${frameworkVersion} ... `,
+        );
+        await child.__setFramworkVersion(
+          `v${frameworkVersion}` as CoreModels.FrameworkVersion,
+        );
       }
       if (child.npmHelpers.majorVersion === majorVersionToSet) {
         Helpers.info(
           `[${child.name}] Major version ${majorVersionToSet} alread set.`,
         );
-      } else {
-        Helpers.info(
-          `[${child.name}] Updating version for ${child.name}@${child.__packageJson.data.version} => ${majorVersionToSet} ... `,
-        );
-        await child.__setMajorVersion(majorVersionToSet);
       }
+      Helpers.info(
+        `[${child.name}] Updating version for ${child.name}` +
+          `@${child.__packageJson.data.version} => ${majorVersionToSet} ... `,
+      );
+      await child.__setMajorVersion(majorVersionToSet);
+
       // Helpers.taskDone();
     }
+    //#endregion
+
+    Helpers.taskDone(`Major version set to ${majorVersionToSet}`);
     this._exit();
   }
   //#endregion
 
+  //#region set framework version
   async setFrameworkVersion() {
     const newFrameworkVersion =
       `v${this.firstArg.replace('v', '')}` as CoreModels.FrameworkVersion;
@@ -184,6 +233,7 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
     Helpers.taskDone(`Framework version set to ${newFrameworkVersion}`);
     this._exit();
   }
+  //#endregion
 
   //#region start
   private async start(

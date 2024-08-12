@@ -98,6 +98,7 @@ export abstract class LibPorjectBase extends BaseFeatureForProject<Project> {
     }
 
     for (const projToUpdate of projectForCodeUpdate) {
+      // TODO @LAST should not need this when using copy manager
       await projToUpdate.__node_modules.updateFromReleaseDist(realCurrentProj);
     }
 

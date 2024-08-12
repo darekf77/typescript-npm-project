@@ -1217,6 +1217,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   }
   //#endregion
 
+  /**
+   * get actuall npm packge name from project
+   */
   public get universalPackageName(): string {
     //#region @backendFunc
     if (this.__isSmartContainerChild) {
@@ -1229,6 +1232,10 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     //#endregion
   }
 
+  /**
+   * get all npm packages names that can be
+   * obtainer from project
+   */
   public get packageNamesFromProject(): string[] {
     //#region @backendFunc
     if (this.__isSmartContainer) {
@@ -4854,8 +4861,8 @@ ${config.frameworkName} start
     const currentMinorVersion = Number(ver[1]);
     const newVer = [ver[0], minorVersionToSet, 0].join('.');
 
-    if (minorVersionToSet <= currentMinorVersion && !force) {
-      Helpers.warn(`Ommiting... Trying to set same or lower minor version for project: ${this.genericName}
+    if (minorVersionToSet < currentMinorVersion && !force) {
+      Helpers.warn(`Ommiting... Trying to set lower minor version for project: ${this.genericName}
         ${this.version} => v${newVer}
       `);
     } else {
@@ -4879,7 +4886,7 @@ ${config.frameworkName} start
    * with @param minorVersionToSet equals 15
    * will result in
    * {
-   *  version:"15.1.4"
+   *  version:"15.0.0"
    * }
    */
   async __setMajorVersion(majorVersionToSet: number) {
@@ -4903,10 +4910,10 @@ ${config.frameworkName} start
     }
 
     const currentMajorVersion = Number(ver[0]);
-    const newMajorVer = [majorVersionToSet, ver[1], ver[2]].join('.');
+    const newMajorVer = [majorVersionToSet, 0, 0].join('.');
 
-    if (majorVersionToSet <= currentMajorVersion) {
-      Helpers.warn(`Ommiting... Trying to set same or lower minor version for project: ${this.genericName}
+    if (majorVersionToSet < currentMajorVersion) {
+      Helpers.warn(`Ommiting... Trying to set lower major version for project: ${this.genericName}
         ${this.version} => v${newMajorVer}
       `);
     } else {
@@ -4922,8 +4929,14 @@ ${config.frameworkName} start
     if (this.typeIs('unknow')) {
       return '';
     }
+    this.setValueToJSON(
+      config.file.firedev_jsonc,
+      'version',
+      frameworkVersionArg,
+    );
     this.__packageJson.data.tnp.version = frameworkVersionArg;
     this.__packageJson.save('updating framework version');
+
     //#endregion
   }
   //#endregion
