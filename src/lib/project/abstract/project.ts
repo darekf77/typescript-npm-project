@@ -2271,7 +2271,7 @@ ${releaseOptions.resolved
     const index = i + 1;
     return `(${bold ? chalk.underline(chalk.bold(index.toString())) : index}. ${
       bold ? chalk.underline(chalk.bold(p.name)) : p.name
-    })`;
+    }@${p.npmHelpers.versionWithPatchPlusOne})`;
   })
   .join(', ')}
 

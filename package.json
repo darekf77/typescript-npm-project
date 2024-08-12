@@ -376,7 +376,7 @@
     "private": false
   },
   "name": "tnp",
-  "version": "18.0.0",
+  "version": "18.0.1",
   "bin": {
     "t": "bin/t",
     "t-debug": "bin/t-debug",
@@ -385,7 +385,7 @@
     "tnp-debug": "bin/tnp-debug",
     "tnp-debug-brk": "bin/tnp-debug-brk"
   },
-  "lastBuildTagHash": "9b248a25bef3c15533b673bd7323c449ea3591e4",
+  "lastBuildTagHash": "ac981b0c77fd01ee06f43d275c01c2b02714902b",
   "scripts": {
     "activate": "npm i --force && firedev dedupe && npx tsc && firedev link && tnp bd"
   },
@@ -666,7 +666,7 @@
     "tnp-core": "~18.0.3",
     "tnp-db": "~16.444.14",
     "tnp-helpers": "~16.444.25",
-    "tnp-models": "~16.444.15",
+    "tnp-models": "~18.0.1",
     "ts-debug": "1.3.0",
     "ts-json-schema-generator": "2.3.0-next.5",
     "ts-loader": "2.3.1",
