@@ -550,8 +550,8 @@ function beforeSaveAction(
   ) {
     const projForVer = Project.by('container', project.__frameworkVersion);
     if (projForVer) {
-      // QUICK_FIX?
       global.actionShowingDepsForContainer = true;
+      projForVer.__packageJson.reload();
       projForVer.__packageJson.showDeps(
         `update deps for project ${project.genericName} in version ${project.__frameworkVersion}`,
       );
@@ -642,9 +642,12 @@ function beforeSaveAction(
       });
 
     if (
-      project.__packageJson.data.tnp?.overrided?.includeOnly?.includes('tnp')
+      project.__packageJson.data[
+        config.packageJsonFrameworkKey
+      ].overrided?.includeOnly?.includes(config.packageJsonFrameworkKey)
     ) {
-      dependencies['tnp'] = `~${Project.ins.Tnp?.version}`;
+      dependencies[config.packageJsonFrameworkKey] =
+        `~${Project.ins.Tnp?.version}`;
     }
 
     keyToDeleteDeps.forEach(key => {

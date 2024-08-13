@@ -93,7 +93,7 @@ export class PackageJSON
     const fifedev_json =
       Helpers.readJson5([location, config.file.firedev_jsonc]) || {};
     const package_json = Helpers.readJson([location, config.file.package_json]);
-    package_json['tnp'] = _.cloneDeep(fifedev_json);
+    package_json[config.packageJsonFrameworkKey] = _.cloneDeep(fifedev_json);
 
     const pkgJson = new PackageJSON({ data: package_json, location, project });
     pkgJson.writeToDisc();

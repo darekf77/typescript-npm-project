@@ -17,13 +17,18 @@ import { PackageJsonCore } from './package-json-core.backend';
 import { PackageJsonDepsCoreCategories } from './package-json-deps-categories.backend';
 import { CoreModels } from 'tnp-core/src';
 
+export type PackageJsonBaseOpt = {
+  data: Object;
+  location?: string;
+  project?: Project;
+};
 export class PackageJsonBase extends PackageJsonCore {
   public readonly project: Project;
   private reasonToHidePackages = '';
   private reasonToShowPackages = '';
   private readonly coreCategories: PackageJsonDepsCoreCategories;
 
-  constructor(options: { data: Object; location?: string; project?: Project }) {
+  constructor(options: PackageJsonBaseOpt) {
     super(
       options.project && !options.location
         ? options.project.location
@@ -35,22 +40,31 @@ export class PackageJsonBase extends PackageJsonCore {
       }
       _.merge(this, options);
 
-      this.data = _.merge(
-        {
-          tnp: {
-            resources: [],
-          },
-        } as Models.IPackageJSON,
-        options.data as any,
-      );
+      this.fixPackageJson(options);
     }
     this.coreCategories = new PackageJsonDepsCoreCategories(this.project);
+  }
+
+  private fixPackageJson(options: PackageJsonBaseOpt) {
+    this.data = _.merge(
+      {
+        tnp: {
+          resources: [],
+        },
+      } as Models.IPackageJSON,
+      options.data as any,
+    );
   }
 
   public save(reasonToShowPackages: string) {
     this.reasonToShowPackages = `\n${reasonToShowPackages}`;
     this.prepareForSave('save');
     this.writeToDisc();
+  }
+
+  public reload() {
+    this.data = this.project.readJson(config.file.package_json);
+    this.fixPackageJson({ data: this.data });
   }
 
   public showDeps(reasonToShowPackages: string) {

@@ -55,6 +55,9 @@ export abstract class LibPorjectBase extends BaseFeatureForProject<Project> {
     ].filter(f => !!f);
 
     for (const coreContainer of coreContainters) {
+      // console.log(
+      //   `[updateTnpAndCoreContainers] Updating ${coreContainer.genericName}...`,
+      // );
       for (const packageName of realCurrentProj.packageNamesFromProject) {
         await coreContainer.npmHelpers.updateDep({
           packageName: packageName,
@@ -67,6 +70,7 @@ export abstract class LibPorjectBase extends BaseFeatureForProject<Project> {
 
     for (const projToUpdate of projectForCodeUpdate) {
       await projToUpdate.__node_modules.updateFromReleaseDist(realCurrentProj);
+      Helpers.taskDone('Done updating core container: ' + projToUpdate.genericName);
     }
 
     //#endregion
