@@ -163,7 +163,7 @@ export class $Global extends BaseCommandLine<{}, Project> {
     const symlinkCatalogFile = crossPlatformPath([
       proj.location,
       'symlinkCatalog',
-      'dupa.txt',
+      'aaa.txt',
     ]);
     const options: IncrementalWatcherOptions = {
       name: `[firedev]  properwatchtest (testing only)`,
@@ -171,10 +171,10 @@ export class $Global extends BaseCommandLine<{}, Project> {
     };
 
     Helpers.remove(symlinkCatalog);
-    Helpers.writeFile(symlinkCatalogFile, 'hello dupa');
+    Helpers.writeFile(symlinkCatalogFile, 'hello aaa');
     Helpers.writeFile(
       crossPlatformPath([proj.location, config.folder.src, 'a1', 'aa']),
-      'asdasdasdhello dupa',
+      'asdasdasdhello aaa',
     );
     Helpers.writeFile(
       crossPlatformPath([proj.location, config.folder.src, 'a2', 'ccc']),

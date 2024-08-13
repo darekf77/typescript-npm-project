@@ -7,13 +7,6 @@ import {
   combineLatest,
   switchMap,
 } from 'rxjs';
-import {
-  FiredevFileController,
-  FiredevBinaryFileController,
-  FiredevFile,
-  FiredevFileCss,
-  FiredevBinaryFile,
-} from 'firedev-ui'; // TODO LAST WHY CLASS NAME DOES NOT WORK
 import { HOST_BACKEND_PORT } from './app.hosts';
 import { _ } from 'tnp-core/src';
 //#region @browser
