@@ -24,7 +24,7 @@ import {
   frontendFiles,
   notNeededForExportFiles,
 } from 'tnp-config/src';
-import { Helpers, BaseCommandLine } from 'tnp-helpers/src';
+import { Helpers, BaseCommandLine, UtilsNpm } from 'tnp-helpers/src';
 import { PackagesRecognition } from '../features/package-recognition/packages-recognition';
 import { BrowserCodeCut } from '../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
 import { CLI } from 'tnp-cli/src';
@@ -1209,6 +1209,7 @@ ${this.project.children
 
   //#endregion
 
+  //#region update deps for core container
   async updatedeps(): Promise<void> {
     if (!this.project || !this.project.__isCoreProject) {
       Helpers.error(`This command is only for core projects`, false, true);
@@ -1574,6 +1575,46 @@ ${this.project.children
       }
     }
 
+    this._exit();
+  }
+  //#endregion
+
+  compareContainers() {
+    Helpers.clearConsole();
+    const [c1ver, c2ver] = this.args;
+    const c1 = Project.by('container', `v${c1ver.replace('v', '')}` as any);
+    const c2 = Project.by('container', `v${c2ver.replace('v', '')}` as any);
+    const c1Deps = c1.npmHelpers.allDependencies;
+    const c2Deps = c2.npmHelpers.allDependencies;
+    const displayCompare = (
+      depName: string,
+      c1depVer: string,
+      c2depVer: string,
+    ) => {
+      // console.log(`Comparing ${depName} ${c1depVer} => ${c2depVer}`);
+      c1depVer = UtilsNpm.fixMajorVerNumber(c1depVer);
+      c2depVer = UtilsNpm.fixMajorVerNumber(c2depVer);
+
+      if ([c1depVer, c2depVer].includes('latest')) {
+        console.log(`${chalk.gray(depName)}@(${c1depVer} => ${c2depVer})\t`);
+      } else if (c2depVer && c1depVer) {
+        if (semver.lt(c2depVer, c1depVer)) {
+          console.log(`${chalk.red(depName)}@(${c1depVer} => ${c2depVer})\t`);
+        } else if (semver.gte(c2depVer, c1depVer)) {
+          console.log(`${chalk.gray(depName)}@(${c1depVer} => ${c2depVer})\t`);
+        }
+      } else {
+        console.log(`${chalk.bold(depName)}@(${c1depVer} => ${c2depVer})\t`);
+      }
+    };
+    const allDepsKeys = Object.keys(c1Deps).concat(Object.keys(c2Deps));
+    for (const packageName of allDepsKeys) {
+      displayCompare(
+        packageName,
+        UtilsNpm.clearVersion(c1Deps[packageName], { removePrefixes: true }),
+        UtilsNpm.clearVersion(c2Deps[packageName], { removePrefixes: true }),
+      );
+    }
     this._exit();
   }
 

@@ -7,7 +7,8 @@ import { Models } from '../../../models';
 import { LibPorjectBase } from './lib-project-base.backend';
 
 import { Project } from '../../abstract/project';
-import { BuildOptions } from '../../../../cli';
+import { BuildOptions } from '../../../build-options';
+import { clientCodeVersionFolder } from '../../../constants';
 //#endregion
 
 export class LibProjectSmartContainer extends LibPorjectBase {
@@ -78,6 +79,14 @@ export class LibProjectSmartContainer extends LibPorjectBase {
       `Publish on npm all new versions: ${newVersion} ?`,
       async () => {
         Helpers.foldersFrom(base).forEach(cwd => {
+          // QUICK_FIX
+          for (const clientFolder of clientCodeVersionFolder) {
+            Helpers.writeFile(
+              [cwd, clientFolder, config.file._npmignore],
+              '# file overrided - I need package.json on npm',
+            );
+          }
+
           let successPublis = false;
           // const proj = Project.ins.From(absFolder) as Project;
 
@@ -129,7 +138,7 @@ ${otherProjectNames
     //#endregion
 
     return await Helpers.questionYesNo(
-      this.messages.docsBuildQuesions,
+      `Do you wanna build /docs folder app for preview`,
       async () => {
         //#region questions
         const returnFun = (childName: string) => {
@@ -199,7 +208,7 @@ ${otherProjectNames
         let appBuildOptions = { docsAppInProdMode: prod, websql: false };
 
         await Helpers.questionYesNo(
-          this.messages.productionMode,
+          `Do you want build in production mode`,
           () => {
             appBuildOptions.docsAppInProdMode = true;
           },
@@ -312,7 +321,11 @@ ${otherProjectNames
         }
 
         realCurrentProj.git.revertFileChanges('docs/CNAME');
-        Helpers.log(this.messages.docsBuildDone);
+        Helpers.log(`
+
+        Building docs preview - done
+
+        `);
       },
     );
   }

@@ -174,7 +174,6 @@ export class PortUtils {
   }
 
   appHostTemplateFor(project: Project) {
-
     //#region @backendFunc
     const clientPorts =
       project.__isStandaloneProject && !project.__isSmartContainerTarget
@@ -228,9 +227,13 @@ export function tempSourceFolder(
   return `tmp-src-${appForLib ? 'app-' : ''}${outDir}${websql ? '-websql' : ''}`;
 }
 
-export const notAllowedAsPacakge = [
+export const clientCodeVersionFolder = [
   config.folder.browser,
   config.folder.websql,
+];
+
+export const notAllowedAsPacakge = [
+  ...clientCodeVersionFolder,
   config.folder.assets,
 ];
 

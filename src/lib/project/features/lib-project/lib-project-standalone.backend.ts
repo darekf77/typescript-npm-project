@@ -6,8 +6,8 @@ import { AppBuildConfig } from '../../features/docs-app-build-config.backend';
 import { LibPorjectBase } from './lib-project-base.backend';
 import { Project } from '../../abstract/project';
 import { Models } from '../../../models';
-import { TEMP_DOCS } from '../../../constants';
-import { BuildOptions } from '../../../../cli';
+import { TEMP_DOCS, clientCodeVersionFolder } from '../../../constants';
+import { BuildOptions } from '../../../build-options';
 //#endregion
 
 export class LibProjectStandalone extends LibPorjectBase {
@@ -106,7 +106,7 @@ export class LibProjectStandalone extends LibPorjectBase {
     //#endregion
 
     return await Helpers.questionYesNo(
-      this.messages.docsBuildQuesions,
+      `Do you wanna build /docs folder app for preview`,
       async () => {
         //#region questions
         if (automaticReleaseDocs) {
@@ -118,7 +118,7 @@ export class LibProjectStandalone extends LibPorjectBase {
 
         if (!automaticReleaseDocs) {
           await Helpers.questionYesNo(
-            this.messages.productionMode,
+            `Do you want build in production mode`,
             () => {
               appBuildOptions.docsAppInProdMode = true;
             },
@@ -193,7 +193,11 @@ export class LibProjectStandalone extends LibPorjectBase {
         // })
         Helpers.copyFile(assetsListPathSourceMain, assetsListPathDestMain);
 
-        Helpers.log(this.messages.docsBuildDone);
+        Helpers.log(`
+
+        Building docs preview - done
+
+        `);
       },
     );
   }
@@ -218,6 +222,16 @@ export class LibProjectStandalone extends LibPorjectBase {
     await Helpers.questionYesNo(
       `Publish on npm version: ${newVersion} ?`,
       async () => {
+
+        // QUICK_FIX
+        for (const clientFolder of clientCodeVersionFolder) {
+          Helpers.writeFile(
+            [existedReleaseDist, clientFolder, config.file._npmignore],
+            '# file overrided - I need package.json on npm',
+          );
+          // console.log(`Write file: ${existedReleaseDist}/${clientFolder}/${config.file._npmignore}`);
+        }
+
         // publishing standalone
         try {
           Helpers.run('npm publish', {
@@ -250,6 +264,8 @@ export class LibProjectStandalone extends LibPorjectBase {
           const packageJsonAdd: Models.IPackageJSON = Helpers.readJson(
             path.join(additionBase, config.file.package_json),
           );
+
+
           packageJsonAdd.name = c;
           // const keys = Object.keys(packageJsonAdd.bin || {});
           // keys.forEach(k => {

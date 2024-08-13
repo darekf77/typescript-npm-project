@@ -18,7 +18,6 @@ export namespace Models {
     reasonToHidePackages: string;
   };
 
-
   export interface NpmInstallOptions {
     remove?: boolean;
     npmPackages?: CoreModels.Package[];
@@ -47,7 +46,6 @@ export namespace Models {
   export const ArrTnpNpmDependencyType: TnpNpmDependencyType[] = [
     'tnp_overrided_dependencies',
   ];
-
 
   export interface FiredevLoaderConfig {
     name?: FiredevLoaders;
@@ -223,10 +221,17 @@ export namespace Models {
     links: string[];
   };
 
-  export interface TnpIPackageJSONOverride {
+  /**
+   * use CoreModels.FiredevJson
+   * @deprecated
+   */
+  export interface TnpIPackageJSONOverride extends CoreModels.FiredevJson {
     scripts?: { [script in string]: string };
     description?: string;
     license?: string;
+    /**
+     * if true => package is private
+     */
     private?: boolean;
     author?: string;
     homepage?: string;
@@ -249,19 +254,6 @@ export namespace Models {
   };
 
   export interface TnpData extends TnpIPackageJSONOverride {
-    type: CoreModels.LibType;
-    version?: CoreModels.FrameworkVersion;
-    smartContainerBuildTarget?: string;
-    smart?: boolean;
-    monorepo?: boolean;
-    /**
-     * link your local projects *.ts files inside this project.. through tsconfig pathes
-     * Example:
-     *  - local projct 'tnp-helper' with 'src' folder
-     *  -> will be available inside:
-     *     import {  from 'tnp-helper';
-     */
-    linkedProjects?: string[];
     linkedRepos?: LinkedRepo[];
 
     /**
@@ -273,21 +265,13 @@ export namespace Models {
      * }
      */
     workerPlugins?: { [pathOrName in string]: string };
-    libReleaseOptions: {
-      cliBuildObscure?: boolean;
-      cliBuildUglify?: boolean;
-      cliBuildNoDts?: boolean;
-      cliBuildIncludeNodeModules?: boolean;
-    };
+
     targetProjects: TargetProject[];
     /**
      * framework available inside project/app
      */
     frameworks?: CoreModels.UIFramework[];
-    /**
-     * project is template for other project
-     */
-    isCoreProject: boolean;
+
     additionalNpmNames: boolean;
     /**
      * only for container
@@ -368,7 +352,8 @@ export namespace Models {
     };
   }
 
-  export interface IPackageJSON extends TnpIPackageJSONOverride {
+  export interface IPackageJSON
+    extends Omit<TnpIPackageJSONOverride, 'version'> {
     name: string;
     husky?: {
       hooks: {
@@ -386,8 +371,6 @@ export namespace Models {
     tnp: TnpData & TnpIPackageJSONOverride;
     firedev: TnpData & TnpIPackageJSONOverride;
   }
-
-
 
   /**
    * @deprecated

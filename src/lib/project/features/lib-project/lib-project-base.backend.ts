@@ -4,12 +4,16 @@ import { config } from 'tnp-config/src';
 import { _ } from 'tnp-core/src';
 
 export abstract class LibPorjectBase extends BaseFeatureForProject<Project> {
+  //#region build docs
   abstract buildDocs(
     prod: boolean,
     realCurrentProj: Project,
     automaticReleaseDocs: boolean,
     libBuildCallback: (websql: boolean, prod: boolean) => any,
   ): Promise<boolean>;
+  //#endregion
+
+  //#region publish
   abstract publish(options: {
     realCurrentProj: Project;
     newVersion: string;
@@ -17,48 +21,11 @@ export abstract class LibPorjectBase extends BaseFeatureForProject<Project> {
     prod: boolean;
     rootPackageName?: string;
   }): Promise<any>;
+  //#endregion
 
+  //#region prepare pacakge
   abstract preparePackage(smartContainer: Project, newVersion: string);
-
-  messages = {
-    productionMode: `Do you want build in production mode`,
-    docsBuildQuesions: `Do you wanna build /docs folder app for preview`,
-    docsBuildDone: `
-
-    Building docs preview - done
-
-    `,
-  };
-
-  // async bumpVersionInOtherProjects(
-  //   newVersion,
-  //   onlyInThisProjectSubprojects = false,
-  // ) {
-  //   if (onlyInThisProjectSubprojects) {
-  //     // console.log('UPDATE VERSION !!!!!!!!!!!!!')
-  //     updateChildrenVersion(this.project, newVersion, this.project.name);
-  //   } else {
-  //     if (Project.ins.Tnp.name === this.project.name) {
-  //       Helpers.info(
-  //         `Ommiting version bump ${this.project.name} - for ${config.frameworkName} itself`,
-  //       );
-  //     } else if (
-  //       this.project.__packageJson.hasDependency(Project.ins.Tnp.name)
-  //     ) {
-  //       Helpers.info(
-  //         `Ommiting version bump ${this.project.name} - has ${config.frameworkName} as dependency`,
-  //       );
-  //     } else {
-  //       Project.ins.Tnp.__packageJson.setDependencyAndSave(
-  //         {
-  //           name: this.project.name,
-  //           version: newVersion,
-  //         },
-  //         `Bump new version "${newVersion}" of ${this.project.name}`,
-  //       );
-  //     }
-  //   }
-  // }
+  //#endregion
 
   //#region update core/special projects/container
   async updateTnpAndCoreContainers(
@@ -89,16 +56,16 @@ export abstract class LibPorjectBase extends BaseFeatureForProject<Project> {
 
     for (const coreContainer of coreContainters) {
       for (const packageName of realCurrentProj.packageNamesFromProject) {
-        coreContainer.npmHelpers.updateDep({
+        await coreContainer.npmHelpers.updateDep({
           packageName: packageName,
           version: newVersion,
           updateFiredevJsonFirst: true,
+          addIfNotExists: true,
         });
       }
     }
 
     for (const projToUpdate of projectForCodeUpdate) {
-      // TODO @LAST should not need this when using copy manager
       await projToUpdate.__node_modules.updateFromReleaseDist(realCurrentProj);
     }
 
