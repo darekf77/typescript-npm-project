@@ -2453,16 +2453,25 @@ processing...
               true,
               true,
             );
-            if (
-              !(await Helpers.questionYesNo(
-                `Try again ? (or exit proces)`,
-                void 0,
-                void 0,
-                true,
-                true,
-              ))
-            ) {
+            const errorOptions = {
+              tryAgain: {
+                name: 'Try again',
+              },
+              skipPackage: {
+                name: 'Skip release for this package',
+              },
+              exit: {
+                name: 'Exit process',
+              },
+            };
+            const res = await Helpers.consoleGui.select<
+              keyof typeof errorOptions
+            >('What you wanna do ?', errorOptions);
+
+            if (res === 'exit') {
               process.exit(0);
+            } else if (res === 'skipPackage') {
+              break;
             }
           }
         }
