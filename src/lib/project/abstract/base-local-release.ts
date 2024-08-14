@@ -18,6 +18,9 @@ export class BaseLocalRelease extends BaseLinkedProjects<Project> {
     await this._();
     //#region @backendFunc
 
+    await this.project.npmHelpers.bumpPatchVersion();
+    this.project.__packageJson.reload();
+
     //#region resolve pathes
     const destBase = this.project.pathFor(
       `${config.folder.local_release}/cli/${this.project.nameForCli}-v${this.project.version}`,
