@@ -66,6 +66,13 @@ export class BaseLocalRelease extends BaseLinkedProjects<Project> {
     );
     this.project.copy(['bin']).to(destBase);
 
+    const destStartJS = crossPlatformPath([destBase, 'bin/start.js']);
+    Helpers.writeFile(
+      destStartJS,
+      `console.log('<<< USING BUNDLED CLI >>>');` +
+        `\n${Helpers.readFile(destStartJS)}`,
+    );
+
     Helpers.writeJson(destPackageJson, {
       name: `${this.project.name.replace('-cli', '')}`,
       version: this.project.version,
@@ -95,11 +102,11 @@ npm link
         const destBaseLatestProjVersioned = this.project.pathFor(
           `${config.folder.local_release}/cli/${this.project.nameForCli}-v${latestProj.version}`,
         );
-        Helpers.remove(destBaseLatestProjVersioned);
+        Helpers.tryRemoveDir(destBaseLatestProjVersioned);
         Helpers.copy(destBaseLatest, destBaseLatestProjVersioned);
       }
 
-      Helpers.remove(destBaseLatest);
+      Helpers.tryRemoveDir(destBaseLatest);
       Helpers.copy(destBase, destBaseLatest);
     }
 
