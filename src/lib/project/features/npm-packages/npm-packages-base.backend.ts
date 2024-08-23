@@ -132,12 +132,15 @@ export class NpmPackagesBase extends NpmPackagesCore {
         await this.actualNpmProcess({ reason: triggeredMsg });
       } else {
         for (const pkg of npmPackages) {
-          await this.actualNpmProcess({ pkg, reason: triggeredMsg, remove });
+          if (remove) {
+            pkg.installType = 'remove';
+          }
+          await this.actualNpmProcess({ pkg, reason: triggeredMsg });
         }
       }
     }
 
-    if(this.project.__node_modules.shouldDedupePackages) {
+    if (this.project.__node_modules.shouldDedupePackages) {
       this.project.__node_modules.dedupe();
     }
 

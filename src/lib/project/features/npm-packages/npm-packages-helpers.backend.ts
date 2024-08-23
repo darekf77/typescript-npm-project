@@ -80,9 +80,6 @@ export function fixOptions(
   if (_.isUndefined(options.useYarn)) {
     options.useYarn = false;
   }
-  if (_.isUndefined(options.remove)) {
-    options.remove = false;
-  }
   if (_.isUndefined(options.pkg)) {
     options.pkg = void 0;
   }

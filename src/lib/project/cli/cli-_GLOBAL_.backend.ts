@@ -80,7 +80,7 @@ export class $Global extends BaseCommandLine<{}, Project> {
       projectName = argv[1];
     }
     Helpers.info(`Forking ${githubUrl} with name ${projectName}`);
-    this.project.git.clone(githubUrl, projectName);
+    await this.project.git.clone(githubUrl, projectName);
     let newProj = Project.ins.From(
       path.join(this.project.location, projectName),
     ) as Project;

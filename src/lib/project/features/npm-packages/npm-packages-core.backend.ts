@@ -95,11 +95,10 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
     if (this.project.__isDocker) {
       return;
     }
-    const { useYarn, pkg, remove } = fixOptions(options);
+    const { useYarn, pkg } = fixOptions(options);
 
     const command: string = await this.project.npmHelpers.prepareCommand({
       pkg,
-      remove,
       useYarn,
     });
     this.modifyPackageJson(this.project);
@@ -111,7 +110,7 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
 
     `);
 
-    if (remove) {
+    if (pkg?.installType === 'remove') {
       executeCommand(command, this.project);
     } else {
       try {
