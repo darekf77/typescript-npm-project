@@ -808,9 +808,9 @@ export class $Global extends BaseCommandLine<{}, Project> {
 
     if (proj.__isContainer) {
       if (proj.__isContainerCoreProject) {
-        Helpers.taskStarted(`Removing old node_modules for core container`);
+        Helpers.taskStarted(`Removing old node_modules for core container ${proj.__frameworkVersion}`);
         proj.__node_modules.remove();
-        Helpers.taskDone(`Removed old node_modules for core container`);
+        Helpers.taskDone(`Removed old node_modules for core container ${proj.__frameworkVersion}`);
         await proj.__npmPackages.installFromArgs('');
         Helpers.info(`Reinstal done for core container`);
       } else {
