@@ -35,7 +35,7 @@
     "includeAsDev": [],
     //#region include only for tnp package
     "includeOnly": [
-      "tnp-db",
+      // "tnp-helpers",
       "ora",
       "progress",
       "open",
@@ -100,6 +100,7 @@
         "background-worker-process",
         "morphi",
         "firedev-storage",
+        "taon-storage",
         "@ngtools/webpack",
         "typeorm",
         "portfinder",
