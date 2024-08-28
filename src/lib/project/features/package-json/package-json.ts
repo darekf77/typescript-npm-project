@@ -60,11 +60,11 @@ export class PackageJSON
           Helpers.writeJson5([location, config.file.taon_jsonc], tnpData);
         }
       }
-      Helpers.removeFileIfExists(config.file.taon_jsonc);
       Helpers.removeFileIfExists(firedevFilePath);
     }
     const taon_json =
       Helpers.readJson5([location, config.file.taon_jsonc]) || {};
+
     const package_json = Helpers.readJson([location, config.file.package_json]);
     package_json[config.packageJsonFrameworkKey] = _.cloneDeep(taon_json);
 

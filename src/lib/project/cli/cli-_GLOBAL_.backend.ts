@@ -5,6 +5,7 @@ import {
 } from 'incremental-compiler/src';
 import { Project } from '../abstract/project';
 import { config } from 'tnp-config/src';
+import { requiredForDev } from 'tnp-core/src';
 import {
   crossPlatformPath,
   path,
@@ -882,7 +883,7 @@ export class $Global extends BaseCommandLine<{}, Project> {
   }
 
   ENV_INSTALL() {
-    CLI.installEnvironment(config.required);
+    CLI.installEnvironment(requiredForDev);
     this._exit();
   }
   //#endregion

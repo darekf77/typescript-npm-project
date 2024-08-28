@@ -1,7 +1,7 @@
 //#region imports
 //#region @backend
 import { $Global } from '../cli/cli-_GLOBAL_.backend';
-import { fse, json5, os, dateformat } from 'tnp-core/src';
+import { fse, json5, os, dateformat, requiredForDev } from 'tnp-core/src';
 import { child_process } from 'tnp-core/src';
 import { Taon, BaseContext } from 'taon/src';
 import * as semver from 'semver';
@@ -448,7 +448,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
         fse.mkdirpSync(path.dirname(taonRepoPathUserInUserDir));
       }
 
-      CLI.installEnvironment(config.required);
+      CLI.installEnvironment(requiredForDev);
 
       try {
         child_process.execSync(
