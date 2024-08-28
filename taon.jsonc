@@ -8,8 +8,6 @@
       // TOOD replace sharp with jimp to remove node-gyp
       // or generate icons with jimp directly
       "favicons": "~7.1.2",
-
-      "ng2-rest-swagger-generator": "16.444.1",
     },
     //#endregion
     "npmFixes": [],
