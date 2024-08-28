@@ -264,37 +264,22 @@ export class PackageJsonCore {
       delete this.data[''];
     }
     const data = _.cloneDeep(this.data) as Models.IPackageJSON;
-    const firedevJsonPath = crossPlatformPath([
-      this.cwd,
-      config.file.firedev_jsonc,
-    ]);
-    const isFiredevProj =
+    const taonJsonPath = crossPlatformPath([this.cwd, config.file.taon_jsonc]);
+    const isTaonProj =
       data.tnp?.type === 'isomorphic-lib' || data.tnp?.type === 'container';
-    if (isFiredevProj) {
-      Helpers.writeJson5(firedevJsonPath, data.tnp);
+    if (isTaonProj) {
+      Helpers.writeJson5(taonJsonPath, data.tnp);
     }
 
     Helpers.removeFileIfExists(
-      crossPlatformPath([
-        this.cwd,
-        config.file.package_json__devDependencies_json,
-      ]),
-    );
-    Helpers.removeFileIfExists(
-      crossPlatformPath([this.cwd, config.file.package_json__tnp_json5]),
-    );
-    Helpers.removeFileIfExists(
-      crossPlatformPath([this.cwd, config.file.package_json__tnp_json]),
-    );
-    Helpers.removeFileIfExists(
-      crossPlatformPath([this.cwd, config.file.firedev_json]),
+      crossPlatformPath([this.cwd, config.file.firedev_jsonc]),
     );
     Helpers.removeFileIfExists(
       crossPlatformPath([this.cwd, config.file.devDependencies_json]),
     );
     Helpers.log(`Split done..`, 2);
 
-    if (isFiredevProj) {
+    if (isTaonProj) {
       if (removeFromPj) {
         if (Helpers.isExistedSymlink(this.pathPackageJson)) {
           Helpers.log(

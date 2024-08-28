@@ -134,9 +134,9 @@ export class PackageJsonBase extends PackageJsonCore {
     (() => {
       const source = path.join(
         this.project.location,
-        config.file.firedev_jsonc,
+        config.file.taon_jsonc,
       );
-      const dest = path.join(destination, config.file.firedev_jsonc);
+      const dest = path.join(destination, config.file.taon_jsonc);
       Helpers.removeFileIfExists(dest);
       Helpers.createSymLink(source, dest);
     })();

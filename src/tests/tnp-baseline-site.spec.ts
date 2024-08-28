@@ -115,8 +115,8 @@
 //   ctx.siteChild.filesFactory.createFile(filePathBaseline.relative.custom, `
 // import { ${fileNameWithoutExt} as Base } from '${ctx.baseline.name}/${ctx.baselinChild.name}/${relativeWithoutext}';
 // import {
-// Firedev
-// } from 'firedev';
+// Taon
+// } from 'taon/src';
 
 // export class ${fileNameWithoutExt} extends Base {
 
@@ -139,7 +139,7 @@
 
 //     // it('should join new lines in import into one long import', async () => {
 //     //   expect(!!~Helpers.readFile(filePathSite.absolute.normal).toString().trim()
-//     //     .search(`import { Firedev } from 'firedev/src';`)).to.be.true;
+//     //     .search(`import { Taon } from 'taon/src';`)).to.be.true;
 //     // });
 
 //   })

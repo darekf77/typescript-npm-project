@@ -9,9 +9,8 @@ import {
   //#endregion
 } from 'tnp-core/src';
 
-export const firedevFrameworkName = 'firedev';
 
-export const firedevIgnore = '@firedev' + '-' + 'ignore';
+export const taonIgnore = '@taon' + '-' + 'ignore';
 
 export const OVERRIDE_FROM_TNP = [
   'scripts',
@@ -30,9 +29,9 @@ export const OVERRIDE_FROM_TNP = [
 export const UNIT_TEST_TIMEOUT = 30000;
 export const INTEGRATION_TEST_TIMEOUT = 30000;
 
-export let firedevRepoPathUserInUserDir: string =
+export let taonRepoPathUserInUserDir: string =
   //#region @backend
-  path.join(crossPlatformPath(os.homedir()), '.firedev', firedevFrameworkName);
+  path.join(crossPlatformPath(os.homedir()), '.taon', config.frameworkNames.taon);
 //#endregion
 ('');
 

@@ -44,13 +44,13 @@ export abstract class LibPorjectBase extends BaseFeatureForProject<Project> {
     ) as Project[];
 
     const tnpProj = Project.ins.Tnp;
-    const updateLocalFiredevProjectWithOwnNodeModules =
+    const updateLocalTaonProjectWithOwnNodeModules =
       config.frameworkName === 'tnp' &&
       realCurrentProj.name !== 'tnp' &&
       allVersions.includes(tnpProj.__frameworkVersion);
 
     const projectForCodeUpdate = [
-      ...(updateLocalFiredevProjectWithOwnNodeModules ? [tnpProj] : []),
+      ...(updateLocalTaonProjectWithOwnNodeModules ? [tnpProj] : []),
       ...coreContainters,
     ].filter(f => !!f);
 
@@ -62,7 +62,7 @@ export abstract class LibPorjectBase extends BaseFeatureForProject<Project> {
         await coreContainer.npmHelpers.updateDep({
           packageName: packageName,
           version: newVersion,
-          updateFiredevJsonFirst: true,
+          updateTaonJsonFirst: true,
           addIfNotExists: true,
         });
       }

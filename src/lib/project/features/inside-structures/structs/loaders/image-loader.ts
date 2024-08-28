@@ -9,14 +9,14 @@ export function imageLoader(
 ) {
   return `
 <style>
-  .firedev-ui-image-pre-loader {
+  .taon-image-pre-loader {
     display: block;
     position: absolute;
     left: 50%;
     top: 48%;
     transform: translate(-50%, -50%);
   }
-  .firedev-ui-image-ngbootstrap-loader {
+  .taon-image-ngbootstrap-loader {
     display: block;
     position: absolute;
     left: 50%;
@@ -25,7 +25,7 @@ export function imageLoader(
   }
 </style>
 
-<img  src="${pathToLoaderImageInAssets}" ${preloader ? ID_LOADER_PRE_BOOTSTRAP : PRE_LOADER_NG_IF_INITED}  class="firedev-ui-image-${preloader ? 'pre' : 'ngbootstrap'}-loader">
+<img  src="${pathToLoaderImageInAssets}" ${preloader ? ID_LOADER_PRE_BOOTSTRAP : PRE_LOADER_NG_IF_INITED}  class="taon-image-${preloader ? 'pre' : 'ngbootstrap'}-loader">
 
   `;
 }

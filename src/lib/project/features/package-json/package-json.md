@@ -1,6 +1,6 @@
 # Package.json
 
-# Firedev secion
+# Taon section
 ```
 "tnp": {
     "resources": [

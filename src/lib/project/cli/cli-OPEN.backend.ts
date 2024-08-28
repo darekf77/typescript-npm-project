@@ -71,7 +71,7 @@ export class $Open extends CommandLineFeature<{}, Project> {
     const libs = proj.__childrenThatAreLibs.filter(f =>
       f.git.thereAreSomeUncommitedChangeExcept([
         config.file.package_json,
-        config.file.firedev_jsonc,
+        config.file.taon_jsonc,
       ]),
     );
     libs.forEach(l => l.__openInVscode());

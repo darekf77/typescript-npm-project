@@ -1,5 +1,5 @@
 //#region imports
-import { Firedev } from 'firedev/src';
+import { Taon } from 'taon/src';
 import { _ } from 'tnp-core/src';
 //#endregion
 
@@ -8,14 +8,14 @@ import { _ } from 'tnp-core/src';
  *
  * + use static methods to for backend access encapsulation
  */
-@Firedev.Entity({
+@Taon.Entity({
   //#region entity options
   className: 'BuildProcess',
   //#endregion
 })
-export class BuildProcess extends Firedev.Base.AbstractEntity<BuildProcess> {
+export class BuildProcess extends Taon.Base.AbstractEntity<BuildProcess> {
   //#region @websql
-  @Firedev.Orm.Column.Custom({
+  @Taon.Orm.Column.Custom({
     type: 'varchar',
     length: 100,
     default: '',
@@ -24,17 +24,17 @@ export class BuildProcess extends Firedev.Base.AbstractEntity<BuildProcess> {
   description?: string;
 
   //#region @websql
-  @Firedev.Orm.Column.Number()
+  @Taon.Orm.Column.Number()
   //#endregion
   backendPort: number;
 
   //#region @websql
-  @Firedev.Orm.Column.Number()
+  @Taon.Orm.Column.Number()
   //#endregion
   standaloneNormalAppPort: number;
 
   //#region @websql
-  @Firedev.Orm.Column.Number()
+  @Taon.Orm.Column.Number()
   //#endregion
   standaloneWebsqlAppPort: number;
 

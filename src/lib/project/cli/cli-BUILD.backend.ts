@@ -168,31 +168,31 @@ ${config.frameworkName} app ${smartContainerTargetName} ${
       name: '< select command >',
     },
     BUILD_DEPLY_DOCS_FIREDEV: {
-      name: 'Build & deply docs for www.firedev.io',
+      name: 'Build & deply docs for www.taon.dev',
       value: {
-        command: `python -m mkdocs build --site-dir ../../firedev-projects/www-firedev-io/docs/documentation`,
+        command: `python -m mkdocs build --site-dir ../../taon-projects/www-taon-dev/docs/documentation`,
         action: async () => {
-          const firedevProj = Project.ins.From([
+          const taonProjWww = Project.ins.From([
             this.cwd,
-            '../../firedev-projects/www-firedev-io',
+            '../../taon-projects/www-taon-dev',
           ]);
           if (await Helpers.questionYesNo('Push and commit docs update ?')) {
-            firedevProj.git.addAndCommit('update docs');
-            await firedevProj.git.pushCurrentBranch();
+            taonProjWww.git.addAndCommit('update docs');
+            await taonProjWww.git.pushCurrentBranch();
           }
         },
       },
     },
     BUILD_DOCS_FIREDEV: {
-      name: 'Build docs for www.firedev.io',
+      name: 'Build docs for www.taon.dev',
       value: {
-        command: `python -m mkdocs build --site-dir ../../firedev-projects/www-firedev-io/${TEMP_DOCS}`,
+        command: `python -m mkdocs build --site-dir ../../taon-projects/www-taon-dev/${TEMP_DOCS}`,
         action: void 0,
       },
     },
     //#endregion
     SERVE_DOCS_FIREDEV: {
-      name: 'Serve docs for www.firedev.io on 8000',
+      name: 'Serve docs for www.taon.dev on 8000',
       value: {
         command: 'python -m mkdocs serve',
         action: void 0,

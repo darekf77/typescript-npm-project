@@ -4,7 +4,7 @@
 
 ### Usage of region **@backend**
 ```ts
-import { Firedev } from 'firedev/src'
+import { Taon } from 'taon/src'
 
 console.log('visible everywhere')
 //#region @backend
@@ -18,7 +18,7 @@ if(Helpers.isBrowser) {
 
 ### Usage of region **@backendFunc**
 ```ts
-import { Firedev } from 'firedev/src'
+import { Taon } from 'taon/src'
 
 
 class MyController {

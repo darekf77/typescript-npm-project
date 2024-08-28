@@ -35,7 +35,7 @@ const regexAsyncImportG =
   /\ import\((\`|\'|\")([a-zA-Z|\-|\@|\/|\.]+)(\`|\'|\")\)/g;
 
 const debugFiles = [
-  // 'firedev-cms.models.ts'
+  // 'taon-cms.models.ts'
   // 'app.ts'
 ];
 
@@ -208,7 +208,7 @@ export class BrowserCodeCut {
         );
       } catch (error) {
         Helpers.warn(
-          `[firedev][browser-code-cut] file not found ${this.absSourcePathFromSrc}`,
+          `[taon][browser-code-cut] file not found ${this.absSourcePathFromSrc}`,
         );
       }
     }

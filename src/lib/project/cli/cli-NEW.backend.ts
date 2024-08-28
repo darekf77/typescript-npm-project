@@ -515,10 +515,10 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
 
     //     DONE CREATING ${containersAndProjFromArgName.join('/')}
 
-    // ${chalk.green('To start developing firedev\'s backend/frontend apps/libs execute command:')}
+    // ${chalk.green('To start developing taon\'s backend/frontend apps/libs execute command:')}
 
     // cd ${preOrgs + '/' + (cleanDisplaName.includes('/') ? _.first(cleanDisplaName.split('/')) : cleanDisplaName)
-    //       } && firedev start ${_.last(containersAndProjFromArgName)} --websql
+    //       } && taon start ${_.last(containersAndProjFromArgName)} --websql
 
     //     `);
   }

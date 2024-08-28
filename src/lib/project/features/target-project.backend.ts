@@ -147,7 +147,7 @@ async function generate(project: Project, t: Models.TargetProject) {
       void 0,
     );
   });
-  [config.file.yarn_lock, config.file.firedev_jsonc].forEach(dumbFiles => {
+  [config.file.yarn_lock, config.file.taon_jsonc].forEach(dumbFiles => {
     Helpers.removeFileIfExists(path.join(t.path, dumbFiles));
   });
   Helpers.run(`code ${t.path}`).sync();

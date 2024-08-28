@@ -185,8 +185,8 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
             '.npmrc',
             ...Object.keys(self.project.lintFiles),
             config.file.devDependencies_json,
-            ...// TODO or firedev json
-            (Helpers.exists(self.project.pathFor(config.file.firedev_jsonc))
+            ...// TODO or taon json
+            (Helpers.exists(self.project.pathFor(config.file.taon_jsonc))
               ? [config.file.package_json]
               : []),
             // 'docs',
@@ -587,8 +587,7 @@ ${
     : []
 }
 # =====================
-!firedev.json
-!firedev.jsonc
+!taon.jsonc
 ${this.project.__isCoreProject ? '!*.filetemplate' : '*.filetemplate'}
 ${this.project.__isDocker ? '!Dockerfile.filetemplate' : ''}
 ${this.project.__isSmartContainer ? '/angular.json' : ''}
@@ -682,7 +681,7 @@ ${this.project.__isCoreProject ? '' : '/.vscode/launch.json'}
             .__projectLinkedFiles()
             .find(a => a.relativePath === relativeFilePath);
           if (linked) {
-            Helpers.warn(`[firedev]]FIXING LINKED projects`);
+            Helpers.warn(`[taon] FIXING LINKED projects`);
             Helpers.createSymLink(
               path.join(linked.sourceProject.location, linked.relativePath),
               path.join(defaultProjectProptotype.location, relativeFilePath),

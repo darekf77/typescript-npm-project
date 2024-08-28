@@ -45,28 +45,28 @@ export class FilesFactory extends BaseFeatureForProject<Project> {
     ).replace(/\s/g, '_');
     this.create(relativePath, kebebCaseName, `${fileNameWithoutExt}.ts`).file(
       `
-import { Firedev } from 'firedev/src';
+import { Taon } from 'taon/src';
 
 export interface I${fileNameWithoutExt} {
   id?: number;
   exampleProperty?: string;
 }
 
-@Firedev.Entity<${fileNameWithoutExt}>({
+@Taon.Entity<${fileNameWithoutExt}>({
   className: '${fileNameWithoutExt}',
   mapping: {
 
   }
 })
-export class ${fileNameWithoutExt} extends Firedev.Base.Entity<${fileNameWithoutExt}, I${fileNameWithoutExt}> implements I${fileNameWithoutExt} {
+export class ${fileNameWithoutExt} extends Taon.Base.Entity<${fileNameWithoutExt}, I${fileNameWithoutExt}> implements I${fileNameWithoutExt} {
 
   //#region @backend
-  @Firedev.Orm.Column.Generated()
+  @Taon.Orm.Column.Generated()
   //#endregion
   id: number
 
   //#region @backend
-  @Firedev.Orm.Column.Custom()
+  @Taon.Orm.Column.Custom()
   //#endregion
   exampleProperty: string
 
@@ -84,10 +84,10 @@ export class ${fileNameWithoutExt} extends Firedev.Base.Entity<${fileNameWithout
     const NameController = `${camelCaseUpperFirst}Controller`;
     this.create(relativePath, kebebCaseName, `${NameController}.ts`).file(
       `
-import { Firedev } from 'morphi/src';
+import { Taon } from 'morphi/src';
 import { ${fileNameWithoutExt} } from './${fileNameWithoutExt}';
 
-@Firedev.Controller({
+@Taon.Controller({
   className: '${NameController}',
   entity: ${fileNameWithoutExt},
   //#region @backend
@@ -96,7 +96,7 @@ import { ${fileNameWithoutExt} } from './${fileNameWithoutExt}';
   // }
   //#endregion
 })
-export class ${NameController} extends Firedev.Base.Controller<${fileNameWithoutExt}> {
+export class ${NameController} extends Taon.Base.Controller<${fileNameWithoutExt}> {
 
   //#region @backend
   async initExampleDbData() {

@@ -142,7 +142,7 @@ export class Branding extends BaseFeatureForProject<Project> {
       // ],
     };
 
-    // TODO implement for sharp for firedev branding
+    // TODO implement for sharp for taon branding
     //#region @notForNpm
     try {
       const favicons = require('favicons');

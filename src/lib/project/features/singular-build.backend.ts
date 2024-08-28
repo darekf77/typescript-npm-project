@@ -48,7 +48,7 @@ export class SingularBuild extends BaseFeatureForProject<Project> {
     (() => {
       [
         config.file.package_json,
-        config.file.firedev_jsonc,
+        config.file.taon_jsonc,
         config.file.environment_js,
         config.file.tnpEnvironment_json,
       ].forEach(fileOrFolder => {
@@ -362,8 +362,8 @@ exports.default = start;`,
           })
         ).on('all', (event, f) => {
           f = crossPlatformPath(f);
-          // C:/Users/darek/projects/npm/firedev-projects/firedev-simple-org/main/src/app.ts
-          // C:/Users/darek/projects/npm/firedev-projects/firedev-simple-org
+          // C:/Users/darek/projects/npm/taon-projects/taon-simple-org/main/src/app.ts
+          // C:/Users/darek/projects/npm/taon-projects/taon-simple-org
           // console.log('FIREDEV SINGULAR BUILD CODE WATCHER EVENT')
           const containerLocaiton = this.project.location;
           const childName = _.first(

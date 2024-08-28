@@ -16,7 +16,7 @@ axios.defaults.timeout = 3000;
 
 export async function start(
   argsv: string[],
-  frameworkName: 'tnp' | 'firedev' = 'tnp',
+  frameworkName: 'tnp' | 'taon' = 'tnp',
   mode: 'dist' | 'npm' = 'dist',
 ) {
   config.frameworkName = frameworkName;

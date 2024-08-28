@@ -1,8 +1,8 @@
 # Introduction
 
-## What is firedev?
+## What is taon?
 
-**Firedev** 🔥🔥🔥 is a solution (**global cli tool** & **framework**) for
+**Taon** 🔥🔥🔥 is a solution (**global cli tool** & **framework**) for
 
 \+
 [typescript](https://www.typescriptlang.org/)
@@ -35,7 +35,7 @@
 <br/><br/>
 <br/>
 
-## Philosophy of Firedev
+## Philosophy of Taon
 
 ### 1. One language for browser/backend/database - **TypeScript**
 
@@ -51,7 +51,7 @@ only possible with isomorphic code
 
 ### 6. Every package available everywhere - shared <b>node_modules</b> for similar projects
 
-Firedev has one big npm pacakges container (located in: ~/.firedev/firedev/projects/container-v4 - )
+Taon has one big npm pacakges container (located in: ~/.taon/taon/projects/container-v4 - )
 **There is no need for local node_modules** => many projects takes megabytes instead gigabytes
 
 ### 8. Automation for releasing projects (standalone and organization) to github pages / npm repositories
@@ -65,13 +65,13 @@ Firedev has one big npm pacakges container (located in: ~/.firedev/firedev/proje
 1. NORMAL - sqlite/mysql for database and normal NodeJS server
 
 ```
-firedev start # in any project
+taon start # in any project
 ```
 
 2. WEBSQL - sql.js for database/server in browser development mode
 
 ```
-firedev start --websql  # in any project
+taon start --websql  # in any project
 ```
 
 > WEBSQL mode is a perfect solution for:

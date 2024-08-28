@@ -860,7 +860,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
   // THIS FILE IS GENERATED
   export * from './source';
   // THIS FILE IS GENERATED
-  // please use command: firedev build:watch to see here links for your globally builded lib code files
+  // please use command: taon build:watch to see here links for your globally builded lib code files
   // THIS FILE IS GENERATED
                     `.trimStart(),
       );
@@ -886,7 +886,7 @@ export class CopyManagerOrganization extends CopyManagerStandalone {
 // THIS FILE IS GENERATED
 export * from './lib';
 // THIS FILE IS GENERATED
-// please use command: firedev build:watch to see here links for your globally builded lib code files
+// please use command: taon build:watch to see here links for your globally builded lib code files
 // THIS FILE IS GENERATED
                     `.trimStart(),
       );

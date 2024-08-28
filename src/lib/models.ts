@@ -1,12 +1,12 @@
 import { CoreModels, _ } from 'tnp-core/src';
 
 export namespace Models {
-  export type TestTypeFiredev = 'mocha' | 'jest' | 'cypress';
-  export const TestTypeFiredevArr = [
+  export type TestTypeTaon = 'mocha' | 'jest' | 'cypress';
+  export const TestTypeTaonArr = [
     'mocha',
     'jest',
     'cypress',
-  ] as TestTypeFiredev[];
+  ] as TestTypeTaon[];
 
   export type SaveAction = 'save' | 'show' | 'hide';
 
@@ -47,8 +47,8 @@ export namespace Models {
     'tnp_overrided_dependencies',
   ];
 
-  export interface FiredevLoaderConfig {
-    name?: FiredevLoaders;
+  export interface TaonLoaderConfig {
+    name?: TaonLoaders;
     color?: string;
   }
 
@@ -68,7 +68,7 @@ export namespace Models {
     //#endregion
   }
 
-  export type FiredevLoaders =
+  export type TaonLoaders =
     | 'lds-default'
     | 'lds-ellipsis'
     | 'lds-facebook'
@@ -82,7 +82,7 @@ export namespace Models {
      */
     angularProd?: boolean;
     /**
-     * replace title in firedev app
+     * replace title in taon app
      */
     title?: string;
     /**
@@ -108,12 +108,12 @@ export namespace Models {
          * loder path to image or
          * build in loader config
          */
-        loader?: string | FiredevLoaderConfig;
+        loader?: string | TaonLoaderConfig;
         background?: string;
       };
       /**
        * this loader is presented when
-       * firedev app data is being loader
+       * taon app data is being loader
        * (right after *preAngularBootstrap*)
        */
       afterAngularBootstrap?: {
@@ -121,7 +121,7 @@ export namespace Models {
          * loder path to image or
          * build in loader config
          */
-        loader?: string | FiredevLoaderConfig;
+        loader?: string | TaonLoaderConfig;
         background?: string;
       };
     };
@@ -222,10 +222,10 @@ export namespace Models {
   };
 
   /**
-   * use CoreModels.FiredevJson
+   * use CoreModels.TaonJson
    * @deprecated
    */
-  export interface TnpIPackageJSONOverride extends CoreModels.FiredevJson {
+  export interface TnpIPackageJSONOverride extends CoreModels.TaonJson {
     scripts?: { [script in string]: string };
     description?: string;
     license?: string;
@@ -369,7 +369,7 @@ export namespace Models {
     peerDependencies?: DependenciesFromPackageJsonStyle;
     devDependencies?: DependenciesFromPackageJsonStyle;
     tnp: TnpData & TnpIPackageJSONOverride;
-    firedev: TnpData & TnpIPackageJSONOverride;
+    taon: TnpData & TnpIPackageJSONOverride;
   }
 
   /**

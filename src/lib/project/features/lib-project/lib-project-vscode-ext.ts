@@ -17,7 +17,7 @@ export class LibProjectVscodeExt extends BaseFeatureForProject<Project> {
       Helpers.error(`Project is not vscode extension`, false, true);
     }
     const vsixPackageName = this.extensionVsixName.replace(
-      config.frameworkNames.firedev,
+      config.frameworkNames.taon,
       config.frameworkName,
     );
     // .replace('.vsix', '-') +
@@ -63,7 +63,7 @@ export class LibProjectVscodeExt extends BaseFeatureForProject<Project> {
       tempProj.pathFor(config.file.package_json),
       'name',
       extensionName.replace(
-        config.frameworkNames.firedev,
+        config.frameworkNames.taon,
         config.frameworkName,
       ),
     );
@@ -72,7 +72,7 @@ export class LibProjectVscodeExt extends BaseFeatureForProject<Project> {
       tempProj.pathFor(config.file.package_json),
       'displayName',
       extensionName.replace(
-        config.frameworkNames.firedev,
+        config.frameworkNames.taon,
         config.frameworkName,
       ),
     );
@@ -93,7 +93,7 @@ export class LibProjectVscodeExt extends BaseFeatureForProject<Project> {
     try {
       await Helpers.actionWrapper(
         () => {
-          this.project.run(`firedev-vsce package`).sync();
+          this.project.run(`taon-vsce package`).sync();
         },
         `Building vsix package ` + chalk.bold(vsixPackageName) + `... `,
       );

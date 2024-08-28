@@ -3,7 +3,7 @@
 import { $Global } from '../cli/cli-_GLOBAL_.backend';
 import { fse, json5, os, dateformat } from 'tnp-core/src';
 import { child_process } from 'tnp-core/src';
-import { Firedev, BaseContext } from 'firedev/src';
+import { Taon, BaseContext } from 'taon/src';
 import * as semver from 'semver';
 import {
   PackageJSON,
@@ -51,14 +51,13 @@ import { CoreConfig } from 'tnp-core/src';
 import { BuildOptions, InitOptions, ReleaseOptions } from '../../build-options';
 import { Models } from '../../models';
 import {
-  firedevFrameworkName,
   MESSAGES,
-  firedevRepoPathUserInUserDir,
+  taonRepoPathUserInUserDir,
   tmpBuildPort,
   tmpBaseHrefOverwriteRelPath,
 } from '../../constants';
 import { EnvironmentConfig } from '../features/environment-config/environment-config';
-import { CLI } from 'tnp-cli/src';
+import { CLI } from 'tnp-core/src';
 import { AngularFeBasenameManager } from '../features/basename-manager';
 import { LibraryBuild } from './library-build';
 import { NpmHelpers } from './npm-helpers';
@@ -69,7 +68,7 @@ import { Git } from './git';
 
 const debugWord = 'Debug/Start';
 
-export class FiredevProjectResolve extends BaseProjectResolver<Project> {
+export class TaonProjectResolve extends BaseProjectResolver<Project> {
   //#region methods / type from
   typeFrom(location: string) {
     //#region @backendFunc
@@ -124,7 +123,7 @@ export class FiredevProjectResolve extends BaseProjectResolver<Project> {
     }
     if (!fse.existsSync(location)) {
       Helpers.log(
-        `[firedev-helpers][project.from] Cannot find project in location: ${location}`,
+        `[taon/project][project.from] Cannot find project in location: ${location}`,
         1,
       );
       this.emptyLocations.push(location);
@@ -170,7 +169,7 @@ export class FiredevProjectResolve extends BaseProjectResolver<Project> {
 
     if (_.isString(type) && !LibTypeArr.includes(type)) {
       Helpers.error(
-        `[firedev-helpers][project.nearestTo] wrong type: ${type}`,
+        `[taon/project][project.nearestTo] wrong type: ${type}`,
         false,
         true,
       );
@@ -261,7 +260,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   //#region static
 
   //#region static / instace of resolve
-  static ins = new FiredevProjectResolve(Project);
+  static ins = new TaonProjectResolve(Project);
   //#endregion
 
   //#region static / has resovle core deps and folder
@@ -274,8 +273,8 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     const projectsInUserFolder = crossPlatformPath(
       path.join(
         crossPlatformPath(os.homedir()),
-        '.firedev',
-        firedevFrameworkName,
+        '.taon',
+        config.frameworkNames.taon,
         'projects',
       ),
     );
@@ -286,14 +285,14 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
   //#region static / sync core project
   /**
-   * firedev sync command
+   * taon sync command
    */
   static sync({ syncFromCommand }: { syncFromCommand?: boolean } = {}): void {
     //#region @backendFunc
-    const cwd = firedevRepoPathUserInUserDir;
+    const cwd = taonRepoPathUserInUserDir;
     Helpers.info(`Syncing... Fetching git data... `);
 
-    //#region reset origin of firedev repo
+    //#region reset origin of taon repo
     try {
       Helpers.run(`git reset --hard && git clean -df && git fetch`, {
         cwd,
@@ -301,7 +300,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       }).sync();
     } catch (error) {
       Helpers.error(
-        `[${config.frameworkName} Not able to reset origin of firedev repo: ${config.urlRepoFiredev} in: ${cwd}`,
+        `[${config.frameworkName} Not able to reset origin of taon repo: ${config.urlRepoTaon} in: ${cwd}`,
         false,
         true,
       );
@@ -315,7 +314,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     } catch (error) {
       Helpers.log(error);
       Helpers.error(
-        `[${config.frameworkName} Not able to checkout master branch for :${config.urlRepoFiredev} in: ${cwd}`,
+        `[${config.frameworkName} Not able to checkout master branch for :${config.urlRepoTaon} in: ${cwd}`,
         false,
         true,
       );
@@ -336,7 +335,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       Helpers.log(error);
       Helpers.error(
         `[${config.frameworkName} Not able to pull master branch for :` +
-          `${config.urlRepoFiredev} in: ${crossPlatformPath(cwd)}`,
+          `${config.urlRepoTaon} in: ${crossPlatformPath(cwd)}`,
         false,
         true,
       );
@@ -348,7 +347,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     const tagToCheckout = Project.morphiTagToCheckoutForCurrentCliVersion(cwd);
     const currentBranch = Helpers.git.currentBranchName(cwd);
     Helpers.taskStarted(
-      `Checking out lastest tag ${tagToCheckout} for firedev framework...`,
+      `Checking out lastest tag ${tagToCheckout} for taon framework...`,
     );
     if (currentBranch !== tagToCheckout) {
       try {
@@ -359,7 +358,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       } catch (error) {
         console.log(error);
         Helpers.warn(
-          `[${config.frameworkName} Not ablt to checkout latest tag of firedev framework: ${config.urlRepoFiredev} in: ${cwd}`,
+          `[${config.frameworkName} Not ablt to checkout latest tag of taon framework: ${config.urlRepoTaon} in: ${cwd}`,
           false,
         );
       }
@@ -372,7 +371,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     } catch (error) {
       console.log(error);
       Helpers.warn(
-        `[${config.frameworkName} Not ablt to pull latest tag of firedev framework: ${config.urlRepoFiredev} in: ${cwd}`,
+        `[${config.frameworkName} Not ablt to pull latest tag of taon framework: ${config.urlRepoTaon} in: ${cwd}`,
         false,
       );
     }
@@ -388,7 +387,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       Project.reinstallActiveFrameworkContainers();
     }
 
-    Helpers.success('firedev-framework synced ok');
+    Helpers.success('taon framework synced ok');
     //#endregion
   }
   //#endregion
@@ -398,7 +397,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     //#region @backendFunc
     for (const ver of config.activeFramewrokVersions) {
       const nodeModulesForContainer = crossPlatformPath([
-        firedevRepoPathUserInUserDir,
+        taonRepoPathUserInUserDir,
         `projects/container-${ver}`,
       ]);
       Helpers.run(
@@ -418,7 +417,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   // private static get nodeModulesInstalledForCoreContainer(): boolean {
   //   for (const ver of config.activeFramewrokVersions) {
   //     const nodeModulesForContainer = crossPlatformPath([
-  //       firedevRepoPathUserInUserDir,
+  //       taonRepoPathUserInUserDir,
   //       `projects/container-${ver}`,
   //       config.folder.node_modules,
   //     ]);
@@ -437,16 +436,16 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       return;
     }
     const morhiVscode = crossPlatformPath([
-      path.dirname(firedevRepoPathUserInUserDir),
-      'firedev/.vscode',
+      path.dirname(taonRepoPathUserInUserDir),
+      'taon/.vscode',
     ]);
 
     if (
-      !fse.existsSync(firedevRepoPathUserInUserDir) &&
+      !fse.existsSync(taonRepoPathUserInUserDir) &&
       !global.skipCoreCheck
     ) {
-      if (!fse.existsSync(path.dirname(firedevRepoPathUserInUserDir))) {
-        fse.mkdirpSync(path.dirname(firedevRepoPathUserInUserDir));
+      if (!fse.existsSync(path.dirname(taonRepoPathUserInUserDir))) {
+        fse.mkdirpSync(path.dirname(taonRepoPathUserInUserDir));
       }
 
       CLI.installEnvironment(config.required);
@@ -466,15 +465,15 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       }
 
       try {
-        child_process.execSync(`git clone ${config.urlRepoFiredev}`, {
-          cwd: path.dirname(firedevRepoPathUserInUserDir),
+        child_process.execSync(`git clone ${config.urlRepoTaon}`, {
+          cwd: path.dirname(taonRepoPathUserInUserDir),
           stdio: [0, 1, 2],
         });
         Helpers.remove(morhiVscode);
       } catch (error) {
         Helpers.error(
-          `[${config.frameworkName}][config] Not able to clone repository: ${config.urlRepoFiredev} in:
-       ${firedevRepoPathUserInUserDir}`,
+          `[${config.frameworkName}][config] Not able to clone repository: ${config.urlRepoTaon} in:
+       ${taonRepoPathUserInUserDir}`,
           false,
           true,
         );
@@ -504,7 +503,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     // TODO (remove this) this is causing problems
     // if (
     //   !this.nodeModulesInstalledForCoreContainer &&
-    //   config.frameworkName === 'firedev' &&
+    //   config.frameworkName === 'taon' &&
     //   !global.skipCoreCheck
     // ) {
     //   Project.reinstallActiveFrameworkContainers();
@@ -520,12 +519,12 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
     if (
       global['frameworkName'] &&
-      global['frameworkName'] === firedevFrameworkName
+      global['frameworkName'] === config.frameworkNames.taon
     ) {
       const joined = partOfPath.join('/');
 
       let pathResult = joined.replace(
-        config.dirnameForTnp + '/' + this.firedevProjectsRelative,
+        config.dirnameForTnp + '/' + this.taonProjectsRelative,
         this.projectsInUserFolder,
       );
 
@@ -538,9 +537,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   }
   //#endregion
 
-  //#region static / firedev relative projects pathes
-  private static get firedevProjectsRelative() {
-    return `../firedev/projects`;
+  //#region static / taon relative projects pathes
+  private static get taonProjectsRelative() {
+    return `../taon/projects`;
   }
   //#endregion
 
@@ -553,13 +552,13 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     version = !version || version === 'v1' ? '' : (`-${version}` as any);
     if (version === 'v4') {
       Helpers.warn(
-        `[firedev-helpers] v4 is not supported anymore.. use v16 instead`,
+        `[taon/project] v4 is not supported anymore.. use v16 instead`,
       );
     }
     const result = {
       container: this.pathResolved(
         config.dirnameForTnp,
-        `${this.firedevProjectsRelative}/container${version}`,
+        `${this.taonProjectsRelative}/container${version}`,
       ),
       projectByType: (libType: CoreModels.NewFactoryType) => {
         if (libType === 'vscode-ext') {
@@ -569,12 +568,12 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
           }
           return this.pathResolved(
             config.dirnameForTnp,
-            `${this.firedevProjectsRelative}/container${version}/${libType}${version}`,
+            `${this.taonProjectsRelative}/container${version}/${libType}${version}`,
           );
         }
         return this.pathResolved(
           config.dirnameForTnp,
-          `${this.firedevProjectsRelative}/container${version}/${libType}${version}`,
+          `${this.taonProjectsRelative}/container${version}/${libType}${version}`,
         );
       },
     };
@@ -606,7 +605,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
      ${projectPath}
      ${projectPath.replace(/\//g, '\\\\')}
      ${crossPlatformPath(projectPath)}
-     [firedev-helpers] Bad library type "${libraryType}" for this framework version "${version}"
+     [taon/project] Bad library type "${libraryType}" for this framework version "${version}"
 
      `,
         false,
@@ -874,7 +873,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   /**
    * @overload
    */
-  public get ins(): FiredevProjectResolve {
+  public get ins(): TaonProjectResolve {
     return Project.ins;
   }
   //#endregion
@@ -1425,7 +1424,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       },
       //#endregion
       '.prettierignore': `
-# This file is generated by firedev
+# This file is generated by taon.dev
 /build
 /coverage
 /e2e
@@ -1614,7 +1613,7 @@ trim_trailing_whitespace = false
    'smartContainerBuildTarget',
  )}:
 
- file: ${config.file.firedev_jsonc}
+ file: ${config.file.taon_jsonc}
 
    ...
      smartContainerBuildTarget: <name of main project>
@@ -2024,7 +2023,7 @@ trim_trailing_whitespace = false
         config.folder.assets,
         config.folder.websql,
         config.folder.browser,
-        config.file.firedev_jsonc,
+        config.file.taon_jsonc,
         config.file.tnpEnvironment_json,
         config.file._gitignore,
         config.file._npmignore,
@@ -2719,7 +2718,7 @@ processing...
       return;
     }
     await Helpers.killProcessByPort(DEFAULT_PORT.DIST_SERVER_DOCS);
-    const commandHostLoclDocs = `firedev-http-server -s -p ${DEFAULT_PORT.DIST_SERVER_DOCS} --base-dir ${this.name}`;
+    const commandHostLoclDocs = `taon-http-server -s -p ${DEFAULT_PORT.DIST_SERVER_DOCS} --base-dir ${this.name}`;
 
     // console.log({
     //   cwd, commandHostLoclDocs
@@ -3057,7 +3056,7 @@ ${otherProjectNames
           outputLineReplace: (line: string) => {
             if (isStandalone) {
               if (line.startsWith('WARNING: postcss-url')) {
-                return ' --- [firedev] IGNORED WARN ---- ';
+                return ' --- [taon] IGNORED WARN ---- ';
               }
 
               line = line.replace(`projects/${this.name}/src/`, `./src/`);
@@ -3197,7 +3196,7 @@ ${otherProjectNames
         }
 
         if (productionModeButIncludePackageJsonDeps) {
-          //#region release production backend build for firedev/tnp specyfic
+          //#region release production backend build for taon/tnp specyfic
 
           await incrementalBuildProcess.start(
             'isomorphic compilation (only browser) ',
@@ -3386,7 +3385,7 @@ ${otherProjectNames
     //#region @backendFunc
     this.__copyWhenExist('bin', destinations);
     this.__linkWhenExist(config.file.package_json, destinations);
-    this.__copyWhenExist(config.file.firedev_jsonc, destinations);
+    this.__copyWhenExist(config.file.taon_jsonc, destinations);
     this.__copyWhenExist('.npmrc', destinations);
     this.__copyWhenExist('.npmignore', destinations);
     this.__copyWhenExist('.gitignore', destinations);
@@ -3464,7 +3463,7 @@ ${otherProjectNames
       .concat([
         ...this.__resources,
         ...(this.__isSmartContainerChild
-          ? [config.file._npmignore, config.file.firedev_jsonc]
+          ? [config.file._npmignore, config.file.taon_jsonc]
           : [config.file._npmignore]),
       ])
       .forEach(res => {
@@ -3718,7 +3717,7 @@ ${otherProjectNames
     if (config.frameworkName === 'tnp') {
       const pathToCheck = crossPlatformPath([
         projTnp.location,
-        config.file.firedev_jsonc,
+        config.file.taon_jsonc,
       ]);
       const value = Helpers.readValueFromJsonC(
         pathToCheck,
@@ -3730,7 +3729,7 @@ ${otherProjectNames
       trusted = value;
     }
 
-    if (config.frameworkName === 'firedev') {
+    if (config.frameworkName === 'taon') {
       const value = Helpers.readValueFromJsonC(
         crossPlatformPath([projTnp.location, config.file.tnpEnvironment_json]),
         `packageJSON.tnp.core.dependencies.trusted.${this.__frameworkVersion}`,
@@ -3762,14 +3761,14 @@ ${otherProjectNames
       const value = Helpers.readValueFromJsonC(
         crossPlatformPath([
           projTnp.location,
-          config.file.firedev_jsonc, // TODO replace with firedev.json5 in future
+          config.file.taon_jsonc,
         ]),
         `core.dependencies.trustedMaxMajor.${this.__frameworkVersion}`,
       );
       trustedValue = value;
     }
 
-    if (config.frameworkName === 'firedev') {
+    if (config.frameworkName === 'taon') {
       const file = crossPlatformPath([
         projTnp.location,
         config.file.tnpEnvironment_json,
@@ -3798,14 +3797,14 @@ ${otherProjectNames
       const value = Helpers.readValueFromJson(
         crossPlatformPath([
           projTnp.location,
-          config.file.firedev_jsonc, // TODO replace with firedev.json5 in future
+          config.file.taon_jsonc, // TODO replace with taon.jsonc in future
         ]),
         `core.dependencies.additionalTrusted`,
       );
       trustedValue = value;
     }
 
-    if (config.frameworkName === 'firedev') {
+    if (config.frameworkName === 'taon') {
       const file = crossPlatformPath([
         projTnp.location,
         config.file.tnpEnvironment_json,
@@ -4072,7 +4071,7 @@ ${otherProjectNames
     ) as any;
     if (!coreContainer) {
       Helpers.error(
-        `You need to sync firedev. Try command:
+        `You need to sync taon. Try command:
 
       ${config.frameworkName} sync
 
@@ -4098,16 +4097,16 @@ ${otherProjectNames
     }
     //#endregion
 
-    //#region prevent empty firedev node_modules
+    //#region prevent empty taon node_modules
     await this.coreContainer.__node_modules.reinstallIfNeeded();
     //#endregion
 
     //#region prevent not requested framework version
     if (this.__frameworkVersionLessThan('v4')) {
       Helpers.error(
-        `Please upgrade firedev framework version to to at least v4
+        `Please upgrade taon framework version to to at least v4
 
-      ${config.file.firedev_jsonc} => version => should be at least 4
+      ${config.file.taon_jsonc} => version => should be at least 4
 
       `,
         false,
@@ -4138,7 +4137,7 @@ ${otherProjectNames
       );
       //#endregion
 
-      //#region create firedev context for main lib code build ports assignations
+      //#region create taon context for main lib code build ports assignations
       const projectInfoPort = await this.assignFreePort(4100);
       this.__setProjectInfoPort(projectInfoPort);
       this.backendPort = PortUtils.instance(
@@ -4152,7 +4151,7 @@ ${otherProjectNames
 
       const hostForBuild = `http://localhost:${projectInfoPort}`;
 
-      // Firedev.destroyContext(hostForBuild);
+      // Taon.destroyContext(hostForBuild);
       if (!buildOptions?.skipProjectProcess) {
         //#region check build message
         console.info(`
@@ -4168,7 +4167,7 @@ ${otherProjectNames
 
         Helpers.taskStarted(`starting project service... ${hostForBuild}`);
 
-        const ProjectBuildContext = Firedev.createContext(() => ({
+        const ProjectBuildContext = Taon.createContext(() => ({
           contextName: 'ProjectBuildContext',
           host: hostForBuild,
           contexts: { BaseContext },
@@ -4238,7 +4237,7 @@ ${otherProjectNames
       buildOptions.baseHref = fromFileBaseHref;
       //#endregion
 
-      //#region create firedev context for for client app remote connection to build server
+      //#region create taon context for for client app remote connection to build server
       if (!libContextExists) {
         const projectInfoPortFromFile = Number(
           Helpers.readFile(this.pathFor(tmpBuildPort)),
@@ -4251,7 +4250,7 @@ ${otherProjectNames
         const hostForAppWorker = `http://localhost:${projectInfoPortFromFile}`;
         // console.log({ hostForAppWorker })
         if (!buildOptions?.skipProjectProcess) {
-          const ProjectBuildContext = Firedev.createContext(() => ({
+          const ProjectBuildContext = Taon.createContext(() => ({
             contextName: 'ProjectBuildContext',
             remoteHost: hostForAppWorker,
             contexts: { BaseContext },
@@ -4937,7 +4936,7 @@ ${config.frameworkName} start
       return '';
     }
     this.setValueToJSONC(
-      config.file.firedev_jsonc,
+      config.file.taon_jsonc,
       'version',
       frameworkVersionArg,
     );

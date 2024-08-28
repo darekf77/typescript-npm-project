@@ -68,12 +68,12 @@ export class $Test extends CommandLineFeature<{}, Project> {
     }
 
     const [possibleTest] = args.split(' ');
-    const testType = Models.TestTypeFiredevArr.includes(possibleTest as any)
+    const testType = Models.TestTypeTaonArr.includes(possibleTest as any)
       ? possibleTest
       : void 0;
     const res = testType
       ? testType // @ts-ignore
-      : await Helpers.consoleGui.select<Models.TestTypeFiredev>(
+      : await Helpers.consoleGui.select<Models.TestTypeTaon>(
           `What do you want to test ? ${
             !watch ? '(single run ' : '(watch mode '
           } ${debug ? '- with debugger connected' : '- without debugger'})`,

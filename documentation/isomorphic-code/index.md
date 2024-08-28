@@ -1,4 +1,4 @@
-# Advantages of Isomorphic Code & Firedev Framework
+# Advantages of Isomorphic Code & Taon Framework
 
 Isomorphic code in TypeScript offers a range of advantages for web developers. 
 By enabling code reuse on both client and server sides,
@@ -15,12 +15,12 @@ Angular templates - CHECK!
 <b>example.ts</b>
 
 ```ts
-import { Firedev } from 'firedev';
+import { Taon } from 'taon';
 
-@Firedev.Entity()
+@Taon.Entity()
 class User {
   //#region @backend
-  @Firedev.Orm.Column.Generated()
+  @Taon.Orm.Column.Generated()
   //#endregion
   id: string;
 }
@@ -29,9 +29,9 @@ class User {
 
 your browser will get code below:
 ```ts
-import { Firedev } from 'firedev/browser';
+import { Taon } from 'taon/browser';
 
-@Firedev.Entity()
+@Taon.Entity()
 class User {
   /* */
   /* */
@@ -46,7 +46,7 @@ class User {
 <b>common.service.ts</b>
 
 ```ts
-import { Firedev } from 'firedev';
+import { Taon } from 'taon';
 //@region @browser
 import { Injectable } from '@angular/core';
 //#endregion
@@ -64,7 +64,7 @@ class CommonService {
 
 your backend will get code below:
 ```ts
-import { Firedev } from 'firedev';
+import { Taon } from 'taon';
 /* */
 /* */
 /* */
@@ -82,17 +82,17 @@ class CommonService {
 
 ### 2. Additional "Websql Mode" for writing backend in browser!
 - Instead running local server - run everything (db,backend) in browser thanks to sql.js/typeorm !
-- This is possible ONLY in firedev with highest possible abstraction concepts
+- This is possible ONLY in taon with highest possible abstraction concepts
 
 <b>example.ts</b>
 
 ```ts
-import { Firedev } from 'firedev';
+import { Taon } from 'taon';
 
-@Firedev.Entity()
+@Taon.Entity()
 class User {
   //#region @websql
-  @Firedev.Orm.Column.Generated()
+  @Taon.Orm.Column.Generated()
   //#endregion
   id: string;
 }
@@ -101,13 +101,13 @@ class User {
 
 your browser will get code below:
 ```ts
-import { Firedev } from 'firedev/websql';
+import { Taon } from 'taon/websql';
 
 
-@Firedev.Entity()
+@Taon.Entity()
 class User {
  //#region @websql
-  @Firedev.Orm.Column.Generated()
+  @Taon.Orm.Column.Generated()
   //#endregion
   id: string;
 }
@@ -117,18 +117,18 @@ Database columns can be created in browser/frontend with sql.js !
 
 <p style="text-align: center;"><img src="../assets/images/admin-mode.png" ></p>
 
-\+ also you can set in *Firedev Admin Mode* if you prefere to 
+\+ also you can set in *Taon Admin Mode* if you prefere to 
  clear database after each page refresh.
 
 
 ### 3. Smooth REST api
 - define host only once for backend and frontend!
-- no more of ugly acces to server... firedev takes it to next level !
+- no more of ugly acces to server... taon takes it to next level !
 - in Angular/RxJS environemtn => it more than pefect solution !
 
 user.controller.ts
 ```ts
-@Firedev.Controller({
+@Taon.Controller({
   entity: User
 })
 class UserController {
@@ -136,8 +136,8 @@ class UserController {
                       // name 'helloAmazingWorld' 
                       // from this class function 
                       // is being use for creating
-  @Firedev.Http.GET() // expressjs server routes 
-  helloAmazingWorld():Firedev.Response<string> {  
+  @Taon.Http.GET() // expressjs server routes 
+  helloAmazingWorld():Taon.Response<string> {  
     //region @backendFunc
     return async () => {
       return `hello world`;
@@ -150,7 +150,7 @@ class UserController {
 
 user.ts
 ```ts
-@Firedev.Entity()
+@Taon.Entity()
 class User {
   static ctrl: UserController; // automatically injected
   static helloAmazingWorld() {
@@ -179,7 +179,7 @@ app.module.ts
 ```ts
 const host = 'http://localhost:4444'; // host defined once!
 
-const context = await Firedev.init({
+const context = await Taon.init({
     host,
     controllers: [UserController],
     entities: [User],
@@ -196,22 +196,22 @@ context.host // -> available on backend and frontend !
 ### 4. CRUD api in 60 seconds or less...
 - use observable or promises .. .whatever you like
 ```ts
-@Firedev.Entity()
+@Taon.Entity()
 class Task {
   ctrl: TaskController; // injected automatically
   //#region @backend
-  @Firedev.Orm.Column.Generated()
+  @Taon.Orm.Column.Generated()
   //#endregion
   id: number;
 
   //#region @backend
-  @Firedev.Orm.Column.Column({ type: 'varchar', length: 100 })
+  @Taon.Orm.Column.Column({ type: 'varchar', length: 100 })
   //#endregion
   content: string;
 }
 
-@Firedev.Controlle({ entity: Task })
-export class TaskController extends Firedev.Base.Controller<Task>{ } 
+@Taon.Controlle({ entity: Task })
+export class TaskController extends Taon.Base.Controller<Task>{ } 
 
 @Component({
   // ...
@@ -239,11 +239,11 @@ export class TasksComponent implements OnInit {
 
 task.ts
 ```ts
-@Firedev.Entity()
+@Taon.Entity()
 class Task {
   static ctrl: TaskController; // automatically injected
   //#region @backend
-  @Firedev.Orm.Column.Generated()
+  @Taon.Orm.Column.Generated()
   //#endregion
   id: number;
 }
@@ -251,8 +251,8 @@ class Task {
 
 task.controller.ts
 ```ts
-@Firedev.Controlle({ entity: Task })
-export class TaskController extends Firedev.Base.Controller<Task>{ }
+@Taon.Controlle({ entity: Task })
+export class TaskController extends Taon.Base.Controller<Task>{ }
 ```
 
 task.component.ts
@@ -265,7 +265,7 @@ export class TasksComponent implements OnInit, OnDestroy {
 
   @Input(); task: Task;
   ngOnInit() {
-    Firedev.Realtime.Browser.listenChangesEntityObj(this.task).pipe(
+    Taon.Realtime.Browser.listenChangesEntityObj(this.task).pipe(
       takeUntil(this.$destroyed)
       exhaustMap(()=> {
         return Tasks.ctrl.getBy(this.task.id).received.observable.pipe(

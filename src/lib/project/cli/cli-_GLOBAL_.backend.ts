@@ -27,10 +27,9 @@ import {
 import { Helpers, BaseCommandLine, UtilsNpm } from 'tnp-helpers/src';
 import { PackagesRecognition } from '../features/package-recognition/packages-recognition';
 import { BrowserCodeCut } from '../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
-import { CLI } from 'tnp-cli/src';
+import { CLI } from 'tnp-core/src';
 import { Models } from '../../models';
 import * as psList from 'ps-list';
-import { MESSAGES, firedevRepoPathUserInUserDir } from '../../constants';
 import { MagicRenamer } from 'magic-renamer/src';
 import * as semver from 'semver';
 import { walk } from 'lodash-walk-object/src';
@@ -166,7 +165,7 @@ export class $Global extends BaseCommandLine<{}, Project> {
       'aaa.txt',
     ]);
     const options: IncrementalWatcherOptions = {
-      name: `[firedev]  properwatchtest (testing only)`,
+      name: `[taon]  properwatchtest (testing only)`,
       ignoreInitial: true,
     };
 
@@ -935,15 +934,15 @@ export class $Global extends BaseCommandLine<{}, Project> {
     // Helpers.sleep(5);
     // global.spinner?.stop();
     // log.data('Hellleoeoeo')
-    const tnp = Project.ins.Tnp;
-    const firedev = Project.ins.From([
-      fse.realpathSync(path.dirname(tnp.location)),
-      config.frameworkNames.firedev,
+    const tnpProj = Project.ins.Tnp;
+    const taonProj = Project.ins.From([
+      fse.realpathSync(path.dirname(tnpProj.location)),
+      config.frameworkNames.taon,
     ]);
     Helpers.success(`
 
-  Firedev: ${firedev?.version ? `v${firedev.version}` : '-'}
-  Tnp: ${tnp?.version ? `v${tnp.version}` : '-'}
+  Taon: ${taonProj?.version ? `v${taonProj.version}` : '-'}
+  Tnp: ${tnpProj?.version ? `v${tnpProj.version}` : '-'}
 
     `);
     this._exit();
@@ -1312,10 +1311,10 @@ ${this.project.children
       const packageName = allDepsKeys[index];
       const currentPackageVersion = allDeps[packageName];
       const currentVerObj = getVerObj(currentPackageVersion);
-      const firedevJsonContent = this.project.readFile(
-        config.file.firedev_jsonc,
+      const taonJsonContent = this.project.readFile(
+        config.file.taon_jsonc,
       );
-      const tags = Utils.json.getAtrributies(packageName, firedevJsonContent);
+      const tags = Utils.json.getAtrributies(packageName, taonJsonContent);
       Helpers.info(
         `(${index + 1} / ${allDepsKeys.length}) ` +
           `Downloading info about "${packageName}" (current ver: ${currentPackageVersion})`,
@@ -1409,7 +1408,7 @@ ${this.project.children
         this.project.npmHelpers.updateDependency({
           packageName,
           version: currentPackageVersion,
-          updateFiredevJsonFirst: true,
+          updateTaonJsonFirst: true,
         });
         continue;
       }
@@ -1529,13 +1528,13 @@ ${this.project.children
         await this.project.npmHelpers.updateDep({
           packageName,
           version: `${prefix}${latestToUpdate}`,
-          updateFiredevJsonFirst: true,
+          updateTaonJsonFirst: true,
         });
       } else if (whatToDo === 'delete') {
         await this.project.npmHelpers.updateDep({
           packageName,
           version: null,
-          updateFiredevJsonFirst: true,
+          updateTaonJsonFirst: true,
         });
       } else if (whatToDo === 'manual') {
         while (true) {
@@ -1552,7 +1551,7 @@ ${this.project.children
             await this.project.npmHelpers.updateDep({
               packageName,
               version,
-              updateFiredevJsonFirst: true,
+              updateTaonJsonFirst: true,
             });
             break;
           } else {
@@ -1670,7 +1669,7 @@ ${this.project.children
   //#region @notForNpm
   getJsonCAttrs() {
     console.log(`Scannign for args in jsonc files...`);
-    const jsoncContent = this.project.readFile(config.file.firedev_jsonc);
+    const jsoncContent = this.project.readFile(config.file.taon_jsonc);
     walk.Object(Helpers.parse(jsoncContent, true), (value, jsonPath) => {
       if (!this.firstArg || jsonPath.includes(this.firstArg)) {
         // console.log('PATH: ' + jsonPath);
@@ -1703,9 +1702,9 @@ ${this.project.children
   //#endregion
   //#endregion
 
-  //#region not for npm / tnp fix firedev json
+  //#region not for npm / tnp fix taon json
   //#region @notForNpm
-  async tnpFixFiredevJson() {
+  async tnpFixTaonJson() {
     this._exit();
   }
   //#endregion

@@ -1,11 +1,11 @@
 export namespace AssetListHelper {
   // export enum AssetListRelativePathType {
   //   /**
-  //    * 	/src/assets/assets-for/firedev-ui/arnold.png
+  //    * 	/src/assets/assets-for/taon/arnold.png
   //    */
   //   FROM_PROX_PROJ = 'FROM_PROX_PROJ',
   //   /**
-  //    *  assets/assets-for/firedev-ui/arnold.png
+  //    *  assets/assets-for/taon/arnold.png
   //    */
   //   FOR_BROWSER = 'FOR_BROWSER',
   //   /**

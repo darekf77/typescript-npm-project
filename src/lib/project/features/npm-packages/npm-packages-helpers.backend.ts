@@ -11,7 +11,7 @@ import { config } from 'tnp-config/src';
 import { CoreModels } from 'tnp-core/src';
 //#endregion
 
-const noTrace = global.hideLog && config.frameworkName === 'firedev';
+const noTrace = global.hideLog && config.frameworkName === 'taon';
 const showNpmCommandOutput = !noTrace;
 
 export function resolvePacakgesFromArgs(args: string[]): CoreModels.Package[] {
@@ -53,7 +53,7 @@ export function executeCommand(command: string, project: Project) {
 
    `);
 
-  if (config.frameworkName === 'firedev' && project.__isContainerCoreProject) {
+  if (config.frameworkName === 'taon' && project.__isContainerCoreProject) {
     Helpers.info(`
     [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]
     This may take a long time (usually 10-15min on 0.5Gb/s internet connection)...

@@ -676,7 +676,7 @@ function beforeSaveAction(
     }
     //#region  install latest version of package
 
-    // TODO firedev should be handled here
+    // TODO taon should be handled here
     Object.keys(project.__packageJson.data.devDependencies)
       .filter(key => allTrusted.includes(key) || key === 'typeorm')
       .forEach(packageIsomorphicName => {
@@ -827,7 +827,7 @@ function beforeSaveAction(
     } catch (error) {
       // debugger;
       Helpers.error(
-        `[firedev] Not able to get last version of package: ${pkgNameToCheckVer}`,
+        `[taon] Not able to get last version of package: ${pkgNameToCheckVer}`,
         false,
         true,
       );
@@ -889,7 +889,7 @@ function beforeSaveAction(
     ) {
       const versionFromContainerName = `^${_.last(project.universalPackageName.split('-v'))}`;
       // console.log('versionFromContainerName', versionFromContainerName);
-      project.__packageJson.data.dependencies['firedev'] =
+      project.__packageJson.data.dependencies['taon'] =
         versionFromContainerName;
     }
 
@@ -898,7 +898,7 @@ function beforeSaveAction(
 
   if (project.name === 'tnp') {
     delete project.__packageJson.data.dependencies['tnp'];
-    delete project.__packageJson.data.dependencies['firedev'];
+    delete project.__packageJson.data.dependencies['taon'];
   }
 
   _.keys(project.__packageJson.data.dependencies).forEach(depName => {

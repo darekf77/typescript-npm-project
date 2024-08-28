@@ -5,7 +5,7 @@
 that can be relaased in npm as normal packages
 (example **my-standalone-app**)
 ```
-firedev new my-standalone-app
+taon new my-standalone-app
 ```
 ---
 
@@ -14,54 +14,54 @@ firedev new my-standalone-app
 that can be released in npm as organization packages 
 (example **@organization/my-app-or-lib **)
 ```
-firedev new organization/my-app-or-lib 
+taon new organization/my-app-or-lib 
 
 # and then you can add another one:
 
-firedev new organization/my-next-app-lib
+taon new organization/my-next-app-lib
 ```
 ---
 \+ Release app to github pages or/and npm
 ```
-firedev release
+taon release
 
-firedev ar # quick patch release of lib to npm 
-firedev adr # quick release of app to github with last configuration
+taon ar # quick patch release of lib to npm 
+taon adr # quick release of app to github with last configuration
 ```
 ---
 
-\+ Synchronize latest global firedev's packages container
+\+ Synchronize latest global taon's packages container
 ```
-firedev sync
+taon sync
 ```
-\+ Update firedev from npm and local container from npm packages
+\+ Update taon from npm and local container from npm packages
 ```
-firedev au  #  auto:update
+taon au  #  auto:update
 
-# above command will also perform "firedev sync" 
+# above command will also perform "taon sync" 
 ```
 ---
-\+ Check firedev version
+\+ Check taon version
 ```
-firedev version
+taon version
 ```
 ## Projects structure
 - **Organization project (smart container)** has many "small" **standalone projects** inside itself.
 - Standalone projects can be also use as global cli terminal tools
-- In ANY firedev project property "name" in package.json MUST be equal project's folder basename
+- In ANY taon project property "name" in package.json MUST be equal project's folder basename
 - organization subprojects can be easily transformed to standalone projects just by taking them out of smart container
 
 <p style="text-align: center;"><img src="../assets/images/code-structure.png" ></p>
 
 ## CLI commands
 
-### Firedev auto-update
+### Taon auto-update
 
-Triger auto-update of firedev's global cli tool and core containers
+Triger auto-update of taon's global cli tool and core containers
 
 ```
-firedev autoupdate
-firedev au
+taon autoupdate
+taon au
 ```
 
 
@@ -70,24 +70,24 @@ firedev au
 Add -verbose flag to any command to see more of debugging data
 
 ```
-firedev any-firedev-command -verbose
+taon any-taon-command -verbose
 ```
 
 ### Creating apps/libs as standalone or smart container (organization) projects
 
 ```
-firedev new my-standalone-lib-app
-firedev new my-workspace/my-workspace-child-lib-app
-firedev container my-new-container
+taon new my-standalone-lib-app
+taon new my-workspace/my-workspace-child-lib-app
+taon container my-new-container
 ```
 
 ### Initing / clearing temporary files for project 
 Everytime you are starting lib build or you wan't to clear all project
 temporary data.. use these commands
 ```
-firedev clear
-firedev cl
-firedev init # => is a part of lib build and you don't need to use it
+taon clear
+taon cl
+taon init # => is a part of lib build and you don't need to use it
 
 ```
 
@@ -97,9 +97,9 @@ Quicket way to start local development of app and lib build in the same process
 
 ```
 # global lib build with angular app
-firedev start
-firedev start --port 4444
-firedev start --websql
+taon start
+taon start --port 4444
+taon start --websql
 ```
 
 
@@ -109,14 +109,14 @@ Don't waste your local resources and build/serve only things that you need
 
 ```
 # lib build
-firedev build
-firedev build:watch
-firedev b
-firedev bw
+taon build
+taon build:watch
+taon b
+taon bw
 
 # app build
-firedev app
-firedev app child-project-name
+taon app
+taon app child-project-name
 ```
 
 ### Releasing to npm repository or/and  github/gitlab pages
@@ -125,22 +125,22 @@ Easy release of app or libs for standalone/organization projects
 
 ```
 # path release
-firedev release
-firedev patch:release
-firedev r
-firedev release
-firedev automatic:release
-firedev ar
+taon release
+taon patch:release
+taon r
+taon release
+taon automatic:release
+taon ar
 
 # minor release
-firedev minor:release
-firedev minor
+taon minor:release
+taon minor
 
 # major relase
-firedev major:release
-firedev major
+taon major:release
+taon major
 
-firedev set:major:ver 14 # can be done in container for all pacakges
+taon set:major:ver 14 # can be done in container for all pacakges
 ```
 
 ### Github pushing/puling projects
@@ -149,19 +149,19 @@ Puling and pushing git repos. Organization projects (smart containers) can be mo
 or childs can be split just like in containers.
 
 ```
-firedev pull
-firedev push
-firedev pullall
-firedev reset
-firedev rebase
-firedev push:feature 
-firedev pf
-firedev push:fix 
-firedev pfix
-firedev pchore
-firedev pc
-firedev prefactor
-firedev pref
+taon pull
+taon push
+taon pullall
+taon reset
+taon rebase
+taon push:feature 
+taon pf
+taon push:fix 
+taon pfix
+taon pchore
+taon pc
+taon prefactor
+taon pref
 ```
 
 ### Testing
@@ -169,31 +169,31 @@ firedev pref
 Unit/Integration testing
 
 ```
-firedev test
-firedev test:watch
-firedev test:watch:debug
+taon test
+taon test:watch
+taon test:watch:debug
 ```
 
 
-### Firedev project update
+### Taon project update
 
-Update firedev project configuration (linked project, firedev framework versiopn etc.)
+Update taon project configuration (linked project, taon framework versiopn etc.)
 
 ```
-firedev update
-firedev up
+taon update
+taon up
 ```
 
-### Firedev extension for Visual Studio Code 
+### Taon extension for Visual Studio Code 
 
 Install vscode plugin
 
 ```
-firedev vscode:ext
-firedev ext
+taon vscode:ext
+taon ext
 ```
 
-## Rules of writing firedev code
+## Rules of writing taon code
 ### Files with special extension and purpose:
 
 \+ Frontend only files (available also in websql backend mode)

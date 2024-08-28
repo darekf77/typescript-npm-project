@@ -28,16 +28,16 @@ export class Git extends BaseGit<Project> {
 
 
     // ? TODO not needed anymore
-    // if (this.project.name === 'firedev') {
+    // if (this.project.name === 'taon') {
     //   config.activeFramewrokVersions.forEach(frameworkVersion => {
     //     // console.log(`Active Framework: ${frameworkVersion}`)
-    //     const firedevProjectContainerPath = path.join(
+    //     const taonProjectContainerPath = path.join(
     //       this.project.location,
     //       'projects',
     //       `container${frameworkVersion === 'v1' ? '' : `-${frameworkVersion}`}`,
     //     );
     //     const containerCoreForVersion = this.project.ins.From(
-    //       firedevProjectContainerPath,
+    //       taonProjectContainerPath,
     //     ) as Project;
     //     if (containerCoreForVersion) {
     //       Helpers.info(
@@ -46,11 +46,11 @@ export class Git extends BaseGit<Project> {
     //         } in ${this.project.name}`,
     //       );
     //       containerCoreForVersion.__packageJson.save(
-    //         'Updating firedev container',
+    //         'Updating taon container',
     //       );
     //     } else {
     //       Helpers.warn(
-    //         `[firedev][hotfix] Not able to find container for framework version ${frameworkVersion}`,
+    //         `[taon][hotfix] Not able to find container for framework version ${frameworkVersion}`,
     //       );
     //     }
     //   });

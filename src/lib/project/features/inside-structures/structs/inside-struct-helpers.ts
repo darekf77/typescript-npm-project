@@ -184,7 +184,7 @@ export function appfileTemplate(project: Project) {
   // TODO quick fix for @ browser remover
   return `
 ${'//#reg' + 'ion'} imports
-import { Firedev, BaseContext } from 'firedev/src';
+import { Taon, BaseContext } from 'taon/src';
 import { Observable, map } from 'rxjs';
 import { HOST_BACKEND_PORT } from './app.hosts';
 ${'//#reg' + 'ion'} @${'bro' + 'wser'}
@@ -227,7 +227,7 @@ ${'//#reg' + 'ion'} @${'bro' + 'wser'}
   providedIn:'root'
 })
 export class UserApiService {
-  userControlller = Firedev.inject(()=> MainContext.getClass(UserController))
+  userControlller = Taon.inject(()=> MainContext.getClass(UserController))
   getAll() {
     return this.userControlller.getAll()
       .received
@@ -250,18 +250,18 @@ ${'//#end' + 'region'}
 ${'//#end' + 'region'}
 
 ${'//#reg' + 'ion'}  ${project.name} entity
-@Firedev.Entity({ className: 'User' })
-class User extends Firedev.Base.AbstractEntity {
+@Taon.Entity({ className: 'User' })
+class User extends Taon.Base.AbstractEntity {
   ${'//#reg' + 'ion'} @${'web' + 'sql'}
-  @Firedev.Orm.Column.String()
+  @Taon.Orm.Column.String()
   ${'//#end' + 'region'}
   name?: string;
 }
 ${'//#end' + 'region'}
 
 ${'//#reg' + 'ion'}  ${project.name} controller
-@Firedev.Controller({ className: 'UserController' })
-class UserController extends Firedev.Base.CrudController<User> {
+@Taon.Controller({ className: 'UserController' })
+class UserController extends Taon.Base.CrudController<User> {
   entityClassResolveFn = ()=> User;
   ${'//#reg' + 'ion'} @${'web' + 'sql'}
   async initExampleDbData(): Promise<void> {
@@ -274,7 +274,7 @@ class UserController extends Firedev.Base.CrudController<User> {
 ${'//#end' + 'region'}
 
 ${'//#reg' + 'ion'}  ${project.name} context
-const MainContext = Firedev.createContext(()=>({
+const MainContext = Taon.createContext(()=>({
   host,
   contextName: 'MainContext',
   contexts:{ BaseContext },
@@ -295,7 +295,7 @@ async function start() {
 
   await MainContext.initialize();
 
-  if (Firedev.isBrowser) {
+  if (Taon.isBrowser) {
     const users = (await MainContext.getClassInstance(UserController).getAll().received)
       .body?.json;
     console.log({

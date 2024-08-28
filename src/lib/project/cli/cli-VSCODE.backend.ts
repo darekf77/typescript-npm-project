@@ -32,11 +32,11 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
       },
       {
         key: 'shift+cmd+c',
-        command: 'extension.firedevstopdefaultbuild',
+        command: 'extension.taonstopdefaultbuild',
       },
       {
         key: 'shift+cmd+b',
-        command: 'extension.firedevrundefaultbuild',
+        command: 'extension.taonrundefaultbuild',
       },
       {
         key: 'ctrl+cmd+p',

@@ -1,8 +1,8 @@
-# tnp -> core part of firedev.io
+# tnp -> core part of taon.dev
 
-this project is a core part of https://github.com/darekf77/firedev
+this project is a core part of https://github.com/darekf77/taon
 
-(tnp means "typescript-npm-project" - old name for firedev framework)
+(tnp means "typescript-npm-project" - old name for taon framework)
 
-Check firedev on https://firedev.io
+Check taon on https://taon.dev
 

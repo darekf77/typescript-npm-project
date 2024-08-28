@@ -4,8 +4,7 @@ import { path, _ } from 'tnp-core/src';
 import { TsImportExport, recognizeImportsFromFile } from 'tnp-helpers/src';
 import { CODE_SPLIT_PROCESS } from './code-split-process.enum';
 import type { CallBackProcess } from './code-split-process.enum';
-//import { firedevIgnore}from '../../../../../cli'; // TODO create rule
-import { firedevIgnore } from '../../../../constants';
+import { taonIgnore } from '../../../../constants';
 
 export class SplitFileProcess {
   private importExports: TsImportExport[] = [];
@@ -108,7 +107,7 @@ export class SplitFileProcess {
       if (lineIndex < lines.length) {
         const line = lines[lineIndex];
         const prevLine = lines[lineIndex - 1];
-        if (prevLine && prevLine.includes(firedevIgnore)) {
+        if (prevLine && prevLine.includes(taonIgnore)) {
           continue;
         }
         const actualStartIndex = imp.startCol - 1;

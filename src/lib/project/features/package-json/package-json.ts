@@ -38,45 +38,18 @@ export class PackageJSON
       return void 0;
     }
 
-    if (!Helpers.exists([location, config.file.firedev_jsonc])) {
-      const firedevJsonPath = crossPlatformPath([
+    if (!Helpers.exists([location, config.file.taon_jsonc])) {
+      /**
+       * @deprecated
+       */
+      const firedevFilePath = crossPlatformPath([
         location,
-        config.file.firedev_json,
+        config.file.firedev_jsonc,
       ]);
-      const json5FilePath = crossPlatformPath([
-        location,
-        config.file.package_json__tnp_json5,
-      ]);
-      const jsonFilePath = crossPlatformPath([
-        location,
-        config.file.package_json__tnp_json,
-      ]);
-      if (Helpers.exists(json5FilePath)) {
+      if (Helpers.exists(firedevFilePath)) {
         Helpers.writeFile(
-          [location, config.file.firedev_jsonc],
-          Helpers.readFile(json5FilePath),
-        );
-        Helpers.writeJson5(
-          [location, config.file.firedev_jsonc],
-          Helpers.readJson5([location, config.file.firedev_jsonc]),
-        );
-      } else if (Helpers.exists(jsonFilePath)) {
-        Helpers.writeFile(
-          [location, config.file.firedev_jsonc],
-          Helpers.readFile(jsonFilePath),
-        );
-        Helpers.writeJson5(
-          [location, config.file.firedev_jsonc],
-          Helpers.readJson5([location, config.file.firedev_jsonc]),
-        );
-      } else if (Helpers.exists(firedevJsonPath)) {
-        Helpers.writeFile(
-          [location, config.file.firedev_jsonc],
-          Helpers.readFile(firedevJsonPath),
-        );
-        Helpers.writeJson5(
-          [location, config.file.firedev_jsonc],
-          Helpers.readJson5([location, config.file.firedev_jsonc]),
+          [location, config.file.taon_jsonc],
+          Helpers.readFile(firedevFilePath),
         );
       } else {
         const tnpData = Helpers.readJson5([
@@ -84,16 +57,16 @@ export class PackageJSON
           config.file.package_json,
         ])?.tnp;
         if (tnpData) {
-          Helpers.writeJson5([location, config.file.firedev_jsonc], tnpData);
+          Helpers.writeJson5([location, config.file.taon_jsonc], tnpData);
         }
       }
-      Helpers.removeFileIfExists(json5FilePath);
-      Helpers.removeFileIfExists(jsonFilePath);
+      Helpers.removeFileIfExists(config.file.taon_jsonc);
+      Helpers.removeFileIfExists(firedevFilePath);
     }
-    const fifedev_json =
-      Helpers.readJson5([location, config.file.firedev_jsonc]) || {};
+    const taon_json =
+      Helpers.readJson5([location, config.file.taon_jsonc]) || {};
     const package_json = Helpers.readJson([location, config.file.package_json]);
-    package_json[config.packageJsonFrameworkKey] = _.cloneDeep(fifedev_json);
+    package_json[config.packageJsonFrameworkKey] = _.cloneDeep(taon_json);
 
     const pkgJson = new PackageJSON({ data: package_json, location, project });
     pkgJson.writeToDisc();

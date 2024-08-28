@@ -7,17 +7,17 @@
 
 1.1. Init code with cli
 ```
-firedev new my-app
+taon new my-app
 code my-app
 ```
 
 1.2. Start lib/app build in integrated terminal
 ```
-firedev start
+taon start
 
 # OR to start separated build of app and lib project parts
-firedev bw     # it will start lib build from ./src/lib  
-firedev baw    # it will start app build from ./src/app*
+taon bw     # it will start lib build from ./src/lib  
+taon baw    # it will start app build from ./src/app*
 
 # bw => build:watch
 # baw => build:app:watch
@@ -34,18 +34,18 @@ firedev baw    # it will start app build from ./src/app*
 
 2.1 Init code with cli
 ```
-firedev new my-organization-with-apps/main-app
+taon new my-organization-with-apps/main-app
 code new my-organization-with-apps
 ```
 
 2.2. Start lib/app build in integrated terminal
 ```
-firedev start  # it will start lib/app build for default project
+taon start  # it will start lib/app build for default project
 
 // OR if you want to deveop many projects at the same time
-firedev bw                       # to start global build
-firedev baw  child-name          # to start app build of child
-firedev baw  second-child-name   # to start app build of child
+taon bw                       # to start global build
+taon baw  child-name          # to start app build of child
+taon baw  second-child-name   # to start app build of child
 
 # bw => build:watch
 # baw => build:app:watch
@@ -58,7 +58,7 @@ firedev baw  second-child-name   # to start app build of child
 
 ## 3 How to start project in WEBSQL MODE ?
 ```
-firedev new my-organization-or-standalone-app
+taon new my-organization-or-standalone-app
 cd new my-organization-or-standalone-app
-firedev start --websql
+taon start --websql
 ```

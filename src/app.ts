@@ -1,5 +1,5 @@
 //#region imports
-import { Firedev } from 'firedev/src';
+import { Taon } from 'taon/src';
 import {
   Observable,
   map,
@@ -62,25 +62,25 @@ export class TnpComponent implements OnInit {
 export class TnpModule {}
 //#endregion
 
-@Firedev.Entity({ className: 'User' })
-class User extends Firedev.Base.Entity {
+@Taon.Entity({ className: 'User' })
+class User extends Taon.Base.Entity {
   public static ctrl?: UserController;
   public static from(user: Partial<User>) {
     return _.merge(new User(), _.cloneDeep(user));
   }
   //#region @websql
-  @Firedev.Orm.Column.Generated()
+  @Taon.Orm.Column.Generated()
   //#endregion
   id?: string | number;
 
   //#region @websql
-  @Firedev.Orm.Column.Custom({ type: 'varchar', length: '100', nullable: true })
+  @Taon.Orm.Column.Custom({ type: 'varchar', length: '100', nullable: true })
   //#endregion
   name?: string | number;
 }
 
-@Firedev.Controller({ className: 'UserController' })
-class UserController extends Firedev.Base.CrudController<User> {
+@Taon.Controller({ className: 'UserController' })
+class UserController extends Taon.Base.CrudController<User> {
   entityClassResolveFn: () => User;
 
   //#region @websql
@@ -98,19 +98,19 @@ async function start() {
   console.log('Your server will start on port ' + HOST_BACKEND_PORT);
   const host = 'http://localhost:' + HOST_BACKEND_PORT;
 
-  // const context = await Firedev.init({
+  // const context = await Taon.init({
   //   host,
   //   controllers: [
   //     UserController,
-  //     FiredevFileController,
-  //     FiredevBinaryFileController,
+  //     TaonFileController,
+  //     TaonBinaryFileController,
   //     // PUT FIREDEV CONTORLLERS HERE
   //   ],
   //   entities: [
   //     User,
-  //     FiredevFile,
-  //     FiredevFileCss,
-  //     FiredevBinaryFile,
+  //     TaonFile,
+  //     TaonFileCss,
+  //     TaonBinaryFile,
   //     // PUT FIREDEV ENTITIES HERE
   //   ],
   //   //#region @websql
@@ -122,7 +122,7 @@ async function start() {
   //   //#endregion
   // });
 
-  // if (Firedev.isBrowser) {
+  // if (Taon.isBrowser) {
   //#region @browser
   // const users = (await User.ctrl.getAll().received).body.json;
   // console.log({

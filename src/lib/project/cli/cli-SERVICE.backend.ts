@@ -11,7 +11,7 @@ class $Service extends CommandLineFeature<{}, Project> {
   }
 
   public async _() {
-    console.log('helllo from firedev service');
+    console.log('helllo from taon service');
   }
 }
 

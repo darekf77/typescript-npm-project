@@ -214,13 +214,13 @@ ${appModuleFile}
           let appComponentFile = Helpers.readFile(appComponentFilePath);
 
           appComponentFile = appComponentFile.replace(
-            `import { Firedev } from 'firedev/src';`,
-            `import { Firedev } from 'firedev/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
+            `import { Taon } from 'taon/src';`,
+            `import { Taon } from 'taon/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
           );
 
           appComponentFile = appComponentFile.replace(
-            `from 'firedev-ui/src';`,
-            `from 'firedev-ui/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
+            `from 'taon/src';`,
+            `from 'taon/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
           );
 
           appComponentFile = appComponentFile.replace(
@@ -243,8 +243,8 @@ ${appModuleFile}
           let appModuleFile = Helpers.readFile(appComponentFilePath);
 
           appModuleFile = appModuleFile.replace(
-            `import { FiredevAdminModeConfigurationModule } from 'firedev-ui/src';`,
-            `import { FiredevAdminModeConfigurationModule } from 'firedev-ui/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
+            `import { TaonAdminModeConfigurationModule } from 'taon/src';`,
+            `import { TaonAdminModeConfigurationModule } from 'taon/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
           );
 
           Helpers.writeFile(appComponentFilePath, appModuleFile);
@@ -277,13 +277,13 @@ ${appModuleFile}
           );
 
           appMainFile = appMainFile.replace(
-            `import { FiredevAdmin } from 'firedev-ui/src';`,
-            `import { FiredevAdmin } from 'firedev-ui/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
+            `import { TaonAdmin } from 'taon/src';`,
+            `import { TaonAdmin } from 'taon/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
           );
 
           appMainFile = appMainFile.replace(
-            `import { Stor } from 'firedev-storage/src';`,
-            `import { Stor } from 'firedev-storage/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
+            `import { Stor } from 'taon-storage/src';`,
+            `import { Stor } from 'taon-storage/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
           );
 
           Helpers.writeFile(appMainFilePath, appMainFile);
