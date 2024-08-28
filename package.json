@@ -346,7 +346,7 @@
     "private": false
   },
   "name": "tnp",
-  "version": "18.0.7",
+  "version": "18.0.8",
   "bin": {
     "t": "bin/t",
     "t-debug": "bin/t-debug",
