@@ -273,8 +273,8 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     const projectsInUserFolder = crossPlatformPath(
       path.join(
         crossPlatformPath(os.homedir()),
-        '.taon',
-        config.frameworkNames.taon,
+        `.${config.frameworkNames.productionFrameworkName}`,
+        config.frameworkNames.productionFrameworkName,
         'projects',
       ),
     );
@@ -440,10 +440,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       'taon/.vscode',
     ]);
 
-    if (
-      !fse.existsSync(taonRepoPathUserInUserDir) &&
-      !global.skipCoreCheck
-    ) {
+    if (!fse.existsSync(taonRepoPathUserInUserDir) && !global.skipCoreCheck) {
       if (!fse.existsSync(path.dirname(taonRepoPathUserInUserDir))) {
         fse.mkdirpSync(path.dirname(taonRepoPathUserInUserDir));
       }
@@ -503,7 +500,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     // TODO (remove this) this is causing problems
     // if (
     //   !this.nodeModulesInstalledForCoreContainer &&
-    //   config.frameworkName === 'taon' &&
+    //   config.frameworkName === config.frameworkNames.productionFrameworkName &&
     //   !global.skipCoreCheck
     // ) {
     //   Project.reinstallActiveFrameworkContainers();
@@ -519,7 +516,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
     if (
       global['frameworkName'] &&
-      global['frameworkName'] === config.frameworkNames.taon
+      global['frameworkName'] === config.frameworkNames.productionFrameworkName
     ) {
       const joined = partOfPath.join('/');
 
@@ -3729,7 +3726,7 @@ ${otherProjectNames
       trusted = value;
     }
 
-    if (config.frameworkName === 'taon') {
+    if (config.frameworkName === config.frameworkNames.productionFrameworkName) {
       const value = Helpers.readValueFromJsonC(
         crossPlatformPath([projTnp.location, config.file.tnpEnvironment_json]),
         `packageJSON.tnp.core.dependencies.trusted.${this.__frameworkVersion}`,
@@ -3759,16 +3756,13 @@ ${otherProjectNames
     let trustedValue: number;
     if (config.frameworkName === 'tnp') {
       const value = Helpers.readValueFromJsonC(
-        crossPlatformPath([
-          projTnp.location,
-          config.file.taon_jsonc,
-        ]),
+        crossPlatformPath([projTnp.location, config.file.taon_jsonc]),
         `core.dependencies.trustedMaxMajor.${this.__frameworkVersion}`,
       );
       trustedValue = value;
     }
 
-    if (config.frameworkName === 'taon') {
+    if (config.frameworkName === config.frameworkNames.productionFrameworkName) {
       const file = crossPlatformPath([
         projTnp.location,
         config.file.tnpEnvironment_json,
@@ -3804,7 +3798,9 @@ ${otherProjectNames
       trustedValue = value;
     }
 
-    if (config.frameworkName === 'taon') {
+    if (
+      config.frameworkName === config.frameworkNames.productionFrameworkName
+    ) {
       const file = crossPlatformPath([
         projTnp.location,
         config.file.tnpEnvironment_json,

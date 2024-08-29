@@ -9,7 +9,6 @@ import {
   //#endregion
 } from 'tnp-core/src';
 
-
 export const taonIgnore = '@taon' + '-' + 'ignore';
 
 export const OVERRIDE_FROM_TNP = [
@@ -31,7 +30,11 @@ export const INTEGRATION_TEST_TIMEOUT = 30000;
 
 export let taonRepoPathUserInUserDir: string =
   //#region @backend
-  path.join(crossPlatformPath(os.homedir()), '.taon', config.frameworkNames.taon);
+  path.join(
+    crossPlatformPath(os.homedir()),
+    `.${config.frameworkNames.productionFrameworkName}`,
+    config.frameworkNames.productionFrameworkName,
+  );
 //#endregion
 ('');
 

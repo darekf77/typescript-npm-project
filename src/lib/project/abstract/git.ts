@@ -28,7 +28,7 @@ export class Git extends BaseGit<Project> {
 
 
     // ? TODO not needed anymore
-    // if (this.project.name === 'taon') {
+    // if (this.project.name === config.frameworkNames.productionFrameworkName) {
     //   config.activeFramewrokVersions.forEach(frameworkVersion => {
     //     // console.log(`Active Framework: ${frameworkVersion}`)
     //     const taonProjectContainerPath = path.join(

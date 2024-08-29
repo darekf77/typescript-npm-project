@@ -11,7 +11,9 @@ import { config } from 'tnp-config/src';
 import { CoreModels } from 'tnp-core/src';
 //#endregion
 
-const noTrace = global.hideLog && config.frameworkName === 'taon';
+const noTrace =
+  global.hideLog &&
+  config.frameworkName === config.frameworkNames.productionFrameworkName;
 const showNpmCommandOutput = !noTrace;
 
 export function resolvePacakgesFromArgs(args: string[]): CoreModels.Package[] {
@@ -53,7 +55,7 @@ export function executeCommand(command: string, project: Project) {
 
    `);
 
-  if (config.frameworkName === 'taon' && project.__isContainerCoreProject) {
+  if (config.frameworkName === config.frameworkNames.productionFrameworkName && project.__isContainerCoreProject) {
     Helpers.info(`
     [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]
     This may take a long time (usually 10-15min on 0.5Gb/s internet connection)...

@@ -17,7 +17,7 @@ export class LibProjectVscodeExt extends BaseFeatureForProject<Project> {
       Helpers.error(`Project is not vscode extension`, false, true);
     }
     const vsixPackageName = this.extensionVsixName.replace(
-      config.frameworkNames.taon,
+      config.frameworkNames.productionFrameworkName,
       config.frameworkName,
     );
     // .replace('.vsix', '-') +
@@ -63,7 +63,7 @@ export class LibProjectVscodeExt extends BaseFeatureForProject<Project> {
       tempProj.pathFor(config.file.package_json),
       'name',
       extensionName.replace(
-        config.frameworkNames.taon,
+        config.frameworkNames.productionFrameworkName,
         config.frameworkName,
       ),
     );
@@ -72,7 +72,7 @@ export class LibProjectVscodeExt extends BaseFeatureForProject<Project> {
       tempProj.pathFor(config.file.package_json),
       'displayName',
       extensionName.replace(
-        config.frameworkNames.taon,
+        config.frameworkNames.productionFrameworkName,
         config.frameworkName,
       ),
     );

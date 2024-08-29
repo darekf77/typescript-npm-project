@@ -889,16 +889,16 @@ function beforeSaveAction(
     ) {
       const versionFromContainerName = `^${_.last(project.universalPackageName.split('-v'))}`;
       // console.log('versionFromContainerName', versionFromContainerName);
-      project.__packageJson.data.dependencies['taon'] =
+      project.__packageJson.data.dependencies[config.frameworkNames.productionFrameworkName] =
         versionFromContainerName;
     }
 
     //#endregion
   }
 
-  if (project.name === 'tnp') {
-    delete project.__packageJson.data.dependencies['tnp'];
-    delete project.__packageJson.data.dependencies['taon'];
+  if (project.name === config.frameworkNames.developmentFrameworkName) {
+    delete project.__packageJson.data.dependencies[config.frameworkNames.developmentFrameworkName];
+    delete project.__packageJson.data.dependencies[config.frameworkNames.productionFrameworkName];
   }
 
   _.keys(project.__packageJson.data.dependencies).forEach(depName => {

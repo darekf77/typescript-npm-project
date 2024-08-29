@@ -25,7 +25,7 @@ export class NodeModules extends BaseFeatureForProject<Project> {
       await coreContainer.__node_modules.reinstallIfNeeded();
       return;
     }
-    // Helpers.taskStarted(
+    // console.log(
     //   `Linking from core container ${coreContainer.name} ${this.project.genericName}`,
     // );
     await coreContainer.__node_modules.reinstallIfNeeded();
@@ -332,6 +332,11 @@ export class NodeModules extends BaseFeatureForProject<Project> {
     }
 
     Helpers.remove(pathDestNodeModules, true);
+    if (Helpers.isUnexistedLink(this.path)) {
+      try {
+        fse.unlinkSync(this.path);
+      } catch (error) {}
+    }
     Helpers.createSymLink(this.path, pathDestNodeModules, {
       continueWhenExistedFolderDoesntExists: true,
     });

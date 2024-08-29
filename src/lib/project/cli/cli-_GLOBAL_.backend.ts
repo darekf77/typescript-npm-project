@@ -938,7 +938,7 @@ export class $Global extends BaseCommandLine<{}, Project> {
     const tnpProj = Project.ins.Tnp;
     const taonProj = Project.ins.From([
       fse.realpathSync(path.dirname(tnpProj.location)),
-      config.frameworkNames.taon,
+      config.frameworkNames.productionFrameworkName,
     ]);
     Helpers.success(`
 
