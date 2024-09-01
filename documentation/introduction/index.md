@@ -51,7 +51,7 @@ only possible with isomorphic code
 
 ### 6. Every package available everywhere - shared <b>node_modules</b> for similar projects
 
-Taon has one big npm pacakges container (located in: ~/.taon/taon/projects/container-v4 - )
+Taon has one big npm pacakges container (located in: ~/.taon/taon/projects/container-v18 - )
 **There is no need for local node_modules** => many projects takes megabytes instead gigabytes
 
 ### 8. Automation for releasing projects (standalone and organization) to github pages / npm repositories

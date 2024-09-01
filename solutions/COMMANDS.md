@@ -4,7 +4,7 @@ tnp versions
 ```
 
 
-## Firedev extension for Visual Studio Code 
+## Taon extension for Visual Studio Code 
 
 Install vscode plugin
 

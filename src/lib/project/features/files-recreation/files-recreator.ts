@@ -12,18 +12,18 @@ import { config } from 'tnp-config/src';
 import { BaseFeatureForProject } from 'tnp-helpers/src';
 import { InitOptions } from '../../../build-options';
 
-function getVscodeSettingsFrom(project: Project) {
-  let settings: CoreModels.VSCodeSettings;
-  const pathSettingsVScode = path.join(
-    project.location,
-    '.vscode',
-    'settings.json',
-  );
-  if (Helpers.exists(pathSettingsVScode)) {
-    settings = JSON5.parse(Helpers.readFile(pathSettingsVScode));
-  }
-  return settings;
-}
+// function getVscodeSettingsFrom(project: Project) {
+//   let settings: CoreModels.VSCodeSettings;
+//   const pathSettingsVScode = path.join(
+//     project.location,
+//     '.vscode',
+//     'settings.json',
+//   );
+//   if (Helpers.exists(pathSettingsVScode)) {
+//     settings = JSON5.parse(Helpers.readFile(pathSettingsVScode));
+//   }
+//   return settings;
+// }
 
 export class FilesRecreator extends BaseFeatureForProject<Project> {
   public async recreateSimpleFiles(initOptions: InitOptions) {
@@ -193,7 +193,8 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
             'logo.svg',
             // ...(self.project.isWorkspace ? self.project.children.map(c => c.name) : [])
           ])
-          .map(f => (f.startsWith('/') ? f.slice(1) : f));
+          .map(f => (f.startsWith('/') ? f.slice(1) : f))
+          .map(f => `**/${f}`);
         // .filter(f => {
         //   // console.log('f',siteFiles)
         //   if (self.project.isSiteInStrictMode && siteFiles.includes(f)) {
@@ -352,14 +353,24 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
           toogleHideOrShowDeps() {
             let action: 'hide' | 'show' | 'nothing';
             self.modifyVscode(settings => {
+              settings['search.useIgnoreFiles'] = false;
+              settings['search.include'] = ['**/src/**'];
               settings['search.exclude'] = {
                 docs: true,
                 projects: true,
                 bin: true,
                 local_release: true,
-                "**/package-lock.json": true,
-                "package-lock.json": true,
+                node_modules: true,
+                '.build': true,
+                '.vscode': true,
+                browser: true,
+                dist: true,
+                'package-lock.json': true,
               };
+
+              Object.keys(settings['search.exclude']).forEach(k => {
+                settings['search.exclude'][`**/${k}`] = true;
+              });
 
               if (!settings['files.exclude']) {
                 settings['files.exclude'] = {};
@@ -405,9 +416,9 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
                 s['files.exclude'][`**/*____ORIGINAL____.ts`] = true;
                 s['files.exclude'][`_changelog`] = true;
 
-                s['files.exclude']['tsconfig.backend.dist.json'] = true;
-                s['files.exclude']['tsconfig.backend.dist.json.filetemplate'] =
-                  true;
+                // s['files.exclude']['tsconfig.backend.dist.json'] = true;
+                // s['files.exclude']['tsconfig.backend.dist.json.filetemplate'] =
+                //   true;
 
                 if (project.__isVscodeExtension) {
                   s['files.exclude']['out'] = true;
@@ -434,15 +445,24 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
                   [...self.filesIgnoredBy.vscodeSidebarFilesView].map(f => {
                     s['files.exclude'][f] = true;
                   });
-                if (project.__isCoreProject) {
+                if (!project.__isCoreProject) {
                   s['files.exclude']['**/*.filetemplate'] = true;
                   s['files.exclude']['**/tsconfig.*'] = true;
-                  s['files.exclude']['tslint.*'] = true;
-                  s['files.exclude']['index.*'] = true;
-                  s['files.exclude']['package-lock.json'] = true;
-                  s['files.exclude']['protractor.conf.js'] = true;
-                  s['files.exclude']['karma.conf.js'] = true;
-                  s['files.exclude']['.editorconfig'] = true;
+                  s['files.exclude']['**/tslint.*'] = true;
+                  s['files.exclude']['**/index.*'] = true;
+                  s['files.exclude']['**/recent.json'] = true;
+                  s['files.exclude']['**/angular.json'] = true;
+                  s['files.exclude']['**/webpack*'] = true;
+                  s['files.exclude']['**/docs/**/*.*'] = true;
+                  s['files.exclude']['**/run-*'] = true;
+                  s['files.exclude']['**/run.*'] = true;
+                  s['files.exclude']['**/package-lock.json'] = true;
+                  s['files.exclude']['**/protractor.conf.js'] = true;
+                  s['files.exclude']['**/karma.conf.js'] = true;
+                  s['files.exclude']['**/.editorconfig'] = true;
+                  Object.keys(project.lintFiles).forEach(f => {
+                    s['files.exclude'][`**/${f}`] = true;
+                  });
                   project.__vscodeFileTemplates.forEach(f => {
                     s['files.exclude'][f.replace('.filetemplate', '')] = false;
                   });
@@ -457,39 +477,39 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
                   settings['files.exclude'][`angular.json`] = true;
                   // settings['files.exclude'][`src/lib`] = true;
 
-                  self.project.children.forEach(c => {
-                    const childernSettings = getSettingsFor(c);
-                    Object.keys(childernSettings['files.exclude']).forEach(
-                      k => {
-                        settings['files.exclude'][`${c.name}/${k}`] =
-                          childernSettings['files.exclude'][k];
-                      },
-                    );
-                    settings['files.exclude'][`${c.name}/tsconfig*`] = true;
-                    settings['files.exclude'][`${c.name}/webpack*`] = true;
-                    settings['files.exclude'][`${c.name}/index*`] = true;
-                    settings['files.exclude'][`${c.name}/run.js`] = true;
-                    settings['files.exclude'][`${c.name}/run-org.js`] = true;
+                  // self.project.children.forEach(c => {
+                  //   const childernSettings = getSettingsFor(c);
+                  //   Object.keys(childernSettings['files.exclude']).forEach(
+                  //     k => {
+                  //       settings['files.exclude'][`${c.name}/${k}`] =
+                  //         childernSettings['files.exclude'][k];
+                  //     },
+                  //   );
+                  //   settings['files.exclude'][`${c.name}/tsconfig*`] = true;
+                  //   settings['files.exclude'][`${c.name}/webpack*`] = true;
+                  //   settings['files.exclude'][`${c.name}/index*`] = true;
+                  //   settings['files.exclude'][`${c.name}/run.js`] = true;
+                  //   settings['files.exclude'][`${c.name}/run-org.js`] = true;
 
-                    settings['files.exclude'][`${c.name}/src/index.ts`] = true;
-                    settings['files.exclude'][`${c.name}/.vscode`] = true;
-                    // settings['files.exclude'][`${c.name}/${config.file.package_json__tnp_json5}`] = true;
-                    settings['files.exclude'][
-                      `${c.name}/${config.file.package_json}`
-                    ] = true;
-                    // settings['files.exclude'][`${c.name}/src/lib`] = true;
-                    // settings['files.exclude'][`${c.name}/README.md`] = true;
-                    settings['files.exclude'][`${c.name}/karma.conf.js*`] =
-                      true;
-                    settings['files.exclude'][`${c.name}/protractor.conf.js*`] =
-                      true;
-                    c.__filesTemplates().forEach(t => {
-                      settings['files.exclude'][`${c.name}/${t}`] = true;
-                      settings['files.exclude'][
-                        `${c.name}/${t.replace('.filetemplate', '')}`
-                      ] = true;
-                    });
-                  });
+                  //   settings['files.exclude'][`${c.name}/src/index.ts`] = true;
+                  //   settings['files.exclude'][`${c.name}/.vscode`] = true;
+                  //   // settings['files.exclude'][`${c.name}/${config.file.package_json__tnp_json5}`] = true;
+                  //   settings['files.exclude'][
+                  //     `${c.name}/${config.file.package_json}`
+                  //   ] = true;
+                  //   // settings['files.exclude'][`${c.name}/src/lib`] = true;
+                  //   // settings['files.exclude'][`${c.name}/README.md`] = true;
+                  //   settings['files.exclude'][`${c.name}/karma.conf.js*`] =
+                  //     true;
+                  //   settings['files.exclude'][`${c.name}/protractor.conf.js*`] =
+                  //     true;
+                  //   c.__filesTemplates().forEach(t => {
+                  //     settings['files.exclude'][`${c.name}/${t}`] = true;
+                  //     settings['files.exclude'][
+                  //       `${c.name}/${t.replace('.filetemplate', '')}`
+                  //     ] = true;
+                  //   });
+                  // });
                 }
               }
               // settings['files.exclude'][config.folder.tmpTestsEnvironments] = false;

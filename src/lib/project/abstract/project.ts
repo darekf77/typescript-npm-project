@@ -1488,9 +1488,6 @@ trim_trailing_whitespace = false
       //   }
       // }
     };
-    if (this.shouldNotEnableLintAndPrettier) {
-      return {};
-    }
     return files;
     //#endregion
   }

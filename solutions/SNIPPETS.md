@@ -94,7 +94,7 @@ if (isNaN(parsed)) {
 ```ts
 
 //#region @notForNpm
-import { Firedev } from 'firedev';
+import { Taon } from 'firedev';
 // import 'core-js/client/shim';
 // import 'reflect-metadata';
 require('zone.js/dist/zone');
@@ -144,7 +144,7 @@ async function start() {
   const body: HTMLElement = document.getElementsByTagName('body')[0];
   body.innerHTML = `<my-app>Loading...</my-app>`;
 
-  if (Firedev.isBrowser) {
+  if (Taon.isBrowser) {
     if (document.readyState === 'complete') {
       main();
     } else {
@@ -153,7 +153,7 @@ async function start() {
   }
 }
 
-if (Firedev.isBrowser) {
+if (Taon.isBrowser) {
   start();
 }
 
@@ -170,10 +170,10 @@ export default start;
 # backend and angular material
 
 ```ts
-import { Firedev } from 'firedev';
+import { Taon } from 'firedev';
 // import 'core-js/client/shim';
 // import 'reflect-metadata';
-if (Firedev.isBrowser) {
+if (Taon.isBrowser) {
   require('zone.js/dist/zone');
 }
 
@@ -189,8 +189,8 @@ const host = 'http://localhost:3333';
 
 
 
-@Firedev.Entity({ className: 'Book' })
-class Book extends Firedev.Base.Entity<any> {
+@Taon.Entity({ className: 'Book' })
+class Book extends Taon.Base.Entity<any> {
   static from(name: string) {
     const b = new Book();
     b.name = name;
@@ -198,12 +198,12 @@ class Book extends Firedev.Base.Entity<any> {
   }
 
   //#region @backend
-  @Firedev.Orm.Column.Custom('varchar')
+  @Taon.Orm.Column.Custom('varchar')
   //#endregion
   public name: string
 
   //#region @backend
-  @Firedev.Orm.Column.Generated()
+  @Taon.Orm.Column.Generated()
   //#endregion
   public id: number
 
@@ -211,8 +211,8 @@ class Book extends Firedev.Base.Entity<any> {
 
 
 
-@Firedev.Controller({ className: 'BookCtrl', entity: Book })
-class BookCtrl extends Firedev.Base.Controller<any> {
+@Taon.Controller({ className: 'BookCtrl', entity: Book })
+class BookCtrl extends Taon.Base.Controller<any> {
   //#region @backend
   async initExampleDbData() {
     const db = await this.connection.getRepository(Book);
@@ -284,7 +284,7 @@ async function start() {
   };
   //#endregion
 
-  const context = await Firedev.init({
+  const context = await Taon.init({
     host,
     controllers: [BookCtrl],
     entities: [Book],
@@ -294,7 +294,7 @@ async function start() {
   });
   console.log(context);
 
-  if (Firedev.isBrowser) {
+  if (Taon.isBrowser) {
     const body: HTMLElement = document.getElementsByTagName('body')[0];
     body.innerHTML = `<my-app>Loading...</my-app>`;
     if (document.readyState === 'complete') {
@@ -305,7 +305,7 @@ async function start() {
   }
 }
 
-if (Firedev.isBrowser) {
+if (Taon.isBrowser) {
   start();
 }
 

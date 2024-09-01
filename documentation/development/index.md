@@ -34,13 +34,13 @@ taon adr # quick release of app to github with last configuration
 ```
 taon sync
 ```
-\+ Update taon from npm and local container from npm packages
+<!-- \+ Update taon from npm and local container from npm packages
 ```
 taon au  #  auto:update
 
 # above command will also perform "taon sync" 
 ```
----
+--- -->
 \+ Check taon version
 ```
 taon version
