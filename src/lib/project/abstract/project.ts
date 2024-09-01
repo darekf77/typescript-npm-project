@@ -3310,6 +3310,7 @@ ${otherProjectNames
             this.__showMesageWhenBuildLibDoneForSmartContainer(buildOptions);
           } catch (e) {
             Helpers.log(e);
+            // TODO remove this error (it should not interrup release proces)
             Helpers.error(
               `
           Command failed: ${commandForLibraryBuild}

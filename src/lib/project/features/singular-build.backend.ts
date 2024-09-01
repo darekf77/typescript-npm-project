@@ -362,8 +362,6 @@ exports.default = start;`,
           })
         ).on('all', (event, f) => {
           f = crossPlatformPath(f);
-          // C:/Users/darek/projects/npm/taon-projects/taon-simple-org/main/src/app.ts
-          // C:/Users/darek/projects/npm/taon-projects/taon-simple-org
           // console.log('FIREDEV SINGULAR BUILD CODE WATCHER EVENT')
           const containerLocaiton = this.project.location;
           const childName = _.first(

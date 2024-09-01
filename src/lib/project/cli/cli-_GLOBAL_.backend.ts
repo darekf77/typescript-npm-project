@@ -808,9 +808,13 @@ export class $Global extends BaseCommandLine<{}, Project> {
 
     if (proj.__isContainer) {
       if (proj.__isContainerCoreProject) {
-        Helpers.taskStarted(`Removing old node_modules for core container ${proj.__frameworkVersion}`);
+        Helpers.taskStarted(
+          `Removing old node_modules for core container ${proj.__frameworkVersion}`,
+        );
         proj.__node_modules.remove();
-        Helpers.taskDone(`Removed old node_modules for core container ${proj.__frameworkVersion}`);
+        Helpers.taskDone(
+          `Removed old node_modules for core container ${proj.__frameworkVersion}`,
+        );
         await proj.__npmPackages.installFromArgs('');
         Helpers.info(`Reinstal done for core container`);
       } else {
@@ -1312,9 +1316,7 @@ ${this.project.children
       const packageName = allDepsKeys[index];
       const currentPackageVersion = allDeps[packageName];
       const currentVerObj = getVerObj(currentPackageVersion);
-      const taonJsonContent = this.project.readFile(
-        config.file.taon_jsonc,
-      );
+      const taonJsonContent = this.project.readFile(config.file.taon_jsonc);
       const tags = Utils.json.getAtrributies(packageName, taonJsonContent);
       Helpers.info(
         `(${index + 1} / ${allDepsKeys.length}) ` +
@@ -1579,6 +1581,7 @@ ${this.project.children
   }
   //#endregion
 
+  //#region compare containers
   compareContainers() {
     Helpers.clearConsole();
     const [c1ver, c2ver] = this.args;
@@ -1617,6 +1620,7 @@ ${this.project.children
     }
     this._exit();
   }
+  //#endregion
 
   //#region not for npm / mp3
   //#region @notForNpm
