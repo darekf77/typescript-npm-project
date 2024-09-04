@@ -2,6 +2,8 @@
 
 ## What is taon?
 
+**T**ypescript **A**ngular **O**rm **N**ode
+
 **Taon** 🔥🔥🔥 is a solution (**global cli tool** & **framework**) for
 
 \+

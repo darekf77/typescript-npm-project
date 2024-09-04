@@ -1,11 +1,12 @@
 //#region @backend
 import { _, chalk } from 'tnp-core/src';
-import { Helpers } from 'tnp-helpers/src';
+import { Helpers, UtilsTerminal } from 'tnp-helpers/src';
 import { CommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
 import { BuildOptions } from '../../build-options';
 import { TEMP_DOCS } from '../../constants';
 import { config } from 'tnp-config/src';
+import { Utils } from 'tnp-core/src';
 
 class $Build extends CommandLineFeature<BuildOptions, Project> {
   protected async __initialize__() {
@@ -107,8 +108,9 @@ class $Build extends CommandLineFeature<BuildOptions, Project> {
       this.project?.__smartContainerBuildTarget?.name
     ) {
       Helpers.error(
-        `Start mode only available for child project "${this.project
-          ?.__smartContainerBuildTarget.name}"
+        `Start mode only available for child project "${
+          this.project?.__smartContainerBuildTarget.name
+        }"
 
         Please use 2 commands instead (in 2 separaed terminals):
 
@@ -142,14 +144,61 @@ ${config.frameworkName} app ${smartContainerTargetName} ${
   }
 
   async mkdocs() {
-    let res;
+    const mkdocsActions = {
+      //#region @notForNpm
+      SELECT_COMMAND: {
+        name: '< select command >',
+      },
+      BUILD_DEPLY_DOCS_FIREDEV: {
+        name: 'Build & deply docs for www.taon.dev',
+        value: {
+          command: `python -m mkdocs build --site-dir ../../firedev-projects/www-taon-dev/docs/documentation`,
+          action: async () => {
+            const taonProjWww = Project.ins.From([
+              this.cwd,
+              '../../firedev-projects/www-taon-dev',
+            ]);
+            if (await Helpers.questionYesNo('Push and commit docs update ?')) {
+              taonProjWww.git.addAndCommit('docs: update');
+              await taonProjWww.git.pushCurrentBranch();
+            }
+          },
+        },
+      },
+      // BUILD_DOCS_FIREDEV: {
+      //   name: 'Build docs for www.taon.dev',
+      //   value: {
+      //     command: `python -m mkdocs build --site-dir ../../firedev-projects/www-taon-dev/${TEMP_DOCS}`,
+      //     action: void 0,
+      //   },
+      // },
+      //#endregion
+      SERVE_DOCS_FIREDEV: {
+        name: 'Serve docs for www.taon.dev on 8000',
+        value: {
+          command: 'python -m mkdocs serve',
+          action: void 0,
+        },
+      },
+    };
+
+    let res: {
+      command: string;
+      action: () => Promise<void>;
+    };
+
     while (true) {
       Helpers.clearConsole();
-      res = await Helpers.consoleGui.select(
-        'What you wanna do with docs ?',
-        Object.values(this.mkdocsActions) as any,
-      );
-      if (res.command) {
+      const q = await UtilsTerminal.select<{
+        command: string;
+        action: () => Promise<void>;
+      }>({
+        choices: mkdocsActions,
+        question: 'What you wanna do with docs ?',
+      });
+
+      if (q.command) {
+        res = q;
         break;
       }
     }
@@ -161,44 +210,6 @@ ${config.frameworkName} app ${smartContainerTargetName} ${
     Helpers.info('DONE BUILDING DOCS');
     this._exit();
   }
-
-  private mkdocsActions = {
-    //#region @notForNpm
-    SELECT_COMMAND: {
-      name: '< select command >',
-    },
-    BUILD_DEPLY_DOCS_FIREDEV: {
-      name: 'Build & deply docs for www.taon.dev',
-      value: {
-        command: `python -m mkdocs build --site-dir ../../taon-projects/www-taon-dev/docs/documentation`,
-        action: async () => {
-          const taonProjWww = Project.ins.From([
-            this.cwd,
-            '../../taon-projects/www-taon-dev',
-          ]);
-          if (await Helpers.questionYesNo('Push and commit docs update ?')) {
-            taonProjWww.git.addAndCommit('update docs');
-            await taonProjWww.git.pushCurrentBranch();
-          }
-        },
-      },
-    },
-    BUILD_DOCS_FIREDEV: {
-      name: 'Build docs for www.taon.dev',
-      value: {
-        command: `python -m mkdocs build --site-dir ../../taon-projects/www-taon-dev/${TEMP_DOCS}`,
-        action: void 0,
-      },
-    },
-    //#endregion
-    SERVE_DOCS_FIREDEV: {
-      name: 'Serve docs for www.taon.dev on 8000',
-      value: {
-        command: 'python -m mkdocs serve',
-        action: void 0,
-      },
-    },
-  };
 }
 
 export default {

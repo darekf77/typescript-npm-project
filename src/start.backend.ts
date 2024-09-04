@@ -48,6 +48,7 @@ export async function start(
       start: 'build:start',
       cstart: 'build:start:clean',
       cs: 'build:start:clean',
+      mkdocs: 'build:mkdocs',
       ew: 'electron:watch',
       r: 'release',
       'lr':'local:release',

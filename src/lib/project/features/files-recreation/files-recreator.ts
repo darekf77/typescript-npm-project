@@ -449,7 +449,7 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
                   s['files.exclude']['**/*.filetemplate'] = true;
                   s['files.exclude']['**/tsconfig.*'] = true;
                   s['files.exclude']['**/tslint.*'] = true;
-                  s['files.exclude']['**/index.*'] = true;
+                  // s['files.exclude']['**/index.*'] = true;
                   s['files.exclude']['**/recent.json'] = true;
                   s['files.exclude']['**/angular.json'] = true;
                   s['files.exclude']['**/webpack*'] = true;

@@ -1092,7 +1092,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       }
     }
 
-    this.quickFixes.missingSourceFolders();
+    this.quickFixes.addMissingSrcFolderToEachProject();
     Helpers.info(`Cleaning project: ${this.genericName} done`);
 
     if (recrusive) {
@@ -6010,7 +6010,7 @@ ${config.frameworkName} start
         alreadyInitedPorjects.find(p => p.location === this.location),
       )
     ) {
-      this.quickFixes.missingSourceFolders();
+      this.quickFixes.addMissingSrcFolderToEachProject();
       // if (this.__isStandaloneProject && this.__packageJson) {
       //   this.__packageJson.updateHooks();
       // }
@@ -6039,7 +6039,7 @@ ${config.frameworkName} start
       );
     }
 
-    this.quickFixes.missingSourceFolders();
+    this.quickFixes.addMissingSrcFolderToEachProject();
 
     if (!omitChildren && this.__isSmartContainer) {
       const children = this.children;
@@ -6057,7 +6057,7 @@ ${config.frameworkName} start
 
     this.quickFixes.missingAngularLibFiles();
     if (this.__isStandaloneProject || this.__isContainer) {
-      this.quickFixes.missingLibs([]);
+      this.quickFixes.missingEmptyDummyLibs([]);
     }
 
     Helpers.taskStarted(
@@ -6137,9 +6137,9 @@ ${config.frameworkName} start
       //#endregion
     }
 
-    this.quickFixes.missingSourceFolders();
+    this.quickFixes.addMissingSrcFolderToEachProject();
 
-    this.quickFixes.badTypesInNodeModules();
+    this.quickFixes.removeBadTypesInNodeModules();
     Helpers.log(`Init DONE for project: ${chalk.bold(this.genericName)} `);
     //#endregion
   }

@@ -18,7 +18,7 @@ Angular templates - CHECK!
 import { Taon } from 'taon';
 
 @Taon.Entity()
-class User {
+class User extends Taon.Entity {
   //#region @backend
   @Taon.Orm.Column.Generated()
   //#endregion
@@ -32,7 +32,7 @@ your browser will get code below:
 import { Taon } from 'taon/browser';
 
 @Taon.Entity()
-class User {
+class User extends Taon.Entity {
   /* */
   /* */
   /* */

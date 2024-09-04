@@ -1,21 +1,29 @@
+//#region imports
 //#region @backend
-import { path, _, CoreModels } from 'tnp-core/src';
-import { fse, rimraf } from 'tnp-core/src';
-import { glob, crossPlatformPath } from 'tnp-core/src';
-import chalk from 'chalk';
+import { glob, fse, rimraf, chalk } from 'tnp-core/src';
+//#endregion
+import { path, _, crossPlatformPath } from 'tnp-core/src';
+import {} from 'tnp-core/src';
 import { Project } from '../abstract/project';
-import { BaseFeatureForProject } from 'tnp-helpers/src';
+import {
+  BaseFeatureForProject,
+  UtilsTerminal,
+  UtilsTypescript,
+} from 'tnp-helpers/src';
 import { Helpers } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
 import { folder_shared_folder_info, tempSourceFolder } from '../../constants';
 import { Models } from '../../models';
+//#endregion
 
 export class QuickFixes extends BaseFeatureForProject<Project> {
+  //#region update stanalone project before publishing
   updateStanaloneProjectBeforePublishing(
     project: Project,
     realCurrentProj: Project,
     specyficProjectForBuild: Project,
   ) {
+    //#region @backendFunc
     if (project.__isStandaloneProject) {
       const distForPublishPath = crossPlatformPath([
         specyficProjectForBuild.location,
@@ -53,13 +61,17 @@ export * from './lib';
       Helpers.removeFileIfExists(pjPath);
       Helpers.writeJson(pjPath, pj); // QUICK_FIX
     }
+    //#endregion
   }
+  //#endregion
 
+  //#region update container project before publishing
   updateContainerProjectBeforePublishing(
     project: Project,
     realCurrentProj: Project,
     specyficProjectForBuild: Project,
   ) {
+    //#region @backendFunc
     if (project.__isSmartContainer) {
       const base = path.join(
         specyficProjectForBuild.location,
@@ -86,9 +98,13 @@ export * from './lib';
         );
       }
     }
+    //#endregion
   }
+  //#endregion
 
+  //#region recreate temp source necessary files
   recreateTempSourceNecessaryFiles(outDir: 'dist') {
+    //#region @backendFunc
     if (this.project.typeIsNot('isomorphic-lib')) {
       return;
     }
@@ -241,8 +257,11 @@ Object.defineProperty(document.body.style, 'transform', {
     //   })
     // }
     // }
+    //#endregion
   }
+  //#endregion
 
+  //#region remove uncessesary files
   removeUncessesaryFiles() {
     const filesV1 = [
       'src/tsconfig.packages.json',
@@ -251,13 +270,15 @@ Object.defineProperty(document.body.style, 'transform', {
       '.angular-cli.json',
     ];
   }
+  //#endregion
 
+  //#region  remove tnp from itself
   /**
    * TODO QUICK FIX
    * something wrong when minifying cli
    */
   public async removeTnpFromItself(actionwhenNotInNodeModules: () => {}) {
-    //#region @backend
+    //#region @backendFunc
     if (!(this.project.name === 'tnp' && this.project.isInCiReleaseProject)) {
       await Helpers.runSyncOrAsync({
         functionFn: actionwhenNotInNodeModules,
@@ -285,8 +306,11 @@ Object.defineProperty(document.body.style, 'transform', {
     }
     //#endregion
   }
+  //#endregion
 
+  //#region add missing anular files
   public missingAngularLibFiles() {
+    //#region @backendFunc
     Helpers.taskStarted(`[quick fixes] missing angular lib fles start`, true);
     if (
       this.project.__frameworkVersionAtLeast('v3') &&
@@ -438,9 +462,13 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
     }
 
     Helpers.taskDone(`[quick fixes] missing angular lib fles end`);
+    //#endregion
   }
+  //#endregion
 
-  badTypesInNodeModules() {
+  //#region bad types in node modules
+  removeBadTypesInNodeModules() {
+    //#region @backendFunc
     if (this.project.__frameworkVersionAtLeast('v2')) {
       [
         '@types/prosemirror-*',
@@ -456,6 +484,13 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
       ].forEach(name => {
         Helpers.remove(path.join(this.project.__node_modules.path, name));
       });
+      const globalsDts = this.project.readFile(
+        'node_modules/@types/node/globals.d.ts',
+      );
+      this.project.writeFile(
+        'node_modules/@types/node/globals.d.ts',
+        UtilsTypescript.removeRegionByName(globalsDts, 'borrowed'),
+      );
     }
     // if (this.project.isVscodeExtension) {
     //   [
@@ -464,9 +499,16 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
     //     Helpers.removeFolderIfExists(path.join(this.project.node_modules.path, name));
     //   });
     // }
+    //#endregion
   }
+  //#endregion
 
-  public missingLibs(missingLibsNames: string[] = []) {
+  //#region add missing empty libs
+  /**
+   * @deprecated
+   */
+  public missingEmptyDummyLibs(missingLibsNames: string[] = []) {
+    //#region @backendFunc
     if (this.project.__isContainer) {
       return;
     }
@@ -510,9 +552,13 @@ export default _default;
         } as Models.IPackageJSON,
       );
     });
+    //#endregion
   }
+  //#endregion
 
-  public missingSourceFolders() {
+  //#region add missing source folder
+  public addMissingSrcFolderToEachProject() {
+    //#region @backendFunc
     /// QUCIK_FIX make it more generic
     if (this.project.__frameworkVersionEquals('v1')) {
       return;
@@ -532,14 +578,19 @@ export default _default;
       }
     }
     Helpers.taskDone(`[quick fixes] missing source folder end`);
+    //#endregion
   }
+  //#endregion
 
-  public get nodeModulesReplacementsZips() {
+  //#region node_modules replacements zips
+  public get nodeModulesPkgsReplacements() {
+    //#region @backendFunc
     const npmReplacements = glob
       .sync(`${this.project.location} /${config.folder.node_modules}-*.zip`)
       .map(p => p.replace(this.project.location, '').slice(1));
 
     return npmReplacements;
+    //#endregion
   }
 
   /**
@@ -549,7 +600,8 @@ export default _default;
    * to node_modules folder before instalation.
    * This will prevent packages deletion from npm
    */
-  public nodeModulesPackagesZipReplacement() {
+  public unpackNodeModulesPackagesZipReplacements() {
+    //#region @backendFunc
     const nodeModulesPath = path.join(
       this.project.location,
       config.folder.node_modules,
@@ -558,7 +610,7 @@ export default _default;
     if (!fse.existsSync(nodeModulesPath)) {
       Helpers.mkdirp(nodeModulesPath);
     }
-    this.nodeModulesReplacementsZips.forEach(p => {
+    this.nodeModulesPkgsReplacements.forEach(p => {
       const name = p.replace(`${config.folder.node_modules}-`, '');
       const moduleInNodeMdules = path.join(
         this.project.location,
@@ -579,6 +631,7 @@ export default _default;
         this.project.run(`extract-zip ${p} ${nodeModulesPath}`).sync();
       }
     });
+    //#endregion
   }
+  //#endregion
 }
-//#endregion

@@ -139,7 +139,7 @@ export class NpmPackagesCore extends BaseFeatureForProject<Project> {
     npm install process for ${this.project.genericName} done.
     [${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}]`);
 
-    this.project.quickFixes.nodeModulesPackagesZipReplacement();
+    this.project.quickFixes.unpackNodeModulesPackagesZipReplacements();
     await PackagesRecognition.startFor(this.project, 'after npm install');
 
     if (!options.generateYarnOrPackageJsonLock) {
