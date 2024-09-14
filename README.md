@@ -1,8 +1,10 @@
-# tnp -> core part of taon.dev
+# tnp -> CLI part of taon framework
 
-this project is a core part of https://github.com/darekf77/taon
+## Purpose of this project
+- this project is a core part of https://github.com/darekf77/taon
+- local development of taon
 
-(tnp means "typescript-npm-project" - old name for taon framework)
+
+(tnp means "typescript-npm-project" - old name of taon framework)
 
 Check taon on https://taon.dev
-

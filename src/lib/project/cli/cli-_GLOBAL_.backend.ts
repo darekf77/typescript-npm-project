@@ -1069,7 +1069,7 @@ export class $Global extends BaseCommandLine<{}, Project> {
 
     const exampleLocation = crossPlatformPath([
       container.location,
-      'gen-examples',
+      `gen-examples-${container.__frameworkVersion}`,
       moduleName,
       myEntity,
     ]);
@@ -1077,7 +1077,7 @@ export class $Global extends BaseCommandLine<{}, Project> {
     const newEntityName = _.kebabCase(entityName);
     const generatedCodeAbsLoc = crossPlatformPath([
       container.location,
-      'gen-examples',
+      `gen-examples-${container.__frameworkVersion}`,
       moduleName,
       newEntityName,
     ]);

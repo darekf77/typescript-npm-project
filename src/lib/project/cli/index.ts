@@ -13,6 +13,7 @@ import VSCODE from './cli-VSCODE.backend';
 import NEW from './cli-NEW.backend';
 import SERVICE from './cli-SERVICE.backend';
 import TS from './cli-TS.backend';
+import DOCS from './cli-DOCS.backend';
 
 export default [
   GLOBAL,
@@ -29,6 +30,7 @@ export default [
   NEW,
   SERVICE,
   TS,
+  DOCS,
 ];
 
 //#endregion

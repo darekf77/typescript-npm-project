@@ -1556,10 +1556,12 @@ trim_trailing_whitespace = false
     if (this.shouldNotEnableLintAndPrettier) {
       return;
     }
-    if (
+    const allowToRecreateLintFiles =
       this.typeIs('vscode-ext', 'isomorphic-lib', 'container') &&
-      !this.__isSmartContainerChild
-    ) {
+      !this.__isSmartContainerChild;
+
+    // console.log({ allowToRecreateLintFiles });
+    if (allowToRecreateLintFiles) {
       // Helpers.info(`Reacreating lint configuration for ${this.genericName}`);
       this.__recreate.modifyVscode(settings => {
         return {
@@ -3724,7 +3726,9 @@ ${otherProjectNames
       trusted = value;
     }
 
-    if (config.frameworkName === config.frameworkNames.productionFrameworkName) {
+    if (
+      config.frameworkName === config.frameworkNames.productionFrameworkName
+    ) {
       const value = Helpers.readValueFromJsonC(
         crossPlatformPath([projTnp.location, config.file.tnpEnvironment_json]),
         `packageJSON.tnp.core.dependencies.trusted.${this.__frameworkVersion}`,
@@ -3760,7 +3764,9 @@ ${otherProjectNames
       trustedValue = value;
     }
 
-    if (config.frameworkName === config.frameworkNames.productionFrameworkName) {
+    if (
+      config.frameworkName === config.frameworkNames.productionFrameworkName
+    ) {
       const file = crossPlatformPath([
         projTnp.location,
         config.file.tnpEnvironment_json,

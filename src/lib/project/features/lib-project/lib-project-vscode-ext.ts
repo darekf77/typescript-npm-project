@@ -70,6 +70,12 @@ export class LibProjectVscodeExt extends BaseFeatureForProject<Project> {
 
     Helpers.setValueToJSON(
       tempProj.pathFor(config.file.package_json),
+      'scripts.vscode:prepublish',
+      void 0,
+    );
+
+    Helpers.setValueToJSON(
+      tempProj.pathFor(config.file.package_json),
       'displayName',
       extensionName.replace(
         config.frameworkNames.productionFrameworkName,

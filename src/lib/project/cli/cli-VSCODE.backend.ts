@@ -113,6 +113,11 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
     //#region global / setting for all
 
     let settings = {
+      // 'scm.showIncomingChanges': false,
+      // 'scm.showOutgoingChanges': false,
+      "workbench.layoutControl.enabled": false,
+      "scm.showHistoryGraph": false,
+      "scm.showActionButton": false,
       'editor.renderWhitespace': true,
       'window.commandCenter': false,
       'window.zoomPerWindow': false,

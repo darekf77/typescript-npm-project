@@ -1,6 +1,6 @@
 site_name: Taon Documentation
 # site_url: https://firedev.io/documentation
-docs_dir: documentation
+docs_dir: tmp-documentation
 nav:
   - Introduction: introduction/index.md
   - Setup: setup/index.md
