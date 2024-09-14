@@ -6194,7 +6194,7 @@ ${config.frameworkName} start
     initOptions = InitOptions.from(initOptions);
     if (this.__isSmartContainer) {
       this.children.forEach(c => c.creteBuildInfoFile(initOptions));
-    } else {
+    } else if (this.__isStandaloneProject) {
       const dest = this.pathFor([
         config.folder.src,
         config.folder.lib,
