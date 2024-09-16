@@ -20,7 +20,6 @@ import { TAGS } from 'tnp-config/src';
 import { Models } from '../../../../models';
 //#endregion
 
-@IncCompiler.Class({ className: 'BroswerCompilation' })
 export class BroswerCompilation extends BackendCompilation {
   /**
    * @deprecated
@@ -168,7 +167,6 @@ export class BroswerCompilation extends BackendCompilation {
   //#endregion
 
   //#region methods / async action
-  @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
     // console.log('ASYNC ACTION CODE CUT ', event.fileAbsolutePath);
     if (!this.codecut) {

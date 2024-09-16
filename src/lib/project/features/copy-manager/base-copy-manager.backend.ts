@@ -314,7 +314,6 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
   }, 1000);
 
   //#region async action
-  @IncCompiler.methods.AsyncAction()
   async asyncAction(event: IncCompiler.Change) {
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
     // console.log('async event '+ absoluteFilePath)

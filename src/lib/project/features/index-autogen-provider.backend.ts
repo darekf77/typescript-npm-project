@@ -8,7 +8,8 @@ export class IndexAutogenProvider extends BaseCompilerForProject<{}, Project> {
   constructor(project: Project) {
     super(project, {
       folderPath: project.pathFor(config.folder.src),
-      allowedOnlyFileExt: ['.ts', '.tsx'],
+      subscribeOnlyFor: ['ts', 'tsx'],
+      taskName: 'IndexAutogenProvider',
     });
   }
 

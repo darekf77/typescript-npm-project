@@ -90,6 +90,7 @@ export class CopyManagerStandalone extends CopyManager {
     this.initOptions({
       folderPath: [monitoredOutDir, ...monitoredOutDirSharedAssets],
       folderPathContentCheck: [monitoredOutDir],
+      taskName: 'CopyManager',
     });
   }
   //#endregion

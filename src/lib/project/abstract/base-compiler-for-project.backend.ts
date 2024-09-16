@@ -52,6 +52,7 @@ function checkFolderCompiler(
   const folders = _.isArray(options.folderPath)
     ? options.folderPath
     : [options.folderPath];
+
   options.folderPath = folders.map(f => {
     f = crossPlatformPath(f);
     if (!dontCheck) {

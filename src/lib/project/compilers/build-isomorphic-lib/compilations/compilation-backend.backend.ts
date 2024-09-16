@@ -15,7 +15,6 @@ import { Project } from '../../../abstract/project';
 import { BuildOptions } from '../../../../build-options';
 //#endregion
 
-@IncCompiler.Class({ className: 'BackendCompilation' })
 export class BackendCompilation extends IncCompiler.Base {
   //#region static
   static counter = 1;
@@ -63,6 +62,7 @@ export class BackendCompilation extends IncCompiler.Base {
       folderPath: crossPlatformPath([cwd, srcFolder]),
       notifyOnFileUnlink: true,
       followSymlinks: true,
+      taskName: 'BackendCompilation',
     });
   }
   //#endregion

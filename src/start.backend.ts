@@ -38,6 +38,8 @@ export async function start(
       app: 'build:app:watch', // should be console menu
       ba: 'build:app',
       b: 'build',
+      d: 'docs',
+      dw: 'docs:watch',
       cb: 'build:clean:build',
       cbuild: 'build:clean:build',
       baw: 'build:app:watch',
