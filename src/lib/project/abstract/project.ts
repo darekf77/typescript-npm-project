@@ -755,7 +755,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   public __npmPackages: NpmPackages;
   public __env: EnvironmentConfig;
   public __copyManager: CopyManager;
-  public __indexAutogenProvider: IndexAutogenProvider;
+  public indexAutogenProvider: IndexAutogenProvider;
   public __insideStructure: InsideStructures;
   public __singluarBuild: SingularBuild;
   public __webpackBackendBuild: WebpackBackendCompilation;
@@ -813,7 +813,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       });
 
       this.defineProperty<Project>(
-        '__indexAutogenProvider',
+        'indexAutogenProvider',
         IndexAutogenProvider,
       );
 
@@ -977,6 +977,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   backendPort: number;
   standaloneNormalAppPort: number;
   standaloneWebsqlAppPort: number;
+  public npmHelpers: NpmHelpers;
 
   //#region  methods & getters / get default develop Branch
   getDefaultDevelopmentBranch() {
@@ -3105,8 +3106,18 @@ ${otherProjectNames
 
       //#endregion
 
+      if (
+        this.npmHelpers.generateIndexAutogenFile &&
+        this.__isStandaloneProject
+      ) {
+        await this.indexAutogenProvider.runTask({
+          watch: buildOptions.watch,
+        });
+      } else {
+        this.indexAutogenProvider.writeIndexFile(true);
+      }
+
       if (buildOptions.watch) {
-        // await this.__indexAutogenProvider.startAndWatch(); // TOOD @UNCOMMENT
         if (productionModeButIncludePackageJsonDeps) {
           //#region webpack dist release build
           console.log('Startomg build');
@@ -3184,7 +3195,6 @@ ${otherProjectNames
           //#endregion
         }
       } else {
-        // await this.__indexAutogenProvider.start(); // TODO @UNCOMMENT
         //#region non watch build
 
         if (cutNpmPublishLibReleaseCode) {
