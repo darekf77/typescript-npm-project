@@ -46,6 +46,7 @@ export async function start(
       bw: 'build:watch',
       cbw: 'build:clean:watch',
       cbuildwwatch: 'build:clean:watch',
+      c: 'clear',
       s: 'build:start',
       start: 'build:start',
       cstart: 'build:start:clean',

@@ -6174,6 +6174,7 @@ ${config.frameworkName} start
       path.join(this.location, config.file.tnpEnvironment_json),
     );
     this.vsCodeHelpers.recreateExtensions();
+    this.vsCodeHelpers.recreateWindowTitle();
     // });
 
     if (this.__isStandaloneProject && this.isInCiReleaseProject) {
