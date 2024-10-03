@@ -2,31 +2,37 @@
 //#region @backend
 import * as semver from 'semver';
 //#endregion
-import { BaseNpmHelpers, Helpers } from 'tnp-helpers/src';
+import {
+  BaseFeatureForProject,
+  BaseNpmHelpers,
+  Helpers,
+} from 'tnp-helpers/src';
 import { Project } from './project';
 import { BaseLinkedProjects } from 'tnp-helpers/src';
 import { crossPlatformPath, path } from 'tnp-core/src';
 import { config } from 'tnp-config/src';
 //#endregion
 
-export class BaseLocalRelease extends BaseLinkedProjects<Project> {
+export class BaseLocalRelease extends BaseFeatureForProject<Project> {
   protected async _() {
     await this.project.init('before local release');
   }
 
-  async startCLiRelease() {
-    await this._();
+  //#region methods / compilation process
+  async compilationProcess() {
     //#region @backendFunc
-
-    await this.project.npmHelpers.bumpPatchVersion();
-    this.project.__packageJson.reload();
-
     //#region resolve pathes
-    const destBase = this.project.pathFor(
-      `${config.folder.local_release}/cli/${this.project.nameForCli}-v${this.project.version}`,
+    const destBaseLatest = this.project.pathFor(
+      `${config.folder.local_release}/cli/${this.project.nameForCli}-latest`,
     );
 
-    const destTmpBase = this.project.pathFor(
+    const destBase = destBaseLatest;
+
+    // const destBase = this.project.pathFor(
+    //   `${config.folder.local_release}/cli/${this.project.nameForCli}-v${this.project.version}`,
+    // );
+
+    const destTmpBaseOldVersions = this.project.pathFor(
       `${config.folder.local_release}/cli/tmp-old-versions/` +
         `${this.project.nameForCli}-v${this.project.version}-${new Date().getTime()}`,
     );
@@ -43,7 +49,7 @@ export class BaseLocalRelease extends BaseLinkedProjects<Project> {
     //#endregion
 
     if (Helpers.exists(destBase)) {
-      Helpers.copy(destBase, destTmpBase);
+      Helpers.copy(destBase, destTmpBaseOldVersions);
       Helpers.remove(destBase);
     }
 
@@ -87,44 +93,20 @@ npm link
 \`\`\`
 `,
     );
+    //#endregion
+  }
+  //#endregion
 
-    const destBaseLatest = this.project.pathFor(
-      `${config.folder.local_release}/cli/${this.project.nameForCli}-latest`,
-    );
+  //#region methods / startCLiRelease
+  async startCLiRelease() {
+    await this._();
+    //#region @backendFunc
 
-    let latestProj = Project.ins.From(destBaseLatest);
-
-    if (
-      !latestProj ||
-      (latestProj && semver.gte(this.project.version, latestProj.version))
-    ) {
-      if (latestProj) {
-        const destBaseLatestProjVersioned = this.project.pathFor(
-          `${config.folder.local_release}/cli/${this.project.nameForCli}-v${latestProj.version}`,
-        );
-        Helpers.tryRemoveDir(destBaseLatestProjVersioned);
-        Helpers.copy(destBaseLatest, destBaseLatestProjVersioned);
-      }
-
-      Helpers.tryRemoveDir(destBaseLatest);
-      Helpers.copy(destBase, destBaseLatest);
-    }
-
-    Project.ins.unload(destBaseLatest);
-    latestProj = Project.ins.From(destBaseLatest);
-    const baseProj = Project.ins.From(
-      this.project.pathFor(
-        `${config.folder.local_release}/cli/${this.project.nameForCli}-v${latestProj.version}`,
-      ),
-    );
-
-    const shouldRemoveVersioned =
-      baseProj && latestProj && baseProj?.version === latestProj?.version;
-
-    if (shouldRemoveVersioned) {
-      Helpers.remove(destBase);
-    }
+    await this.project.npmHelpers.bumpPatchVersion();
+    this.project.__packageJson.reload();
+    await this.compilationProcess();
 
     //#endregion
   }
+  //#endregion
 }
