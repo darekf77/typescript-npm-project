@@ -50,7 +50,10 @@ class $Release extends CommandLineFeature<ReleaseOptions, Project> {
 
   //#region install:locally
   async installLocally() {
-    if (!this.project.hasFolder('out')) {
+    if (
+      !this.project.hasFolder('out') ||
+      Helpers.filesFrom(this.project.pathFor('out'), true).length === 0
+    ) {
       Helpers.info('Building project...');
       await this.project.build(BuildOptions.from({ watch: false }));
     }

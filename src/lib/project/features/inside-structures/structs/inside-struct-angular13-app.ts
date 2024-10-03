@@ -672,7 +672,7 @@ ${appModuleFile}
             const iconsPath = crossPlatformPath(path.join(assetsPath, 'icons'));
 
             const iconsFilesPathes = Helpers.filesFrom(iconsPath).filter(f => {
-              return Models.ImageFileExtensionArr.includes(
+              return CoreModels.ImageFileExtensionArr.includes(
                 path.extname(f as any).replace('.', '') as any,
               );
             }); // glob.sync(`${iconsPath}/**/*.(png|jpeg|svg)`);

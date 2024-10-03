@@ -12,17 +12,29 @@ export interface AppBuildConfig {
   children?: AppBuildConfig[];
 }
 
-export class DocsAppBuildConfig extends BaseFeatureForProject<Project> {
+export class GithubPagesAppBuildConfig extends BaseFeatureForProject<Project> {
+  private oldConfigName = 'docs-app-build-config.json5';
   private get configFileName() {
-    return 'docs-app-build-config.json5';
+    return 'github-pages-app-build-config.jsonc';
   }
 
   private get path() {
+    this.replaceOldConfig();
     return crossPlatformPath([this.project.location, this.configFileName]);
   }
 
   get configExists() {
     return Helpers.exists(this.path);
+  }
+
+  private replaceOldConfig() {
+    if (this.project.hasFile(this.oldConfigName)) {
+      this.project.writeFile(
+        this.configFileName,
+        this.project.readFile(this.oldConfigName),
+      );
+      this.project.removeFile(this.oldConfigName);
+    }
   }
 
   get config() {

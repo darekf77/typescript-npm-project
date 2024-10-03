@@ -39,6 +39,11 @@ const debugFiles = [
   // 'app.ts'
 ];
 
+export type InlinePkg = {
+  isIsomorphic: boolean;
+  realName: string;
+};
+
 /**
  * Allow imports or exports with '/src' at tthe end
  *
@@ -653,7 +658,7 @@ export class BrowserCodeCut {
   //#endregion
 
   //#region private / methods & getters / get inline package
-  private getInlinePackage(packageName: string): Models.InlinePkg {
+  private getInlinePackage(packageName: string): InlinePkg {
     const packagesNames = this.project.allIsomorphicPackagesFromMemory;
 
     let realName = packageName;

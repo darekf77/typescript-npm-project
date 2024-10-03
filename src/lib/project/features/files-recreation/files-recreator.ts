@@ -11,6 +11,8 @@ import { Helpers } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
 import { BaseFeatureForProject } from 'tnp-helpers/src';
 import { InitOptions } from '../../../build-options';
+import { Utils } from 'tnp-core/src';
+import { frameworkBuildFolders } from '../../../constants';
 
 // function getVscodeSettingsFrom(project: Project) {
 //   let settings: CoreModels.VSCodeSettings;
@@ -24,6 +26,8 @@ import { InitOptions } from '../../../build-options';
 //   }
 //   return settings;
 // }
+
+export type RecreateFile = { where: string; from: string; linked?: boolean };
 
 export class FilesRecreator extends BaseFeatureForProject<Project> {
   public async recreateSimpleFiles(initOptions: InitOptions) {
@@ -368,6 +372,10 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
                 'package-lock.json': true,
               };
 
+              frameworkBuildFolders.forEach(f => {
+                settings['search.exclude'][f] = true;
+              });
+
               Object.keys(settings['search.exclude']).forEach(k => {
                 settings['search.exclude'][`**/${k}`] = true;
               });
@@ -446,6 +454,9 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
                     s['files.exclude'][f] = true;
                   });
                 if (!project.__isCoreProject) {
+                  for (const element of frameworkBuildFolders) {
+                    s['files.exclude'][element] = true;
+                  }
                   s['files.exclude']['**/*.filetemplate'] = true;
                   s['files.exclude']['**/tsconfig.*'] = true;
                   s['files.exclude']['**/tslint.*'] = true;
@@ -460,6 +471,8 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
                   s['files.exclude']['**/protractor.conf.js'] = true;
                   s['files.exclude']['**/karma.conf.js'] = true;
                   s['files.exclude']['**/.editorconfig'] = true;
+                  s['files.exclude'][`**/${project.docs.docsConfigSchema}`] =
+                    true;
                   Object.keys(project.lintFiles).forEach(f => {
                     s['files.exclude'][`**/${f}`] = true;
                   });
@@ -568,6 +581,10 @@ yarn-error.log
 testem.log
 /typings
 app.hosts.ts
+${frameworkBuildFolders.map(c => `/${c}`).join('\n')}
+  .map(c => '/' + c)
+  .join('\n')}
+/${this.project.docs.docsConfigSchema}
 /**/*._auto-generated_.ts
 /**/BUILD-INFO.md
 ${this.project.__linkedRepos.git.ignored()}
@@ -656,7 +673,7 @@ ${this.project.__isCoreProject ? '' : '/.vscode/launch.json'}
       this.project.__frameworkVersion,
     ) as Project;
 
-    const files: Models.RecreateFile[] = [];
+    const files: RecreateFile[] = [];
 
     if (
       crossPlatformPath(this.project.location) ===

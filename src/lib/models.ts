@@ -1,13 +1,12 @@
 import { CoreModels, _ } from 'tnp-core/src';
 
 export namespace Models {
+  //#region taon test type
   export type TestTypeTaon = 'mocha' | 'jest' | 'cypress';
-  export const TestTypeTaonArr = [
-    'mocha',
-    'jest',
-    'cypress',
-  ] as TestTypeTaon[];
+  export const TestTypeTaonArr = ['mocha', 'jest', 'cypress'] as TestTypeTaon[];
+  //#endregion
 
+  //#region taon npm package type
   export type SaveAction = 'save' | 'show' | 'hide';
 
   export type PackageJsonSaveOptions = {
@@ -46,12 +45,24 @@ export namespace Models {
   export const ArrTnpNpmDependencyType: TnpNpmDependencyType[] = [
     'tnp_overrided_dependencies',
   ];
+  //#endregion
 
+  //#region taon fe app loader
   export interface TaonLoaderConfig {
     name?: TaonLoaders;
     color?: string;
   }
 
+  export type TaonLoaders =
+    | 'lds-default'
+    | 'lds-ellipsis'
+    | 'lds-facebook'
+    | 'lds-grid'
+    | 'lds-heart'
+    | 'lds-ripple';
+  //#endregion
+
+  //#region env config
   export interface EnvConfigProject {
     baseUrl: string;
     host?: string; // generated
@@ -67,14 +78,6 @@ export namespace Models {
     isWebsqlBuild?: boolean; // generated
     //#endregion
   }
-
-  export type TaonLoaders =
-    | 'lds-default'
-    | 'lds-ellipsis'
-    | 'lds-facebook'
-    | 'lds-grid'
-    | 'lds-heart'
-    | 'lds-ripple';
 
   export interface EnvConfig {
     /**
@@ -200,6 +203,7 @@ export namespace Models {
       };
     };
   }
+  //#endregion
 
   //#region site option
   export type NewSiteOptions = {
@@ -214,6 +218,10 @@ export namespace Models {
   };
   //#endregion
 
+  //#region taon.json config @deprecated
+  /**
+   * @deprecated
+   */
   export type TargetProject = {
     path?: string;
     origin: string;
@@ -351,7 +359,12 @@ export namespace Models {
       dependencies?: DependenciesFromPackageJsonStyle;
     };
   }
+  //#endregion
 
+  //#region package.json @deprecated
+  /**
+   * @deprecated use CoreModels.TaonJson
+   */
   export interface IPackageJSON
     extends Omit<TnpIPackageJSONOverride, 'version'> {
     name: string;
@@ -371,107 +384,20 @@ export namespace Models {
     tnp: TnpData & TnpIPackageJSONOverride;
     taon: TnpData & TnpIPackageJSONOverride;
   }
-
   /**
    * @deprecated
    */
   export type DependenciesFromPackageJsonStyle = { [name: string]: string };
 
-  export interface ProjectForAutoBuild {
-    cwd: string;
-    command: string;
-    commandWatch: string;
-    args?: string[];
-  }
+  //#endregion
 
-  export interface ProjectForAutoRelease {
-    cwd: string;
-    command: string;
-    args?: string[];
-  }
-
-  export interface AutoActionsUser {
-    builds?: ProjectForAutoBuild[];
-    autoreleases?: ProjectForAutoRelease[];
-  }
-
-  export interface TscCompileOptions {
-    cwd: string;
-    watch?: boolean;
-    outDir?: BuildDir;
-    generateDeclarations?: boolean;
-    tsExe?: string;
-    diagnostics?: boolean;
-    hideErrors?: boolean;
-    debug?: boolean;
-  }
-
-  export interface BuildServeArgsServe {
-    port: string;
-    baseUrl: string;
-    outDir: string;
-  }
-
+  //#region  build dir
   export type BuildDir = 'dist';
   export type BuildDirBrowser = 'browser' | 'websql';
+  //#endregion
 
-  export type InlinePkg = {
-    isIsomorphic: boolean;
-    realName: string;
-  };
-
-  export type ModifiedFiles = { modifiedFiles: string[] };
-
-  export class Range {
-    static clone(r: Range) {
-      return new Range(r.from, r.to);
-    }
-
-    static from(from: number) {
-      // const self = this;
-      return {
-        to(to: number) {
-          return new Range(from, to);
-        },
-      };
-    }
-
-    constructor(
-      public from: number,
-      public to: number,
-    ) {
-      if (_.isNative(from) || _.isNative(to)) {
-        throw new Error(`This Range type is only for positive numbers`);
-      }
-    }
-
-    get length() {
-      return this.to - this.from;
-    }
-
-    get array() {
-      const arr = [];
-      for (let index = this.from; index <= this.to; index++) {
-        arr.push(index);
-      }
-      return arr;
-    }
-
-    contains(anotherRangeOrNumber: Range | number) {
-      if (_.isNumber(anotherRangeOrNumber)) {
-        return (
-          anotherRangeOrNumber >= this.from && anotherRangeOrNumber <= this.to
-        );
-      }
-      anotherRangeOrNumber = anotherRangeOrNumber as Range;
-
-      return (
-        anotherRangeOrNumber.from >= this.from &&
-        anotherRangeOrNumber.to <= this.to
-      );
-    }
-  }
-
+  //#region cli root args
+  // TODO make it more visible
   export type RootArgsType = {
     tnpNonInteractive: boolean;
     tnpShowProgress: boolean;
@@ -482,7 +408,9 @@ export namespace Models {
     findNearestProjectTypeWithGitRoot: CoreModels.LibType;
     cwd: string;
   };
+  //#endregion
 
+  //#region generate project copy
   export interface GenerateProjectCopyOpt {
     override?: boolean;
     markAsGenerated?: boolean;
@@ -498,35 +426,11 @@ export namespace Models {
      */
     dereference?: boolean;
   }
+  //#endregion
 
-  export type SourceFolder = 'src' | 'components' | 'custom' | 'tmp-src';
 
-  export const ImageFileExtensionArr: CoreModels.ImageFileExtension[] = [
-    'jpg',
-    'jpeg',
-    'png',
-    'svg',
-  ];
 
-  export type RecreateFile = { where: string; from: string; linked?: boolean };
-
-  export type Tnp = TnpData & TnpIPackageJSONOverride;
-
-  export interface RegisterServiceOptions {
-    killAlreadyRegisterd?: boolean;
-    actionWhenAssignedPort?: (
-      itWasRegistered: boolean,
-      registerdOnPort?: number,
-    ) => any;
-  }
-
-  export class SystemService {
-    constructor(
-      public name: string,
-      public description?: string,
-    ) {}
-  }
-
+  //#region ps list info
   export interface PsListInfo {
     pid: number;
     ppid: number;
@@ -535,4 +439,58 @@ export namespace Models {
     name: string;
     cmd: string;
   }
+  //#endregion
+
+  //#region DocsConfig
+  export interface DocsConfig {
+    /**
+     * override site name
+     */
+    site_name: string;
+    /**
+     * relative pathes to md files
+     * for proper order
+     */
+    priorityOrder?: string[];
+    /**
+     * glob pattern to omit files
+     */
+    omitFilesPatters: string[];
+    /**
+     * relative path to the assets folders in project
+     * [external assets not allowed... use externalDocs for that]
+     */
+    additionalAssets: string[];
+    externalDocs: {
+      mdfiles: {
+        /**
+         * path to *.md file
+         * or array of paths (fallbacks pathes for the same file)
+         * [in case of multiple files -> you will be ask to choose one]
+         */
+        path: string | string[];
+        /**
+         * if you want to rename something inside file
+         * you can use this magic rename rules
+         * example:
+         *
+         * framework-name => new-framework-name
+         *
+         * example with array:
+         *
+         * framework-name => new-framework-name, framework-name2 => new-framework-name2
+         */
+        magicRenameRules: string;
+      }[];
+      projects: {
+        /**
+         * path to project
+         * or array of paths (fallbacks pathes for the same projec)
+         * [in case of multiple projects -> you will be ask to choose one]
+         */
+        path: string;
+      }[];
+    };
+  }
+  //#endregion
 }

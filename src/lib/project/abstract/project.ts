@@ -20,7 +20,7 @@ import {
   WebpackBackendCompilation,
   LinkedRepos,
   Branding,
-  DocsAppBuildConfig,
+  GithubPagesAppBuildConfig,
   AssetsManager,
 } from '../features';
 import { AssetsFileListGenerator } from '../compilers';
@@ -64,6 +64,8 @@ import { NpmHelpers } from './npm-helpers';
 import { LinkedProjects } from './linked-projects';
 import { BaseLocalRelease } from './base-local-release';
 import { Git } from './git';
+import { Docs } from './docs';
+import { Vscode } from './vscode';
 //#endregion
 
 const debugWord = 'Debug/Start';
@@ -254,6 +256,18 @@ export class TaonProjectResolve extends BaseProjectResolver<Project> {
     //#endregion
   }
   //#endregion
+
+  //#region static / by
+  public by(
+    libraryType: CoreModels.NewFactoryType,
+    //#region @backend
+    version: CoreModels.FrameworkVersion = config.defaultFrameworkVersion,
+    //#endregion
+  ): Project {
+    //#region @backendFunc
+    return Project.by(libraryType, version);
+    //#endregion
+  }
 }
 
 export class Project extends BaseProject<Project, CoreModels.LibType> {
@@ -723,6 +737,8 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   private __npmRunNg: string = `npm-run ng`; // when there is not globl "ng" command -> npm-run ng.js works
   public angularFeBasenameManager: AngularFeBasenameManager;
   public localRelease: BaseLocalRelease;
+  public docs: Docs;
+  public vsCodeHelpers: Vscode;
 
   //#region @backend
   public __libStandalone: LibProjectStandalone;
@@ -736,7 +752,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
    */
   public __packageJson: PackageJSON;
   public __filesTemplatesBuilder: FilesTemplatesBuilder;
-  public __docsAppBuild: DocsAppBuildConfig;
+  public __docsAppBuild: GithubPagesAppBuildConfig;
   public __assetsManager: AssetsManager;
   public __targetProjects: TargetProject;
   public __branding: Branding;
@@ -785,12 +801,16 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     this.localRelease = new (require('./base-local-release')
       .BaseLocalRelease as typeof BaseLocalRelease)(this as any);
 
+    this.vsCodeHelpers = new (require('./vscode').Vscode as typeof Vscode)(
+      this as any,
+    );
+
     if (!global.codePurposeBrowser) {
       // TODO when on weird on node 12
 
       this.__packageJson = PackageJSON.fromProject(this);
       this.setType(this.__packageJson ? this.__packageJson.type : 'unknow');
-
+      this.defineProperty<Project>('docs', Docs);
       this.defineProperty<Project>('quickFixes', QuickFixes);
       this.defineProperty<Project>('__node_modules', NodeModules);
       this.defineProperty<Project>('__npmPackages', NpmPackages);
@@ -826,7 +846,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       );
       this.defineProperty<Project>('__linkedRepos', LinkedRepos);
       this.defineProperty<Project>('__branding', Branding);
-      this.defineProperty<Project>('__docsAppBuild', DocsAppBuildConfig);
+      this.defineProperty<Project>('__docsAppBuild', GithubPagesAppBuildConfig);
       this.defineProperty<Project>('__assetsManager', AssetsManager);
       this.defineProperty<Project>(
         '__assetsFileListGenerator',
@@ -969,6 +989,17 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       );
     }
 
+    //#endregion
+  }
+  //#endregion
+
+  //#region getters & methods / all npm packages names
+  get allNpmPackagesNames(): string[] {
+    //#region @backendFunc
+    return [
+      this.universalPackageName,
+      ...this.__packageJson.additionalNpmNames,
+    ];
     //#endregion
   }
   //#endregion

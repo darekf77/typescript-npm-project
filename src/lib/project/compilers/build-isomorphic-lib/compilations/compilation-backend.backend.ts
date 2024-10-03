@@ -95,7 +95,7 @@ export class BackendCompilation extends IncCompiler.Base {
       generateDeclarations = false,
       tsExe = 'npm-run tsc',
       diagnostics = false,
-    }: Models.TscCompileOptions,
+    }: CoreModels.TscCompileOptions,
   ) {
     if (!this.isEnableCompilation) {
       Helpers.log(

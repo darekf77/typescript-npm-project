@@ -3,15 +3,22 @@ import { _ } from 'tnp-core/src';
 import { Helpers } from 'tnp-helpers/src';
 import { CommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
-import { DocsProvider } from '../features/docs-provider';
+
+import { watch } from 'fs';
 class $Docs extends CommandLineFeature<{}, Project> {
   public async _() {
-    await new DocsProvider(this.project).start();
+    await this.project.docs.runTask({
+      initalParams: {
+        docsOutFolder: 'dupa',
+      },
+    });
     this._exit(0);
   }
 
   async watch() {
-    await new DocsProvider(this.project).startAndWatch();
+    await this.project.docs.runTask({
+      watch: true,
+    });
   }
 }
 

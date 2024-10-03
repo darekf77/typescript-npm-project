@@ -469,7 +469,10 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
   //#region bad types in node modules
   removeBadTypesInNodeModules() {
     //#region @backendFunc
-    if (this.project.__frameworkVersionAtLeast('v2')) {
+    if (
+      this.project.__frameworkVersionAtLeast('v2') &&
+      (this.project.__isStandaloneProject || this.project.__isSmartContainer)
+    ) {
       [
         '@types/prosemirror-*',
         '@types/mocha',
@@ -487,10 +490,22 @@ THIS FILE IS GENERATED.THIS FILE IS GENERATED. THIS FILE IS GENERATED.
       const globalsDts = this.project.readFile(
         'node_modules/@types/node/globals.d.ts',
       );
-      this.project.writeFile(
-        'node_modules/@types/node/globals.d.ts',
-        UtilsTypescript.removeRegionByName(globalsDts, 'borrowed'),
-      );
+      try {
+        this.project.writeFile(
+          'node_modules/@types/node/globals.d.ts',
+          UtilsTypescript.removeRegionByName(globalsDts, 'borrowed'),
+        );
+      } catch (error) {
+        Helpers.error(
+          `Problem with removing borrowed types from globals.d.ts`,
+          true,
+          false,
+        );
+        this.project.writeFile(
+          'node_modules/@types/node/globals.d.ts',
+          globalsDts,
+        );
+      }
     }
     // if (this.project.isVscodeExtension) {
     //   [

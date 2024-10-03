@@ -5,7 +5,7 @@ import {
 } from 'incremental-compiler/src';
 import { Project } from '../abstract/project';
 import { config } from 'tnp-config/src';
-import { requiredForDev } from 'tnp-core/src';
+import { requiredForDev, UtilsString } from 'tnp-core/src';
 import {
   crossPlatformPath,
   path,
@@ -34,6 +34,7 @@ import * as psList from 'ps-list';
 import { MagicRenamer } from 'magic-renamer/src';
 import * as semver from 'semver';
 import { walk } from 'lodash-walk-object/src';
+import { createGenerator, SchemaGenerator } from 'ts-json-schema-generator';
 
 declare const ENV: any;
 //#endregion
@@ -1074,7 +1075,7 @@ export class $Global extends BaseCommandLine<{}, Project> {
       myEntity,
     ]);
 
-    const newEntityName = _.kebabCase(entityName);
+    const newEntityName = UtilsString.kebabCaseNoSplitNumbers(entityName);
     const generatedCodeAbsLoc = crossPlatformPath([
       container.location,
       `gen-examples-${container.__frameworkVersion}`,
@@ -1723,6 +1724,51 @@ ${this.project.children
     this._exit();
   }
   //#endregion
+
+  jsonSchema() {
+    return this.schemaJson();
+  }
+  schemaJson() {
+    interface CreateJsonSchemaOptions {
+      project: Project;
+      nameOfTypeOrInterface: string;
+      relativePathToTsFile: string;
+    }
+
+    const createJsonSchemaFrom = ({
+      project,
+      relativePathToTsFile,
+      nameOfTypeOrInterface,
+    }: CreateJsonSchemaOptions): string => {
+      // Create the config for ts-json-schema-generator
+      const config = {
+        path: relativePathToTsFile, // Path to the TypeScript file
+        tsconfig: project.pathFor('tsconfig.json'), // Path to the tsconfig.json file
+        type: nameOfTypeOrInterface, // Type or interface name
+        skipTypeCheck: false, // Optional: Skip type checking
+      };
+
+      // Create the schema generator using the config
+      const generator: SchemaGenerator = createGenerator(config);
+
+      // Generate the schema
+      const schema = generator.createSchema(config.type);
+
+      // Convert the schema object to JSON string
+      const schemaJson = JSON.stringify(schema, null, 2);
+
+      return schemaJson;
+    };
+
+    console.log(
+      createJsonSchemaFrom({
+        project: this.project,
+        relativePathToTsFile: this.firstArg,
+        nameOfTypeOrInterface: this.lastArg,
+      }),
+    );
+    this._exit();
+  }
 }
 
 export default {

@@ -1,13 +1,11 @@
+//#region imports
+//#region @backend
+import { os } from 'tnp-core/src';
+//#endregion
 import { config } from 'tnp-config/src';
 import type { Project } from './project/abstract/project';
-
-import {
-  crossPlatformPath,
-  path,
-  //#region @backend
-  os,
-  //#endregion
-} from 'tnp-core/src';
+import { crossPlatformPath, path, Utils } from 'tnp-core/src';
+//#endregion
 
 export const taonIgnore = '@taon' + '-' + 'ignore';
 
@@ -201,6 +199,13 @@ ${clientPorts}
     //#endregion
   }
 }
+
+export const frameworkBuildFolders = Utils.uniqArray([
+  '.firedev',
+  '.taon',
+  '.tnp',
+  `.${config.frameworkName}`,
+]);
 
 export const notAllowedProjectNames = [
   // TODO @LAST add all npm package names from core container

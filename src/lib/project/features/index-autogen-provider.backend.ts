@@ -1,6 +1,6 @@
 import { BaseFeatureForProject } from 'tnp-helpers/src';
 import type { Project } from '../abstract/project';
-import { BaseCompilerForProject } from '../abstract/base-compiler-for-project.backend';
+import { BaseCompilerForProject } from 'tnp-helpers/src';
 import { ChangeOfFile } from 'incremental-compiler/src';
 import { config, extAllowedToReplace } from 'tnp-config/src';
 import { UtilsTypescript } from 'tnp-helpers/src';

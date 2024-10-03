@@ -4,7 +4,7 @@ import { fse } from 'tnp-core/src';
 import { path } from 'tnp-core/src';
 import { config } from 'tnp-config/src';
 import { Project } from '../../abstract/project';
-import { BaseCompilerForProject } from '../../abstract/base-compiler-for-project.backend';
+import { BaseCompilerForProject } from 'tnp-helpers/src';
 import { Models } from '../../../models';
 import { CopyMangerHelpers } from './copy-manager-helpers.backend';
 import { IncCompiler } from 'incremental-compiler/src';
