@@ -4,10 +4,10 @@ import { BaseCompilerForProject } from 'tnp-helpers/src';
 import { ChangeOfFile } from 'incremental-compiler/src';
 import { config } from 'tnp-config/src';
 import { BaseDebounceCompilerForProject } from 'tnp-helpers/src';
-import { Helpers } from 'tnp-helpers/src';
+import { Helpers, UtilsHttp } from 'tnp-helpers/src';
 import type { Project } from './project';
 import { Models } from '../../models';
-import { _ } from 'tnp-core/src';
+import { _, crossPlatformPath } from 'tnp-core/src';
 //#endregion
 
 export class Docs extends BaseDebounceCompilerForProject<
@@ -32,15 +32,22 @@ export class Docs extends BaseDebounceCompilerForProject<
   /**
    * mkdocs temp folder
    */
-  public readonly tmpDocsFolder = `.${config.frameworkName}/temp-docs-folder/docs`;
+  public readonly tmpDocsFolderRoot = `.${config.frameworkName}/temp-docs-folder`;
+
+  get tmpDocsFolderRootDocsDir() {
+    //#region @backendFunc
+    return crossPlatformPath([this.tmpDocsFolderRoot, 'docs']);
+    //#endregion
+  }
+
   //#endregion
 
   //#region fields & getters / out docs folder path
-  get outDocsFolderRelative() {
+  get outDocsDistFolderAbs() {
     //#region @backendFunc
-    return (
-      this.initalParams.docsOutFolder || `.${config.frameworkName}/docs-dist`
-    );
+    return this.project.pathFor([
+      this.initalParams.docsOutFolder || `.${config.frameworkName}/docs-dist`,
+    ]);
     //#endregion
   }
   //#endregion
@@ -69,8 +76,6 @@ export class Docs extends BaseDebounceCompilerForProject<
   }
   //#endregion
   //#endregion
-
-  //#region methods
 
   //#region methods / get docs config json $schema
   protected docsConfigSchemaContent(): string {
@@ -101,9 +106,9 @@ export class Docs extends BaseDebounceCompilerForProject<
 
   //#region methods / mkdocsYmlContent
   mkdocsYmlContent(entryPointFilesRelativePaths: string[]): string {
-    console.log({
-      entryPointFilesRelativePaths,
-    });
+    // console.log({
+    //   entryPointFilesRelativePaths,
+    // });
     // TODO @LAST
     // - Introduction: introduction/index.md
     // - Setup: setup/index.md
@@ -116,7 +121,7 @@ export class Docs extends BaseDebounceCompilerForProject<
     return `site_name: Taon Documentation
 # site_url: https://firedev.io/documentation
 nav:
-${entryPointFilesRelativePaths.map(p => `  - ${_.upperCase(p)}: ${p}`).join('\n')}
+${entryPointFilesRelativePaths.map(p => `  - ${_.upperCase(p.replace('.md', ''))}: ${p}`).join('\n')}
 docs_dir: ./docs
 theme:
   name: material
@@ -189,19 +194,34 @@ markdown_extensions:
   //#region methods / build mkdocs
   private async buildMkdocs({ watch }: { watch: boolean }) {
     //#region @backendFunc
+    this.project.setValueToJSONC(
+      config.file.package_json,
+      'scripts.mkdocs',
+      'python3 -m mkdocs',
+    );
     if (watch) {
       const mkdocsServePort = await this.project.assignFreePort(3900);
       // python3 -m
-      Helpers.run(`mkdocs serve -a localhost:${mkdocsServePort} --quiet`, {
-        cwd: this.project.pathFor([this.tmpDocsFolder, '..']),
-      }).async();
-    } else {
       Helpers.run(
-        `mkdocs build --site-dir ../../${this.outDocsFolderRelative}`,
+        //--quiet
+        `python3 -m mkdocs serve -a localhost:${mkdocsServePort} `,
         {
-          cwd: this.project.pathFor([this.tmpDocsFolder, '..']),
+          cwd: this.project.pathFor([this.tmpDocsFolderRoot]),
+        },
+      ).async();
+      Helpers.info(`Mkdocs server started on port ${mkdocsServePort}`);
+    } else {
+      if (!Helpers.exists(this.outDocsDistFolderAbs)) {
+        Helpers.mkdirp(this.outDocsDistFolderAbs);
+      }
+      Helpers.run(
+        `python3 -m mkdocs build --site-dir ${this.outDocsDistFolderAbs}`,
+        {
+          cwd: this.project.pathFor([this.tmpDocsFolderRoot]),
         },
       ).sync();
+      const portForDocs = await this.project.assignFreePort(3950);
+      await UtilsHttp.startHttpServer(this.outDocsDistFolderAbs, portForDocs);
     }
     //#endregion
   }
@@ -221,8 +241,8 @@ markdown_extensions:
     // console.log('initalParams', this.initalParams);
     if (!asyncEvent) {
       //#region sync init
-      if (!this.project.hasFolder(this.tmpDocsFolder)) {
-        this.project.createFolder(this.tmpDocsFolder);
+      if (!this.project.hasFolder(this.tmpDocsFolderRootDocsDir)) {
+        this.project.createFolder(this.tmpDocsFolderRootDocsDir);
       }
       if (!this.project.hasFile(this.docsConfig)) {
         this.project.writeJson(this.docsConfig, this.defaultDocsConfig());
@@ -234,14 +254,6 @@ markdown_extensions:
         );
       }
       this.project.vsCodeHelpers.recreateJsonSchemaForDocs();
-      this.project.writeFile(
-        [this.tmpDocsFolder, '../mkdocs.yml'],
-        this.mkdocsYmlContent(
-          files
-            .map(f => this.project.relative(f))
-            .filter(f => f.split('/').length === 1 && f.endsWith('.md')),
-        ),
-      );
 
       //#endregion
     }
@@ -255,16 +267,28 @@ markdown_extensions:
       );
       Helpers.copyFile(
         asbFilePath,
-        this.project.pathFor([this.tmpDocsFolder, relativePath]),
+        this.project.pathFor([this.tmpDocsFolderRootDocsDir, relativePath]),
       );
     }
     //#endregion
 
-    await this.buildMkdocs({ watch: this.isWatchCompilation });
+    const rootFiles = Helpers.filesFrom(this.project.location).filter(f =>
+      f.toLowerCase().endsWith('.md'),
+    );
+    this.project.writeFile(
+      [this.tmpDocsFolderRoot, 'mkdocs.yml'],
+      this.mkdocsYmlContent(
+        rootFiles
+          .map(f => this.project.relative(f))
+          .filter(f => f.split('/').length === 1 && f.endsWith('.md')),
+      ),
+    );
+
+    if (!asyncEvent) {
+      await this.buildMkdocs({ watch: this.isWatchCompilation });
+    }
 
     //#endregion
   }
-  //#endregion
-
   //#endregion
 }

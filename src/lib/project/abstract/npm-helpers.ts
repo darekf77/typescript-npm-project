@@ -9,7 +9,6 @@ export class NpmHelpers extends BaseNpmHelpers<Project> {
     options?: Omit<CoreModels.NpmInstallOptions, 'pkg'>,
   ) {
     if (this.project.__isStandaloneProject || this.project.__isContainer) {
-      // TODO @LAST
       return;
     }
     await super.makeSureNodeModulesInstalled(options);

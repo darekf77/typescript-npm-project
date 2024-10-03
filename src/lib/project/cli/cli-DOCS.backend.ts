@@ -9,7 +9,7 @@ class $Docs extends CommandLineFeature<{}, Project> {
   public async _() {
     await this.project.docs.runTask({
       initalParams: {
-        docsOutFolder: 'dupa',
+        docsOutFolder: this.firstArg,
       },
     });
     this._exit(0);
