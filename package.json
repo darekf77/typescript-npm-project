@@ -356,7 +356,8 @@
   },
   "lastBuildTagHash": "d0235806cb49d554b5be2b393c8a67dc01b2f3b2",
   "scripts": {
-    "activate": "npm i --force && firedev dedupe && npx tsc && firedev link && tnp bd"
+    "activate": "npm i --force && firedev dedupe && npx tsc && firedev link && tnp bd",
+    "mkdocs": "python3 -m mkdocs"
   },
   "license": "MIT",
   "private": false,

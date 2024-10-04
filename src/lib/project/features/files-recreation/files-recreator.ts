@@ -464,7 +464,7 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
                   s['files.exclude']['**/recent.json'] = true;
                   s['files.exclude']['**/angular.json'] = true;
                   s['files.exclude']['**/webpack*'] = true;
-                  s['files.exclude']['**/docs/**/*.*'] = true;
+                  s['files.exclude']['**/docs/**/*'] = true;
                   s['files.exclude']['**/run-*'] = true;
                   s['files.exclude']['**/run.*'] = true;
                   s['files.exclude']['**/package-lock.json'] = true;

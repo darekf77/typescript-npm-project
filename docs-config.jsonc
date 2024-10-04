@@ -3,10 +3,13 @@
   "additionalAssets": [],
   "externalDocs": {
     "mdfiles": [
-
+      {
+        "magicRenameRules": "taon -> tnp",
+        "path": "../tnp-helpers/GIT-COMMANDS.md",
+      },
     ],
-    "projects": []
+    "projects": [],
   },
   "omitFilesPatters": [],
-  "priorityOrder": []
+  "priorityOrder": [],
 }
