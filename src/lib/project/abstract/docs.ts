@@ -211,38 +211,44 @@ export class Docs extends BaseDebounceCompilerForProject<
   //#endregion
 
   //#region methods / apply priority order
+
   private applyPriorityOrder(files: EntrypointFile[]): EntrypointFile[] {
     //#region @backendFunc
-    const priorityOrder =
-      (this.config.priorityOrder || []).length > 0
-        ? this.config.priorityOrder
-        : ['README.md'];
+    const orderByPriority = (items: EntrypointFile[], priority: string[]) => {
+      return items.sort((a, b) => {
+        // Get the index of the 'title' in the priorityOrder array
+        const indexA = priority.indexOf(a.title.replace('.md', ''));
+        const indexB = priority.indexOf(b.title.replace('.md', ''));
 
-    // Filter out the priority files
-    const prioritizedFiles = files.filter(file =>
-      priorityOrder
-        .map(a => a.replace('.md', ''))
-        .includes(file.title.replace('.md', '')),
-    );
+        // If either title is not in the priority order, move it to the end (assign a large index)
+        const priorityA = indexA === -1 ? priority.length : indexA;
+        const priorityB = indexB === -1 ? priority.length : indexB;
 
-    // Filter out non-priority files
-    const nonPrioritizedFiles = files.filter(
-      file =>
-        !priorityOrder
-          .map(a => a.replace('.md', ''))
-          .includes(file.title.replace('.md', '')),
+        // Compare by priority order
+        return priorityA - priorityB;
+      });
+    };
+
+    files = orderByPriority(
+      files,
+      (this.config.priorityOrder || []).map(p => p.replace('.md', '')),
     );
 
     // Return prioritized files first, followed by the rest
     const omitFilesPatters = this.config.omitFilesPatters || [];
-    return Utils.uniqArray(
-      [...prioritizedFiles, ...nonPrioritizedFiles].filter(
+    const result = Utils.uniqArray(
+      // [...prioritizedFiles, ...nonPrioritizedFiles]
+      files.filter(
         f =>
           f.title &&
-          !omitFilesPatters.map(a => a.replace('.md', '')).includes(f.title),
+          !omitFilesPatters
+            .map(a => a.replace('.md', ''))
+            .includes(f.title.replace('.md', '')),
       ),
       'relativePath',
     );
+
+    return result as EntrypointFile[];
     //#endregion
   }
   //#endregion
