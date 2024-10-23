@@ -5,7 +5,12 @@ import {
 } from 'incremental-compiler/src';
 import { Project } from '../abstract/project';
 import { config } from 'tnp-config/src';
-import { requiredForDev, UtilsString } from 'tnp-core/src';
+import {
+  chokidar,
+  dateformat,
+  requiredForDev,
+  UtilsString,
+} from 'tnp-core/src';
 import {
   crossPlatformPath,
   path,
@@ -1725,43 +1730,62 @@ ${this.project.children
   }
   //#endregion
 
+  async jsonSchemaDocsWatch() {
+    await this.project.init('initing before json schema docs watch');
+    const fileToWatchRelative = 'src/lib/models.ts';
+    const fileToWatch = this.project.pathFor(fileToWatchRelative);
+
+    const recreate = async () => {
+      const schema = await this._createJsonSchemaFrom({
+        nameOfTypeOrInterface: 'Models.DocsConfig',
+        project: this.project,
+        relativePathToTsFile: fileToWatch,
+      });
+      Helpers.writeFile(this.project.docs.docsConfigSchemaPath, schema);
+      Helpers.info(
+        `DocsConfig schema updated ${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}`,
+      );
+    };
+
+    const debouceRecreate = _.debounce(recreate, 100);
+    Helpers.taskStarted('Recreating... src/lib/models.ts');
+    await recreate();
+    Helpers.taskDone('Recreation done src/lib/models.ts');
+    Helpers.taskStarted('Watching for changes in src/lib/models.ts');
+    chokidar.watch(fileToWatch).on('change', () => {
+      debouceRecreate();
+    });
+  }
+
   jsonSchema() {
     return this.schemaJson();
   }
-  schemaJson() {
-    interface CreateJsonSchemaOptions {
-      project: Project;
-      nameOfTypeOrInterface: string;
-      relativePathToTsFile: string;
-    }
+  async _createJsonSchemaFrom(options: Models.CreateJsonSchemaOptions) {
+    const { project, relativePathToTsFile, nameOfTypeOrInterface } = options;
 
-    const createJsonSchemaFrom = ({
-      project,
-      relativePathToTsFile,
-      nameOfTypeOrInterface,
-    }: CreateJsonSchemaOptions): string => {
-      // Create the config for ts-json-schema-generator
-      const config = {
-        path: relativePathToTsFile, // Path to the TypeScript file
-        tsconfig: project.pathFor('tsconfig.json'), // Path to the tsconfig.json file
-        type: nameOfTypeOrInterface, // Type or interface name
-        skipTypeCheck: false, // Optional: Skip type checking
-      };
-
-      // Create the schema generator using the config
-      const generator: SchemaGenerator = createGenerator(config);
-
-      // Generate the schema
-      const schema = generator.createSchema(config.type);
-
-      // Convert the schema object to JSON string
-      const schemaJson = JSON.stringify(schema, null, 2);
-
-      return schemaJson;
+    // Create the config for ts-json-schema-generator
+    const config = {
+      path: relativePathToTsFile, // Path to the TypeScript file
+      tsconfig: project.pathFor('tsconfig.json'), // Path to the tsconfig.json file
+      type: nameOfTypeOrInterface, // Type or interface name
+      skipTypeCheck: false, // Optional: Skip type checking
     };
 
+    // Create the schema generator using the config
+    const generator: SchemaGenerator = createGenerator(config);
+
+    // Generate the schema
+    const schema = generator.createSchema(config.type);
+
+    // Convert the schema object to JSON string
+    const schemaJson = JSON.stringify(schema, null, 2);
+
+    return schemaJson;
+  }
+
+  schemaJson() {
     console.log(
-      createJsonSchemaFrom({
+      this._createJsonSchemaFrom({
         project: this.project,
         relativePathToTsFile: this.firstArg,
         nameOfTypeOrInterface: this.lastArg,

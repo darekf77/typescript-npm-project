@@ -454,8 +454,10 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
                     s['files.exclude'][f] = true;
                   });
                 if (!project.__isCoreProject) {
-                  for (const element of frameworkBuildFolders) {
-                    s['files.exclude'][element] = true;
+                  if (config.frameworkName !== 'tnp') {
+                    for (const element of frameworkBuildFolders) {
+                      s['files.exclude'][element] = true;
+                    }
                   }
                   s['files.exclude']['**/*.filetemplate'] = true;
                   s['files.exclude']['**/tsconfig.*'] = true;

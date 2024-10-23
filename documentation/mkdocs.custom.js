@@ -1,3 +1,4 @@
-// $( document ).ready(function() {
-//   console.log( "ready!" );
-// });
+// event on document ready without jquery
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM loaded');
+});

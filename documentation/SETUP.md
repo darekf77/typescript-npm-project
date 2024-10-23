@@ -26,7 +26,7 @@ Go to: https://marketplace.visualstudio.com/items?itemName=taon.taon-vscode-ext
 (WARNING before using *taon-vscode-ext*, please at lease once 
 execute **any** command of **taon** in your temrinal)
 
-<p style="text-align: center;border: 1px solid black;"><img src="../assets/images/vscode-ext.png" ></p>
+<p style="text-align: center;border: 1px solid black;"><img src="../__assets/images/vscode-ext.png" ></p>
 
 ##  How to uninstall taon from local machine
 Taon stores a big global container (in ~/.taon) for npm packages that are being shared 

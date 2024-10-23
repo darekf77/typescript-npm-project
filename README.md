@@ -1,8 +1,6 @@
----
-title: README
----
-
 # tnp -> CLI part of taon framework
+
+<p style="text-align: center;"><img src="./logo-small.png" ></p>
 
 ## Purpose of this project
 - this project is a core part of https://github.com/darekf77/taon

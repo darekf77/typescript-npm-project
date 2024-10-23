@@ -1,4 +1,7 @@
 //#region imports
+//#region @backend
+import { chalk, chokidar, fse, Utils } from 'tnp-core/src';
+//#endregion
 import { BaseProject, UtilsMd } from 'tnp-helpers/src';
 import { BaseCompilerForProject } from 'tnp-helpers/src';
 import { ChangeOfFile } from 'incremental-compiler/src';
@@ -9,6 +12,15 @@ import type { Project } from './project';
 import { Models } from '../../models';
 import { _, crossPlatformPath, path } from 'tnp-core/src';
 import { MagicRenamer, RenameRule } from 'magic-renamer/src';
+//#endregion
+
+//#region models / EntrypointFile
+type EntrypointFile = {
+  title: string;
+  relativePath: string;
+  // packageName: string;
+  contentToWrite?: string;
+};
 //#endregion
 
 export class Docs extends BaseDebounceCompilerForProject<
@@ -23,16 +35,46 @@ export class Docs extends BaseDebounceCompilerForProject<
 > {
   //#region fields & getters
 
-  //#region fields & getters / docs config path
-  public readonly docsConfig = 'docs-config.jsonc';
+  public readonly docsConfigJsonFileName = 'docs-config.jsonc';
   public readonly docsConfigSchema = 'docs-config.schema.json';
+  public readonly customDefaultCss = 'custom-default.css';
+  public readonly customDefaultJs = 'custom-default.js';
+  protected mkdocsServePort: number;
+  private linkedAlreadProjects = {};
 
-  get config() {
+  //#region fields & getters / docs config current proj abs path
+  public get docsConfigCurrentProjAbsPath() {
     //#region @backendFunc
-    return this.project.readJson(this.docsConfig) as Models.DocsConfig;
+    return this.project.pathFor(this.docsConfigJsonFileName);
     //#endregion
   }
+  //#endregion
 
+  //#region fields & getters / docs config
+  get config(): Models.DocsConfig {
+    //#region @backendFunc
+    return this.project.readJson(
+      this.docsConfigJsonFileName,
+    ) as Models.DocsConfig;
+    //#endregion
+  }
+  //#endregion
+
+  //#region fields & getters / linkd docs to global container
+  private linkDocsToGlobalContainer() {
+    //#region @backendFunc
+    if (!Helpers.exists(path.dirname(this.docsConfigGlobalContainerAbsPath))) {
+      Helpers.mkdirp(path.dirname(this.docsConfigGlobalContainerAbsPath));
+    }
+    try {
+      fse.unlinkSync(this.docsConfigGlobalContainerAbsPath);
+    } catch (error) {}
+    Helpers.createSymLink(
+      this.project.pathFor(this.tmpDocsFolderRootDocsDirRelativePath),
+      this.docsConfigGlobalContainerAbsPath,
+    );
+    //#endregion
+  }
   //#endregion
 
   //#region fields & getters / tmp docs folder path
@@ -42,7 +84,7 @@ export class Docs extends BaseDebounceCompilerForProject<
   public readonly tmpDocsFolderRoot = `.${config.frameworkName}/temp-docs-folder`;
 
   public readonly combinedDocsFolder = `allmdfiles`;
-  get tmpDocsFolderRootDocsDir() {
+  get tmpDocsFolderRootDocsDirRelativePath() {
     //#region @backendFunc
     return crossPlatformPath([this.tmpDocsFolderRoot, this.combinedDocsFolder]);
     //#endregion
@@ -60,6 +102,30 @@ export class Docs extends BaseDebounceCompilerForProject<
   }
   //#endregion
 
+  //#region n fields & getters / docs config global container abs path
+  get docsConfigGlobalContainerAbsPath() {
+    //#region @backendFunc
+    const globalContainer = this.project.ins.by(
+      'container',
+      this.project.__frameworkVersion,
+    );
+    return globalContainer.pathFor(
+      `.${config.frameworkName}/docs-from-projects/${this.project.universalPackageName}`,
+    );
+    //#endregion
+  }
+  //#endregion
+
+  //#region n fields & getters / docs config schema path
+  get docsConfigSchemaPath(): string {
+    //#region @backendFunc
+    return this.project.ins
+      .by('isomorphic-lib', this.project.__frameworkVersion)
+      .pathFor(this.docsConfigSchema);
+    //#endregion
+  }
+  //#endregion
+
   //#endregion
 
   //#region constructor
@@ -73,47 +139,116 @@ export class Docs extends BaseDebounceCompilerForProject<
         project.pathFor('tmp-*'),
         project.pathFor('dist/**/*.*'),
         project.pathFor('dist'),
+        project.pathFor('dist-*/**/*.*'),
         project.pathFor('browser/**/*.*'),
         project.pathFor('browser'),
         project.pathFor('websql/**/*.*'),
         project.pathFor('websql'),
         project.pathFor('.*/**/*.*'),
       ],
-      subscribeOnlyFor: ['md'],
+      subscribeOnlyFor: ['md', 'yml' as any],
     });
   }
   //#endregion
   //#endregion
 
-  //#region methods / get docs config json $schema
-  protected docsConfigSchemaContent(): string {
+  //#region methods / init
+  async init() {
     //#region @backendFunc
-    return this.project.ins
-      .by('isomorphic-lib', this.project.__frameworkVersion)
-      .readFile(this.project.docs.docsConfigSchema);
+    this.project.removeFolderByRelativePath(
+      this.tmpDocsFolderRootDocsDirRelativePath,
+    );
+    this.project.createFolder(this.tmpDocsFolderRootDocsDirRelativePath);
+    if (!this.project.hasFile(this.docsConfigJsonFileName)) {
+      this.project.writeJson(
+        this.docsConfigJsonFileName,
+        this.defaultDocsConfig(),
+      );
+    }
+    try {
+      fse.unlinkSync(this.project.pathFor(this.docsConfigSchema));
+    } catch (error) {}
+    Helpers.createSymLink(
+      this.docsConfigSchemaPath,
+      this.project.pathFor(this.docsConfigSchema),
+    );
+    this.project.vsCodeHelpers.recreateJsonSchemaForDocs();
+
+    this.linkDocsToGlobalContainer();
+
     //#endregion
   }
   //#endregion
 
-  //#region methods / defaultDocsConfig
+  //#region methods / docs config json $schema content
+  protected docsConfigSchemaContent(): string {
+    //#region @backendFunc
+    return Helpers.readFile(this.docsConfigSchemaPath);
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / default docs config
   protected defaultDocsConfig(): Models.DocsConfig {
     //#region @backendFunc
     return {
       site_name: this.project.name,
-      additionalAssets: [],
+      // additionalAssets: [], // TODO MAKE IT AUTOMATIC
       externalDocs: {
         mdfiles: [],
         projects: [],
       },
       omitFilesPatters: [],
       priorityOrder: [],
+      mapTitlesNames: {
+        'README.md': 'Introduction',
+      },
+      customCssPath: 'custom.css',
+      customJsPath: 'custom.js',
     } as Models.DocsConfig;
     //#endregion
   }
   //#endregion
 
-  //#region methods / mkdocsYmlContent
-  mkdocsYmlContent(entryPointFilesRelativePaths: string[]): string {
+  //#region methods / apply priority order
+  private applyPriorityOrder(files: EntrypointFile[]): EntrypointFile[] {
+    //#region @backendFunc
+    const priorityOrder =
+      (this.config.priorityOrder || []).length > 0
+        ? this.config.priorityOrder
+        : ['README.md'];
+
+    // Filter out the priority files
+    const prioritizedFiles = files.filter(file =>
+      priorityOrder
+        .map(a => a.replace('.md', ''))
+        .includes(file.title.replace('.md', '')),
+    );
+
+    // Filter out non-priority files
+    const nonPrioritizedFiles = files.filter(
+      file =>
+        !priorityOrder
+          .map(a => a.replace('.md', ''))
+          .includes(file.title.replace('.md', '')),
+    );
+
+    // Return prioritized files first, followed by the rest
+    const omitFilesPatters = this.config.omitFilesPatters || [];
+    return Utils.uniqArray(
+      [...prioritizedFiles, ...nonPrioritizedFiles].filter(
+        f =>
+          f.title &&
+          !omitFilesPatters.map(a => a.replace('.md', '')).includes(f.title),
+      ),
+      'relativePath',
+    );
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / mkdocs.yml content
+  mkdocsYmlContent(entryPointFilesRelativePaths: EntrypointFile[]): string {
     //#region @backendFunc
     // console.log({
     //   entryPointFilesRelativePaths,
@@ -127,10 +262,17 @@ export class Docs extends BaseDebounceCompilerForProject<
     // - Changelog: changelog/index.md
     // - QA: qa/index.md
     // docs_dir: ./
-    return `site_name: ${_.upperFirst(this.project.name)} Documentation
+    return `site_name: ${this.config.site_name ? this.config.site_name : _.upperFirst(this.project.name) + 'Documentation'}
 # site_url:  ${this.project.__env.config.domain}
 nav:
-${entryPointFilesRelativePaths.map(p => `  - ${p}`).join('\n')}
+${this.applyPriorityOrder(entryPointFilesRelativePaths)
+  .map(p => {
+    if (p.relativePath === p.title) {
+      `  - ${_.replace(p.title, /[_\s]/g, ' ')}`;
+    }
+    return `  - ${_.replace(p.title, /[_\s]/g, ' ')}: ${p.relativePath}`;
+  })
+  .join('\n')}
 docs_dir: ./${this.combinedDocsFolder}
 theme:
   name: material
@@ -162,10 +304,10 @@ theme:
     # accent: red
 
 extra_css:
-  - stylesheets/extra.css
+  - ${this.config.customCssPath || this.customDefaultCss}
 
 extra_javascript:
-  - javascripts/extra.js
+  - ${this.config.customJsPath || this.customDefaultJs}
 
 # plugins:
 #   - social
@@ -210,16 +352,18 @@ markdown_extensions:
       'python3 -m mkdocs',
     );
     if (watch) {
-      const mkdocsServePort = await this.project.assignFreePort(3900);
+      this.mkdocsServePort = await this.project.assignFreePort(3900);
       // python3 -m
       Helpers.run(
         //--quiet
-        `python3 -m mkdocs serve -a localhost:${mkdocsServePort} `,
+        `python3 -m mkdocs serve -a localhost:${this.mkdocsServePort} --quiet`,
         {
           cwd: this.project.pathFor([this.tmpDocsFolderRoot]),
         },
       ).async();
-      Helpers.info(`Mkdocs server started on port ${mkdocsServePort}`);
+      Helpers.info(
+        `Mkdocs server started on  http://localhost:${this.mkdocsServePort}`,
+      );
     } else {
       if (!Helpers.exists(this.outDocsDistFolderAbs)) {
         Helpers.mkdirp(this.outDocsDistFolderAbs);
@@ -230,16 +374,436 @@ markdown_extensions:
           cwd: this.project.pathFor([this.tmpDocsFolderRoot]),
         },
       ).sync();
-      if (!this.initalParams.docsOutFolder) {
-        const portForDocs = await this.project.assignFreePort(3950);
-        await UtilsHttp.startHttpServer(this.outDocsDistFolderAbs, portForDocs);
-      }
     }
     //#endregion
   }
   //#endregion
 
-  //#region methods/ action
+  //#region methods / copy files to docs folder
+  private copyFilesToTempDocsFolder(
+    relativeFilePathesToCopy: string[],
+    asyncEvent: boolean,
+  ) {
+    //#region @backendFunc
+    let counterCopy = 0;
+
+    //#region handle custom js/css files
+    if (
+      this.config.customCssPath &&
+      this.project.hasFile(this.config.customCssPath)
+    ) {
+      Helpers.copyFile(
+        this.project.pathFor(this.config.customCssPath),
+        this.project.pathFor([
+          this.tmpDocsFolderRootDocsDirRelativePath,
+          this.config.customCssPath,
+        ]),
+      );
+    } else {
+      this.project.writeFile(
+        [this.tmpDocsFolderRootDocsDirRelativePath, this.customDefaultCss],
+        '',
+      );
+    }
+
+    if (
+      this.config.customJsPath &&
+      this.project.hasFile(this.config.customJsPath)
+    ) {
+      Helpers.copyFile(
+        this.project.pathFor(this.config.customJsPath),
+        this.project.pathFor([
+          this.tmpDocsFolderRootDocsDirRelativePath,
+          this.config.customJsPath,
+        ]),
+      );
+    } else {
+      this.project.writeFile(
+        [this.tmpDocsFolderRootDocsDirRelativePath, this.customDefaultJs],
+        '',
+      );
+    }
+    //#endregion
+
+    for (const asbFileSourcePath of relativeFilePathesToCopy) {
+      if (
+        Helpers.isFolder(asbFileSourcePath) ||
+        Helpers.isSymlinkFileExitedOrUnexisted(asbFileSourcePath)
+      ) {
+        continue;
+      }
+      const relativeFileSourcePath = this.project.relative(asbFileSourcePath);
+      // console.log(
+      //   `(${asyncEvent ? 'async' : 'sync'}) Files changed:`,
+      //   relativeFileSourcePath,
+      // );
+      const isNotInRootMdFile =
+        path.basename(asbFileSourcePath) !== relativeFileSourcePath;
+
+      if (isNotInRootMdFile) {
+        // console.info('repalcign...');
+        const contentWithReplacedSomeLinks = UtilsMd.moveAssetsPathesToLevel(
+          Helpers.readFile(asbFileSourcePath),
+          2,
+        );
+        // console.info('repalcign done...');
+        Helpers.writeFile(
+          this.project.pathFor([
+            this.tmpDocsFolderRootDocsDirRelativePath,
+            relativeFileSourcePath,
+          ]),
+          contentWithReplacedSomeLinks,
+        );
+      } else {
+        Helpers.copyFile(
+          asbFileSourcePath,
+          this.project.pathFor([
+            this.tmpDocsFolderRootDocsDirRelativePath,
+            relativeFileSourcePath,
+          ]),
+        );
+      }
+
+      counterCopy++;
+      const assetsFromMdFile = UtilsMd.getAssets(
+        Helpers.readFile(asbFileSourcePath),
+      );
+      // if (path.basename(asbFilePath) === 'QA.md') {
+      // console.log(`assets for ${relativeFileSourcePath}`, assetsFromMdFile);
+      // }
+
+      // TODO @LAST add assets to watching list
+      for (const assetRelativePathFromFile of assetsFromMdFile) {
+        const hasSlash = relativeFileSourcePath.includes('/');
+        const slash = hasSlash ? '/' : '';
+        const relativeAssetPath = relativeFileSourcePath.replace(
+          slash + path.basename(relativeFileSourcePath),
+          slash + assetRelativePathFromFile,
+        );
+        const assetSourcetAbsPath = this.project.pathFor(relativeAssetPath);
+
+        const assetDestLocationAbsPath = this.project.pathFor([
+          this.tmpDocsFolderRootDocsDirRelativePath,
+          relativeAssetPath,
+        ]);
+        // console.log({
+        //   assetRelativePathFromFile,
+        //   relativeAssetPath,
+        //   relativeFileSourcePath,
+        //   assetDestAbsPath: assetSourcetAbsPath,
+        //   assetDestLocationAbsPath,
+        // });
+
+        // console.log(
+        //   `Copy asset ${assetRelativePathFromFile} ${chalk.bold(relativeAssetPath)} to ${assetDestLocationAbsPath}`,
+        // );
+
+        Helpers.copyFile(assetSourcetAbsPath, assetDestLocationAbsPath);
+
+        counterCopy++;
+      }
+    }
+    const asyncInfo = asyncEvent
+      ? `Refreshing http://localhost:${this.mkdocsServePort}..`
+      : '';
+    Helpers.info(
+      `(${asyncEvent ? 'async' : 'sync'}) Copied ${counterCopy} ` +
+        `files to temp docs folder. ${asyncInfo}`,
+    );
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / get root files
+  private async getRootFiles(): Promise<EntrypointFile[]> {
+    //#region @backendFunc
+
+    return [
+      ...Helpers.filesFrom(this.project.location)
+        .filter(f => f.toLowerCase().endsWith('.md'))
+        .map(f => path.basename(f)),
+    ].map(f => ({
+      title: f.replace('.md', ''),
+      relativePath: f,
+      // packageName: this.project.universalPackageName,
+    }));
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / link project to docs folder
+  private linkProjectToDocsFolder(packageName: string) {
+    //#region @backendFunc
+
+    if (this.project.universalPackageName === packageName) {
+      // Helpers.warn(
+      //   `Project ${packageName} is the same as current project ${this.project.universalPackageName}`,
+      // );
+      return;
+    }
+
+    // console.log('packageName', packageName);
+    const orgLocation = fse.realpathSync(
+      crossPlatformPath([
+        path.dirname(this.docsConfigGlobalContainerAbsPath),
+        packageName,
+      ]),
+    );
+
+    const dest = this.project.pathFor([
+      this.tmpDocsFolderRootDocsDirRelativePath,
+      packageName,
+    ]);
+
+    if (!this.linkedAlreadProjects[orgLocation]) {
+      try {
+        fse.unlinkSync(dest);
+      } catch (error) {}
+      Helpers.createSymLink(orgLocation, dest);
+    }
+
+    this.linkedAlreadProjects[orgLocation] = true;
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / resolve package data from
+  private resolvePackageDataFrom(packageNameWithPath: string): {
+    /**
+     * global linked package name
+     */
+    packageName: string;
+    /**
+     * relative path of the file
+     */
+    destRelativePath: string;
+  } {
+    //#region @backendFunc
+
+    const isRelativePath =
+      packageNameWithPath.startsWith('../') &&
+      packageNameWithPath.startsWith('./');
+
+    const isNpmOrgPath = packageNameWithPath.startsWith('@');
+    // const isNormalNpmPackagePath = !isRelativePath && !isNpmOrgPath;
+    if (isRelativePath) {
+      Helpers.error(
+        `Relative pathes are not supported: ${this.docsConfigCurrentProjAbsPath}`,
+        false,
+        true,
+      );
+    }
+
+    const packageName = isNpmOrgPath
+      ? packageNameWithPath.split('/').slice(0, 2).join('/')
+      : _.first(packageNameWithPath.split('/'));
+
+    this.linkProjectToDocsFolder(packageName);
+
+    const destRelativePath = packageNameWithPath
+      .replace(packageName + '/', '')
+      .replace(packageName, '');
+
+    return { packageName, destRelativePath };
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / process md files
+  async getExternalMdFiles(): Promise<EntrypointFile[]> {
+    //#region @backendFunc
+    const externalMdFiles: EntrypointFile[] = [];
+    const externalMdFies = this.config.externalDocs.mdfiles;
+
+    for (const file of externalMdFies) {
+      const { packageName, destRelativePath } = this.resolvePackageDataFrom(
+        file.packageNameWithPath,
+      );
+
+      const sourceAbsPath = fse.realpathSync(
+        crossPlatformPath([
+          path.dirname(this.docsConfigGlobalContainerAbsPath),
+          packageName,
+          destRelativePath,
+        ]),
+      );
+
+      const destinationAbsPath = this.project.pathFor([
+        this.tmpDocsFolderRootDocsDirRelativePath,
+        packageName,
+        destRelativePath,
+      ]);
+
+      const destMagicRelativePath = file.overrideTitle
+        ? file.overrideTitle + '.md'
+        : crossPlatformPath([packageName, destRelativePath])
+            .split('/')
+            .map(p => _.kebabCase(p.replace('.md', '')))
+            .join('__') + '.md';
+
+      const destinationMagicAbsPath = this.project.pathFor([
+        this.tmpDocsFolderRootDocsDirRelativePath,
+        destMagicRelativePath,
+      ]);
+
+      Helpers.copyFile(sourceAbsPath, destinationAbsPath);
+
+      if (file.magicRenameRules) {
+        let content = Helpers.readFile(destinationAbsPath);
+        const rules = RenameRule.from(file.magicRenameRules);
+        for (const rule of rules) {
+          content = rule.replaceInString(content);
+        }
+        Helpers.writeFile(destinationMagicAbsPath, content);
+      }
+
+      externalMdFiles.push({
+        // packageName,
+        relativePath: file.magicRenameRules
+          ? destMagicRelativePath
+          : crossPlatformPath([packageName, destRelativePath]),
+        title: file.overrideTitle
+          ? file.overrideTitle
+          : destRelativePath.replace('.md', ''),
+      });
+    }
+    return externalMdFiles;
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / get/process externalDocs.projects files
+  private async getProjectsFiles(): Promise<EntrypointFile[]> {
+    //#region @backendFunc
+
+    return (this.config.externalDocs.projects || []).map(p => {
+      const {
+        packageName: firstPackageName,
+        destRelativePath: firstDestRelativePath,
+      } = this.resolvePackageDataFrom(
+        Array.isArray(p.packageNameWithPath)
+          ? _.first(p.packageNameWithPath)
+          : p.packageNameWithPath,
+      );
+
+      let title: string = p.overrideTitle ? p.overrideTitle : firstPackageName;
+
+      if (Array.isArray(p.packageNameWithPath)) {
+        const joinEntrypointName = p.overrideTitle
+          ? p.overrideTitle + '.md'
+          : p.packageNameWithPath
+              .map(p => _.snakeCase(p.replace('.md', '')))
+              .join('__') + '.md';
+
+        return {
+          title,
+          relativePath: joinEntrypointName,
+          // packageName: p.packageName,
+          contentToWrite: p.packageNameWithPath
+            .map(singlePackageNameWithPath => {
+              const { packageName, destRelativePath } =
+                this.resolvePackageDataFrom(singlePackageNameWithPath);
+
+              const orgLocation =
+                this.project.universalPackageName === packageName
+                  ? this.project.pathFor(
+                      this.tmpDocsFolderRootDocsDirRelativePath,
+                    )
+                  : fse.realpathSync(
+                      crossPlatformPath([
+                        path.dirname(this.docsConfigGlobalContainerAbsPath),
+                        packageName,
+                      ]),
+                    );
+
+              let fileContent = Helpers.readFile([
+                orgLocation,
+                destRelativePath,
+              ]);
+              const exterFileConfig = this.config.externalDocs.mdfiles.find(
+                f => f.packageNameWithPath === singlePackageNameWithPath,
+              );
+              if (exterFileConfig?.magicRenameRules) {
+                const rules = RenameRule.from(exterFileConfig.magicRenameRules);
+                for (const rule of rules) {
+                  fileContent = rule.replaceInString(fileContent);
+                }
+              }
+              return fileContent;
+            })
+            .join('\n'),
+        };
+      }
+      return {
+        title,
+        // packageName: p.packageName,
+        relativePath:
+          `${firstPackageName}/` +
+          `${firstDestRelativePath ? firstDestRelativePath : 'README.md'}`,
+      };
+    });
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / recreate files in temp folder
+  private async recreateFilesInTempFolder(asyncEvent: boolean) {
+    //#region @backendFunc
+    const files: string[] = this.exitedFilesAbsPathes;
+    this.copyFilesToTempDocsFolder(files, asyncEvent);
+
+    let rootFiles = await this.getRootFiles();
+    const externalMdFiles = await this.getExternalMdFiles();
+    const projectsFiles = await this.getProjectsFiles();
+    const mapTitlesNames = this.config.mapTitlesNames || {};
+    // Object.keys(mapTitlesNames).forEach(k => {
+    //   mapTitlesNames[k] = mapTitlesNames[k].replace('.md', '');
+    // });
+
+    const allFiles = [...rootFiles, ...externalMdFiles, ...projectsFiles].map(
+      //#region allow own packages redirection
+      // QUICKFIX
+      f => {
+        if (
+          f.relativePath.startsWith(`${this.project.universalPackageName}/`)
+        ) {
+          f.relativePath = f.relativePath.replace(
+            `${this.project.universalPackageName}/`,
+            '',
+          );
+        }
+        if (mapTitlesNames[f.title]) {
+          f.title = mapTitlesNames[f.title];
+        } else if (mapTitlesNames[f.title.replace('.md', '')]) {
+          f.title = mapTitlesNames[f.title.replace('.md', '')];
+        } else if (mapTitlesNames[f.title + '.md']) {
+          f.title = mapTitlesNames[f.title + '.md'];
+        }
+        return f;
+      },
+      //#endregion
+    );
+
+    //#region write join entrypoint files
+    for (const projectFile of allFiles) {
+      if ('contentToWrite' in projectFile) {
+        this.project.writeFile(
+          [this.tmpDocsFolderRootDocsDirRelativePath, projectFile.relativePath],
+          projectFile.contentToWrite,
+        );
+      }
+    }
+    //#endregion
+
+    this.project.writeFile(
+      [this.tmpDocsFolderRoot, 'mkdocs.yml'],
+      this.mkdocsYmlContent(allFiles),
+    );
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / action
   async action({
     changeOfFiles,
     asyncEvent,
@@ -248,124 +812,32 @@ markdown_extensions:
     asyncEvent: boolean;
   }) {
     //#region @backendFunc
-    const files = changeOfFiles.map(f => f.fileAbsolutePath);
-    // console.log({ files });
-    // console.log('initalParams', this.initalParams);
     if (!asyncEvent) {
-      //#region sync init
-      this.project.removeFolderByRelativePath(this.tmpDocsFolderRootDocsDir);
-      this.project.createFolder(this.tmpDocsFolderRootDocsDir);
-      if (!this.project.hasFile(this.docsConfig)) {
-        this.project.writeJson(this.docsConfig, this.defaultDocsConfig());
-      }
-      if (!this.project.hasFile(this.docsConfigSchema)) {
-        this.project.writeFile(
-          this.docsConfigSchema,
-          this.docsConfigSchemaContent(),
-        );
-      }
-      this.project.vsCodeHelpers.recreateJsonSchemaForDocs();
-
-      //#endregion
+      await this.init();
     }
 
-    //#region copy files
-    for (const asbFilePath of files) {
-      const relativePath = this.project.relative(asbFilePath);
-      console.log(
-        `(${asyncEvent ? 'async' : 'sync'}) Files changed:`,
-        relativePath,
-      );
-      Helpers.copyFile(
-        asbFilePath,
-        this.project.pathFor([this.tmpDocsFolderRootDocsDir, relativePath]),
-      );
-      const assets = UtilsMd.getAssets(Helpers.readFile(asbFilePath));
-      for (const asset of assets) {
-        const absPath = this.project.pathFor(asset);
-        const destLocation = this.project.pathFor([
-          this.tmpDocsFolderRootDocsDir,
-          asset,
-        ]);
-        Helpers.copyFile(absPath, destLocation);
-      }
-    }
-    //#endregion
-
-    const { externalMdFiles } = await this.processExternalMdFiles();
-    const priorityOrder =
-      (this.config.priorityOrder || []).length > 0
-        ? this.config.priorityOrder
-        : ['README.md'];
-
-    const applyPriority = (files: string[]): string[] => {
-      // Filter out the priority file (README.md in this case)
-      const prioritizedFiles = files.filter(file =>
-        priorityOrder.includes(file),
-      );
-
-      // Filter out files that are not in the priority list
-      const nonPrioritizedFiles = files.filter(
-        file => !priorityOrder.includes(file),
-      );
-
-      // Return prioritized files first, followed by the rest
-      return [...prioritizedFiles, ...nonPrioritizedFiles];
-    };
-
-    const rootFiles = applyPriority([
-      ...Helpers.filesFrom(this.project.location)
-        .filter(f => f.toLowerCase().endsWith('.md'))
-        .map(f => path.basename(f)),
-      ...externalMdFiles,
-    ]);
-
-    // console.log({ rootFiles });
-    // process.exit(0);
-
-    this.project.writeFile(
-      [this.tmpDocsFolderRoot, 'mkdocs.yml'],
-      this.mkdocsYmlContent(rootFiles),
-    );
+    await this.recreateFilesInTempFolder(asyncEvent);
 
     if (!asyncEvent) {
       await this.buildMkdocs({ watch: this.isWatchCompilation });
-    }
 
-    //#endregion
-  }
-  //#endregion
+      chokidar
+        .watch(this.project.pathFor(this.docsConfigJsonFileName), {
+          ignoreInitial: true,
+        })
+        .on('all', async () => {
+          Helpers.info('Docs config changed.. rebuilding..');
+          await this.action({
+            changeOfFiles: [],
+            asyncEvent: true,
+          });
+        });
 
-  //#region methods / process md files
-  async processExternalMdFiles(): Promise<{ externalMdFiles: string[] }> {
-    //#region @backendFunc
-    const externalMdFiles = [];
-    const externalMdFies = this.config.externalDocs.mdfiles;
-    for (const file of externalMdFies) {
-      const possiblePathes = Array.isArray(file.path) ? file.path : [file.path];
-      for (const possiblePath of possiblePathes) {
-        const absPath = this.project.pathFor(possiblePath);
-        if (Helpers.exists(absPath)) {
-          const destLocation = this.project.pathFor([
-            this.tmpDocsFolderRootDocsDir,
-            path.basename(possiblePath),
-          ]);
-          Helpers.copyFile(absPath, destLocation);
-
-          if (file.magicRenameRules) {
-            let content = Helpers.readFile(destLocation);
-            const rules = RenameRule.from(file.magicRenameRules);
-            for (const rule of rules) {
-              content = rule.replaceInString(content);
-            }
-            Helpers.writeFile(destLocation, content);
-          }
-          externalMdFiles.push(path.basename(destLocation));
-          break;
-        }
+      if (this.initalParams.docsOutFolder) {
+        const portForDocs = await this.project.assignFreePort(3950);
+        await UtilsHttp.startHttpServer(this.outDocsDistFolderAbs, portForDocs);
       }
     }
-    return { externalMdFiles };
     //#endregion
   }
   //#endregion

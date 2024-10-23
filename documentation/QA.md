@@ -54,7 +54,7 @@ taon baw  second-child-name   # to start app build of child
 
 2.4. Select target app and press f5 in your Visual Studio Code
 
-<p style="text-align: center;"><img src="../assets/images/organization-debug.png" ></p>
+<p style="text-align: center;"><img src="../__assets/images/organization-debug.png" ></p>
 
 ## 3 How to start project in WEBSQL MODE ?
 ```

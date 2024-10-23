@@ -1,15 +1,29 @@
 {
   "site_name": "tnp",
-  "additionalAssets": [],
   "externalDocs": {
     "mdfiles": [
       {
         "magicRenameRules": "taon -> tnp",
-        "path": "../tnp-helpers/GIT-COMMANDS.md",
+        "packageNameWithPath": "tnp-helpers/GIT-COMMANDS.md",
       },
     ],
-    "projects": [],
+    "projects": [
+      {
+        "packageNameWithPath": [
+          "tnp/documentation/COMMANDS.md",
+          "tnp-helpers/GIT-COMMANDS.md",
+        ],
+        "overrideTitle": "ALL_COMMANDS",
+      },
+      // {
+      //   "packageNameWithPath": "tnp/documentation/COMMANDS.md",
+      //   "overrideTitle": "COMMANDS ARE HERE",
+      // },
+    ],
   },
-  "omitFilesPatters": [],
-  "priorityOrder": [],
+  "omitFilesPatters": ["BUILD-INFO.md", "README.md", "GIT-COMMANDS"],
+  "priorityOrder": ["Start"],
+  "mapTitlesNames": {
+    "README": "Start",
+  }
 }

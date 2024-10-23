@@ -468,8 +468,7 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
 
       Helpers.writeFile(
         [appProj.location, 'README.md'],
-        `
-       #  @${appProj.parent.name}/${appProj.name}
+        `#  @${appProj.parent.name}/${appProj.name}
 
        I am child of smart container.
        `,
@@ -477,8 +476,7 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
     } else {
       Helpers.writeFile(
         [appProj.location, 'README.md'],
-        `
-       #  ${appProj.name}
+        `#  ${appProj.name}
 
        I am standalone project.
        `,
@@ -487,8 +485,7 @@ export class $New extends CommandLineFeature<NewOptions, Project> {
     if (lastIsBrandNew) {
       lastContainer.writeFile(
         'README.md',
-        `
-       # @${lastContainer.name}
+        `# @${lastContainer.name}
 
        This smart container is perfect for publishing organizaiton npm pacakges
 

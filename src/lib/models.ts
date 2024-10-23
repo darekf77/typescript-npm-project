@@ -1,4 +1,5 @@
 import { CoreModels, _ } from 'tnp-core/src';
+import type { Project } from './project/abstract/project';
 
 export namespace Models {
   //#region taon test type
@@ -428,8 +429,6 @@ export namespace Models {
   }
   //#endregion
 
-
-
   //#region ps list info
   export interface PsListInfo {
     pid: number;
@@ -441,34 +440,45 @@ export namespace Models {
   }
   //#endregion
 
+  export interface CreateJsonSchemaOptions {
+    project: Project;
+    nameOfTypeOrInterface: string;
+    relativePathToTsFile: string;
+  }
+
   //#region DocsConfig
   export interface DocsConfig {
     /**
-     * override site name
+     * override site name (default is project name)
      */
     site_name: string;
     /**
-     * relative pathes to md files
+     * relative pathes (or titles) of md files
      * for proper order
      */
     priorityOrder?: string[];
     /**
-     * glob pattern to omit files
+     * glob pattern to omit files by title
      */
     omitFilesPatters: string[];
     /**
      * relative path to the assets folders in project
      * [external assets not allowed... use externalDocs for that]
      */
-    additionalAssets: string[];
+    // additionalAssets: string[];
+    /**
+     * include external docs
+     * inside this docs
+     */
     externalDocs: {
       mdfiles: {
         /**
          * path to *.md file
-         * or array of paths (fallbacks pathes for the same file)
-         * [in case of multiple files -> you will be ask to choose one]
+         * Examples:
+         * taon-core/README.md
+         * taon-core/docs/README.md # deep pathes allowed
          */
-        path: string | string[];
+        packageNameWithPath: string;
         /**
          * if you want to rename something inside file
          * you can use this magic rename rules
@@ -480,17 +490,33 @@ export namespace Models {
          *
          * framework-name => new-framework-name, framework-name2 => new-framework-name2
          */
-        magicRenameRules: string;
+        magicRenameRules?: string;
+        /**
+         * override menu item name (by default titile is relative path)         *
+         */
+        overrideTitle?: string;
       }[];
       projects: {
         /**
-         * path to project
-         * or array of paths (fallbacks pathes for the same projec)
-         * [in case of multiple projects -> you will be ask to choose one]
+         * default README.md file
+         * If array -> file will be join and first file will be used as title
          */
-        path: string;
+        packageNameWithPath?: string | string[];
+        /**
+         * override menu item name
+         */
+        overrideTitle?: string;
       }[];
     };
+    /**
+     * rename/override titles in menu, exmaple:
+     * README.md => Home
+     */
+    mapTitlesNames: {
+      [title: string]: string;
+    };
+    customJsPath?: string;
+    customCssPath?: string;
   }
   //#endregion
 }

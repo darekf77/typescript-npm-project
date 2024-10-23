@@ -2,6 +2,15 @@ import { config } from 'tnp-config/src';
 import type { Project } from './project';
 import { BaseGit, Helpers } from 'tnp-helpers/src';
 import { chalk, path } from 'tnp-core/src';
+interface LaunchConfiguration {
+  type: string;
+  outFiles?: string[];
+  // Add other properties as needed
+}
+
+interface LaunchJson {
+  configurations: LaunchConfiguration[];
+}
 
 export class Git extends BaseGit<Project> {
   //#region getters & methods / before push action
@@ -26,6 +35,20 @@ export class Git extends BaseGit<Project> {
 
     this.project.removeFolderByRelativePath('node_modules/husky');
 
+    // TODO  @LAST
+    // if (this.project.__isStandaloneProject) {
+    //   if (this.project.hasFile(`.vscode/launch.json`)) {
+    //     const launchJson =
+    //       this.project.readJson<LaunchJson>(`.vscode/launch.json`);
+
+    //     const typeNode = launchJson.configurations.find(
+    //       (c: any) => c.type === 'node',
+    //     );
+    //     if (typeNode) {
+    //       typeNode.outFiles = this.project.defaultOutFilesLaunchJson;
+    //     }
+    //   }
+    // }
 
     // ? TODO not needed anymore
     // if (this.project.name === config.frameworkNames.productionFrameworkName) {

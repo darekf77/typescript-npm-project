@@ -8,7 +8,7 @@ export class Vscode extends BaseVscodeHelpers<Project> {
   recreateJsonSchemaForDocs(): void {
     //#region @backendFunc
     const properSchema = {
-      fileMatch: [`/${this.project.docs.docsConfig}`],
+      fileMatch: [`/${this.project.docs.docsConfigJsonFileName}`],
       url: `./${this.project.docs.docsConfigSchema}`,
     };
 
