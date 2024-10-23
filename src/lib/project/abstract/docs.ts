@@ -543,12 +543,22 @@ markdown_extensions:
     }
 
     // console.log('packageName', packageName);
-    const orgLocation = fse.realpathSync(
-      crossPlatformPath([
-        path.dirname(this.docsConfigGlobalContainerAbsPath),
-        packageName,
-      ]),
-    );
+    let orgLocation: string;
+    try {
+      orgLocation = fse.realpathSync(
+        crossPlatformPath([
+          path.dirname(this.docsConfigGlobalContainerAbsPath),
+          packageName,
+        ]),
+      );
+    } catch (error) {
+      Helpers.error(
+        `Not found "${chalk.bold(packageName)}" in global docs container. ` +
+          `Update your externalDocs.project config.`,
+        false,
+        true,
+      );
+    }
 
     const dest = this.project.pathFor([
       this.tmpDocsFolderRootDocsDirRelativePath,
@@ -686,7 +696,9 @@ markdown_extensions:
           : p.packageNameWithPath,
       );
 
-      let title: string = p.overrideTitle ? p.overrideTitle : firstPackageName;
+      let title: string = p.overrideTitle
+        ? p.overrideTitle
+        : crossPlatformPath([firstPackageName, firstDestRelativePath]);
 
       if (Array.isArray(p.packageNameWithPath)) {
         const joinEntrypointName = p.overrideTitle

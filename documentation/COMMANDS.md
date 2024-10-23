@@ -100,10 +100,23 @@ tnp set:major:ver 14 ## can be done in container for all pacakges
 
 Unit/Integration testing
 
+### Unit (jest)
 ```
+tnp t
 tnp test
 tnp test:watch
 tnp test:watch:debug
+tnp test:updatesnaphot
+
+tnp test:updatesnaphot
+tnp tu
+```
+
+### E2E (playwright)
+```
+tnp e2e
+tnp e2e:watch
+tnp e2e:watch:debug
 ```
 
 
