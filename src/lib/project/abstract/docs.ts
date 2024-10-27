@@ -73,6 +73,8 @@ export class Docs extends BaseDebounceCompilerForProject<
       this.project.pathFor(this.tmpDocsFolderRootDocsDirRelativePath),
       this.docsConfigGlobalContainerAbsPath,
     );
+
+    this.writeGlobalWatcherTimestamp();
     //#endregion
   }
   //#endregion
@@ -116,6 +118,16 @@ export class Docs extends BaseDebounceCompilerForProject<
   }
   //#endregion
 
+  //#region fields & getters / docs global timestamp for watcher abs path
+  get docsGlobalTimestampForWatcherAbsPath() {
+    //#region @backendFunc
+    return this.getTimestampWatcherForPackageName(
+      this.project.universalPackageName,
+    );
+    //#endregion
+  }
+  //#endregion
+
   //#region n fields & getters / docs config schema path
   get docsConfigSchemaPath(): string {
     //#region @backendFunc
@@ -130,7 +142,16 @@ export class Docs extends BaseDebounceCompilerForProject<
 
   //#region constructor
   //#region @backend
+  // @ts-ignore
   constructor(project: Project) {
+    // @ts-ignore
+    this.project = project;
+    const timestampContainer = crossPlatformPath(
+      // @ts-ignore
+      path.dirname(this.docsGlobalTimestampForWatcherAbsPath),
+    );
+    // console.log('timestampContainer', timestampContainer);
+    // process.exit(0);
     super(project, {
       taskName: 'DocsProvider',
       folderPath: project.location,
@@ -144,7 +165,13 @@ export class Docs extends BaseDebounceCompilerForProject<
         project.pathFor('browser'),
         project.pathFor('websql/**/*.*'),
         project.pathFor('websql'),
+        // QUICK_FIX I may include for example .ts files in md files with handlebars
+        ...['ts', 'js', 'scss', 'css', 'html'].map(ext =>
+          project.pathFor(`src/**/*.${ext}`),
+        ),
         project.pathFor('.*/**/*.*'),
+        `${timestampContainer}`,
+        `${timestampContainer}/**/*.*`,
       ],
       subscribeOnlyFor: ['md', 'yml' as any],
     });
@@ -180,6 +207,66 @@ export class Docs extends BaseDebounceCompilerForProject<
   }
   //#endregion
 
+  //#region methods / action
+  async action({
+    changeOfFiles,
+    asyncEvent,
+  }: {
+    changeOfFiles: ChangeOfFile[];
+    asyncEvent: boolean;
+  }) {
+    //#region @backendFunc
+    // if (asyncEvent) {
+    //   console.log(
+    //     'changeOfFiles',
+    //     changeOfFiles.map(f => f.fileAbsolutePath),
+    //   );
+    // }
+    // QUICK_FIX
+    if (
+      asyncEvent &&
+      changeOfFiles.length === 1 &&
+      _.first(changeOfFiles)?.fileAbsolutePath ===
+        this.docsGlobalTimestampForWatcherAbsPath
+    ) {
+      return;
+    }
+
+    if (!asyncEvent) {
+      await this.init();
+    }
+
+    await this.recreateFilesInTempFolder(asyncEvent);
+
+    if (!asyncEvent) {
+      await this.buildMkdocs({ watch: this.isWatchCompilation });
+
+      chokidar
+        .watch(this.project.pathFor(this.docsConfigJsonFileName), {
+          ignoreInitial: true,
+        })
+        .on('all', async () => {
+          Helpers.info(
+            'Docs config changed (docs-config.jsonc).. rebuilding..',
+          );
+          await this.action({
+            changeOfFiles: [],
+            asyncEvent: true,
+          });
+        });
+
+      if (this.initalParams.docsOutFolder) {
+        const portForDocs = await this.project.assignFreePort(3950);
+        await UtilsHttp.startHttpServer(this.outDocsDistFolderAbs, portForDocs);
+      }
+    }
+    if (asyncEvent) {
+      this.writeGlobalWatcherTimestamp();
+    }
+    //#endregion
+  }
+  //#endregion
+
   //#region methods / docs config json $schema content
   protected docsConfigSchemaContent(): string {
     //#region @backendFunc
@@ -188,8 +275,10 @@ export class Docs extends BaseDebounceCompilerForProject<
   }
   //#endregion
 
-  //#region methods / default docs config
-  protected defaultDocsConfig(): Models.DocsConfig {
+  //#region private methods
+
+  //#region private methods / default docs config
+  private defaultDocsConfig(): Models.DocsConfig {
     //#region @backendFunc
     return {
       site_name: this.project.name,
@@ -210,7 +299,7 @@ export class Docs extends BaseDebounceCompilerForProject<
   }
   //#endregion
 
-  //#region methods / apply priority order
+  //#region private methods / apply priority order
 
   private applyPriorityOrder(files: EntrypointFile[]): EntrypointFile[] {
     //#region @backendFunc
@@ -253,8 +342,10 @@ export class Docs extends BaseDebounceCompilerForProject<
   }
   //#endregion
 
-  //#region methods / mkdocs.yml content
-  mkdocsYmlContent(entryPointFilesRelativePaths: EntrypointFile[]): string {
+  //#region private methods / mkdocs.yml content
+  private mkdocsYmlContent(
+    entryPointFilesRelativePaths: EntrypointFile[],
+  ): string {
     //#region @backendFunc
     // console.log({
     //   entryPointFilesRelativePaths,
@@ -349,7 +440,7 @@ markdown_extensions:
   }
   //#endregion
 
-  //#region methods / build mkdocs
+  //#region private methods / build mkdocs
   private async buildMkdocs({ watch }: { watch: boolean }) {
     //#region @backendFunc
     this.project.setValueToJSONC(
@@ -385,7 +476,9 @@ markdown_extensions:
   }
   //#endregion
 
-  //#region methods / copy files to docs folder
+  // TODO @LAST hande @render tag in md files
+
+  //#region private methods / copy files to docs folder
   private copyFilesToTempDocsFolder(
     relativeFilePathesToCopy: string[],
     asyncEvent: boolean,
@@ -510,17 +603,17 @@ markdown_extensions:
       }
     }
     const asyncInfo = asyncEvent
-      ? `Refreshing http://localhost:${this.mkdocsServePort}..`
+      ? `\nRefreshing http://localhost:${this.mkdocsServePort}..`
       : '';
     Helpers.info(
-      `(${asyncEvent ? 'async' : 'sync'}) Copied ${counterCopy} ` +
+      `(${asyncEvent ? 'async' : 'sync'}) [${Utils.fullDateTime()}] Copied ${counterCopy} ` +
         `files to temp docs folder. ${asyncInfo}`,
     );
     //#endregion
   }
   //#endregion
 
-  //#region methods / get root files
+  //#region private methods / get root files
   private async getRootFiles(): Promise<EntrypointFile[]> {
     //#region @backendFunc
 
@@ -537,7 +630,7 @@ markdown_extensions:
   }
   //#endregion
 
-  //#region methods / link project to docs folder
+  //#region private methods / link project to docs folder
   private linkProjectToDocsFolder(packageName: string) {
     //#region @backendFunc
 
@@ -571,11 +664,36 @@ markdown_extensions:
       packageName,
     ]);
 
+    if (Helpers.filesFrom(orgLocation).length === 0) {
+      const nearestProj = this.project.ins.nearestTo(orgLocation);
+      Helpers.error(
+        `Please rebuild docs for this project ${nearestProj?.genericName}.`,
+        false,
+        true,
+      );
+    }
+
     if (!this.linkedAlreadProjects[orgLocation]) {
       try {
         fse.unlinkSync(dest);
       } catch (error) {}
       Helpers.createSymLink(orgLocation, dest);
+
+      // TODO unlink watcher when project no longer in docs-config.json
+      Helpers.info(`Listening changes of external project "${packageName}"..`);
+      chokidar
+        .watch(this.getTimestampWatcherForPackageName(packageName), {
+          ignoreInitial: true,
+        })
+        .on('all', () => {
+          Helpers.info(
+            `Docs changed  in external project "${chalk.bold(packageName)}".. rebuilding..`,
+          );
+          this.action({
+            changeOfFiles: [],
+            asyncEvent: true,
+          });
+        });
     }
 
     this.linkedAlreadProjects[orgLocation] = true;
@@ -583,7 +701,7 @@ markdown_extensions:
   }
   //#endregion
 
-  //#region methods / resolve package data from
+  //#region private methods / resolve package data from
   private resolvePackageDataFrom(packageNameWithPath: string): {
     /**
      * global linked package name
@@ -625,8 +743,8 @@ markdown_extensions:
   }
   //#endregion
 
-  //#region methods / process md files
-  async getExternalMdFiles(): Promise<EntrypointFile[]> {
+  //#region private methods / process md files
+  private async getExternalMdFiles(): Promise<EntrypointFile[]> {
     //#region @backendFunc
     const externalMdFiles: EntrypointFile[] = [];
     const externalMdFies = this.config.externalDocs.mdfiles;
@@ -688,7 +806,7 @@ markdown_extensions:
   }
   //#endregion
 
-  //#region methods / get/process externalDocs.projects files
+  //#region private methods / get/process externalDocs.projects files
   private async getProjectsFiles(): Promise<EntrypointFile[]> {
     //#region @backendFunc
 
@@ -764,7 +882,7 @@ markdown_extensions:
   }
   //#endregion
 
-  //#region methods / recreate files in temp folder
+  //#region private methods / recreate files in temp folder
   private async recreateFilesInTempFolder(asyncEvent: boolean) {
     //#region @backendFunc
     const files: string[] = this.exitedFilesAbsPathes;
@@ -821,42 +939,31 @@ markdown_extensions:
   }
   //#endregion
 
-  //#region methods / action
-  async action({
-    changeOfFiles,
-    asyncEvent,
-  }: {
-    changeOfFiles: ChangeOfFile[];
-    asyncEvent: boolean;
-  }) {
+  //#region private methods / write global watcher timestamp
+  private writeGlobalWatcherTimestamp() {
     //#region @backendFunc
-    if (!asyncEvent) {
-      await this.init();
-    }
-
-    await this.recreateFilesInTempFolder(asyncEvent);
-
-    if (!asyncEvent) {
-      await this.buildMkdocs({ watch: this.isWatchCompilation });
-
-      chokidar
-        .watch(this.project.pathFor(this.docsConfigJsonFileName), {
-          ignoreInitial: true,
-        })
-        .on('all', async () => {
-          Helpers.info('Docs config changed.. rebuilding..');
-          await this.action({
-            changeOfFiles: [],
-            asyncEvent: true,
-          });
-        });
-
-      if (this.initalParams.docsOutFolder) {
-        const portForDocs = await this.project.assignFreePort(3950);
-        await UtilsHttp.startHttpServer(this.outDocsDistFolderAbs, portForDocs);
-      }
-    }
+    Helpers.writeFile(
+      this.docsGlobalTimestampForWatcherAbsPath,
+      new Date().getTime().toString(),
+    );
     //#endregion
   }
+  //#endregion
+
+  //#region private methods / get timestamp watcher for package name
+
+  private getTimestampWatcherForPackageName(universalPackageName: string) {
+    //#region @backendFunc
+    const globalContainer = this.project.ins.by(
+      'container',
+      this.project.__frameworkVersion,
+    );
+    return globalContainer.pathFor(
+      `.${config.frameworkName}/watcher-timestamps-for/${universalPackageName}`,
+    );
+    //#endregion
+  }
+  //#endregion
+
   //#endregion
 }
