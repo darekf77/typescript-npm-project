@@ -298,7 +298,7 @@ export class NodeModules extends BaseFeatureForProject<Project> {
   dedupeCount(packages?: string[]): void {
     dedupePackages(
       this.project.location,
-      packages,
+      Array.isArray(packages) ? packages : [],
       true,
       !this.project.__npmPackages.useLinkAsNodeModules,
     );

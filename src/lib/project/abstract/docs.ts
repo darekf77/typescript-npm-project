@@ -83,10 +83,10 @@ export class Docs extends BaseDebounceCompilerForProject<
   /**
    * mkdocs temp folder
    */
-  public readonly tmpDocsFolderRoot = `.${config.frameworkName}/temp-docs-folder`;
+  public readonly tmpDocsFolderRoot: string = `.${config.frameworkName}/temp-docs-folder`;
 
-  public readonly combinedDocsFolder = `allmdfiles`;
-  get tmpDocsFolderRootDocsDirRelativePath() {
+  public readonly combinedDocsFolder: string = `allmdfiles`;
+  get tmpDocsFolderRootDocsDirRelativePath(): string {
     //#region @backendFunc
     return crossPlatformPath([this.tmpDocsFolderRoot, this.combinedDocsFolder]);
     //#endregion

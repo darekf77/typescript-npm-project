@@ -739,9 +739,7 @@ export class $Global extends BaseCommandLine<{}, Project> {
   }
 
   DEDUPE_COUNT() {
-    this.project.__node_modules.dedupeCount(
-      this.args.join(' ').trim() === '' ? void 0 : this.args,
-    );
+    this.project.__node_modules.dedupeCount(this.args);
     this._exit();
   }
   //#endregion

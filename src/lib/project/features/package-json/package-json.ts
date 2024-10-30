@@ -68,6 +68,10 @@ export class PackageJSON
     const package_json = Helpers.readJson([location, config.file.package_json]);
     package_json[config.packageJsonFrameworkKey] = _.cloneDeep(taon_json);
 
+    // if (package_json && package_json.name === path.basename(location)) {
+    package_json.name = path.basename(location);
+    // }
+
     const pkgJson = new PackageJSON({ data: package_json, location, project });
     pkgJson.writeToDisc();
 
