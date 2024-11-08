@@ -144,6 +144,8 @@ export class NpmPackagesBase extends NpmPackagesCore {
       this.project.__node_modules.dedupe();
     }
 
+    this.project.quickFixes.fixSQLLiteModuleInNodeModules();
+
     this.project.__packageJson.save(
       `${this.project.type} instalation after  [${triggeredMsg}]`,
     );

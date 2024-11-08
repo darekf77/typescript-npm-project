@@ -7,7 +7,6 @@ import { Taon, BaseContext } from 'taon/src';
 import * as semver from 'semver';
 import {
   PackageJSON,
-  QuickFixes,
   NpmPackages,
   NodeModules,
   FilesRecreator,
@@ -45,7 +44,12 @@ import { IndexAutogenProvider } from '../features/index-autogen-provider.backend
 //#endregion
 import { config, extAllowedToReplace, TAGS } from 'tnp-config/src';
 import { _, crossPlatformPath, path, CoreModels } from 'tnp-core/src';
-import { Helpers, BaseProjectResolver, BaseProject } from 'tnp-helpers/src';
+import {
+  Helpers,
+  BaseProjectResolver,
+  BaseProject,
+  UtilsQuickFixes,
+} from 'tnp-helpers/src';
 import { LibTypeArr } from 'tnp-config/src';
 import { CoreConfig } from 'tnp-core/src';
 import { BuildOptions, InitOptions, ReleaseOptions } from '../../build-options';
@@ -66,6 +70,7 @@ import { BaseLocalRelease } from './base-local-release';
 import { Git } from './git';
 import { Docs } from './docs';
 import { Vscode } from './vscode';
+import { QuickFixes } from './quick-fixes';
 //#endregion
 
 const debugWord = 'Debug/Start';
@@ -4076,8 +4081,9 @@ ${otherProjectNames
           );
           Helpers.writeFile(
             indexJSPath,
-            Helpers.readFile(indexJSPath)
-              .replace('module = undefined;', '')
+            UtilsQuickFixes.replaceSQLliteFaultyCode(
+              Helpers.readFile(indexJSPath),
+            )
               .split('\n')
               .map(line => line.replace(/\@removeStart.*\@removeEnd/g, ''))
               .join('\n'),
@@ -5840,7 +5846,7 @@ ${config.frameworkName} start
     const indexJSPath = crossPlatformPath([nccBase, 'index.js']);
     Helpers.writeFile(
       indexJSPath,
-      Helpers.readFile(indexJSPath).replace('module = undefined;', ''),
+      UtilsQuickFixes.replaceSQLliteFaultyCode(Helpers.readFile(indexJSPath)),
     );
 
     // copy wasm file for dest

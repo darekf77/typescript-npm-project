@@ -1,22 +1,20 @@
 //#region imports
 //#region @backend
-import { glob, fse, rimraf, chalk } from 'tnp-core/src';
+import { glob, fse, chalk } from 'tnp-core/src';
 //#endregion
 import { path, _, crossPlatformPath } from 'tnp-core/src';
-import {} from 'tnp-core/src';
 import { Project } from '../abstract/project';
 import {
-  BaseFeatureForProject,
-  UtilsTerminal,
   UtilsTypescript,
 } from 'tnp-helpers/src';
-import { Helpers } from 'tnp-helpers/src';
+import { Helpers, BaseQuickFixes } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
 import { folder_shared_folder_info, tempSourceFolder } from '../../constants';
 import { Models } from '../../models';
 //#endregion
 
-export class QuickFixes extends BaseFeatureForProject<Project> {
+export class QuickFixes extends BaseQuickFixes<Project> {
+  project: Project;
   //#region update stanalone project before publishing
   updateStanaloneProjectBeforePublishing(
     project: Project,
