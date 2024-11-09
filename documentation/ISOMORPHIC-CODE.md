@@ -175,7 +175,7 @@ export class UserComponent implements OnInit {
 ```
 
 
-app.module.ts
+app.context.ts
 ```ts
 const host = 'http://localhost:4444'; // host defined once!
 
