@@ -115,9 +115,9 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
     let settings = {
       // 'scm.showIncomingChanges': false,
       // 'scm.showOutgoingChanges': false,
-      "workbench.layoutControl.enabled": false,
-      "scm.showHistoryGraph": false,
-      "scm.showActionButton": false,
+      'workbench.layoutControl.enabled': false,
+      'scm.showHistoryGraph': false,
+      'scm.showActionButton': false,
       'editor.renderWhitespace': true,
       'window.commandCenter': false,
       'window.zoomPerWindow': false,
@@ -198,6 +198,7 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
       '[scss]': {
         'editor.defaultFormatter': 'vscode.typescript-language-features',
       },
+      'cSpell.userWords': ['endregion', 'Taon'],
     };
     //#endregion
 

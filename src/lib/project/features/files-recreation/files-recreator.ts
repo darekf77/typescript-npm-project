@@ -361,7 +361,6 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
               settings['search.include'] = ['**/src/**'];
               settings['search.exclude'] = {
                 docs: true,
-                projects: true,
                 bin: true,
                 local_release: true,
                 node_modules: true,
@@ -379,6 +378,8 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
               Object.keys(settings['search.exclude']).forEach(k => {
                 settings['search.exclude'][`**/${k}`] = true;
               });
+
+              settings['search.exclude']['projects'] = true;
 
               if (!settings['files.exclude']) {
                 settings['files.exclude'] = {};
@@ -583,8 +584,9 @@ yarn-error.log
 testem.log
 /typings
 app.hosts.ts
-${frameworkBuildFolders.map(c => `/${c}`).join('\n')}
-  .map(c => '/' + c)
+${frameworkBuildFolders
+  .filter(c => !!c)
+  .map(c => `/${c}`)
   .join('\n')}
 /${this.project.docs.docsConfigSchema}
 /**/*._auto-generated_.ts

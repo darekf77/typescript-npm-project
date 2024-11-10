@@ -201,11 +201,13 @@ ${clientPorts}
 }
 
 export const frameworkBuildFolders = Utils.uniqArray([
-  '.firedev',
-  '.taon',
-  '.tnp',
-  `.${config.frameworkName}`,
-]);
+  'firedev',
+  'taon',
+  'tnp',
+  `${config.frameworkName}`,
+])
+  .filter(f => !!f)
+  .map(f => `.${f}`);
 
 export const notAllowedProjectNames = [
   // TODO @LAST add all npm package names from core container
