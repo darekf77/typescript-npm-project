@@ -372,3 +372,85 @@ $(document).ready(function() {
 "preinstall": " chalk red bold ERROR: && echo Use: && chalk red bold \"firedev install\" && echo instead && chalk gray bold \"npm install\" && exit 1",
 "preinstall": "echo \"ERROR:  Use \"firedev install\" instead \"npm install\" \" && exit 1",
 ```
+
+# decorator that is modyfying methods
+```ts
+import { ClassHelpers } from '../../helpers/class-helpers';
+import { Symbols } from '../../symbols';
+import { Models } from '../../models';
+import { _ } from 'tnp-core/src';
+import type { BaseSubscriberForEntity } from '../../base-classes/base-subscriber-for-entity';
+import type { EndpointContext } from '../../endpoint-context';
+
+export class TaonSubscriberOptions<
+  T = any,
+> extends Models.DecoratorAbstractOpt {
+  allowedEvents?: (keyof T)[];
+}
+
+export function TaonSubscriber(options: TaonSubscriberOptions) {
+  return function <T extends { new (...args: any[]): {} }>(constructor: T) {
+    Reflect.defineMetadata(
+      Symbols.metadata.options.repository,
+      options,
+      constructor,
+    );
+    Reflect.defineMetadata(
+      Symbols.metadata.className,
+      options?.className || constructor.name,
+      constructor,
+    );
+    ClassHelpers.setName(constructor, options?.className);
+    return class extends constructor {
+      constructor(...args: any[]) {
+        super(...args);
+
+        //#region @websql
+        // Get all method names of the class
+        const methodNamesAll = ClassHelpers.getMethodsNames(
+          constructor.prototype,
+        );
+
+        const methodNames = methodNamesAll.filter(m => {
+          return (
+            !(
+              [
+                '__trigger_event__',
+                'clone',
+                'listenTo',
+              ] as (keyof BaseSubscriberForEntity)[]
+            ).includes(m as any) &&
+            !m.startsWith('_') &&
+            !m.startsWith('inject')
+          );
+        });
+
+        // Wrap each method
+        methodNames.forEach(methodName => {
+          const originalMethod = (this as any)[methodName];
+
+          (this as any)[methodName] = async (...methodArgs: any[]) => {
+            const result = originalMethod.apply(this, methodArgs);
+            const self = this as any as BaseSubscriberForEntity<any>;
+            // If the result is a promise, wait for it to resolve
+            if (result instanceof Promise) {
+              await result;
+            }
+
+            // Check if we need to trigger the manual event
+            if (
+              options.allowedEvents === undefined ||
+              options.allowedEvents.includes(methodName)
+            ) {
+              self.__trigger_event__(methodName as any);
+            }
+
+            return result;
+          };
+        });
+        //#endregion
+      }
+    } as any;
+  } as any;
+}
+```
