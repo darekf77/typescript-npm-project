@@ -654,9 +654,20 @@ export default _default;
   //#endregion
 
   //#region fix missing components/modules
-  fixStandaloneAppFile() {
+  fixAppTsFile() {
     //#region @backendFunc
-    if (!this.project.__isStandaloneProject) {
+
+    if (
+      !this.project.__isStandaloneProject &&
+      !this.project.__isSmartContainerChild &&
+      !this.project.__isSmartContainer
+    ) {
+      return;
+    }
+    if (this.project.__isSmartContainer) {
+      for (const child of this.project.children) {
+        child.quickFixes.fixAppTsFile();
+      }
       return;
     }
     const appFile = this.project.pathFor([config.folder.src, 'app.ts']);

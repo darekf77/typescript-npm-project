@@ -6245,7 +6245,7 @@ ${config.frameworkName} start
     // this.__saveLaunchJson(4000);
     // });
     await this.creteBuildInfoFile(initOptions);
-    this.quickFixes.fixStandaloneAppFile();
+    this.quickFixes.fixAppTsFile();
     initOptions.finishCallback();
 
     //#endregion
