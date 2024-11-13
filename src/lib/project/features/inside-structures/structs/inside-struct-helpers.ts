@@ -188,7 +188,7 @@ import { Taon, BaseContext } from 'taon/src';
 import { Observable, map } from 'rxjs';
 import { HOST_BACKEND_PORT } from './app.hosts';
 ${'//#reg' + 'ion'} @${'bro' + 'wser'}
-import { inject, Injectable } from '@angular/core';
+import { NgModule, inject, Injectable } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { VERSION } from '@angular/core';
@@ -202,6 +202,7 @@ const host = 'http://localhost:' + HOST_BACKEND_PORT;
 ${'//#reg' + 'ion'} ${project.name} component
 ${'//#reg' + 'ion'} @${'bro' + 'wser'}
 @Component({
+  selector: 'app-${project.name}',
   template: \`hello from ${project.name}<br>
     Angular version: {{ angularVersion }}<br>
     <br>
@@ -211,8 +212,6 @@ ${'//#reg' + 'ion'} @${'bro' + 'wser'}
     </ul>
   \`,
   styles: [\` body { margin: 0px !important; } \`],
-  standalone: true,
-  imports: [CommonModule],
 })
 export class ${componentName} {
   angularVersion = VERSION.full;
@@ -236,6 +235,17 @@ export class UserApiService {
       .pipe(map(r => r.body.json));
   }
 }
+${'//#end' + 'region'}
+${'//#end' + 'region'}
+
+${'//#reg' + 'ion'}  ${project.name} module
+${'//#reg' + 'ion'} @${'bro' + 'wser'}
+@NgModule({
+  exports: [${componentName}],
+  imports: [CommonModule],
+  declarations: [${componentName}],
+})
+export class ${moduleName} { }
 ${'//#end' + 'region'}
 ${'//#end' + 'region'}
 
@@ -264,7 +274,7 @@ class UserController extends Taon.Base.CrudController<User> {
 ${'//#end' + 'region'}
 
 ${'//#reg' + 'ion'}  ${project.name} context
-const MainContext = Taon.createContext(()=>({
+var MainContext = Taon.createContext(()=>({
   host,
   contextName: 'MainContext',
   contexts:{ BaseContext },

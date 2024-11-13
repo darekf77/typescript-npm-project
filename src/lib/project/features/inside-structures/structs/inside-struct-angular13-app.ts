@@ -164,6 +164,45 @@ export class InsideStructAngular13App extends BaseInsideStruct {
       endAction: async ({ replacement }) => {
         //#region action after recreating/updating inside strcut
 
+        //#region replace app.module.ts
+        (() => {
+          const appModuleFilePath = path.join(
+            project.location,
+            replacement(tmpProjectsStandalone),
+            `/src/app/app.module.ts`,
+          );
+
+          let appModuleFile = Helpers.readFile(appModuleFilePath);
+
+          const moduleName = _.upperFirst(_.camelCase(project.name)) + 'Module';
+          appModuleFile = `
+import { ${moduleName} } from './${this.project.name}/app';
+${appModuleFile}
+`;
+          appModuleFile = appModuleFile.replace(
+            '//<<<TO_REPLACE_MODULE>>>',
+            `${moduleName},`,
+          );
+
+          const enableServiceWorker =
+            this.project.isInCiReleaseProject &&
+            !initOptions.disableServiceWorker;
+
+          if (enableServiceWorker) {
+            // TODO it will colide with ng serve ?
+            appModuleFile = appModuleFile.replace(
+              new RegExp(
+                Helpers.escapeStringForRegEx('//distReleaseOnly'),
+                'g',
+              ),
+              '',
+            );
+          }
+
+          Helpers.writeFile(appModuleFilePath, appModuleFile);
+        })();
+        //#endregion
+
         //#region replace app.component.ts
         (() => {
           const appComponentFilePath = path.join(
@@ -201,43 +240,27 @@ ${appComponentFile}
             `${componentName}`,
           );
 
-          const enableServiceWorker =
-            this.project.isInCiReleaseProject &&
-            !initOptions.disableServiceWorker;
-
-          if (enableServiceWorker) {
-            // TODO it will colide with ng serve ?
-            appComponentFile = appComponentFile.replace(
-              new RegExp(
-                Helpers.escapeStringForRegEx('//distReleaseOnly'),
-                'g',
-              ),
-              '',
-            );
-          }
-
           Helpers.writeFile(appComponentFilePath, appComponentFile);
         })();
         //#endregion
 
-        //#region replace app.component.ts
-        // TODO @LAST add dynamically admin components
-        // (() => {
-        //   const appComponentFilePath = path.join(
-        //     project.location,
-        //     replacement(tmpProjectsStandalone),
-        //     `/src/app/app.module.ts`,
-        //   );
+        //#region replace app.module.ts
+        (() => {
+          const appComponentFilePath = path.join(
+            project.location,
+            replacement(tmpProjectsStandalone),
+            `/src/app/app.module.ts`,
+          );
 
-        //   let appModuleFile = Helpers.readFile(appComponentFilePath);
+          let appModuleFile = Helpers.readFile(appComponentFilePath);
 
-        //   appModuleFile = appModuleFile.replace(
-        //     `import { TaonAdminModeConfigurationModule } from 'taon/src';`,
-        //     `import { TaonAdminModeConfigurationModule } from 'taon/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
-        //   );
+          appModuleFile = appModuleFile.replace(
+            `import { TaonAdminModeConfigurationModule } from 'taon/src';`,
+            `import { TaonAdminModeConfigurationModule } from 'taon/${this.websql ? config.folder.websql : config.folder.browser}/src';`,
+          );
 
-        //   Helpers.writeFile(appComponentFilePath, appModuleFile);
-        // })();
+          Helpers.writeFile(appComponentFilePath, appModuleFile);
+        })();
         //#endregion
 
         //#region replace main.ts websql things

@@ -18,12 +18,6 @@ class $Electron extends CommandLineFeature<BuildOptions, Project> {
     // await this.project.recreateReleaseProject(true);
   }
 
-  // _preventWebsqlModel() {
-  //   if (this.params.websql) {
-  //     Helpers.error(`Websql is not supported in electron`, false, true);
-  //   }
-  // }
-
   public async _() {
     await this._prepare();
     await this.project.build(
