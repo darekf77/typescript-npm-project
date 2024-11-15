@@ -25,6 +25,7 @@ import {
   ReplaceOptionsExtended,
 } from 'isomorphic-region-loader/src';
 import { SplitFileProcess } from './file-split-process';
+import { TO_REMOVE_TAG } from '../../../../constants';
 
 //#endregion
 
@@ -488,7 +489,7 @@ export class BrowserCodeCut {
   }
   //#endregion
 
-  //#region private / methods & getters / process brrowser not correct imports exports
+  //#region private / methods & getters / process browser not correct imports exports
   private processBrowserNotCorrectImportsExports = (
     importOrExportLine: string,
   ) => {
@@ -853,7 +854,7 @@ export class BrowserCodeCut {
         .map(c => {
           if (true) {
             const from = `${c.name}/src/assets/`;
-            const to = `assets/assets-for/${parent.name + '--' + c.name}/`;
+            const to = `${TO_REMOVE_TAG}assets/assets-for/${parent.name + '--' + c.name}/`;
             this.rawContentForBrowser = this.rawContentForBrowser.replace(
               new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'),
               to,
@@ -869,7 +870,7 @@ export class BrowserCodeCut {
         .filter(f => f.typeIs('isomorphic-lib'))
         .forEach(c => {
           const from = `src/assets/`;
-          const to = `assets/assets-for/${c.name}/`;
+          const to = `${TO_REMOVE_TAG}assets/assets-for/${c.name}/`;
           this.rawContentForBrowser = this.rawContentForBrowser.replace(
             new RegExp(Helpers.escapeStringForRegEx(`/${from}`), 'g'),
             to,
@@ -887,7 +888,10 @@ export class BrowserCodeCut {
 
   //#region private / methods & getters / processing asset link for app
   private processAssetsLinksForApp() {
-    this.rawContentForAPPONLYBrowser = this.rawContentForBrowser;
+    this.rawContentForAPPONLYBrowser = this.rawContentForBrowser.replace(
+      new RegExp(Helpers.escapeStringForRegEx(TO_REMOVE_TAG),'g'),
+      '',
+    );
     // console.log(`[incremental-build-process processAssetsLinksForApp '${this.buildOptions.baseHref}'`)
     const baseHref = this.project.angularFeBasenameManager.getBaseHref(
       InitOptions.fromBuild(this.buildOptions),
@@ -1396,6 +1400,8 @@ import { < My Stuff > } from '${this.project.name}/src';`,
     const isAsset =
       !this.project.__isSmartContainerTarget &&
       this.relativePath.startsWith(`${config.folder.assets}/`);
+
+    // isAsset && console.log('isAsset', absDestinationPath);
     return isAsset
       ? absDestinationPath.replace(
           '/assets/',

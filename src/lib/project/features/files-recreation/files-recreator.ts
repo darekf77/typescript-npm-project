@@ -482,6 +482,13 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
                   project.__vscodeFileTemplates.forEach(f => {
                     s['files.exclude'][f.replace('.filetemplate', '')] = false;
                   });
+
+
+                  ['index.js', 'index.d.ts', 'index.js.map'].forEach(
+                    indexFile => {
+                      s['files.exclude'][`**/${indexFile}`] = true;
+                    },
+                  );
                 }
                 return s;
               };
@@ -529,6 +536,10 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
                 }
               }
               // settings['files.exclude'][config.folder.tmpTestsEnvironments] = false;
+
+              // QUICK FIX FOR BROWSER
+              delete settings['files.exclude']['**/browser*'];
+              delete settings['files.exclude']['**/bundle*'];
 
               return settings;
             });

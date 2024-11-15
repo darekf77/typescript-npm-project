@@ -2,6 +2,7 @@
 //#region @backend
 import { os } from 'tnp-core/src';
 //#endregion
+import { _ } from 'tnp-core/src';
 import { config } from 'tnp-config/src';
 import type { Project } from './project/abstract/project';
 import { crossPlatformPath, path, Utils } from 'tnp-core/src';
@@ -257,3 +258,13 @@ export const ONLY_COPY_ALLOWED = [
   '.bin',
   '.install-date',
 ];
+
+/**
+ * to prevent lib error when building with asserts
+ */
+export const TO_REMOVE_TAG = `/${'TO_REMOVE'
+  .split('')
+  .map(c => _.times(8, () => c).join(''))
+  .join('')}`;
+
+// console.log('TO_REMOVE_TAG', TO_REMOVE_TAG);

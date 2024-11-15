@@ -12,6 +12,7 @@ import { Log } from 'ng2-logger/src';
 import { SourceMappingUrl } from './source-maping-url.backend';
 import { BuildOptions } from '../../../build-options';
 import { Helpers } from 'tnp-helpers/src';
+import { TO_REMOVE_TAG } from '../../../constants';
 
 const REPLACE_INDEX_D_TS_IN_DEST_WHEN_WATCH = false;
 
@@ -313,9 +314,41 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
     Helpers.log(`[copy-manager] update triggered`);
   }, 1000);
 
+  /**
+   * @returns if trus - skip futher processing
+   */
+  protected contentReplaced(fileAbsolutePath: string): boolean {
+    // console.log('processing', fileAbsolutePath);
+    if (
+      !(
+        fileAbsolutePath.endsWith('.js') ||
+        fileAbsolutePath.endsWith('.js.map') ||
+        fileAbsolutePath.endsWith('.mjs') ||
+        fileAbsolutePath.endsWith('.mjs.map')
+      )
+    ) {
+      return false;
+    }
+    let contentOrg = Helpers.readFile(fileAbsolutePath) || '';
+    const newContent = contentOrg.replace(
+      new RegExp(Helpers.escapeStringForRegEx(TO_REMOVE_TAG), 'g'),
+      '',
+    );
+    if (newContent && contentOrg && newContent !== contentOrg) {
+      Helpers.writeFile(fileAbsolutePath, newContent);
+      // console.log(`[copy-manager] content replaced in ${fileAbsolutePath}`);
+      return true;
+    }
+    return false;
+  }
+
   //#region async action
   async asyncAction(event: IncCompiler.Change) {
     const absoluteFilePath = crossPlatformPath(event.fileAbsolutePath);
+    if (this.contentReplaced(absoluteFilePath)) {
+      return;
+    }
+
     // console.log('async event '+ absoluteFilePath)
     SourceMappingUrl.fixContent(absoluteFilePath, this.projectWithBuild);
 
@@ -358,7 +391,11 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
   //#endregion
 
   //#region sync action
-  async syncAction() {
+  async syncAction(files: string[]) {
+    for (const fileAbsPath of files) {
+      this.contentReplaced(fileAbsPath);
+    }
+
     // files: string[]
     const outDir = this.buildOptions.outDir;
 

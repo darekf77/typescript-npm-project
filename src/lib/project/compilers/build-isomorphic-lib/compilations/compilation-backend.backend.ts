@@ -189,6 +189,14 @@ export class BackendCompilation extends IncCompiler.Base {
   ) {
     //#region @backendFunc
     let { commandJs, commandMaps, cwd, project, outDir, watch } = options;
+    const smartContainerChildrenNames =
+      project.__smartContainerTargetParentContainer?.children.map(
+        c => c.name,
+      ) || [];
+
+    // console.log({ childrenNames });
+
+    const smartContainerTarget = project.__smartContainerBuildTarget?.name;
 
     const isStandalone =
       !project.__isSmartContainerTarget && !project.__isSmartContainerChild;
@@ -198,10 +206,29 @@ export class BackendCompilation extends IncCompiler.Base {
 
     Helpers.info(`
 
-Starting backend typescirpt build....
+Starting backend TypeScript build....
 
     `);
     const additionalReplace = (line: string) => {
+      const [tmpSource, dashOrFile, childName] = line.split('/');
+      // console.log({ tmpSource, dashOrFile, childName });
+      if (
+        tmpSource === 'tmp-source-dist' &&
+        dashOrFile === '-' &&
+        smartContainerChildrenNames.includes(childName)
+      ) {
+        return line.replace(
+          `tmp-source-dist/-/${childName}/`,
+          `${childName}/src/`,
+        );
+      }
+      if (tmpSource === 'tmp-source-dist' && dashOrFile.startsWith('app.')) {
+        return line.replace(
+          `tmp-source-dist/${dashOrFile}`,
+          `${smartContainerTarget}/src/${dashOrFile}`,
+        );
+      }
+
       if (!parent) {
         return line;
       }
@@ -232,6 +259,7 @@ Starting backend typescirpt build....
           }
         }
       }
+
       return line;
     };
 
