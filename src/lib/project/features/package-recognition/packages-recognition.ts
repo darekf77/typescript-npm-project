@@ -154,7 +154,7 @@ export class PackagesRecognition {
     recognizedPackages = Helpers.uniqArray(
       [
         ...(recognizedPackages || []),
-        ...this.orginalProject.selftIsomorphicPackages,
+        ...this.orginalProject.packageNamesFromProject,
         ...(fromNodeModulesFolderSearch || []),
         ...Object.values(config.frameworkNames),
       ].filter(f => !f.startsWith(PREFIXES.RESTORE_NPM)),

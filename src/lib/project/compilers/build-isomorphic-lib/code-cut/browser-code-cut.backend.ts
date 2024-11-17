@@ -1371,7 +1371,7 @@ import { < My Stuff > } from '${this.project.name}/src';`,
     isBrowser: boolean = false,
   ): string {
     return this.changeContenBeforeSave(content, absFilePath, {
-      additionalSmartPckages: this.project.selftIsomorphicPackages,
+      additionalSmartPckages: this.project.packageNamesFromProject,
       isStandalone: false,
       isBrowser,
     });

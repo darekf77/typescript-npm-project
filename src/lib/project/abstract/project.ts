@@ -684,6 +684,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     this.coreContainer.__inMemoryIsomorphicLibs = Helpers.uniqArray([
       ...this.coreContainer.__inMemoryIsomorphicLibs,
       ...libsNames,
+      ...this.packageNamesFromProject,
     ]);
   }
 
@@ -718,19 +719,15 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
         }
       }
     }
-    return this.coreContainer.__inMemoryIsomorphicLibs;
+    const result = Helpers.uniqArray([
+      ...this.coreContainer.__inMemoryIsomorphicLibs,
+      ...this.packageNamesFromProject,
+    ]);
+    // console.log(`allIsomorphicPackagesFromMemory: ${result.join('\n ')}`);
+    return result;
     //#endregion
   }
 
-  get selftIsomorphicPackages(): string[] {
-    //#region @backendFunc
-    if (this.__isSmartContainer) {
-      const parent = this;
-      return this.children.map(c => `@${parent.name}/${c.name}`);
-    }
-    return [this.name];
-    //#endregion
-  }
   //#endregion
 
   //#region fields
@@ -1273,6 +1270,11 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     //#region @backendFunc
     if (this.__isSmartContainer) {
       return this.children.map(c => c.universalPackageName);
+    }
+    if (this.__isSmartContainerTarget) {
+      return (this.__smartContainerTargetParentContainer.children || []).map(
+        c => c.universalPackageName,
+      );
     }
     return [this.universalPackageName];
     //#endregion

@@ -695,7 +695,7 @@ ${this.project.__isCoreProject ? '' : '/.vscode/launch.json'}
       crossPlatformPath(defaultProjectProptotype?.location)
     ) {
       Helpers.info(
-        `LINKING CORE PROJCET ${this.project.name} ${this.project.type} ${this.project.__frameworkVersion}`,
+        `LINKING CORE PROJECT ${this.project.name} ${this.project.type} ${this.project.__frameworkVersion}`,
       );
       if (
         this.project.__frameworkVersionAtLeast('v3') &&
