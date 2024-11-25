@@ -198,6 +198,7 @@ export class Docs extends BaseDebounceCompilerForProject<
     Helpers.createSymLink(
       this.docsConfigSchemaPath,
       this.project.pathFor(this.docsConfigSchema),
+      { continueWhenExistedFolderDoesntExists: true },
     );
     this.project.vsCodeHelpers.recreateJsonSchemaForDocs();
 
