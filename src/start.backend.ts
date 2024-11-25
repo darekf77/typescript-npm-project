@@ -4,12 +4,13 @@ import { _ } from 'tnp-core/src';
 import { config } from 'tnp-config/src';
 import cliClassArr from './lib/project/cli/index';
 import { BaseStartConfig } from 'tnp-helpers/src';
+import type { BaseCommandLine } from 'tnp-helpers/src';
 import axios from 'axios';
 //#endregion
 
 //#region constants
 /**
- * ISSUE larget http request sometime are failing ... but with second try everying is OK
+ * ISSUE largest http request sometime are failing ... but with second try everything is OK
  */
 axios.defaults.timeout = 3000;
 //#endregion
@@ -21,10 +22,19 @@ export async function start(
 ) {
   config.frameworkName = frameworkName;
   // console.log('frameworkName', frameworkName);
+  // console.log('config.frameworkName', config.frameworkName);
 
-  Helpers.log(`ins start, mode: "${mode}"`);
+  // Helpers.log(`ins start, mode: "${mode}"`);
   const ProjectClass = (await import('./lib/project/abstract/project')).Project;
   ProjectClass.initialCheck();
+
+  if (
+    !global.skipCoreCheck &&
+    !argsv.includes('startCliServicePortsWorker' as keyof BaseCommandLine)
+  ) {
+    await ProjectClass.ins.portsWorker.startDetachedIfNeedsToBeStarted();
+  }
+
   new BaseStartConfig({
     ProjectClass: ProjectClass as any,
     functionsOrClasses: BaseStartConfig.prepareArgs(cliClassArr),
@@ -54,7 +64,7 @@ export async function start(
       mkdocs: 'build:mkdocs',
       ew: 'electron:watch',
       r: 'release',
-      'lr':'local:release',
+      lr: 'local:release',
       rmajor: 'release:major',
       rminor: 'release:minor',
       'r:major': 'release:major',

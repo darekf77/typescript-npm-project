@@ -11,9 +11,8 @@ declare global {
        *  - I am calling Tnp from require/imports in some ts files
        */
       globalSystemToolMode: boolean;
-      premiumMode?: boolean;
       /**
-       * Occasioonal mute of all messages
+       * Occasional mute of all messages
        */
       muteMessages: boolean;
       testMode: boolean;
@@ -38,11 +37,7 @@ declare global {
        * when vscode plugin is running
        */
       tnpNonInteractive?: boolean;
-
       tnpNoColorsMode?: boolean;
-      useWorker?: boolean;
-      restartWorker?: boolean;
-      reinitDb?: boolean;
       dbAlreadyRecreated?: boolean;
       spinner: any; // Ora;
     }

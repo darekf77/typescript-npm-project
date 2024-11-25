@@ -279,7 +279,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   //#region static
 
   //#region static / instace of resolve
-  static ins = new TaonProjectResolve(Project);
+  static ins = new TaonProjectResolve(Project, global.frameworkName);
   //#endregion
 
   //#region static / has resovle core deps and folder

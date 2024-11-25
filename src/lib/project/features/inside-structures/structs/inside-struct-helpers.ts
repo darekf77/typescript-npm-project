@@ -185,8 +185,9 @@ export function appfileTemplate(project: Project) {
   return `
 ${'//#reg' + 'ion'} imports
 import { Taon, BaseContext } from 'taon/src';
+import { Helpers } from 'tnp-core/src';
 import { Observable, map } from 'rxjs';
-import { HOST_BACKEND_PORT } from './app.hosts';
+import { HOST_BACKEND_PORT, CLIENT_DEV_WEBSQL_APP_PORT, CLIENT_DEV_NORMAL_APP_PORT } from './app.hosts';
 ${'//#reg' + 'ion'} @${'bro' + 'wser'}
 import { NgModule, inject, Injectable } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
@@ -198,6 +199,9 @@ ${'//#end' + 'region'}
 console.log('hello world');
 console.log('Your server will start on port '+ HOST_BACKEND_PORT);
 const host = 'http://localhost:' + HOST_BACKEND_PORT;
+const frontendHost =
+  'http://localhost:' +
+  (Helpers.isWebSQL ? CLIENT_DEV_WEBSQL_APP_PORT : CLIENT_DEV_NORMAL_APP_PORT);
 
 ${'//#reg' + 'ion'} ${project.name} component
 ${'//#reg' + 'ion'} @${'bro' + 'wser'}
@@ -276,6 +280,7 @@ ${'//#end' + 'region'}
 ${'//#reg' + 'ion'}  ${project.name} context
 var MainContext = Taon.createContext(()=>({
   host,
+  frontendHost,
   contextName: 'MainContext',
   contexts:{ BaseContext },
   controllers: {
@@ -322,7 +327,7 @@ path,
 ${'//#reg' + 'ion'} @${'back' + 'end'}
 fse
 ${'//#end' + 'region'}
-} from 'tnp-core';
+} from 'tnp-core/src';
 ${'//#reg' + 'ion'} @${'back' + 'end'}
 import { app, BrowserWindow, screen } from 'electron';
 import start from './app';

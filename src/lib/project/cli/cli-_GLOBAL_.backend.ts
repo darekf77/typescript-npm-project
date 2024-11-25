@@ -9,6 +9,7 @@ import {
   chokidar,
   dateformat,
   requiredForDev,
+  UtilsProcess,
   UtilsString,
 } from 'tnp-core/src';
 import {
@@ -407,6 +408,12 @@ export class $Global extends BaseCommandLine<{}, Project> {
   }
 
   SHOW_LOOP_MESSAGES(args) {
+    console.log(`
+
+    platform: ${process.platform}
+    terminal: ${UtilsProcess.getBashOrShellName()}
+
+    `)
     global.tnpShowProgress = true;
     console.log('process pid', process.pid);
     console.log('process ppid', process.ppid);
@@ -414,6 +421,11 @@ export class $Global extends BaseCommandLine<{}, Project> {
     //   this._exit()
     // })
     this._SHOW_LOOP_MESSAGES();
+  }
+
+  async newTermMessages() {
+    UtilsProcess.startInNewTerminalWindow(`tnp showloopmessages 10`);
+    this._exit();
   }
 
   _SHOW_LOOP(c = 0 as any, maximum = Infinity, errExit = false) {
@@ -771,10 +783,10 @@ export class $Global extends BaseCommandLine<{}, Project> {
       .forEach(f => {
         const packageName = path.basename(f);
         if (packageName.startsWith('@')) {
-          const orgName = packageName;
+          const orgPackageRootName = packageName;
           Helpers.foldersFrom(f).forEach(f2 => {
             try {
-              result[`${orgName}/${path.basename(f2)}`] =
+              result[`${orgPackageRootName}/${path.basename(f2)}`] =
                 Helpers.readValueFromJson(
                   path.join(f2, config.file.package_json),
                   'version',

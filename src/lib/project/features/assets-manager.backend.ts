@@ -58,7 +58,7 @@ export class AssetsManager extends BaseFeatureForProject<Project> {
     this.project.allIsomorphicPackagesFromMemory
       .filter(f => f.startsWith('@'))
       .map(orgPkgName => {
-        const orgName = path.dirname(orgPkgName).replace('@', '');
+        const orgPackageRootName = path.dirname(orgPkgName).replace('@', '');
         const realPathOrg = this.project.__node_modules.pathFor(
           crossPlatformPath(path.dirname(orgPkgName)),
         );
@@ -78,7 +78,7 @@ export class AssetsManager extends BaseFeatureForProject<Project> {
                 `tmp-src-${outDir}${websql ? '-websql' : ''}`,
                 config.folder.assets,
                 assetsFor,
-                `${orgName}--${path.basename(orgPkgName)}`,
+                `${orgPackageRootName}--${path.basename(orgPkgName)}`,
                 config.folder.shared,
               ]),
 
@@ -87,7 +87,7 @@ export class AssetsManager extends BaseFeatureForProject<Project> {
                 `tmp-src-app-${outDir}${websql ? '-websql' : ''}`,
                 config.folder.assets,
                 assetsFor,
-                `${orgName}--${path.basename(orgPkgName)}`,
+                `${orgPackageRootName}--${path.basename(orgPkgName)}`,
                 config.folder.shared,
               ]),
 
@@ -96,7 +96,7 @@ export class AssetsManager extends BaseFeatureForProject<Project> {
                 `tmp-source-${outDir}${websql ? '-websql' : ''}`,
                 config.folder.assets,
                 assetsFor,
-                `${orgName}--${path.basename(orgPkgName)}`,
+                `${orgPackageRootName}--${path.basename(orgPkgName)}`,
                 config.folder.shared,
               ]),
             ];
