@@ -10,6 +10,8 @@ import { crossPlatformPath, path, Utils } from 'tnp-core/src';
 
 export const taonIgnore = '@taon' + '-' + 'ignore';
 
+export const DEBUG_WORD = 'Debug/Start';
+
 export const OVERRIDE_FROM_TNP = [
   'scripts',
   'description',

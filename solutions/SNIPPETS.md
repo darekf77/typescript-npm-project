@@ -454,3 +454,34 @@ export function TaonSubscriber(options: TaonSubscriberOptions) {
   } as any;
 }
 ```
+
+
+# png in terminal
+
+```ts
+protected async header(): Promise<void> {
+  //#region @backendFunc
+  const logoLight = this.ins
+    .by('container', config.defaultFrameworkVersion)
+    .pathFor('../../__images/logo/logo-console-light.png');
+
+  const logoDark = this.ins
+    .by('container', config.defaultFrameworkVersion)
+    .pathFor('../../__images/logo/logo-console-dark.png');
+
+  // console.log({ logoLight });
+  const pngStringify = require('console-png');
+  // consolePng.attachTo(console);
+  const image = fse.readFileSync(logoDark);
+  return new Promise((resolve, reject) => {
+    pngStringify(image, function (err, string) {
+      if (err) {
+        throw err;
+      }
+      console.log(string);
+      resolve();
+    });
+  });
+  //#endregion
+}
+```

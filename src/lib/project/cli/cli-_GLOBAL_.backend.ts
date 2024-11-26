@@ -4,6 +4,7 @@ import {
   incrementalWatcher,
 } from 'incremental-compiler/src';
 import { Project } from '../abstract/project';
+import type { TaonProjectResolve } from '../abstract/project';
 import { config } from 'tnp-config/src';
 import {
   chokidar,
@@ -46,6 +47,7 @@ declare const ENV: any;
 //#endregion
 
 export class $Global extends BaseCommandLine<{}, Project> {
+  readonly ins: TaonProjectResolve;
   public _() {
     Helpers.error('Please select proper command.', false, true);
     this._exit();
@@ -413,7 +415,7 @@ export class $Global extends BaseCommandLine<{}, Project> {
     platform: ${process.platform}
     terminal: ${UtilsProcess.getBashOrShellName()}
 
-    `)
+    `);
     global.tnpShowProgress = true;
     console.log('process pid', process.pid);
     console.log('process ppid', process.ppid);
@@ -1740,6 +1742,28 @@ ${this.project.children
   }
   //#endregion
 
+  //#region start taon projects worker
+  async startCliServiceTaonProjectsWorker() {
+    if (this.params['restart']) {
+      await this.ins.taonProjectsWorker.restart();
+      this._exit();
+    }
+
+    if (this.params['kill']) {
+      await this.ins.taonProjectsWorker.kill();
+      this._exit();
+    }
+
+    if (!!this.params['detached'] || !!this.params['detach']) {
+      await this.ins.taonProjectsWorker.startDetachedIfNeedsToBeStarted();
+      this._exit();
+    } else {
+      await this.ins.taonProjectsWorker.startNormallyInCurrentProcess();
+    }
+  }
+  //#endregion
+
+  //#region json schema docs watcher
   async jsonSchemaDocsWatch() {
     await this.project.init('initing before json schema docs watch');
     const fileToWatchRelative = 'src/lib/models.ts';
@@ -1803,6 +1827,7 @@ ${this.project.children
     );
     this._exit();
   }
+  //#endregion
 }
 
 export default {

@@ -26,7 +26,12 @@ import { AssetsFileListGenerator } from '../compilers';
 import { CopyManager } from '../features/copy-manager/copy-manager.backend';
 import { InsideStructures } from '../features/inside-structures/inside-structures';
 import { SingularBuild } from '../features/singular-build.backend';
-import { argsToClear, DEFAULT_PORT, PortUtils } from '../../constants';
+import {
+  argsToClear,
+  DEFAULT_PORT,
+  PortUtils,
+  DEBUG_WORD,
+} from '../../constants';
 import { RegionRemover } from 'isomorphic-region-loader/src';
 import { IncrementalBuildProcess } from '../../project/compilers/build-isomorphic-lib/compilations/incremental-build-process.backend';
 import { PackagesRecognition } from '../../project/features/package-recognition/packages-recognition';
@@ -71,11 +76,19 @@ import { Git } from './git';
 import { Docs } from './docs';
 import { Vscode } from './vscode';
 import { QuickFixes } from './quick-fixes';
+import { TaonProjectsWorker } from './taon-worker';
 //#endregion
 
-const debugWord = 'Debug/Start';
-
 export class TaonProjectResolve extends BaseProjectResolver<Project> {
+  taonProjectsWorker: TaonProjectsWorker = new TaonProjectsWorker(
+    'taon-projects',
+    `${config.frameworkName} ${
+      'startCliServiceTaonProjectsWorker'
+      // as keyof $Global
+    }`,
+    this,
+  );
+
   //#region methods / type from
   typeFrom(location: string) {
     //#region @backendFunc
@@ -4672,7 +4685,7 @@ ${config.frameworkName} start
           return {
             type: 'node',
             request: 'launch',
-            name: `${debugWord} Server @${container.name}/${c.name}`,
+            name: `${DEBUG_WORD} Server @${container.name}/${c.name}`,
             cwd: '${workspaceFolder}' + `/dist/${container.name}/${c.name}`,
             program:
               '${workspaceFolder}' +
@@ -4730,7 +4743,7 @@ ${config.frameworkName} start
         const startServerTemplate = {
           type: 'node',
           request: 'launch',
-          name: `${debugWord} Server`,
+          name: `${DEBUG_WORD} Server`,
           program: '${workspaceFolder}/run.js',
           cwd: void 0,
           args: [`port=${backendPort}`],
@@ -4830,7 +4843,7 @@ ${config.frameworkName} start
       //#region electron
       const startElectronServeTemplate = (remoteDebugElectronPort: number) => {
         return {
-          name: `${debugWord} Electron`,
+          name: `${DEBUG_WORD} Electron`,
           type: 'node',
           request: 'launch',
           protocol: 'inspector',
@@ -4866,7 +4879,7 @@ ${config.frameworkName} start
             ),
           );
           compounds.push({
-            name: `${debugWord} (Server + Electron)`,
+            name: `${DEBUG_WORD} (Server + Electron)`,
             configurations: [...configurations.map(c => c.name)],
           });
           configurations.push(temlateAttachProcess);
