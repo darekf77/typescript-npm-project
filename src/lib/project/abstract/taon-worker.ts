@@ -1,4 +1,3 @@
-
 //#region imports
 import { BaseCliWorker, CfontAlign, CfontStyle } from 'tnp-helpers/src';
 import {
@@ -161,21 +160,30 @@ export class TaonProjectsWorker extends BaseCliWorker {
   }
   //#endregion
 
-  //#region methods / header text
   protected async headerText(): Promise<string> {
-    return `Taon.dev Projects`;
+    return 'Taon.dev';
   }
-  //#endregion
 
-  //#region methods / header style
-  protected headerStyle(): CfontStyle {
-    return 'chrome';
-  }
-  //#endregion
+  protected async header(): Promise<void> {
+    //#region @backendFunc
+    // return super.header();
+    const consoleLogoPath = this.ins
+      .by('container', config.defaultFrameworkVersion)
+      .pathFor('../../__images/logo/logo-console.png');
 
-  //#region methods / header align
-  protected headerAlign(): CfontAlign {
-    return 'left';
+    // console.log({ logoLight });
+    const pngStringify = require('console-png');
+    // consolePng.attachTo(console);
+    const image = fse.readFileSync(consoleLogoPath);
+    return new Promise((resolve, reject) => {
+      pngStringify(image, function (err, string) {
+        if (err) {
+          throw err;
+        }
+        console.log(string);
+        resolve();
+      });
+    });
+    //#endregion
   }
-  //#endregion
 }
