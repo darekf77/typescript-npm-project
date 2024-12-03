@@ -1744,22 +1744,7 @@ ${this.project.children
 
   //#region start taon projects worker
   async startCliServiceTaonProjectsWorker() {
-    if (this.params['restart']) {
-      await this.ins.taonProjectsWorker.restart();
-      this._exit();
-    }
-
-    if (this.params['kill']) {
-      await this.ins.taonProjectsWorker.kill();
-      this._exit();
-    }
-
-    if (!!this.params['detached'] || !!this.params['detach']) {
-      await this.ins.taonProjectsWorker.startDetachedIfNeedsToBeStarted();
-      this._exit();
-    } else {
-      await this.ins.taonProjectsWorker.startNormallyInCurrentProcess();
-    }
+    await this.ins.taonProjectsWorker.cliStartProcedure(this.params);
   }
   //#endregion
 

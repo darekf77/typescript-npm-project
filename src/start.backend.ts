@@ -33,6 +33,7 @@ export async function start(
     !argsv.includes('startCliServicePortsWorker' as keyof BaseCommandLine)
   ) {
     await ProjectClass.ins.portsWorker.startDetachedIfNeedsToBeStarted();
+    await ProjectClass.ins.taonProjectsWorker.startDetachedIfNeedsToBeStarted();
   }
 
   new BaseStartConfig({

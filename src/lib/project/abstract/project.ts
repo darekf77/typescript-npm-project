@@ -80,14 +80,28 @@ import { TaonProjectsWorker } from './taon-worker';
 //#endregion
 
 export class TaonProjectResolve extends BaseProjectResolver<Project> {
-  taonProjectsWorker: TaonProjectsWorker = new TaonProjectsWorker(
-    'taon-projects',
-    `${config.frameworkName} ${
-      'startCliServiceTaonProjectsWorker'
-      // as keyof $Global
-    }`,
-    this,
-  );
+  taonProjectsWorker: TaonProjectsWorker;
+
+  //#region constructor
+  constructor(
+    protected classFn: any,
+    public cliToolName: string,
+  ) {
+    super(classFn, cliToolName);
+    // console.log("global.frameworkName",global.frameworkName)
+    if (!this.cliToolName) {
+      Helpers.throw(`cliToolName is not provided`);
+    }
+    this.taonProjectsWorker = new TaonProjectsWorker(
+      'taon-projects',
+      `${cliToolName} ${
+        'startCliServiceTaonProjectsWorker --skipCoreCheck'
+        // as keyof $Global
+      }`,
+      this,
+    );
+  }
+  //#endregion
 
   //#region methods / type from
   typeFrom(location: string) {
