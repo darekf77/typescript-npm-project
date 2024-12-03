@@ -21,17 +21,17 @@ export async function start(
   mode: 'dist' | 'npm' = 'dist',
 ) {
   config.frameworkName = frameworkName;
-  // console.log('frameworkName', frameworkName);
-  // console.log('config.frameworkName', config.frameworkName);
 
   // Helpers.log(`ins start, mode: "${mode}"`);
   const ProjectClass = (await import('./lib/project/abstract/project')).Project;
   ProjectClass.initialCheck();
 
+  // console.log(argsv);
   if (
     !global.skipCoreCheck &&
-    !argsv.includes('startCliServicePortsWorker' as keyof BaseCommandLine)
+    _.isUndefined(argsv.find(a => a.startsWith('startCliService'))) // for workers
   ) {
+    // console.log('starting projects workers...');
     await ProjectClass.ins.portsWorker.startDetachedIfNeedsToBeStarted();
     await ProjectClass.ins.taonProjectsWorker.startDetachedIfNeedsToBeStarted();
   }
