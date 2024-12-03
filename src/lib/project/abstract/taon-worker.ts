@@ -116,7 +116,7 @@ export class TaonProjectsWorker extends BaseCliWorker {
     startCommand: string,
     protected readonly ins: TaonProjectResolve,
   ) {
-    super(serviceID, startCommand);
+    super(serviceID, startCommand, '0.0.0');
   }
   //#endregion
 
