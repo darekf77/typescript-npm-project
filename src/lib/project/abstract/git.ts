@@ -106,7 +106,7 @@ export class Git extends BaseGit<Project> {
   //#endregion
 
   //#region getters & methods / automatically add all changes when pushing to git
-  automaticallyAddAllChnagesWhenPushingToGit() {
+  automaticallyAddAllChangesWhenPushingToGit() {
     return (
       this.project.__isContainer ||
       this.project.__isStandaloneProject ||
