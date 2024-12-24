@@ -88,7 +88,6 @@ export class TaonProjectResolve extends BaseProjectResolver<Project> {
     public cliToolName: string,
   ) {
     super(classFn, cliToolName);
-    // console.log("global.frameworkName",global.frameworkName)
     if (!this.cliToolName) {
       Helpers.throw(`cliToolName is not provided`);
     }
@@ -300,6 +299,7 @@ export class TaonProjectResolve extends BaseProjectResolver<Project> {
     return Project.by(libraryType, version);
     //#endregion
   }
+  //#endregion
 }
 
 export class Project extends BaseProject<Project, CoreModels.LibType> {
@@ -1274,6 +1274,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   }
   //#endregion
 
+  //#region getters & methods / universal package name
   /**
    * get actuall npm packge name from project
    */
@@ -1288,7 +1289,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     return this.name;
     //#endregion
   }
+  //#endregion
 
+  //#region getters & methods / package name from project
   /**
    * get all npm packages names that can be
    * obtainer from project
@@ -1306,6 +1309,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     return [this.universalPackageName];
     //#endregion
   }
+  //#endregion
 
   //#region getters & methods / version
   /**
@@ -4597,9 +4601,11 @@ ${config.frameworkName} start
   }
   //#endregion
 
+  //#region getters & methods / get default out files for debugging
   get defaultOutFilesLaunchJson() {
     return ['${workspaceFolder}/dist/**/*.js', '!**/node_modules/**'];
   }
+  //#endregion
 
   //#region getters & methods / get out files for debugging
   /**
