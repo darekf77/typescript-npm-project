@@ -360,7 +360,6 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
               settings['search.useIgnoreFiles'] = false;
               settings['search.include'] = ['**/src/**'];
               settings['search.exclude'] = {
-                docs: true,
                 bin: true,
                 local_release: true,
                 node_modules: true,
@@ -467,7 +466,6 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
                   s['files.exclude']['**/recent.json'] = true;
                   s['files.exclude']['**/angular.json'] = true;
                   s['files.exclude']['**/webpack*'] = true;
-                  s['files.exclude']['**/docs/**/*'] = true;
                   s['files.exclude']['**/run-*'] = true;
                   s['files.exclude']['**/run.*'] = true;
                   s['files.exclude']['**/package-lock.json'] = true;
