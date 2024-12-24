@@ -361,7 +361,7 @@ ${appComponentFile}
                 ?.background;
             if (bgColor) {
               appScssFile = appScssFile.replace(
-                'FIREDEV_TO_REPLACE_COLOR',
+                'TAON_TO_REPLACE_COLOR',
                 bgColor,
               );
             }
@@ -411,7 +411,7 @@ ${appComponentFile}
               ? `style="background-color: ${bgColor};"`
               : '';
             indexHtmlFile = indexHtmlFile.replace(
-              'FIREDEV_TO_REPLACE_COLOR',
+              'TAON_TO_REPLACE_COLOR',
               bgColorStyle,
             );
 

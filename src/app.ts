@@ -109,11 +109,11 @@ var MainContext = Taon.createContext(() => ({
   contexts: { BaseContext },
   controllers: {
     UserController,
-    // PUT FIREDEV CONTROLLERS HERE
+    // PUT TAON CONTROLLERS HERE
   },
   entities: {
     User,
-    // PUT FIREDEV ENTITIES HERE
+    // PUT TAON ENTITIES HERE
   },
   database: true,
   // disabledRealtime: true,

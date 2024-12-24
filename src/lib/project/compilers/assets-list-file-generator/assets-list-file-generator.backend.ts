@@ -124,7 +124,7 @@ export class AssetsFileListGenerator extends BaseFeatureForProject<Project> {
       await incrementalWatcher(
         [this.assetsFolder, `${this.assetsFolder}/**/*.*`],
         {
-          name: `FIREDEV ASSETS LIST`,
+          name: `TAON ASSETS LIST`,
           ignoreInitial: true,
           followSymlinks: false,
           ignored: filePath => this.shoudBeIgnore(filePath),
@@ -132,7 +132,7 @@ export class AssetsFileListGenerator extends BaseFeatureForProject<Project> {
         },
       )
     ).on('all', (event, f) => {
-      // console.log('FIREDEV ASSETS LIST EVENT')
+      // console.log('TAON ASSETS LIST EVENT')
       f = crossPlatformPath(f);
       const relative = f.replace(srcPath, '');
       if (this.allowedOnList(f)) {

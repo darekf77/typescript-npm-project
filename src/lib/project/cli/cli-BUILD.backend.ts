@@ -149,7 +149,7 @@ ${config.frameworkName} app ${smartContainerTargetName} ${
       SELECT_COMMAND: {
         name: '< select command >',
       },
-      BUILD_DEPLY_DOCS_FIREDEV: {
+      BUILD_DEPLY_DOCS_TAON: {
         name: 'Build & deply docs for www.taon.dev',
         value: {
           command: `python -m mkdocs build --site-dir ../../taon-projects/www-taon-dev/docs/documentation`,
@@ -165,7 +165,7 @@ ${config.frameworkName} app ${smartContainerTargetName} ${
           },
         },
       },
-      // BUILD_DOCS_FIREDEV: {
+      // BUILD_DOCS_TAON: {
       //   name: 'Build docs for www.taon.dev',
       //   value: {
       //     command: `python -m mkdocs build --site-dir ../../taon-projects/www-taon-dev/${TEMP_DOCS}`,
@@ -173,7 +173,7 @@ ${config.frameworkName} app ${smartContainerTargetName} ${
       //   },
       // },
       //#endregion
-      SERVE_DOCS_FIREDEV: {
+      SERVE_DOCS_TAON: {
         name: 'Serve docs for www.taon.dev on 8000',
         value: {
           command: 'python -m mkdocs serve',

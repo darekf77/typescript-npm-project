@@ -231,9 +231,9 @@ ${'//#reg' + 'ion'} @${'bro' + 'wser'}
   providedIn:'root'
 })
 export class UserApiService {
-  userControlller = Taon.inject(()=> MainContext.getClass(UserController))
+  userController = Taon.inject(()=> MainContext.getClass(UserController))
   getAll() {
-    return this.userControlller.getAll()
+    return this.userController.getAll()
       .received
       .observable
       .pipe(map(r => r.body.json));
@@ -285,11 +285,11 @@ var MainContext = Taon.createContext(()=>({
   contexts:{ BaseContext },
   controllers: {
     UserController,
-    // PUT FIREDEV CONTORLLERS HERE
+    // PUT TAON CONTROLLERS HERE
   },
   entities: {
     User,
-    // PUT FIREDEV ENTITIES HERE
+    // PUT TAON ENTITIES HERE
   },
   database: true,
   // disabledRealtime: true,

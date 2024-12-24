@@ -239,13 +239,13 @@ exports.default = start;`,
           });
           const watcher = (
             await incrementalWatcher(source_assets, {
-              name: `FIREDEV SINGULAR BUILD ASSETS WATCHER `,
+              name: `TAON SINGULAR BUILD ASSETS WATCHER `,
               ignoreInitial: true,
               followSymlinks: false,
               ...COMPILER_POOLING,
             })
           ).on('all', (event, f) => {
-            // console.log('FIREDEV SINGULAR BUILD ASSETS WATCHER EVENT')
+            // console.log('TAON SINGULAR BUILD ASSETS WATCHER EVENT')
             f = crossPlatformPath(f);
             const dest = path.join(
               dest_assets,
@@ -355,14 +355,14 @@ exports.default = start;`,
         copyAll();
         const watcher = (
           await incrementalWatcher(filesToWatch, {
-            name: `FIREDEV SINGULAR BUILD CODE WATCHER`,
+            name: `TAON SINGULAR BUILD CODE WATCHER`,
             ignoreInitial: true,
             followSymlinks: false,
             ...COMPILER_POOLING,
           })
         ).on('all', (event, f) => {
           f = crossPlatformPath(f);
-          // console.log('FIREDEV SINGULAR BUILD CODE WATCHER EVENT')
+          // console.log('TAON SINGULAR BUILD CODE WATCHER EVENT')
           const containerLocaiton = this.project.location;
           const childName = _.first(
             f.replace(containerLocaiton + '/', '').split('/'),
