@@ -9,7 +9,8 @@ import {
   //#endregion
 } from 'tnp-core';
 //#region @backend
-import { app, BrowserWindow, screen, Menu, Tray } from 'electron';
+import { app, BrowserWindow, Menu, screen, Tray } from 'electron';
+import start from './app';
 
 let win: BrowserWindow | null = null;
 const args = process.argv.slice(1);
@@ -24,8 +25,8 @@ function createWindow(): BrowserWindow {
     x: 0,
     y: 0,
     autoHideMenuBar: true,
-    width: size.width / 2,
-    height: size.height / 2,
+    width: size.width * (3 / 4),
+    height: size.height * (3 / 4),
     webPreferences: {
       nodeIntegration: true,
       allowRunningInsecureContent: serve,
@@ -36,6 +37,7 @@ function createWindow(): BrowserWindow {
   if (serve) {
     const debug = require('electron-debug');
     debug();
+    win.webContents.openDevTools();
 
     require('electron-reloader')(module);
     win.loadURL(
@@ -55,19 +57,6 @@ function createWindow(): BrowserWindow {
     win.loadURL(url.href);
   }
 
-  let tray = null;
-  app.whenReady().then(() => {
-    tray = new Tray('/src/assets/generated/pwa/favicon.ico');
-    const contextMenu = Menu.buildFromTemplate([
-      { label: 'Item1', type: 'radio' },
-      { label: 'Item2', type: 'radio' },
-      { label: 'Item3', type: 'radio', checked: true },
-      { label: 'Item4', type: 'radio' },
-    ]);
-    tray.setToolTip('This is my application.');
-    tray.setContextMenu(contextMenu);
-  });
-
   // Emitted when the window is closed.
   win.on('closed', () => {
     // Dereference the window object, usually you would store window
@@ -76,16 +65,37 @@ function createWindow(): BrowserWindow {
     win = null;
   });
 
+  let tray = null;
+  app.whenReady().then(() => {
+    tray = new Tray(
+      path.join(__dirname, '../src/assets/generated/pwa/favicon.ico'),
+    );
+    const contextMenu = Menu.buildFromTemplate([
+      { label: 'Exit Taon service', type: 'normal', click: () => process.exit(0) },
+      // { label: 'Item2', type: 'checkbox' },
+      // { label: 'Item3', type: 'radio', checked: true },
+      // { label: 'Item4', type: 'submenu',  submenu: [
+      //   { label: 'Item1', type: 'normal' },
+      //   { label: 'Item2', type: 'checkbox' },
+      //   { label: 'Item3', type: 'radio', checked: true },
+      // ]},
+    ]);
+    tray.setToolTip('This is my application.');
+    tray.setContextMenu(contextMenu);
+  });
+
   return win;
 }
 
 async function startElectron() {
+  await start();
   try {
     // This method will be called when Electron has finished
     // initialization and is ready to create browser windows.
     // Some APIs can only be used after this event occurs.
     // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
-    app.on('ready', () => setTimeout(createWindow, 400));
+    // app.on('ready', () => setTimeout(createWindow, 400));
+    setTimeout(createWindow, 400);
 
     // Quit when all windows are closed.
     app.on('window-all-closed', () => {
@@ -105,7 +115,7 @@ async function startElectron() {
     });
   } catch (e) {
     // Catch Error
-    // throw e;
+    throw e;
   }
 }
 
