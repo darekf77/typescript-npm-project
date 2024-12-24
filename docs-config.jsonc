@@ -15,15 +15,20 @@
         ],
         "overrideTitle": "ALL_COMMANDS",
       },
-      // {
-      //   "packageNameWithPath": "tnp/documentation/COMMANDS.md",
-      //   "overrideTitle": "COMMANDS ARE HERE",
-      // },
+      {
+        "packageNameWithPath": "tnp/docs/ADDITIONAL-COMMANDS.md",
+        "overrideTitle": "Additional Commands",
+      },
     ],
   },
-  "omitFilesPatters": ["BUILD-INFO.md", "README.md", "GIT-COMMANDS"],
+  "omitFilesPatters": [
+    "BUILD-INFO.md",
+    "README.md",
+    "GIT-COMMANDS",
+    "COMMANDS.md",
+  ],
   "priorityOrder": ["Start"],
   "mapTitlesNames": {
     "README": "Start",
-  }
+  },
 }

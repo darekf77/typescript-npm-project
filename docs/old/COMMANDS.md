@@ -10,14 +10,6 @@ Add -verbose flag to any command to see more of debugging data
 tnp any-tnp-command -verbose
 ```
 
-### Tnp extension for Visual Studio Code 
-
-Install vscode plugin
-
-```
-tnp vscode:ext
-tnp ext
-```
 
 
 

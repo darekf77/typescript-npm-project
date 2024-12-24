@@ -447,14 +447,16 @@ markdown_extensions:
     this.project.setValueToJSONC(
       config.file.package_json,
       'scripts.mkdocs',
-      'python3 -m mkdocs',
+      process.platform === 'darwin' ? 'mkdocs' : 'python3 -m mkdocs',
     );
     if (watch) {
       this.mkdocsServePort = await this.project.assignFreePort(3900);
       // python3 -m
       Helpers.run(
-        //--quiet
-        `python3 -m mkdocs serve -a localhost:${this.mkdocsServePort} --quiet`,
+        process.platform === 'darwin'
+          ? `mkdocs serve -a localhost:${this.mkdocsServePort} --quiet`
+          : //--quiet
+            `python3 -m mkdocs serve -a localhost:${this.mkdocsServePort} --quiet`,
         {
           cwd: this.project.pathFor([this.tmpDocsFolderRoot]),
         },

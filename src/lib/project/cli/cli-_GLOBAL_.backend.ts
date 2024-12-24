@@ -1641,16 +1641,17 @@ ${this.project.children
   //#endregion
 
   //#region not for npm / mp3
-  //#region @notForNpm
   /**
    *  npm install --global bin-version-check-cli
    *  npm i -g yt-dlp
    *  choco install ffmpeg
    */
   MP3(args) {
-    const downloadPath = crossPlatformPath(
-      path.join(os.userInfo().homedir, 'Downloads', 'mp3-from-youtube'),
-    );
+    const downloadPath = crossPlatformPath([
+      os.userInfo().homedir,
+      'Downloads',
+      'mp3-from-websites',
+    ]);
     if (!Helpers.exists(downloadPath)) {
       Helpers.mkdirp(downloadPath);
     }
@@ -1666,14 +1667,14 @@ ${this.project.children
     this._exit();
   }
   //#endregion
-  //#endregion
 
   //#region not for npm / mp4
-  //#region @notForNpm
   MP4(args) {
-    const downloadPath = crossPlatformPath(
-      path.join(os.userInfo().homedir, 'Downloads', 'mp3-from-youtube'),
-    );
+    const downloadPath = crossPlatformPath([
+      os.userInfo().homedir,
+      'Downloads',
+      'mp4-from-websites',
+    ]);
     // yt-dlp --print filename -o "%(uploader)s-%(upload_date)s-%(title)s.%(ext)s"
     Helpers.run(
       'yt-dlp --verbose  -S "res:1080,fps" -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" ' +
@@ -1685,7 +1686,6 @@ ${this.project.children
     ).sync();
     this._exit();
   }
-  //#endregion
   //#endregion
 
   //#region not for npm / get trusted
