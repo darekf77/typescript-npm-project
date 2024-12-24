@@ -10,7 +10,7 @@
     "projects": [
       {
         "packageNameWithPath": [
-          "tnp/documentation/COMMANDS.md",
+          "tnp/COMMANDS.md",
           "tnp-helpers/GIT-COMMANDS.md",
         ],
         "overrideTitle": "ALL_COMMANDS",

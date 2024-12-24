@@ -1,3 +1,5 @@
+@deprecated
+
 # Development of Apps/Libs
 
 ## Standalone projects

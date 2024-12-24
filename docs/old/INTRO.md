@@ -1,3 +1,5 @@
+@deprecated
+
 # Introduction
 
 ## What is taon?
