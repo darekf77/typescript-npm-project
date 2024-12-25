@@ -57,6 +57,7 @@
     "**/recent.json": true,
     "**/angular.json": true,
     "**/webpack*": true,
+    "**/docs/**/*": true,
     "**/run-*": true,
     "**/run.*": true,
     "**/package-lock.json": true,
@@ -65,6 +66,7 @@
     "**/docs-config.schema.json": true
   },
   "search.exclude": {
+    "docs": true,
     "bin": true,
     "local_release": true,
     "node_modules": true,
@@ -76,6 +78,7 @@
     ".firedev": true,
     ".taon": true,
     ".tnp": true,
+    "**/docs": true,
     "**/bin": true,
     "**/local_release": true,
     "**/node_modules": true,
