@@ -14,9 +14,9 @@ interface LaunchJson {
 
 export class Git extends BaseGit<Project> {
   //#region getters & methods / before push action
-  protected async _beforePushProcessAction() {
+  protected async _beforePushProcessAction(setOrigin: 'ssh' | 'http') {
     //#region @backendFunc
-    await super._beforePushProcessAction();
+    await super._beforePushProcessAction(setOrigin);
 
     if (
       !this.project.git.originURL &&
@@ -35,7 +35,6 @@ export class Git extends BaseGit<Project> {
 
     this.project.removeFolderByRelativePath('node_modules/husky');
 
-    // TODO  @LAST
     // if (this.project.__isStandaloneProject) {
     //   if (this.project.hasFile(`.vscode/launch.json`)) {
     //     const launchJson =
@@ -91,9 +90,9 @@ export class Git extends BaseGit<Project> {
   //#endregion
 
   //#region getters & methods / before pull action
-  protected async _beforePullProcessAction() {
+  protected async _beforePullProcessAction(setOrigin: 'ssh' | 'http') {
     //#region @backendFunc
-    await super._beforePullProcessAction();
+    await super._beforePullProcessAction(setOrigin);
     // await Helpers.killAllNodeExceptCurrentProcess();
     //#endregion
   }
