@@ -5,7 +5,7 @@ import { path } from 'tnp-core/src';
 import { fse } from 'tnp-core/src';
 
 import { config } from 'tnp-config/src';
-import { Helpers } from 'tnp-helpers/src';
+import { Helpers, UtilsTypescript } from 'tnp-helpers/src';
 import { Project } from '../../abstract/project';
 import { Models } from '../../../models';
 import { config as schemaConfig } from './example-environment-config';
@@ -79,7 +79,7 @@ export async function standaloneConfigBy(
       createExampleConfigFor(standaloneProject),
     );
 
-    Helpers.tsCodeModifier.formatFile(`${pathToProjectEnvironment}.js`);
+    UtilsTypescript.formatFile(`${pathToProjectEnvironment}.js`);
   }
 
   requireUncached(pathToProjectEnvironment);

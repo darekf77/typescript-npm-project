@@ -670,7 +670,8 @@ export default _default;
       }
       return;
     }
-    const appFile = this.project.pathFor([config.folder.src, 'app.ts']);
+    const relativeAppTs = crossPlatformPath([config.folder.src, 'app.ts']);
+    const appFile = this.project.pathFor(relativeAppTs);
     if (Helpers.exists(appFile)) {
       let contentAppFile = Helpers.readFile(appFile);
       let newContentAppFile = this.replaceModuleAndComponentName(
@@ -681,7 +682,7 @@ export default _default;
       if (contentAppFile !== newContentAppFile) {
         Helpers.writeFile(appFile, newContentAppFile);
         try {
-          this.project.run(`prettier --write ${appFile}`).sync();
+          this.project.formatFile(relativeAppTs);
         } catch (error) {}
       }
     }

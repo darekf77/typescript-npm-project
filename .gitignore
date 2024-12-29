@@ -68,3 +68,4 @@ webpack.*
 
 
 /.vscode/launch.json
+/*.sqlite

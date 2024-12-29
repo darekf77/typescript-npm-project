@@ -213,7 +213,7 @@ export const frameworkBuildFolders = Utils.uniqArray([
   .map(f => `.${f}`);
 
 export const notAllowedProjectNames = [
-  // TODO @LAST add all npm package names from core container
+  // TODO add all npm package names from core container
   'copyto',
   'app',
   'apps',

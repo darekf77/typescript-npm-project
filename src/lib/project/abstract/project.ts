@@ -77,6 +77,7 @@ import { Docs } from './docs';
 import { Vscode } from './vscode';
 import { QuickFixes } from './quick-fixes';
 import { TaonProjectsWorker } from './taon-worker';
+import { MigrationHelper } from './migrations-helper';
 //#endregion
 
 export class TaonProjectResolve extends BaseProjectResolver<Project> {
@@ -768,6 +769,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   public localRelease: BaseLocalRelease;
   public docs: Docs;
   public vsCodeHelpers: Vscode;
+  public migrationHelper: MigrationHelper;
 
   //#region @backend
   public __libStandalone: LibProjectStandalone;
@@ -841,6 +843,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       this.setType(this.__packageJson ? this.__packageJson.type : 'unknow');
       this.defineProperty<Project>('docs', Docs);
       this.defineProperty<Project>('quickFixes', QuickFixes);
+      this.defineProperty<Project>('migrationHelper', MigrationHelper);
       this.defineProperty<Project>('__node_modules', NodeModules);
       this.defineProperty<Project>('__npmPackages', NpmPackages);
       this.defineProperty<Project>('__recreate', FilesRecreator);
@@ -4265,7 +4268,9 @@ ${otherProjectNames
           controllers: { BuildProcessController },
           entities: { BuildProcess },
           logs: false,
-          database: true,
+          database: {
+            autoSave: false, // skip creationg db file
+          },
         }));
         await ProjectBuildContext.initialize();
         const buildProcessController: BuildProcessController =
@@ -4348,6 +4353,9 @@ ${otherProjectNames
             controllers: { BuildProcessController },
             entities: { BuildProcess },
             logs: false,
+            database: {
+              autoSave: false, // probably not needed here
+            },
           }));
           await ProjectBuildContext.initialize();
           const buildProcessController: BuildProcessController =
@@ -6242,6 +6250,9 @@ ${config.frameworkName} start
     this.quickFixes.addMissingSrcFolderToEachProject();
 
     this.quickFixes.removeBadTypesInNodeModules();
+    await this.migrationHelper.runTask({
+      watch,
+    });
     Helpers.log(`Init DONE for project: ${chalk.bold(this.genericName)} `);
     //#endregion
   }
@@ -6281,6 +6292,7 @@ ${config.frameworkName} start
     // });
     await this.creteBuildInfoFile(initOptions);
     this.quickFixes.fixAppTsFile();
+
     initOptions.finishCallback();
 
     //#endregion

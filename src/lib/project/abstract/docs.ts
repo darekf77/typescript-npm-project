@@ -351,7 +351,7 @@ export class Docs extends BaseDebounceCompilerForProject<
     // console.log({
     //   entryPointFilesRelativePaths,
     // });
-    // TODO @LAST
+    // example:
     // - Introduction: introduction/index.md
     // - Setup: setup/index.md
     // - Isomorphic Code: isomorphic-code/index.md

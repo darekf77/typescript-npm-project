@@ -14,6 +14,7 @@ import NEW from './cli-NEW.backend';
 import SERVICE from './cli-SERVICE.backend';
 import TS from './cli-TS.backend';
 import DOCS from './cli-DOCS.backend';
+import MIGRATION from './cli-MIGRATION.backend'
 
 export default [
   GLOBAL,
@@ -31,6 +32,7 @@ export default [
   SERVICE,
   TS,
   DOCS,
+  MIGRATION,
 ];
 
 //#endregion

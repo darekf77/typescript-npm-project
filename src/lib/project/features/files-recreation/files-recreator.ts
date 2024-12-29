@@ -643,6 +643,7 @@ ${this.project.__isDocker ? '!Dockerfile.filetemplate' : ''}
 ${this.project.__isSmartContainer ? '/angular.json' : ''}
 ${this.project.__isVscodeExtension ? '' : coreFiles}
 ${this.project.__isCoreProject ? '' : '/.vscode/launch.json'}
+/*.sqlite
 
   `.trim() +
       '\n';

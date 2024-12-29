@@ -20,6 +20,8 @@ tnp app --websql # start ng serve in special "backend inside browser" mode
 ```
 
 ## Combined **Angular app build** and **Isomorphic/library build**
+Combined Angular/TypeScript/Node build is sometime useful is you want to just 
+start everything *fast*.
 ```bash
 tnp start
 tnp s
@@ -28,14 +30,33 @@ tnp start --websql
 tnp s --websql 
 ```
 
-## Create db migration
+## Running nodejs backend app 
+Usually you **don't** use this command for development 
+
+-> **debugger** from Visual Studio Code is for this 
+(F5 on keyboard, Task "Debug/Start Server"). 
+```bash
+tnp run
+```
+
+## Migrations (for databases)
 ```bash
 tnp migration # migration menu
-tnp m # migration menu
+tnp m
 
-tnp migration:create # create from scratch
-tnp migration:from:db # from current db changes
-tnp migration:revert 
+# create migration file (with classes for all detected contexts)
+tnp migration:create 
+tnp mc
+
+ # run all migrations (for all contexts)
+tnp migration:run   # similar to 'tnp run', but won't start express
+tnp mr              # server and it will stop after contexts
+                    # initialize() functions...
+
+ # revert migration to timestamp
+tnp migration:revert timestamp  # similar to 'tnp run', but won't start express
+tnp mr timestamp                # server and it will stop after contexts
+                                # initialize() functions...
 ```
 
 ## Documentation (mkdocs , storybook, compodoc) build

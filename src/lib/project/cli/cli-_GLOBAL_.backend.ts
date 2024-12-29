@@ -972,6 +972,16 @@ export class $Global extends BaseCommandLine<{}, Project> {
   }
   //#endregion
 
+  //#region run
+  run() {
+    Helpers.run(`node run.js`, {
+      output: true,
+      silence: false,
+    }).sync();
+    this._exit(0);
+  }
+  //#endregion
+
   //#region ps info
   async PSINFO(args: string) {
     const pid = Number(args);
@@ -1224,7 +1234,7 @@ ${this.project.children
     Helpers.info(`Initing before prettier...`);
     await this.project.init('initing before prettier');
     Helpers.info(`Running prettier...`);
-    this.project.run(`npm-run prettier --write .`, { output: true }).sync();
+    this.project.formatAllFiles();
     Helpers.info(`Prettier done`);
     this._exit();
   }
