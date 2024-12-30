@@ -24,8 +24,16 @@ class $Migration extends CommandLineFeature<ReleaseOptions, Project> {
       Helpers.error(
         `
 
-        No context detected. ${chalk.bold('Please start locally your project first')}.
-        You must initialize all your contexts (and databases) before creating a migration.
+  No context detected. ${chalk.bold.underline('Please start locally your project first')}.
+  You must ${chalk.underline('initialize')} all your contexts (and databases) 
+  before creating a migration. 
+
+  Start you ${chalk.bold('Visual Studio Code debugger')} with ${chalk.bold('F5')}
+  or
+  use command: ${chalk.bold(config.frameworkName)} ${chalk.bold('run')}
+  
+  .. and when every context is fully loaded - shut down process 
+  with ${chalk.bold('ctrl + c')} and try again creating migration from cli.
 
         `,
         false,
