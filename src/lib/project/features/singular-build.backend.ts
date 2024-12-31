@@ -16,6 +16,10 @@ import { InitOptions } from '../../build-options';
 
 //#endregion
 
+/**
+ * @deprecated I will use standalone build with flag for organization package
+ * Singular build for workspace
+ */
 export class SingularBuild extends BaseFeatureForProject<Project> {
   watchers: IncrementalWatcherInstance[] = [];
 

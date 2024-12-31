@@ -25,14 +25,14 @@ class $Migration extends CommandLineFeature<ReleaseOptions, Project> {
         `
 
   No context detected. ${chalk.bold.underline('Please start locally your project first')}.
-  You must ${chalk.underline('initialize')} all your contexts (and databases) 
-  before creating a migration. 
+  You must ${chalk.underline('initialize')} all your contexts (and databases)
+  before creating a migration.
 
   Start you ${chalk.bold('Visual Studio Code debugger')} with ${chalk.bold('F5')}
   or
   use command: ${chalk.bold(config.frameworkName)} ${chalk.bold('run')}
-  
-  .. and when every context is fully loaded - shut down process 
+
+  .. and when every context is fully loaded - shut down process
   with ${chalk.bold('ctrl + c')} and try again creating migration from cli.
 
         `,
@@ -47,6 +47,14 @@ class $Migration extends CommandLineFeature<ReleaseOptions, Project> {
   className: '${contextName}_${timestamp}_${migrationName}',
 })
 export class ${contextName}_${timestamp}_${migrationName} extends Taon.Base.Migration {
+
+    /**
+     * remove this method if you are ready to run this migration
+     */
+    public isReadToRun(): boolean {
+      return false;
+    }
+
     async up(queryRunner: QueryRunner): Promise<any> {
       // do "something" in db
     }
