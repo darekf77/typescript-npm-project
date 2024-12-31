@@ -51,7 +51,7 @@ export class ${contextName}_${timestamp}_${migrationName} extends Taon.Base.Migr
     /**
      * remove this method if you are ready to run this migration
      */
-    public isReadToRun(): boolean {
+    public isReadyToRun(): boolean {
       return false;
     }
 
