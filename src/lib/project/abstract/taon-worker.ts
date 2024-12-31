@@ -146,7 +146,7 @@ export class TaonProjectsWorker extends BaseCliWorker {
   }) {
     //#region @backendFunc
     options = options || {};
-    await this.preventStartIfAlreadyStarted(options);
+    await this.preventStartIfAlreadyStarted();
     const port = await this.getServicePort();
 
     await TaonProjectsContext.initialize({

@@ -1,24 +1,114 @@
-import { CoreModels, _, chalk, path } from 'tnp-core/src';
-import { Helpers, UtilsTypescript } from 'tnp-helpers/src';
+import { CoreModels, UtilsMigrations, _, chalk, path } from 'tnp-core/src';
+import { Helpers, UtilsTerminal, UtilsTypescript } from 'tnp-helpers/src';
 import { CommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
 import { BuildOptions, ReleaseOptions } from '../../build-options';
 import { config } from 'tnp-config/src';
 
 class $Migration extends CommandLineFeature<ReleaseOptions, Project> {
-  public _() {
-    throw new Error('Method not implemented.');
+  public async _() {
+    const options = {
+      create: {
+        name: `Create migration file`,
+      },
+      run: {
+        name: `Run all migrations`,
+      },
+      revert: {
+        name: `Revert to migration timestamp`,
+      },
+    };
+
+    const resp = await UtilsTerminal.select<keyof typeof options>({
+      choices: options,
+      question: `What you wanna do with migrations?`,
+    });
+
+    if (resp === 'create') {
+      const migrationName = await UtilsTerminal.input({
+        question: `Migration name (as parameter)`,
+        required: true,
+      });
+      await this.create(migrationName);
+    } else if (resp === 'run') {
+      await this.run();
+    } else if (resp === 'revert') {
+      const allMigrationsOptions = Helpers.filesFrom(
+        this.project.pathFor([config.folder.src, config.folder.migrations]),
+      )
+        .filter(f => {
+          const timestampRegex = /\d{13}/;
+          return f.endsWith('.ts') && timestampRegex.test(f);
+        })
+        .map(f => {
+          let timestamp: number;
+          try {
+            timestamp = Number(path.basename(f).match(/\d{13}/)[0]);
+          } catch (error) {
+            return;
+          }
+          if (!UtilsMigrations.isValidTimestamp(timestamp)) {
+            return;
+          }
+
+          return {
+            timestamp,
+            name: _.startCase(
+              path.basename(f).replace(`${timestamp}`, '').replace('.ts', ''),
+            ),
+          };
+        })
+        .filter(f => !!f)
+        .map(f => {
+          return {
+            name: `(${f.timestamp}) ${UtilsMigrations.formatTimestamp(f.timestamp)}  [${f.name}]`,
+            value: f.timestamp,
+          };
+        })
+        .sort((a, b) => {
+          return b.value - a.value;
+        });
+      const detectedContexts = this._allDetectedDatabases();
+      console.info(`
+
+      Detected databases that can be reverted:
+
+${detectedContexts.map(db => `- ${db}`).join('\n')}
+
+`);
+
+      const migrationTimestamp = await UtilsTerminal.select({
+        autocomplete: true,
+        choices: allMigrationsOptions,
+        question: `Choose migration to revert to`,
+      });
+      await this.revert(migrationTimestamp);
+    }
+  }
+
+  _allDetectedDatabases() {
+    const detectedDatabaseFiles = Helpers.filesFrom(this.project.location)
+      .map(f => path.basename(f))
+      .filter(f => f.startsWith('db-') && f.endsWith('.sqlite'));
+    return detectedDatabaseFiles;
+  }
+
+  _allDetectedContexts() {
+    const detectedContexts = this._allDetectedDatabases().map(f =>
+      f.replace('.sqlite', '').replace('db-', ''),
+    );
+    return detectedContexts;
   }
 
   //#region create
-  async create() {
+  async create(migrationName?: string) {
     const timestamp = new Date().getTime();
-    const migrationName = _.camelCase(this.args.join(' '));
+    migrationName = _.camelCase(this.args.join(' ')) || migrationName;
+    if (!(migrationName || '').trim()) {
+      Helpers.error(`Migration name (as parameter) is required.`, false, true);
+    }
     const migrationFileName = `${timestamp}_${migrationName}.ts`;
-    const detectedContexts = Helpers.filesFrom(this.project.location)
-      .map(f => path.basename(f))
-      .filter(f => f.startsWith('db-') && f.endsWith('.sqlite'))
-      .map(f => f.replace('.sqlite', '').replace('db-', ''));
+    const detectedContexts = this._allDetectedContexts();
 
     if (detectedContexts.length === 0) {
       Helpers.error(
@@ -94,9 +184,9 @@ export class ${contextName}_${timestamp}_${migrationName} extends Taon.Base.Migr
   //#endregion
 
   //#region revert
-  async revert() {
+  async revert(timestamp: number) {
     Helpers.run(
-      `node run.js --onlyMigrationRevertToTimestamp ${this.firstArg}`,
+      `node run.js --onlyMigrationRevertToTimestamp ${this.firstArg || timestamp}`,
       {
         output: true,
         silence: false,
