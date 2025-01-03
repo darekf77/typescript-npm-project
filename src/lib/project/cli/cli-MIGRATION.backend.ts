@@ -1,11 +1,14 @@
+//#region imports
 import { CoreModels, UtilsMigrations, _, chalk, path } from 'tnp-core/src';
 import { Helpers, UtilsTerminal, UtilsTypescript } from 'tnp-helpers/src';
 import { CommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
 import { BuildOptions, ReleaseOptions } from '../../build-options';
 import { config } from 'tnp-config/src';
+//#endregion
 
 class $Migration extends CommandLineFeature<ReleaseOptions, Project> {
+  //#region migration console menu
   public async _() {
     const options = {
       create: {
@@ -85,23 +88,31 @@ ${detectedContexts.map(db => `- ${db}`).join('\n')}
       await this.revert(migrationTimestamp);
     }
   }
+  //#endregion
 
-  _allDetectedDatabases() {
+  //#region private methods
+  private _allDetectedDatabases() {
     const detectedDatabaseFiles = Helpers.filesFrom(this.project.location)
       .map(f => path.basename(f))
       .filter(f => f.startsWith('db-') && f.endsWith('.sqlite'));
     return detectedDatabaseFiles;
   }
 
-  _allDetectedContexts() {
+  private _allDetectedContexts() {
     const detectedContexts = this._allDetectedDatabases().map(f =>
       f.replace('.sqlite', '').replace('db-', ''),
     );
     return detectedContexts;
   }
+  //#endregion
 
   //#region create
   async create(migrationName?: string) {
+    console.info(`
+
+    ACTION: CREATING MIGRATION
+
+    `);
     const timestamp = new Date().getTime();
     migrationName = _.camelCase(this.args.join(' ')) || migrationName;
     if (!(migrationName || '').trim()) {
@@ -175,6 +186,11 @@ export class ${contextName}_${timestamp}_${migrationName} extends Taon.Base.Migr
 
   //#region run
   async run() {
+    console.info(`
+
+    ACTION: RUNNING MIGRATIONS
+
+    `);
     Helpers.run(`node run.js --onlyMigrationRun`, {
       output: true,
       silence: false,
@@ -185,6 +201,11 @@ export class ${contextName}_${timestamp}_${migrationName} extends Taon.Base.Migr
 
   //#region revert
   async revert(timestamp: number) {
+    console.info(`
+
+    ACTION: REVERTING MIGRATIONS
+
+    `);
     Helpers.run(
       `node run.js --onlyMigrationRevertToTimestamp ${this.firstArg || timestamp}`,
       {

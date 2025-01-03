@@ -101,6 +101,7 @@ export async function start(
       'mr': 'migration:run',
       'mrun': 'migration:run',
       'mrw': 'migration:revert',
+      'mrev': 'migration:revert',
       'mrevert': 'migration:revert',
       //#endregion
     },

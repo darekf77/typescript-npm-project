@@ -210,6 +210,8 @@ export class $Vscode extends CommandLineFeature<{}, Project> {
         'git' + 'bash',
         'Try' + 's',
         'port' + 'finder',
+        'ngrx',
+        'nocheck',
       ],
     };
     //#endregion
