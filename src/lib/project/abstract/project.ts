@@ -341,6 +341,11 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
     //#region reset origin of taon repo
     try {
+      // @LAST this can cause error when can
+      // $ git clean -df or git reset --hard
+      //warning: could not open directory 'projects/container-v18/isomorphic-lib
+      // -v18/docs-config.schema.json/': Function not implemented
+      // this may be temporary
       Helpers.run(`git reset --hard && git clean -df && git fetch`, {
         cwd,
         output: false,
@@ -1279,7 +1284,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
 
   //#region getters & methods / universal package name
   /**
-   * get actuall npm packge name from project
+   * get actual npm package name from project
    */
   public get universalPackageName(): string {
     //#region @backendFunc
@@ -1288,6 +1293,16 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
     }
     if (this.__isSmartContainer) {
       return `@${this.parent?.name}`;
+    }
+    const parentBasename =
+      !this.__isStandaloneProject && this.parentBasename.startsWith('@')
+        ? this.parentBasename
+        : '';
+    if (parentBasename) {
+      return crossPlatformPath([
+        this.parentBasename,
+        this.name.replace(parentBasename, ''),
+      ]);
     }
     return this.name;
     //#endregion
@@ -4514,6 +4529,7 @@ ${config.frameworkName} start
     should dedupe packages ${this.__node_modules.shouldDedupePackages}
 
     genericName: ${this.genericName}
+    universalPackageName: ${this.universalPackageName}
 
     frameworkVersion: ${this.__frameworkVersion}
     type: ${this.type}

@@ -70,7 +70,7 @@ export function dedupePackages(
       return;
     }
     Helpers.logInfo(
-      `Scanning for duplicates of current ${current.name}@${current.version} ....\n`,
+      `Scanning for duplicates of current ${current.universalPackageName}@${current.version} ....\n`,
     );
     const nodeMod = path.join(projectLocation, config.folder.node_modules);
     if (!fse.existsSync(nodeMod)) {
