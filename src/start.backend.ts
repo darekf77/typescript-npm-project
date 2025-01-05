@@ -103,6 +103,7 @@ export async function start(
       'mrw': 'migration:revert',
       'mrev': 'migration:revert',
       'mrevert': 'migration:revert',
+      'mctxs': 'migration:contexts',
       //#endregion
     },
   });

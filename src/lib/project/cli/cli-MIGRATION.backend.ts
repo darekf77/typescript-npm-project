@@ -98,10 +98,25 @@ ${detectedContexts.map(db => `- ${db}`).join('\n')}
     return detectedDatabaseFiles;
   }
 
+  private _allDetectedNestedContexts() {
+    const detectedDatabaseFiles = Helpers.filesFrom(
+      this.project.pathFor([config.folder.src, config.folder.lib]),
+      true,
+    )
+      .filter(f => f.endsWith('.worker.ts') || f.endsWith('.context.ts'))
+      .reduce((a, b) => {
+        return a.concat(UtilsTypescript.getTaonContextsNamesFromFile(b));
+      }, []);
+    return detectedDatabaseFiles;
+  }
+
   private _allDetectedContexts() {
-    const detectedContexts = this._allDetectedDatabases().map(f =>
-      f.replace('.sqlite', '').replace('db-', ''),
-    );
+    const detectedContexts = [
+      ...this._allDetectedNestedContexts(),
+      ...this._allDetectedDatabases().map(f =>
+        f.replace('.sqlite', '').replace('db-', ''),
+      ),
+    ];
     return detectedContexts;
   }
   //#endregion
@@ -216,6 +231,20 @@ export class ${contextName}_${timestamp}_${migrationName} extends Taon.Base.Migr
     this._exit(0);
   }
   //#endregion
+
+  contexts() {
+    Helpers.taskStarted('Detecting contexts...');
+    const detectedContexts = this._allDetectedContexts();
+    Helpers.taskDone(`
+
+    Detected contexts:
+
+    `);
+    detectedContexts.forEach(context => {
+      console.info(`- ${context}`);
+    });
+    this._exit(0);
+  }
 }
 
 export default {
