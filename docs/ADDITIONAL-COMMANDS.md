@@ -1,6 +1,15 @@
-### Tnp extension for Visual Studio Code 
+## Tnp init
+Initialize all file structure (normally this process happen automatically
+in first order during: build, start, app commands )
+```bash
+tnp init # init current project 
 
-Install essential vscode plugins from project workspace recommended
+tnp init:all # init current project and first level children
+tnp initall # alias init:all
+```
+
+## Tnp extension for Visual Studio Code 
+ Install essential vscode plugins from project workspace recommended
 
 ```bash
 tnp vscode:ext
