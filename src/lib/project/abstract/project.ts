@@ -4642,20 +4642,21 @@ ${config.frameworkName} start
       ? void 0
       : [
           ...this.defaultOutFilesLaunchJson,
-          ...Helpers.uniqArray(
-            this.allIsomorphicPackagesFromMemory
-              .map(packageName => {
-                const p = this.pathFor([
-                  config.folder.node_modules,
-                  packageName,
-                  config.folder.source,
-                ]);
-                return Helpers.isExistedSymlink(p)
-                  ? `${crossPlatformPath(fse.realpathSync(p))}/../dist/**/*.js`
-                  : void 0;
-              })
-              .filter(f => !!f),
-          ),
+          // TODO this allow debugging thir party modules.. but it is not reliable
+          // ...Helpers.uniqArray(
+          //   this.allIsomorphicPackagesFromMemory
+          //     .map(packageName => {
+          //       const p = this.pathFor([
+          //         config.folder.node_modules,
+          //         packageName,
+          //         config.folder.source,
+          //       ]);
+          //       return Helpers.isExistedSymlink(p)
+          //         ? `${crossPlatformPath(fse.realpathSync(p))}/../dist/**/*.js`
+          //         : void 0;
+          //     })
+          //     .filter(f => !!f),
+          // ),
         ];
     //#endregion
   }
@@ -4678,7 +4679,7 @@ ${config.frameworkName} start
   //#endregion
 
   //#region getters & methods / save lanunch json
-  public __saveLaunchJson(basePort: number) {
+  public __saveLaunchJson(basePort: number = 4100) {
     //#region @backendFunc
     if (this.__isVscodeExtension) {
       const configVscodeLaunch = {
@@ -6289,6 +6290,7 @@ ${config.frameworkName} start
     );
     this.vsCodeHelpers.recreateExtensions();
     this.vsCodeHelpers.recreateWindowTitle();
+    this.__saveLaunchJson();
     // });
 
     if (this.__isStandaloneProject && this.isInCiReleaseProject) {
