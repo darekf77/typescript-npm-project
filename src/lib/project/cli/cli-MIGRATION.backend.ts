@@ -170,6 +170,7 @@ ${detectedContexts.map(db => `- ${db}`).join('\n')}
 export class ${contextName}_${timestamp}_${migrationName} extends Taon.Base.Migration {
 
     /**
+     * IMPORTANT !!!
      * remove this method if you are ready to run this migration
      */
     public isReadyToRun(): boolean {
