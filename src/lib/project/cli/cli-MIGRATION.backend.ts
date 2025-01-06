@@ -100,10 +100,15 @@ ${detectedContexts.map(db => `- ${db}`).join('\n')}
 
   private _allDetectedNestedContexts() {
     const detectedDatabaseFiles = Helpers.filesFrom(
-      this.project.pathFor([config.folder.src, config.folder.lib]),
+      this.project.pathFor([config.folder.src]),
       true,
     )
-      .filter(f => f.endsWith('.worker.ts') || f.endsWith('.context.ts'))
+      .filter(
+        f =>
+          path.basename(f) === 'app.ts' ||
+          f.endsWith('.worker.ts') ||
+          f.endsWith('.context.ts'),
+      )
       .reduce((a, b) => {
         return a.concat(UtilsTypescript.getTaonContextsNamesFromFile(b));
       }, []);
