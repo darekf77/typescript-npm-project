@@ -126,6 +126,26 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
         //#endregion
 
         (() => {
+          //#region hande / src / migrations
+          const source = path.join(
+            this.project.location,
+            `tmp-src-${config.folder.dist}${this.websql ? '-websql' : ''}`,
+            'migrations',
+          );
+
+          const dest = path.join(
+            this.project.location,
+            replacement(tmpProjectsStandalone),
+            `projects/${this.project.name}/src/migrations`,
+          );
+          Helpers.remove(dest);
+          Helpers.createSymLink(source, dest, {
+            continueWhenExistedFolderDoesntExists: true,
+          });
+          //#endregion
+        })();
+
+        (() => {
           //#region hande / src / lib
           const source = path.join(
             this.project.location,
