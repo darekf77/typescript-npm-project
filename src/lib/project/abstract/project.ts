@@ -6267,9 +6267,11 @@ ${config.frameworkName} start
     this.quickFixes.addMissingSrcFolderToEachProject();
 
     this.quickFixes.removeBadTypesInNodeModules();
-    await this.migrationHelper.runTask({
-      watch,
-    });
+    if(this.__isStandaloneProject) {
+      await this.migrationHelper.runTask({
+        watch,
+      });
+    }
     Helpers.log(`Init DONE for project: ${chalk.bold(this.genericName)} `);
     //#endregion
   }
