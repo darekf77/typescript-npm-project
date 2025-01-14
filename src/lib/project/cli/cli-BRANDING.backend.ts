@@ -1,7 +1,7 @@
 //#region @backend
 import { CoreModels, _, crossPlatformPath, path } from 'tnp-core/src';
 import { Helpers } from 'tnp-helpers/src';
-import { CommandLineFeature } from 'tnp-helpers/src';
+import { BaseCommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
 
 /**
@@ -20,7 +20,7 @@ import { Project } from '../abstract/project';
     + files contents
 
  */
-export class $Branding extends CommandLineFeature<{}, Project> {
+export class $Branding extends BaseCommandLineFeature<{}, Project> {
   protected __initialize__(): void {
     this._tryResolveChildIfInsideArg();
   }

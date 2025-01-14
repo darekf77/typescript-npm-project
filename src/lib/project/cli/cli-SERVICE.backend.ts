@@ -1,7 +1,13 @@
 //#region imports
-import { _, child_process, crossPlatformPath, os } from 'tnp-core/src';
-import { Helpers, UtilsTerminal } from 'tnp-helpers/src';
-import { CommandLineFeature } from 'tnp-helpers/src';
+import {
+  _,
+  child_process,
+  crossPlatformPath,
+  UtilsTerminal,
+  os,
+} from 'tnp-core/src';
+import { Helpers } from 'tnp-helpers/src';
+import { BaseCommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
 import { BuildOptions } from '../../build-options';
 import { config } from 'tnp-config/src';
@@ -23,7 +29,7 @@ export interface ServiceOptions {
 }
 //#endregion
 
-class $Service extends CommandLineFeature<{}, Project> {
+class $Service extends BaseCommandLineFeature<{}, Project> {
   //#region methods / initialize
   protected async __initialize__() {
     // console.log(this.params)

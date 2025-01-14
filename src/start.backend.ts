@@ -4,7 +4,6 @@ import { _ } from 'tnp-core/src';
 import { config } from 'tnp-config/src';
 import cliClassArr from './lib/project/cli/index';
 import { BaseStartConfig } from 'tnp-helpers/src';
-import type { BaseCommandLine } from 'tnp-helpers/src';
 import axios from 'axios';
 //#endregion
 

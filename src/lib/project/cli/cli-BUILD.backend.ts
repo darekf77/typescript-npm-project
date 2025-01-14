@@ -1,14 +1,14 @@
 //#region @backend
-import { _, chalk } from 'tnp-core/src';
-import { Helpers, UtilsTerminal } from 'tnp-helpers/src';
-import { CommandLineFeature } from 'tnp-helpers/src';
+import { _, chalk, UtilsTerminal } from 'tnp-core/src';
+import { Helpers } from 'tnp-helpers/src';
+import { BaseCommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
 import { BuildOptions } from '../../build-options';
 import { TEMP_DOCS } from '../../constants';
 import { config } from 'tnp-config/src';
 import { Utils } from 'tnp-core/src';
 
-class $Build extends CommandLineFeature<BuildOptions, Project> {
+class $Build extends BaseCommandLineFeature<BuildOptions, Project> {
   protected async __initialize__() {
     if (this.params['base-href'] && !this.params.baseHref) {
       this.params.baseHref = this.params['base-href'];

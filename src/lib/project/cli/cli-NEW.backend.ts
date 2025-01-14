@@ -8,14 +8,14 @@ import {
   path,
 } from 'tnp-core/src';
 import { Helpers } from 'tnp-helpers/src';
-import { CommandLineFeature } from 'tnp-helpers/src';
+import { BaseCommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
 import { BuildOptions, InitOptions, NewOptions } from '../../build-options';
 import { MESSAGES, TEMP_DOCS, notAllowedProjectNames } from '../../constants';
 import { Models } from '../../models';
 import { config } from 'tnp-config/src';
 
-export class $New extends CommandLineFeature<NewOptions, Project> {
+export class $New extends BaseCommandLineFeature<NewOptions, Project> {
   public async _() {
     await this._containerStandaloneFromArgs(this.args.join(' '));
   }

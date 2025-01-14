@@ -1,14 +1,14 @@
 //#region @backend
 import { _ } from 'tnp-core/src';
 import { Helpers } from 'tnp-helpers/src';
-import { CommandLineFeature } from 'tnp-helpers/src';
+import { BaseCommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
 import { BuildOptions, ReleaseOptions } from '../../build-options';
 import { TEMP_DOCS } from '../../constants';
 import { config } from 'tnp-config/src';
 import { crossPlatformPath } from 'tnp-core/src';
 
-class $Electron extends CommandLineFeature<BuildOptions, Project> {
+class $Electron extends BaseCommandLineFeature<BuildOptions, Project> {
   protected async __initialize__() {
     this.params = BuildOptions.from(this.params);
   }

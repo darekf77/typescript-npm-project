@@ -32,7 +32,7 @@ import {
   frontendFiles,
   notNeededForExportFiles,
 } from 'tnp-config/src';
-import { Helpers, BaseCommandLine, UtilsNpm } from 'tnp-helpers/src';
+import { Helpers, BaseGlobalCommandLine, UtilsNpm } from 'tnp-helpers/src';
 import { PackagesRecognition } from '../features/package-recognition/packages-recognition';
 import { BrowserCodeCut } from '../compilers/build-isomorphic-lib/code-cut/browser-code-cut.backend';
 import { CLI } from 'tnp-core/src';
@@ -46,7 +46,7 @@ import { createGenerator, SchemaGenerator } from 'ts-json-schema-generator';
 declare const ENV: any;
 //#endregion
 
-export class $Global extends BaseCommandLine<{}, Project> {
+export class $Global extends BaseGlobalCommandLine<{}, Project> {
   readonly ins: TaonProjectResolve;
   public _() {
     Helpers.error('Please select proper command.', false, true);

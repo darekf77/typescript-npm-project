@@ -9,14 +9,14 @@ import {
   path,
 } from 'tnp-core/src';
 import { Helpers } from 'tnp-helpers/src';
-import { CommandLineFeature } from 'tnp-helpers/src';
+import { BaseCommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
 import { BuildOptions, InitOptions } from '../../build-options';
 import { MESSAGES, TEMP_DOCS } from '../../constants';
 import { config } from 'tnp-config/src';
 import { VpnSplit } from 'vpn-split/src';
 
-export class $Open extends CommandLineFeature<{}, Project> {
+export class $Open extends BaseCommandLineFeature<{}, Project> {
   public _() {
     Helpers.info('Opening folder...');
     let pathToFolder = this.firstArg;

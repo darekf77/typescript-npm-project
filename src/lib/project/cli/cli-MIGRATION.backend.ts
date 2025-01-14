@@ -1,13 +1,20 @@
 //#region imports
-import { CoreModels, UtilsMigrations, _, chalk, path } from 'tnp-core/src';
-import { Helpers, UtilsTerminal, UtilsTypescript } from 'tnp-helpers/src';
-import { CommandLineFeature } from 'tnp-helpers/src';
+import {
+  CoreModels,
+  UtilsMigrations,
+  UtilsTerminal,
+  _,
+  chalk,
+  path,
+} from 'tnp-core/src';
+import { Helpers, UtilsTypescript } from 'tnp-helpers/src';
+import { BaseCommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
 import { BuildOptions, ReleaseOptions } from '../../build-options';
 import { config } from 'tnp-config/src';
 //#endregion
 
-class $Migration extends CommandLineFeature<ReleaseOptions, Project> {
+class $Migration extends BaseCommandLineFeature<ReleaseOptions, Project> {
   //#region migration console menu
   public async _() {
     const options = {

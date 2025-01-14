@@ -1,13 +1,13 @@
 //#region @backend
 import { CoreModels, _, crossPlatformPath, path } from 'tnp-core/src';
 import { Helpers } from 'tnp-helpers/src';
-import { CommandLineFeature } from 'tnp-helpers/src';
+import { BaseCommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
 import { BuildOptions, InitOptions } from '../../build-options';
 import { MESSAGES, TEMP_DOCS } from '../../constants';
 import { config } from 'tnp-config/src';
 
-export class $Init extends CommandLineFeature<InitOptions, Project> {
+export class $Init extends BaseCommandLineFeature<InitOptions, Project> {
   protected async __initialize__() {
     this.__askForWhenEmpty();
     this._tryResolveChildIfInsideArg();

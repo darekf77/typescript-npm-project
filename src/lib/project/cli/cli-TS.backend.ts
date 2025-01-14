@@ -1,9 +1,9 @@
 import { Helpers, recognizeImportsFromFile } from 'tnp-helpers/src';
-import { CommandLineFeature } from 'tnp-helpers/src';
+import { BaseCommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
 import { path } from 'tnp-core/src';
 
-export class $Ts extends CommandLineFeature<{}, Project> {
+export class $Ts extends BaseCommandLineFeature<{}, Project> {
   public _() {
     Helpers.clearConsole();
     const importsExports = recognizeImportsFromFile(

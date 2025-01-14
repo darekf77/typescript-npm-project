@@ -1,12 +1,12 @@
-import { CoreModels, _, chalk, path } from 'tnp-core/src';
-import { Helpers, UtilsTerminal } from 'tnp-helpers/src';
-import { CommandLineFeature } from 'tnp-helpers/src';
+import { CoreModels, _, UtilsTerminal, path } from 'tnp-core/src';
+import { Helpers } from 'tnp-helpers/src';
+import { BaseCommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
 import { BuildOptions, ReleaseOptions } from '../../build-options';
 import { Models } from '../../models';
 import { config } from 'tnp-config/src';
 
-class $Release extends CommandLineFeature<ReleaseOptions, Project> {
+class $Release extends BaseCommandLineFeature<ReleaseOptions, Project> {
   //#region __initialize__
   __initialize__() {
     //#region resolve smart containter

@@ -1,10 +1,10 @@
 import { CoreModels, _, chalk, path } from 'tnp-core/src';
 import { Helpers } from 'tnp-helpers/src';
-import { CommandLineFeature } from 'tnp-helpers/src';
+import { BaseCommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
 import { BuildOptions, ReleaseOptions } from '../../build-options';
 
-class $LocalRelease extends CommandLineFeature<ReleaseOptions, Project> {
+class $LocalRelease extends BaseCommandLineFeature<ReleaseOptions, Project> {
   //#region _
   public async _() {
     Helpers.clearConsole();

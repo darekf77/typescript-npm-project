@@ -1,13 +1,13 @@
 //#region @backend
 import { _ } from 'tnp-core/src';
 import { Helpers } from 'tnp-helpers/src';
-import { CommandLineFeature } from 'tnp-helpers/src';
+import { BaseCommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
 import { BuildOptions } from '../../build-options';
 import { TEMP_DOCS } from '../../constants';
 import { config } from 'tnp-config/src';
 
-class $CiBuild extends CommandLineFeature<BuildOptions, Project> {
+class $CiBuild extends BaseCommandLineFeature<BuildOptions, Project> {
   protected async __initialize__() {
     this.params = BuildOptions.from(this.params);
     await this.project.recreateReleaseProject(this.params);

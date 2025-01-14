@@ -1,11 +1,11 @@
 //#region @backend
 import { _ } from 'tnp-core/src';
 import { Helpers } from 'tnp-helpers/src';
-import { CommandLineFeature } from 'tnp-helpers/src';
+import { BaseCommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
 
 import { watch } from 'fs';
-class $Docs extends CommandLineFeature<{}, Project> {
+class $Docs extends BaseCommandLineFeature<{}, Project> {
   public async _() {
     await this.project.docs.runTask({
       initalParams: {

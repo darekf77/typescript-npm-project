@@ -56,22 +56,7 @@ class TaonProject extends Taon.Base.AbstractEntity {
 @Taon.Controller({
   className: 'TaonProjectsController',
 })
-class TaonProjectsController extends BaseCliWorkerController<TaonProject> {
-  entityClassResolveFn = () => TaonProject;
-
-  //#region methods / init example db data
-  async initExampleDbData() {
-    //#region @websql
-    await this.db.save(
-      TaonProject.from({
-        location: '/tmp',
-        serviceId: 'angular dev server',
-      }),
-    );
-    //#endregion
-  }
-  //#endregion
-}
+class TaonProjectsController extends BaseCliWorkerController {}
 //#endregion
 
 //#region ports context
