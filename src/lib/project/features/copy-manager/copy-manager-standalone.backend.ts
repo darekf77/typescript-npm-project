@@ -933,9 +933,9 @@ export * from './source';
       );
       // if (Helpers.exists(dest)) {
       // console.log(dest);
-      const content = Helpers.readFile(source);
+      const sourceContent = Helpers.readFile(source);
 
-      Helpers.writeFile(source, this.dtsFixer.forBackendContent(content));
+      Helpers.writeFile(dest, this.dtsFixer.forBackendContent(sourceContent));
       // }
     }
   }

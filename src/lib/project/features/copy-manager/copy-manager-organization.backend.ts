@@ -1316,7 +1316,9 @@ export * from './lib';
       // })
       // if (Helpers.exists(dest)) {
       // console.log(dest)
-      Helpers.copyFile(source, dest);
+      const sourceContent = Helpers.readFile(source);
+
+      Helpers.writeFile(dest, this.dtsFixer.forBackendContent(sourceContent));
       // }
     }
   }
