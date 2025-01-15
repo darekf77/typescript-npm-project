@@ -76,6 +76,7 @@ var TaonProjectsContext = Taon.createContext(() => ({
   contexts: { BaseContext },
   controllers: { TaonProjectsController },
   entities: { TaonProject },
+  skipWritingServerRoutes: true,
   //#region @backend
   database: {
     location: taonProjectsWorkerDatabaseLocation,
