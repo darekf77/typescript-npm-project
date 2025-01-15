@@ -1,5 +1,11 @@
 //#region @backend
-import { CoreModels, _, crossPlatformPath, path } from 'tnp-core/src';
+import {
+  CoreModels,
+  UtilsTerminal,
+  _,
+  crossPlatformPath,
+  path,
+} from 'tnp-core/src';
 import { Helpers } from 'tnp-helpers/src';
 import { BaseCommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
@@ -9,7 +15,7 @@ import { config } from 'tnp-config/src';
 
 export class $Init extends BaseCommandLineFeature<InitOptions, Project> {
   protected async __initialize__() {
-    this.__askForWhenEmpty();
+    await this.__askForWhenEmpty();
     this._tryResolveChildIfInsideArg();
     this.params = InitOptions.from(this.params);
   }
@@ -85,12 +91,15 @@ export class $Init extends BaseCommandLineFeature<InitOptions, Project> {
       let smart = false;
       let monorepo = false;
       if (responseProjectType === 'container') {
-        smart = await Helpers.consoleGui.question.yesNo(
-          'Do you wanna use smart container for organization project ?',
-        );
-        monorepo = await Helpers.consoleGui.question.yesNo(
-          'Do you want your container to be monorepo ?',
-        );
+        smart = await UtilsTerminal.confirm({
+          message:
+            'Do you wanna use smart container for organization project ?',
+          defaultValue: false,
+        });
+        monorepo = await UtilsTerminal.confirm({
+          message: 'Do you want your container to be monorepo ?',
+          defaultValue: false,
+        });
         Helpers.writeFile(
           [crossPlatformPath(this.cwd), config.file.package_json],
           {
