@@ -4247,7 +4247,13 @@ ${otherProjectNames
       //#endregion
 
       //#region create taon context for main lib code build ports assignations
-      const projectInfoPort = await this.assignFreePort(4100);
+      const projectInfoPort = await this.registerAndAssignPort(
+        `project-build-info`,
+        {
+          startFrom: 4100,
+        },
+      );
+
       this.__setProjectInfoPort(projectInfoPort);
       this.backendPort = PortUtils.instance(
         this.projectInfoPort,
@@ -4282,6 +4288,7 @@ ${otherProjectNames
           contexts: { BaseContext },
           controllers: { BuildProcessController },
           entities: { BuildProcess },
+          skipWritingServerRoutes: true,
           logs: false,
           database: {
             autoSave: false, // skip creationg db file
@@ -4367,6 +4374,7 @@ ${otherProjectNames
             contexts: { BaseContext },
             controllers: { BuildProcessController },
             entities: { BuildProcess },
+            skipWritingServerRoutes: true,
             logs: false,
             database: {
               autoSave: false, // probably not needed here
@@ -5630,8 +5638,11 @@ ${config.frameworkName} start
     }
 
     if (!_.isNumber(portAssignedToAppBuild) || !portAssignedToAppBuild) {
-      portAssignedToAppBuild = await this.assignFreePort(
-        DEFAULT_PORT.APP_BUILD_LOCALHOST,
+      portAssignedToAppBuild = await this.registerAndAssignPort(
+        `build ng app (${buildOptions.websql ? 'websql' : 'normal'})`,
+        {
+          startFrom: DEFAULT_PORT.APP_BUILD_LOCALHOST,
+        },
       );
     }
 
@@ -6267,7 +6278,7 @@ ${config.frameworkName} start
     this.quickFixes.addMissingSrcFolderToEachProject();
 
     this.quickFixes.removeBadTypesInNodeModules();
-    if(this.__isStandaloneProject) {
+    if (this.__isStandaloneProject) {
       await this.migrationHelper.runTask({
         watch,
       });

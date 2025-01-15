@@ -257,7 +257,12 @@ export class Docs extends BaseDebounceCompilerForProject<
         });
 
       if (this.initalParams.docsOutFolder) {
-        const portForDocs = await this.project.assignFreePort(3950);
+        const portForDocs = await this.project.registerAndAssignPort(
+          ('docs port for http server'),
+          {
+            startFrom: 3950,
+          },
+        );
         await UtilsHttp.startHttpServer(this.outDocsDistFolderAbs, portForDocs);
       }
     }
@@ -450,7 +455,12 @@ markdown_extensions:
       process.platform === 'darwin' ? 'mkdocs' : 'python3 -m mkdocs',
     );
     if (watch) {
-      this.mkdocsServePort = await this.project.assignFreePort(3900);
+      this.mkdocsServePort = await this.project.registerAndAssignPort(
+        'mkdocs serve',
+        {
+          startFrom: 3900,
+        },
+      );
       // python3 -m
       Helpers.run(
         process.platform === 'darwin'
