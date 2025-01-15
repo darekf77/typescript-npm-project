@@ -911,9 +911,10 @@ export * from './source';
 
   //#region update backend full dts files
   updateBackendFullDtsFiles(destinationOrDist: Project | string) {
-    const base = crossPlatformPath(
-      path.join(this.project.location, `${this.buildOptions.outDir}-nocutsrc`),
-    );
+    const base = crossPlatformPath([
+      this.project.location,
+      `${this.buildOptions.outDir}-nocutsrc`,
+    ]);
 
     const filesToUpdate = Helpers.filesFrom(base, true)
       .filter(f => f.endsWith('.d.ts'))
@@ -931,8 +932,10 @@ export * from './source';
         ),
       );
       // if (Helpers.exists(dest)) {
-      // console.log(dest)
-      Helpers.copyFile(source, dest);
+      // console.log(dest);
+      const content = Helpers.readFile(source);
+
+      Helpers.writeFile(source, this.dtsFixer.forBackendContent(content));
       // }
     }
   }

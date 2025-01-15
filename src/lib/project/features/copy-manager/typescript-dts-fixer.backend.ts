@@ -25,6 +25,30 @@ export class TypescriptDtsFixer {
 
   //#region helpers / fix dts import
 
+  forBackendContent(content: string) {
+    content = content ? content : '';
+    const isomorphicPackages = this.isomorphicPackages;
+    for (let index = 0; index < isomorphicPackages.length; index++) {
+      const isomorphicPackageName = isomorphicPackages[index];
+      content = (content || '').replace(
+        new RegExp(
+          Helpers.escapeStringForRegEx(`${isomorphicPackageName}/src'`),
+          'g',
+        ),
+        `${isomorphicPackageName}'`,
+      );
+
+      content = (content || '').replace(
+        new RegExp(
+          Helpers.escapeStringForRegEx(`${isomorphicPackageName}/src"`),
+          'g',
+        ),
+        `${isomorphicPackageName}"`,
+      );
+    }
+    return content;
+  }
+
   forContent(content: string, browserFolder: 'browser' | 'websql' | string) {
     content = content ? content : '';
 
