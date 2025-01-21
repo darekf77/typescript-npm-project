@@ -1,92 +1,11 @@
-//#region imports
-import { BaseCliWorker, CfontAlign, CfontStyle } from 'tnp-helpers/src';
-import {
-  _,
-  crossPlatformPath,
-  //#region @backend
-  fse,
-  os,
-  path,
-  Utils,
-  //#endregion
-} from 'tnp-core/src';
-import { BaseContext, Taon } from 'taon/src';
-import { Helpers } from 'tnp-helpers/src';
-// import type { BaseProject } from './base-project';
-// import { config } from 'tnp-config/src';
-import { BaseCliWorkerController } from 'tnp-helpers/src';
-import { config } from 'tnp-config/src';
-import type { TaonProjectResolve } from './project';
-
-//#endregion
-
-//#region port entity
-@Taon.Entity({
-  className: 'TaonProject',
-})
-class TaonProject extends Taon.Base.AbstractEntity {
-  static from(opt: Omit<TaonProject, 'id' | 'version' | '_' | 'clone'>) {
-    return _.merge(new TaonProject(), opt);
-  }
-
-  //#region port entity / columns /  serviceId
-  //#region @websql
-  @Taon.Orm.Column.Custom({
-    type: 'varchar',
-    length: 150,
-    unique: true,
-  })
-  //#endregion
-  location: string;
-  //#endregion
-
-  //#region port entity / columns /  serviceId
-  //#region @websql
-  @Taon.Orm.Column.Custom({
-    type: 'varchar',
-    length: 150,
-  })
-  //#endregion
-  serviceId: string;
-  //#endregion
-}
-//#endregion
-
-//#region ports controller
-@Taon.Controller({
-  className: 'TaonProjectsController',
-})
-class TaonProjectsController extends BaseCliWorkerController {}
-//#endregion
-
-//#region ports context
-
 //#region @backend
-const taonProjectsWorkerDatabaseLocation = crossPlatformPath([
-  os.userInfo().homedir,
-  `.taon/databases-for-services/taon-projects-worker.sqlite`,
-]);
-if (!Helpers.exists(path.dirname(taonProjectsWorkerDatabaseLocation))) {
-  Helpers.mkdirp(path.dirname(taonProjectsWorkerDatabaseLocation));
-}
+import { fse, UtilsTerminal } from 'tnp-core/src';
 //#endregion
-
-var TaonProjectsContext = Taon.createContext(() => ({
-  contextName: 'TaonProjectsContext',
-  contexts: { BaseContext },
-  controllers: { TaonProjectsController },
-  entities: { TaonProject },
-  skipWritingServerRoutes: true,
-  //#region @backend
-  database: {
-    location: taonProjectsWorkerDatabaseLocation,
-  },
-  //#endregion
-  logs: {
-    // framework: true,
-  },
-}));
-//#endregion
+import { BaseCliWorker, Helpers } from 'tnp-helpers/src';
+import { TaonProjectResolve } from '../project';
+import { TaonProjectsController } from './taon.controller';
+import { TaonProjectsContext } from './taon.context';
+import { config } from 'tnp-config/src';
 
 export class TaonProjectsWorker extends BaseCliWorker {
   //#region constructor
@@ -131,6 +50,10 @@ export class TaonProjectsWorker extends BaseCliWorker {
     healthCheckRequestTrys?: number;
   }) {
     //#region @backendFunc
+    await this.ins.portsWorker.startDetachedIfNeedsToBeStarted({
+      useCurrentWindowForDetach: true,
+    });
+
     options = options || {};
     await this.preventStartIfAlreadyStarted();
     const port = await this.getServicePort();
@@ -143,7 +66,7 @@ export class TaonProjectsWorker extends BaseCliWorker {
 
     Helpers.info(`Service started !`);
     this.preventExternalConfigChange();
-    await this._infoScreen();
+    await this.infoScreen();
     //#endregion
   }
   //#endregion
@@ -175,6 +98,36 @@ export class TaonProjectsWorker extends BaseCliWorker {
         resolve();
       });
     });
+    //#endregion
+  }
+  //#endregion
+
+  //#region methods / get worker terminal actions
+  getWorkerTerminalActions() {
+    //#region @backendFunc
+
+    return {
+      ...this.chooseAction,
+      previewPorts: {
+        name: 'Show Environments builds',
+        action: async () => {
+          console.log('hello world');
+          const ctrl = await this.getControllerForRemoteConnection();
+          const list = (await ctrl.getEnvironments().received)?.body.json || [];
+          await UtilsTerminal.previewLongList(
+            list.map(s => `${s.name} ${s.type}`),
+          );
+          await UtilsTerminal.pressAnyKeyToContinueAsync();
+        },
+      },
+      tcpUdPorts: {
+        name: 'Manage TCP/UDP ports',
+        action: async () => {
+          await this.ins.portsWorker.infoScreen({ exitIsOnlyReturn: true });
+        },
+      },
+      ...super.getWorkerTerminalActions({ chooseAction: false }),
+    };
     //#endregion
   }
   //#endregion

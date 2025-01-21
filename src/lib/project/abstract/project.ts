@@ -76,7 +76,7 @@ import { Git } from './git';
 import { Docs } from './docs';
 import { Vscode } from './vscode';
 import { QuickFixes } from './quick-fixes';
-import { TaonProjectsWorker } from './taon-worker';
+import { TaonProjectsWorker } from './taon-worker/taon.worker';
 import { MigrationHelper } from './migrations-helper';
 //#endregion
 

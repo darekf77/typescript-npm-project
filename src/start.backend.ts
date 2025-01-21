@@ -31,7 +31,7 @@ export async function start(
     _.isUndefined(argsv.find(a => a.startsWith('startCliService'))) // for workers
   ) {
     // console.log('starting projects workers...');
-    await ProjectClass.ins.portsWorker.startDetachedIfNeedsToBeStarted();
+
     await ProjectClass.ins.taonProjectsWorker.startDetachedIfNeedsToBeStarted();
   }
 
@@ -39,6 +39,9 @@ export async function start(
     ProjectClass: ProjectClass as any,
     functionsOrClasses: BaseStartConfig.prepareArgs(cliClassArr),
     argsv,
+    callbackNotRecognizedCommand: async options => {
+      await ProjectClass.ins.taonProjectsWorker.infoScreen();
+    },
     shortArgsReplaceConfig: {
       //#region short args replacement
       il: 'release:install:locally',
@@ -95,14 +98,14 @@ export async function start(
       td: 'test:debug',
       t: 'test',
       // migrations
-      'm': 'migration',
-      'mc': 'migration:create',
-      'mr': 'migration:run',
-      'mrun': 'migration:run',
-      'mrw': 'migration:revert',
-      'mrev': 'migration:revert',
-      'mrevert': 'migration:revert',
-      'mctxs': 'migration:contexts',
+      m: 'migration',
+      mc: 'migration:create',
+      mr: 'migration:run',
+      mrun: 'migration:run',
+      mrw: 'migration:revert',
+      mrev: 'migration:revert',
+      mrevert: 'migration:revert',
+      mctxs: 'migration:contexts',
       //#endregion
     },
   });
