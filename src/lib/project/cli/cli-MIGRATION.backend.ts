@@ -1,6 +1,7 @@
 //#region imports
 import {
   CoreModels,
+  Utils,
   UtilsMigrations,
   UtilsTerminal,
   _,
@@ -122,14 +123,14 @@ ${detectedContexts.map(db => `- ${db}`).join('\n')}
     return detectedDatabaseFiles;
   }
 
-  private _allDetectedContexts() {
+  private _allDetectedContexts(): string[] {
     const detectedContexts = [
       ...this._allDetectedNestedContexts(),
       ...this._allDetectedDatabases().map(f =>
         f.replace('.sqlite', '').replace('db-', ''),
       ),
     ];
-    return detectedContexts;
+    return Utils.uniqArray(detectedContexts);
   }
   //#endregion
 
