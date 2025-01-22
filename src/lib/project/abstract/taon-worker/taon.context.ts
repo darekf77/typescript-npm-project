@@ -31,6 +31,7 @@ export const TaonProjectsContext = Taon.createContext(() => ({
   //#region @backend
   database: {
     location: taonProjectsWorkerDatabaseLocation,
+    recreateMode: 'DROP_DB+MIGRATIONS',
   },
   //#endregion
   logs: {
