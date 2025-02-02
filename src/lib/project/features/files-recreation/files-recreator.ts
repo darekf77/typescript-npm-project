@@ -10,7 +10,7 @@ import { Models } from '../../../models';
 import { Helpers } from 'tnp-helpers/src';
 import { config } from 'tnp-config/src';
 import { BaseFeatureForProject } from 'tnp-helpers/src';
-import { InitOptions } from '../../../build-options';
+import { InitOptions } from '../../../options';
 import { Utils } from 'tnp-core/src';
 import { frameworkBuildFolders } from '../../../constants';
 
@@ -481,7 +481,6 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
                     s['files.exclude'][f.replace('.filetemplate', '')] = false;
                   });
 
-
                   ['index.js', 'index.d.ts', 'index.js.map'].forEach(
                     indexFile => {
                       s['files.exclude'][`**/${indexFile}`] = true;
@@ -781,13 +780,13 @@ ${this.project.__isCoreProject ? '' : '/.vscode/launch.json'}
   }
 
   commonFiles() {
-    const wokrspace = Project.by('container', this.project.__frameworkVersion);
+    const coreContainer = this.project.coreContainer;
 
     const files = [];
     files
       .map(file => {
         return {
-          from: path.join(wokrspace.location, file),
+          from: path.join(coreContainer.location, file),
           where: path.join(this.project.location, file),
         };
       })

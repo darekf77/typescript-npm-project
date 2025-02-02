@@ -39,9 +39,10 @@ export abstract class LibPorjectBase extends BaseFeatureForProject<Project> {
       realCurrentProj.__frameworkVersion,
     ]);
 
-    const coreContainters = allVersions.map(v =>
-      Project.by('container', v),
-    ) as Project[];
+    const coreContainters = [
+      this.project.coreContainer,
+      ...(allVersions.map(v => Project.by('container', v)) as Project[]),
+    ];
 
     const tnpProj = Project.ins.Tnp;
     const updateLocalTaonProjectWithOwnNodeModules =
@@ -70,7 +71,9 @@ export abstract class LibPorjectBase extends BaseFeatureForProject<Project> {
 
     for (const projToUpdate of projectForCodeUpdate) {
       await projToUpdate.__node_modules.updateFromReleaseDist(realCurrentProj);
-      Helpers.taskDone('Done updating core container: ' + projToUpdate.genericName);
+      Helpers.taskDone(
+        'Done updating core container: ' + projToUpdate.genericName,
+      );
     }
 
     //#endregion

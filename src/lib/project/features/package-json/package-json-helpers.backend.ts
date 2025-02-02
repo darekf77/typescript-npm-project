@@ -548,7 +548,7 @@ function beforeSaveAction(
     project.__frameworkVersionAtLeast('v2') &&
     !global.actionShowingDepsForContainer
   ) {
-    const projForVer = Project.by('container', project.__frameworkVersion);
+    const projForVer = project.coreContainer;
     if (projForVer) {
       global.actionShowingDepsForContainer = true;
       projForVer.__packageJson.reload();
@@ -794,7 +794,7 @@ function beforeSaveAction(
   const maxVersionForAngular = project.__trustedMaxMajorVersion;
 
   const versionForTagsPath = crossPlatformPath([
-    Project.by('container', project.__frameworkVersion).location,
+    project.coreContainer.location,
     `../../versions-cache.json`,
   ]);
   const versionForTags = Helpers.readJson(versionForTagsPath, {});
@@ -889,16 +889,21 @@ function beforeSaveAction(
     ) {
       const versionFromContainerName = `^${_.last(project.universalPackageName.split('-v'))}`;
       // console.log('versionFromContainerName', versionFromContainerName);
-      project.__packageJson.data.dependencies[config.frameworkNames.productionFrameworkName] =
-        versionFromContainerName;
+      project.__packageJson.data.dependencies[
+        config.frameworkNames.productionFrameworkName
+      ] = versionFromContainerName;
     }
 
     //#endregion
   }
 
   if (project.name === config.frameworkNames.developmentFrameworkName) {
-    delete project.__packageJson.data.dependencies[config.frameworkNames.developmentFrameworkName];
-    delete project.__packageJson.data.dependencies[config.frameworkNames.productionFrameworkName];
+    delete project.__packageJson.data.dependencies[
+      config.frameworkNames.developmentFrameworkName
+    ];
+    delete project.__packageJson.data.dependencies[
+      config.frameworkNames.productionFrameworkName
+    ];
   }
 
   _.keys(project.__packageJson.data.dependencies).forEach(depName => {

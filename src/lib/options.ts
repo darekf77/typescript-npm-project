@@ -203,13 +203,16 @@ export class BuildOptions extends BuildOptionsLibOrApp<BuildOptions> {
 //#endregion
 
 //#region release options
+/**
+ * @deprecated
+ */
 export class ReleaseOptions extends BuildOptionsLibOrApp<ReleaseOptions> {
   private constructor() {
     super();
     this.releaseType = 'patch';
     this.resolved = [];
   }
-  releaseType: CoreModels.ReleaseType;
+  releaseType: CoreModels.ReleaseVersionType;
   shouldReleaseLibrary: boolean;
   /**
    * build action only for specyfic framework version of prohect
@@ -240,13 +243,12 @@ export class ReleaseOptions extends BuildOptionsLibOrApp<ReleaseOptions> {
    * quick automatic release of docs app(s)
    */
   automaticReleaseDocs: boolean;
-  bumbVersionIn: string[];
   /**
    * @deprecated
    */
   specifiedVersion: string;
   /**
-   * release only trusted projects for specyfic container framework version
+   * release only trusted projects for specific container framework version
    */
   trusted: boolean;
   releaseTarget: 'lib' | 'app' | 'lib-app';

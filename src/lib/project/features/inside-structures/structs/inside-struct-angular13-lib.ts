@@ -7,7 +7,7 @@ import { config } from 'tnp-config/src';
 import { BaseInsideStruct } from './base-inside-struct';
 import { InsideStruct } from '../inside-struct';
 import { recreateApp, recreateIndex } from './inside-struct-helpers';
-import { InitOptions } from '../../../../build-options';
+import { InitOptions } from '../../../../options';
 //#endregion
 
 export class InsideStructAngular13Lib extends BaseInsideStruct {
@@ -83,10 +83,7 @@ export class InsideStructAngular13Lib extends BaseInsideStruct {
             config.file.package_json,
           );
 
-          const container = Project.by(
-            'container',
-            this.project.__frameworkVersion,
-          ) as Project;
+          const container = this.project.coreContainer;
 
           const json = Helpers.readJson(jsonPath) as Models.IPackageJSON;
 

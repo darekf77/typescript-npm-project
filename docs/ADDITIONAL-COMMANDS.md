@@ -1,3 +1,14 @@
+## Tnp start
+Combined **Angular app build** and **Isomorphic/library build**
+start everything *fast*.
+```bash
+tnp start
+tnp s
+
+tnp start --websql 
+tnp s --websql 
+```
+
 ## Tnp init
 Initialize all file structure (normally this process happen automatically
 in first order during: build, start, app commands )
@@ -7,6 +18,34 @@ tnp init # init current project
 tnp init:all # init current project and first level children
 tnp initall # alias init:all
 ```
+
+## Link
+```bash
+# - link local lib/cli development build as global cli tool
+# - link local repo cli as global cli tools
+tnp  link
+```
+
+## Install locally
+
+```bash
+# - install local vscode extension in system
+# - install electron app in system
+# - install and run local backend/frontend docker image
+tnp install:locally
+tnp il
+```
+
+
+## Running nodejs backend app 
+Usually you **don't** use this command for development 
+
+-> **debugger** from Visual Studio Code is for this 
+(F5 on keyboard, Task "Debug/Start Server"). 
+```bash
+tnp run
+```
+
 
 ## Tnp extension for Visual Studio Code 
  Install essential vscode plugins from project workspace recommended

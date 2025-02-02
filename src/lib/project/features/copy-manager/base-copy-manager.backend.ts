@@ -10,7 +10,7 @@ import { CopyMangerHelpers } from './copy-manager-helpers.backend';
 import { IncCompiler } from 'incremental-compiler/src';
 import { Log } from 'ng2-logger/src';
 import { SourceMappingUrl } from './source-maping-url.backend';
-import { BuildOptions } from '../../../build-options';
+import { BuildOptions } from '../../../options';
 import { Helpers } from 'tnp-helpers/src';
 import { TO_REMOVE_TAG } from '../../../constants';
 
@@ -33,10 +33,7 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
   //#region getters & methods / select all project to copy to
   protected async selectAllProjectCopyto() {
     //#region  @backendFunc
-    const containerCoreProj = Project.by(
-      'container',
-      this.project.__frameworkVersion,
-    ) as Project;
+    const containerCoreProj = this.project.coreContainer;
 
     const independentProjects = [containerCoreProj];
 
@@ -125,6 +122,30 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
           ]
         : []),
     ];
+
+    //#region fix when building project with core container from tnp
+    // add tnp project to copy
+    if (
+      config.frameworkNames.productionFrameworkName.includes(
+        config.frameworkName,
+      )
+    ) {
+      try {
+        const possibleTnpLocation = crossPlatformPath(
+          path.dirname(
+            fse.realpathSync(this.project.ins.Tnp.pathFor('source')),
+          ),
+        );
+        // console.log({
+        //   'possibleTnpLocation': possibleTnpLocation,
+        // })
+        const tnpProject = this.project.ins.From(possibleTnpLocation);
+        if (tnpProject) {
+          node_modules_projs.push(tnpProject);
+        }
+      } catch (error) {}
+    }
+    //#endregion
 
     if (Array.isArray(this.copyto) && this.copyto.length > 0) {
       result = [
@@ -415,7 +436,7 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
       Helpers.info(`[buildable-project] copying compiled code/assets to ${
         projectToCopyTo.length
       } other projects...
-${projectToCopyTo.map(proj => `- ${proj.genericName}`).join('\n')}
+${projectToCopyTo.map(proj => `- ${proj.location}`).join('\n')}
       `);
     }
 

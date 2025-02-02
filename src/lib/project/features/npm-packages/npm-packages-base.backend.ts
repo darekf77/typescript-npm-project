@@ -45,7 +45,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
       !this.project.__isSmartContainer &&
       !this.project.__isContainerCoreProject
     ) {
-      Helpers.log(`No need for package installation in normal containter`);
+      Helpers.log(`No need for package installation in normal container`);
       return;
     }
 
@@ -59,7 +59,9 @@ export class NpmPackagesBase extends NpmPackagesCore {
     }
     if (global.tnpNonInteractive) {
       PROGRESS_DATA.log({
-        msg: `${this.useLinkAsNodeModules ? 'SMART ' : ''}npm instalation for "${this.project.genericName}" started..`,
+        msg:
+          `${this.useLinkAsNodeModules ? 'SMART ' : ''} ` +
+          `npm installation for "${this.project.genericName}" started..`,
       });
     }
     options = fixOptionsNpmInstall(options, this.project);

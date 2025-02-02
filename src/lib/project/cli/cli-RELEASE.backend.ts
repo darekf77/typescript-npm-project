@@ -1,8 +1,8 @@
-import { CoreModels, _, UtilsTerminal, path } from 'tnp-core/src';
+import { CoreModels, _, UtilsTerminal, path, chalk } from 'tnp-core/src';
 import { Helpers } from 'tnp-helpers/src';
 import { BaseCommandLineFeature } from 'tnp-helpers/src';
 import { Project } from '../abstract/project';
-import { BuildOptions, ReleaseOptions } from '../../build-options';
+import { BuildOptions, ReleaseOptions } from '../../options';
 import { Models } from '../../models';
 import { config } from 'tnp-config/src';
 
@@ -46,17 +46,13 @@ class $Release extends BaseCommandLineFeature<ReleaseOptions, Project> {
 
   //#region _
   public async _() {
-    // switch (await this.chooseTaonReleaseType()) {
-    //   case 'npm library':
-
-    //     break;
-
-    //   default:
-    //     break;
-    // }
+    // await this.project.releaseProcess.displayReleaseProcessMenu();
     this.patch();
+    this._exit();
   }
   //#endregion
+
+  //#region old release functions
 
   //#region install:locally
   async installLocally() {
@@ -79,25 +75,25 @@ class $Release extends BaseCommandLineFeature<ReleaseOptions, Project> {
 
   //#region automatic release
   async auto() {
-    await this.startReleaseProcess('patch', true);
+    await this._startLibCliReleaseProcess('patch', true);
   }
   //#endregion
 
   //#region major
   async major() {
-    await this.startReleaseProcess('major');
+    await this._startLibCliReleaseProcess('major');
   }
   //#endregion
 
   //#region minor
   async minor() {
-    await this.startReleaseProcess('minor');
+    await this._startLibCliReleaseProcess('minor');
   }
   //#endregion
 
   //#region patch
   async patch() {
-    await this.startReleaseProcess('patch');
+    await this._startLibCliReleaseProcess('patch');
   }
   //#endregion
 
@@ -248,44 +244,18 @@ class $Release extends BaseCommandLineFeature<ReleaseOptions, Project> {
   }
   //#endregion
 
-  //#region choose taon release type
-  // TODO unify release
-  // async chooseTaonReleaseType() {
-  //   const releaseTypeOpt = {
-  //     'npm library': {
-  //       name: 'NPM',
-  //     },
-  //     'github-app': {
-  //       name: 'Gtihub pages webapp',
-  //     },
-  //     'local-cli': {
-  //       name: 'cli inside /local_release',
-  //     },
-  //     'local-vscode-exit': {
-  //       name: 'Vscode Ext. inside /local_release',
-  //     },
-  //   };
-  //   const releaseType = await UtilsTerminal.select<keyof typeof releaseTypeOpt>(
-  //     {
-  //       choices: releaseTypeOpt,
-  //       question: 'Choose release type',
-  //     },
-  //   );
-  //   return releaseType;
-  // }
-  //#endregion
-
   //#region start
-  private async startReleaseProcess(
-    npmReleaseType: CoreModels.ReleaseType = 'patch',
+  // TODO move this to release process separate class
+  private async _startLibCliReleaseProcess(
+    npmReleaseVersionType: CoreModels.ReleaseVersionType = 'patch',
     automaticRelease: boolean = false,
   ) {
     Helpers.clearConsole();
-    // const taonReleaseType = await this.chooseTaonReleaseType();
+    // const taonReleaseVersionType = await this.chooseTaonReleaseVersionType();
 
     const releaseOptions = ReleaseOptions.from({
       ...this.params,
-      releaseType: npmReleaseType,
+      releaseType: npmReleaseVersionType,
       automaticRelease,
       skipProjectProcess: true,
       finishCallback: () => {
@@ -368,6 +338,8 @@ ${project.children
     }
     //#endregion
   }
+  //#endregion
+
   //#endregion
 }
 

@@ -29,6 +29,45 @@ export class NodeModules extends BaseFeatureForProject<Project> {
     //   `Linking from core container ${coreContainer.name} ${this.project.genericName}`,
     // );
     await coreContainer.__node_modules.reinstallIfNeeded();
+
+    //#region respect other proper core container linked node_modules
+    if (
+      config.frameworkNames.productionFrameworkName.includes(
+        config.frameworkName,
+      )
+    ) {
+      try {
+        const realpathCCfromCurrentProj = fse.realpathSync(
+          this.project.__node_modules.path,
+        );
+        const pathCCfromCurrentProj = crossPlatformPath(
+          path.dirname(realpathCCfromCurrentProj),
+        );
+
+        const coreContainerFromNodeModules = this.project.ins.From(
+          pathCCfromCurrentProj,
+        );
+
+        const isCoreContainer =
+          coreContainerFromNodeModules?.__isCoreProject &&
+          coreContainerFromNodeModules?.__isContainer &&
+          coreContainerFromNodeModules.__frameworkVersionEquals(
+            this.project.__frameworkVersion,
+          );
+
+        // console.log({
+        //   realpathCCfromCurrentProj,
+        //   pathCCfromCurrentProj,
+        //   isCoreContainer,
+        // });
+
+        if (isCoreContainer) {
+          return;
+        }
+      } catch (error) {}
+    }
+    //#endregion
+
     try {
       fse.unlinkSync(this.project.__node_modules.path);
     } catch (error) {
