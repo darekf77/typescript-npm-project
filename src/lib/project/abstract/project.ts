@@ -593,6 +593,14 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   }
   //#endregion
 
+  //#region static / taon relative projects pathes
+  get tnpCurrentCoreContainer() {
+    return this.ins.From(
+      this.pathFor(`../taon/projects/container-${this.__frameworkVersion}`),
+    );
+  }
+  //#endregion
+
   //#region static / resolve core projects pathes
   private static resolveCoreProjectsPathes(
     version?: CoreModels.FrameworkVersion,
@@ -1045,6 +1053,7 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
   }
   //#endregion
 
+  // TODO @LAST group this into obj
   projectInfoPort: number;
   backendPort: number;
   standaloneNormalAppPort: number;
@@ -1930,11 +1939,13 @@ trim_trailing_whitespace = false
   }
   //#endregion
 
+  //#region getters & methods / uses its own node_modules
   get usesItsOwnNodeModules() {
     //#region @backendFunc
     return this.__packageJson.usesItsOwnNodeModules;
     //#endregion
   }
+  //#endregion
 
   //#region getters & methods / is tnp
   /**
@@ -4569,6 +4580,8 @@ ${config.frameworkName} start
     parent: ${this.parent?.name}
     grandpa: ${this.grandpa?.name}
     children: ${this.children.length}
+    core container location: ${this.coreContainer?.location}
+    core project location: ${this.coreProject?.location}
 
     isStandaloneProject: ${this.__isStandaloneProject}
     isCoreProject: ${this.__isCoreProject}

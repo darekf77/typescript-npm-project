@@ -118,10 +118,22 @@ export abstract class BaseCopyManger extends BaseCompilerForProject<
                     Project.by('container', v),
                   ),
                 ]
-              : [this.project.coreContainer]),
+              : []),
+            ...[
+              this.project.coreContainer,
+              this.project.tnpCurrentCoreContainer,
+            ],
           ]
         : []),
     ];
+
+    // Helpers.info(
+    //   `this.project.tnpCurrentCoreContainer ${!!this.project.tnpCurrentCoreContainer}`,
+    // );
+
+    // Helpers.info(
+    //   `this.project.tnpCurrentCoreContainer.location: ${this.project.tnpCurrentCoreContainer.location}`,
+    // );
 
     //#region fix when building project with core container from tnp
     // add tnp project to copy

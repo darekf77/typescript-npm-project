@@ -359,9 +359,7 @@
   },
   "license": "MIT",
   "private": false,
-  "devDependencies": {},
-  "main": "dist/app.electron.js",
-  "dependencies": {
+  "devDependencies": {
     "@angular-builders/custom-webpack": "~18.0.0",
     "@angular-devkit/build-angular": "~18.1.4",
     "@angular-devkit/core": "~18.1.4",
@@ -531,7 +529,6 @@
     "inquirer-select-pro": "1.0.0-alpha.7",
     "inquirer-toggle": "1.0.1",
     "is-elevated": "3.0.0",
-    "isomorphic-region-loader": "~18.0.19",
     "istanbul-instrumenter-loader": "3.0.1",
     "jest": "29.7.0",
     "jest-date-mock": "1.0.10",
@@ -554,7 +551,6 @@
     "lodash": "4.17.21",
     "lodash-walk-object": "~18.0.19",
     "lowdb": "7.0.1",
-    "magic-renamer": "~18.0.19",
     "material-design-icons": "3.0.1",
     "method-override": "2.3.10",
     "minimist": "1.2.8",
@@ -590,8 +586,6 @@
     "npm-get-dependents": "1.0.1",
     "npm-run": "4.1.2",
     "omelette": "0.4.17",
-    "open": "7.2.1",
-    "ora": "3.4.0",
     "passport": "0.7.0",
     "passport-http-bearer": "1.0.1",
     "password-hash": "1.2.2",
@@ -606,7 +600,6 @@
     "primeflex": "3.3.1",
     "primeicons": "7.0.0",
     "primeng": "17.18.8",
-    "progress": "2.0.3",
     "prompts": "2.4.2",
     "ps-list": "6.1.0",
     "ps-node": "0.1.6",
@@ -633,11 +626,13 @@
     "supertest": "7.0.0",
     "sweetalert2": "11.7.32",
     "systeminformation": "3.45.7",
+    "taon": "^18",
     "taon-storage": "18.0.28",
     "taon-type-sql": "18.0.19",
     "taon-typeorm": "18.0.18",
     "task.js": "0.1.5",
     "threads": "1.7.0",
+    "tnp": "~18.0.24",
     "tnp-config": "~18.0.21",
     "tnp-core": "~18.0.46",
     "tnp-helpers": "~18.0.19",
@@ -669,5 +664,13 @@
     "webpack-dev-server": "~5.0.4",
     "yup": "1.3.3",
     "zone.js": "~0.13.0"
+  },
+  "main": "dist/app.electron.js",
+  "dependencies": {
+    "isomorphic-region-loader": "~18.0.19",
+    "magic-renamer": "~18.0.19",
+    "open": "7.2.1",
+    "ora": "3.4.0",
+    "progress": "2.0.3"
   }
 }

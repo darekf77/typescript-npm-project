@@ -30,6 +30,7 @@
     "**/index.js": true,
     "**/index.d.ts": true,
     "**/index.js.map": true,
+    "**/taon-config.schema.json": true,
     "**/webpack.config.js": true,
     "**/webpack.backend-dist-build.js": true,
     "**/run.js": true,
@@ -51,6 +52,9 @@
     "**/devDependencies.json": true,
     "**/package.json": true,
     "**/logo.svg": true,
+    ".firedev": true,
+    ".taon": true,
+    ".tnp": true,
     "**/*.filetemplate": true,
     "**/tsconfig.*": true,
     "**/tslint.*": true,
@@ -151,6 +155,12 @@
         "/docs-config.jsonc"
       ],
       "url": "./docs-config.schema.json"
+    },
+    {
+      "fileMatch": [
+        "/taon.jsonc"
+      ],
+      "url": "./taon-config.schema.json"
     }
   ]
 }
