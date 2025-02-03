@@ -29,7 +29,7 @@ export class NpmPackagesBase extends NpmPackagesCore {
       return true;
     }
 
-    if (this.project.__isTnp) {
+    if (this.project.usesItsOwnNodeModules) {
       return false;
     }
 

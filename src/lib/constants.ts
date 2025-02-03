@@ -52,6 +52,7 @@ export const argsToClear = [
 ];
 
 export const folder_shared_folder_info = 'shared_folder_info.txt';
+export const taonConfigSchemaJson = 'taon-config.schema.json'
 
 export const TEMP_DOCS = 'tmp-documentation';
 

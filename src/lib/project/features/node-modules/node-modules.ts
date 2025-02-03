@@ -191,34 +191,6 @@ export class NodeModules extends BaseFeatureForProject<Project> {
     //#endregion
   }
 
-  get fixesForNodeModulesPackages() {
-    //#region @backendFunc
-    // const notAllowedNames = [
-    //   'plugins',
-    //   'scripts',
-    //   'projects',
-    //   'examples',
-    //   'src',
-    //   'components',
-    //   'solutions',
-    // ]
-
-    const patterns = this.project.__packageJson.data.tnp.overrided['npmFixes'];
-    return patterns || [];
-    // return this.project
-    //   .getFolders()
-    //   .filter(f => {
-    //     return !this.project.children.map(c => c.name).includes(path.basename(f)) &&
-    //       !Helpers.values(config.tempFolders).includes(path.basename(f));
-    //   })
-    //   .map( f => crossPlatformPath(f) )
-    //   .map(f => f.replace(this.project.location, '').replace(/^\//, ''))
-    //   .filter(f => f.search('\/') === -1)
-    //   .filter(f => !notAllowedNames.includes(f))
-    //   ;
-    //#endregion
-  }
-
   get path(): string {
     //#region @backendFunc
     return crossPlatformPath(

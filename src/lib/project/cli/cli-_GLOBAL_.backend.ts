@@ -49,6 +49,7 @@ import { walk } from 'lodash-walk-object/src';
 import { createGenerator, SchemaGenerator } from 'ts-json-schema-generator';
 import { UtilsTerminal } from 'tnp-core/src';
 import { BuildOptions } from '../../options';
+import { taonConfigSchemaJson } from '../../constants';
 
 declare const ENV: any;
 //#endregion
@@ -1780,6 +1781,9 @@ ${this.project.children
   //#region json schema docs watcher
   async jsonSchemaDocsWatch() {
     await this.project.init('initing before json schema docs watch');
+    if (this.project.name !== 'tnp') {
+      Helpers.error(`This command is only for tnp project`, false, true);
+    }
     const fileToWatchRelative = 'src/lib/models.ts';
     const fileToWatch = this.project.pathFor(fileToWatchRelative);
 
@@ -1792,6 +1796,36 @@ ${this.project.children
       Helpers.writeFile(this.project.docs.docsConfigSchemaPath, schema);
       Helpers.info(
         `DocsConfig schema updated ${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}`,
+      );
+    };
+
+    const debouceRecreate = _.debounce(recreate, 100);
+    Helpers.taskStarted('Recreating... src/lib/models.ts');
+    await recreate();
+    Helpers.taskDone('Recreation done src/lib/models.ts');
+    Helpers.taskStarted('Watching for changes in src/lib/models.ts');
+    chokidar.watch(fileToWatch).on('change', () => {
+      debouceRecreate();
+    });
+  }
+
+  async jsonSchemaTaonWatch() {
+    await this.project.init('initing before json schema docs watch');
+    if (this.project.name !== 'tnp') {
+      Helpers.error(`This command is only for tnp project`, false, true);
+    }
+    const fileToWatchRelative = 'src/lib/models.ts';
+    const fileToWatch = this.project.pathFor(fileToWatchRelative);
+
+    const recreate = async () => {
+      const schema = await this._createJsonSchemaFrom({
+        nameOfTypeOrInterface: 'Models.TaonConfig',
+        project: this.project,
+        relativePathToTsFile: fileToWatch,
+      });
+      Helpers.writeFile(this.project.coreProject.pathFor(taonConfigSchemaJson), schema);
+      Helpers.info(
+        `TaonConfig schema updated ${dateformat(new Date(), 'dd-mm-yyyy HH:MM:ss')}`,
       );
     };
 

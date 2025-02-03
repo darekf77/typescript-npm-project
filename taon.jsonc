@@ -1,6 +1,6 @@
 {
   "resources": [],
-
+  "usesItsOwnNodeModules": true,
   "overrided": {
     //#region dependencies only for tnp
     "dependencies": {

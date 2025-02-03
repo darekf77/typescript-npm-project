@@ -89,6 +89,10 @@ export class PackageJsonCore {
     return !!this.data.tnp?.monorepo;
   }
 
+  get usesItsOwnNodeModules(): boolean {
+    return !!this.data.tnp?.usesItsOwnNodeModules;
+  }
+
   get frameworks(): CoreModels.UIFramework[] {
     const res =
       this.data.tnp && _.isArray(this.data.tnp.frameworks)

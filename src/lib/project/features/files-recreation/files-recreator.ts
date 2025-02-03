@@ -12,7 +12,10 @@ import { config } from 'tnp-config/src';
 import { BaseFeatureForProject } from 'tnp-helpers/src';
 import { InitOptions } from '../../../options';
 import { Utils } from 'tnp-core/src';
-import { frameworkBuildFolders } from '../../../constants';
+import {
+  frameworkBuildFolders,
+  taonConfigSchemaJson,
+} from '../../../constants';
 
 // function getVscodeSettingsFrom(project: Project) {
 //   let settings: CoreModels.VSCodeSettings;
@@ -272,7 +275,7 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
               ? self.project.__projectSpecyficFiles()
               : [],
           )
-          .concat(self.project.__isTnp ? ['projects/tmp*'] : [])
+          .concat(['projects/tmp*'])
           .concat(['tsconfig.backend.dist.json']);
         // .concat(self.project.isContainer ? [
         //   ...(self.project.children.filter(c => c.git.isInsideGitRepo).map(c => c.name))
@@ -434,19 +437,14 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
                   s['files.exclude']['.vscodeignore'] = true;
                   s['files.exclude']['*.vsix'] = true;
                 }
-                if (project.__isTnp) {
-                  project.__node_modules.fixesForNodeModulesPackages.forEach(
-                    p => {
-                      s['files.exclude'][p] = true;
-                    },
-                  );
-                  // s['files.exclude']["*.js"] = true;
-                  // s['files.exclude']["environment.js"] = false;
-                  s['files.exclude']['*.sh'] = true;
-                  s['files.exclude']['*.xlsx'] = true;
-                  s['files.exclude']['scripts'] = true;
-                  // s['files.exclude']["bin"] = true;
-                }
+
+                // s['files.exclude']["*.js"] = true;
+                // s['files.exclude']["environment.js"] = false;
+                s['files.exclude']['*.sh'] = true;
+                s['files.exclude']['*.xlsx'] = true;
+                s['files.exclude']['scripts'] = true;
+                // s['files.exclude']["bin"] = true;
+
                 project.__projectLinkedFiles().forEach(({ relativePath }) => {
                   s['files.exclude'][relativePath] = true;
                 }),
@@ -474,6 +472,9 @@ export class FilesRecreator extends BaseFeatureForProject<Project> {
                   s['files.exclude']['**/.editorconfig'] = true;
                   s['files.exclude'][`**/${project.docs.docsConfigSchema}`] =
                     true;
+
+                  s['files.exclude'][`**/${taonConfigSchemaJson}`] = true;
+
                   Object.keys(project.lintFiles).forEach(f => {
                     s['files.exclude'][`**/${f}`] = true;
                   });
@@ -597,6 +598,7 @@ ${frameworkBuildFolders
   .map(c => `/${c}`)
   .join('\n')}
 /${this.project.docs.docsConfigSchema}
+/${taonConfigSchemaJson}
 /**/*._auto-generated_.ts
 /**/BUILD-INFO.md
 ${this.project.__linkedRepos.git.ignored()}
@@ -614,8 +616,8 @@ ${this.project.__isVscodeExtension ? '/out' : ''}
 ` +
       ignoredByGit +
       `
-${this.project.__isTnp || this.project.__isVscodeExtension ? '!tsconfig*' : ''}
-${this.project.__isTnp ? 'webpack.*' : ''}
+!tsconfig*
+!webpack.*
 ${
   this.project.linkedProjects.linkedProjects.length > 0 ||
   !!this.project.linkedProjects.linkedProjectsPrefix

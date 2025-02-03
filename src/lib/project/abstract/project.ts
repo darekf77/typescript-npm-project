@@ -31,6 +31,7 @@ import {
   DEFAULT_PORT,
   PortUtils,
   DEBUG_WORD,
+  taonConfigSchemaJson,
 } from '../../constants';
 import { RegionRemover } from 'isomorphic-region-loader/src';
 import { IncrementalBuildProcess } from '../../project/compilers/build-isomorphic-lib/compilations/incremental-build-process.backend';
@@ -953,6 +954,9 @@ export class Project extends BaseProject<Project, CoreModels.LibType> {
       return taonChildren;
     }
 
+    /**
+     * TODO QUICK_FIX
+     */
     if (this.__isTnp && !global.globalSystemToolMode) {
       return [];
     }
@@ -1926,6 +1930,12 @@ trim_trailing_whitespace = false
   }
   //#endregion
 
+  get usesItsOwnNodeModules() {
+    //#region @backendFunc
+    return this.__packageJson.usesItsOwnNodeModules;
+    //#endregion
+  }
+
   //#region getters & methods / is tnp
   /**
    * TODO make this more robust
@@ -2004,7 +2014,12 @@ trim_trailing_whitespace = false
   //#region getters & methods / project specify files
   __projectSpecyficFiles() {
     //#region @backendFunc
-    let files = ['index.js', 'index.d.ts', 'index.js.map'];
+    let files = [
+      'index.js',
+      'index.d.ts',
+      'index.js.map',
+      taonConfigSchemaJson,
+    ];
 
     if (this.__isSmartContainer) {
       return [
@@ -2019,7 +2034,7 @@ trim_trailing_whitespace = false
     }
 
     if (this.__isVscodeExtension) {
-      return [
+      files = [
         '.vscode/tasks.json',
         '.vscode/launch.json',
         '.vscodeignore',
@@ -2029,26 +2044,26 @@ trim_trailing_whitespace = false
         ...this.__projectSpecyficFilesLinked(),
         ...this.__recreateIfNotExists(),
       ];
-    }
+    } else {
+      if (this.typeIs('isomorphic-lib')) {
+        files = files
+          .concat([
+            'tsconfig.browser.json',
+            'webpack.config.js',
+            'webpack.backend-dist-build.js',
+            'run.js',
+            'run-org.js',
+            ...this.__filesTemplates(),
+          ])
+          .concat(!this.__isStandaloneProject ? ['src/typings.d.ts'] : []);
 
-    if (this.typeIs('isomorphic-lib')) {
-      files = files
-        .concat([
-          'tsconfig.browser.json',
-          'webpack.config.js',
-          'webpack.backend-dist-build.js',
-          'run.js',
-          'run-org.js',
-          ...this.__filesTemplates(),
-        ])
-        .concat(!this.__isStandaloneProject ? ['src/typings.d.ts'] : []);
+        if (this.__frameworkVersionAtLeast('v2')) {
+          files = files.filter(f => f !== 'tsconfig.browser.json');
+        }
 
-      if (this.__frameworkVersionAtLeast('v2')) {
-        files = files.filter(f => f !== 'tsconfig.browser.json');
-      }
-
-      if (this.__frameworkVersionAtLeast('v3')) {
-        files = files.filter(f => !this.__ignoreInV3.includes(f));
+        if (this.__frameworkVersionAtLeast('v3')) {
+          files = files.filter(f => !this.__ignoreInV3.includes(f));
+        }
       }
     }
 
@@ -2122,7 +2137,6 @@ trim_trailing_whitespace = false
         config.file.tnpEnvironment_json,
         config.file._gitignore,
         config.file._npmignore,
-        config.file._npmrc,
         config.file._npmrc,
         'src.d.ts',
         ...this.__resources,
@@ -4548,6 +4562,7 @@ ${config.frameworkName} start
     name: ${this.name}
     basename: ${this.basename}
     has node_modules :${!this.npmHelpers.emptyNodeModules}
+    uses it own node_modules: ${this.usesItsOwnNodeModules}
     version: ${this.version}
     private: ${this.__packageJson?.isPrivate}
     monorepo: ${this.isMonorepo}
@@ -5417,7 +5432,7 @@ ${config.frameworkName} start
     if (!this.__packageJson.data) {
       return [];
     }
-    const isTnpOverridedDependency =
+    const overrideDeps =
       type === 'tnp_overrided_dependencies' &&
       this.__packageJson.data.tnp &&
       this.__packageJson.data.tnp.overrided &&
@@ -5426,7 +5441,7 @@ ${config.frameworkName} start
     let installType: CoreModels.InstalationType;
 
     let data: any;
-    if (isTnpOverridedDependency) {
+    if (overrideDeps) {
       data = this.__packageJson.data.tnp.overrided.dependencies;
     } else {
       data = this.__packageJson.data[type];

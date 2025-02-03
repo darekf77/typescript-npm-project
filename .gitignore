@@ -59,7 +59,7 @@ Thumbs.db
 /run-org.js
 /projects/tmp*
 !tsconfig*
-webpack.*
+!webpack.*'
 
 # =====================
 !taon.jsonc

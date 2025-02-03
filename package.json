@@ -1,6 +1,7 @@
 {
   "tnp": {
     "resources": [],
+    "usesItsOwnNodeModules": true,
     "overrided": {
       "dependencies": {
         "favicons": "~7.1.2"

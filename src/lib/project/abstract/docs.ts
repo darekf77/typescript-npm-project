@@ -200,7 +200,7 @@ export class Docs extends BaseDebounceCompilerForProject<
       this.project.pathFor(this.docsConfigSchema),
       { continueWhenExistedFolderDoesntExists: true },
     );
-    this.project.vsCodeHelpers.recreateJsonSchemaForDocs();
+    this.project.vsCodeHelpers.recreateJsonSchemas();
 
     this.linkDocsToGlobalContainer();
 

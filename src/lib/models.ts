@@ -263,9 +263,13 @@ export namespace Models {
   };
 
   export interface TnpData extends TnpIPackageJSONOverride {
+    /**
+     * for type-orm fork
+     */
     linkedRepos?: LinkedRepo[];
 
     /**
+     * @deprecated
      * worker plugins for cli
      *
      * workerPlugin: {
@@ -275,12 +279,22 @@ export namespace Models {
      */
     workerPlugins?: { [pathOrName in string]: string };
 
+    /**
+     * let project use it own node_modules instead linking
+     * them from core container
+     */
+    usesItsOwnNodeModules?: boolean;
+
     targetProjects: TargetProject[];
     /**
+     * @deprecated
      * framework available inside project/app
      */
     frameworks?: CoreModels.UIFramework[];
 
+    /**
+     * @deprecated
+     */
     additionalNpmNames: boolean;
     /**
      * only for container
@@ -288,11 +302,16 @@ export namespace Models {
     overrideCoreDeps?: boolean;
     /**
      * Easy way to skip browser compilation
+     * @deprecated
      */
     isCommandLineToolOnly?: boolean;
+    /**
+     * @deprecated
+     */
     isGlobalSystemTool?: boolean;
     /**
      * Only for isomorphic lib
+     * @deprecated
      * - if true => generate controllers.ts, entities.ts
      */
     useFramework: boolean;
@@ -363,6 +382,8 @@ export namespace Models {
   //#endregion
 
   //#region package.json @deprecated
+  export type TaonConfig = TnpData & TnpIPackageJSONOverride;
+
   /**
    * @deprecated use CoreModels.TaonJson
    */
@@ -382,8 +403,8 @@ export namespace Models {
     dependencies?: DependenciesFromPackageJsonStyle;
     peerDependencies?: DependenciesFromPackageJsonStyle;
     devDependencies?: DependenciesFromPackageJsonStyle;
-    tnp: TnpData & TnpIPackageJSONOverride;
-    taon: TnpData & TnpIPackageJSONOverride;
+    tnp: TaonConfig;
+    taon: TaonConfig;
   }
   /**
    * @deprecated
